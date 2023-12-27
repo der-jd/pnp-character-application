@@ -18,4 +18,4 @@ jobs:
       - checkout
       - run:
           name: hello world
-          command: "Hello World from CI/CD pipeline!"
+          command: echo "Hello World from CI/CD pipeline!"
