@@ -1,0 +1,21 @@
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@4.1
+
+
+workflows:
+  build-deploy:
+    jobs:
+      - my-first-job
+
+
+jobs:
+  my-first-job: # TODO
+    docker:
+      - image: cimg/base:2023.12
+    steps:
+      - checkout
+      - run:
+          name: hello world
+          command: "Hello World from CI/CD pipeline!"
