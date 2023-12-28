@@ -1,7 +1,3 @@
-config {
-    module = true # Enable module inspection
-}
-
 plugin "terraform" {
   enabled = true
   preset  = "recommended"
@@ -9,6 +5,6 @@ plugin "terraform" {
 
 plugin "aws" {
   enabled = true
-  version = "0.24.0"
+  version = "0.34.0"
   source  = "github.com/terraform-linters/tflint-ruleset-aws"
 }

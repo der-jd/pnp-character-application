@@ -1,32 +1,22 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.16"
-    }
-  }
-
-  required_version = ">= 1.2.0"
-}
-
-provider "aws" {
-  region  = "eu-central-1"
-}
-
+data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "frontend_bucket" {
-  bucket = "pnp-character-tool-frontend-${data.aws_caller_identity.current.account_id}"
+  bucket = "pnp-character-application-frontend-${data.aws_caller_identity.current.account_id}"
 
   force_destroy = true
 
   tags = {
-    Project = "pnp-character-tool"
-    Environment = "production"
+    project   = "pnp-character-application"
+    environment = "prod"
   }
 }
 
+variable "ads" {
+
+}
+
 resource "aws_s3_bucket_website_configuration" "static_website" {
-  bucket = aws_s3_bucket.frontend_bucket
+  bucket = aws_s3_bucket.frontend_bucket.bucket
 
   index_document {
     suffix = "index.html"
@@ -38,5 +28,5 @@ resource "aws_s3_bucket_website_configuration" "static_website" {
 }
 
 output "frontend_bucket_domain_name" {
-  value = aws_s3_bucket.static_site_bucket.website_endpoint
+  value = aws_s3_bucket_website_configuration.static_website.website_endpoint
 }

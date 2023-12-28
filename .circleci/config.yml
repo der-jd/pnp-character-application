@@ -1,21 +1,99 @@
 version: 2.1
 
 orbs:
-  aws-cli: circleci/aws-cli@4
+  aws-cli: circleci/aws-cli@5
+
+
+parameters:
+  delete-services:
+    description: If true, deletes the Terraform resources in AWS.
+    type: boolean
+    default: false
 
 
 workflows:
   build-deploy:
+    when:
+      not: << pipeline.parameters.delete-services >>
     jobs:
-      - my-first-job
+      - check-format-terraform-code
+      - lint-terraform-code
+      - deploy-frontend:
+          requires:
+            - check-format-terraform-code
+            - lint-terraform-code
+
+  delete-services:
+    when: << pipeline.parameters.delete-services >>
+    jobs:
+      - terraform-destroy
 
 
 jobs:
-  my-first-job: # TODO
+  check-format-terraform-code:
     docker:
-      - image: cimg/base:2023.12
+      - image: hashicorp/terraform:1.9
     steps:
       - checkout
       - run:
-          name: hello world
-          command: echo "Hello World from CI/CD pipeline!"
+          name: Install make
+          command: apk add make
+      - run:
+          name: Check format of Terraform code
+          command: make check-format-terraform
+
+  lint-terraform-code:
+    docker:
+      - image: cimg/base:2024.10
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+            make lint-init-terraform
+      - run:
+          name: Lint Terraform code
+          command: make lint-terraform
+
+  # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
+  deploy-frontend:
+    docker:
+      - image: hashicorp/terraform:1.9
+    steps:
+      - checkout
+      - aws-cli/setup:
+          role_arn: "$AWS_ROLE_ARN"
+      - run:
+          name: Terraform init
+          command: |
+           cd terraform
+           terraform init -input=false
+      - run:
+          name: Terraform plan
+          command: |
+            cd terraform
+            terraform plan -out tfapply
+      - run:
+          name: Terraform apply
+          command: |
+            cd terraform
+            terraform apply -auto-approve tfapply
+
+  terraform-destroy:
+    docker:
+      - image: hashicorp/terraform:1.9
+    steps:
+      - checkout
+      - aws-cli/setup:
+          role_arn: "$AWS_ROLE_ARN"
+      - run:
+          name: Terraform plan destroy
+          command: |
+            cd terraform
+            terraform plan -destroy -out tfdestroy
+      - run:
+          name: Terraform destroy
+          command: |
+            cd terraform
+            terraform apply -auto-approve tfdestroy
