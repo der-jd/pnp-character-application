@@ -4,10 +4,26 @@
 
 Serverless web application for character sheets of a custom Pen & Paper game.
 
+## Architecture
+
+![Architecture](architecture_simple.png "Architecture")
+
+## Local development setup
+
+- Install the following tools
+  - `aws-cli`
+  - `Terraform`
+  - [`tflint`](https://github.com/terraform-linters/tflint)
+  - `prettier`
+- Run `terraform init` in the `/terraform` working directory to initialize Terraform
+  - Rerun this command if a module or backend configuration for Terraform is set or changed. This will then reinitialize the working directory
+- Run `make tflint-init` to install the plugins defined in `.tflint.hcl`
+
 ## Tech stack
 
-- Infrastructure with AWS
-- Frontend: React with TS/JS
-- Character sheets in JSON
-- CI/CD pipeline with CircleCI
-- IaC with Terraform
+- [Amazon Web Services (AWS)](https://aws.amazon.com/) for the infrastructure
+- Frontend: [React](https://react.dev/) with TypeScript
+- [CircleCI](https://circleci.com/) for the CI/CD pipeline
+- [Terraform](https://www.terraform.io/) in combination with [Terraform Cloud](https://app.terraform.io/app) for infrastructure as code
+- [tflint](https://github.com/terraform-linters/tflint) as linter for Terraform
+- [prettier](https://github.com/prettier/prettier) as code formatting tool
