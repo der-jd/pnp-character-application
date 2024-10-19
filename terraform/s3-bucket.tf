@@ -6,13 +6,9 @@ resource "aws_s3_bucket" "frontend_bucket" {
   force_destroy = true
 
   tags = {
-    project   = "pnp-character-application"
+    project     = "pnp-character-application"
     environment = "prod"
   }
-}
-
-variable "ads" {
-
 }
 
 resource "aws_s3_bucket_website_configuration" "static_website" {
