@@ -21,7 +21,6 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = "S3-${aws_s3_bucket.frontend_bucket.id}"
     viewer_protocol_policy = "redirect-to-https"
-    default_ttl            = 3600
   }
 
   price_class = "PriceClass_100"
