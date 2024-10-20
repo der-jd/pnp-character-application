@@ -1,16 +1,11 @@
 // https://repost.aws/knowledge-center/cloudfront-serve-static-website
+// https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteEndpoints.html#WebsiteRestEndpointDiff
 
 resource "aws_cloudfront_distribution" "frontend_distribution" {
   origin {
-    domain_name = aws_s3_bucket_website_configuration.static_website.website_endpoint
-    origin_id   = "S3-${aws_s3_bucket.frontend_bucket.id}"
-
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
-    }
+    domain_name              = aws_s3_bucket_website_configuration.static_website.website_endpoint
+    origin_id                = "S3-${aws_s3_bucket.frontend_bucket.id}"
+    origin_access_control_id = aws_cloudfront_origin_access_control.frontend_oac
   }
 
   enabled             = true
@@ -36,6 +31,14 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   viewer_certificate {
     cloudfront_default_certificate = true
   }
+}
+
+resource "aws_cloudfront_origin_access_control" "frontend_oac" {
+  name                              = "frontend-oac"
+  description                       = "Origin Access Control for accessing S3 bucket securely"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 output "cloudfront_domain_name" {
