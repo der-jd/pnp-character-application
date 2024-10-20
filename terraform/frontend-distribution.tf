@@ -16,12 +16,12 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   default_root_object = "index.html"
 
   default_cache_behavior {
-    cache_policy_id = "pnp-application-frontend-caching-policy"
+    cache_policy_id        = "pnp-application-frontend-caching-policy"
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = "S3-${aws_s3_bucket.frontend_bucket.id}"
     viewer_protocol_policy = "redirect-to-https"
-    default_ttl = 3600
+    default_ttl            = 3600
   }
 
   price_class = "PriceClass_100"
