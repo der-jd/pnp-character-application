@@ -1,3 +1,5 @@
+// https://repost.aws/knowledge-center/cloudfront-serve-static-website
+
 resource "aws_cloudfront_distribution" "frontend_distribution" {
   origin {
     domain_name = aws_s3_bucket_website_configuration.static_website.website_endpoint
