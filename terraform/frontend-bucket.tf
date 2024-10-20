@@ -29,7 +29,7 @@ resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
         Effect   = "Allow"
         Resource = "${aws_s3_bucket.frontend_bucket.arn}/*"
         Principal = {
-          AWS = aws_cloudfront_origin_access_identity.oai.iam_arn
+          AWS = "arn:aws:iam::cloudfront:user/*"
         }
       }
     ]
