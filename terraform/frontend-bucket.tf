@@ -36,10 +36,6 @@ resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
   })
 }
 
-output "cloudfront_domain_name" {
-  value = aws_cloudfront_distribution.frontend_distribution.domain_name
-}
-
 output "frontend_bucket_domain_name" {
   value = aws_s3_bucket_website_configuration.static_website.website_endpoint
 }

@@ -48,3 +48,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
 resource "aws_cloudfront_origin_access_identity" "oai" {
   comment = "OAI for frontend S3 bucket"
 }
+
+output "cloudfront_domain_name" {
+  value = aws_cloudfront_distribution.frontend_distribution.domain_name
+}
