@@ -1,6 +1,6 @@
 resource "aws_cloudfront_distribution" "frontend_distribution" {
   origin {
-    domain_name = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
+    domain_name = aws_s3_bucket_website_configuration.static_website.website_endpoint
     origin_id   = "S3-${aws_s3_bucket.frontend_bucket.id}"
 
     s3_origin_config {
