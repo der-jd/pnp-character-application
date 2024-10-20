@@ -11,12 +11,13 @@ Serverless web application for character sheets of a custom Pen & Paper game.
 ## Local development setup
 
 - Install the following tools
-  - aws-cli
-  - Terraform
   - [tflint](https://github.com/terraform-linters/tflint)
+  - aws-cli (optional; only necessary for local AWS commands)
+  - Terraform (optional; only necessary for local TF commands)
+- Run `make lint-init-terraform` to install the plugins defined in `.tflint.hcl`
+- Run `terraform login` to generate an API key for the backend
 - Run `terraform init` in the `/terraform` working directory to initialize Terraform
   - Rerun this command if a module or backend configuration for Terraform is set or changed. This will then reinitialize the working directory
-- Run `make lint-init-terraform` to install the plugins defined in `.tflint.hcl`
 
 ## Tech stack
 
