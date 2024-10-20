@@ -25,11 +25,16 @@ resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = "s3:GetObject"
         Effect   = "Allow"
+        Action   = "s3:GetObject"
         Resource = "${aws_s3_bucket.frontend_bucket.arn}/*"
         Principal = {
-          AWS = "arn:aws:iam::cloudfront:user/*"
+          Service = "cloudfront.amazonaws.com"
+        }
+        Condition = {
+          StringEquals = {
+              "AWS:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.frontend-distribution.id}"
+          }
         }
       }
     ]
