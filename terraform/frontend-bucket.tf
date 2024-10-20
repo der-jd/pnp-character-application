@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "frontend_bucket" {
-  bucket = "pnp-character-application-frontend-${data.aws_caller_identity.current.account_id}"
+  bucket = "pnp-character-application-frontend"
 
   force_destroy = true
 }
