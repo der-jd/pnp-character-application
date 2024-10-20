@@ -2,6 +2,8 @@
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteEndpoints.html#WebsiteRestEndpointDiff
 
 resource "aws_cloudfront_distribution" "frontend_distribution" {
+  comment = "PnP application frontend"
+
   origin {
     domain_name              = aws_s3_bucket.frontend_bucket.bucket_domain_name
     origin_id                = "S3-${aws_s3_bucket.frontend_bucket.id}"
@@ -34,7 +36,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
 }
 
 resource "aws_cloudfront_origin_access_control" "frontend_oac" {
-  name                              = "frontend-oac"
+  name                              = "pnp-application-frontend-oac"
   description                       = "Origin Access Control for accessing S3 bucket securely"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
