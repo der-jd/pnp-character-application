@@ -5,7 +5,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   origin {
     domain_name              = aws_s3_bucket.frontend_bucket.bucket_domain_name
     origin_id                = "S3-${aws_s3_bucket.frontend_bucket.id}"
-    origin_access_control_id = aws_cloudfront_origin_access_control.frontend_oac
+    origin_access_control_id = aws_cloudfront_origin_access_control.frontend_oac.id
   }
 
   enabled             = true
