@@ -3,9 +3,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     domain_name = aws_s3_bucket_website_configuration.static_website.website_endpoint
     origin_id   = "S3-${aws_s3_bucket.frontend_bucket.id}"
 
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.oai.cloudfront_access_identity_path
-    }
+    origin_access_control_id = aws_cloudfront_origin_access_control.origin_access_control.id
   }
 
   enabled             = true
@@ -44,9 +42,11 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   }
 }
 
-# CloudFront Origin Access Identity (OAI) to restrict S3 bucket access to CloudFront
-resource "aws_cloudfront_origin_access_identity" "oai" {
-  comment = "OAI for frontend S3 bucket"
+resource "aws_cloudfront_origin_access_control" "origin_access_control" {
+  name                              = "s3-frontend-bucket"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 output "cloudfront_domain_name" {
