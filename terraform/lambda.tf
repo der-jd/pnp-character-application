@@ -4,7 +4,7 @@ resource "aws_lambda_function" "increase_skill_lambda" {
   runtime       = "nodejs20.x"
 
   role     = aws_iam_role.lambda_exec_role.arn
-  filename = "../backend/skill_calculation.zip"
+  filename = "../backend/dist/skill-calculation.zip"
 }
 
 resource "aws_iam_role" "lambda_exec_role" {

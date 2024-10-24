@@ -90,7 +90,7 @@ jobs:
             cd backend
             npm run zip
       - persist_to_workspace:
-          root: backend
+          root: backend/dist
           paths:
             - skill_calculation.zip
 
@@ -127,7 +127,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: backend
+          at: backend/dist
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
