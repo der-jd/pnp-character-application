@@ -89,6 +89,10 @@ jobs:
           command: |
             cd backend
             npm run zip
+      - persist_to_workspace:
+          root: backend/dist
+          paths:
+            - skill_calculation.zip
 
   check-format-terraform-code:
     docker:
@@ -122,6 +126,8 @@ jobs:
       - image: hashicorp/terraform:1.9
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
