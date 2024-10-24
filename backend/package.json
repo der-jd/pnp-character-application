@@ -6,7 +6,7 @@
     "format": "prettier . --write",
     "check-format": "prettier . --check",
     "lint": "eslint .",
-    "build": "npx tsc",
+    "build": "tsc",
     "zip": "cd dist && zip -r ../skill_calculation.zip *"
   },
   "devDependencies": {
