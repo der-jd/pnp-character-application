@@ -7,7 +7,7 @@
     "check-format": "prettier . --check",
     "lint": "eslint .",
     "build": "tsc",
-    "zip": "cd dist && zip -r skill-calculation.zip *"
+    "zip": "zip-all-lambdas.sh"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

@@ -92,7 +92,7 @@ jobs:
       - persist_to_workspace:
           root: backend/dist
           paths:
-            - skill-calculation.zip
+            - ./*
 
   check-format-terraform-code:
     docker:
