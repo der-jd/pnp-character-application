@@ -7,7 +7,7 @@
     "check-format": "prettier . --check",
     "lint": "eslint .",
     "build": "npx tsc",
-    "zip": "cd dist && zip -r skill_calculation.zip *"
+    "zip": "cd dist && zip -r ../skill_calculation.zip *"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
