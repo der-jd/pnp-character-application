@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "format": "prettier . --write",
+    "check-format": "prettier . --check",
     "build": "npx tsc",
     "zip": "cd dist && zip -r skill_calculation.zip *"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.145",
+    "prettier": "^3.3.3",
     "typescript": "^5.6.3"
   }
 }
