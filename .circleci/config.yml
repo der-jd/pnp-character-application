@@ -64,6 +64,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm install
+      - run:
           name: Compile code
           command: |
             cd backend
