@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const handler = (event: APIGatewayProxyEvent): APIGatewayProxyResult => {
-  // eslint-disable-line @typescript-eslint/no-unused-vars
   try {
     return {
       statusCode: 200,
