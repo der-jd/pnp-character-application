@@ -16,8 +16,8 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
   user_pool_id                         = aws_cognito_user_pool.pnp_user_pool.id
   allowed_oauth_flows                  = ["implicit"]
   allowed_oauth_scopes                 = ["email", "openid"]
-  callback_urls                        = [aws_cloudfront_distribution.frontend_distribution.domain_name]
-  logout_urls                          = ["${aws_cloudfront_distribution.frontend_distribution.domain_name}/logout"]
+  callback_urls                        = ["https://${aws_cloudfront_distribution.frontend_distribution.domain_name}"]
+  logout_urls                          = ["https://${aws_cloudfront_distribution.frontend_distribution.domain_name}/logout"]
   allowed_oauth_flows_user_pool_client = true
 }
 
