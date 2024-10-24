@@ -9,7 +9,9 @@ export const handler = (event: APIGatewayProxyEvent): APIGatewayProxyResult => {
     if (typeof number1 !== "number" || typeof number2 !== "number") {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: "Error: Please provide two valid numbers!" }),
+        body: JSON.stringify({
+          message: "Error: Please provide two valid numbers!",
+        }),
       };
     }
 
@@ -22,7 +24,10 @@ export const handler = (event: APIGatewayProxyEvent): APIGatewayProxyResult => {
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "An error occurred", error: (error as Error).message }),
+      body: JSON.stringify({
+        message: "An error occurred",
+        error: (error as Error).message,
+      }),
     };
   }
 };
