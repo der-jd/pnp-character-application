@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
-export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => { // TODO async probably useless --> remove
+export const handler = (event: APIGatewayProxyEvent): APIGatewayProxyResult => {
   try {
     const body = JSON.parse(event.body || "{}");
     const number1 = body.number1;
@@ -20,9 +20,9 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       body: JSON.stringify({ sum }),
     };
   } catch (error) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ message: "An error occurred", error: error.message }),
-      };
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "An error occurred", error: (error as Error).message }),
+    };
   }
 };
