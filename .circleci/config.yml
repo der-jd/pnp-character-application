@@ -16,17 +16,19 @@ workflows:
     when:
       not: << pipeline.parameters.delete-services >>
     jobs:
-      - check-format-terraform-code
-      - lint-terraform-code
-      - check-format
+      - check-format-backend-files
+      - lint-typescript-code
       - package-lambda-code:
           requires:
-            - check-format
+            - check-format-backend-files
+            - lint-typescript-code
+      - check-format-terraform-code
+      - lint-terraform-code
       - deploy:
           requires:
+            - package-lambda-code
             - check-format-terraform-code
             - lint-terraform-code
-            - package-lambda-code
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
@@ -35,6 +37,59 @@ workflows:
 
 
 jobs:
+  check-format-backend-files:
+    docker:
+      - image: cimg/node:22.10
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm install
+      - run:
+          name: Check file formatting
+          command: |
+            cd backend
+            npm run check-format
+
+  lint-typescript-code:
+    docker:
+      - image: cimg/node:22.10
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm install
+      - run:
+          name: Lint TypeScript code
+          command: |
+            cd backend
+            npm run lint
+
+  package-lambda-code:
+    docker:
+      - image: cimg/node:22.10
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm install
+      - run:
+          name: Compile code
+          command: |
+            cd backend
+            npm run build
+      - run:
+          name: Zip code
+          command: |
+            cd backend
+            npm run zip
+
   check-format-terraform-code:
     docker:
       - image: hashicorp/terraform:1.9
@@ -60,43 +115,6 @@ jobs:
       - run:
           name: Lint Terraform code
           command: make lint-terraform
-
-  check-format:
-    docker:
-      - image: cimg/node:22.10
-    steps:
-      - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            cd backend
-            npm install
-      - run:
-          name: Check file formatting
-          command: |
-            cd backend
-            npm run check-format
-
-  package-lambda-code:
-    docker:
-      - image: cimg/node:22.10
-    steps:
-      - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            cd backend
-            npm install
-      - run:
-          name: Compile code
-          command: |
-            cd backend
-            npm run build
-      - run:
-          name: Zip code
-          command: |
-            cd backend
-            npm run zip
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy:
