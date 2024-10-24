@@ -72,12 +72,12 @@ jobs:
           name: Compile code
           command: |
             cd backend
-            npx tsc
+            npm run build
       - run:
           name: Zip code
           command: |
-            cd backend/dist
-            zip -r skill_calculation.zip *
+            cd backend
+            npm run zip
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy:
