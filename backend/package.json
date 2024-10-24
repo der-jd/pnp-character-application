@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx tsc",
+    "zip": "cd dist && zip -r skill_calculation.zip *"
   },
   "devDependencies": {
-    "aws-lambda": "^1.0.7",
+    "@types/aws-lambda": "^8.10.145",
     "typescript": "^5.6.3"
   }
 }
