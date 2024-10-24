@@ -18,10 +18,10 @@ workflows:
     jobs:
       - check-format-terraform-code
       - lint-terraform-code
-      - check-format-typescript
+      - check-format
       - package-lambda-code:
           requires:
-            - check-format-typescript
+            - check-format
       - deploy:
           requires:
             - check-format-terraform-code
@@ -61,7 +61,7 @@ jobs:
           name: Lint Terraform code
           command: make lint-terraform
 
-  check-format-typescript:
+  check-format:
     docker:
       - image: cimg/node:22.10
     steps:
@@ -72,7 +72,7 @@ jobs:
             cd backend
             npm install
       - run:
-          name: Check format of TypeScript code
+          name: Check file formatting
           command: |
             cd backend
             npm run check-format
