@@ -7,8 +7,7 @@ export default [
     files: ["**/*.{js,mjs,cjs,ts}"],
   },
   {
-    files: ["**/*.js"],
-    languageOptions: { sourceType: "commonjs" },
+    ignores: ["node_modules/", "build/", "dist/"],
   },
   {
     languageOptions: { globals: globals.node },
