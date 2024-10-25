@@ -9,7 +9,7 @@ mkdir --parents dist
 for lambda in "${lambdas[@]}"
 do
   echo "Zipping $lambda..."
-  zip -r dist/$lambda.zip build/$lambda/*
+  zip -r -j dist/$lambda.zip build/$lambda/*
 done
 
 echo "All Lambda functions zipped!"
