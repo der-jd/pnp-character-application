@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "prepare": "husky",
+    "prepare": "cd .. && husky backend/.husky",
     "format": "prettier . --write",
     "check-format": "prettier . --check",
     "lint": "eslint .",
