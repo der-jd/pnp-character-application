@@ -43,6 +43,7 @@ resource "aws_cloudfront_origin_access_control" "frontend_oac" {
   signing_protocol                  = "sigv4"
 }
 
+// TODO register custom domain for cloudfront endpoint --> around 14 USD/Year
 output "cloudfront_domain_name" {
   value = aws_cloudfront_distribution.frontend_distribution.domain_name
 }
