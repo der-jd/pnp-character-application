@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
 export const handler = (event: APIGatewayProxyEvent): APIGatewayProxyResult => {
+  // TODO move logic into separate function --> enable unit tests
   try {
     const body = JSON.parse(event.body || "{}");
     const number1 = body.number1;
