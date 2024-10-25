@@ -88,6 +88,11 @@ jobs:
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
+          name: Terraform init
+          command: |
+            cd terraform
+            terraform init -input=false
+      - run:
           name: Terraform plan destroy
           command: |
             cd terraform
