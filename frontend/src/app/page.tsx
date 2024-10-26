@@ -12,7 +12,7 @@ export default function SplashScreen() {
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      router.push('/dashboard');
+      router.push('protected/dashboard');
     }
   }, [isAuthenticated, loading, router]);
 
@@ -25,7 +25,7 @@ export default function SplashScreen() {
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
       <div className="w-1/2 relative">
         <Image
           src="/images/splash-image.png"
@@ -41,12 +41,12 @@ export default function SplashScreen() {
             <Image src="/images/logo.png" alt="Logo" width={100} height={100} />
           </div>
           <h1 className="text-3xl font-bold text-center text-gray-900">Welcome to XXX</h1>
-          <p className="text-center text-gray-600">Your ultimate virtual character companion</p>
+          <p className="text-center text-gray-600">Your ultimate character management companion</p>
           <div className="space-y-4">
-            <Link href="/pages/signin" className="block w-full px-4 py-2 text-center text-white bg-blue-600 rounded-md hover:bg-blue-700">
+            <Link href="/auth/signin" className="block w-full px-4 py-2 text-center text-white bg-blue-600 rounded-md hover:bg-blue-700">
               Sign In
             </Link>
-            <Link href="/pages/signup" className="block w-full px-4 py-2 text-center text-blue-600 bg-white border border-blue-600 rounded-md hover:bg-blue-50">
+            <Link href="/auth/signup" className="block w-full px-4 py-2 text-center text-blue-600 bg-white border border-blue-600 rounded-md hover:bg-blue-50">
               Sign Up
             </Link>
           </div>

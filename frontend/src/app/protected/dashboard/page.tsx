@@ -4,11 +4,11 @@ import { withAuth } from '../../components/withAuth'
 
 function Dashboard() {
   return (
-    <div>
-      <h1>Welcome to your Dashboard</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-4">Welcome to your Dashboard</h1>
       {/* Add your dashboard content here */}
     </div>
   )
 }
 
-export default withAuth(Dashboard)
+export default Dashboard

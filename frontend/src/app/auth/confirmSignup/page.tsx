@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ConfirmSignUpCommand } from "@aws-sdk/client-cognito-identity-provider"
 import { cognitoClient, cognitoConfig } from '../../cognitoConfig'
+import { useAuth } from '../../context/AuthContext'
+
 
 export default function ConfirmSignUp() {
   const [code, setCode] = useState('')
@@ -12,6 +14,13 @@ export default function ConfirmSignUp() {
   const [error, setError] = useState('')
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { isAuthenticated } = useAuth()
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/protected/dashboard')
+    }
+  }, [isAuthenticated, router])
 
   useEffect(() => {
     const emailParam = searchParams.get('email')
@@ -33,7 +42,7 @@ export default function ConfirmSignUp() {
       await cognitoClient.send(command);
       
       console.log("User confirmed successfully");
-      router.push('/pages/signin')
+      router.push('/auth/signin')
     } catch (error) {
       setError('Failed to confirm sign up. Please try again.')
       console.error('Error confirming sign up:', error)

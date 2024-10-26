@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { SignUpCommand } from "@aws-sdk/client-cognito-identity-provider"
 import { cognitoClient, cognitoConfig } from '../../cognitoConfig'
+import { useAuth } from '../../context/AuthContext'
 
 export default function SignUp() {
   const [name, setName] = useState('')
@@ -13,6 +14,14 @@ export default function SignUp() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
+
+  const { isAuthenticated } = useAuth()
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/protected/dashboard')
+    }
+  }, [isAuthenticated, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,7 +48,7 @@ export default function SignUp() {
       
       if (response.UserSub) {
         console.log("User signed up successfully:", response.UserSub);
-        router.push('/pages/confirmSignup?email=' + encodeURIComponent(email))
+        router.push('/auth/confirmSignup?email=' + encodeURIComponent(email))
       } else {
         throw new Error("Sign up failed");
       }
