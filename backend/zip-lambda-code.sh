@@ -5,7 +5,12 @@ set -e
 
 build_dir="build"
 dist_dir="dist"
-lambdas=("another-lambda" "skill-calculation")
+
+# Gather the names of all subdirectories (Lambda functions) in the build_dir
+lambdas=()
+while IFS= read -r -d '' dir; do
+  lambdas+=("$(basename "$dir")")
+done < <(find "$build_dir" -mindepth 1 -maxdepth 1 -type d -print0)
 
 mkdir --parents $dist_dir
 
