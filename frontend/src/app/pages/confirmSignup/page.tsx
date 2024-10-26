@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ConfirmSignUpCommand } from "@aws-sdk/client-cognito-identity-provider"
-import { cognitoClient, CLIENT_ID } from '../../../cognitoConfig'
+import { cognitoClient, cognitoConfig } from '../../cognitoConfig'
 
 export default function ConfirmSignUp() {
   const [code, setCode] = useState('')
@@ -25,7 +25,7 @@ export default function ConfirmSignUp() {
     setError('')
     try {
       const command = new ConfirmSignUpCommand({
-        ClientId: CLIENT_ID,
+        ClientId: cognitoConfig.clientId,
         Username: email,
         ConfirmationCode: code,
       });
@@ -44,16 +44,17 @@ export default function ConfirmSignUp() {
     <div className="flex h-screen">
       <div className="w-1/2 relative">
         <Image
-          src="/confirm-signup-image.jpg"
+          src="/images/splash-image.png"
           alt="Confirm Sign Up Image"
           layout="fill"
           objectFit="cover"
+          priority
         />
       </div>
-      <div className="w-1/2 flex items-center justify-center bg-gray-100">
+      <div className="w-1/2 flex items-center justify-center bg-gray-100 overflow-y-auto">
         <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
           <div className="flex justify-center">
-            <Image src="/logo.png" alt="Logo" width={100} height={100} />
+            <Image src="/images/logo.png" alt="Logo" width={100} height={100} />
           </div>
           <h1 className="text-2xl font-bold text-center text-gray-900">Confirm Sign Up</h1>
           {error && <p className="text-red-500 text-center">{error}</p>}

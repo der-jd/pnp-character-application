@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { SignUpCommand } from "@aws-sdk/client-cognito-identity-provider"
-import { cognitoClient, CLIENT_ID } from '../../../cognitoConfig'
+import { cognitoClient, cognitoConfig } from '../../cognitoConfig'
 
 export default function SignUp() {
   const [name, setName] = useState('')
@@ -19,7 +19,7 @@ export default function SignUp() {
     setError('')
     try {
       const command = new SignUpCommand({
-        ClientId: CLIENT_ID,
+        ClientId: cognitoConfig.clientId,
         Username: email,
         Password: password,
         UserAttributes: [
@@ -52,16 +52,17 @@ export default function SignUp() {
     <div className="flex h-screen">
       <div className="w-1/2 relative">
         <Image
-          src="/signup-image.jpg"
+          src="/images/splash-image.png"
           alt="Sign Up Image"
           layout="fill"
           objectFit="cover"
+          priority
         />
       </div>
-      <div className="w-1/2 flex items-center justify-center bg-gray-100">
+      <div className="w-1/2 flex items-center justify-center bg-gray-100 overflow-y-auto">
         <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
           <div className="flex justify-center">
-            <Image src="/logo.png" alt="Logo" width={100} height={100} />
+            <Image src="/images/logo.png" alt="Logo" width={100} height={100} />
           </div>
           <h1 className="text-2xl font-bold text-center text-gray-900">Sign Up</h1>
           {error && <p className="text-red-500 text-center">{error}</p>}
@@ -118,7 +119,7 @@ export default function SignUp() {
             </div>
           </form>
           <div className="text-sm text-center">
-            <Link href="/signin" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link href="/pages/signin" className="font-medium text-blue-600 hover:text-blue-500">
               Already have an account? Sign In
             </Link>
           </div>
