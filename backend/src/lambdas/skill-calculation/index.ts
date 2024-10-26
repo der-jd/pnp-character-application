@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
 export const handler = (event: APIGatewayProxyEvent): APIGatewayProxyResult => {
   return calcSkillValue(event);
-}
+};
 
 function calcSkillValue(event: APIGatewayProxyEvent): APIGatewayProxyResult {
   try {
@@ -34,4 +34,4 @@ function calcSkillValue(event: APIGatewayProxyEvent): APIGatewayProxyResult {
       }),
     };
   }
-};
+}
