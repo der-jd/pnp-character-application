@@ -20,6 +20,9 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
   logout_urls                          = ["https://${aws_cloudfront_distribution.frontend_distribution.domain_name}/logout"]
   allowed_oauth_flows_user_pool_client = true
   explicit_auth_flows                  = ["ALLOW_CUSTOM_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH", "ALLOW_USER_SRP_AUTH"]
+  access_token_validity                = 12
+  id_token_validity                    = 12
+  refresh_token_validity               = 1
 
 }
 
@@ -34,12 +37,9 @@ resource "aws_cognito_identity_pool" "pnp_identity_pool" {
 }
 
 resource "aws_api_gateway_authorizer" "cognito_authorizer" {
-  rest_api_id            = aws_api_gateway_rest_api.pnp_rest_api.id
-  name                   = "CognitoAuthorizer"
-  type                   = "COGNITO_USER_POOLS"
-  identity_source        = "method.request.header.Authorization"
-  provider_arns          = [aws_cognito_user_pool.pnp_user_pool.arn]
-  access_token_validity  = "12"
-  id_token_validity      = "12"
-  refresh_token_validity = "1"
+  rest_api_id     = aws_api_gateway_rest_api.pnp_rest_api.id
+  name            = "CognitoAuthorizer"
+  type            = "COGNITO_USER_POOLS"
+  identity_source = "method.request.header.Authorization"
+  provider_arns   = [aws_cognito_user_pool.pnp_user_pool.arn]
 }
