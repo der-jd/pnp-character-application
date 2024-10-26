@@ -24,6 +24,12 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
   id_token_validity                    = 12
   refresh_token_validity               = 1
 
+  token_validity_units {
+    access_token  = "hours"
+    id_token      = "hours"
+    refresh_token = "days"
+  }
+
 }
 
 resource "aws_cognito_identity_pool" "pnp_identity_pool" {
