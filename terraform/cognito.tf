@@ -34,9 +34,12 @@ resource "aws_cognito_identity_pool" "pnp_identity_pool" {
 }
 
 resource "aws_api_gateway_authorizer" "cognito_authorizer" {
-  rest_api_id     = aws_api_gateway_rest_api.pnp_rest_api.id
-  name            = "CognitoAuthorizer"
-  type            = "COGNITO_USER_POOLS"
-  identity_source = "method.request.header.Authorization"
-  provider_arns   = [aws_cognito_user_pool.pnp_user_pool.arn]
+  rest_api_id            = aws_api_gateway_rest_api.pnp_rest_api.id
+  name                   = "CognitoAuthorizer"
+  type                   = "COGNITO_USER_POOLS"
+  identity_source        = "method.request.header.Authorization"
+  provider_arns          = [aws_cognito_user_pool.pnp_user_pool.arn]
+  access_token_validity  = "12"
+  id_token_validity      = "12"
+  refresh_token_validity = "1"
 }
