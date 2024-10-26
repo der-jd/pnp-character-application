@@ -1,9 +1,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
-export const handler = (event: APIGatewayProxyEvent): APIGatewayProxyResult => {
-  // TODO move logic into separate function --> enable unit tests
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  return calcSkillValue(event);
+};
+
+function calcSkillValue(event: APIGatewayProxyEvent): APIGatewayProxyResult {
   try {
-    const body = JSON.parse(event.body || "{}");
+    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
     const number1 = body.number1;
     const number2 = body.number2;
 
@@ -31,4 +34,4 @@ export const handler = (event: APIGatewayProxyEvent): APIGatewayProxyResult => {
       }),
     };
   }
-};
+}

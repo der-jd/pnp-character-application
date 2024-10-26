@@ -8,8 +8,8 @@
     "format": "prettier . --write",
     "check-format": "prettier . --check",
     "lint": "eslint .",
-    "build": "tsc",
-    "zip": "./zip-all-lambdas.sh"
+    "build": "tsc && ./rename-build-files.sh",
+    "zip": "./zip-lambda-code.sh"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
