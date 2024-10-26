@@ -8,7 +8,7 @@
     "format": "prettier . --write",
     "check-format": "prettier . --check",
     "lint": "eslint .",
-    "build": "tsc",
+    "build": "tsc && ./rename-build-files.sh",
     "zip": "./zip-lambda-code.sh"
   },
   "devDependencies": {
