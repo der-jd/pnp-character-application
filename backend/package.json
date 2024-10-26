@@ -11,9 +11,11 @@
     "build": "tsc",
     "zip": "./zip-all-lambdas.sh"
   },
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.145"
+  },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
-    "@types/aws-lambda": "^8.10.145",
     "eslint": "^9.13.0",
     "globals": "^15.11.0",
     "husky": "^9.1.6",
