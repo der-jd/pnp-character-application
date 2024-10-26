@@ -35,10 +35,11 @@ export default function SignUp() {
       });
 
       const response = await cognitoClient.send(command);
+      console.log(response)
       
       if (response.UserSub) {
         console.log("User signed up successfully:", response.UserSub);
-        router.push('/confirm-signup?email=' + encodeURIComponent(email))
+        router.push('/pages/confirmSignup?email=' + encodeURIComponent(email))
       } else {
         throw new Error("Sign up failed");
       }

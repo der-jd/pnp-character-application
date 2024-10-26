@@ -32,7 +32,7 @@ export default function SignIn() {
       
       if (response.AuthenticationResult?.IdToken) {
         setIsAuthenticated(true)
-        router.push('/dashboard')
+        router.push('/pages/dashboard')
       } else {
         throw new Error("Authentication failed");
       }

@@ -33,7 +33,7 @@ export default function ConfirmSignUp() {
       await cognitoClient.send(command);
       
       console.log("User confirmed successfully");
-      router.push('/signin')
+      router.push('/pages/signin')
     } catch (error) {
       setError('Failed to confirm sign up. Please try again.')
       console.error('Error confirming sign up:', error)
