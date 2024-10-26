@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Exit immediately if a command exits with a non-zero status
+# Exit immediately if a command exits with a non-zero status (relevant for the "for"-loop)
 set -e
 
 lambdas=("another-lambda" "skill-calculation")
