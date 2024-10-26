@@ -24,7 +24,7 @@ workflows:
             - lint-typescript-code
       - check-format-terraform-code
       - lint-terraform-code
-      - deploy:
+      - deploy-backend-and-infrastructure:
           requires:
             - package-lambda-code
             - check-format-terraform-code
@@ -121,7 +121,7 @@ jobs:
           command: make lint-terraform
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
-  deploy:
+  deploy-backend-and-infrastructure:
     docker:
       - image: hashicorp/terraform:1.9
     steps:
