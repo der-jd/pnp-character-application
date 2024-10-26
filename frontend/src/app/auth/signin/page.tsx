@@ -1,17 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider"
-import { cognitoClient, CLIENT_ID } from '../../../cognitoConfig'
+import { cognitoConfig,cognitoClient } from '../../cognitoConfig'
+import { useAuth } from '../../context/AuthContext'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
+  const { setIsAuthenticated, isAuthenticated, setAccessToken } = useAuth()
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/protected/dashboard')
+    }
+  }, [isAuthenticated, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,7 +27,7 @@ export default function SignIn() {
     try {
       const command = new InitiateAuthCommand({
         AuthFlow: "USER_PASSWORD_AUTH",
-        ClientId: CLIENT_ID,
+        ClientId: cognitoConfig.clientId,
         AuthParameters: {
           USERNAME: email,
           PASSWORD: password,
@@ -28,11 +36,10 @@ export default function SignIn() {
 
       const response = await cognitoClient.send(command);
       
-      if (response.AuthenticationResult?.IdToken) {
-        // Store the token securely (e.g., in HttpOnly cookies)
-        // For this example, we'll just log it
-        console.log("User authenticated:", response.AuthenticationResult.IdToken);
-        router.push('/dashboard') // Redirect to dashboard after successful sign in
+      if (response.AuthenticationResult?.AccessToken) {
+        setAccessToken(response.AuthenticationResult.AccessToken);
+        setIsAuthenticated(true)
+        router.push('/protected/dashboard')
       } else {
         throw new Error("Authentication failed");
       }
@@ -46,16 +53,17 @@ export default function SignIn() {
     <div className="flex h-screen">
       <div className="w-1/2 relative">
         <Image
-          src="/signin-image.jpg"
+          src="/images/splash-image.png"
           alt="Sign In Image"
           layout="fill"
           objectFit="cover"
+          priority
         />
       </div>
-      <div className="w-1/2 flex items-center justify-center bg-gray-100">
+      <div className="w-1/2 flex items-center justify-center bg-gray-100 overflow-y-auto">
         <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
           <div className="flex justify-center">
-            <Image src="/logo.png" alt="Logo" width={100} height={100} />
+            <Image src="/images/logo.png" alt="Logo" width={100} height={100} />
           </div>
           <h1 className="text-2xl font-bold text-center text-gray-900">Sign In</h1>
           {error && <p className="text-red-500 text-center">{error}</p>}
@@ -98,8 +106,8 @@ export default function SignIn() {
             </div>
           </form>
           <div className="text-sm text-center">
-            <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
-              Don&apost have an account? Sign Up
+            <Link href="/auth/signup" className="font-medium text-blue-600 hover:text-blue-500">
+              Don't have an account? Sign Up
             </Link>
           </div>
         </div>
