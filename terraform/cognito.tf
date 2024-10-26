@@ -19,7 +19,7 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
   callback_urls                        = ["https://${aws_cloudfront_distribution.frontend_distribution.domain_name}"]
   logout_urls                          = ["https://${aws_cloudfront_distribution.frontend_distribution.domain_name}/logout"]
   allowed_oauth_flows_user_pool_client = true
-  explicit_auth_flows                  = ["ALLOW_CUSTOM_AUTH","ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH", "ALLOW_USER_SRP_AUTH"]
+  explicit_auth_flows                  = ["ALLOW_CUSTOM_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH", "ALLOW_USER_SRP_AUTH"]
 
 }
 
