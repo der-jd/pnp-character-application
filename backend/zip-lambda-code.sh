@@ -8,8 +8,8 @@ lambdas=("another-lambda" "skill-calculation")
 mkdir --parents dist
 for lambda in "${lambdas[@]}"
 do
-  echo "Zipping $lambda..."
+  echo "Zipping code for $lambda..."
   zip -r -j dist/$lambda.zip build/$lambda/*
 done
 
-echo "All Lambda functions zipped!"
+echo "Code for all Lambda functions zipped!"
