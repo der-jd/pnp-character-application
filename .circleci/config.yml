@@ -141,7 +141,10 @@ jobs:
             npm install
       - run:
           name: build frontend
-          command: npm run build
+          command: |
+            cd frontend
+            npm run build
+            mv out build
       - persist_to_workspace:
           root: frontend/build
           paths:
