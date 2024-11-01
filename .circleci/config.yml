@@ -31,7 +31,7 @@ workflows:
             - lint-terraform-code
       - deploy-frontend:
           requires:
-            -deploy-backend-and-infrastructure
+            - deploy-backend-and-infrastructure
 
 
            
@@ -126,7 +126,6 @@ jobs:
           name: Lint Terraform code
           command: make lint-terraform
   
-  # build frontend files 
   build-frontend:
     docker:
       - image: cimg/node:22.10
