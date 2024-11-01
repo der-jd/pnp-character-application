@@ -163,7 +163,7 @@ jobs:
           name: deploy frontend
           command: |
             cd frontend
-            aws s3 sync ./build s3:://pnp-character-application-frontend
+            aws s3 sync build s3://pnp-character-application-frontend
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
