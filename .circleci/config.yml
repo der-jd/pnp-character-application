@@ -29,9 +29,12 @@ workflows:
             - package-lambda-code
             - check-format-terraform-code
             - lint-terraform-code
-      - deploy-frontend:
+      - build-frontend:
           requires:
             - deploy-backend-and-infrastructure
+      - deploy-frontend:
+          requires:
+            - build-frontend
 
 
            
@@ -139,6 +142,10 @@ jobs:
       - run:
           name: buil frontend
           command: npx next build
+      - persist_to_workspace:
+          root: frontend/build
+          paths:
+            - ./*
 
   deploy-frontend:
     docker:
@@ -146,9 +153,6 @@ jobs:
     steps:
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
-      - run:
-          name: build frontend
-          command: build-frontend
       - run:
           name: deploy frontend
           command: |
