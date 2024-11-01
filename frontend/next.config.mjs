@@ -4,6 +4,9 @@ const nextConfig = {
     experimental: {
         missingSuspenseWithCSRBailout: false,
       },
+    images: {
+    unoptimized: true,
+    },
 };
 
 export default nextConfig;
