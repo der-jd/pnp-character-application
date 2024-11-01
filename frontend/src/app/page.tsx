@@ -28,7 +28,7 @@ export default function SplashScreen() {
     <div className="flex h-screen overflow-hidden">
       <div className="w-1/2 relative">
         <Image
-          src="../public/images/splash-image.png"
+          src="/images/splash-image.png"
           alt="Splash Image"
           layout="fill"
           objectFit="cover"
@@ -38,7 +38,7 @@ export default function SplashScreen() {
       <div className="w-1/2 flex flex-col items-center justify-center bg-gray-100 overflow-y-auto">
         <div className="w-full max-w-md p-8 space-y-8">
           <div className="flex justify-center">
-            <Image src="../public/images/logo.png" alt="Logo" width={100} height={100} />
+            <Image src="/images/logo.png" alt="Logo" width={100} height={100} />
           </div>
           <h1 className="text-3xl font-bold text-center text-gray-900">Welcome to XXX</h1>
           <p className="text-center text-gray-600">Your ultimate character management companion</p>
