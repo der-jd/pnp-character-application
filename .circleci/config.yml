@@ -140,8 +140,8 @@ jobs:
             cd frontend
             npm install
       - run:
-          name: buil frontend
-          command: npx next build
+          name: build frontend
+          command: npm run build
       - persist_to_workspace:
           root: frontend/build
           paths:
@@ -151,6 +151,9 @@ jobs:
     docker:
       - image: cimg/node:22.10
     steps:
+      - checkout
+      - attach_workspace:
+          at: frontend/dist
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:

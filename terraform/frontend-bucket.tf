@@ -56,12 +56,3 @@ resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
     ]
   })
 }
-
-resource "aws_s3_object" "upload_object" {
-  for_each     = fileset("frontend/build/", "*")
-  bucket       = aws_s3_bucket.frontend_bucket.id
-  key          = each.value
-  source       = "frontend/build/${each.value}"
-  etag         = filemd5("frontend/build/${each.value}")
-  content_type = "html/javascript"
-}
