@@ -5,6 +5,8 @@ resource "aws_s3_bucket" "frontend_bucket" {
   force_destroy = true
 }
 
+
+
 resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
   bucket = aws_s3_bucket.frontend_bucket.id
 
@@ -13,6 +15,7 @@ resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid      = "PublicReadGedObject"
         Effect   = "Allow"
         Action   = "s3:GetObject"
         Resource = "${aws_s3_bucket.frontend_bucket.arn}/*"
@@ -21,7 +24,7 @@ resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
         }
         Condition = {
           StringEquals = {
-            "AWS:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.frontend_distribution.id}"
+            "AWS:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.frontend_distribution.id}",
           }
         }
       }

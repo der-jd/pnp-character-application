@@ -1,8 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { AuthProvider, useAuth } from '../context/AuthContext'
+import { AuthProvider } from '../context/AuthContext'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
