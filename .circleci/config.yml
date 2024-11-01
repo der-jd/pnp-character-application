@@ -144,6 +144,8 @@ jobs:
     docker:
       - image: cimg/node:22.10
     steps:
+      - aws-cli/setup:
+          role_arn: "$AWS_ROLE_ARN"
       - run:
           name: build frontend
           command: build-frontend
@@ -167,7 +169,7 @@ jobs:
           name: Terraform init
           command: |
             cd terraform
-            terraform init -input=falseterraform import frontend-bucket.frontend_bucket["0"] "bucket"
+            terraform init -input=false
       - run:
           name: Terraform plan
           command: |
