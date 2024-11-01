@@ -10,7 +10,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   }
 
   admin_create_user_config {
-    allow_admin_create_user_only = false
+    allow_admin_create_user_only = true
   }
 }
 
