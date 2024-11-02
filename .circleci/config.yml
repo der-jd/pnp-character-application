@@ -36,9 +36,6 @@ workflows:
           requires:
             - build-frontend
 
-
-           
-
   delete-services:
     when: << pipeline.parameters.delete-services >>
     jobs:
