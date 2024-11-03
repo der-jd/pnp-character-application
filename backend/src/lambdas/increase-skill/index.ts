@@ -1,5 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDB } from "aws-sdk";
+import { process } from "@types/node";
+import { SkillThreshold, CostCategory, costMatrix } from "../../config";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill(event);
@@ -15,8 +17,9 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     let availableAdventurePoints = verifyParameters(event);
 
     let skillValue = body.initialValue;
+    const costCategory = CostCategory.parse(body.costCategory);
     for (let i = 0; i < body.increasedPoints; i++) {
-      const increaseCost = getIncreaseCost(skillValue, body.costCategory);
+      const increaseCost = getIncreaseCost(skillValue, costCategory);
 
       if (increaseCost > availableAdventurePoints) {
         return {
@@ -62,15 +65,12 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     // TODO save event in history
     return {
       statusCode: 200,
-      body: JSON.stringify("Success"),
-      /**
-       * return
-       * - success message
-       * - new skill value
-       * - new cost category
-       * - new cost/point
-       * - new adventure points
-       */
+      body: JSON.stringify({
+        message: "Successfully increased skill",
+        skillValue: skillValue,
+        increaseCost: getIncreaseCost(skillValue, costCategory),
+        availableAdventurePoints: availableAdventurePoints,
+      }),
     };
   } catch (error: any) {
     return {
@@ -179,56 +179,15 @@ function verifyParameters(event: APIGatewayProxyEvent): any {
   return characterSheet.calculationPoints.adventurePoints.available;
 }
 
-function getIncreaseCost(skillValue: number, costCategory: string): number {
-  /**
-   * +-------------------+-----------------+-----------------+-----------------+-----------------+
-   * |                   | Cost category 1 | Cost category 2 | Cost category 3 | Cost category 4 |
-   * +-------------------+-----------------+-----------------+-----------------+-----------------+
-   * | Skill threshold 1 |        x        |        x        |        x        |        x        |
-   * | Skill threshold 2 |        x        |        x        |        x        |        x        |
-   * | Skill threshold 3 |        x        |        x        |        x        |        x        |
-   * +-------------------+-----------------+-----------------+-----------------+-----------------+
-   */
-  const costMatrix: number[][] = [
-    // TODO use variables for costs
-    [0, 0.5, 1, 2],
-    [0, 1, 2, 3],
-    [0, 2, 3, 4],
-  ];
-
-  let row: number;
-  // TODO use variables for thresholds
-  if (skillValue < 50) {
-    row = 0;
-  } else if (skillValue < 75) {
-    row = 1;
-  } else {
-    row = 2;
-  }
-
+function getIncreaseCost(skillValue: number, costCategory: CostCategory): number {
   let column: number;
-  // TODO use variables/enum for thresholds --> automatically pass costCategory to column value
-  switch (costCategory) {
-    case "Frei":
-      column = 0;
-      break;
-    case "Guenstig":
-      column = 1;
-      break;
-    case "Normal":
-      column = 2;
-      break;
-    case "Teuer":
-      column = 3;
-      break;
-    default:
-      throw {
-        statusCode: 400,
-        body: JSON.stringify({
-          message: `Cost category '${costCategory}' not found!`,
-        }),
-      };
+  if (skillValue < SkillThreshold._1) {
+    column = SkillThreshold._1;
+  } else if (skillValue < SkillThreshold._2) {
+    column = SkillThreshold._2;
+  } else {
+    column = SkillThreshold._3;
   }
 
-  return costMatrix[row][column];
+  return costMatrix[costCategory][column];
 }
