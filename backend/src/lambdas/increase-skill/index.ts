@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDB } from "aws-sdk";
-import { process } from "@types/node";
-import { SkillThreshold, CostCategory, costMatrix } from "../../config";
+import { SkillThreshold, CostCategory, costMatrix } from "../../config.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill(event);
@@ -100,6 +99,21 @@ function verifyParameters(event: APIGatewayProxyEvent): any {
   const increasedPoints = body.increasedPoints;
   const costCategory = body.costCategory;
 
+  if (
+    typeof characterId !== "string" ||
+    typeof skillId !== "string" ||
+    typeof initialSkillValue !== "number" ||
+    typeof increasedPoints !== "number" ||
+    typeof costCategory !== "string"
+  ) {
+    throw {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "Invalid input values!",
+      }),
+    };
+  }
+
   const uuidRegex = new RegExp("/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i");
   if (!uuidRegex.test(characterId)) {
     throw {
@@ -114,19 +128,6 @@ function verifyParameters(event: APIGatewayProxyEvent): any {
       statusCode: 400,
       body: JSON.stringify({
         message: "Skill id is not a valid UUID format!",
-      }),
-    };
-  }
-
-  if (
-    typeof initialSkillValue !== "number" ||
-    typeof increasedPoints !== "number" ||
-    typeof costCategory !== "string"
-  ) {
-    throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Invalid input values!",
       }),
     };
   }
