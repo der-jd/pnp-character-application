@@ -19,12 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 
-export enum CostCategory {
-  FREE,
-  LOW_PRICED,
-  NORMAL,
-  EXPENSIVE,
-}
+import { CostCategory, ISkillProps } from './SkillDefinitions';
 
 const getCostCategoryLabel = (category: CostCategory): string => {
   switch (category) {
@@ -41,30 +36,29 @@ const getCostCategoryLabel = (category: CostCategory): string => {
   }
 };
 
-export interface ISkillProps {
-  name: string;
-  category: string;
-  level: number;
-  is_active: boolean;
-  cost_category: CostCategory;
-  cost: number;
-  is_edited: boolean;
-  edited_level: number;
-}
-
 export function SkillsTable({ data: initialData }: { data: ISkillProps[] }) {
+  
   const [data, setData] = useState(initialData)
   const [isEditMode, setIsEditMode] = useState(false)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     is_active: false,
     cost_category: false,
     cost: false,
+    skilling: false,
   })
+
+  const try_increase_skill = async(skill: ISkillProps, points_to_skill: number) => {
+    // todo async call to api should happen here
+
+    const new_level = skill.edited_level + points_to_skill
+    const updatedData = data.map((item) => item.name === skill.name ? {...item, edited_level: new_level} : item);
+    setData(updatedData);
+  }
 
   const columns: ColumnDef<ISkillProps>[] = [
     {
       accessorKey: "name",
-      header: () => <div className="text-left">Name</div>,
+      header: () => <div className="text-left text-black text-bold">Name</div>,
       cell: ({ row }) => <div className="font-medium p-1">{row.getValue("name")}</div>,
     },
     {
@@ -109,6 +103,15 @@ export function SkillsTable({ data: initialData }: { data: ISkillProps[] }) {
       header: () => <div className="text-right">Cost</div>,
       cell: ({ row }) => <div className="text-right">{row.getValue("cost")}</div>,
     },
+    {
+      accessorKey: "skilling",
+      header: () => <div className="text-center">Increase Skill</div>,
+      cell: ({ row }) => <div className="flex justify-evenly items-center w-full space-x-4">
+      <Button className="flex-1 py-2 bg-black hover:text-black hover:bg-gray-300 text-white rounded text-center rounded-lg" onClick={() => try_increase_skill(row.original, 1)}>1</Button>
+      <Button className="flex-1 py-2 bg-black hover:text-black hover:bg-gray-300 text-white rounded text-center rounded-lg" onClick={() => try_increase_skill(row.original, 5)}>5</Button>
+      <Button className="flex-1 py-2 bg-black hover:text-black hover:bg-gray-300 text-white rounded text-center rounded-lg" onClick={() => try_increase_skill(row.original, 10)}>10</Button>
+      </div>
+    },
   ]
 
   const table = useReactTable({
@@ -129,7 +132,13 @@ export function SkillsTable({ data: initialData }: { data: ISkillProps[] }) {
       is_active: !isEditMode,
       cost_category: !isEditMode,
       cost: !isEditMode,
+      skilling: !isEditMode,
     })
+
+    if(isEditMode) {
+      const updatedData = data.map((item) => ({...item, level : item.edited_level}));
+      setData(updatedData);
+    }
   }
 
   return (

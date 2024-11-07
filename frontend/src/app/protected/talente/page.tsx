@@ -1,5 +1,5 @@
-import { SkillsTable } from '../../components/Skill/SkillTable'
 import  skillData  from '../../components/Skill/ExampleData'
+import SkillCategory from '../../components/Skill/SkillCategory';
 
 
 export default function SkillsPage() {
@@ -8,7 +8,7 @@ export default function SkillsPage() {
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-2xl font-bold mb-5">Skills</h1>
-      <SkillsTable data={skills} />
+      <SkillCategory data={skills} />
     </div>
   )
 }
