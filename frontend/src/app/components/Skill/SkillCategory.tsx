@@ -25,13 +25,24 @@ const SkillCategory = ({ data, isEditMode }: SkillCategoryProps) => {
 
     }, {} as Record<string, ISkillProps[]>);
 
+    // sort categories by size
+    const categories = Object.keys(groupedSkills).sort((a, b) => {
+        const aSkillsCount = groupedSkills[a].length;
+        const bSkillsCount = groupedSkills[b].length;
+        return bSkillsCount - aSkillsCount; 
+      });
+
+    const skillsInOrder = categories.map((category) => {const skills = groupedSkills[category]; return {category, skills}})
+    
     return (
-        <div>
-            {Object.entries(groupedSkills).map(([category, skills]) => (
-            <div key={category} className="py-2">
-                <h2 className="text-xl font-semibold">{category}</h2>
-                <SkillsTable data={skills} is_edit_mode={isEditMode}/>
-            </div>
+        <div className="flex flex-wrap -m-4">
+            {skillsInOrder.map(({ category, skills }) => (
+                <div key={category} className="w-1/2 p-4">
+                    <div className="border border-gray-300 rounded-lg">
+                        <h2 className="text-xl font-semibold rounded-t-lg bg-black text-white">{category}</h2>
+                        <SkillsTable data={skills} is_edit_mode={isEditMode} />
+                    </div>
+                </div>
             ))}
         </div>
     );

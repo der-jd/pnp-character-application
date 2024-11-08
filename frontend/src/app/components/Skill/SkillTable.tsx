@@ -63,7 +63,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
   const columns: ColumnDef<ISkillProps>[] = [
     {
       accessorKey: "name",
-      header: () => <div className="text-left text-black text-bold">Name</div>,
+      header: () => <div className="text-left text-bold">Name</div>,
       cell: ({ row }) => <div className="font-medium p-1">{row.getValue("name")}</div>,
     },
     {
@@ -112,7 +112,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
       accessorKey: "skilling",
       header: () => <div className="text-center">Increase Skill</div>,
       cell: ({ row }) => <div className="flex justify-evenly items-right w-full space-x-4">
-          {[1, 5, 10].map((points) => (<Button key={points} className="flex-1 bg-black hover:bg-gray-300 text-white rounded-lg" onClick={() => try_increase_skill(row.original, points)}>{points}</Button>))}
+          {[1, 5, 10].map((points) => (<Button key={points} className="flex-1 bg-black hover:bg-gray-300 hover:text-black text-white rounded-lg" onClick={() => try_increase_skill(row.original, points)}>{points}</Button>))}
       </div>
     },
   ]
@@ -151,7 +151,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="bg-gray-300">
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id} className={header.column.id === "actions" ? "text-right" : ""}>
                     {header.isPlaceholder

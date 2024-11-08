@@ -13,8 +13,9 @@ export default function SkillsPage() {
   
   return (
     <div className="container mx-auto py-10">
-        <div>
+        <div className="space-x-2">
           <Button variant="outline" className="bg-black font-bold text-white hover:bg-gray-300 rounded-lg" onClick={toggle_edit_mode}>{isEditMode ? "Save" : "Edit"}</Button>
+          { isEditMode ? <Button variant="outline" className="bg-black font-bold text-white hover:bg-gray-300 rounded-lg">Discard</Button> : null}
       </div>
       <h1 className="text-2xl font-bold mb-5">Skills</h1>
       <SkillCategory data={skills} isEditMode={isEditMode} />
