@@ -1,20 +1,41 @@
 
-import React, { useState, useEffect } from 'react'
+'use client'
 
-import { CostCategory, ISkillProps } from './SkillDefinitions';
+import React, { useState } from 'react'
+
+import { ISkillProps } from './SkillDefinitions';
 import { SkillsTable } from "./SkillTable";
 
 
 interface SkillCategoryProps {
-    data: ISkillProps[]; // This ensures 'data' is passed as a prop of the correct type
-  }
+    data: ISkillProps[];
+    isEditMode: boolean;
+}
   
-  const SkillCategory = ({ data }: SkillCategoryProps) => {
+const SkillCategory = ({ data, isEditMode }: SkillCategoryProps) => {
+
+    const groupedSkills = data.reduce((acc, skill) => {
+        const category = skill.category;
+        if (!acc[category]) {
+            acc[category] = [];
+        }
+
+        acc[category].push(skill);
+        return acc;
+
+    }, {} as Record<string, ISkillProps[]>);
+
     return (
-      <div>
-        <SkillsTable data={data}/>
-      </div>
+        <div>
+            {Object.entries(groupedSkills).map(([category, skills]) => (
+            <div key={category} className="py-2">
+                <h2 className="text-xl font-semibold">{category}</h2>
+                <SkillsTable data={skills} is_edit_mode={isEditMode}/>
+            </div>
+            ))}
+        </div>
     );
-  };
-  
-  export default SkillCategory;
+};
+
+
+export default SkillCategory;

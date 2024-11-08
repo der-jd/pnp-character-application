@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Table,
   TableBody,
@@ -36,16 +36,16 @@ const getCostCategoryLabel = (category: CostCategory): string => {
   }
 };
 
-export function SkillsTable({ data: initialData }: { data: ISkillProps[] }) {
+export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillProps[], is_edit_mode: boolean}) {
   
-  const [data, setData] = useState(initialData)
-  const [isEditMode, setIsEditMode] = useState(false)
+  const [data, setData] = useState(initialData);
+  const [showActiveOnly, setShowActiveOnly] = useState(true);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     is_active: false,
     cost_category: false,
     cost: false,
     skilling: false,
-  })
+  });
 
   const try_increase_skill = async(skill: ISkillProps, points_to_skill: number) => {
     // todo async call to api should happen here
@@ -55,6 +55,11 @@ export function SkillsTable({ data: initialData }: { data: ISkillProps[] }) {
     setData(updatedData);
   }
 
+  // Memoize filteredData to prevent re-computation on every render
+  const filteredData = useMemo(() => (
+    showActiveOnly ? data.filter(skill => skill.is_active) : data
+  ), [data, showActiveOnly]);
+
   const columns: ColumnDef<ISkillProps>[] = [
     {
       accessorKey: "name",
@@ -63,10 +68,10 @@ export function SkillsTable({ data: initialData }: { data: ISkillProps[] }) {
     },
     {
       accessorKey: "level",
-      header: () => <div className="text-right">Level</div>,
+      header: () => <div className="text-center">Level</div>,
       cell: ({ row }) => {
-        const value = isEditMode ? row.original.edited_level : row.original.level
-        return <div className="text-right">{value}</div>
+        const value = is_edit_mode ? row.original.edited_level : row.original.level
+        return <div className="text-center">{value}</div>
       },
     },
     {
@@ -95,8 +100,8 @@ export function SkillsTable({ data: initialData }: { data: ISkillProps[] }) {
     },
     {
       accessorKey: "cost_category",
-      header: "Cost Category",
-      cell: ({ row }) => getCostCategoryLabel(row.original.cost_category),
+      header: () => <div className="text-center">Cost Category</div>,
+      cell: ({ row }) => <div className="text-center">{getCostCategoryLabel(row.original.cost_category)}</div>,
     },
     {
       accessorKey: "cost",
@@ -106,16 +111,14 @@ export function SkillsTable({ data: initialData }: { data: ISkillProps[] }) {
     {
       accessorKey: "skilling",
       header: () => <div className="text-center">Increase Skill</div>,
-      cell: ({ row }) => <div className="flex justify-evenly items-center w-full space-x-4">
-      <Button className="flex-1 py-2 bg-black hover:text-black hover:bg-gray-300 text-white rounded text-center rounded-lg" onClick={() => try_increase_skill(row.original, 1)}>1</Button>
-      <Button className="flex-1 py-2 bg-black hover:text-black hover:bg-gray-300 text-white rounded text-center rounded-lg" onClick={() => try_increase_skill(row.original, 5)}>5</Button>
-      <Button className="flex-1 py-2 bg-black hover:text-black hover:bg-gray-300 text-white rounded text-center rounded-lg" onClick={() => try_increase_skill(row.original, 10)}>10</Button>
+      cell: ({ row }) => <div className="flex justify-evenly items-right w-full space-x-4">
+          {[1, 5, 10].map((points) => (<Button key={points} className="flex-1 bg-black hover:bg-gray-300 text-white rounded-lg" onClick={() => try_increase_skill(row.original, points)}>{points}</Button>))}
       </div>
     },
   ]
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -125,29 +128,25 @@ export function SkillsTable({ data: initialData }: { data: ISkillProps[] }) {
     },
   })
 
-  const toggleEditMode = () => {
-    setIsEditMode(!isEditMode)
+  useEffect(() => {
+    setShowActiveOnly(!is_edit_mode);
     setColumnVisibility({
       ...columnVisibility,
-      is_active: !isEditMode,
-      cost_category: !isEditMode,
-      cost: !isEditMode,
-      skilling: !isEditMode,
+      is_active: is_edit_mode,
+      cost_category: is_edit_mode,
+      cost: is_edit_mode,
+      skilling: is_edit_mode,
     })
 
-    if(isEditMode) {
+    if(!is_edit_mode) {
+      // this is the changing of edit to not edit so edited level should be saved
       const updatedData = data.map((item) => ({...item, level : item.edited_level}));
       setData(updatedData);
     }
-  }
+  }, [is_edit_mode]);
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        <Button variant="outline" size="sm" onClick={toggleEditMode}>
-          {isEditMode ? "Save" : "Edit"}
-        </Button>
-      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
