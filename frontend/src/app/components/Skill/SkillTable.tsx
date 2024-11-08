@@ -138,11 +138,10 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
       skilling: is_edit_mode,
     })
 
-    if(!is_edit_mode) {
-      // this is the changing of edit to not edit so edited level should be saved
-      const updatedData = data.map((item) => ({...item, level : item.edited_level}));
-      setData(updatedData);
-    }
+    // this is the changing of edit to not edit so edited level should be saved
+    const updatedData = data.map((item) => ({...item, level : item.edited_level}));
+    setData(updatedData);
+
   }, [is_edit_mode]);
 
   return (

@@ -39,7 +39,7 @@ const SkillCategory = ({ data, isEditMode }: SkillCategoryProps) => {
             {skillsInOrder.map(({ category, skills }) => (
                 <div key={category} className="w-1/2 p-4">
                     <div className="border border-gray-300 rounded-lg">
-                        <h2 className="text-xl font-semibold rounded-t-lg bg-black text-white">{category}</h2>
+                        <h2 className="p-1 text-xl font-semibold rounded-t-lg bg-black text-white">{category}</h2>
                         <SkillsTable data={skills} is_edit_mode={isEditMode} />
                     </div>
                 </div>
