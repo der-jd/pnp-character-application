@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 
-import { CostCategory, ISkillProps } from './SkillDefinitions';
+import { CostCategory, ISkillProps, render_skill_icon } from './SkillDefinitions';
 
 const getCostCategoryLabel = (category: CostCategory): string => {
   switch (category) {
@@ -61,6 +61,11 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
   ), [data, showActiveOnly]);
 
   const columns: ColumnDef<ISkillProps>[] = [
+    {
+      accessorKey:"icon",
+      header: "",
+      cell: ({row}) => <div className="h-4 w-4 ">{render_skill_icon(row.getValue("name"))}</div>,
+    },
     {
       accessorKey: "name",
       header: () => <div className="text-left text-bold">Name</div>,
@@ -106,7 +111,25 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
     {
       accessorKey: "cost",
       header: () => <div className="text-right">Cost</div>,
-      cell: ({ row }) => <div className="text-right">{row.getValue("cost")}</div>,
+      cell: 
+        ({ row }) => 
+          <div className="text-right">
+            <Button className={(() => {
+              switch(row.original.cost_category) {
+                case CostCategory.FREE:
+                  return "bg-green-800 text-center text-white hover:bg-gray-300 hover:text-black";
+                case CostCategory.LOW_PRICED:
+                  return "bg-green-600 text-center text-white hover:bg-gray-300 hover:text-black";
+                case CostCategory.NORMAL:
+                  return "bg-orange-400 text-center text-white hover:bg-gray-300 hover:text-black";
+                case CostCategory.EXPENSIVE:
+                  return "bg-orange-800 text-center text-white hover:bg-gray-300 hover:text-black";
+              }
+            })()}>
+              {row.getValue("cost")}
+            </Button>
+          
+          </div>
     },
     {
       accessorKey: "skilling",
@@ -169,7 +192,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className='space-x-6'>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
