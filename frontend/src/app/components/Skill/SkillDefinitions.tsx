@@ -39,7 +39,6 @@ import { GiBearHead } from "react-icons/gi";
 import { GiRaceCar } from "react-icons/gi";
 import { GiTalk } from "react-icons/gi";
 import { GiTakeMyMoney } from "react-icons/gi";
-import { GiLindenLeaf } from "react-icons/gi";
 import { GiCampfire } from "react-icons/gi";
 import { GiFishing } from "react-icons/gi";
 import { GiPathDistance } from "react-icons/gi";
@@ -52,7 +51,6 @@ import { GiMeatCleaver } from "react-icons/gi";
 import { GiAnimalHide } from "react-icons/gi";
 import { GiFirstAidKit } from "react-icons/gi";
 import { GiWoodAxe } from "react-icons/gi";
-import { GiSleepingBag } from "react-icons/gi";
 import { GiCookingPot } from "react-icons/gi";
 import { GiSewingString } from "react-icons/gi";
 import { GiMusicalScore } from "react-icons/gi";
@@ -63,10 +61,15 @@ import { GiTreasureMap } from "react-icons/gi";
 import { GiBrickWall } from "react-icons/gi";
 import { GiStonePile } from "react-icons/gi";
 import { GiPlantSeed } from "react-icons/gi";
-
-
-
-
+import { GiHumanPyramid } from "react-icons/gi";
+import { GiInternalOrgan } from "react-icons/gi";
+import { GiMantrap } from "react-icons/gi";
+import { GiGooeySword } from "react-icons/gi";
+import { GiGraduateCap } from "react-icons/gi";
+import { GiHistogram } from "react-icons/gi";
+import { GiBestialFangs } from "react-icons/gi";
+import { GiTinker } from "react-icons/gi";
+import { GiDespair } from "react-icons/gi";
 
 
 
@@ -103,40 +106,40 @@ export function render_skill_icon(skill_name: string): JSX.Element {
     case "Singen":                  return <GiSing size={25}/>;
     case "Sinnenschärfe":           return <GiAwareness size={25}/>;
     case "Stimmen Imitieren":       return <GiScreaming size={25}/>;
-    case "Tanzen":
+    case "Tanzen":                  return <GiHumanPyramid size={25}/>
     case "Zechen":                  return <GiBeerStein size={25}/>;
     case "Taschendiebstahl":        return <GiHand size={25}/>;
     case "Gesellschaft":            return <GiRoundTable size={25}/>;
     case "Betören":                 return <GiWrappedHeart size={25}/>;
-    case "Etikette":
+    case "Etikette":                return <GiGraduateCap size={25}/>;
     case "Religion":                return <GiKneeling size={25}/>;
     case "Lehren":                  return <GiTeacher size={25}/>;
     case "Schauspielerei":          return <GiCarnivalMask size={25}/>;
     case "Schriftlicher Ausdruck":  return <GiPencil size={25}/>;
     case "Sich verkleiden":         return <GiDominoMask size={25}/>;
-    case "Gassenwissen":
+    case "Gassenwissen":            return <GiGooeySword size={25}/>;
     case "Menschenkenntnis":        return <GiBackup size={25}/>;
-    case "Überreden":               return <GiTalk />;
-    case "Überzeugen":              return <GiTakeMyMoney />;
-    case "Fährtensuchen":           return <GiDeerTrack />;
-    case "Fesseln / Entfesseln":    return <GiRopeCoil />;
-    case "Fallen stellen":
-    case "Fischen / Angeln":        return <GiFishing />;
-    case "Orientierung":            return <GiPathDistance />;
-    case "Wildnisleben":            return <GiCampfire />;
+    case "Überreden":               return <GiTalk size={25} />;
+    case "Überzeugen":              return <GiTakeMyMoney size={25} />;
+    case "Fährtensuchen":           return <GiDeerTrack size={25} />;
+    case "Fesseln / Entfesseln":    return <GiRopeCoil size={25} />;
+    case "Fallen stellen":          return <GiMantrap size={25} />;
+    case "Fischen / Angeln":        return <GiFishing  size={25}/>;
+    case "Orientierung":            return <GiPathDistance size={25} />;
+    case "Wildnisleben":            return <GiCampfire size={25} />;
     case "Anatomie":                return <GiAnatomy size={25}/>;
-    case "Baukunst":                return <GiBrickWall />;
-    case "Geographie":              return <GiTreasureMap />;
+    case "Baukunst":                return <GiBrickWall size={25} />;
+    case "Geographie":              return <GiTreasureMap size={25} />;
     case "Geschichtswissen":        return <GiInspiration size={25}/>;
-    case "Gesteinskunde":           return <GiStonePile />;
-    case "Pflanzenkunde":           return <GiPlantSeed />;
-    case "Philosophie":
+    case "Gesteinskunde":           return <GiStonePile  size={25}/>;
+    case "Pflanzenkunde":           return <GiPlantSeed size={25} />;
+    case "Philosophie":             return <GiInternalOrgan size={25}/>;
     case "Sternkunde":              return <GiFallingStar size={25}/>;
     case "Rechnen":                 return <GiCalculator size={25}/>;
-    case "Rechtskunde":             return <GiInjustice />;
-    case "Schätzen":
-    case "Tierkunde":
-    case "Technik":
+    case "Rechtskunde":             return <GiInjustice size={25} />;
+    case "Schätzen":                return <GiHistogram size={25}/>;
+    case "Tierkunde":               return <GiBestialFangs size={25}/>;
+    case "Technik":                 return <GiTinker size={25}/>;
     case "Chemie":                  return <GiChemicalDrop size={25}/>;
     case "Kriegskunst":             return <GiAxeSword size={25}/>;
     case "IT Kenntnis":             return <GiComputing size={25}/>;
@@ -148,20 +151,20 @@ export function render_skill_icon(skill_name: string): JSX.Element {
     case "Maurerarbeiten":          return <GiCampCookingPot />;
     case "Alkoholherstellung":      return <GiBeerHorn size={25}/>;
     case "Fahrzeug lenken":         return <GiRaceCar size={25}/>;
-    case "Falschspiel":             return <GiCardExchange />;
-    case "Feinmechanik":            return <GiMechanicalArm />;
-    case "Fleischer":               return <GiMeatCleaver />;
-    case "Gerber / Kürschner":      return <GiAnimalHide />;    
+    case "Falschspiel":             return <GiCardExchange size={25} />;
+    case "Feinmechanik":            return <GiMechanicalArm size={25} />;
+    case "Fleischer":               return <GiMeatCleaver size={25} />;
+    case "Gerber / Kürschner":      return <GiAnimalHide size={25} />;    
     case "Handel / Feilschen":      return <GiCoinflip size={25}/>;
-    case "Erste Hilfe":             return <GiFirstAidKit />;
-    case "Beruhigen":               
-    case "Holzbearbeitung":         return <GiWoodAxe />;
-    case "Kochen":                  return <GiCookingPot />;
-    case "Lederarbeit / Nähen":     return <GiSewingString />;
+    case "Erste Hilfe":             return <GiFirstAidKit size={25} />;
+    case "Beruhigen":               return <GiDespair size={25}/>;   
+    case "Holzbearbeitung":         return <GiWoodAxe size={25} />;
+    case "Kochen":                  return <GiCookingPot size={25} />;
+    case "Lederarbeit / Nähen":     return <GiSewingString size={25} />;
     case "Malen / Zeichnen":        return <GiPencilBrush size={25}/>;
-    case "Musizieren":              return <GiMusicalScore />;
-    case "Schlösser knacken":       return <GiCombinationLock />;
-    case "Sprachen & Schriften":    return <GiBookmark />;
+    case "Musizieren":              return <GiMusicalScore size={25} />;
+    case "Schlösser knacken":       return <GiCombinationLock size={25} />;
+    case "Sprachen & Schriften":    return <GiBookmark size={25} />;
     case "Deutsch":
     case "Englisch":
     case "Spanisch":
