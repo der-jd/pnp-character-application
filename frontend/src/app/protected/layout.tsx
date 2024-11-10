@@ -2,7 +2,6 @@
 
 import { AuthProvider } from '../context/AuthContext'
 import Header from '../components/Header'
-import Footer from '../components/Footer'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,7 +9,6 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
         <AuthProvider>
             <Header />
                 <main>{children}</main>
-            <Footer />
         </AuthProvider>
     </>
   )
