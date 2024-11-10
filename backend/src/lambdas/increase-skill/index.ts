@@ -1,4 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { DynamoDB } from "aws-sdk";
 import { SkillThreshold, CostCategory, costMatrix } from "../../config.js";
 
@@ -13,7 +15,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     // The conditional parse is necessary for Lambda tests via the AWS console
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
-    let availableAdventurePoints = verifyParameters(event);
+    let availableAdventurePoints = await verifyParameters(event);
 
     let skillValue = body.initialValue;
     const costCategory = CostCategory.parse(body.costCategory);
@@ -90,7 +92,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
  *
  * @returns Available adventure points
  */
-function verifyParameters(event: APIGatewayProxyEvent): any {
+async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
   const characterId = event.pathParameters?.characterId;
   const skillId = event.pathParameters?.skillId;
   // The conditional parse is necessary for Lambda tests via the AWS console
@@ -132,52 +134,66 @@ function verifyParameters(event: APIGatewayProxyEvent): any {
     };
   }
 
-  const dynamoDb = new DynamoDB({ apiVersion: "2012-08-10" });
-  const params = {
+  const client = new DynamoDBClient({});
+  const docClient = DynamoDBDocumentClient.from(client);
+
+  const command = new GetCommand({
     TableName: process.env.TABLE_NAME,
     Key: {
-      characterId: {
-        N: characterId,
-      },
+      characterId: characterId,
     },
     ProjectionExpression: "characterSheet",
-  };
-
-  const characterSheet = dynamoDb.getItem(params, function (error: any, data: any): any {
-    if (error) {
-      throw {
-        statusCode: 500,
-        body: JSON.stringify({
-          message: "Error when getting DynamoDB item",
-          error: (error as Error).message,
-        }),
-      };
-    }
-
-    console.log("Successfully got DynamoDB item", data.Item);
-
-    if (data.Item.skills[skillId].activated === "false") {
-      throw {
-        statusCode: 409,
-        body: JSON.stringify({
-          message: "Skill is not activated yet! Activate it before it can be increased.",
-        }),
-      };
-    }
-
-    if (initialSkillValue !== data.Item.skills[skillId].value) {
-      throw {
-        statusCode: 409,
-        body: JSON.stringify({
-          message: "The given skill value doesn't match the value in the backend! Reload the character data.",
-        }),
-      };
-    }
-
-    return data.Item;
   });
 
-  return characterSheet.calculationPoints.adventurePoints.available;
+  const response = await docClient.send(command);
+
+  console.log("Successfully got DynamoDB item", response);
+
+  return 500;
+
+  //  if (response.skills[skillId].activated === "false") {
+  //    throw {
+  //      statusCode: 409,
+  //      body: JSON.stringify({
+  //        message: "Skill is not activated yet! Activate it before it can be increased.",
+  //      }),
+  //    };
+  //  }
+  //
+  //  if (initialSkillValue !== response.skills[skillId].value) {
+  //    throw {
+  //      statusCode: 409,
+  //      body: JSON.stringify({
+  //        message: "The given skill value doesn't match the value in the backend! Reload the character data.",
+  //      }),
+  //    };
+  //  }
+  //
+  //  return response;
+  //},
+  //(error) => {
+  //  throw {
+  //    statusCode: 500,
+  //    body: JSON.stringify({
+  //      message: "Error when getting DynamoDB item",
+  //      error: (error as Error).message,
+  //    }),
+  //  };
+  //});
+
+  //const dynamoDb = new DynamoDB({ apiVersion: "2012-08-10" });
+  //const params = {
+  //  TableName: process.env.TABLE_NAME,
+  //  Key: {
+  //    characterId: {
+  //      N: characterId,
+  //    },
+  //  },
+  //  ProjectionExpression: "characterSheet",
+  //};
+  //const characterSheet = dynamoDb.getItem(params, function (error: any, data: any): any {
+
+  //return characterSheet.calculationPoints.adventurePoints.available;
 }
 
 function getIncreaseCost(skillValue: number, costCategory: CostCategory): number {
