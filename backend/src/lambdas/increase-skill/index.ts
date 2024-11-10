@@ -164,7 +164,7 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
   //    throw {
   //      statusCode: 409,
   //      body: JSON.stringify({
-  //        message: "The given skill value doesn't match the value in the backend! Reload the character data.",
+  //        message: "The given skill value doesn't match the value in the backend! Reload the character data.", // TODO this is not really idempotent as duplicate events will always throw?!
   //      }),
   //    };
   //  }
