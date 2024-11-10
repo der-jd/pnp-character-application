@@ -11,6 +11,10 @@
     "build": "tsc && ./rename-build-files.sh",
     "zip": "./zip-lambda-code.sh"
   },
+  "dependencies": {
+    "increase-skill": "file:src/lambdas/increase-skill",
+    "get-character": "file:src/lambdas/get-character"
+  },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "eslint": "^9.13.0",

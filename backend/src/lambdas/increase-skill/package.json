@@ -4,11 +4,12 @@
   "main": "index.js",
   "type": "module",
   "dependencies": {
-    "aws-sdk": "^2.1691.0",
     "@aws-sdk/client-dynamodb": "^3.682.0",
-    "@aws-sdk/lib-dynamodb": "^3.685.0"
+    "@aws-sdk/lib-dynamodb": "^3.685.0",
+    "aws-sdk": "^2.1691.0"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.145"
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^22.9.0"
   }
 }
