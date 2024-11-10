@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Table,
   TableBody,
@@ -17,15 +17,8 @@ import {
   VisibilityState,
 } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-
 import {IBaseValue, IProperty, render_attribute_icon} from "./PropertiesDefinition"
 
-
-interface PropertiesProps {
-    base_values: IBaseValue[];
-    properties: IProperty[];
-}
 
 
 export function PropertiesTable({ data: initialData, is_edit_mode }: { data: IBaseValue[] | IProperty[], is_edit_mode: boolean}) {
@@ -83,16 +76,18 @@ export function PropertiesTable({ data: initialData, is_edit_mode }: { data: IBa
   })
 
   useEffect(() => {
-    setColumnVisibility({
-      ...columnVisibility,
+    setColumnVisibility((prevVisibility) => ({
+      ...prevVisibility,
       skilling: is_edit_mode,
-    })
+    }));
+  }, [is_edit_mode]); 
 
-    // this is the changing of edit to not edit so edited level should be saved
-    const updatedData = data.map((item) => ({...item, level : item.edited_level}));
-    setData(updatedData);
-
-  }, [is_edit_mode]);
+useEffect(() => {
+    setData((prevData) => prevData.map((item) => ({
+      ...item,
+      level: item.edited_level,
+    })));
+  }, [is_edit_mode]); 
 
   return (
     <div className="">

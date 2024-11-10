@@ -9,14 +9,14 @@ import { useState } from 'react';
 
 
 export default function SkillsPage() {
-  const skills = skillData;
+  let skills = skillData;
   const [isEditMode, setEditMode] = useState(false);
   const toggle_edit_mode = () => setEditMode(!isEditMode);
 
   const discard_values = () => {
     setEditMode(false);
-    const skills = skillData;
-  }
+    skills = skillData;
+  };
   
   return (
     <div className="container mx-auto py-5">

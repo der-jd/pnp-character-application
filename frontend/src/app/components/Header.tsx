@@ -1,26 +1,18 @@
 import Link from 'next/link'
-import { useAuth } from '../context/AuthContext'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { useState } from 'react'
+// import { useRouter } from 'next/navigation'
 
 import { Button } from "@/components/ui/button";
 
 import "../styles/globals.css"
 
 export default function Header() {
-  const { logout } = useAuth()
-  const router = useRouter()
-  const [dropdownOpen, setDropdownOpen] = useState(false)
+  //const { logout } = useAuth()
+  // const router = useRouter()
 
-  const handleLogout = () => {
-    logout()
-    router.push('/')
-  }
-
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev)
-  }
+  // const handleLogout = () => {
+  //   logout()
+  //   router.push('/')
+  // }
 
   return (
     <header className="p-4 w-full bg-gray-300">

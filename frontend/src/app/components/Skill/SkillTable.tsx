@@ -130,19 +130,22 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
 
   useEffect(() => {
     setShowActiveOnly(!is_edit_mode);
-    setColumnVisibility({
-      ...columnVisibility,
+    
+    // Update columnVisibility based on is_edit_mode
+    setColumnVisibility((prevVisibility) => ({
+      ...prevVisibility,
       is_active: is_edit_mode,
       cost_category: is_edit_mode,
       cost: is_edit_mode,
       skilling: is_edit_mode,
-    })
+    }));
 
-    // this is the changing of edit to not edit so edited level should be saved
-    const updatedData = data.map((item) => ({...item, level : item.edited_level}));
-    setData(updatedData);
-
-  }, [is_edit_mode]);
+    // Update data levels based on edited_level
+    setData((prevData) => prevData.map((item) => ({
+      ...item,
+      level: item.edited_level,
+    })));
+  }, [is_edit_mode]); 
 
   return (
     <div className="w-full">

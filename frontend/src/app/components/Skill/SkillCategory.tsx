@@ -1,7 +1,7 @@
 
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 
 import { ISkillProps } from './SkillDefinitions';
 import { SkillsTable } from "./SkillTable";
