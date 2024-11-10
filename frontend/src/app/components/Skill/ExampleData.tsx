@@ -2,16 +2,6 @@ import { CostCategory, ISkillProps } from './SkillDefinitions';
 
 const skillData: ISkillProps[] = [
   {
-    name: "Körper",
-    category: "Athletik",
-    level: 5,
-    is_active: true,
-    cost_category: CostCategory.NORMAL,
-    cost: 50,
-    is_edited: false,
-    edited_level: 5,
-  },
-  {
     name: "Athletik",
     category: "Athletik",
     level: 3,

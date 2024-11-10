@@ -148,7 +148,7 @@ export function render_skill_icon(skill_name: string): JSX.Element {
     case "Abrichten":               return <GiBearHead size={25}/>;
     case "Ackerbau":                return <GiField size={25}/>;
     case "Bogenbau":                return <GiBowString size={25}/>;
-    case "Maurerarbeiten":          return <GiCampCookingPot />;
+    case "Maurerarbeiten":          return <GiCampCookingPot size={25}/>;
     case "Alkoholherstellung":      return <GiBeerHorn size={25}/>;
     case "Fahrzeug lenken":         return <GiRaceCar size={25}/>;
     case "Falschspiel":             return <GiCardExchange size={25} />;

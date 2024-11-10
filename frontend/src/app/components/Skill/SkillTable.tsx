@@ -106,30 +106,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
     {
       accessorKey: "cost_category",
       header: () => <div className="text-center">Cost Category</div>,
-      cell: ({ row }) => <div className="text-center">{getCostCategoryLabel(row.original.cost_category)}</div>,
-    },
-    {
-      accessorKey: "cost",
-      header: () => <div className="text-right">Cost</div>,
-      cell: 
-        ({ row }) => 
-          <div className="text-right">
-            <Button className={(() => {
-              switch(row.original.cost_category) {
-                case CostCategory.FREE:
-                  return "bg-green-800 text-center text-white hover:bg-gray-300 hover:text-black";
-                case CostCategory.LOW_PRICED:
-                  return "bg-green-600 text-center text-white hover:bg-gray-300 hover:text-black";
-                case CostCategory.NORMAL:
-                  return "bg-orange-400 text-center text-white hover:bg-gray-300 hover:text-black";
-                case CostCategory.EXPENSIVE:
-                  return "bg-orange-800 text-center text-white hover:bg-gray-300 hover:text-black";
-              }
-            })()}>
-              {row.getValue("cost")}
-            </Button>
-          
-          </div>
+      cell: ({ row }) => <div className="text-left">{getCostCategoryLabel(row.original.cost_category)}</div>,
     },
     {
       accessorKey: "skilling",
