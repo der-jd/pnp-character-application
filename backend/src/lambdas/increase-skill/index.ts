@@ -146,7 +146,7 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
 
   return 500;
 
-// TODO check for existing skill id/name
+  // TODO check for existing skill id/name
 
   //  if (response.skills[skillId].activated === "false") {
   //    throw {
