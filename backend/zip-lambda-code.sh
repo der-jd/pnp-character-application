@@ -18,7 +18,7 @@ echo "Package Lambda code in '$build_dir' directory"
 for lambda in "${lambdas[@]}"
 do
   echo "Zipping code for $lambda..."
-  zip --recurse-paths --junk-paths $dist_dir/$lambda.zip $build_dir/$lambda/*
+  zip --recurse-paths --junk-paths "$dist_dir/$lambda-$CIRCLE_SHA1.zip" $build_dir/$lambda/*
 done
 
 echo "Zip files created and saved in '$dist_dir'!"

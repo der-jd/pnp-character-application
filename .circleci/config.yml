@@ -181,11 +181,13 @@ jobs:
           name: Terraform plan
           command: |
             cd terraform
+            export TF_VAR_git_commit_hash=$CIRCLE_SHA1
             terraform plan -out tfapply
       - run:
           name: Terraform apply
           command: |
             cd terraform
+            export TF_VAR_git_commit_hash=$CIRCLE_SHA1
             terraform apply -auto-approve tfapply
 
   terraform-destroy:
