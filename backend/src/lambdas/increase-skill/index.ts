@@ -11,7 +11,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
     const characterId = event.pathParameters?.characterId;
-    const skillId = event.pathParameters?.skillId;
+    const skillName = event.pathParameters?.skillName;
 
     // The conditional parse is necessary for Lambda tests via the AWS console
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
@@ -19,6 +19,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     let skillValue = body.initialValue;
     const costCategory = CostCategory.parse(body.costCategory);
+    let totalIncreaseCost = 0;
     for (let i = 0; i < body.increasedPoints; i++) {
       const increaseCost = getIncreaseCost(skillValue, costCategory);
 
@@ -32,6 +33,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       }
 
       skillValue += 1;
+      totalIncreaseCost += increaseCost;
       availableAdventurePoints -= increaseCost;
       // TODO add event to history event list --> apply all events in the end when it is clear if there are enough ap
     }
@@ -47,7 +49,8 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       },
       UpdateExpression:
         `SET characterSheet.calculationPoints.adventurePoints.available = ${availableAdventurePoints}, ` +
-        `characterSheet.skills.${skillId}.value = ${skillValue}`,
+        `characterSheet.skills.${skillName}.value = ${skillValue}, ` +
+        `characterSheet.skills.${skillName}.totalCost = characterSheet.skills.${skillName}.totalCost + ${totalIncreaseCost}`,
     };
     dynamoDb.updateItem(params, function (error: any, data: any) {
       if (error) {
@@ -94,7 +97,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
  */
 async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
   const characterId = event.pathParameters?.characterId;
-  const skillId = event.pathParameters?.skillId;
+  const skillName = event.pathParameters?.skillName;
   // The conditional parse is necessary for Lambda tests via the AWS console
   const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
   const initialSkillValue = body.initialValue;
@@ -103,7 +106,7 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
 
   if (
     typeof characterId !== "string" ||
-    typeof skillId !== "string" ||
+    typeof skillName !== "string" ||
     typeof initialSkillValue !== "number" ||
     typeof increasedPoints !== "number" ||
     typeof costCategory !== "string"
@@ -125,14 +128,6 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
       }),
     };
   }
-  if (!uuidRegex.test(skillId)) {
-    throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Skill id is not a valid UUID format!",
-      }),
-    };
-  }
 
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
@@ -150,6 +145,8 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
   console.log("Successfully got DynamoDB item", response);
 
   return 500;
+
+// TODO check for existing skill id/name
 
   //  if (response.skills[skillId].activated === "false") {
   //    throw {
