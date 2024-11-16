@@ -94,7 +94,7 @@ jobs:
           name: Build Lambda Layer
           command: |
             # https://docs.aws.amazon.com/lambda/latest/dg/nodejs-layers.html
-            mkdir --parent backend/build/nodejs
+            mkdir --parent backend/build/lambda-layer/nodejs
             cd backend/src/lambda-layer
             npm install
             cp --verbose --recursive node_modules ../../build/lambda-layer/nodejs
