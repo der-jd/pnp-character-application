@@ -1,5 +1,9 @@
+locals {
+  characters_table_name = "pnp-app-characters"
+}
+
 resource "aws_dynamodb_table" "characters" {
-  name         = "pnp-app-characters"
+  name         = local.characters_table_name
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "characterId"
 
