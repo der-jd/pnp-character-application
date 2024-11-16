@@ -97,7 +97,7 @@ jobs:
             mkdir --parent backend/build/nodejs
             cd backend/src/lambda-layer
             npm install
-            cp --verbose --recursive node_modules ../../build/nodejs
+            cp --verbose --recursive node_modules ../../build/lambda-layer/nodejs
       - persist_to_workspace:
           root: backend/build
           paths:
