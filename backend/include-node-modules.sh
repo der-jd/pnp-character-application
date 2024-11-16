@@ -20,7 +20,7 @@ do
 
   echo "Installing prod dependencies in $build_dir/$lambda..."
   cd $build_dir/$lambda
-  npm install --production
+  npm install --omit=dev
   cd $start_dir
 done
 
