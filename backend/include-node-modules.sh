@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e # Exit immediately if any command exits with a non-zero status. Needed for the for loop below
+
 build_dir="build/lambdas"
 src_dir="src/lambdas"
 start_dir=$pwd
