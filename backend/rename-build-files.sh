@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-lambda_build_dir="build/lambdas"
+build_dir="build"
 
-mkdir --parents $lambda_build_dir
+mkdir --parents $build_dir
 
-echo "Rename all .js files in '$lambda_build_dir' to .mjs"
-find "$lambda_build_dir" -type f -name "*.js" | while read -r file; do
+echo "Rename all .js files in '$build_dir' to .mjs"
+find "$build_dir" -type f -name "*.js" | while read -r file; do
   new_file="${file%.js}.mjs"
   echo "Renaming $file -> $new_file"
   mv "$file" "$new_file"
