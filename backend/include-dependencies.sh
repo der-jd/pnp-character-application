@@ -16,9 +16,6 @@ done < <(find "$lambda_build_dir" -mindepth 1 -maxdepth 1 -type d -print0)
 echo "Include dependencies in Lambda code"
 for lambda in "${lambdas[@]}"
 do
-  echo "Copying relative dependencies..."
-  cp --verbose $build_dir/*.js $lambda_build_dir/$lambda
-
   echo "Copying package*.json files..."
   cp --verbose $src_dir/$lambda/package*.json $lambda_build_dir/$lambda
 
