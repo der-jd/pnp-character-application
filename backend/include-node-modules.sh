@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+build_dir="build/lambdas"
+src_dir="src/lambdas"
+start_dir=$pwd
+
+# Gather the names of all subdirectories (Lambda functions) in the build_dir
+lambdas=()
+while IFS= read -r -d '' dir; do
+  lambdas+=("$(basename "$dir")")
+done < <(find "$build_dir" -mindepth 1 -maxdepth 1 -type d -print0)
+
+echo "Include node_modules in Lambda code"
+for lambda in "${lambdas[@]}"
+do
+  echo "Copying package*.json files..."
+  cp $src_dir/$lambda/package*.json $build_dir/$lambda
+
+  echo "Installing prod dependencies in $build_dir/$lambda..."
+  cd $build_dir/$lambda
+  npm install --production
+  cd $start_dir
+done
+
+echo "All dependencies installed!"
