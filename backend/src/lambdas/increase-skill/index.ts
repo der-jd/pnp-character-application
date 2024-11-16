@@ -14,7 +14,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const skillName = event.pathParameters?.skillName;
 
     // TODO remove after test
-    console.log("Is change uploaded by Terraform?")
+    console.log("Is change uploaded by Terraform?");
 
     // The conditional parse is necessary for Lambda tests via the AWS console
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
