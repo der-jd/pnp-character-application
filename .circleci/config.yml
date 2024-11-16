@@ -18,7 +18,7 @@ workflows:
     jobs:
       - check-format-backend-files
       - lint-typescript-code
-      - package-lambda-code:
+      - build-backend:
           requires:
             - check-format-backend-files
             - lint-typescript-code
@@ -26,7 +26,7 @@ workflows:
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
           requires:
-            - package-lambda-code
+            - build-backend
             - check-format-terraform-code
             - lint-terraform-code
       - build-frontend:
@@ -75,7 +75,7 @@ jobs:
             cd backend
             npm run lint
 
-  package-lambda-code:
+  build-backend:
     docker:
       - image: cimg/node:22.10
     steps:
@@ -90,13 +90,8 @@ jobs:
           command: |
             cd backend
             npm run build
-      - run:
-          name: Zip code
-          command: |
-            cd backend
-            npm run zip
       - persist_to_workspace:
-          root: backend/dist
+          root: backend/build
           paths:
             - ./*
 
@@ -169,7 +164,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: backend/dist
+          at: backend/build
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
@@ -181,13 +176,11 @@ jobs:
           name: Terraform plan
           command: |
             cd terraform
-            export TF_VAR_git_commit_hash=$CIRCLE_SHA1
             terraform plan -out tfapply
       - run:
           name: Terraform apply
           command: |
             cd terraform
-            export TF_VAR_git_commit_hash=$CIRCLE_SHA1
             terraform apply -auto-approve tfapply
 
   terraform-destroy:
