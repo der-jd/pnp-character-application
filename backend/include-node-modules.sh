@@ -16,7 +16,7 @@ echo "Include node_modules in Lambda code"
 for lambda in "${lambdas[@]}"
 do
   echo "Copying package*.json files..."
-  cp $src_dir/$lambda/package*.json $build_dir/$lambda
+  cp --verbose $src_dir/$lambda/package*.json $build_dir/$lambda
 
   echo "Installing prod dependencies in $build_dir/$lambda..."
   cd $build_dir/$lambda
