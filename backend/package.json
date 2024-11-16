@@ -8,7 +8,7 @@
     "format": "prettier . --write",
     "check-format": "prettier . --check",
     "lint": "eslint .",
-    "build": "tsc && ./rename-build-files.sh && ./include-node-modules.sh"
+    "build": "tsc && ./rename-build-files.sh && ./include-dependencies.sh"
   },
   "dependencies": {
     "increase-skill": "file:src/lambdas/increase-skill",
