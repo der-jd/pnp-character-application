@@ -1,3 +1,16 @@
+data "archive_file" "configuration" {
+  type        = "zip"
+  source_dir  = "../backend/build/nodejs"
+  output_path = "../backend/dist/lambda-layer.zip"
+}
+
+resource "aws_lambda_layer_version" "configuration" {
+  layer_name          = "configuration"
+  filename            = "../backend/dist/lambda-layer.zip"
+  source_code_hash    = data.archive_file.configuration.output_base64sha256
+  compatible_runtimes = ["nodejs20.x"]
+}
+
 data "archive_file" "increase_skill" {
   type        = "zip"
   source_dir  = "../backend/build/lambdas/increase-skill"
@@ -12,6 +25,7 @@ resource "aws_lambda_function" "increase_skill_lambda" {
 
   filename         = "../backend/dist/increase-skill.zip"
   source_code_hash = data.archive_file.increase_skill.output_base64sha256
+  layers           = [aws_lambda_layer_version.configuration.arn]
   environment {
     variables = {
       TABLE_NAME = local.characters_table_name
