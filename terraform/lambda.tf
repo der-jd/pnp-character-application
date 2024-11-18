@@ -1,6 +1,6 @@
 data "archive_file" "configuration" {
   type        = "zip"
-  source_dir  = "../backend/build/lambda-layer"
+  source_dir  = "../backend/build"
   output_path = "../backend/dist/lambda-layer.zip"
 }
 
