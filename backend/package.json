@@ -11,6 +11,7 @@
     "build": "tsc && ./rename-build-files.sh && ./include-dependencies.sh"
   },
   "dependencies": {
+    "config": "file:src/config",
     "increase-skill": "file:src/lambdas/increase-skill",
     "get-character": "file:src/lambdas/get-character"
   },

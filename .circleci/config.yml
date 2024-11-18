@@ -32,9 +32,9 @@ workflows:
       - build-frontend:
           requires:
             - deploy-backend-and-infrastructure
-      - deploy-frontend:
-          requires:
-            - build-frontend
+      #- deploy-frontend:
+       #   requires:
+        #    - build-frontend
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
@@ -90,14 +90,6 @@ jobs:
           command: |
             cd backend
             npm run build
-      - run:
-          name: Build Lambda Layer
-          command: |
-            # https://docs.aws.amazon.com/lambda/latest/dg/nodejs-layers.html
-            mkdir --parent backend/build/lambda-layer/nodejs
-            cd backend/src/lambda-layer
-            npm install
-            cp --verbose --recursive node_modules ../../build/lambda-layer/nodejs
       - persist_to_workspace:
           root: backend/build
           paths:
