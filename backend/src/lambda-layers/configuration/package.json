@@ -2,7 +2,6 @@
   "name": "configuration",
   "version": "1.0.0",
   "dependencies": {
-    "config": "file:../../config",
-    "lodash": "4.17.21"
+    "config": "file:../../config"
   }
 }
