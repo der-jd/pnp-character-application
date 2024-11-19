@@ -51,9 +51,10 @@ do
   cd $layer_dest_dir
   npm install --omit=dev
 
-  echo "Copying dependencies into required sub folder for Lambda Layer..."
+  echo "Moving dependencies into required sub folder for Lambda Layer..."
   mkdir nodejs
   cp --verbose --recursive --dereference node_modules nodejs
+  rm -r node_modules
 
   cd $start_dir
 done
