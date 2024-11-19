@@ -6,6 +6,7 @@ start_dir=$PWD
 lambdas_build_dir="build/lambdas"
 lambda_layers_build_dir="build/lambda-layers"
 src_dir="src"
+lambda_layers_src_dir="$src_dir/lambda-layers"
 
 # Gather the names of all subdirectories (Lambda functions) in the lambdas_build_dir
 lambdas=()
@@ -31,7 +32,7 @@ done
 lambda_layers=()
 while IFS= read -r -d '' dir; do
   lambda_layers+=("$(basename "$dir")")
-done < <(find "$lambda_layers_build_dir" -mindepth 1 -maxdepth 1 -type d -print0)
+done < <(find "$lambda_layers_src_dir" -mindepth 1 -maxdepth 1 -type d -print0)
 
 echo ""
 echo "========================================================="
@@ -46,7 +47,7 @@ do
 
   # TODO copy package files to correct dir (nodejs) and then run npm install or run it at first and after that copy the output (node_modules) to the nodejs dir?!
   echo "Copying package*.json files..."
-  cp --verbose $src_dir/lambda-layers/$layer/package*.json $layer_dest_dir
+  cp --verbose $lambda_layers_src_dir/$layer/package*.json $layer_dest_dir
 
   echo "Installing prod dependencies in $layer_dest_dir..."
   cd $layer_dest_dir
