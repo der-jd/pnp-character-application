@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { DynamoDB } from "aws-sdk";
+import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { SkillThreshold, CostCategory, costMatrix } from "config";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -38,34 +37,22 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       // TODO add event to history event list --> apply all events in the end when it is clear if there are enough ap
     }
 
-    // TODO remove!! this is sdk v2. Use v3 instead
-    // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#updateItem-property
-    const dynamoDb = new DynamoDB({ apiVersion: "2012-08-10" });
-    const params = {
+    // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
+    const client = new DynamoDBClient({});
+    const docClient = DynamoDBDocumentClient.from(client);
+    const command = new UpdateCommand({
       TableName: process.env.TABLE_NAME,
       Key: {
-        characterId: {
-          N: characterId,
-        },
+        characterId: characterId,
       },
       UpdateExpression:
-        `SET characterSheet.calculationPoints.adventurePoints.available = ${availableAdventurePoints}, ` +
+        `set characterSheet.calculationPoints.adventurePoints.available = ${availableAdventurePoints}, ` +
         `characterSheet.skills.${skillName}.value = ${skillValue}, ` +
         `characterSheet.skills.${skillName}.totalCost = characterSheet.skills.${skillName}.totalCost + ${totalIncreaseCost}`,
-    };
-    dynamoDb.updateItem(params, function (error: any, data: any) {
-      if (error) {
-        throw {
-          statusCode: 500,
-          body: JSON.stringify({
-            message: "Error when updating DynamoDB item",
-            error: (error as Error).message,
-          }),
-        };
-      }
-
-      console.log("Successfully updated DynamoDB item", data.Item);
     });
+    const response = await docClient.send(command);
+    console.log("Successfully updated DynamoDB item", response);
+    console.log(response);
 
     // TODO save event in history
     return {
