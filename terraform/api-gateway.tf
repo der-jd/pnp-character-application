@@ -29,7 +29,12 @@ resource "aws_api_gateway_method" "get_method" {
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on  = [aws_api_gateway_integration.lambda_integration]
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  stage_name  = "prod"
+}
+
+resource "aws_api_gateway_stage" "prod" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  deployment_id = aws_api_gateway_deployment.api_deployment.id
+  stage_name    = "prod"
 }
 
 output "api_gateway_url" {
