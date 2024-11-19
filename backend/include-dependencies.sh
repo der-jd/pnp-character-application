@@ -42,9 +42,9 @@ echo ""
 echo "Include dependencies for Lambda Layers"
 for layer in "${lambda_layers[@]}"
 do
-  # TODO copy package files to correct dir (nodejs) and then run npm install or run it at first and after that copy the output (node_modules) to the nodejs dir?!
   echo "Copying package*.json files..."
   layer_dest_dir="$lambda_layers_build_dir/$layer"
+  mkdir --parent $layer_dest_dir
   cp --verbose $lambda_layers_src_dir/$layer/package*.json $layer_dest_dir
 
   echo "Installing prod dependencies in $layer_dest_dir..."
