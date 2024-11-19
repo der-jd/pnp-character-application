@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
-    "config": "file:../../config"
+    "config": "file:../../config",
+    "lodash": "4.17.21"
   }
 }
