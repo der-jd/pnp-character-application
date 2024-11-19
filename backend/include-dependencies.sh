@@ -33,6 +33,10 @@ while IFS= read -r -d '' dir; do
   lambda_layers+=("$(basename "$dir")")
 done < <(find "$lambda_layers_build_dir" -mindepth 1 -maxdepth 1 -type d -print0)
 
+echo ""
+echo "========================================================="
+echo ""
+
 # https://docs.aws.amazon.com/lambda/latest/dg/nodejs-layers.html
 echo "Include dependencies for Lambda Layers"
 for layer in "${lambda_layers[@]}"
