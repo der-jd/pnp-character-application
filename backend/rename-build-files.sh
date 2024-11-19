@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-build_dir="build/lambdas"
+build_dir="build"
 
 echo "Rename all .js files in '$build_dir' to .mjs so that AWS Lambda recognizes them as ES Modules"
 find "$build_dir" -type f -name "*.js" | while read -r file; do
