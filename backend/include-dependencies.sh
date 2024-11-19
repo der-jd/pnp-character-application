@@ -52,8 +52,8 @@ do
   npm install --omit=dev
 
   echo "Moving dependencies into required sub folder for Lambda Layer..."
-  mkdir nodejs
-  cp --verbose --recursive --dereference node_modules nodejs
+  mkdir --parent nodejs/node20
+  cp --verbose --recursive --dereference node_modules nodejs/node20
   rm -r node_modules
 
   cd $start_dir
