@@ -38,6 +38,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       // TODO add event to history event list --> apply all events in the end when it is clear if there are enough ap
     }
 
+    // TODO remove!! this is sdk v2. Use v3 instead
     // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#updateItem-property
     const dynamoDb = new DynamoDB({ apiVersion: "2012-08-10" });
     const params = {
