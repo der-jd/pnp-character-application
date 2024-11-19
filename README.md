@@ -7,6 +7,7 @@ Serverless web application for character sheets of a custom Pen & Paper game.
 ## Architecture
 
 ![Architecture](aws_architecture.png "Architecture")
+TODO update
 
 ## Local development setup
 

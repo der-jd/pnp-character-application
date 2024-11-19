@@ -1,10 +1,36 @@
+data "archive_file" "configuration" {
+  type        = "zip"
+  source_dir  = "../backend/build/lambda-layers/configuration"
+  output_path = "../backend/dist/configuration.zip"
+}
+
+resource "aws_lambda_layer_version" "configuration" {
+  layer_name          = "configuration"
+  filename            = "../backend/dist/configuration.zip"
+  source_code_hash    = data.archive_file.configuration.output_base64sha256
+  compatible_runtimes = ["nodejs20.x"]
+}
+
+data "archive_file" "increase_skill" {
+  type        = "zip"
+  source_dir  = "../backend/build/lambdas/increase-skill"
+  output_path = "../backend/dist/increase-skill.zip"
+}
+
 resource "aws_lambda_function" "increase_skill_lambda" {
   function_name = "pnp-increase-skill"
   handler       = "index.handler"
   runtime       = "nodejs20.x"
+  role          = aws_iam_role.lambda_exec_role.arn
 
-  role     = aws_iam_role.lambda_exec_role.arn
-  filename = "../backend/dist/skill-calculation.zip" // TODO code changes are not automatically applied with terraform apply --> use zip file name based on git hash?!
+  filename         = "../backend/dist/increase-skill.zip"
+  source_code_hash = data.archive_file.increase_skill.output_base64sha256
+  layers           = [aws_lambda_layer_version.configuration.arn]
+  environment {
+    variables = {
+      TABLE_NAME = local.characters_table_name
+    }
+  }
 }
 
 resource "aws_iam_role" "lambda_exec_role" {

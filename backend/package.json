@@ -1,19 +1,21 @@
 {
   "name": "pnp-application",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
   "scripts": {
     "prepare": "cd .. && husky backend/.husky",
     "format": "prettier . --write",
     "check-format": "prettier . --check",
     "lint": "eslint .",
-    "build": "tsc && ./rename-build-files.sh",
-    "zip": "./zip-lambda-code.sh"
+    "build": "tsc && ./rename-build-files.sh && ./include-dependencies.sh"
+  },
+  "dependencies": {
+    "config": "file:src/config",
+    "increase-skill": "file:src/lambdas/increase-skill",
+    "get-character": "file:src/lambdas/get-character"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
-    "@types/aws-lambda": "^8.10.145",
     "eslint": "^9.13.0",
     "globals": "^15.11.0",
     "husky": "^9.1.6",

@@ -18,7 +18,7 @@ workflows:
     jobs:
       - check-format-backend-files
       - lint-typescript-code
-      - package-lambda-code:
+      - build-backend:
           requires:
             - check-format-backend-files
             - lint-typescript-code
@@ -26,18 +26,16 @@ workflows:
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
           requires:
-            - package-lambda-code
+            - build-backend
             - check-format-terraform-code
             - lint-terraform-code
       - build-frontend:
           requires:
             - deploy-backend-and-infrastructure
-      - deploy-frontend:
-          requires:
-            - build-frontend
-
-
-           
+      # TODO only deploy frontend if files have changed
+      #- deploy-frontend:
+       #   requires:
+        #    - build-frontend
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
@@ -78,7 +76,7 @@ jobs:
             cd backend
             npm run lint
 
-  package-lambda-code:
+  build-backend:
     docker:
       - image: cimg/node:22.10
     steps:
@@ -93,13 +91,8 @@ jobs:
           command: |
             cd backend
             npm run build
-      - run:
-          name: Zip code
-          command: |
-            cd backend
-            npm run zip
       - persist_to_workspace:
-          root: backend/dist
+          root: backend/build
           paths:
             - ./*
 
@@ -128,7 +121,7 @@ jobs:
       - run:
           name: Lint Terraform code
           command: make lint-terraform
-  
+
   build-frontend:
     docker:
       - image: cimg/node:22.10
@@ -172,7 +165,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: backend/dist
+          at: backend/build
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
