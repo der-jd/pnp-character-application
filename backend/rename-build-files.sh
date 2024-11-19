@@ -2,8 +2,6 @@
 
 build_dir="build"
 
-mkdir --parents $build_dir
-
 echo "Rename all .js files in '$build_dir' to .mjs"
 find "$build_dir" -type f -name "*.js" | while read -r file; do
   new_file="${file%.js}.mjs"
