@@ -66,7 +66,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     };
   } catch (error: any) {
     return {
-      statusCode: error.statusCode,
+      statusCode: 500,
       body: error.body
         ? error.body
         : JSON.stringify({
