@@ -61,7 +61,7 @@ resource "aws_iam_role_policy" "lambda_inline_policy" {
     Statement = [{
       Effect   = "Allow",
       Action   = "dynamodb:*",
-      Resource = ["${aws_dynamodb_table.characters.arn}", "${aws_dynamodb_table.characters_history.arn}"]
+      Resource = [aws_dynamodb_table.characters.arn, aws_dynamodb_table.characters_history.arn]
     }]
   })
 }
