@@ -38,7 +38,7 @@ echo ""
 echo "========================================================="
 echo ""
 
-# https://docs.aws.amazon.com/lambda/latest/dg/nodejs-layers.html
+# https://docs.aws.amazon.com/lambda/latest/dg/typescript-layers.html
 echo "Include dependencies for Lambda Layers"
 for layer in "${lambda_layers[@]}"
 do
