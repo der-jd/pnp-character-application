@@ -130,9 +130,9 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
 
   const response = await docClient.send(command);
 
-  console.log("Successfully got DynamoDB item", response);
+  console.log("Successfully got DynamoDB item");
 
-  return 500;
+  return response.Item?.characterSheet.calculationPoints.adventurePoints.available;
 
   // TODO check for existing skill id/name
 
