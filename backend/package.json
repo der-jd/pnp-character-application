@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "config": "file:src/config",
-    "increase-skill": "file:src/lambdas/increase-skill",
-    "get-character": "file:src/lambdas/get-character"
+    "get-character": "file:src/lambdas/get-character",
+    "increase-skill": "file:src/lambdas/increase-skill"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
