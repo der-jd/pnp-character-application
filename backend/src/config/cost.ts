@@ -16,7 +16,7 @@ export namespace CostCategory {
   }
 }
 
-export const enum SkillThreshold {
+const enum SkillThreshold {
   _1,
   _2,
   _3,
@@ -32,9 +32,22 @@ export const enum SkillThreshold {
  * | EXPENSIVE  |      x      |      x      |      x      |
  * +------------+-------------+-------------+-------------+
  */
-export const costMatrix: number[][] = [
+const costMatrix: number[][] = [
   [0, 0, 0],
   [0.5, 1, 2],
   [1, 2, 3],
   [2, 3, 4],
 ];
+
+export function getIncreaseCost(skillValue: number, costCategory: CostCategory): number {
+  let column: number;
+  if (skillValue < SkillThreshold._1) {
+    column = SkillThreshold._1;
+  } else if (skillValue < SkillThreshold._2) {
+    column = SkillThreshold._2;
+  } else {
+    column = SkillThreshold._3;
+  }
+
+  return costMatrix[costCategory][column];
+}

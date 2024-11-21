@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { SkillThreshold, CostCategory, costMatrix, Character, CharacterSheet } from "config/index.mjs";
+import { CostCategory, Character, getIncreaseCost, getSkill } from "config/index.mjs";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill(event);
@@ -16,8 +16,8 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     let availableAdventurePoints = characterSheet.calculationPoints.adventurePoints.available;
     const skillCategory = event.pathParameters?.skillCategory as keyof Character["characterSheet"]["skills"];
     const skillName = event.pathParameters?.skillName as string;
-    let skillValue = CharacterSheet.getSkill(characterSheet.skills, skillCategory, skillName).current;
-    let totalCost = CharacterSheet.getSkill(characterSheet.skills, skillCategory, skillName).totalCost;
+    let skillValue = getSkill(characterSheet.skills, skillCategory, skillName).current;
+    let totalCost = getSkill(characterSheet.skills, skillCategory, skillName).totalCost;
 
     // The conditional parse is necessary for Lambda tests via the AWS console
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
@@ -172,17 +172,4 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character>
       }),
     };
   }
-}
-
-function getIncreaseCost(skillValue: number, costCategory: CostCategory): number {
-  let column: number;
-  if (skillValue < SkillThreshold._1) {
-    column = SkillThreshold._1;
-  } else if (skillValue < SkillThreshold._2) {
-    column = SkillThreshold._2;
-  } else {
-    column = SkillThreshold._3;
-  }
-
-  return costMatrix[costCategory][column];
 }
