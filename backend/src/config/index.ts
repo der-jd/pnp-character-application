@@ -1,4 +1,4 @@
-export { CostCategory, SkillThreshold, costMatrix } from "./cost-settings.js";
+export { CostCategory, SkillThreshold, costMatrix } from "cost-settings.mjs";
 export {
   Attribute,
   BaseValue,
@@ -7,4 +7,4 @@ export {
   RangedCombatSkill,
   Character,
   CharacterSheet,
-} from "./character.js";
+} from "character.mjs";
