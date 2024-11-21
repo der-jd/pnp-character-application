@@ -85,6 +85,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
  */
 async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
   const characterId = event.pathParameters?.characterId;
+  const skillCategory = event.pathParameters?.skillCategory;
   const skillName = event.pathParameters?.skillName;
   // The conditional parse is necessary for Lambda tests via the AWS console
   const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
@@ -94,6 +95,7 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
 
   if (
     typeof characterId !== "string" ||
+    typeof skillCategory !== "string" ||
     typeof skillName !== "string" ||
     typeof initialSkillValue !== "number" ||
     typeof increasedPoints !== "number" ||
@@ -131,39 +133,32 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
   try {
     const response = await docClient.send(command);
     console.log("Successfully got DynamoDB item");
+
+    if (response.Item?.skills.$skillCategory.$skillName.activated === "false") {
+      throw {
+        statusCode: 409,
+        body: JSON.stringify({
+          message: "Skill is not activated yet! Activate it before it can be increased.",
+        }),
+      };
+    }
+
+    if (initialSkillValue !== response.Item?.skills.$skillCategory.$skillName.current) {
+      console.warn(
+        "The given skill value doesn't match the value in the backend! Continue calculation with the value from the backend anyway.",
+      );
+    }
+
     return response.Item?.characterSheet.calculationPoints.adventurePoints.available;
   } catch (error: any) {
     throw {
       statusCode: 500,
       body: JSON.stringify({
-        message: "Error when getting DynamoDB item",
+        message: "Error when getting DynamoDB item. Skill category and name may be wrong.",
         error: (error as Error).message,
       }),
     };
   }
-
-  // TODO check for existing skill id/name
-
-  //  if (response.skills[skillId].activated === "false") {
-  //    throw {
-  //      statusCode: 409,
-  //      body: JSON.stringify({
-  //        message: "Skill is not activated yet! Activate it before it can be increased.",
-  //      }),
-  //    };
-  //  }
-  //
-  //  if (initialSkillValue !== response.skills[skillId].value) {
-  //    throw {
-  //      statusCode: 409,
-  //      body: JSON.stringify({
-  //        message: "The given skill value doesn't match the value in the backend! Reload the character data.", // TODO this is not really idempotent as duplicate events will always throw?!
-  //      }),
-  //    };
-  //  }
-  //
-  //  return response;
-  //},
 }
 
 function getIncreaseCost(skillValue: number, costCategory: CostCategory): number {
