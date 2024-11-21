@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { SkillThreshold, CostCategory, costMatrix } from "config/index.mjs";
+import { SkillThreshold, CostCategory, costMatrix, Character, CharacterSheet } from "config/index.mjs";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill(event);
@@ -9,16 +9,20 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const characterId = event.pathParameters?.characterId;
-    const skillName = event.pathParameters?.skillName;
+    const character = await verifyParameters(event);
+
+    const characterId = character.characterId;
+    const characterSheet = character.characterSheet;
+    let availableAdventurePoints = characterSheet.calculationPoints.adventurePoints.available;
+    const skillCategory = event.pathParameters?.skillCategory as keyof Character["characterSheet"]["skills"];
+    const skillName = event.pathParameters?.skillName as string;
+    let skillValue = CharacterSheet.getSkill(characterSheet.skills, skillCategory, skillName).current;
+    let totalCost = CharacterSheet.getSkill(characterSheet.skills, skillCategory, skillName).totalCost;
 
     // The conditional parse is necessary for Lambda tests via the AWS console
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
-    let availableAdventurePoints = await verifyParameters(event);
-
-    let skillValue = body.initialValue;
     const costCategory = CostCategory.parse(body.costCategory);
-    let totalIncreaseCost = 0;
+
     for (let i = 0; i < body.increasedPoints; i++) {
       const increaseCost = getIncreaseCost(skillValue, costCategory);
 
@@ -32,7 +36,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       }
 
       skillValue += 1;
-      totalIncreaseCost += increaseCost;
+      totalCost += increaseCost;
       availableAdventurePoints -= increaseCost;
       // TODO add event to history event list --> apply all events in the end when it is clear if there are enough ap
     }
@@ -47,11 +51,11 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       },
       UpdateExpression:
         `set characterSheet.calculationPoints.adventurePoints.available = ${availableAdventurePoints}, ` +
-        `characterSheet.skills.${skillName}.value = ${skillValue}, ` +
-        `characterSheet.skills.${skillName}.totalCost = characterSheet.skills.${skillName}.totalCost + ${totalIncreaseCost}`,
+        `characterSheet.skills.${skillCategory}.${skillName}.current = ${skillValue}, ` +
+        `characterSheet.skills.${skillCategory}.${skillName}.totalCost = ${totalCost}`,
     });
     const response = await docClient.send(command);
-    console.log("Successfully updated DynamoDB item", response);
+    console.log("Successfully updated DynamoDB item");
     console.log(response);
 
     // TODO save event in history
@@ -81,9 +85,9 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
  * All necessary values for the calculation are taken from the backend as single source of truth.
  * Otherwise, unsynchronized or manipulated frontend values could disrupt the backend data.
  *
- * @returns Available adventure points
+ * @returns object for the character item in the DynamoDB table
  */
-async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
+async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character> {
   const characterId = event.pathParameters?.characterId;
   const skillCategory = event.pathParameters?.skillCategory;
   const skillName = event.pathParameters?.skillName;
@@ -127,11 +131,20 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
     Key: {
       characterId: characterId,
     },
-    ProjectionExpression: "characterSheet",
   });
 
   try {
     const response = await docClient.send(command);
+
+    if (!response.Item) {
+      throw {
+        statusCode: 500,
+        body: JSON.stringify({
+          message: "Item from DynamoDB table is missing in the request's response",
+        }),
+      };
+    }
+
     console.log("Successfully got DynamoDB item");
 
     if (response.Item?.skills.$skillCategory.$skillName.activated === "false") {
@@ -145,16 +158,16 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
 
     if (initialSkillValue !== response.Item?.skills.$skillCategory.$skillName.current) {
       console.warn(
-        "The given skill value doesn't match the value in the backend! Continue calculation with the value from the backend anyway.",
+        "The given skill value doesn't match the value in the backend! Continue calculation with the backend value anyway.",
       );
     }
 
-    return response.Item?.characterSheet.calculationPoints.adventurePoints.available;
+    return response.Item as Character;
   } catch (error: any) {
     throw {
       statusCode: 500,
       body: JSON.stringify({
-        message: "Error when getting DynamoDB item. Skill category and name may be wrong.",
+        message: "Error when getting DynamoDB item.",
         error: (error as Error).message,
       }),
     };
