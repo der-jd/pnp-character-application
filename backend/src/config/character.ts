@@ -1,9 +1,9 @@
- /** TODO
-  *  Remove values which can be calculated from interfaces? E.g. the diff between start value and current value.
-  *  It would simplify the update of DynamoDB items because we don't need to calculate and save multiple values.
-  *  On the other side, the frontend would need to calculate these values which means the frontend needs to know something about the logic.
-  *  (Given we want to show the values at all)
-  */
+/** TODO
+ *  Remove values which can be calculated from interfaces? E.g. the diff between start value and current value.
+ *  It would simplify the update of DynamoDB items because we don't need to calculate and save multiple values.
+ *  On the other side, the frontend would need to calculate these values which means the frontend needs to know something about the logic.
+ *  (Given we want to show the values at all)
+ */
 
 export interface Character {
   characterId: string;
@@ -153,15 +153,15 @@ export interface CharacterSheet {
 }
 
 // TODO this function does not work for combat skills because they have a different structure
-  export function getSkill(
-    skills: CharacterSheet["skills"],
-    category: keyof CharacterSheet["skills"],
-    name: string,
-  ): Skill {
-    const skillCategory = skills[category] as Record<string, any>;
-    const skill = skillCategory[name];
-    if (!skill) {
-      throw new Error(`Skill ${name} not found!`);
-    }
-    return skill;
+export function getSkill(
+  skills: CharacterSheet["skills"],
+  category: keyof CharacterSheet["skills"],
+  name: string,
+): Skill {
+  const skillCategory = skills[category] as Record<string, any>;
+  const skill = skillCategory[name];
+  if (!skill) {
+    throw new Error(`Skill ${name} not found!`);
   }
+  return skill;
+}

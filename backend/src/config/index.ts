@@ -7,5 +7,5 @@ export {
   RangedCombatSkill,
   Character,
   CharacterSheet,
-  getSkill
+  getSkill,
 } from "./character.js";
