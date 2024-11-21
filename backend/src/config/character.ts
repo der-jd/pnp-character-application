@@ -145,6 +145,7 @@ export interface CharacterSheet {
   };
 }
 
+// TODO this function does not work for combat skills because they have a different structure
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace CharacterSheet {
   export function getSkill(
