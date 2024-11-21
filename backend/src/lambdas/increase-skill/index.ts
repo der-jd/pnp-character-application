@@ -66,13 +66,13 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     };
   } catch (error: any) {
     return {
-      statusCode: 500,
-      body: error.body
-        ? error.body
-        : JSON.stringify({
-            message: "An error occurred!",
-            error: (error as Error).message,
-          }),
+      statusCode: error.statusCode ?? 500,
+      body:
+        error.body ??
+        JSON.stringify({
+          message: "An error occurred!",
+          error: (error as Error).message,
+        }),
     };
   }
 }
@@ -128,11 +128,19 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
     ProjectionExpression: "characterSheet",
   });
 
-  const response = await docClient.send(command);
-
-  console.log("Successfully got DynamoDB item");
-
-  return response.Item?.characterSheet.calculationPoints.adventurePoints.available;
+  try {
+    const response = await docClient.send(command);
+    console.log("Successfully got DynamoDB item");
+    return response.Item?.characterSheet.calculationPoints.adventurePoints.available;
+  } catch (error: any) {
+    throw {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Error when getting DynamoDB item",
+        error: (error as Error).message,
+      }),
+    };
+  }
 
   // TODO check for existing skill id/name
 
@@ -156,29 +164,6 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
   //
   //  return response;
   //},
-  //(error) => {
-  //  throw {
-  //    statusCode: 500,
-  //    body: JSON.stringify({
-  //      message: "Error when getting DynamoDB item",
-  //      error: (error as Error).message,
-  //    }),
-  //  };
-  //});
-
-  //const dynamoDb = new DynamoDB({ apiVersion: "2012-08-10" });
-  //const params = {
-  //  TableName: process.env.TABLE_NAME,
-  //  Key: {
-  //    characterId: {
-  //      N: characterId,
-  //    },
-  //  },
-  //  ProjectionExpression: "characterSheet",
-  //};
-  //const characterSheet = dynamoDb.getItem(params, function (error: any, data: any): any {
-
-  //return characterSheet.calculationPoints.adventurePoints.available;
 }
 
 function getIncreaseCost(skillValue: number, costCategory: CostCategory): number {
