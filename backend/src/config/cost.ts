@@ -16,6 +16,7 @@ export namespace CostCategory {
   }
 }
 
+// TODO Add Lambda function that returns basic config/rule values for frontend
 const enum SkillThreshold {
   _1,
   _2,
