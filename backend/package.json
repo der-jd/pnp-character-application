@@ -7,7 +7,7 @@
     "format": "prettier . --write",
     "check-format": "prettier . --check",
     "lint": "eslint .",
-    "build": "tsc && ./rename-build-files.sh && ./include-dependencies.sh"
+    "build": "tsc && ./rename-build-files-and-imports.sh && ./include-dependencies.sh"
   },
   "dependencies": {
     "config": "file:src/config",
