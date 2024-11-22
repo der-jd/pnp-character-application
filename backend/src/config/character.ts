@@ -1,10 +1,3 @@
-/** TODO
- *  Remove values which can be calculated from interfaces? E.g. the diff between start value and current value.
- *  It would simplify the update of DynamoDB items because we don't need to calculate and save multiple values.
- *  On the other side, the frontend would need to calculate these values which means the frontend needs to know something about the logic.
- *  (Given we want to show the values at all)
- */
-
 export interface Character {
   characterId: string;
   characterSheet: CharacterSheet;
@@ -12,14 +5,12 @@ export interface Character {
 
 export interface Attribute {
   start: number;
-  increased: number;
   current: number;
   mod: number;
 }
 
 export interface BaseValue {
   start: number;
-  bought: number;
   current: number;
   mod: number;
 }
@@ -27,7 +18,6 @@ export interface BaseValue {
 export interface Skill {
   activated: boolean;
   start: number;
-  increased: number;
   current: number;
   mod: number;
   totalCost: number;
@@ -37,7 +27,6 @@ export interface MeleeCombatSkill {
   activated: boolean;
   handling: number;
   start: number;
-  increased: number;
   current: number;
   mod: number;
   totalCost: number;
@@ -49,7 +38,6 @@ export interface RangedCombatSkill {
   activated: boolean;
   handling: number;
   start: number;
-  increased: number;
   current: number;
   mod: number;
   totalCost: number;
@@ -82,14 +70,11 @@ export interface CharacterSheet {
   calculationPoints: {
     adventurePoints: {
       available: number;
-      spent: number;
       total: number;
     };
     attributePoints: {
       start: number;
-      additional: number;
       available: number;
-      spent: number;
       total: number;
     };
   };
