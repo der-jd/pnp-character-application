@@ -11,6 +11,15 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
   try {
     const character = await verifyParameters(event);
 
+    if (!character) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: "Skill already increased to target value. Nothing to do!",
+        }),
+      };
+    }
+
     const characterId = character.characterId;
     const characterSheet = character.characterSheet;
     let availableAdventurePoints = characterSheet.calculationPoints.adventurePoints.available;
@@ -87,7 +96,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
  *
  * @returns object for the character item in the DynamoDB table
  */
-async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character> {
+async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character | null> {
   const characterId = event.pathParameters?.characterId;
   const skillCategory = event.pathParameters?.skillCategory;
   const skillName = event.pathParameters?.skillName;
@@ -166,9 +175,16 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character>
     }
 
     if (initialSkillValue !== response.Item?.skills.$skillCategory.$skillName.current) {
-      console.warn(
-        "The given skill value doesn't match the value in the backend! Continue calculation with the backend value anyway.",
-      );
+      if (initialSkillValue + increasedPoints === response.Item?.skills.$skillCategory.$skillName.current) {
+        return null;
+      }
+
+      throw {
+        statusCode: 409,
+        body: JSON.stringify({
+          message: "The passed skill value doesn't match the value in the backend!",
+        }),
+      };
     }
 
     return response.Item as Character;
