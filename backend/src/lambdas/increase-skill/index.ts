@@ -113,6 +113,15 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character>
     };
   }
 
+  if (increasedPoints <= 0) {
+    throw {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "Points to increase are 0 or negative! The value must be greater than or equal 1.",
+      }),
+    };
+  }
+
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
   if (!uuidRegex.test(characterId)) {
     throw {
