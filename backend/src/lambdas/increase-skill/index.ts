@@ -67,9 +67,8 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         `characterSheet.skills.${skillCategory}.${skillName}.current = ${skillValue}, ` +
         `characterSheet.skills.${skillCategory}.${skillName}.totalCost = ${totalCost}`,
     });
-    const response = await docClient.send(command);
+    await docClient.send(command);
     console.log("Successfully updated DynamoDB item");
-    console.log(response);
 
     // TODO save event in history
     return {
@@ -77,7 +76,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       body: JSON.stringify({
         message: "Successfully increased skill",
         skillValue: skillValue,
-        increaseCost: getIncreaseCost(skillValue, costCategory),
+        totalCost: totalCost,
         availableAdventurePoints: availableAdventurePoints,
       }),
     };
@@ -143,9 +142,9 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character 
     };
   }
 
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
-
   const command = new GetCommand({
     TableName: process.env.TABLE_NAME,
     Key: {
