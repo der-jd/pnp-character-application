@@ -63,9 +63,19 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         characterId: characterId,
       },
       UpdateExpression:
-        `set characterSheet.calculationPoints.adventurePoints.available = ${availableAdventurePoints}, ` +
-        `characterSheet.skills.${skillCategory}.${skillName}.current = ${skillValue}, ` +
-        `characterSheet.skills.${skillCategory}.${skillName}.totalCost = ${totalCost}`,
+        "SET #adventurePointsAvailable = :available, " +
+        "#currentSkillValue = :current, " +
+        "#skillTotalCost = :totalCost",
+      ExpressionAttributeNames: {
+        "#adventurePointsAvailable": "characterSheet.calculationPoints.adventurePoints.available",
+        "#currentSkillValue": `characterSheet.skills.${skillCategory}.${skillName}.current`,
+        "#skillTotalCost": `characterSheet.skills.${skillCategory}.${skillName}.totalCost`,
+      },
+      ExpressionAttributeValues: {
+        ":available": availableAdventurePoints,
+        ":current": skillValue,
+        ":totalCost": totalCost,
+      },
     });
     await docClient.send(command);
     console.log("Successfully updated DynamoDB item");
