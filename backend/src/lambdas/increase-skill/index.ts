@@ -9,27 +9,30 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const character = await verifyParameters(event);
+    verifyParameters(event);
+
+    const skillName = event.pathParameters?.skillName as string;
+    // The conditional parse is necessary for Lambda tests via the AWS console
+    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
+
+    console.info(`Update character ${event.pathParameters?.characterId}`);
+    console.info(
+      `Increase value of skill '${skillName}' from ${body.initialValue} to ${body.initialValue + body.increasedPoints} by cost category '${body.costCategory}'`,
+    );
+
+    const character = await getCharacterItem(event);
 
     const characterId = character.characterId;
     const characterSheet = character.characterSheet;
     let availableAdventurePoints = characterSheet.calculationPoints.adventurePoints.available;
     const skillCategory = event.pathParameters?.skillCategory as keyof Character["characterSheet"]["skills"];
-    const skillName = event.pathParameters?.skillName as string;
     /**
      * The skill value is taken from the backend as single source of truth, although,
      * at this place it has already been checked that the backend and frontend values match.
      */
     let skillValue = getSkill(characterSheet.skills, skillCategory, skillName).current;
     let totalCost = getSkill(characterSheet.skills, skillCategory, skillName).totalCost;
-    // The conditional parse is necessary for Lambda tests via the AWS console
-    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
     const costCategory = CostCategory.parse(body.costCategory);
-
-    console.info(`Update character ${characterId} with name ${characterSheet.generalInformation.name}`);
-    console.info(
-      `Increase value of skill '${skillName}' from ${body.initialValue} to ${body.initialValue + body.increasedPoints} by cost category '${body.costCategory}'`,
-    );
 
     if (body.initialValue + body.increasedPoints === skillValue) {
       return {
@@ -118,8 +121,8 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
   }
 }
 
-async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character> {
-  console.info("Verifying request's parameters...");
+function verifyParameters(event: APIGatewayProxyEvent) {
+  console.info("Verify request parameters");
 
   const characterId = event.pathParameters?.characterId;
   const skillCategory = event.pathParameters?.skillCategory;
@@ -164,6 +167,18 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character>
       }),
     };
   }
+}
+
+async function getCharacterItem(event: APIGatewayProxyEvent): Promise<Character> {
+  console.info("Get Character from DynamoDB");
+
+  const characterId = event.pathParameters?.characterId;
+  const skillCategory = event.pathParameters?.skillCategory as string;
+  const skillName = event.pathParameters?.skillName as string;
+  // The conditional parse is necessary for Lambda tests via the AWS console
+  const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
+  const initialSkillValue = body.initialValue;
+  const increasedPoints = body.increasedPoints;
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
   const client = new DynamoDBClient({});
@@ -175,47 +190,38 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character>
     },
   });
 
-  try {
-    const response = await docClient.send(command);
+  const response = await docClient.send(command);
 
-    if (!response.Item) {
-      throw {
-        statusCode: 500,
-        body: JSON.stringify({
-          message: "Item from DynamoDB table is missing in the request's response",
-        }),
-      };
-    }
-
-    console.info("Successfully got DynamoDB item");
-    const skill = response.Item.characterSheet.skills[skillCategory][skillName];
-
-    if (skill.activated === "false") {
-      throw {
-        statusCode: 409,
-        body: JSON.stringify({
-          message: "Skill is not activated yet! Activate it before it can be increased.",
-        }),
-      };
-    }
-
-    if (initialSkillValue !== skill.current && initialSkillValue + increasedPoints !== skill.current) {
-      throw {
-        statusCode: 409,
-        body: JSON.stringify({
-          message: "The passed skill value doesn't match the value in the backend!",
-        }),
-      };
-    }
-
-    return response.Item as Character;
-  } catch (error: any) {
+  if (!response.Item) {
     throw {
       statusCode: 500,
       body: JSON.stringify({
-        message: "Error when getting DynamoDB item.",
-        error: (error as Error).message,
+        message: "Item from DynamoDB table is missing in the request response",
       }),
     };
   }
+
+  console.info("Successfully got DynamoDB item");
+
+  const skill = response.Item.characterSheet.skills[skillCategory][skillName];
+
+  if (skill.activated === "false") {
+    throw {
+      statusCode: 409,
+      body: JSON.stringify({
+        message: "Skill is not activated yet! Activate it before it can be increased.",
+      }),
+    };
+  }
+
+  if (initialSkillValue !== skill.current && initialSkillValue + increasedPoints !== skill.current) {
+    throw {
+      statusCode: 409,
+      body: JSON.stringify({
+        message: "The passed skill value doesn't match the value in the backend!",
+      }),
+    };
+  }
+
+  return response.Item as Character;
 }
