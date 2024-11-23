@@ -164,7 +164,7 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character 
     }
 
     console.log("Successfully got DynamoDB item");
-    const skill = response.Item.skills.$skillCategory.$skillName;
+    const skill = response.Item.characterSheet.skills.$skillCategory.$skillName;
 
     if (skill.activated === "false") {
       throw {
