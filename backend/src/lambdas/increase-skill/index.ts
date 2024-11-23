@@ -25,6 +25,10 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     let availableAdventurePoints = characterSheet.calculationPoints.adventurePoints.available;
     const skillCategory = event.pathParameters?.skillCategory as keyof Character["characterSheet"]["skills"];
     const skillName = event.pathParameters?.skillName as string;
+    /**
+     * The skill value is taken from the backend as single source of truth, although,
+     * at this place it has already been checked that the backend and frontend values match.
+     */
     let skillValue = getSkill(characterSheet.skills, skillCategory, skillName).current;
     let totalCost = getSkill(characterSheet.skills, skillCategory, skillName).totalCost;
 
@@ -91,10 +95,8 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 }
 
 /**
- * All necessary values for the calculation are taken from the backend as single source of truth.
- * Otherwise, unsynchronized or manipulated frontend values could disrupt the backend data.
- *
- * @returns object for the character item in the DynamoDB table
+ * @param event
+ * @returns Character item of the DynamoDB table | null in case the skill has already been increased
  */
 async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character | null> {
   const characterId = event.pathParameters?.characterId;
