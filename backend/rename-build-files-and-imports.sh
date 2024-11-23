@@ -10,6 +10,6 @@ find "$build_dir" -type f -name "*.js" | while read -r file; do
 done
 echo "Renaming complete!"
 
-echo "Replace all '.js' imports in the JavaScript files to '.mjs' imports"
+echo "Replacing all '.js' imports in the JavaScript files to '.mjs' imports..."
 find "$build_dir" -type f -name "*.mjs" -exec sed --in-place --regexp-extended 's/from[[:space:]]+"([a-zA-Z0-9_/.-]+)\.js"/from "\1.mjs"/g' {} +
 echo "Replaced all imports!"
