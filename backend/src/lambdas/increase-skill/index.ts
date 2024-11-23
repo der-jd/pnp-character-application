@@ -36,6 +36,11 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         statusCode: 200,
         body: JSON.stringify({
           message: "Skill already increased to target value. Nothing to do!",
+          characterId: characterId,
+          skillName: skillName,
+          skillValue: skillValue,
+          totalCost: totalCost,
+          availableAdventurePoints: availableAdventurePoints,
         }),
       };
     }
@@ -56,7 +61,6 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       skillValue += 1;
       totalCost += increaseCost;
       availableAdventurePoints -= increaseCost;
-
       console.log(`Skill value: ${skillValue}`);
       console.log(`Skill total cost: ${totalCost}`);
       console.log(`Available adventure points: ${availableAdventurePoints}`);
@@ -94,6 +98,8 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       statusCode: 200,
       body: JSON.stringify({
         message: "Successfully increased skill",
+        characterId: characterId,
+        skillName: skillName,
         skillValue: skillValue,
         totalCost: totalCost,
         availableAdventurePoints: availableAdventurePoints,
