@@ -37,7 +37,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const costCategory = CostCategory.parse(body.costCategory);
 
     console.info(
-      `Increase value of skill '${skillName}' from ${skillValue} to ${skillValue + body.increasedPoints} by cost category '${costCategory}'`,
+      `Increase value of skill '${skillName}' from ${skillValue} to ${skillValue + body.increasedPoints} by cost category '${body.costCategory}'`,
     );
     for (let i = 0; i < body.increasedPoints; i++) {
       const increaseCost = getIncreaseCost(skillValue, costCategory);
