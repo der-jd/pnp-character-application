@@ -54,7 +54,7 @@ do
   echo "Moving dependencies into required sub folder for Lambda Layer..."
   mkdir nodejs
   cp --verbose --recursive --dereference node_modules nodejs
-  rm -r node_modules
+  rm --recursive node_modules
 
   cd $start_dir
 done
