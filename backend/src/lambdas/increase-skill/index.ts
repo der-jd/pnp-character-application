@@ -11,15 +11,6 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
   try {
     const character = await verifyParameters(event);
 
-    if (!character) {
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          message: "Skill already increased to target value. Nothing to do!",
-        }),
-      };
-    }
-
     const characterId = character.characterId;
     const characterSheet = character.characterSheet;
     let availableAdventurePoints = characterSheet.calculationPoints.adventurePoints.available;
@@ -31,14 +22,23 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
      */
     let skillValue = getSkill(characterSheet.skills, skillCategory, skillName).current;
     let totalCost = getSkill(characterSheet.skills, skillCategory, skillName).totalCost;
-
     // The conditional parse is necessary for Lambda tests via the AWS console
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
     const costCategory = CostCategory.parse(body.costCategory);
 
     console.info(
-      `Increase value of skill '${skillName}' from ${skillValue} to ${skillValue + body.increasedPoints} by cost category '${body.costCategory}'`,
+      `Increase value of skill '${skillName}' from ${body.initialValue} to ${body.initialValue + body.increasedPoints} by cost category '${body.costCategory}'`,
     );
+
+    if (body.initialValue + body.increasedPoints === skillValue) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: "Skill already increased to target value. Nothing to do!",
+        }),
+      };
+    }
+
     for (let i = 0; i < body.increasedPoints; i++) {
       const increaseCost = getIncreaseCost(skillValue, costCategory);
 
@@ -111,11 +111,9 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
   }
 }
 
-/**
- * @param event
- * @returns Character item of the DynamoDB table | null in case the skill has already been increased
- */
-async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character | null> {
+async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character> {
+  console.info("Verifying request's parameters...");
+
   const characterId = event.pathParameters?.characterId;
   const skillCategory = event.pathParameters?.skillCategory;
   const skillName = event.pathParameters?.skillName;
@@ -194,12 +192,7 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character 
       };
     }
 
-    if (initialSkillValue !== skill.current) {
-      if (initialSkillValue + increasedPoints === skill.current) {
-        console.info("Skill already increased to target value. Nothing to do!");
-        return null;
-      }
-
+    if (initialSkillValue !== skill.current && initialSkillValue + increasedPoints !== skill.current) {
       throw {
         statusCode: 409,
         body: JSON.stringify({
