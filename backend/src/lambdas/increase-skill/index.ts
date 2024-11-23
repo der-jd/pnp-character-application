@@ -177,7 +177,7 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character 
 
     if (initialSkillValue !== skill.current) {
       if (initialSkillValue + increasedPoints === skill.current) {
-        console.log("Skill already increased to target value. Nothing to do!")
+        console.log("Skill already increased to target value. Nothing to do!");
         return null;
       }
 
