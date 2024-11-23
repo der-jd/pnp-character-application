@@ -36,6 +36,9 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
     const costCategory = CostCategory.parse(body.costCategory);
 
+    console.info(
+      `Increase value of skill '${skillName}' from ${skillValue} to ${skillValue + body.increasedPoints} by cost category '${costCategory}'`,
+    );
     for (let i = 0; i < body.increasedPoints; i++) {
       const increaseCost = getIncreaseCost(skillValue, costCategory);
 
@@ -48,9 +51,14 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         };
       }
 
+      console.log(`Increasing skill by 1 for ${increaseCost} adventure points...`);
       skillValue += 1;
       totalCost += increaseCost;
       availableAdventurePoints -= increaseCost;
+
+      console.log(`Skill value: ${skillValue}`);
+      console.log(`Skill total cost: ${totalCost}`);
+      console.log(`Available adventure points: ${availableAdventurePoints}`);
       // TODO add event to history event list --> apply all events in the end when it is clear if there are enough ap
     }
 
@@ -78,7 +86,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       },
     });
     await docClient.send(command);
-    console.log("Successfully updated DynamoDB item");
+    console.info("Successfully updated DynamoDB item");
 
     // TODO save event in history
     return {
@@ -174,7 +182,7 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character 
       };
     }
 
-    console.log("Successfully got DynamoDB item");
+    console.info("Successfully got DynamoDB item");
     const skill = response.Item.characterSheet.skills[skillCategory][skillName];
 
     if (skill.activated === "false") {
@@ -188,7 +196,7 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character 
 
     if (initialSkillValue !== skill.current) {
       if (initialSkillValue + increasedPoints === skill.current) {
-        console.log("Skill already increased to target value. Nothing to do!");
+        console.info("Skill already increased to target value. Nothing to do!");
         return null;
       }
 
