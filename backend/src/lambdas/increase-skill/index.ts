@@ -164,8 +164,9 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character 
     }
 
     console.log("Successfully got DynamoDB item");
+    const skill = response.Item.skills.$skillCategory.$skillName;
 
-    if (response.Item.skills.$skillCategory.$skillName.activated === "false") {
+    if (skill.activated === "false") {
       throw {
         statusCode: 409,
         body: JSON.stringify({
@@ -174,8 +175,9 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<Character 
       };
     }
 
-    if (initialSkillValue !== response.Item.skills.$skillCategory.$skillName.current) {
-      if (initialSkillValue + increasedPoints === response.Item.skills.$skillCategory.$skillName.current) {
+    if (initialSkillValue !== skill.current) {
+      if (initialSkillValue + increasedPoints === skill.current) {
+        console.log("Skill already increased to target value. Nothing to do!")
         return null;
       }
 
