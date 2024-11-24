@@ -7,40 +7,40 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   return increaseSkill(event);
 };
 
+interface Parameters {
+  characterId: string;
+  skillCategory: string;
+  skillName: string;
+  initialSkillValue: number;
+  increasedPoints: number;
+  costCategory: string;
+}
+
 async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    verifyParameters(event);
+    const params = verifyParameters(event);
 
-    const skillName = event.pathParameters?.skillName as string;
-    // The conditional parse is necessary for Lambda tests via the AWS console
-    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
-
-    console.info(`Update character ${event.pathParameters?.characterId}`);
+    console.info(`Update character ${params.characterId}`);
     console.info(
-      `Increase value of skill '${skillName}' from ${body.initialValue} to ${body.initialValue + body.increasedPoints} by cost category '${body.costCategory}'`,
+      `Increase value of skill '${params.skillName}' from ${params.initialSkillValue} to ${params.initialSkillValue + params.increasedPoints} by cost category '${params.costCategory}'`,
     );
 
-    const character = await getCharacterItem(event);
+    const character = await getCharacterItem(params);
 
-    const characterId = character.characterId;
     const characterSheet = character.characterSheet;
     let availableAdventurePoints = characterSheet.calculationPoints.adventurePoints.available;
-    const skillCategory = event.pathParameters?.skillCategory as keyof Character["characterSheet"]["skills"];
-    /**
-     * The skill value is taken from the backend as single source of truth, although,
-     * at this place it has already been checked that the backend and frontend values match.
-     */
-    let skillValue = getSkill(characterSheet.skills, skillCategory, skillName).current;
-    let totalCost = getSkill(characterSheet.skills, skillCategory, skillName).totalCost;
-    const costCategory = CostCategory.parse(body.costCategory);
+    const skillCategory = params.skillCategory as keyof Character["characterSheet"]["skills"];
+    let skillValue = getSkill(characterSheet.skills, skillCategory, params.skillName).current;
+    let totalCost = getSkill(characterSheet.skills, skillCategory, params.skillName).totalCost;
+    const costCategory = CostCategory.parse(params.costCategory);
 
-    if (body.initialValue + body.increasedPoints === skillValue) {
+    if (params.initialSkillValue + params.increasedPoints === skillValue) {
       return {
         statusCode: 200,
         body: JSON.stringify({
           message: "Skill already increased to target value. Nothing to do!",
-          characterId: characterId,
-          skillName: skillName,
+          characterId: params.characterId,
+          skillName: params.skillName,
           skillValue: skillValue,
           totalCost: totalCost,
           availableAdventurePoints: availableAdventurePoints,
@@ -48,7 +48,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       };
     }
 
-    for (let i = 0; i < body.increasedPoints; i++) {
+    for (let i = 0; i < params.increasedPoints; i++) {
       const increaseCost = getIncreaseCost(skillValue, costCategory);
 
       if (increaseCost > availableAdventurePoints) {
@@ -76,21 +76,21 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const command = new UpdateCommand({
       TableName: process.env.TABLE_NAME,
       Key: {
-        characterId: characterId,
+        characterId: params.characterId,
       },
       UpdateExpression:
-        "SET #adventurePointsAvailable = :available, " +
-        "#currentSkillValue = :current, " +
-        "#skillTotalCost = :totalCost",
+        "SET #currentSkillValue = :current, " +
+        "#skillTotalCost = :totalCost, " +
+        "#adventurePointsAvailable = :available",
       ExpressionAttributeNames: {
+        "#currentSkillValue": `characterSheet.skills.${skillCategory}.${params.skillName}.current`,
+        "#skillTotalCost": `characterSheet.skills.${skillCategory}.${params.skillName}.totalCost`,
         "#adventurePointsAvailable": "characterSheet.calculationPoints.adventurePoints.available",
-        "#currentSkillValue": `characterSheet.skills.${skillCategory}.${skillName}.current`,
-        "#skillTotalCost": `characterSheet.skills.${skillCategory}.${skillName}.totalCost`,
       },
       ExpressionAttributeValues: {
-        ":available": availableAdventurePoints,
         ":current": skillValue,
         ":totalCost": totalCost,
+        ":available": availableAdventurePoints,
       },
     });
     await docClient.send(command);
@@ -101,8 +101,8 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       statusCode: 200,
       body: JSON.stringify({
         message: "Successfully increased skill",
-        characterId: characterId,
-        skillName: skillName,
+        characterId: params.characterId,
+        skillName: params.skillName,
         skillValue: skillValue,
         totalCost: totalCost,
         availableAdventurePoints: availableAdventurePoints,
@@ -121,25 +121,18 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
   }
 }
 
-function verifyParameters(event: APIGatewayProxyEvent) {
+function verifyParameters(event: APIGatewayProxyEvent): Parameters {
   console.info("Verify request parameters");
 
-  const characterId = event.pathParameters?.characterId;
-  const skillCategory = event.pathParameters?.skillCategory;
-  const skillName = event.pathParameters?.skillName;
   // The conditional parse is necessary for Lambda tests via the AWS console
-  const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
-  const initialSkillValue = body.initialValue;
-  const increasedPoints = body.increasedPoints;
-  const costCategory = body.costCategory;
-
+  const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
   if (
-    typeof characterId !== "string" ||
-    typeof skillCategory !== "string" ||
-    typeof skillName !== "string" ||
-    typeof initialSkillValue !== "number" ||
-    typeof increasedPoints !== "number" ||
-    typeof costCategory !== "string"
+    typeof event.pathParameters?.characterId !== "string" ||
+    typeof event.pathParameters?.skillCategory !== "string" ||
+    typeof event.pathParameters?.skillName !== "string" ||
+    typeof body?.initialSkillValue !== "number" ||
+    typeof body?.increasedPoints !== "number" ||
+    typeof body?.costCategory !== "string"
   ) {
     throw {
       statusCode: 400,
@@ -149,7 +142,16 @@ function verifyParameters(event: APIGatewayProxyEvent) {
     };
   }
 
-  if (increasedPoints <= 0) {
+  const params: Parameters = {
+    characterId: event.pathParameters.characterId,
+    skillCategory: event.pathParameters.skillCategory,
+    skillName: event.pathParameters.skillName,
+    initialSkillValue: body.initialSkillValue,
+    increasedPoints: body.increasedPoints,
+    costCategory: body.costCategory,
+  };
+
+  if (params.increasedPoints <= 0) {
     throw {
       statusCode: 400,
       body: JSON.stringify({
@@ -159,7 +161,7 @@ function verifyParameters(event: APIGatewayProxyEvent) {
   }
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
-  if (!uuidRegex.test(characterId)) {
+  if (!uuidRegex.test(params.characterId)) {
     throw {
       statusCode: 400,
       body: JSON.stringify({
@@ -167,18 +169,12 @@ function verifyParameters(event: APIGatewayProxyEvent) {
       }),
     };
   }
+
+  return params;
 }
 
-async function getCharacterItem(event: APIGatewayProxyEvent): Promise<Character> {
+async function getCharacterItem(params: Parameters): Promise<Character> {
   console.info("Get Character from DynamoDB");
-
-  const characterId = event.pathParameters?.characterId;
-  const skillCategory = event.pathParameters?.skillCategory as string;
-  const skillName = event.pathParameters?.skillName as string;
-  // The conditional parse is necessary for Lambda tests via the AWS console
-  const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
-  const initialSkillValue = body.initialValue;
-  const increasedPoints = body.increasedPoints;
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
   const client = new DynamoDBClient({});
@@ -186,7 +182,7 @@ async function getCharacterItem(event: APIGatewayProxyEvent): Promise<Character>
   const command = new GetCommand({
     TableName: process.env.TABLE_NAME,
     Key: {
-      characterId: characterId,
+      characterId: params.characterId,
     },
   });
 
@@ -203,7 +199,7 @@ async function getCharacterItem(event: APIGatewayProxyEvent): Promise<Character>
 
   console.info("Successfully got DynamoDB item");
 
-  const skill = response.Item.characterSheet.skills[skillCategory][skillName];
+  const skill = response.Item.characterSheet.skills[params.skillCategory][params.skillName];
 
   if (skill.activated === "false") {
     throw {
@@ -214,7 +210,10 @@ async function getCharacterItem(event: APIGatewayProxyEvent): Promise<Character>
     };
   }
 
-  if (initialSkillValue !== skill.current && initialSkillValue + increasedPoints !== skill.current) {
+  if (
+    params.initialSkillValue !== skill.current &&
+    params.initialSkillValue + params.increasedPoints !== skill.current
+  ) {
     throw {
       statusCode: 409,
       body: JSON.stringify({
