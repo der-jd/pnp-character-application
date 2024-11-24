@@ -93,7 +93,7 @@ jobs:
       - persist_to_workspace:
           root: ./
           paths:
-            - ./backend/build
+            - backend/build
 
   check-format-terraform-code:
     docker:
@@ -140,22 +140,7 @@ jobs:
       - persist_to_workspace:
           root: ./
           paths:
-            - ./frontend/build
-
-  # deploy-frontend:
-  #   docker:
-  #     - image: cimg/node:22.10
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: frontend/build
-  #     - aws-cli/setup:
-  #         role_arn: "$AWS_ROLE_ARN"
-  #     - run:
-  #         name: deploy frontend
-  #         command: |
-  #           cd frontend
-  #           aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
+            - frontend/build
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy:
