@@ -165,7 +165,6 @@ jobs:
       - checkout
       - attach_workspace:
           at: backend/build
-      - attach_workspace:
           at: frontend/build_files
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
