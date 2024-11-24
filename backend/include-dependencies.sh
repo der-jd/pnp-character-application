@@ -38,7 +38,7 @@ echo ""
 echo "========================================================="
 echo ""
 
-# https://docs.aws.amazon.com/lambda/latest/dg/nodejs-layers.html
+# https://docs.aws.amazon.com/lambda/latest/dg/typescript-layers.html
 echo "Include dependencies for Lambda Layers"
 for layer in "${lambda_layers[@]}"
 do
@@ -54,7 +54,7 @@ do
   echo "Moving dependencies into required sub folder for Lambda Layer..."
   mkdir nodejs
   cp --verbose --recursive --dereference node_modules nodejs
-  rm -r node_modules
+  rm --recursive node_modules
 
   cd $start_dir
 done
