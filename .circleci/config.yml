@@ -136,9 +136,9 @@ jobs:
           command: |
             cd frontend
             npm run build
-            mv out build
+            mv out build_files
       - persist_to_workspace:
-          root: frontend/build
+          root: frontend/build_files
           paths:
             - ./*
 
@@ -166,7 +166,7 @@ jobs:
       - attach_workspace:
           at: backend/build
       - attach_workspace:
-          at: frontend/build
+          at: frontend/build_files
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
