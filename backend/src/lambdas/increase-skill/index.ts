@@ -20,8 +20,8 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
   try {
     const params = verifyParameters(event);
 
-    console.info(`Update character ${params.characterId}`);
-    console.info(
+    console.log(`Update character ${params.characterId}`);
+    console.log(
       `Increase value of skill '${params.skillName}' from ${params.initialSkillValue} to ${params.initialSkillValue + params.increasedPoints} by cost category '${params.costCategory}'`,
     );
 
@@ -49,6 +49,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     }
 
     for (let i = 0; i < params.increasedPoints; i++) {
+      console.debug("---------------------------");
       const increaseCost = getIncreaseCost(skillValue, costCategory);
 
       if (increaseCost > availableAdventurePoints) {
@@ -62,10 +63,10 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         };
       }
 
-      console.log(`Skill value: ${skillValue}`);
-      console.log(`Skill total cost: ${totalCost}`);
-      console.log(`Available adventure points: ${availableAdventurePoints}`);
-      console.log(`Increasing skill by 1 for ${increaseCost} AP...`);
+      console.debug(`Skill value: ${skillValue}`);
+      console.debug(`Skill total cost: ${totalCost}`);
+      console.debug(`Available adventure points: ${availableAdventurePoints}`);
+      console.debug(`Increasing skill by 1 for ${increaseCost} AP...`);
       skillValue += 1;
       totalCost += increaseCost;
       availableAdventurePoints -= increaseCost;
@@ -102,7 +103,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       },
     });
     await docClient.send(command);
-    console.info("Successfully updated DynamoDB item");
+    console.log("Successfully updated DynamoDB item");
 
     // TODO save event in history
     return {
@@ -130,7 +131,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 }
 
 function verifyParameters(event: APIGatewayProxyEvent): Parameters {
-  console.info("Verify request parameters");
+  console.log("Verify request parameters");
 
   // The conditional parse is necessary for Lambda tests via the AWS console
   const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
@@ -182,7 +183,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
 }
 
 async function getCharacterItem(params: Parameters): Promise<Character> {
-  console.info("Get Character from DynamoDB");
+  console.log("Get Character from DynamoDB");
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
   const client = new DynamoDBClient({});
@@ -205,7 +206,7 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
     };
   }
 
-  console.info("Successfully got DynamoDB item");
+  console.log("Successfully got DynamoDB item");
 
   const skill = response.Item.characterSheet.skills[params.skillCategory][params.skillName];
 
