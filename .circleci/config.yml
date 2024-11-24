@@ -24,14 +24,13 @@ workflows:
             - lint-typescript-code
       - check-format-terraform-code
       - lint-terraform-code
-      - deploy-backend-and-infrastructure:
+      - build-frontend
+      - deploy:
           requires:
             - build-backend
             - check-format-terraform-code
             - lint-terraform-code
-      - build-frontend:
-          requires:
-            - deploy-backend-and-infrastructure
+
       # TODO only deploy frontend if files have changed
       #- deploy-frontend:
        #   requires:
@@ -159,13 +158,15 @@ jobs:
             aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
-  deploy-backend-and-infrastructure:
+  deploy:
     docker:
       - image: hashicorp/terraform:1.9
     steps:
       - checkout
       - attach_workspace:
           at: backend/build
+      - attach_workspace:
+          at: frontend/build
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
