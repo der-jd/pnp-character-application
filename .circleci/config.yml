@@ -91,9 +91,9 @@ jobs:
             cd backend
             npm run build
       - persist_to_workspace:
-          root: ./
+          root: backend
           paths:
-            - backend/build
+            - build
 
   check-format-terraform-code:
     docker:
@@ -138,9 +138,9 @@ jobs:
             npm run build
             mv out build
       - persist_to_workspace:
-          root: ./
+          root: frontend
           paths:
-            - frontend/build
+            - build
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy:
