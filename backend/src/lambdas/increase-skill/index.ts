@@ -130,7 +130,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
     typeof event.pathParameters?.characterId !== "string" ||
     typeof event.pathParameters?.skillCategory !== "string" ||
     typeof event.pathParameters?.skillName !== "string" ||
-    typeof body?.initialSkillValue !== "number" ||
+    typeof body?.initialValue !== "number" ||
     typeof body?.increasedPoints !== "number" ||
     typeof body?.costCategory !== "string"
   ) {
@@ -146,7 +146,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
     characterId: event.pathParameters.characterId,
     skillCategory: event.pathParameters.skillCategory,
     skillName: event.pathParameters.skillName,
-    initialSkillValue: body.initialSkillValue,
+    initialSkillValue: body.initialValue,
     increasedPoints: body.increasedPoints,
     costCategory: body.costCategory,
   };
