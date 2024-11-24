@@ -62,13 +62,13 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         };
       }
 
-      console.log(`Increasing skill by 1 for ${increaseCost} adventure points...`);
-      skillValue += 1;
-      totalCost += increaseCost;
-      availableAdventurePoints -= increaseCost;
       console.log(`Skill value: ${skillValue}`);
       console.log(`Skill total cost: ${totalCost}`);
       console.log(`Available adventure points: ${availableAdventurePoints}`);
+      console.log(`Increasing skill by 1 for ${increaseCost} AP...`);
+      skillValue += 1;
+      totalCost += increaseCost;
+      availableAdventurePoints -= increaseCost;
       // TODO add event to history event list --> apply all events in the end when it is clear if there are enough ap
     }
 
