@@ -1,38 +1,78 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { SkillThreshold, CostCategory, costMatrix } from "config/index.mjs";
+import { CostCategory, Character, getIncreaseCost, getSkill } from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill(event);
 };
 
+interface Parameters {
+  characterId: string;
+  skillCategory: string;
+  skillName: string;
+  initialSkillValue: number;
+  increasedPoints: number;
+  costCategory: string;
+}
+
 async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const characterId = event.pathParameters?.characterId;
-    const skillName = event.pathParameters?.skillName;
+    const params = verifyParameters(event);
 
-    // The conditional parse is necessary for Lambda tests via the AWS console
-    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
-    let availableAdventurePoints = await verifyParameters(event);
+    console.log(`Update character ${params.characterId}`);
+    console.log(
+      `Increase value of skill '${params.skillName}' from ${params.initialSkillValue} to ${params.initialSkillValue + params.increasedPoints} by cost category '${params.costCategory}'`,
+    );
 
-    let skillValue = body.initialValue;
-    const costCategory = CostCategory.parse(body.costCategory);
-    let totalIncreaseCost = 0;
-    for (let i = 0; i < body.increasedPoints; i++) {
+    const character = await getCharacterItem(params);
+
+    const characterSheet = character.characterSheet;
+    let availableAdventurePoints = characterSheet.calculationPoints.adventurePoints.available;
+    const skillCategory = params.skillCategory as keyof Character["characterSheet"]["skills"];
+    let skillValue = getSkill(characterSheet.skills, skillCategory, params.skillName).current;
+    let totalCost = getSkill(characterSheet.skills, skillCategory, params.skillName).totalCost;
+    const costCategory = CostCategory.parse(params.costCategory);
+
+    if (params.initialSkillValue + params.increasedPoints === skillValue) {
+      const response = {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: "Skill already increased to target value. Nothing to do!",
+          characterId: params.characterId,
+          skillName: params.skillName,
+          skillValue: skillValue,
+          totalCost: totalCost,
+          availableAdventurePoints: availableAdventurePoints,
+        }),
+      };
+      console.log(response);
+
+      return response;
+    }
+
+    for (let i = 0; i < params.increasedPoints; i++) {
+      console.debug("---------------------------");
       const increaseCost = getIncreaseCost(skillValue, costCategory);
 
       if (increaseCost > availableAdventurePoints) {
-        return {
+        console.error("Not enough adventure points to increase the skill!");
+        throw {
           statusCode: 400,
           body: JSON.stringify({
             message: "Not enough adventure points to increase the skill!",
+            characterId: params.characterId,
+            skillName: params.skillName,
           }),
         };
       }
 
+      console.debug(`Skill value: ${skillValue}`);
+      console.debug(`Skill total cost: ${totalCost}`);
+      console.debug(`Available adventure points: ${availableAdventurePoints}`);
+      console.debug(`Increasing skill by 1 for ${increaseCost} AP...`);
       skillValue += 1;
-      totalIncreaseCost += increaseCost;
+      totalCost += increaseCost;
       availableAdventurePoints -= increaseCost;
       // TODO add event to history event list --> apply all events in the end when it is clear if there are enough ap
     }
@@ -43,62 +83,76 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const command = new UpdateCommand({
       TableName: process.env.TABLE_NAME,
       Key: {
-        characterId: characterId,
+        characterId: params.characterId,
       },
       UpdateExpression:
-        `set characterSheet.calculationPoints.adventurePoints.available = ${availableAdventurePoints}, ` +
-        `characterSheet.skills.${skillName}.value = ${skillValue}, ` +
-        `characterSheet.skills.${skillName}.totalCost = characterSheet.skills.${skillName}.totalCost + ${totalIncreaseCost}`,
+        "SET #characterSheet.#skills.#skillCategory.#skillName.#current = :current, " +
+        "#characterSheet.#skills.#skillCategory.#skillName.#totalCost = :totalCost, " +
+        "#characterSheet.#calculationPoints.#adventurePoints.#available = :available",
+      ExpressionAttributeNames: {
+        "#characterSheet": "characterSheet",
+        "#skills": "skills",
+        "#skillCategory": skillCategory,
+        "#skillName": params.skillName,
+        "#current": "current",
+        "#totalCost": "totalCost",
+        "#calculationPoints": "calculationPoints",
+        "#adventurePoints": "adventurePoints",
+        "#available": "available",
+      },
+      ExpressionAttributeValues: {
+        ":current": skillValue,
+        ":totalCost": totalCost,
+        ":available": availableAdventurePoints,
+      },
     });
-    const response = await docClient.send(command);
-    console.log("Successfully updated DynamoDB item", response);
-    console.log(response);
+    await docClient.send(command);
+    console.log("Successfully updated DynamoDB item");
 
     // TODO save event in history
-    return {
+    const response = {
       statusCode: 200,
       body: JSON.stringify({
         message: "Successfully increased skill",
+        characterId: params.characterId,
+        skillName: params.skillName,
         skillValue: skillValue,
-        increaseCost: getIncreaseCost(skillValue, costCategory),
+        totalCost: totalCost,
         availableAdventurePoints: availableAdventurePoints,
       }),
     };
+    console.log(response);
+    return response;
   } catch (error: any) {
-    return {
-      statusCode: error.statusCode,
-      body: error.body
-        ? error.body
-        : JSON.stringify({
-            message: "An error occurred!",
-            error: (error as Error).message,
-          }),
+    const response = {
+      statusCode: error.statusCode ?? 500,
+      body:
+        error.body ??
+        JSON.stringify({
+          message: "An error occurred!",
+          error: (error as Error).message,
+        }),
     };
+    console.error(response);
+
+    return response;
   }
 }
 
-/**
- * All necessary values for the calculation are taken from the backend as single source of truth.
- * Otherwise, unsynchronized or manipulated frontend values could disrupt the backend data.
- *
- * @returns Available adventure points
- */
-async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
-  const characterId = event.pathParameters?.characterId;
-  const skillName = event.pathParameters?.skillName;
-  // The conditional parse is necessary for Lambda tests via the AWS console
-  const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body || {};
-  const initialSkillValue = body.initialValue;
-  const increasedPoints = body.increasedPoints;
-  const costCategory = body.costCategory;
+function verifyParameters(event: APIGatewayProxyEvent): Parameters {
+  console.log("Verify request parameters");
 
+  // The conditional parse is necessary for Lambda tests via the AWS console
+  const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
   if (
-    typeof characterId !== "string" ||
-    typeof skillName !== "string" ||
-    typeof initialSkillValue !== "number" ||
-    typeof increasedPoints !== "number" ||
-    typeof costCategory !== "string"
+    typeof event.pathParameters?.characterId !== "string" ||
+    typeof event.pathParameters?.skillCategory !== "string" ||
+    typeof event.pathParameters?.skillName !== "string" ||
+    typeof body?.initialValue !== "number" ||
+    typeof body?.increasedPoints !== "number" ||
+    typeof body?.costCategory !== "string"
   ) {
+    console.error("Invalid input values!");
     throw {
       statusCode: 400,
       body: JSON.stringify({
@@ -107,8 +161,28 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
     };
   }
 
-  const uuidRegex = new RegExp("/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i");
-  if (!uuidRegex.test(characterId)) {
+  const params: Parameters = {
+    characterId: event.pathParameters.characterId,
+    skillCategory: event.pathParameters.skillCategory,
+    skillName: event.pathParameters.skillName,
+    initialSkillValue: body.initialValue,
+    increasedPoints: body.increasedPoints,
+    costCategory: body.costCategory,
+  };
+
+  if (params.increasedPoints <= 0) {
+    console.error(`Points to increase are ${params.increasedPoints}! The value must be greater than or equal 1.`);
+    throw {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: `Points to increase are ${params.increasedPoints}! The value must be greater than or equal 1.`,
+      }),
+    };
+  }
+
+  const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
+  if (!uuidRegex.test(params.characterId)) {
+    console.error("Character id is not a valid UUID format!");
     throw {
       statusCode: 400,
       body: JSON.stringify({
@@ -117,79 +191,66 @@ async function verifyParameters(event: APIGatewayProxyEvent): Promise<number> {
     };
   }
 
+  return params;
+}
+
+async function getCharacterItem(params: Parameters): Promise<Character> {
+  console.log("Get Character from DynamoDB");
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
-
   const command = new GetCommand({
     TableName: process.env.TABLE_NAME,
     Key: {
-      characterId: characterId,
+      characterId: params.characterId,
     },
-    ProjectionExpression: "characterSheet",
   });
 
   const response = await docClient.send(command);
 
-  console.log("Successfully got DynamoDB item", response);
-
-  return 500;
-
-  // TODO check for existing skill id/name
-
-  //  if (response.skills[skillId].activated === "false") {
-  //    throw {
-  //      statusCode: 409,
-  //      body: JSON.stringify({
-  //        message: "Skill is not activated yet! Activate it before it can be increased.",
-  //      }),
-  //    };
-  //  }
-  //
-  //  if (initialSkillValue !== response.skills[skillId].value) {
-  //    throw {
-  //      statusCode: 409,
-  //      body: JSON.stringify({
-  //        message: "The given skill value doesn't match the value in the backend! Reload the character data.", // TODO this is not really idempotent as duplicate events will always throw?!
-  //      }),
-  //    };
-  //  }
-  //
-  //  return response;
-  //},
-  //(error) => {
-  //  throw {
-  //    statusCode: 500,
-  //    body: JSON.stringify({
-  //      message: "Error when getting DynamoDB item",
-  //      error: (error as Error).message,
-  //    }),
-  //  };
-  //});
-
-  //const dynamoDb = new DynamoDB({ apiVersion: "2012-08-10" });
-  //const params = {
-  //  TableName: process.env.TABLE_NAME,
-  //  Key: {
-  //    characterId: {
-  //      N: characterId,
-  //    },
-  //  },
-  //  ProjectionExpression: "characterSheet",
-  //};
-  //const characterSheet = dynamoDb.getItem(params, function (error: any, data: any): any {
-
-  //return characterSheet.calculationPoints.adventurePoints.available;
-}
-
-function getIncreaseCost(skillValue: number, costCategory: CostCategory): number {
-  let column: number;
-  if (skillValue < SkillThreshold._1) {
-    column = SkillThreshold._1;
-  } else if (skillValue < SkillThreshold._2) {
-    column = SkillThreshold._2;
-  } else {
-    column = SkillThreshold._3;
+  if (!response.Item) {
+    console.error("Item from DynamoDB table is missing in the request response");
+    throw {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Item from DynamoDB table is missing in the request response",
+      }),
+    };
   }
 
-  return costMatrix[costCategory][column];
+  console.log("Successfully got DynamoDB item");
+
+  const skill = response.Item.characterSheet.skills[params.skillCategory][params.skillName];
+
+  if (!skill.activated) {
+    console.error("Skill is not activated yet! Activate it before it can be increased.");
+    throw {
+      statusCode: 409,
+      body: JSON.stringify({
+        message: "Skill is not activated yet! Activate it before it can be increased.",
+        characterId: params.characterId,
+        skillName: params.skillName,
+      }),
+    };
+  }
+
+  if (
+    params.initialSkillValue !== skill.current &&
+    params.initialSkillValue + params.increasedPoints !== skill.current
+  ) {
+    console.error("The passed skill value doesn't match the value in the backend!");
+    throw {
+      statusCode: 409,
+      body: JSON.stringify({
+        message: "The passed skill value doesn't match the value in the backend!",
+        characterId: params.characterId,
+        skillName: params.skillName,
+        passedSkillValue: params.initialSkillValue,
+        backendSkillValue: skill.current,
+      }),
+    };
+  }
+
+  return response.Item as Character;
 }
