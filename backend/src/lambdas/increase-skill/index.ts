@@ -56,6 +56,8 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
           statusCode: 400,
           body: JSON.stringify({
             message: "Not enough adventure points to increase the skill!",
+            characterId: params.characterId,
+            skillName: params.skillName,
           }),
         };
       }
@@ -161,7 +163,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
     throw {
       statusCode: 400,
       body: JSON.stringify({
-        message: "Points to increase are 0 or negative! The value must be greater than or equal 1.",
+        message: `Points to increase are ${params.increasedPoints}! The value must be greater than or equal 1.`,
       }),
     };
   }
@@ -212,6 +214,8 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
       statusCode: 409,
       body: JSON.stringify({
         message: "Skill is not activated yet! Activate it before it can be increased.",
+        characterId: params.characterId,
+        skillName: params.skillName,
       }),
     };
   }
@@ -224,6 +228,10 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
       statusCode: 409,
       body: JSON.stringify({
         message: "The passed skill value doesn't match the value in the backend!",
+        characterId: params.characterId,
+        skillName: params.skillName,
+        passedSkillValue: params.initialSkillValue,
+        backendSkillValue: skill.current,
       }),
     };
   }
