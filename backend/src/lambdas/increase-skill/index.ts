@@ -210,7 +210,7 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
 
   const skill = response.Item.characterSheet.skills[params.skillCategory][params.skillName];
 
-  if (skill.activated === "false") {
+  if (!skill.activated) {
     throw {
       statusCode: 409,
       body: JSON.stringify({
