@@ -164,7 +164,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ./
+          at: ~/project
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
