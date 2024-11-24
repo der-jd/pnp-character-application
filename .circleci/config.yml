@@ -178,7 +178,7 @@ jobs:
           name: Terraform plan
           command: |
             cd terraform
-            terraform plan -out tfapply
+            TF_LOG=debug terraform plan -out tfapply
       - run:
           name: Terraform apply
           command: |
