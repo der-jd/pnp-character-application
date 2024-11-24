@@ -35,7 +35,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const costCategory = CostCategory.parse(params.costCategory);
 
     if (params.initialSkillValue + params.increasedPoints === skillValue) {
-      return {
+      const response = {
         statusCode: 200,
         body: JSON.stringify({
           message: "Skill already increased to target value. Nothing to do!",
@@ -46,6 +46,9 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
           availableAdventurePoints: availableAdventurePoints,
         }),
       };
+      console.log(response);
+
+      return response;
     }
 
     for (let i = 0; i < params.increasedPoints; i++) {
@@ -53,7 +56,8 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       const increaseCost = getIncreaseCost(skillValue, costCategory);
 
       if (increaseCost > availableAdventurePoints) {
-        return {
+        console.error("Not enough adventure points to increase the skill!");
+        throw {
           statusCode: 400,
           body: JSON.stringify({
             message: "Not enough adventure points to increase the skill!",
@@ -106,7 +110,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     console.log("Successfully updated DynamoDB item");
 
     // TODO save event in history
-    return {
+    const response = {
       statusCode: 200,
       body: JSON.stringify({
         message: "Successfully increased skill",
@@ -117,8 +121,10 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         availableAdventurePoints: availableAdventurePoints,
       }),
     };
+    console.log(response);
+    return response;
   } catch (error: any) {
-    return {
+    const response = {
       statusCode: error.statusCode ?? 500,
       body:
         error.body ??
@@ -127,6 +133,9 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
           error: (error as Error).message,
         }),
     };
+    console.error(response);
+
+    return response;
   }
 }
 
@@ -143,6 +152,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
     typeof body?.increasedPoints !== "number" ||
     typeof body?.costCategory !== "string"
   ) {
+    console.error("Invalid input values!");
     throw {
       statusCode: 400,
       body: JSON.stringify({
@@ -161,6 +171,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
   };
 
   if (params.increasedPoints <= 0) {
+    console.error(`Points to increase are ${params.increasedPoints}! The value must be greater than or equal 1.`);
     throw {
       statusCode: 400,
       body: JSON.stringify({
@@ -171,6 +182,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
   if (!uuidRegex.test(params.characterId)) {
+    console.error("Character id is not a valid UUID format!");
     throw {
       statusCode: 400,
       body: JSON.stringify({
@@ -198,6 +210,7 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
   const response = await docClient.send(command);
 
   if (!response.Item) {
+    console.error("Item from DynamoDB table is missing in the request response");
     throw {
       statusCode: 500,
       body: JSON.stringify({
@@ -211,6 +224,7 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
   const skill = response.Item.characterSheet.skills[params.skillCategory][params.skillName];
 
   if (!skill.activated) {
+    console.error("Skill is not activated yet! Activate it before it can be increased.");
     throw {
       statusCode: 409,
       body: JSON.stringify({
@@ -225,6 +239,7 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
     params.initialSkillValue !== skill.current &&
     params.initialSkillValue + params.increasedPoints !== skill.current
   ) {
+    console.error("The passed skill value doesn't match the value in the backend!");
     throw {
       statusCode: 409,
       body: JSON.stringify({
