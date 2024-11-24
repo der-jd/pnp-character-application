@@ -79,13 +79,19 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         characterId: params.characterId,
       },
       UpdateExpression:
-        "SET #currentSkillValue = :current, " +
-        "#skillTotalCost = :totalCost, " +
-        "#adventurePointsAvailable = :available",
+        "SET #characterSheet.#skills.#skillCategory.#skillName.#current = :current, " +
+        "#characterSheet.#skills.#skillCategory.#skillName.#totalCost = :totalCost, " +
+        "#characterSheet.#calculationPoints.#adventurePoints.#available = :available",
       ExpressionAttributeNames: {
-        "#currentSkillValue": `characterSheet.skills.${skillCategory}.${params.skillName}.current`,
-        "#skillTotalCost": `characterSheet.skills.${skillCategory}.${params.skillName}.totalCost`,
-        "#adventurePointsAvailable": "characterSheet.calculationPoints.adventurePoints.available",
+        "#characterSheet": "characterSheet",
+        "#skills": "skills",
+        "#skillCategory": skillCategory,
+        "#skillName": params.skillName,
+        "#current": "current",
+        "#totalCost": "totalCost",
+        "#calculationPoints": "calculationPoints",
+        "#adventurePoints": "adventurePoints",
+        "#available": "available",
       },
       ExpressionAttributeValues: {
         ":current": skillValue,
