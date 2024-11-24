@@ -31,6 +31,11 @@ resource "aws_lambda_function" "increase_skill_lambda" {
       TABLE_NAME = local.characters_table_name
     }
   }
+  logging_config {
+    log_format            = "JSON"
+    application_log_level = "INFO"
+    system_log_level      = "INFO"
+  }
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
