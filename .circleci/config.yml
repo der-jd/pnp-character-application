@@ -91,7 +91,7 @@ jobs:
             cd backend
             npm run build
       - persist_to_workspace:
-          root: backend
+          root: ~/project/backend
           paths:
             - build
 
@@ -126,6 +126,8 @@ jobs:
       - image: cimg/node:22.10
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/project
       - run:
           name: Install dependencies
           command: |
@@ -138,9 +140,10 @@ jobs:
             npm run build
             mv out build
       - persist_to_workspace:
-          root: frontend
+          root: ~/project
           paths:
-            - build
+            - frontend/build
+            - backend/build
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy:
