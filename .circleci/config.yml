@@ -32,10 +32,12 @@ workflows:
       - build-frontend:
           requires:
             - deploy-backend-and-infrastructure
-      # TODO only deploy frontend if files have changed
-      #- deploy-frontend:
-       #   requires:
-        #    - build-frontend
+      - deploy-frontend:
+          filters:
+             branches:
+                only: main
+          requires:
+            - build-frontend
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
@@ -92,9 +94,9 @@ jobs:
             cd backend
             npm run build
       - persist_to_workspace:
-          root: backend/build
+          root: ~/project
           paths:
-            - ./*
+            - backend/build
 
   check-format-terraform-code:
     docker:
@@ -139,9 +141,9 @@ jobs:
             npm run build
             mv out build
       - persist_to_workspace:
-          root: frontend/build
+          root: ~/project
           paths:
-            - ./*
+            - frontend/build
 
   deploy-frontend:
     docker:
@@ -165,7 +167,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: backend/build
+          at: ~/project
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
