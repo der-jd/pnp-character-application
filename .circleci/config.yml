@@ -24,16 +24,14 @@ workflows:
             - lint-typescript-code
       - check-format-terraform-code
       - lint-terraform-code
-      - build-frontend:
+      - deploy-backend-and-infrastructure:
           requires:
             - build-backend
-      - deploy:
-          requires:
-            - build-backend
-            - build-frontend
             - check-format-terraform-code
             - lint-terraform-code
-
+      - build-frontend:
+          requires:
+            - deploy-backend-and-infrastructure
       # TODO only deploy frontend if files have changed
       #- deploy-frontend:
        #   requires:
@@ -83,8 +81,6 @@ jobs:
       - image: cimg/node:22.10
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/project
       - run:
           name: Install dependencies
           command: |
@@ -96,9 +92,9 @@ jobs:
             cd backend
             npm run build
       - persist_to_workspace:
-          root: backend
+          root: backend/build
           paths:
-            - build
+            - ./*
 
   check-format-terraform-code:
     docker:
@@ -131,8 +127,6 @@ jobs:
       - image: cimg/node:22.10
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/project
       - run:
           name: Install dependencies
           command: |
@@ -145,13 +139,27 @@ jobs:
             npm run build
             mv out build
       - persist_to_workspace:
-          root: ~/project
+          root: frontend/build
           paths:
-            - frontend/build
-            - backend/build
+            - ./*
+
+  deploy-frontend:
+    docker:
+      - image: cimg/node:22.10
+    steps:
+      - checkout
+      - attach_workspace:
+          at: frontend/build
+      - aws-cli/setup:
+          role_arn: "$AWS_ROLE_ARN"
+      - run:
+          name: deploy frontend
+          command: |
+            cd frontend
+            aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
-  deploy:
+  deploy-backend-and-infrastructure:
     docker:
       - image: hashicorp/terraform:1.9
     steps:
@@ -169,7 +177,7 @@ jobs:
           name: Terraform plan
           command: |
             cd terraform
-            TF_LOG=debug terraform plan -out tfapply
+            terraform plan -out tfapply
       - run:
           name: Terraform apply
           command: |
