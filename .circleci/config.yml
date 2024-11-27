@@ -94,7 +94,7 @@ jobs:
       - persist_to_workspace:
           root: ~/project/backend/build
           paths:
-            - ./*
+            - ./backend/build
 
   check-format-terraform-code:
     docker:
@@ -141,7 +141,7 @@ jobs:
       - persist_to_workspace:
           root: ~/project/frontend/build
           paths:
-            - ./*
+            - ./frontend/build
 
   # deploy-frontend:
   #   docker:
