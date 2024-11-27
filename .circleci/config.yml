@@ -92,9 +92,9 @@ jobs:
             cd backend
             npm run build
       - persist_to_workspace:
-          root: ~/project/backend/build
+          root: ~/project
           paths:
-            - ./backend/build
+            - backend/build
 
   check-format-terraform-code:
     docker:
@@ -139,9 +139,9 @@ jobs:
             npm run build
             mv out build
       - persist_to_workspace:
-          root: ~/project/frontend/build
+          root: ~/project
           paths:
-            - ./frontend/build
+            - frontend/build
 
   # deploy-frontend:
   #   docker:
