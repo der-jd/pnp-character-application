@@ -24,7 +24,9 @@ workflows:
             - lint-typescript-code
       - check-format-terraform-code
       - lint-terraform-code
-      - build-frontend
+      - build-frontend:
+        requires:
+            - build-backend
       - deploy:
           requires:
             - build-backend
@@ -80,6 +82,8 @@ jobs:
       - image: cimg/node:22.10
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/project
       - run:
           name: Install dependencies
           command: |
@@ -91,7 +95,7 @@ jobs:
             cd backend
             npm run build
       - persist_to_workspace:
-          root: ~/project/backend
+          root: backend
           paths:
             - build
 
