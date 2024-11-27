@@ -7,6 +7,21 @@ export default function Inventar() {
         <p>Verwalten Sie hier Ihr Inventar.</p>
         <p>Verwalten Sie hier Ihr Inventar.</p>
         <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
+        <p>Verwalten Sie hier Ihr Inventar.</p>
       </div>
     )
   }
