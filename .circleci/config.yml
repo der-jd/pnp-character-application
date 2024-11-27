@@ -24,14 +24,14 @@ workflows:
             - lint-typescript-code
       - check-format-terraform-code
       - lint-terraform-code
-      - deploy-backend-and-infrastructure:
+      - build-frontend
+      - deploy:
           requires:
+            - build-frontend
             - build-backend
             - check-format-terraform-code
             - lint-terraform-code
-      - build-frontend:
-          requires:
-            - deploy-backend-and-infrastructure
+
       # TODO only deploy frontend if files have changed
       #- deploy-frontend:
        #   requires:
