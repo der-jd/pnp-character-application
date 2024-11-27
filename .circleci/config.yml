@@ -131,7 +131,7 @@ jobs:
           name: build frontend
           command: |
             cd frontend
-            npm run build
+            npm run build && npx next export
             mv out build
       - persist_to_workspace:
           root: ~/project
