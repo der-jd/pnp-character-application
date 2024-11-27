@@ -30,6 +30,7 @@ workflows:
       - deploy:
           requires:
             - build-backend
+            - build-frontend
             - check-format-terraform-code
             - lint-terraform-code
 
