@@ -32,11 +32,6 @@ workflows:
             - check-format-terraform-code
             - lint-terraform-code
 
-      # TODO only deploy frontend if files have changed
-      #- deploy-frontend:
-       #   requires:
-        #    - build-frontend
-
   delete-services:
     when: << pipeline.parameters.delete-services >>
     jobs:
@@ -142,21 +137,6 @@ jobs:
           root: ~/project
           paths:
             - frontend/build
-
-  # deploy-frontend:
-  #   docker:
-  #     - image: cimg/node:22.10
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: frontend/build
-  #     - aws-cli/setup:
-  #         role_arn: "$AWS_ROLE_ARN"
-  #     - run:
-  #         name: deploy frontend
-  #         command: |
-  #           cd frontend
-  #           aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy:
