@@ -117,7 +117,7 @@ jobs:
       - run:
           name: Lint Terraform code
           command: make lint-terraform
-
+#aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
   build-and-deploy-frontend:
     docker:
       - image: cimg/node:22.10
@@ -149,7 +149,7 @@ jobs:
             ./build_on_change.sh ${CIRCLE_BRANCH} {{ checksum "../cachekey" }}
             
             if [ -d "build" ]; then
-              aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
+              "TEST"
             fi
 
             rm -f checksum.txt
