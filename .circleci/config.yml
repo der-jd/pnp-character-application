@@ -134,7 +134,7 @@ jobs:
           name: Prepare cache restoring
           command: |
             cd ~/project
-            PREVIOUS_COMMIT=echo $(git rev-parse HEAD^)
+            PREVIOUS_COMMIT=$(git rev-parse HEAD^)
             echo "Saving previous commit hash:"
             echo "$PREVIOUS_COMMIT" | tee cachekey
       - restore_cache:
