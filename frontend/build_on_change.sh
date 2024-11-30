@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 BRANCH_NAME=$1
-ARTIFACTS_DIR="./artifacts/$BRANCH_NAME"
+COMMIT_HASH=$2
+ARTIFACTS_DIR="./artifacts/${BRANCH_NAME}-${COMMIT_HASH}"
 CHECKSUM_FILE=""
 
 
@@ -39,17 +40,12 @@ else
     diff $CHECKSUM_FILE checksum.txt > /dev/null
     if [ $? -eq 0 ]; then
         echo "No changes detected in frontend folder, skipping build!"
-        rm -f checksum.txt
         exit 0
     else
         echo "Detected changes in frontend folder! regenerating build files!"
     fi
 fi
 
-mkdir -p "./artifacts/$BRANCH_NAME"
-mv checksum.txt "./artifacts/$BRANCH_NAME"
-
 rm -rf build
 npm run build
 mv out build
-rm -f checksum.txt
