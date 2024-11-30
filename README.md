@@ -23,7 +23,7 @@ TODO update
 ## Tech stack
 
 - [Amazon Web Services (AWS)](https://aws.amazon.com/) for the infrastructure
-- Frontend: [React](https://react.dev/) with TypeScript
+- Frontend: [Next.js](https://nextjs.org/) with TypeScript
 - [CircleCI](https://circleci.com/) for the CI/CD pipeline
 - [HCP Terraform Cloud](https://app.terraform.io) for infrastructure as code
 - [tflint](https://github.com/terraform-linters/tflint) as linter for Terraform
