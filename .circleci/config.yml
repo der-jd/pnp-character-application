@@ -133,8 +133,10 @@ jobs:
       - run:
           name: Prepare cache restoring
           command: |
+            cd project
+            mkdir tmp
             PREVIOUS_COMMIT=$(git reflog show HEAD@{1} | head -n 1 | awk '{print $1}')
-            echo "$PREVIOUS_COMMIT" | tee ~/project/tmp/cache-key
+            echo "$PREVIOUS_COMMIT" | tee tmp/cache-key
       - restore_cache:
           keys:
             - frontend-cache-{{ .Branch }}-{{ checksum ~/project/tmp/cache-key}}
@@ -143,7 +145,7 @@ jobs:
           command: |
             cd frontend
             chmod +x build_on_change.sh
-            ./build_on_change.sh ${CIRCLE_BRANCH} {{ checksum ~/project/tmp/cache-key }}
+            ./build_on_change.sh ${CIRCLE_BRANCH} {{ checksum ../tmp/cache-key }}
             mv checksum.txt ./artifacts
             if [ -d "build" ]; then
               echo "build folder generated!"
