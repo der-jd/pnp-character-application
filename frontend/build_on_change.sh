@@ -17,7 +17,7 @@ find . -type f \( \
     -o -name 'lib' \
     -o -name 'components' \) \
     ! -name 'checksum.txt' \
-    -print0 | tar --null -cf - --files-from=- | md5sum > current_checksum.txt
+    -print0 | tee | tar --null -cf - --files-from=- | xargs dos2unix | md5sum > current_checksum.txt
 
 if [ ! -f "$CACHED_CHECKSUM" ]; then
     echo "No Checksum file found, regenerating build!"
