@@ -145,14 +145,13 @@ jobs:
             cd frontend
             chmod +x build_on_change.sh
             ./build_on_change.sh ${CIRCLE_BRANCH} {{ checksum ../cache-key }}
-            mv checksum.txt ./artifacts
             if [ -d "build" ]; then
               echo "build folder generated!"
             fi
       - save_cache:
           key: frontend-cache-{{ .Branch }}-{{ checksum .Revision }}
           paths:
-            - frontend/artifacts/checksum.txt
+            - checksum.txt
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
