@@ -22,20 +22,16 @@ workflows:
           requires:
             - check-format-backend-files
             - lint-typescript-code
-      - build-frontend
       - check-format-terraform-code
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
           requires:
             - build-backend
-            - build-frontend
             - check-format-terraform-code
             - lint-terraform-code
-
-
-      # - deploy-frontend:
-      #     requires:
-      #       - build-frontend
+      - build-and-deploy-frontend:
+          requires:
+            - deploy-backend-and-infrastructure
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
