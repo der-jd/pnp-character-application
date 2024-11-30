@@ -150,7 +150,7 @@ jobs:
               echo "build folder generated!"
             fi
 
-            echo "$CIRCLE_SHA1" > commit
+            echo $CIRCLE_SHA1 > ../commit
       - save_cache:
           key: frontend-cache-{{ .Branch }}-{{ checksum "./commit" }}
           paths:
