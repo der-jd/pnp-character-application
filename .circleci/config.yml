@@ -144,18 +144,15 @@ jobs:
           name: build frontend
           command: |
             cd frontend
-            
             chmod +x build_on_change.sh
             ./build_on_change.sh ${CIRCLE_BRANCH} {{ checksum "../cachekey" }}
-            
+   
             if [ -d "build" ]; then
               echo "TESTTESTTESTTESTTEST"
               echo "FUCK THIS SHIT"
             fi
-
             rm -f checksum.txt
             mv current_checksum.txt checksum.txt
-
             echo "Saving current commit hash:"
             echo $CIRCLE_SHA1 | tee ../commit
       - save_cache:
