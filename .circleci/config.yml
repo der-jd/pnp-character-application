@@ -142,10 +142,6 @@ jobs:
             ./build_on_change.sh ${CIRCLE_BRANCH}
             if [ -d "build" ]; then
               aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
-              persist_to_workspace:
-                  root: ~/project
-                  paths:
-                    - frontend/build
             fi
       - save_cache:
           key: frontend-cache-{{ .Branch }}
