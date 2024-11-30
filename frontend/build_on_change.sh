@@ -2,8 +2,7 @@
 
 BRANCH_NAME=$1
 COMMIT_HASH=$2
-ARTIFACTS_DIR="./artifacts/${BRANCH_NAME}-${COMMIT_HASH}"
-CHECKSUM_FILE=""
+CACHED_CHECKSUM="checksum.txt"
 
 
 # Check the frontend directory for changes and rebuild the frontend if changes are detected
@@ -20,24 +19,13 @@ find . -type f \( \
     -o -name 'node_modules' \
     -o -name 'lib' \
     -o -name 'components' \) \
-    -print0 | tar --null -cf - --files-from=- | md5sum > checksum.txt
+    -print0 | tar --null -cf - --files-from=- | md5sum > current_checksum.txt
 
-# Take the current branch cache, if not there (eg. first commit), look for the main cache,
-# if the main cache is inaccessible, default to building and deploying the frontend
-if [ ! -d "$ARTIFACTS_DIR" ]; then
-    CHECKSUM_FILE="$ARTIFACTS_DIR/checksum.txt"
-else
-    ARTIFACTS_DIR="./artifacts/main"
-    if [ -d "$ARTIFACTS_DIR" ]; then
-        CHECKSUM_FILE="$ARTIFACTS_DIR/checksum.txt"
-    fi
-fi
-
-if [ "$CHECKSUM_FILE" = "" ]; then
+if [ ! -f "$CACHED_CHECKSUM" ]; then
     echo "No Checksum file found, regenerating build!"
 else
 
-    diff $CHECKSUM_FILE checksum.txt > /dev/null
+    diff $CACHED_CHECKSUM current_checksum.txt > /dev/null
     if [ $? -eq 0 ]; then
         echo "No changes detected in frontend folder, skipping build!"
         exit 0
