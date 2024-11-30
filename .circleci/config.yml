@@ -149,7 +149,7 @@ jobs:
             ./build_on_change.sh ${CIRCLE_BRANCH} {{ checksum "../cachekey" }}
             
             if [ -d "build" ]; then
-              echo "TEST"
+              echo "TESTTESTTESTTESTTEST"
             fi
 
             rm -f checksum.txt
