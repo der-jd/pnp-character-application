@@ -117,7 +117,7 @@ jobs:
       - run:
           name: Lint Terraform code
           command: make lint-terraform
-
+# aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
   build-and-deploy-frontend:
     docker:
       - image: cimg/node:22.10
@@ -133,7 +133,7 @@ jobs:
       - run:
           name: Prepare cache restoring
           command: |
-            PREVIOUS_COMMIT=git reflog show HEAD@{1} | head -n 1 | awk '{print $1}'
+            PREVIOUS_COMMIT=$(git reflog show HEAD@{1} | head -n 1 | awk '{print $1}')
             echo "export PREVIOUS_COMMIT" >> "$BASH_ENV"
             echo "restoring cache for previous commit:  ${PREVIOUS_COMMIT}"
       - restore_cache:
@@ -149,7 +149,7 @@ jobs:
             ./build_on_change.sh ${CIRCLE_BRANCH} ${PREVIOUS_COMMIT}
             mv checksum.txt ./artifacts/{{ .Branch }}-{{ .Revision }}
             if [ -d "build" ]; then
-              aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
+              echo "build folder generated!"
             fi
       - save_cache:
           key: frontend/artifacts/{{ .Branch }}-{{ .Revision }}
