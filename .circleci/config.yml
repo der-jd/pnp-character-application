@@ -134,7 +134,6 @@ jobs:
           name: Prepare cache restoring
           command: |
             cd ~/project
-            mkdir 
             PREVIOUS_COMMIT=$(git reflog show HEAD@{1} | head -n 1 | awk '{print $1}')
             echo "$PREVIOUS_COMMIT" | tee cache-key
       - restore_cache:
