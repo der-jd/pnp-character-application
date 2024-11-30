@@ -8,18 +8,13 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
+    const characterId = verifyParameters(event);
+
+    console.log(`Get character ${characterId} from DynamoDB`);
+
+    // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
     const client = new DynamoDBClient({});
     const docClient = DynamoDBDocumentClient.from(client);
-    const characterId = event.pathParameters?.characterId;
-
-    /**
-     * TODO implement function
-     * https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
-     * https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-client-dynamodb/Interface/GetItemCommandInput/
-     * https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/Package/-aws-sdk-lib-dynamodb/Class/GetCommand/
-     * https://aws.amazon.com/blogs/developer/announcing-the-amazon-dynamodb-document-client-in-the-aws-sdk-for-javascript/
-     */
-
     const command = new GetCommand({
       TableName: process.env.TABLE_NAME,
       Key: {
@@ -27,30 +22,72 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
       },
     });
 
-    const response = await docClient.send(command);
-    console.log(response);
+    const dynamoDbResponse = await docClient.send(command);
 
-    return {
+    if (!dynamoDbResponse.Item) {
+      console.error("Item from DynamoDB table is missing in the request response");
+      throw {
+        statusCode: 500,
+        body: JSON.stringify({
+          message: "Item from DynamoDB table is missing in the request response",
+        }),
+      };
+    }
+
+    console.log("Successfully got DynamoDB item");
+
+    const response = {
       statusCode: 200,
-      body: JSON.stringify("Success"),
-      /**
-       * return
-       * - success message
-       * - new skill value
-       * - new cost category
-       * - new cost/point
-       * - new adventure points
-       */
+      body: JSON.stringify({
+        message: "Successfully got character",
+        character: dynamoDbResponse.Item,
+      }),
     };
+    console.log(response);
+    return response;
   } catch (error: any) {
-    return {
-      statusCode: error.statusCode,
-      body: error.body
-        ? error.body
-        : JSON.stringify({
-            message: "An error occurred!",
-            error: (error as Error).message,
-          }),
+    const response = {
+      statusCode: error.statusCode ?? 500,
+      body:
+        error.body ??
+        JSON.stringify({
+          message: "An error occurred!",
+          error: (error as Error).message,
+        }),
+    };
+    console.error(response);
+
+    return response;
+  }
+}
+
+function verifyParameters(event: APIGatewayProxyEvent): string {
+  console.log("Verify request parameters");
+
+  if (
+    typeof event.pathParameters?.characterId !== "string"
+  ) {
+    console.error("Invalid input values!");
+    throw {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "Invalid input values!",
+      }),
     };
   }
+
+  const characterId = event.pathParameters?.characterId;
+
+  const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
+  if (!uuidRegex.test(characterId)) {
+    console.error("Character id is not a valid UUID format!");
+    throw {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "Character id is not a valid UUID format!",
+      }),
+    };
+  }
+
+  return characterId;
 }
