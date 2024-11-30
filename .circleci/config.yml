@@ -149,8 +149,8 @@ jobs:
             if [ -d "build" ]; then
               aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
             fi
-            echo "Saving current commit hash: ${CIRCLE_SHA1}"
-            echo $CIRCLE_SHA1 > ../commit
+            echo "Saving current commit hash
+            echo $CIRCLE_SHA1 | tee ../commit
       - save_cache:
           key: frontend-cache-{{ .Branch }}-{{ checksum "./commit" }}
           paths:
