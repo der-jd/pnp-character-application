@@ -154,7 +154,7 @@ jobs:
       - save_cache:
           key: frontend-cache-{{ .Branch }}-{{ checksum "./commit" }}
           paths:
-            - frontend/checksum.txt
+            - frontend/current_checksum.txt
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
