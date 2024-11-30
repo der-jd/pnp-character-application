@@ -146,7 +146,7 @@ jobs:
       - save_cache:
           key: frontend-cache-{{ .Branch }}
           paths:
-            - frontend/artifacts/${CIRCLE_BRANCH}
+            - frontend/artifacts/{{ .Branch }}
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
