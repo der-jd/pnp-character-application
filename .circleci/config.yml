@@ -22,22 +22,20 @@ workflows:
           requires:
             - check-format-backend-files
             - lint-typescript-code
+      - build-frontend
       - check-format-terraform-code
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
           requires:
             - build-backend
+            - build-frontend
             - check-format-terraform-code
             - lint-terraform-code
-      - build-frontend:
-          requires:
-            - deploy-backend-and-infrastructure
-      - deploy-frontend:
-          filters:
-             branches:
-                only: main
-          requires:
-            - build-frontend
+
+
+      # - deploy-frontend:
+      #     requires:
+      #       - build-frontend
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
@@ -145,20 +143,20 @@ jobs:
           paths:
             - frontend/build
 
-  deploy-frontend:
-    docker:
-      - image: cimg/node:22.10
-    steps:
-      - checkout
-      - attach_workspace:
-          at: frontend/build
-      - aws-cli/setup:
-          role_arn: "$AWS_ROLE_ARN"
-      - run:
-          name: deploy frontend
-          command: |
-            cd frontend
-            aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
+  # deploy-frontend:
+  #   docker:
+  #     - image: cimg/node:22.10
+  #   steps:
+  #     - checkout
+  #     - attach_workspace:
+  #         at: frontend/build
+  #     - aws-cli/setup:
+  #         role_arn: "$AWS_ROLE_ARN"
+  #     - run:
+  #         name: deploy frontend
+  #         command: |
+  #           cd frontend
+  #           aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
