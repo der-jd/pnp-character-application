@@ -64,9 +64,7 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
 function verifyParameters(event: APIGatewayProxyEvent): string {
   console.log("Verify request parameters");
 
-  if (
-    typeof event.pathParameters?.characterId !== "string"
-  ) {
+  if (typeof event.pathParameters?.characterId !== "string") {
     console.error("Invalid input values!");
     throw {
       statusCode: 400,
