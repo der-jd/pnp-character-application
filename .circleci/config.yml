@@ -139,7 +139,7 @@ jobs:
             echo "$PREVIOUS_COMMIT" | tee cachekey
       - restore_cache:
           keys:
-            - frontend-cache-{{ .Branch }}-{{ checksum "/cachekey" }}
+            - frontend-cache-{{ .Branch }}-{{ checksum "./cachekey" }}
       - run:
           name: build frontend
           command: |
@@ -150,9 +150,9 @@ jobs:
               echo "build folder generated!"
             fi
 
-            echo "$CIRCLE_SHA1" > commit.txt
+            echo "$CIRCLE_SHA1" > commit
       - save_cache:
-          key: frontend-cache-{{ .Branch }}-{{ checksum "/commit.txt" }}
+          key: frontend-cache-{{ .Branch }}-{{ checksum "./commit" }}
           paths:
             - checksum.txt
 
