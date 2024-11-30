@@ -134,27 +134,24 @@ jobs:
           name: Prepare cache restoring
           command: |
             PREVIOUS_COMMIT=$(git reflog show HEAD@{1} | head -n 1 | awk '{print $1}')
-            echo "export PREVIOUS_COMMIT" >> "$BASH_ENV"
-            echo "restoring cache for previous commit:  ${PREVIOUS_COMMIT}"
+            echo "$PREVIOUS_COMMIT" | tee ~/project/tmp/cache-key
       - restore_cache:
           keys:
-            - frontend-cache-{{ .Branch }}-${PREVIOUS_COMMIT}
-            - frontend-cache-main
+            - frontend-cache-{{ .Branch }}-{{ checksum ~/project/tmp/cache-key}}
       - run:
           name: build frontend
           command: |
             cd frontend
             chmod +x build_on_change.sh
-            
-            ./build_on_change.sh ${CIRCLE_BRANCH} ${PREVIOUS_COMMIT}
-            mv checksum.txt ./artifacts/{{ .Branch }}-{{ .Revision }}
+            ./build_on_change.sh ${CIRCLE_BRANCH} {{ checksum ~/project/tmp/cache-key }}
+            mv checksum.txt ./artifacts
             if [ -d "build" ]; then
               echo "build folder generated!"
             fi
       - save_cache:
           key: frontend/artifacts/{{ .Branch }}-{{ .Revision }}
           paths:
-            - frontend/artifacts/{{ .Branch }}
+            - frontend/artifacts/checksum.txt
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
