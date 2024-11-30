@@ -35,4 +35,3 @@ fi
 rm -rf build
 npm run build
 mv out build
-mv out build
