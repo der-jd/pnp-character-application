@@ -135,21 +135,24 @@ jobs:
           command: |
             cd ~/project
             PREVIOUS_COMMIT=$(git reflog show HEAD@{1} | head -n 1 | awk '{print $1}')
+            echo "Saving previous commit hash:"
             echo "$PREVIOUS_COMMIT" | tee cachekey
       - restore_cache:
           keys:
-            - frontend-cache-{{ .Branch }}-{{ checksum cachekey}}
+            - frontend-cache-{{ .Branch }}-{{ checksum "/cachekey" }}
       - run:
           name: build frontend
           command: |
             cd frontend
             chmod +x build_on_change.sh
-            ./build_on_change.sh ${CIRCLE_BRANCH} {{ checksum ../cachekey }}
+            ./build_on_change.sh ${CIRCLE_BRANCH} {{ checksum "../cachekey" }}
             if [ -d "build" ]; then
               echo "build folder generated!"
             fi
+
+            echo "$CIRCLE_SHA1" > commit.txt
       - save_cache:
-          key: frontend-cache-{{ .Branch }}-{{ checksum .Revision }}
+          key: frontend-cache-{{ .Branch }}-{{ checksum "/commit.txt" }}
           paths:
             - checksum.txt
 
