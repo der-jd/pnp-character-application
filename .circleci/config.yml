@@ -122,7 +122,7 @@ jobs:
           name: Lint Terraform code
           command: make lint-terraform
 
-  build-frontend:
+  build-and-deploy-frontend:
     docker:
       - image: cimg/node:22.10
     steps:
@@ -132,31 +132,27 @@ jobs:
           command: |
             cd frontend
             npm install
+      - restore_cache:
+          keys:
+            - frontend-cache-{{ .Branch }}
+            - frontend-cache-main
       - run:
           name: build frontend
           command: |
             cd frontend
-            npm run build
-            mv out build
-      - persist_to_workspace:
-          root: ~/project
+            chmod +x build_on_change.sh
+            ./build_on_change.sh ${CIRCLE_BRANCH}
+            if [ -d "build" ]; then
+              aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
+              persist_to_workspace:
+                  root: ~/project
+                  paths:
+                    - frontend/build
+            fi
+      - save_cache:
+          key: frontend-cache-{{ .Branch }}
           paths:
-            - frontend/build
-
-  # deploy-frontend:
-  #   docker:
-  #     - image: cimg/node:22.10
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: frontend/build
-  #     - aws-cli/setup:
-  #         role_arn: "$AWS_ROLE_ARN"
-  #     - run:
-  #         name: deploy frontend
-  #         command: |
-  #           cd frontend
-  #           aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
+            - frontend/artifacts/${CIRCLE_BRANCH}
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
