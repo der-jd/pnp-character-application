@@ -147,7 +147,7 @@ jobs:
             chmod +x build_on_change.sh
             ./build_on_change.sh ${CIRCLE_BRANCH} {{ checksum "../cachekey" }}
             if [ -d "build" ]; then
-              echo "Would have deployed the frontend! Was this wise?"
+              aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
             fi
             echo "Saving current commit hash:"
             echo $CIRCLE_SHA1 | tee ../commit
