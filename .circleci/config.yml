@@ -149,7 +149,6 @@ jobs:
    
             if [ -d "build" ]; then
               echo "TESTTESTTESTTESTTEST"
-              echo "FUCK THIS SHIT"
             fi
             rm -f checksum.txt
             mv current_checksum.txt checksum.txt
