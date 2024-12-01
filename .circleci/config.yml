@@ -146,7 +146,6 @@ jobs:
           command: |
             cd frontend
 
-            chmod +x build_on_change.sh
             ./build_on_change.sh
 
             if [ -d "build" ]; then
