@@ -16,6 +16,7 @@ find . -type f \( \
     -o -name 'lib' \
     -o -name 'components' \) \
     ! -name 'checksum.txt' \
+    ! -name 'build_on_change.sh' \
     -exec md5sum {} \; > current_checksum.txt
     
 if [ ! -f "$CACHED_CHECKSUM" ]; then
