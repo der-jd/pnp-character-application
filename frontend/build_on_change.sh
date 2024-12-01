@@ -5,20 +5,18 @@ CACHED_CHECKSUM="checksum.txt"
 # Check the frontend directory for changes and rebuild the frontend if changes are detected
 # Note: This excludes certain files of the frontend folder
 
+
 find . -type f \( \
     -path './src/*' \
     -o -path './public/*' \
-    -o -path './node_modules/*' \
     -o -path './lib/*' \
     -o -path './components/*' \
     -o -name 'src' \
     -o -name 'public' \
-    -o -name 'node_modules' \
     -o -name 'lib' \
     -o -name 'components' \) \
     ! -name 'checksum.txt' \
-    -exec md5sum {} + | md5sum > current_checksum.txt
-
+    -print0 | tar --null -cf - --files-from=- | md5sum > current_checksum.txt
 
 if [ ! -f "$CACHED_CHECKSUM" ]; then
     echo "No Checksum file found, regenerating build!"
