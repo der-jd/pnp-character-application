@@ -33,3 +33,6 @@ fi
 rm -rf build
 npm run build
 mv out build
+
+rm -f checksum.txt
+mv current_checksum.txt checksum.txt

@@ -142,7 +142,7 @@ jobs:
             - frontend-cache-{{ .Branch }}-{{ checksum "./cachekey" }}
             - frontend-cache-main-{{ checksum "./cachekey" }}
       - run:
-          name: build frontend
+          name: build and deploy
           command: |
             cd frontend
 
@@ -152,9 +152,6 @@ jobs:
             if [ -d "build" ]; then
               aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
             fi
-
-            rm -f checksum.txt
-            mv current_checksum.txt checksum.txt
 
             echo "Saving current commit hash:"
             echo $CIRCLE_SHA1 | tee ../commit
