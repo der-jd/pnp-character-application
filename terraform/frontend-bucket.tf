@@ -5,8 +5,6 @@ resource "aws_s3_bucket" "frontend_bucket" {
   force_destroy = true
 }
 
-
-
 resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
   bucket = aws_s3_bucket.frontend_bucket.id
 
