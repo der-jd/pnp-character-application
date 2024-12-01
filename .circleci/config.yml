@@ -142,7 +142,7 @@ jobs:
             - frontend-cache-{{ .Branch }}-{{ checksum "./cachekey" }}
             - frontend-cache-main-{{ checksum "./cachekey" }}
       - run:
-          name: build and deploy
+          name: Build and deploy
           command: |
             cd frontend
 
