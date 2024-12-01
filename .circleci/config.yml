@@ -29,15 +29,9 @@ workflows:
             - build-backend
             - check-format-terraform-code
             - lint-terraform-code
-      - build-frontend:
+      - build-and-deploy-frontend:
           requires:
             - deploy-backend-and-infrastructure
-      - deploy-frontend:
-          filters:
-             branches:
-                only: main
-          requires:
-            - build-frontend
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
@@ -124,41 +118,46 @@ jobs:
           name: Lint Terraform code
           command: make lint-terraform
 
-  build-frontend:
+  build-and-deploy-frontend:
     docker:
       - image: cimg/node:22.10
     steps:
       - checkout
+      - aws-cli/setup:
+          role_arn: "$AWS_ROLE_ARN"
       - run:
           name: Install dependencies
           command: |
             cd frontend
             npm install
       - run:
-          name: build frontend
+          name: Prepare cache restoring
           command: |
-            cd frontend
-            npm run build
-            mv out build
-      - persist_to_workspace:
-          root: ~/project
-          paths:
-            - frontend/build
-
-  deploy-frontend:
-    docker:
-      - image: cimg/node:22.10
-    steps:
-      - checkout
-      - attach_workspace:
-          at: frontend/build
-      - aws-cli/setup:
-          role_arn: "$AWS_ROLE_ARN"
+            cd ~/project
+            PREVIOUS_COMMIT=$(git rev-parse HEAD^)
+            echo "Saving previous commit hash:"
+            echo "$PREVIOUS_COMMIT" | tee cachekey
+      - restore_cache:
+          keys:
+            - frontend-cache-{{ .Branch }}-{{ checksum "./cachekey" }}
+            - frontend-cache-main-{{ checksum "./cachekey" }}
       - run:
-          name: deploy frontend
+          name: Build and deploy
           command: |
             cd frontend
-            aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
+
+            ./build_on_change.sh
+
+            if [ -d "build" ]; then
+              aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
+            fi
+
+            echo "Saving current commit hash:"
+            echo $CIRCLE_SHA1 | tee ../commit
+      - save_cache:
+          key: frontend-cache-{{ .Branch }}-{{ checksum "./commit" }}
+          paths:
+            - frontend/checksum.txt
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
