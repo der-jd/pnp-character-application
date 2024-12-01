@@ -149,6 +149,7 @@ jobs:
    
             if [ -d "build" ]; then
               echo "TESTTESTTESTTESTTEST"
+              echo "another test"
             fi
             rm -f checksum.txt
             mv current_checksum.txt checksum.txt
