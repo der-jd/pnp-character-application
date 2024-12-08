@@ -148,10 +148,6 @@ jobs:
 
             ./build_on_change.sh
 
-            if [ -d "build" ]; then
-              aws s3 sync build s3://pnp-character-application-frontend --region eu-central-1
-            fi
-
             echo "Saving current commit hash:"
             echo $CIRCLE_SHA1 | tee ../commit
       - save_cache:
