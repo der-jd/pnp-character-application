@@ -3,7 +3,8 @@
 CACHED_CHECKSUM="checksum.txt"
 
 # Check the frontend directory for changes and rebuild the frontend if changes are detected
-# Note: This excludes certain files of the frontend folder
+# Note: This excludes certain files of the frontend folder. 
+# Note: If the s3 bucket is empty, an upload will take place even if the frontend did not change
 
 
 find . -type f \( \
@@ -42,6 +43,7 @@ else
         fi
         
         echo "Bucket is empty! Regenerating build files"
+
     else
         echo "Detected changes in frontend folder! Regenerating build files!"
     fi
