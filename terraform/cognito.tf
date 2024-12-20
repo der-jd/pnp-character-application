@@ -60,8 +60,6 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
     refresh_token = "days"
   }
 
-  # Temporarily use only the standard attributes
-  read_attributes = ["email", "openid"]
 }
 
 resource "aws_cognito_identity_pool" "pnp_identity_pool" {
