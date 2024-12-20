@@ -13,6 +13,13 @@ resource "aws_s3_bucket_public_access_block" "frontend_bucket_access" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_ownership_controls" "frontend_bucket_ownership" {
+  bucket = aws_s3_bucket.frontend_bucket.id
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
 resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
   bucket = aws_s3_bucket.frontend_bucket.id
 
