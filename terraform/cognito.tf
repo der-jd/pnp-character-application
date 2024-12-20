@@ -61,7 +61,7 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
   }
 
   read_attributes  = ["custom:tenant_id"]
-  write_attributes = ["custom:tenant_id"]
+  write_attributes = ["custom:tenant_id", "email", "openid"]
 
 }
 
