@@ -60,6 +60,9 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
     refresh_token = "days"
   }
 
+  read_attributes  = ["custom:tenant_id"]
+  write_attributes = ["custom:tenant_id"]
+
 }
 
 resource "aws_cognito_identity_pool" "pnp_identity_pool" {
