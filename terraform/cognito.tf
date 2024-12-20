@@ -9,6 +9,18 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     mutable             = true
   }
 
+  schema {
+    name                     = "custom:tenant_id"
+    attribute_data_type      = "String"
+    developer_only_attribute = false
+    mutable                  = true
+    required                 = true
+    string_attribute_constraints {
+      max_length = 50
+      min_length = 1
+    }
+  }
+
   admin_create_user_config {
     allow_admin_create_user_only = true
   }
@@ -47,6 +59,9 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
     id_token      = "hours"
     refresh_token = "days"
   }
+
+  read_attributes  = ["custom:tenant_id"]
+  write_attributes = ["custom:tenant_id"]
 
 }
 
