@@ -72,7 +72,6 @@ jobs:
           command: |
             cd backend
             npm run lint
-            # TODO lint frontend files
 
   build-backend:
     docker:
