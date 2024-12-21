@@ -51,7 +51,7 @@ resource "aws_lambda_function" "create_tenant_id_lambda" {
   function_name = "pnp-create-tenant-id"
   handler       = "index.handler"
   runtime       = "nodejs20.x"
-  role          = aws_iam_role.lambda_exec_role.arn
+  role          = aws_iam_role.control_plane_lambda_exec_role.arn
 
   environment {
     variables = {
