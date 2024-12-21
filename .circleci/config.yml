@@ -143,12 +143,25 @@ jobs:
           command: |
             cd terraform
             terraform apply -auto-approve tfapply
+      - run:
+          name: Persist Terraform output for frontend
+          command: |
+            cd terraform
+            echo "export NEXT_PUBLIC_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
+            echo "export NEXT_PUBLIC_COGNITO_USER_POOL_ID=$(terraform output cognito_user_pool_id)" >> terraform_output
+            echo "export NEXT_PUBLIC_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - terraform/terraform_output
 
   build-and-deploy-frontend:
     docker:
       - image: cimg/node:22.10
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/project/terraform/terraform_output
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
@@ -167,6 +180,11 @@ jobs:
           keys:
             - frontend-cache-{{ .Branch }}-{{ checksum "./cachekey" }}
             - frontend-cache-main-{{ checksum "./cachekey" }}
+      - run:
+          name: Set env variables for frontend build
+          command: |
+            cd terraform
+            source terraform_output
       - run:
           name: Build and deploy
           command: |
