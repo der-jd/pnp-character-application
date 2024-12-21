@@ -3,18 +3,6 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
 
   auto_verified_attributes = ["email"]
 
-  schema {
-    name                     = "custom:tenant_id"
-    attribute_data_type      = "String"
-    developer_only_attribute = false
-    mutable                  = true
-    required                 = false
-    string_attribute_constraints {
-      max_length = 50
-      min_length = 1
-    }
-  }
-
   admin_create_user_config {
     allow_admin_create_user_only = true
   }
@@ -47,9 +35,6 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
   access_token_validity                = 12
   id_token_validity                    = 12
   refresh_token_validity               = 1
-
-  write_attributes = ["email"]
-  read_attributes  = ["email"]
 
   token_validity_units {
     access_token  = "hours"

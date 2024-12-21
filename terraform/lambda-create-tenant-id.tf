@@ -14,7 +14,7 @@ resource "aws_lambda_function" "create_tenant_id_lambda" {
     variables = {
       USER_POOL_ID = aws_cognito_user_pool.pnp_user_pool.id
       CLIENT_ID    = aws_cognito_user_pool_client.pnp_user_pool_client.id
-      DOMAIN       = "https://${aws_cognito_user_pool_domain.example_domain.domain}.auth.${data.aws_region.current.name}.amazoncognito.com"
+      DOMAIN       = "https://${aws_cognito_user_pool.example.id}.auth.${provider.aws_region}.amazoncognito.com"
     }
   }
 
