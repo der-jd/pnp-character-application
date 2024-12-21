@@ -118,6 +118,32 @@ jobs:
           name: Lint Terraform code
           command: make lint-terraform
 
+  # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
+  deploy-backend-and-infrastructure:
+    docker:
+      - image: hashicorp/terraform:1.9
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
+      - aws-cli/setup:
+          role_arn: "$AWS_ROLE_ARN"
+      - run:
+          name: Terraform init
+          command: |
+            cd terraform
+            terraform init -input=false
+      - run:
+          name: Terraform plan
+          command: |
+            cd terraform
+            terraform plan -out tfapply
+      - run:
+          name: Terraform apply
+          command: |
+            cd terraform
+            terraform apply -auto-approve tfapply
+
   build-and-deploy-frontend:
     docker:
       - image: cimg/node:22.10
@@ -154,32 +180,6 @@ jobs:
           key: frontend-cache-{{ .Branch }}-{{ checksum "./commit" }}
           paths:
             - frontend/checksum.txt
-
-  # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
-  deploy-backend-and-infrastructure:
-    docker:
-      - image: hashicorp/terraform:1.9
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/project
-      - aws-cli/setup:
-          role_arn: "$AWS_ROLE_ARN"
-      - run:
-          name: Terraform init
-          command: |
-            cd terraform
-            terraform init -input=false
-      - run:
-          name: Terraform plan
-          command: |
-            cd terraform
-            terraform plan -out tfapply
-      - run:
-          name: Terraform apply
-          command: |
-            cd terraform
-            terraform apply -auto-approve tfapply
 
   terraform-destroy:
     docker:
