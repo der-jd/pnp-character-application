@@ -1,3 +1,5 @@
+data "aws_region" "current" {}
+
 data "archive_file" "create-tenant-id" {
   type        = "zip"
   source_dir  = "../backend/build/lambdas/create-tenant-id"
@@ -7,14 +9,14 @@ data "archive_file" "create-tenant-id" {
 resource "aws_lambda_function" "create_tenant_id_lambda" {
   function_name = "pnp-create-tenant-id"
   handler       = "index.handler"
-  runtime       = "nodejs18.x"
+  runtime       = "nodejs22.x"
   role          = aws_iam_role.lambda_exec_role.arn
 
   environment {
     variables = {
       USER_POOL_ID = aws_cognito_user_pool.pnp_user_pool.id
       CLIENT_ID    = aws_cognito_user_pool_client.pnp_user_pool_client.id
-      DOMAIN       = "https://${aws_cognito_user_pool.pnp_user_pool.id}.auth.${var.aws_region}.amazoncognito.com"
+      DOMAIN       = "https://${aws_cognito_user_pool.pnp_user_pool.id}.auth.${data.aws_region.current.name}.amazoncognito.com"
     }
   }
 

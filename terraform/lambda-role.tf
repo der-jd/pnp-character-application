@@ -32,7 +32,7 @@ resource "aws_iam_role_policy" "lambda_inline_policy" {
 }
 
 
-resource "aws_iam_role" "lambda_execution_role" {
+resource "aws_iam_role" "control_plane_lambda_exec_role" {
   name = "lambda-cognito-role"
 
   assume_role_policy = jsonencode({
@@ -49,7 +49,7 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
-resource "aws_iam_policy" "lambda_cognito_policy" {
+resource "aws_iam_policy" "control_plane_lambda_policy" {
   name        = "lambda-user-management-policy"
   description = "Policy for Lambda to manage usergroups"
   policy = jsonencode({
@@ -60,7 +60,6 @@ resource "aws_iam_policy" "lambda_cognito_policy" {
         Action = [
           "cognito-idp:CreateGroup",
           "cognito-idp:AdminAddUserToGroup",
-          "cognito-idp:AdminUpdateUserAttributes",
           "cognito-idp:InitiateAuth"
         ],
         Resource = "*"
@@ -69,7 +68,7 @@ resource "aws_iam_policy" "lambda_cognito_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "attach_lambda_cognito_policy" {
-  role       = aws_iam_role.lambda_execution_role.name
-  policy_arn = aws_iam_policy.lambda_cognito_policy.arn
+resource "aws_iam_role_policy_attachment" "attach_control_plane_lambda_policy" {
+  role       = aws_iam_role.control_plane_lambda_exec_role.name
+  policy_arn = aws_iam_policy.control_plane_lambda_policy.arn
 }
