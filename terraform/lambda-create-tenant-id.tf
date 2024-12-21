@@ -19,7 +19,7 @@ resource "aws_iam_role" "control_plane_lambda_exec_role" {
 
 resource "aws_iam_role_policy" "control_plane_lambda_policy" {
   role = aws_iam_role.control_plane_lambda_exec_role.name
-  name        = "lambda-control-plane-policy"
+  name = "lambda-control-plane-policy"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [

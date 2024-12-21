@@ -39,28 +39,25 @@ export const handler = async (event: any): Promise<any> => {
   console.log(tenantId);
 
   try {
-    await cognito
-      .createGroup({
-        GroupName: sub,
-        UserPoolId: userPoolId,
-        Description: `Group for user ${sub}`,
-      });
+    await cognito.createGroup({
+      GroupName: sub,
+      UserPoolId: userPoolId,
+      Description: `Group for user ${sub}`,
+    });
 
-    await cognito
-      .adminAddUserToGroup({
-        GroupName: sub,
-        UserPoolId: userPoolId,
-        Username: sub,
-      });
+    await cognito.adminAddUserToGroup({
+      GroupName: sub,
+      UserPoolId: userPoolId,
+      Username: sub,
+    });
 
-    const authResponse = await cognito
-      .initiateAuth({
-        AuthFlow: "REFRESH_TOKEN_AUTH",
-        ClientId: clientId,
-        AuthParameters: {
-          REFRESH_TOKEN: refreshToken,
-        },
-      });
+    const authResponse = await cognito.initiateAuth({
+      AuthFlow: "REFRESH_TOKEN_AUTH",
+      ClientId: clientId,
+      AuthParameters: {
+        REFRESH_TOKEN: refreshToken,
+      },
+    });
     console.log("Generated new tokens");
 
     return {
