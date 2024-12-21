@@ -33,10 +33,6 @@ export default function SignUp() {
         Password: password,
         UserAttributes: [
           {
-            Name: "name",
-            Value: name,
-          },
-          {
             Name: "email",
             Value: email,
           },
@@ -77,20 +73,6 @@ export default function SignUp() {
           <h1 className="text-2xl font-bold text-center text-gray-900">Sign Up</h1>
           {error && <p className="text-red-500 text-center">{error}</p>}
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email
