@@ -1,10 +1,9 @@
-cd backend
 npm run format
+make format-terraform
+make lint-terraform
+
+cd backend
 npm run lint
 
 cd ../frontend
 npm run lint
-
-cd ..
-make format-terraform
-make lint-terraform

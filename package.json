@@ -2,9 +2,12 @@
   "name": "pnp-application",
   "version": "1.0.0",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "format": "prettier . --write",
+    "check-format": "prettier . --check"
   },
   "devDependencies": {
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "prettier": "^3.3.3"
   }
 }

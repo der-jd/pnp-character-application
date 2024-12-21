@@ -16,11 +16,11 @@ workflows:
     when:
       not: << pipeline.parameters.delete-services >>
     jobs:
-      - check-format-backend-files
+      - check-format-files
       - lint-typescript-code
       - build-backend:
           requires:
-            - check-format-backend-files
+            - check-format-files
             - lint-typescript-code
       - check-format-terraform-code
       - lint-terraform-code
@@ -31,6 +31,7 @@ workflows:
             - lint-terraform-code
       - build-and-deploy-frontend:
           requires:
+            - check-format-files
             - deploy-backend-and-infrastructure
 
   delete-services:
@@ -40,22 +41,17 @@ workflows:
 
 
 jobs:
-  # TODO check format of frontend files
-  check-format-backend-files:
+  check-format-files:
     docker:
       - image: cimg/node:22.10
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: |
-            cd backend
-            npm ci
+          command: npm ci
       - run:
           name: Check file formatting
-          command: |
-            cd backend
-            npm run check-format
+          command: npm run check-format
 
   lint-typescript-code:
     docker:
