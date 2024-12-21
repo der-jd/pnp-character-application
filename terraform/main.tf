@@ -14,5 +14,5 @@ provider "aws" {
 }
 
 output "aws_region" {
-  value = provider.aws.region
+  value = "eu-central-1"
 }
