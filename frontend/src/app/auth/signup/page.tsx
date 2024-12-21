@@ -9,7 +9,6 @@ import { cognitoClient, cognitoConfig } from '../../cognitoConfig'
 import { useAuth } from '../../context/AuthContext'
 
 export default function SignUp() {
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
