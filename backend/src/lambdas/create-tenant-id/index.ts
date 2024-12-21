@@ -1,7 +1,7 @@
-import * as AWS from "aws-sdk";
+import { CognitoIdentityProvider } from "@aws-sdk/client-cognito-identity-provider";
 import * as jwt from "jsonwebtoken";
 
-const cognito = new AWS.CognitoIdentityServiceProvider();
+const cognito = new CognitoIdentityProvider();
 
 export const handler = async (event: any): Promise<any> => {
   const userPoolId = process.env.USER_POOL_ID;
@@ -44,16 +44,14 @@ export const handler = async (event: any): Promise<any> => {
         GroupName: sub,
         UserPoolId: userPoolId,
         Description: `Group for user ${sub}`,
-      })
-      .promise();
+      });
 
     await cognito
       .adminAddUserToGroup({
         GroupName: sub,
         UserPoolId: userPoolId,
         Username: sub,
-      })
-      .promise();
+      });
 
     const authResponse = await cognito
       .initiateAuth({
@@ -62,8 +60,7 @@ export const handler = async (event: any): Promise<any> => {
         AuthParameters: {
           REFRESH_TOKEN: refreshToken,
         },
-      })
-      .promise();
+      });
     console.log("Generated new tokens");
 
     return {

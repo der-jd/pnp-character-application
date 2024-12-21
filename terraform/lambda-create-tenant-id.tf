@@ -1,5 +1,41 @@
 data "aws_region" "current" {}
 
+resource "aws_iam_role" "control_plane_lambda_exec_role" {
+  name = "lambda-execution-role-control-plane"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "control_plane_lambda_policy" {
+  role = aws_iam_role.control_plane_lambda_exec_role.name
+  name        = "lambda-control-plane-policy"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "cognito-idp:CreateGroup",
+          "cognito-idp:AdminAddUserToGroup",
+          "cognito-idp:InitiateAuth"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 data "archive_file" "create-tenant-id" {
   type        = "zip"
   source_dir  = "../backend/build/lambdas/create-tenant-id"
@@ -28,10 +64,6 @@ resource "aws_lambda_function" "create_tenant_id_lambda" {
     application_log_level = "INFO"
     system_log_level      = "INFO"
   }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.attach_control_plane_lambda_policy
-  ]
 }
 
 resource "aws_lambda_permission" "create_tenant_id_lambda_permission" {
