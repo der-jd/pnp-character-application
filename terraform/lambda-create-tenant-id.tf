@@ -7,7 +7,7 @@ data "archive_file" "create-tenant-id" {
 resource "aws_lambda_function" "create_tenant_id_lambda" {
   function_name = "pnp-create-tenant-id"
   handler       = "index.handler"
-  runtime       = "nodejs22.x"
+  runtime       = "nodejs18.x"
   role          = aws_iam_role.lambda_exec_role.arn
 
   filename         = "../backend/dist/create-tenant-id.zip"
