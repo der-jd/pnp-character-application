@@ -36,7 +36,7 @@ resource "aws_iam_role_policy" "control_plane_lambda_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_managed_policy" {
+resource "aws_iam_role_policy_attachment" "control_plane_lambda_policy_attachment" {
   role       = aws_iam_role.control_plane_lambda_exec_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
