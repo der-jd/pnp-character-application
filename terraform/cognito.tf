@@ -2,18 +2,12 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   name = "pnp-app-user-pool"
 
   auto_verified_attributes = ["email"]
-  schema {
-    attribute_data_type = "String"
-    name                = "email"
-    required            = true
-    mutable             = true
-  }
 
   schema {
     name                     = "custom:tenant_id"
     attribute_data_type      = "String"
     developer_only_attribute = false
-    mutable                  = false
+    mutable                  = true
     required                 = false
     string_attribute_constraints {
       max_length = 50
@@ -55,7 +49,7 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
   refresh_token_validity               = 1
 
   write_attributes = ["email"]
-  read_attributes  = ["custom:tenant_id", "email"]
+  read_attributes  = ["email"]
 
 
 
