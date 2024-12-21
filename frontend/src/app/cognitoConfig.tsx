@@ -2,7 +2,7 @@ import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-
 
 export const cognitoConfig = {
     userPoolId: process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID,
-    clientId: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID,
+    clientId: process.env.NEXT_PUBLIC_COGNITO_APP_CLIENT_ID,
     region: process.env.NEXT_PUBLIC_COGNITO_REGION,
   };
 
