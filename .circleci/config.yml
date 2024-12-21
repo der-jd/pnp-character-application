@@ -3,13 +3,11 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@5
 
-
 parameters:
   delete-services:
     description: If true, deletes the Terraform resources in AWS.
     type: boolean
     default: false
-
 
 workflows:
   build-deploy:
@@ -38,7 +36,6 @@ workflows:
     when: << pipeline.parameters.delete-services >>
     jobs:
       - terraform-destroy
-
 
 jobs:
   check-format-files:

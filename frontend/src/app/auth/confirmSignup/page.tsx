@@ -1,37 +1,36 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { ConfirmSignUpCommand } from "@aws-sdk/client-cognito-identity-provider"
-import { cognitoClient, cognitoConfig } from '../../cognitoConfig'
-import { useAuth } from '../../context/AuthContext'
-
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ConfirmSignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { cognitoClient, cognitoConfig } from "../../cognitoConfig";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ConfirmSignUp() {
-  const [code, setCode] = useState('')
-  const [email, setEmail] = useState('')
-  const [error, setError] = useState('')
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { isAuthenticated } = useAuth()
+  const [code, setCode] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/protected/dashboard')
+      router.push("/protected/dashboard");
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, router]);
 
   useEffect(() => {
-    const emailParam = searchParams.get('email')
+    const emailParam = searchParams.get("email");
     if (emailParam) {
-      setEmail(emailParam)
+      setEmail(emailParam);
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
     try {
       const command = new ConfirmSignUpCommand({
         ClientId: cognitoConfig.clientId,
@@ -40,25 +39,19 @@ export default function ConfirmSignUp() {
       });
 
       await cognitoClient.send(command);
-      
+
       console.log("User confirmed successfully");
-      router.push('/auth/signin')
+      router.push("/auth/signin");
     } catch (error) {
-      setError('Failed to confirm sign up. Please try again.')
-      console.error('Error confirming sign up:', error)
+      setError("Failed to confirm sign up. Please try again.");
+      console.error("Error confirming sign up:", error);
     }
-  }
+  };
 
   return (
     <div className="flex h-screen">
       <div className="w-1/2 relative">
-        <Image
-          src="/images/splash-image.png"
-          alt="Confirm Sign Up Image"
-          layout="fill"
-          objectFit="cover"
-          priority
-        />
+        <Image src="/images/splash-image.png" alt="Confirm Sign Up Image" layout="fill" objectFit="cover" priority />
       </div>
       <div className="w-1/2 flex items-center justify-center bg-gray-100 overflow-y-auto">
         <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
@@ -94,5 +87,5 @@ export default function ConfirmSignUp() {
         </div>
       </div>
     </div>
-  )
+  );
 }

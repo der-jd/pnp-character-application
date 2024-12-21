@@ -1,4 +1,4 @@
-import { CostCategory, ISkillProps } from './SkillDefinitions';
+import { CostCategory, ISkillProps } from "./SkillDefinitions";
 
 const skillData: ISkillProps[] = [
   {
