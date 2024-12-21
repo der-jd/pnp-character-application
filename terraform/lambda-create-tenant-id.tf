@@ -36,6 +36,11 @@ resource "aws_iam_role_policy" "control_plane_lambda_policy" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_managed_policy" {
+  role       = aws_iam_role.control_plane_lambda_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 data "archive_file" "create-tenant-id" {
   type        = "zip"
   source_dir  = "../backend/build/lambdas/create-tenant-id"
