@@ -52,12 +52,5 @@ aws cognito-idp admin-set-user-password \
     --profile $aws_profile \
     --region $AWS_REGION
 
-
-#aws cognito-idp admin-set-user-mfa-preference \
- #   --user-pool-id <your_user_pool_id> \
-  #  --username <username> \
-   # --sms-mfa-settings Enabled=true,PreferredMfa=true
-    #--region $AWS_REGION
-
 echo "New test user '$user_name' created. Use the following password to log in."
 echo "$user_password"
