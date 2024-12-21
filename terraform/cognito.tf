@@ -72,6 +72,6 @@ output "cognito_user_pool_id" {
   value = aws_cognito_user_pool.pnp_user_pool.id
 }
 
-output "cognito_client_id" {
+output "cognito_app_client_id" {
   value = aws_cognito_user_pool_client.pnp_user_pool_client.id
 }
