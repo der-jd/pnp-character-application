@@ -13,8 +13,8 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     name                     = "custom:tenant_id"
     attribute_data_type      = "String"
     developer_only_attribute = false
-    mutable                  = false
-    required                 = false
+    mutable                  = true
+    required                 = true
     string_attribute_constraints {
       max_length = 50
       min_length = 1
@@ -60,7 +60,7 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
     refresh_token = "days"
   }
 
-  write_attributes = ["custom:tenant_id", "email", "openid"]
+  write_attributes = ["email", "openid"]
   read_attributes  = ["custom:tenant_id", "email", "openid"]
 
 }
