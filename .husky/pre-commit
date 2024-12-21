@@ -1,0 +1,9 @@
+npm run format
+make format-terraform
+make lint-terraform
+
+cd backend
+npm run lint
+
+cd ../frontend
+npm run lint

@@ -17,3 +17,7 @@ provider "aws" {
     }
   }
 }
+
+output "aws_region" {
+  value = "eu-central-1"
+}
