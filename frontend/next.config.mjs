@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  output: "export",
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },
@@ -13,6 +13,6 @@ export default {
   ...nextConfig,
   generateBuildId: async () => {
     // This could be anything, using the latest git hash
-    return '42'; // Use a string for safety
+    return "42"; // Use a string for safety
   },
 };

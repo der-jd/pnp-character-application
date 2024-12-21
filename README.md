@@ -13,9 +13,8 @@ TODO update
 
 - Install the following tools
   - [Terraform](https://developer.hashicorp.com/terraform/install)
-  - [tflint](https://github.com/terraform-linters/tflint)
+  - [tflint](https://github.com/terraform-linters/tflint) --> run `make install-lint-terraform`
   - aws-cli (optional; only necessary for local AWS commands)
-- Run `make lint-init-terraform` to install the plugins defined in `.tflint.hcl`
 - Run `terraform login` to generate an API key for the backend
 - Run `terraform init` in the `/terraform` working directory to initialize Terraform
   - Rerun this command if a module or backend configuration for Terraform is set or changed. This will then reinitialize the working directory

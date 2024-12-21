@@ -1,29 +1,29 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider"
-import { cognitoConfig,cognitoClient } from '../../cognitoConfig'
-import { useAuth } from '../../context/AuthContext'
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { cognitoConfig, cognitoClient } from "../../cognitoConfig";
+import { useAuth } from "../../context/AuthContext";
 
 export default function SignIn() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const router = useRouter()
-  const { setIsAuthenticated, isAuthenticated, setAccessToken } = useAuth()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const { setIsAuthenticated, isAuthenticated, setAccessToken } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/protected/dashboard')
+      router.push("/protected/dashboard");
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
     try {
       const command = new InitiateAuthCommand({
         AuthFlow: "USER_PASSWORD_AUTH",
@@ -35,30 +35,24 @@ export default function SignIn() {
       });
 
       const response = await cognitoClient.send(command);
-      
+
       if (response.AuthenticationResult?.AccessToken) {
         setAccessToken(response.AuthenticationResult.AccessToken);
-        setIsAuthenticated(true)
-        router.push('/protected/dashboard')
+        setIsAuthenticated(true);
+        router.push("/protected/dashboard");
       } else {
         throw new Error("Authentication failed");
       }
     } catch (error) {
-      setError('Failed to sign in. Please check your credentials.')
-      console.error('Error signing in:', error)
+      setError("Failed to sign in. Please check your credentials.");
+      console.error("Error signing in:", error);
     }
-  }
+  };
 
   return (
     <div className="flex h-screen">
       <div className="w-1/2 relative">
-        <Image
-          src="/images/splash-image.png"
-          alt="Sign In Image"
-          layout="fill"
-          objectFit="cover"
-          priority
-        />
+        <Image src="/images/splash-image.png" alt="Sign In Image" layout="fill" objectFit="cover" priority />
       </div>
       <div className="w-1/2 flex items-center justify-center bg-gray-100 overflow-y-auto">
         <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
@@ -113,5 +107,5 @@ export default function SignIn() {
         </div>
       </div>
     </div>
-  )
+  );
 }

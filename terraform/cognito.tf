@@ -67,3 +67,11 @@ resource "aws_api_gateway_authorizer" "cognito_authorizer" {
   identity_source = "method.request.header.Authorization"
   provider_arns   = [aws_cognito_user_pool.pnp_user_pool.arn]
 }
+
+output "cognito_user_pool_id" {
+  value = aws_cognito_user_pool.pnp_user_pool.id
+}
+
+output "cognito_app_client_id" {
+  value = aws_cognito_user_pool_client.pnp_user_pool_client.id
+}

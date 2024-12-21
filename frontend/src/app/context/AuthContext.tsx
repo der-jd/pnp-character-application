@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from "react";
 import { GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { cognitoClient } from '../cognitoConfig';
+import { cognitoClient } from "../cognitoConfig";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -25,12 +25,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (accessToken) {
         try {
           const command = new GetUserCommand({
-            AccessToken: accessToken
+            AccessToken: accessToken,
           });
           await cognitoClient.send(command);
           setIsAuthenticated(true);
         } catch (error) {
-          console.error('Error verifying token:', error);
+          console.error("Error verifying token:", error);
           setIsAuthenticated(false);
           setAccessToken(null);
         }
@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

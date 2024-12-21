@@ -3,24 +3,22 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@5
 
-
 parameters:
   delete-services:
     description: If true, deletes the Terraform resources in AWS.
     type: boolean
     default: false
 
-
 workflows:
   build-deploy:
     when:
       not: << pipeline.parameters.delete-services >>
     jobs:
-      - check-format-backend-files
+      - check-format-files
       - lint-typescript-code
       - build-backend:
           requires:
-            - check-format-backend-files
+            - check-format-files
             - lint-typescript-code
       - check-format-terraform-code
       - lint-terraform-code
@@ -31,6 +29,7 @@ workflows:
             - lint-terraform-code
       - build-and-deploy-frontend:
           requires:
+            - check-format-files
             - deploy-backend-and-infrastructure
 
   delete-services:
@@ -38,23 +37,18 @@ workflows:
     jobs:
       - terraform-destroy
 
-
 jobs:
-  check-format-backend-files:
+  check-format-files:
     docker:
       - image: cimg/node:22.10
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: |
-            cd backend
-            npm install
+          command: npm ci
       - run:
           name: Check file formatting
-          command: |
-            cd backend
-            npm run check-format
+          command: npm run check-format
 
   lint-typescript-code:
     docker:
@@ -65,7 +59,7 @@ jobs:
           name: Install dependencies
           command: |
             cd backend
-            npm install
+            npm ci
       - run:
           name: Lint TypeScript code
           command: |
@@ -81,7 +75,7 @@ jobs:
           name: Install dependencies
           command: |
             cd backend
-            npm install
+            npm ci
       - run:
           name: Compile code
           command: |
@@ -112,48 +106,10 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-            make lint-init-terraform
+            make install-lint-terraform
       - run:
           name: Lint Terraform code
           command: make lint-terraform
-
-  build-and-deploy-frontend:
-    docker:
-      - image: cimg/node:22.10
-    steps:
-      - checkout
-      - aws-cli/setup:
-          role_arn: "$AWS_ROLE_ARN"
-      - run:
-          name: Install dependencies
-          command: |
-            cd frontend
-            npm install
-      - run:
-          name: Prepare cache restoring
-          command: |
-            cd ~/project
-            PREVIOUS_COMMIT=$(git rev-parse HEAD^)
-            echo "Saving previous commit hash:"
-            echo "$PREVIOUS_COMMIT" | tee cachekey
-      - restore_cache:
-          keys:
-            - frontend-cache-{{ .Branch }}-{{ checksum "./cachekey" }}
-            - frontend-cache-main-{{ checksum "./cachekey" }}
-      - run:
-          name: Build and deploy
-          command: |
-            cd frontend
-
-            ./build_on_change.sh
-
-            echo "Saving current commit hash:"
-            echo $CIRCLE_SHA1 | tee ../commit
-      - save_cache:
-          key: frontend-cache-{{ .Branch }}-{{ checksum "./commit" }}
-          paths:
-            - frontend/checksum.txt
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
@@ -180,6 +136,61 @@ jobs:
           command: |
             cd terraform
             terraform apply -auto-approve tfapply
+      - run:
+          name: Persist Terraform output for frontend
+          command: |
+            cd terraform
+            echo "export NEXT_PUBLIC_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
+            echo "export NEXT_PUBLIC_COGNITO_USER_POOL_ID=$(terraform output cognito_user_pool_id)" >> terraform_output
+            echo "export NEXT_PUBLIC_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - terraform/terraform_output
+
+  build-and-deploy-frontend:
+    docker:
+      - image: cimg/node:22.10
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
+      - aws-cli/setup:
+          role_arn: "$AWS_ROLE_ARN"
+      - run:
+          name: Install dependencies
+          command: |
+            cd frontend
+            npm ci
+      - run:
+          name: Prepare cache restoring
+          command: |
+            cd ~/project
+            PREVIOUS_COMMIT=$(git rev-parse HEAD^)
+            echo "Saving previous commit hash:"
+            echo "$PREVIOUS_COMMIT" | tee cachekey
+      - restore_cache:
+          keys:
+            - frontend-cache-{{ .Branch }}-{{ checksum "./cachekey" }}
+            - frontend-cache-main-{{ checksum "./cachekey" }}
+      - run:
+          name: Set env variables for frontend build
+          command: |
+            cd terraform
+            source terraform_output
+      - run:
+          name: Build and deploy
+          command: |
+            cd frontend
+
+            ./build_on_change.sh
+
+            echo "Saving current commit hash:"
+            echo $CIRCLE_SHA1 | tee ../commit
+      - save_cache:
+          key: frontend-cache-{{ .Branch }}-{{ checksum "./commit" }}
+          paths:
+            - frontend/checksum.txt
 
   terraform-destroy:
     docker:
