@@ -69,9 +69,11 @@ resource "aws_api_gateway_authorizer" "cognito_authorizer" {
 }
 
 output "cognito_user_pool_id" {
-  value = aws_cognito_user_pool.pnp_user_pool.id
+  value     = aws_cognito_user_pool.pnp_user_pool.id
+  sensitive = true
 }
 
 output "cognito_app_client_id" {
-  value = aws_cognito_user_pool_client.pnp_user_pool_client.id
+  value     = aws_cognito_user_pool_client.pnp_user_pool_client.id
+  sensitive = true
 }
