@@ -59,7 +59,7 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
     id_token      = "hours"
     refresh_token = "days"
   }
-  
+
   write_attributes = ["custom:tenant_id", "email", "openid"]
   read_attributes  = ["custom:tenant_id", "email", "openid"]
 
