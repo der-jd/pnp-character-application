@@ -2,10 +2,6 @@
   "name": "get-tenant-id",
   "version": "1.0.0",
   "main": "index.mjs",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "aws-sdk": "^2.1692.0",
     "jsonwebtoken": "^9.0.2",
