@@ -51,15 +51,11 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
   write_attributes = ["email"]
   read_attributes  = ["email"]
 
-
-
   token_validity_units {
     access_token  = "hours"
     id_token      = "hours"
     refresh_token = "days"
   }
-
-
 
 }
 

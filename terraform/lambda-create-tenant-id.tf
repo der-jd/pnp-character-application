@@ -10,6 +10,13 @@ resource "aws_lambda_function" "create_tenant_id_lambda" {
   runtime       = "nodejs18.x"
   role          = aws_iam_role.lambda_exec_role.arn
 
+  environment {
+    variables = {
+      USER_POOL_ID = aws_cognito_user_pool.pnp_user_pool.id
+      CLIENT_ID    = aws_cognito_user_pool_client.pnp_user_pool_client.id
+    }
+  }
+
   filename         = "../backend/dist/create-tenant-id.zip"
   source_code_hash = data.archive_file.create-tenant-id.output_base64sha256
   layers           = [aws_lambda_layer_version.configuration.arn]
@@ -18,6 +25,10 @@ resource "aws_lambda_function" "create_tenant_id_lambda" {
     application_log_level = "INFO"
     system_log_level      = "INFO"
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.attach_lambda_cognito_policy
+  ]
 }
 
 resource "aws_lambda_permission" "create_tenant_id_lambda_permission" {
