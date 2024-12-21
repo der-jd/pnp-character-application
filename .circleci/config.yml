@@ -40,6 +40,7 @@ workflows:
 
 
 jobs:
+  # TODO check format of frontend files
   check-format-backend-files:
     docker:
       - image: cimg/node:22.10
@@ -71,6 +72,7 @@ jobs:
           command: |
             cd backend
             npm run lint
+            # TODO lint frontend files
 
   build-backend:
     docker:
