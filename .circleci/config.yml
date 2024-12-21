@@ -161,7 +161,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/project/terraform/terraform_output
+          at: ~/project
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
