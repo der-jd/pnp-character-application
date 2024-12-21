@@ -11,12 +11,8 @@ resource "aws_lambda_function" "create_tenant_id_lambda" {
   role          = aws_iam_role.lambda_exec_role.arn
 
   filename         = "../backend/dist/create-tenant-id.zip"
-  source_code_hash = data.archive_file.create_tenant_id.output_base64sha256
+  source_code_hash = data.archive_file.create-tenant-id.output_base64sha256
   layers           = [aws_lambda_layer_version.configuration.arn]
-  environment {
-    variables = {
-    }
-  }
   logging_config {
     log_format            = "JSON"
     application_log_level = "INFO"
@@ -24,7 +20,7 @@ resource "aws_lambda_function" "create_tenant_id_lambda" {
   }
 }
 
-resource "aws_lambda_permission" "increase_skill_invoke_permission" {
+resource "aws_lambda_permission" "create_tenant_id_lambda_permission" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.create_tenant_id_lambda.function_name
