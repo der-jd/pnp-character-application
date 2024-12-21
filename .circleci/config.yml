@@ -114,8 +114,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            curl --silent https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-            make lint-init-terraform
+            make install-lint-terraform
       - run:
           name: Lint Terraform code
           command: make lint-terraform
