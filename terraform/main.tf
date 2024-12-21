@@ -12,3 +12,7 @@ provider "aws" {
     }
   }
 }
+
+output "aws_region" {
+  value = provider.aws.region
+}
