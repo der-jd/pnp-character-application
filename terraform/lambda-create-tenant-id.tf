@@ -9,7 +9,7 @@ data "archive_file" "create-tenant-id" {
 resource "aws_lambda_function" "create_tenant_id_lambda" {
   function_name = "pnp-create-tenant-id"
   handler       = "index.handler"
-  runtime       = "nodejs22.x"
+  runtime       = "nodejs20.x"
   role          = aws_iam_role.lambda_exec_role.arn
 
   environment {
@@ -30,7 +30,7 @@ resource "aws_lambda_function" "create_tenant_id_lambda" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.attach_lambda_cognito_policy
+    aws_iam_role_policy_attachment.attach_control_plane_lambda_policy
   ]
 }
 
