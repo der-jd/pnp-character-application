@@ -14,6 +14,8 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     allow_admin_create_user_only = true
   }
 
+  deletion_protection = "ACTIVE"
+
   password_policy {
     minimum_length                   = 16
     require_lowercase                = true
@@ -26,6 +28,10 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   mfa_configuration = "ON"
   software_token_mfa_configuration {
     enabled = true
+  }
+
+  username_configuration {
+    case_sensitive = true
   }
 }
 
