@@ -32,11 +32,6 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     temporary_password_validity_days = 1
   }
 
-  mfa_configuration = "ON"
-  software_token_mfa_configuration {
-    enabled = true
-  }
-
   // Keep the original attribute value active when an updated value is pending
   user_attribute_update_settings {
     attributes_require_verification_before_update = ["email"]
