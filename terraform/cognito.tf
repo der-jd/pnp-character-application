@@ -17,6 +17,8 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     }
   }
 
+  alias_attributes = ["email"]
+
   auto_verified_attributes = ["email"]
 
   //deletion_protection = "ACTIVE" // TODO activate protection after Cognito pool is properly set up
