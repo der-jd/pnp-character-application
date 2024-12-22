@@ -17,8 +17,6 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     }
   }
 
-  alias_attributes = ["email"]
-
   auto_verified_attributes = ["email"]
 
   //deletion_protection = "ACTIVE" // TODO activate protection after Cognito pool is properly set up
@@ -36,6 +34,8 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   user_attribute_update_settings {
     attributes_require_verification_before_update = ["email"]
   }
+
+  username_attributes = ["email"]
 
   username_configuration {
     case_sensitive = true
