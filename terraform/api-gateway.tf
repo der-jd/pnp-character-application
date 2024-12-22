@@ -12,7 +12,7 @@ resource "aws_api_gateway_resource" "increase_skill_resource" {
 resource "aws_api_gateway_method" "increase_skill_method" {
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.increase_skill_resource.id
-  http_method   = "PUT"
+  http_method   = "PATCH"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
 }
@@ -21,7 +21,7 @@ resource "aws_api_gateway_integration" "increase_skill_integration" {
   rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id             = aws_api_gateway_resource.increase_skill_resource.id
   http_method             = aws_api_gateway_method.increase_skill_method.http_method
-  integration_http_method = "PUT"
+  integration_http_method = "PATCH"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.increase_skill_lambda.invoke_arn
 }
