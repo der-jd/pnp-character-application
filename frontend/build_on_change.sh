@@ -27,7 +27,7 @@ find . -type f \( \
     -or -name 'public' \
     -or -name 'lib' \
     -or -name 'components' \) \
-    -name $file_env_variables \
+    -wholename $file_env_variables \
     ! -name 'checksum.txt' \
     ! -name 'build_on_change.sh' \
     -exec md5sum {} \; > current_checksum.txt
