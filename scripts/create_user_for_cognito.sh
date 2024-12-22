@@ -6,8 +6,8 @@ AWS_REGION="eu-central-1"
 USER_POOL_NAME="pnp-app-user-pool"
 
 if [ -z "$1" ]; then
-  echo "Error: Missing user mail address as input parameter!"
-  echo "Usage: $0 <user_mail_address>"
+  echo "Error: Missing user email address as input parameter!"
+  echo "Usage: $0 <user_mail_address> <aws_profile>"
   exit 1
 fi
 
