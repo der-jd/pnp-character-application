@@ -176,13 +176,12 @@ jobs:
       - run:
           name: Build and deploy
           command: |
-            # Set env variables for frontend build
-            cd terraform
-            source terraform_output
-
             cd ~/project/frontend
 
-            ./build_on_change.sh
+            # Set env variables for frontend build
+            source ~/project/terraform/terraform_output
+
+            ./build_on_change.sh ~/project/terraform/terraform_output
 
             echo "Saving current commit hash:"
             echo $CIRCLE_SHA1 | tee ../commit

@@ -5,6 +5,14 @@
 AWS_REGION="eu-central-1"
 CACHED_CHECKSUM="checksum.txt"
 
+if [ -z "$1" ]; then
+  echo "Error: Missing file with env variables!"
+  echo "Usage: $0 <file_with_env_variables>"
+  exit 1
+fi
+
+file_env_variables=$1
+
 # Check the frontend directory for changes and rebuild the frontend if changes are detected
 # Note: This excludes certain files of the frontend folder.
 # Note: If the s3 bucket is empty, an upload will take place even if the frontend did not change
@@ -19,6 +27,7 @@ find . -type f \( \
     -or -name 'public' \
     -or -name 'lib' \
     -or -name 'components' \) \
+    -name $file_env_variables \
     ! -name 'checksum.txt' \
     ! -name 'build_on_change.sh' \
     -exec md5sum {} \; > current_checksum.txt
