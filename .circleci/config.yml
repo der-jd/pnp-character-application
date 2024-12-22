@@ -176,7 +176,7 @@ jobs:
       - run:
           name: Build and deploy
           command: |
-            cd ~/project/frontend
+            cd frontend
 
             # Set env variables for frontend build
             source ~/project/terraform/terraform_output
