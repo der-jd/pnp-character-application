@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { CostCategory, Character, getIncreaseCost, getSkill } from "config/index.js";
+import { CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill(event);
@@ -58,7 +58,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     for (let i = 0; i < params.increasedPoints; i++) {
       console.debug("---------------------------");
-      const increaseCost = getIncreaseCost(skillValue, costCategory);
+      const increaseCost = getSkillIncreaseCost(skillValue, costCategory);
 
       if (increaseCost > availableAdventurePoints) {
         console.error("Not enough adventure points to increase the skill!");

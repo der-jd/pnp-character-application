@@ -46,8 +46,7 @@ const costMatrix: number[][] = [
   [3, 4, 5],
 ];
 
-// TODO add separate Lambda function that returns skill costs for a given skill value and cost category
-export function getIncreaseCost(skillValue: number, costCategory: CostCategory): number {
+export function getSkillIncreaseCost(skillValue: number, costCategory: CostCategory): number {
   const columnIndex = skillThresholds.findIndex((threshold) => skillValue < threshold);
   return costMatrix[costCategory][columnIndex];
 }

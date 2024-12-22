@@ -4,7 +4,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { CostCategory, Character, getIncreaseCost, getSkill } from "config/index.js";
+import { CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getSkillCost(event);
@@ -36,7 +36,7 @@ async function getSkillCost(event: APIGatewayProxyEvent): Promise<APIGatewayProx
      * The category must equal -1/+0/+1 of default or be zero (free increase)
      */
     const costCategory = CostCategory.parse(params.costCategory);
-    const increaseCost = getIncreaseCost(skillValue, costCategory);
+    const increaseCost = getSkillIncreaseCost(skillValue, costCategory);
 
     const response = {
       statusCode: 200,
