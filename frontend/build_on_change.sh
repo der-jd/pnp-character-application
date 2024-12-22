@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO check if frontend is re-deployed when Cognito user pool has changed and therefore the env variables for the frontend have changed
+
 CACHED_CHECKSUM="checksum.txt"
 
 # Check the frontend directory for changes and rebuild the frontend if changes are detected
