@@ -15,7 +15,7 @@ export default function SignIn() {
   const router = useRouter();
   const { setIsAuthenticated, isAuthenticated, setAccessToken } = useAuth();
 
-  const createTenantId = (token: string) => {
+  const createTenantId = (token: string | undefined) => {
     const url = "https://t3mmarpxmk.execute-api.eu-central-1.amazonaws.com/prod/create-tenant-id";
 
     const headers = {
