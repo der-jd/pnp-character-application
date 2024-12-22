@@ -42,7 +42,9 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     attributes_require_verification_before_update = ["email"]
   }
 
-  username_attributes = ["email"] // Require email address for sign up
+  username_configuration {
+    case_sensitive = true
+  }
 
   verification_message_template {
     default_email_option  = "CONFIRM_WITH_LINK"
