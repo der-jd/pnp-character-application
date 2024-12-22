@@ -17,8 +17,6 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     }
   }
 
-  alias_attributes = ["email"]
-
   auto_verified_attributes = ["email"]
 
   //deletion_protection = "ACTIVE" // TODO activate protection after Cognito pool is properly set up
@@ -47,6 +45,14 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   user_attribute_update_settings {
     attributes_require_verification_before_update = ["email"]
   }
+
+  /**
+   * In our case "alias_attributes" can't be used as it allows to create users with the same email address.
+   * Only one user can have one specific email address as "verified". Setting the same email address for
+   * another user as "verified", will set the address to "Not verified" for the other user.
+   * Nevertheless, the email address is not unique across users and the described behavior is confusing.
+   */
+  username_attributes = ["email"]
 
   username_configuration {
     case_sensitive = true
