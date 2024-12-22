@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { cognitoConfig, cognitoClient } from "../../cognitoConfig";
+import { cognitoConfig, cognitoClient } from "../../context/cognitoConfig";
 import { useAuth } from "../../context/AuthContext";
 
 export default function SignIn() {
@@ -14,6 +14,35 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const router = useRouter();
   const { setIsAuthenticated, isAuthenticated, setAccessToken } = useAuth();
+
+  const createTenantId = (token: string) => {
+    const url = "https://t3mmarpxmk.execute-api.eu-central-1.amazonaws.com/prod/create-tenant-id";
+
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+
+    console.log(headers)
+
+    fetch(url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({}),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Error: ${res.status} ${res.statusText}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Response from API:", data);
+      })
+      .catch((err) => {
+        console.error(err.message);
+      });
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -39,6 +68,7 @@ export default function SignIn() {
       if (response.AuthenticationResult?.AccessToken) {
         setAccessToken(response.AuthenticationResult.AccessToken);
         setIsAuthenticated(true);
+        createTenantId(response.AuthenticationResult.AccessToken);
         router.push("/protected/dashboard");
       } else {
         throw new Error("Authentication failed");
