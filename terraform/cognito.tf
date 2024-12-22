@@ -16,7 +16,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
 
   auto_verified_attributes = ["email"]
 
-  deletion_protection = "ACTIVE"
+  //deletion_protection = "ACTIVE" // TODO activate protection after Cognito pool is properly set up
 
   password_policy {
     minimum_length                   = 16
