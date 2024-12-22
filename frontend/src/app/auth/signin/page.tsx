@@ -68,7 +68,7 @@ export default function SignIn() {
       if (response.AuthenticationResult?.AccessToken) {
         setAccessToken(response.AuthenticationResult.AccessToken);
         setIsAuthenticated(true);
-        createTenantId(response.AuthenticationResult.AccessToken);
+        createTenantId(response.AuthenticationResult.IdToken);
         router.push("/protected/dashboard");
       } else {
         throw new Error("Authentication failed");

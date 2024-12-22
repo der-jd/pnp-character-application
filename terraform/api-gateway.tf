@@ -59,6 +59,10 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   triggers = {
     redeployment = timestamp()
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_api_gateway_stage" "prod" {
