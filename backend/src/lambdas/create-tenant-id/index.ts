@@ -7,8 +7,6 @@ export const handler = async (event: any): Promise<any> => {
   const userPoolId = process.env.USER_POOL_ID;
   const clientId = process.env.CLIENT_ID;
 
-  console.log("FUCK YEAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
   if (!userPoolId || !clientId) {
     return {
       statusCode: 500,
