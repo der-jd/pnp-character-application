@@ -13,6 +13,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     invite_message_template {
       email_message = "Your username is '{username}' and temporary password is: {####}"
       email_subject = "Your temporary password for PnP-Application"
+      sms_message   = "Your username is '{username}' and temporary password is: {####}"
     }
   }
 
