@@ -13,11 +13,6 @@ resource "aws_lambda_function" "get_skill_cost_lambda" {
   filename         = "../backend/dist/get-skill-cost.zip"
   source_code_hash = data.archive_file.get_skill_cost.output_base64sha256
   layers           = [aws_lambda_layer_version.configuration.arn]
-  environment {
-    variables = {
-      TABLE_NAME = local.characters_table_name
-    }
-  }
   logging_config {
     log_format            = "JSON"
     application_log_level = "INFO"
