@@ -75,7 +75,6 @@ resource "aws_api_gateway_integration" "create_tenant_id_integration" {
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
     aws_api_gateway_integration.increase_skill_integration,
-    aws_api_gateway_integration.get_character_integration,
     aws_api_gateway_integration.create_tenant_id_integration,
     aws_api_gateway_integration.get_skill_cost_integration
   ]
