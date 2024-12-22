@@ -1,5 +1,5 @@
 {
-  "name": "get-skill-cost",
+  "name": "get-skill-increase-cost",
   "version": "1.0.0",
   "main": "index.mjs",
   "type": "module",
