@@ -37,7 +37,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
 
   // Keep the original attribute value active when an updated value is pending
   user_attribute_update_settings {
-    attributes_require_verification_before_update = [ "email" ]
+    attributes_require_verification_before_update = ["email"]
   }
 
   username_configuration {
@@ -45,7 +45,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   }
 
   verification_message_template {
-    default_email_option = "CONFIRM_WITH_LINK"
+    default_email_option  = "CONFIRM_WITH_LINK"
     email_subject_by_link = "Verify your email address"
   }
 }
