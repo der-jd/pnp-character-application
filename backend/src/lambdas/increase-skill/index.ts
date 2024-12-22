@@ -32,6 +32,11 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const skillCategory = params.skillCategory as keyof Character["characterSheet"]["skills"];
     let skillValue = getSkill(characterSheet.skills, skillCategory, params.skillName).current;
     let totalCost = getSkill(characterSheet.skills, skillCategory, params.skillName).totalCost;
+    /**
+     * TODO add check if the cost category is reasonable for the skill.
+     * I.e. compare the default cost category of the skill with the given category.
+     * The category must equal -1/+0/+1 of default or be zero (free increase)
+     */
     const costCategory = CostCategory.parse(params.costCategory);
 
     if (params.initialSkillValue + params.increasedPoints === skillValue) {
