@@ -35,10 +35,6 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     attribute_data_type = "String"
     mutable             = true
     required            = true
-    string_attribute_constraints {
-      max_length = 254 // https://stackoverflow.com/a/574698
-      min_length = 3   // https://stackoverflow.com/a/1423203
-    }
   }
 
   // Keep the original attribute value active when an updated value is pending
