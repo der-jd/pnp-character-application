@@ -1,3 +1,5 @@
+import { CostCategory } from "./cost.js";
+
 export interface Character {
   characterId: string;
   characterSheet: CharacterSheet;
@@ -21,6 +23,7 @@ export interface Skill {
   current: number;
   mod: number;
   totalCost: number;
+  defaultCostCategory: CostCategory;
 }
 
 export interface MeleeCombatSkill {
@@ -32,6 +35,7 @@ export interface MeleeCombatSkill {
   totalCost: number;
   attackDistributed: number;
   paradeDistributed: number;
+  defaultCostCategory: CostCategory;
 }
 
 export interface RangedCombatSkill {
@@ -42,6 +46,7 @@ export interface RangedCombatSkill {
   mod: number;
   totalCost: number;
   rangedDistributed: number;
+  defaultCostCategory: CostCategory;
 }
 
 export interface CharacterSheet {
