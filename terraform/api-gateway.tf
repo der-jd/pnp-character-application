@@ -54,7 +54,7 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     aws_api_gateway_integration.increase_skill_integration,
     aws_api_gateway_integration.create_tenant_id_integration
   ]
-  
+
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   triggers = {
     redeployment = timestamp()
