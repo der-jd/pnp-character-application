@@ -65,7 +65,7 @@ rm -rf build
 npm run build
 mv out build
 
-aws s3 sync build s3://pnp-character-application-frontend --region $AWS_REGION
+aws s3 sync build s3://pnp-character-application-frontend --delete --region $AWS_REGION
 
 rm -f checksum.txt
 mv current_checksum.txt checksum.txt
