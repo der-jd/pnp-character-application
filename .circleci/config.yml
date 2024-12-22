@@ -174,14 +174,13 @@ jobs:
             - frontend-cache-{{ .Branch }}-{{ checksum "./cachekey" }}
             - frontend-cache-main-{{ checksum "./cachekey" }}
       - run:
-          name: Set env variables for frontend build
-          command: |
-            cd terraform
-            source terraform_output
-      - run:
           name: Build and deploy
           command: |
-            cd frontend
+            # Set env variables for frontend build
+            cd terraform
+            source terraform_output
+
+            cd ~/project/frontend
 
             ./build_on_change.sh
 
