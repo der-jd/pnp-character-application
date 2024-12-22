@@ -10,7 +10,8 @@
     "config": "file:src/config",
     "get-character": "file:src/lambdas/get-character",
     "increase-skill": "file:src/lambdas/increase-skill",
-    "create-tenant-id": "file:src/lambdas/create-tenant-id"
+    "create-tenant-id": "file:src/lambdas/create-tenant-id",
+    "get-skill-cost": "file:src/lambdas/get-skill-cost"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
