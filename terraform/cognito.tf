@@ -1,8 +1,6 @@
 resource "aws_cognito_user_pool" "pnp_user_pool" {
   name = "pnp-app-user-pool"
 
-  auto_verified_attributes = ["email"]
-
   account_recovery_setting {
     recovery_mechanism {
       name     = "verified_email"
@@ -13,6 +11,10 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   admin_create_user_config {
     allow_admin_create_user_only = true
   }
+
+  alias_attributes = [ "email" ]
+
+  auto_verified_attributes = ["email"]
 
   deletion_protection = "ACTIVE"
 
