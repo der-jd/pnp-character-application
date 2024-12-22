@@ -10,6 +10,9 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
 
   admin_create_user_config {
     allow_admin_create_user_only = true
+    invite_message_template {
+      email_subject = "Your temporary password for PnP-Application"
+    }
   }
 
   alias_attributes = ["email"] // Allows to login via this attribute
@@ -32,8 +35,18 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     enabled = true
   }
 
+  // Keep the original attribute value active when an updated value is pending
+  user_attribute_update_settings {
+    attributes_require_verification_before_update = [ "email" ]
+  }
+
   username_configuration {
     case_sensitive = true
+  }
+
+  verification_message_template {
+    default_email_option = "CONFIRM_WITH_LINK"
+    email_subject_by_link = "Verify your email address"
   }
 }
 
