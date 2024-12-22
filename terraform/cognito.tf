@@ -42,8 +42,6 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     attributes_require_verification_before_update = ["email"]
   }
 
-  username_attributes = ["email"]
-
   username_configuration {
     case_sensitive = true
   }
