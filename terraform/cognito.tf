@@ -30,6 +30,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     temporary_password_validity_days = 1
   }
 
+  // Require the attribute "email" during sign-up. Normally, it is only optional.
   schema {
     name                = "email"
     attribute_data_type = "String"
@@ -51,6 +52,12 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
    * Only one user can have one specific email address as "verified". Setting the same email address for
    * another user as "verified", will set the address to "Not verified" for the other user.
    * Nevertheless, the email address is not unique across users and the described behavior is confusing.
+   *
+   * "username_attributes" forces the user to set an email address when signing up.
+   * The email address is unique across users, i.e. there can't be two users with the same email address.
+   * For sign-in the user must provide its email address.
+   * Notice: Even if the email is handled as username in the sign-up context, the actual username is set to
+   * an unique id (the same as the attribute 'sub') and the email is stored as "email" attribute.
    */
   username_attributes = ["email"]
 
