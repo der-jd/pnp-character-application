@@ -2,11 +2,12 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   name = "pnp-app-user-pool"
 
   auto_verified_attributes = ["email"]
-  schema {
-    attribute_data_type = "String"
-    name                = "email"
-    required            = true
-    mutable             = true
+
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
   }
 
   admin_create_user_config {
