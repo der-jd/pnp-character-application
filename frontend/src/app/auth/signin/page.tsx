@@ -23,7 +23,7 @@ export default function SignIn() {
       Authorization: `Bearer ${token}`,
     };
 
-    console.log(headers)
+    console.log(headers);
 
     fetch(url, {
       method: "POST",
