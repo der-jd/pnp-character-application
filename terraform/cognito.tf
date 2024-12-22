@@ -64,11 +64,6 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   username_configuration {
     case_sensitive = true
   }
-
-  verification_message_template {
-    default_email_option  = "CONFIRM_WITH_LINK"
-    email_subject_by_link = "Verify your email address"
-  }
 }
 
 # Cognito App Client (Frontend will use this to initiate login)
