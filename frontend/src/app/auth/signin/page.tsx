@@ -22,6 +22,9 @@ export default function SignIn() {
   }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log(`client id: ${cognitoConfig.clientId}`);
+    console.log(`user pool id: ${cognitoConfig.userPoolId}`);
+    console.log(`region: ${cognitoConfig.region}`);
     e.preventDefault();
     setError("");
     try {
