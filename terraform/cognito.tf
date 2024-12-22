@@ -12,7 +12,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     allow_admin_create_user_only = true
   }
 
-  alias_attributes = [ "email" ]
+  alias_attributes = ["email"] // Allows to login via this attribute
 
   auto_verified_attributes = ["email"]
 
