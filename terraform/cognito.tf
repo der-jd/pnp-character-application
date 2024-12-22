@@ -1,17 +1,25 @@
 resource "aws_cognito_user_pool" "pnp_user_pool" {
   name = "pnp-app-user-pool"
 
-  auto_verified_attributes = ["email"]
-  schema {
-    attribute_data_type = "String"
-    name                = "email"
-    required            = true
-    mutable             = true
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
   }
 
   admin_create_user_config {
     allow_admin_create_user_only = true
+    invite_message_template {
+      email_message = "Your username is '{username}' and temporary password is: {####}"
+      email_subject = "Your temporary password for PnP-Application"
+      sms_message   = "Your username is '{username}' and temporary password is: {####}"
+    }
   }
+
+  auto_verified_attributes = ["email"]
+
+  //deletion_protection = "ACTIVE" // TODO activate protection after Cognito pool is properly set up
 
   password_policy {
     minimum_length                   = 16
@@ -22,9 +30,39 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     temporary_password_validity_days = 1
   }
 
-  mfa_configuration = "ON"
-  software_token_mfa_configuration {
-    enabled = true
+  // Require the attribute "email" during sign-up. Normally, it is only optional.
+  schema {
+    name                = "email"
+    attribute_data_type = "String"
+    mutable             = true
+    required            = true
+    string_attribute_constraints {
+      max_length = 254 // https://stackoverflow.com/a/574698
+      min_length = 3   // https://stackoverflow.com/a/1423203
+    }
+  }
+
+  // Keep the original attribute value active when an updated value is pending
+  user_attribute_update_settings {
+    attributes_require_verification_before_update = ["email"]
+  }
+
+  /**
+   * In our case "alias_attributes" can't be used as it allows to create users with the same email address.
+   * Only one user can have one specific email address as "verified". Setting the same email address for
+   * another user as "verified", will set the address to "Not verified" for the other user.
+   * Nevertheless, the email address is not unique across users and the described behavior is confusing.
+   *
+   * "username_attributes" forces the user to set an email address when signing up.
+   * The email address is unique across users, i.e. there can't be two users with the same email address.
+   * For sign-in the user must provide its email address.
+   * Notice: Even if the email is handled as username in the sign-up context, the actual username is set to
+   * an unique id (the same as the attribute 'sub') and the email is stored as "email" attribute.
+   */
+  username_attributes = ["email"]
+
+  username_configuration {
+    case_sensitive = true
   }
 }
 

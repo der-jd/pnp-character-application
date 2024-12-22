@@ -20,6 +20,9 @@ fi
 user_mail=$1
 aws_profile=$2
 
+# Suppress AWS CLI pager output --> write output of AWS CLI commands directly to the console
+export AWS_PAGER=""
+
 generate_password() {
   openssl rand -base64 32
 }
@@ -32,25 +35,25 @@ user_pool_id=$(aws cognito-idp list-user-pools \
     --profile $aws_profile \
     --region $AWS_REGION)
 
-echo "Creating new test user..."
-user_name="test$((RANDOM % 1000))" # Random number from 1 to 999
-user_password=$(generate_password)
-echo $(aws cognito-idp admin-create-user \
+echo "Creating new Cognito user..."
+# Suppress invitation email as the temporary password will be overwritten below
+aws cognito-idp admin-create-user \
     --user-pool-id $user_pool_id \
-    --username $user_name \
-    --user-attributes Name=email,Value=$user_mail \
-    --desired-delivery-mediums EMAIL \
+    --username $user_mail \
+    --user-attributes Name="email",Value="$user_mail" Name="email_verified",Value="true" \
+    --message-action SUPPRESS \
     --profile $aws_profile \
-    --region $AWS_REGION)
+    --region $AWS_REGION
 
 echo "Updating temporary password..."
+user_password=$(generate_password)
 aws cognito-idp admin-set-user-password \
     --user-pool-id $user_pool_id \
-    --username $user_name \
+    --username $user_mail \
     --password $user_password \
     --permanent \
     --profile $aws_profile \
     --region $AWS_REGION
 
-echo "New test user '$user_name' created. Use the following password to log in."
+echo "New test user created. Use the following password to log in."
 echo "$user_password"

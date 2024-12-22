@@ -16,7 +16,6 @@ export namespace CostCategory {
   }
 }
 
-// TODO Add Lambda function that returns basic config/rule values for frontend
 const skillThresholds = [50, 75, 99999];
 
 /**
@@ -36,6 +35,7 @@ const costMatrix: number[][] = [
   [2, 3, 4],
 ];
 
+// TODO add separate Lambda function that returns skill costs for a given skill value and cost category
 export function getIncreaseCost(skillValue: number, costCategory: CostCategory): number {
   const columnIndex = skillThresholds.findIndex((threshold) => skillValue < threshold);
   return costMatrix[costCategory][columnIndex];
