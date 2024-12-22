@@ -1,6 +1,3 @@
-//import { CostCategory, Character, getIncreaseCost, getSkill } from "config/index.js";
-// TODO need function when user changes the cost category in frontend and the web Ui needs to show the new cost#
-// TODO allow input of multiple values so that cost for multiple things can be returned (use in case of initial character loading)
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
