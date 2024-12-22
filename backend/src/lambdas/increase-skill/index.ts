@@ -110,6 +110,10 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     console.log("Successfully updated DynamoDB item");
 
     // TODO save event in history
+    /** TODO check latency for increase skill
+     *  If latency high: return cost for next skill point for given cost category
+     *  If latency low: let frontend call separate Lambda for cost for given skill value and cost category
+     */
     const response = {
       statusCode: 200,
       body: JSON.stringify({
