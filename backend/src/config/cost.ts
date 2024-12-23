@@ -34,7 +34,7 @@ export namespace CostCategory {
       return CostCategory.CAT_0;
     }
 
-    const adjustedCategory = defaultCostCategory + learningMethod;
+    const adjustedCategory = Number(defaultCostCategory) + Number(learningMethod);
 
     if (adjustedCategory > MAX_COST_CATEGORY) {
       return MAX_COST_CATEGORY;
