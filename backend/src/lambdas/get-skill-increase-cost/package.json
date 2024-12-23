@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "main": "index.mjs",
   "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.682.0",
+    "@aws-sdk/lib-dynamodb": "^3.685.0"
+  },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.145",
     "@types/node": "^22.9.0"
