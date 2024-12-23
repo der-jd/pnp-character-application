@@ -1,20 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import skillData from "../../components/Skill/ExampleData";
-import { exampleBaseValues, exampleProperties } from "../../components/Properties/ExampleData";
-import SkillCategory from "../../components/Skill/SkillCategory";
-import { PropertiesTable } from "../../components/Properties/ProtpertiesTable";
+import { sample_char } from "@/components/Character/sampleCharacter";
+import SkillCategory from "@/components/Skill/SkillCategory";
+import { extract_properties_data } from "@/components/Skill/SkillDefinitions";
 import { useState } from "react";
 
 export default function SkillsPage() {
-  let skills = skillData;
   const [isEditMode, setEditMode] = useState(false);
   const toggle_edit_mode = () => setEditMode(!isEditMode);
 
   const discard_values = () => {
     setEditMode(false);
-    skills = skillData;
   };
 
   return (
@@ -37,17 +34,9 @@ export default function SkillsPage() {
           </Button>
         ) : null}
       </div>
-      <div className="flex flex-wrap -m-4">
-        <div className="rounded-lg w-1/2 p-4">
-          <h2 className="p-1 text-xl font-semibold rounded-t-lg bg-black text-white">Eigenschaften</h2>
-          <PropertiesTable data={exampleProperties} is_edit_mode={isEditMode} />
-        </div>
-        <div className="rounded-lg w-1/2 p-4">
-          <h2 className="p-1 text-xl font-semibold rounded-t-lg bg-black text-white">Basiswerte</h2>
-          <PropertiesTable data={exampleBaseValues} is_edit_mode={isEditMode} />
-        </div>
+      <div className="flex flex-wrap -m-4 rounded-lg w-full p-4">
+        <SkillCategory data={extract_properties_data(sample_char.characterSheet)} isEditMode={isEditMode} />
       </div>
-      <SkillCategory data={skills} isEditMode={isEditMode} />
     </div>
   );
 }

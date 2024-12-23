@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
-import "../styles/globals.css";
+import "../src/app/styles/globals.css";
 
 export default function Header() {
   //const { logout } = useAuth()
