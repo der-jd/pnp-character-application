@@ -2,7 +2,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { cognitoClient } from "./cognitoConfig";
+import { cognitoClient } from "./CognitoConfig";
 
 interface AuthContextType {
   isAuthenticated: boolean;
