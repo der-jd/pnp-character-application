@@ -33,10 +33,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const defaultCostCategory = getSkill(characterSheet.skills, skillCategory, params.skillName).defaultCostCategory;
     let skillValue = getSkill(characterSheet.skills, skillCategory, params.skillName).current;
     let totalCost = getSkill(characterSheet.skills, skillCategory, params.skillName).totalCost;
-    const adjustedCostCategory = getAdjustedCategory(
-      defaultCostCategory,
-      LearningMethod.parse(params.learningMethod),
-    );
+    const adjustedCostCategory = getAdjustedCategory(defaultCostCategory, LearningMethod.parse(params.learningMethod));
 
     console.log(`Default cost category: ${defaultCostCategory}`);
     console.log(`Adjusted cost category: ${adjustedCostCategory}`);

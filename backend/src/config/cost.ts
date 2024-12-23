@@ -31,22 +31,22 @@ const MIN_COST_CATEGORY = CostCategory.CAT_0;
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 //export namespace CostCategory {
-  // TODO this function does not work because defaultCostCategory is interpreted as string, not as number
-  export function getAdjustedCategory(defaultCostCategory: CostCategory, learningMethod: LearningMethod): CostCategory {
-    if (learningMethod === LearningMethod.FREE) {
-      return CostCategory.CAT_0;
-    }
-
-    const adjustedCategory = Number(defaultCostCategory) + Number(learningMethod);
-
-    if (adjustedCategory > MAX_COST_CATEGORY) {
-      return MAX_COST_CATEGORY;
-    } else if (adjustedCategory < MIN_COST_CATEGORY) {
-      return MIN_COST_CATEGORY;
-    }
-
-    return adjustedCategory as CostCategory;
+// TODO this function does not work because defaultCostCategory is interpreted as string, not as number
+export function getAdjustedCategory(defaultCostCategory: CostCategory, learningMethod: LearningMethod): CostCategory {
+  if (learningMethod === LearningMethod.FREE) {
+    return CostCategory.CAT_0;
   }
+
+  const adjustedCategory = Number(defaultCostCategory) + Number(learningMethod);
+
+  if (adjustedCategory > MAX_COST_CATEGORY) {
+    return MAX_COST_CATEGORY;
+  } else if (adjustedCategory < MIN_COST_CATEGORY) {
+    return MIN_COST_CATEGORY;
+  }
+
+  return adjustedCategory as CostCategory;
+}
 //}
 
 const skillThresholds = [50, 75, 99999];
