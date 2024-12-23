@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { CostCategory, LearningMethod, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
+import { getAdjustedCategory, LearningMethod, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill(event);
@@ -33,7 +33,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const defaultCostCategory = getSkill(characterSheet.skills, skillCategory, params.skillName).defaultCostCategory;
     let skillValue = getSkill(characterSheet.skills, skillCategory, params.skillName).current;
     let totalCost = getSkill(characterSheet.skills, skillCategory, params.skillName).totalCost;
-    const adjustedCostCategory = CostCategory.getAdjustedCategory(
+    const adjustedCostCategory = getAdjustedCategory(
       defaultCostCategory,
       LearningMethod.parse(params.learningMethod),
     );

@@ -30,7 +30,7 @@ const MAX_COST_CATEGORY = CostCategory.CAT_4;
 const MIN_COST_CATEGORY = CostCategory.CAT_0;
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace CostCategory {
+//export namespace CostCategory {
   // TODO this function does not work because defaultCostCategory is interpreted as string, not as number
   export function getAdjustedCategory(defaultCostCategory: CostCategory, learningMethod: LearningMethod): CostCategory {
     if (learningMethod === LearningMethod.FREE) {
@@ -47,7 +47,7 @@ export namespace CostCategory {
 
     return adjustedCategory as CostCategory;
   }
-}
+//}
 
 const skillThresholds = [50, 75, 99999];
 
