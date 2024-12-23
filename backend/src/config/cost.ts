@@ -7,14 +7,14 @@ export enum LearningMethod {
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace LearningMethod {
-  export function parse(category: string): LearningMethod {
+  export function parse(method: string): LearningMethod {
     /**
      * The function itself is added as a key to the enum, because it is part of a namespace with the same name.
      * Therefore, Exclude<> is used to remove the function name from the keys of the enum.
      */
     // TODO this is the reason why LearningMethod works but CostCategory doesn't. The return value here is interpreted as number
     // TODO add a parse function to CostCategory as well??
-    return LearningMethod[category.toUpperCase() as Exclude<keyof typeof LearningMethod, "parse">];
+    return LearningMethod[method.toUpperCase() as Exclude<keyof typeof LearningMethod, "parse">];
   }
 }
 
@@ -30,24 +30,32 @@ const MAX_COST_CATEGORY = CostCategory.CAT_4;
 const MIN_COST_CATEGORY = CostCategory.CAT_0;
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
-//export namespace CostCategory {
-// TODO this function does not work because defaultCostCategory is interpreted as string, not as number
-export function getAdjustedCategory(defaultCostCategory: CostCategory, learningMethod: LearningMethod): CostCategory {
-  if (learningMethod === LearningMethod.FREE) {
-    return CostCategory.CAT_0;
+export namespace CostCategory {
+  export function parse(category: string): CostCategory {
+    /**
+     * The function itself is added as a key to the enum, because it is part of a namespace with the same name.
+     * Therefore, Exclude<> is used to remove the function name from the keys of the enum.
+     */
+    return CostCategory[category.toUpperCase() as Exclude<keyof typeof CostCategory, "parse" | "adjustCategory">];
   }
 
-  const adjustedCategory = Number(defaultCostCategory) + Number(learningMethod);
+  // TODO this function does not work because defaultCostCategory is interpreted as string, not as number
+  export function adjustCategory(defaultCostCategory: CostCategory, learningMethod: LearningMethod): CostCategory {
+    if (learningMethod === LearningMethod.FREE) {
+      return CostCategory.CAT_0;
+    }
 
-  if (adjustedCategory > MAX_COST_CATEGORY) {
-    return MAX_COST_CATEGORY;
-  } else if (adjustedCategory < MIN_COST_CATEGORY) {
-    return MIN_COST_CATEGORY;
+    const adjustedCategory = Number(defaultCostCategory) + Number(learningMethod);
+
+    if (adjustedCategory > MAX_COST_CATEGORY) {
+      return MAX_COST_CATEGORY;
+    } else if (adjustedCategory < MIN_COST_CATEGORY) {
+      return MIN_COST_CATEGORY;
+    }
+
+    return adjustedCategory as CostCategory;
   }
-
-  return adjustedCategory as CostCategory;
 }
-//}
 
 const skillThresholds = [50, 75, 99999];
 
