@@ -24,7 +24,6 @@ const SkillCategory = ({ data, isEditMode }: SkillCategoryProps) => {
     {} as Record<string, ISkillProps[]>,
   );
 
-  // sort categories by size
   const categories = Object.keys(groupedSkills).sort((a, b) => {
     const aSkillsCount = groupedSkills[a].length;
     const bSkillsCount = groupedSkills[b].length;

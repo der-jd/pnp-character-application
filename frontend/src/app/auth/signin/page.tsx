@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { cognitoConfig, cognitoClient } from "../../cognitoConfig";
+import { cognitoConfig, cognitoClient } from "../../context/CognitoConfig";
 import { useAuth } from "../../context/AuthContext";
 
 export default function SignIn() {
