@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cognitoConfig, cognitoClient } from "../../context/CognitoConfig";
 import { useAuth } from "../../context/AuthContext";
+import { createTenantId } from "@/lib/Api/tenant";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -14,35 +15,6 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const router = useRouter();
   const { setIsAuthenticated, isAuthenticated, setAccessToken } = useAuth();
-
-  const createTenantId = (token: string | undefined) => {
-    const url = "https://ddotg5g335.execute-api.eu-central-1.amazonaws.com/prod/create-tenant-id";
-
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-
-    console.log(headers);
-
-    fetch(url, {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify({}),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Error: ${res.status} ${res.statusText}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log("Response from API:", data);
-      })
-      .catch((err) => {
-        console.error(err.message);
-      });
-  };
 
   useEffect(() => {
     if (isAuthenticated) {
