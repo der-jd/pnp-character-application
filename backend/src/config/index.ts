@@ -1,11 +1,2 @@
-export { CostCategory, getIncreaseCost } from "./cost.js";
-export {
-  Attribute,
-  BaseValue,
-  Skill,
-  MeleeCombatSkill,
-  RangedCombatSkill,
-  Character,
-  CharacterSheet,
-  getSkill,
-} from "./character.js";
+export { CostCategory, getSkillIncreaseCost } from "./cost.js";
+export { Attribute, BaseValue, Skill, CombatSkill, Character, CharacterSheet, getSkill } from "./character.js";

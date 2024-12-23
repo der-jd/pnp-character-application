@@ -71,22 +71,156 @@ import { GiBestialFangs } from "react-icons/gi";
 import { GiTinker } from "react-icons/gi";
 import { GiDespair } from "react-icons/gi";
 
-export enum CostCategory {
-  FREE,
-  LOW_PRICED,
-  NORMAL,
-  EXPENSIVE,
-}
+import {
+  Skill,
+  LearningMethod,
+  CostCategory,
+  Character,
+  Attribute,
+  BaseValue,
+  CharacterSheet,
+} from "../Character/character";
 
 export interface ISkillProps {
   name: string;
   category: string;
-  level: number;
-  is_active: boolean;
-  cost_category: CostCategory;
+  current_level: number;
+  mod: number;
+  activated: boolean;
+  learning_method: LearningMethod;
+  defaultCostCategory: CostCategory;
   cost: number;
   is_edited: boolean;
   edited_level: number;
+}
+
+function mapSkillToISkillProps(name: string, category: string, skill: Skill): ISkillProps {
+  return {
+    name,
+    category,
+    current_level: skill.current,
+    mod: skill.mod,
+    activated: skill.activated,
+    learning_method: LearningMethod.NORMAL,
+    defaultCostCategory: skill.defaultCostCategory,
+    cost: skill.totalCost,
+    is_edited: false,
+    edited_level: skill.current,
+  };
+}
+
+function mapAttributeToISkillProps(name: string, category: string, attribute: Attribute): ISkillProps {
+  return {
+    name,
+    category,
+    current_level: attribute.current,
+    mod: attribute.mod,
+    activated: true,
+    learning_method: LearningMethod.NORMAL,
+    defaultCostCategory: CostCategory.CAT_0,
+    cost: 1,
+    is_edited: false,
+    edited_level: attribute.current,
+  };
+}
+
+function mapBaseValueToISkillProps(name: string, category: string, baseValue: BaseValue): ISkillProps {
+  return {
+    name,
+    category,
+    current_level: baseValue.current,
+    mod: baseValue.mod,
+    activated: true,
+    learning_method: LearningMethod.NORMAL,
+    defaultCostCategory: CostCategory.CAT_0,
+    cost: 1,
+    is_edited: false,
+    edited_level: baseValue.current,
+  };
+}
+
+// function mapCombatSkillToISkillProps(name: string, category: string, combatSkill: CombatSkill): ISkillProps {
+//   return {
+//     name,
+//     category,
+//     current_level: combatSkill.handling,
+//     mod: 0,
+//     activated: true,
+//     learning_method: LearningMethod.NORMAL,
+//     defaultCostCategory: CostCategory.CAT_0,
+//     cost: 0,
+//     is_edited: false,
+//     edited_level: combatSkill.handling,
+//   };
+// }
+
+function mapNodeToISkillProps(
+  name: string,
+  category: string,
+  data: Skill | Attribute | BaseValue,
+  type: string,
+): ISkillProps {
+  switch (type) {
+    case "Skill":
+      return mapSkillToISkillProps(name, category, data as Skill);
+    case "Attribute":
+      return mapAttributeToISkillProps(name, category, data as Attribute);
+    case "BaseValue":
+      return mapBaseValueToISkillProps(name, category, data as BaseValue);
+    default:
+      throw new Error(`Unknown type: ${type}`);
+  }
+}
+
+type NodeExtractor = {
+  key: keyof CharacterSheet;
+  type: "Skill" | "Attribute" | "BaseValue";
+  category?: string;
+};
+
+export const nodeExtractors: NodeExtractor[] = [
+  { key: "skills", type: "Skill" },
+  { key: "attributes", type: "Attribute", category: "Attributes" },
+  { key: "baseValues", type: "BaseValue", category: "BaseValues" },
+];
+
+export function extract_properties_data(characterSheet: CharacterSheet): ISkillProps[] {
+  const result: ISkillProps[] = [];
+
+  for (const extractor of nodeExtractors) {
+    const node = characterSheet[extractor.key];
+    const category = extractor.category || extractor.key;
+
+    // Check if the node has nested structures
+    if (category === "skills") {
+      Object.entries(node).forEach(([subCategory, subNode]) => {
+        Object.entries(subNode).forEach(([name, data]) => {
+          result.push(mapNodeToISkillProps(name, subCategory, data, extractor.type));
+        });
+      });
+    } else {
+      Object.entries(node).forEach(([name, data]) => {
+        result.push(mapNodeToISkillProps(name, category, data, extractor.type));
+      });
+    }
+  }
+
+  return result;
+}
+
+export function parseCharacterSheet(json: string): Character | null {
+  try {
+    const character: Character = JSON.parse(json);
+
+    if (!character.characterId || !character.characterSheet) {
+      throw new Error("Invalid JSON structure");
+    }
+
+    return character;
+  } catch (error) {
+    console.error("Error parsing CharacterSheet JSON:", error);
+    return null;
+  }
 }
 
 export function render_skill_icon(skill_name: string): JSX.Element {

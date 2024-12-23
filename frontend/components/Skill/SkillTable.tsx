@@ -5,18 +5,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable, VisibilityState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ISkillProps, render_skill_icon } from "./SkillDefinitions";
+import { LearningMethod } from "@/components/Character/character";
 
-import { CostCategory, ISkillProps, render_skill_icon } from "./SkillDefinitions";
-
-const getCostCategoryLabel = (category: CostCategory): string => {
+const getCostCategoryLabel = (category: LearningMethod): string => {
   switch (category) {
-    case CostCategory.FREE:
+    case LearningMethod.FREE:
       return "Free";
-    case CostCategory.LOW_PRICED:
+    case LearningMethod.LOW_PRICED:
       return "Low";
-    case CostCategory.NORMAL:
+    case LearningMethod.NORMAL:
       return "Normal";
-    case CostCategory.EXPENSIVE:
+    case LearningMethod.EXPENSIVE:
       return "Expensive";
     default:
       return "";
@@ -43,7 +43,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
 
   // Memoize filteredData to prevent re-computation on every render
   const filteredData = useMemo(
-    () => (showActiveOnly ? data.filter((skill) => skill.is_active) : data),
+    () => (showActiveOnly ? data.filter((skill) => skill.activated) : data),
     [data, showActiveOnly],
   );
 
@@ -55,14 +55,14 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
     },
     {
       accessorKey: "name",
-      header: () => <div className="text-left text-bold">Name</div>,
+      header: () => <div className="text-right text-bold">Name</div>,
       cell: ({ row }) => <div className="font-medium p-1">{row.getValue("name")}</div>,
     },
     {
       accessorKey: "level",
       header: () => <div className="text-center">Level</div>,
       cell: ({ row }) => {
-        const value = is_edit_mode ? row.original.edited_level : row.original.level;
+        const value = is_edit_mode ? row.original.edited_level : row.original.current_level;
         return <div className="text-center">{value}</div>;
       },
     },
@@ -74,7 +74,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
         return (
           <div className="text-center">
             <Checkbox
-              checked={skill.is_active}
+              checked={skill.activated}
               onCheckedChange={(checked) => {
                 if (checked === true) {
                   const updatedData = data.map((item) =>
@@ -84,7 +84,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
                 }
               }}
               aria-label={`Set ${skill.name} as active`}
-              disabled={skill.is_active}
+              disabled={skill.activated}
             />
           </div>
         );
@@ -93,7 +93,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
     {
       accessorKey: "cost_category",
       header: () => <div className="text-center">Cost Category</div>,
-      cell: ({ row }) => <div className="text-left">{getCostCategoryLabel(row.original.cost_category)}</div>,
+      cell: ({ row }) => <div className="text-left">{getCostCategoryLabel(row.original.learning_method)}</div>,
     },
     {
       accessorKey: "skilling",

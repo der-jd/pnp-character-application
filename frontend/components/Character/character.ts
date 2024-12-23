@@ -1,4 +1,17 @@
-import { CostCategory } from "./cost.js";
+export enum LearningMethod {
+  FREE, // Cost Category 0
+  LOW_PRICED, // Cost Category -1
+  NORMAL, // Default Cost Category
+  EXPENSIVE, // Cost Category +1
+}
+
+export enum CostCategory {
+  CAT_0,
+  CAT_1,
+  CAT_2,
+  CAT_3,
+  CAT_4,
+}
 
 export interface Character {
   characterId: string;
@@ -128,17 +141,4 @@ export interface CharacterSheet {
       missile: CombatSkill;
     };
   };
-}
-
-export function getSkill(
-  skills: CharacterSheet["skills"],
-  category: keyof CharacterSheet["skills"],
-  name: string,
-): Skill {
-  const skillCategory = skills[category] as Record<string, any>;
-  const skill = skillCategory[name];
-  if (!skill) {
-    throw new Error(`Skill ${name} not found!`);
-  }
-  return skill;
 }

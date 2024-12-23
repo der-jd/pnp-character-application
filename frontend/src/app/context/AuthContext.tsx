@@ -11,6 +11,8 @@ interface AuthContextType {
   logout: () => void;
   accessToken: string | null;
   setAccessToken: React.Dispatch<React.SetStateAction<string | null>>;
+  idToken: string | null;
+  setIdToken: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,6 +21,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [idToken, setIdToken] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -45,11 +48,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     setAccessToken(null);
+    setIdToken(null);
     setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, loading, logout, accessToken, setAccessToken }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, setIsAuthenticated, loading, logout, accessToken, setAccessToken, idToken, setIdToken }}
+    >
       {children}
     </AuthContext.Provider>
   );
