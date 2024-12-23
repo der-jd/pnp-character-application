@@ -1,5 +1,5 @@
 export const createTenantId = (token: string | undefined) => {
-  const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/create-tenant-id";
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/tenant-id";
   console.log(url);
 
   if (!token) {
