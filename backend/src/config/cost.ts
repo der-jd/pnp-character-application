@@ -17,11 +17,11 @@ export namespace LearningMethod {
 }
 
 export enum CostCategory {
-  CAT_0,
-  CAT_1,
-  CAT_2,
-  CAT_3,
-  CAT_4,
+  CAT_0 = 0,
+  CAT_1 = 1,
+  CAT_2 = 2,
+  CAT_3 = 3,
+  CAT_4 = 4,
 }
 
 const MAX_COST_CATEGORY = CostCategory.CAT_4;
