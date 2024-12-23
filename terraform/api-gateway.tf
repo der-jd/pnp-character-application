@@ -52,7 +52,7 @@ resource "aws_api_gateway_integration" "get_skill_increase_cost_integration" {
 resource "aws_api_gateway_resource" "create_tenant_id_resource" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_rest_api.pnp_rest_api.root_resource_id
-  path_part   = "create-tenant-id"
+  path_part   = "tenant-id"
 }
 
 resource "aws_api_gateway_method" "create_tenant_id_method" {
@@ -94,3 +94,8 @@ resource "aws_api_gateway_stage" "prod" {
   deployment_id = aws_api_gateway_deployment.api_deployment.id
   stage_name    = "prod"
 }
+
+output "api_gateway_url" {
+  value = "https://${aws_api_gateway_rest_api.my_api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_deployment.api_deployment.stage_name}"
+}
+
