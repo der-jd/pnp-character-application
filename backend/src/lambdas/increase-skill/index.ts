@@ -39,6 +39,9 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
      */
     const costCategory = CostCategory.parse(params.costCategory);
 
+    console.log(`Skill total cost before increasing: ${totalCost}`);
+    console.log(`Available adventure points before increasing: ${availableAdventurePoints}`);
+
     if (params.initialSkillValue + params.increasedPoints === skillValue) {
       const response = {
         statusCode: 200,
