@@ -16,7 +16,7 @@ export default function SignIn() {
   const { setIsAuthenticated, isAuthenticated, setAccessToken } = useAuth();
 
   const createTenantId = (token: string | undefined) => {
-    const url = "https://t3mmarpxmk.execute-api.eu-central-1.amazonaws.com/prod/create-tenant-id";
+    const url = "https://ddotg5g335.execute-api.eu-central-1.amazonaws.com/prod/create-tenant-id";
 
     const headers = {
       "Content-Type": "application/json",
