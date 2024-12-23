@@ -1,8 +1,17 @@
+// TODO Not used atm. this needs to be placed in the frontend as dropdown menu to calc the actual cost category to send to the backend
+export enum LearningMethod {
+  FREE, // Cost Category 0
+  LOW_PRICED, // Cost Category -1
+  NORMAL, // Default Cost Category
+  EXPENSIVE, // Cost Category +1
+}
+
 export enum CostCategory {
-  FREE,
-  LOW_PRICED,
-  NORMAL,
-  EXPENSIVE,
+  CAT_0,
+  CAT_1,
+  CAT_2,
+  CAT_3,
+  CAT_4,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -20,12 +29,13 @@ const skillThresholds = [50, 75, 99999];
 
 /**
  * +------------+-------------+-------------+-------------+
- * |            | Threshold 1 | Threshold 2 | Threshold 3 |
+ * |  Category  | Threshold 1 | Threshold 2 | Threshold 3 |
  * +------------+-------------+-------------+-------------+
- * | FREE       |      x      |      x      |      x      |
- * | LOW_PRICED |      x      |      x      |      x      |
- * | NORMAL     |      x      |      x      |      x      |
- * | EXPENSIVE  |      x      |      x      |      x      |
+ * |     0      |      x      |      x      |      x      |
+ * |     1      |      x      |      x      |      x      |
+ * |     2      |      x      |      x      |      x      |
+ * |     3      |      x      |      x      |      x      |
+ * |     4      |      x      |      x      |      x      |
  * +------------+-------------+-------------+-------------+
  */
 const costMatrix: number[][] = [
@@ -33,10 +43,10 @@ const costMatrix: number[][] = [
   [0.5, 1, 2],
   [1, 2, 3],
   [2, 3, 4],
+  [3, 4, 5],
 ];
 
-// TODO add separate Lambda function that returns skill costs for a given skill value and cost category
-export function getIncreaseCost(skillValue: number, costCategory: CostCategory): number {
+export function getSkillIncreaseCost(skillValue: number, costCategory: CostCategory): number {
   const columnIndex = skillThresholds.findIndex((threshold) => skillValue < threshold);
   return costMatrix[costCategory][columnIndex];
 }

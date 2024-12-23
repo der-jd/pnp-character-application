@@ -20,6 +20,7 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
       Key: {
         characterId: characterId,
       },
+      ConsistentRead: true,
     });
 
     const dynamoDbResponse = await docClient.send(command);

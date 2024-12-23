@@ -1,3 +1,5 @@
+import { CostCategory } from "./cost.js";
+
 export interface Character {
   characterId: string;
   characterSheet: CharacterSheet;
@@ -21,27 +23,13 @@ export interface Skill {
   current: number;
   mod: number;
   totalCost: number;
+  defaultCostCategory: CostCategory;
 }
 
-export interface MeleeCombatSkill {
-  activated: boolean;
+export interface CombatSkill {
   handling: number;
-  start: number;
-  current: number;
-  mod: number;
-  totalCost: number;
   attackDistributed: number;
   paradeDistributed: number;
-}
-
-export interface RangedCombatSkill {
-  activated: boolean;
-  handling: number;
-  start: number;
-  current: number;
-  mod: number;
-  totalCost: number;
-  rangedDistributed: number;
 }
 
 export interface CharacterSheet {
@@ -103,16 +91,11 @@ export interface CharacterSheet {
     legendaryActions: BaseValue;
   };
   skills: {
-    activated: number;
     combat: {
-      melee: {
-        greatsword: MeleeCombatSkill;
-        martialArt: MeleeCombatSkill;
-      };
-      ranged: {
-        firearmSimple: RangedCombatSkill;
-        missile: RangedCombatSkill;
-      };
+      greatsword: Skill;
+      martialArt: Skill;
+      firearmSimple: Skill;
+      missile: Skill;
     };
     body: {
       athletics: Skill;
@@ -135,9 +118,18 @@ export interface CharacterSheet {
       lockpicking: Skill;
     };
   };
+  combatSkills: {
+    melee: {
+      greatsword: CombatSkill;
+      martialArt: CombatSkill;
+    };
+    ranged: {
+      firearmSimple: CombatSkill;
+      missile: CombatSkill;
+    };
+  };
 }
 
-// TODO this function does not work for combat skills because they have a different structure
 export function getSkill(
   skills: CharacterSheet["skills"],
   category: keyof CharacterSheet["skills"],
