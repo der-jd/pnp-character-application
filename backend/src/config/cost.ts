@@ -12,8 +12,6 @@ export namespace LearningMethod {
      * The function itself is added as a key to the enum, because it is part of a namespace with the same name.
      * Therefore, Exclude<> is used to remove the function name from the keys of the enum.
      */
-    // TODO this is the reason why LearningMethod works but CostCategory doesn't. The return value here is interpreted as number
-    // TODO add a parse function to CostCategory as well??
     return LearningMethod[method.toUpperCase() as Exclude<keyof typeof LearningMethod, "parse">];
   }
 }
@@ -39,7 +37,6 @@ export namespace CostCategory {
     return CostCategory[category.toUpperCase() as Exclude<keyof typeof CostCategory, "parse" | "adjustCategory">];
   }
 
-  // TODO this function does not work because defaultCostCategory is interpreted as string, not as number
   export function adjustCategory(defaultCostCategory: CostCategory, learningMethod: LearningMethod): CostCategory {
     if (learningMethod === LearningMethod.FREE) {
       return CostCategory.CAT_0;
