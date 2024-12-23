@@ -1,9 +1,11 @@
 // import { CognitoIdentityProvider } from "@aws-sdk/client-cognito-identity-provider";
 // import * as jwt from "jsonwebtoken";
 
+import { APIGatewayProxyEvent } from "aws-lambda";
+
 // const cognito = new CognitoIdentityProvider();
 
-export const handler = async (event) => {
+export const handler = async (event: APIGatewayProxyEvent) => {
   const userPoolId = process.env.USER_POOL_ID;
   const clientId = process.env.CLIENT_ID;
   if (!userPoolId || !clientId) {
@@ -11,6 +13,15 @@ export const handler = async (event) => {
       statusCode: 500,
       body: JSON.stringify({
         message: "User pool ID or client ID is not set in environment variables.",
+      }),
+    };
+  }
+
+  if(!event.headers.Authorization) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "No Authorization header received!",
       }),
     };
   }
