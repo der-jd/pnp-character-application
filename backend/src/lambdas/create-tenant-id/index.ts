@@ -17,7 +17,7 @@ export const handler = async (event: APIGatewayProxyEvent) => {
     };
   }
 
-  if(!event.headers.Authorization) {
+  if (!event.headers.Authorization) {
     return {
       statusCode: 500,
       body: JSON.stringify({
