@@ -1,9 +1,19 @@
-// TODO Not used atm. this needs to be placed in the frontend as dropdown menu to calc the actual cost category to send to the backend
 export enum LearningMethod {
-  FREE, // Cost Category 0
-  LOW_PRICED, // Cost Category -1
-  NORMAL, // Default Cost Category
-  EXPENSIVE, // Cost Category +1
+  FREE = 99, // Cost Category 0
+  LOW_PRICED = -1, // Cost Category -1
+  NORMAL = 0, // Default Cost Category
+  EXPENSIVE = 1, // Cost Category +1
+}
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace LearningMethod {
+  export function parse(category: string): LearningMethod {
+    /**
+     * The function itself is added as a key to the enum, because it is part of a namespace with the same name.
+     * Therefore, Exclude<> is used to remove the function name from the keys of the enum.
+     */
+    return LearningMethod[category.toUpperCase() as Exclude<keyof typeof LearningMethod, "parse">];
+  }
 }
 
 export enum CostCategory {
@@ -14,14 +24,25 @@ export enum CostCategory {
   CAT_4,
 }
 
+const MAX_COST_CATEGORY = CostCategory.CAT_4;
+const MIN_COST_CATEGORY = CostCategory.CAT_0;
+
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace CostCategory {
-  export function parse(category: string): CostCategory {
-    /**
-     * The function itself is added as a key to the enum, because it is part of a namespace with the same name.
-     * Therefore, Exclude<> is used to remove the function name from the keys of the enum.
-     */
-    return CostCategory[category.toUpperCase() as Exclude<keyof typeof CostCategory, "parse">];
+  export function getAdjustedCategory(defaultCostCategory: CostCategory, learningMethod: LearningMethod): CostCategory {
+    if (learningMethod === LearningMethod.FREE) {
+      return CostCategory.CAT_0;
+    }
+
+    const adjustedCategory = defaultCostCategory + learningMethod;
+
+    if (adjustedCategory > MAX_COST_CATEGORY) {
+      return MAX_COST_CATEGORY;
+    } else if (adjustedCategory < MIN_COST_CATEGORY) {
+      return MIN_COST_CATEGORY;
+    }
+
+    return adjustedCategory as CostCategory;
   }
 }
 
