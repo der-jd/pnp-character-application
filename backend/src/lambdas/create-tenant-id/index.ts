@@ -1,5 +1,5 @@
 import { CognitoIdentityProvider } from "@aws-sdk/client-cognito-identity-provider";
-import * as jwt from "jsonwebid_token";
+import * as jwt from "jsonwebtoken";
 
 import { APIGatewayProxyEvent } from "aws-lambda";
 
