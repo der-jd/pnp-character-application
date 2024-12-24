@@ -17,6 +17,8 @@ file_env_variables=$1
 # Note: This excludes certain files of the frontend folder.
 # Note: If the s3 bucket is empty, an upload will take place even if the frontend did not change
 
+# TODO script sometimes produces empty checksum files 
+
 
 find . -type f \( \
     -path './src/*' \

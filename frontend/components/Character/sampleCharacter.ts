@@ -257,30 +257,30 @@ export const sample_char: Character = {
           defaultCostCategory: CostCategory.CAT_0,
         },
       },
-      combatSkills: {
-        melee: {
-          greatsword: {
-            handling: 18,
-            attackDistributed: 10,
-            paradeDistributed: 8,
-          },
-          martialArt: {
-            handling: 12,
-            attackDistributed: 6,
-            paradeDistributed: 6,
-          },
+    },
+    combatSkills: {
+      melee: {
+        greatsword: {
+          handling: 18,
+          attackDistributed: 10,
+          paradeDistributed: 8,
         },
-        ranged: {
-          firearmSimple: {
-            handling: 10,
-            attackDistributed: 6,
-            paradeDistributed: 4,
-          },
-          missile: {
-            handling: 8,
-            attackDistributed: 5,
-            paradeDistributed: 3,
-          },
+        martialArt: {
+          handling: 12,
+          attackDistributed: 6,
+          paradeDistributed: 6,
+        },
+      },
+      ranged: {
+        firearmSimple: {
+          handling: 10,
+          attackDistributed: 6,
+          paradeDistributed: 4,
+        },
+        missile: {
+          handling: 8,
+          attackDistributed: 5,
+          paradeDistributed: 3,
         },
       },
     },
