@@ -1,14 +1,15 @@
-export const createTenantId = (token: string | undefined) => {
+export const createTenantId = (token: string | undefined, refresh_token: string | undefined) => {
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/tenant-id";
   console.log(url);
 
-  if (!token) {
+  if (!token || !refresh_token) {
     throw new Error("Token undefined!");
   }
 
   const headers = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
+    RefreshToken: refresh_token,
   };
 
   console.log(headers);
