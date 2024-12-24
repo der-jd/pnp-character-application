@@ -62,7 +62,7 @@ export const handler = async (event: APIGatewayProxyEvent) => {
   try {
     const decoded: jwt.JwtPayload | string | null = jwt.decode(id_token);
 
-    if(!decoded || typeof decoded == "string") {
+    if (!decoded || typeof decoded == "string") {
       return {
         statusCode: 401,
         body: JSON.stringify({
@@ -76,7 +76,6 @@ export const handler = async (event: APIGatewayProxyEvent) => {
     }
 
     sub = decoded.sub;
-
   } catch (error) {
     console.error("Error decoding id_token:", error);
     return {
@@ -131,7 +130,6 @@ export const handler = async (event: APIGatewayProxyEvent) => {
   }
 
   try {
-
     const updated_tokens = await refreshTokens(refresh_token, clientId);
 
     return {
@@ -142,7 +140,7 @@ export const handler = async (event: APIGatewayProxyEvent) => {
       }),
     };
   } catch (error) {
-    if(error instanceof Error) {
+    if (error instanceof Error) {
       return {
         statusCode: 500,
         body: JSON.stringify({
@@ -152,5 +150,4 @@ export const handler = async (event: APIGatewayProxyEvent) => {
       };
     }
   }
-
 };
