@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cognitoConfig, cognitoClient } from "../../context/CognitoConfig";
 import { useAuth } from "../../context/AuthContext";
+import { createTenantId } from "@/lib/Api/tenant";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -39,6 +40,7 @@ export default function SignIn() {
       if (response.AuthenticationResult?.AccessToken) {
         setAccessToken(response.AuthenticationResult.AccessToken);
         setIsAuthenticated(true);
+        createTenantId(response.AuthenticationResult.IdToken, response.AuthenticationResult.RefreshToken);
         router.push("/protected/dashboard");
       } else {
         throw new Error("Authentication failed");

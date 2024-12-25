@@ -157,7 +157,7 @@ function mapBaseValueToISkillProps(name: string, category: string, baseValue: Ba
 function mapNodeToISkillProps(
   name: string,
   category: string,
-  data: Skill | Attribute | BaseValue,
+  data: any, // eslint-disable-line
   type: string,
 ): ISkillProps {
   switch (type) {

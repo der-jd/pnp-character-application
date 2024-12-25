@@ -143,6 +143,7 @@ jobs:
             echo "export NEXT_PUBLIC_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
             echo "export NEXT_PUBLIC_COGNITO_USER_POOL_ID=$(terraform output cognito_user_pool_id)" >> terraform_output
             echo "export NEXT_PUBLIC_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
+            echo "export NEXT_PUBLIC_API_BASE_URL=$(terraform output api_gateway_url)" >> terraform_output
       - persist_to_workspace:
           root: ~/project
           paths:
