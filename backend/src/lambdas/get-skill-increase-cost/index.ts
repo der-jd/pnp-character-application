@@ -1,7 +1,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
+import { LearningMethod, CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getSkillCost(event);
@@ -11,7 +11,7 @@ interface Parameters {
   characterId: string;
   skillCategory: string;
   skillName: string;
-  costCategory: string;
+  learningMethod: string;
 }
 
 async function getSkillCost(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -19,21 +19,24 @@ async function getSkillCost(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     const params = verifyParameters(event);
 
     console.log(
-      `Get cost for skill '${params.skillName}' (cost category '${params.costCategory}') of character ${params.characterId}`,
+      `Get increase cost for skill '${params.skillName}' (learning method '${params.learningMethod}') of character ${params.characterId}`,
     );
 
     const character = await getCharacterItem(params);
 
     const characterSheet = character.characterSheet;
     const skillCategory = params.skillCategory as keyof Character["characterSheet"]["skills"];
+    const defaultCostCategory = getSkill(characterSheet.skills, skillCategory, params.skillName).defaultCostCategory;
+    const adjustedCostCategory = CostCategory.adjustCategory(
+      CostCategory.parse(defaultCostCategory.toString()), // Without parse CostCategory is interpreted as string and not as a number
+      LearningMethod.parse(params.learningMethod),
+    );
     const skillValue = getSkill(characterSheet.skills, skillCategory, params.skillName).current;
-    /**
-     * TODO add check if the cost category is reasonable for the skill.
-     * I.e. compare the default cost category of the skill with the given category.
-     * The category must equal -1/+0/+1 of default or be zero (free increase)
-     */
-    const costCategory = CostCategory.parse(params.costCategory);
-    const increaseCost = getSkillIncreaseCost(skillValue, costCategory);
+
+    console.log(`Default cost category: ${defaultCostCategory}`);
+    console.log(`Adjusted cost category: ${adjustedCostCategory}`);
+
+    const increaseCost = getSkillIncreaseCost(skillValue, adjustedCostCategory);
 
     const response = {
       statusCode: 200,
@@ -69,7 +72,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
     typeof event.pathParameters?.characterId !== "string" ||
     typeof event.pathParameters?.skillCategory !== "string" ||
     typeof event.pathParameters?.skillName !== "string" ||
-    typeof event.queryStringParameters?.costCategory !== "string"
+    typeof event.queryStringParameters?.learningMethod !== "string"
   ) {
     console.error("Invalid input values!");
     throw {
@@ -84,7 +87,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
     characterId: event.pathParameters.characterId,
     skillCategory: event.pathParameters.skillCategory,
     skillName: event.pathParameters.skillName,
-    costCategory: event.queryStringParameters.costCategory,
+    learningMethod: event.queryStringParameters.learningMethod,
   };
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");

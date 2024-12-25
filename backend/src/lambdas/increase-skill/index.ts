@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
+import { LearningMethod, CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill(event);
@@ -13,7 +13,7 @@ interface Parameters {
   skillName: string;
   initialSkillValue: number;
   increasedPoints: number;
-  costCategory: string;
+  learningMethod: string;
 }
 
 async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -22,7 +22,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     console.log(`Update character ${params.characterId}`);
     console.log(
-      `Increase value of skill '${params.skillName}' from ${params.initialSkillValue} to ${params.initialSkillValue + params.increasedPoints} by cost category '${params.costCategory}'`,
+      `Increase value of skill '${params.skillName}' from ${params.initialSkillValue} to ${params.initialSkillValue + params.increasedPoints} by learning method '${params.learningMethod}'`,
     );
 
     const character = await getCharacterItem(params);
@@ -30,15 +30,16 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const characterSheet = character.characterSheet;
     let availableAdventurePoints = characterSheet.calculationPoints.adventurePoints.available;
     const skillCategory = params.skillCategory as keyof Character["characterSheet"]["skills"];
+    const defaultCostCategory = getSkill(characterSheet.skills, skillCategory, params.skillName).defaultCostCategory;
     let skillValue = getSkill(characterSheet.skills, skillCategory, params.skillName).current;
     let totalCost = getSkill(characterSheet.skills, skillCategory, params.skillName).totalCost;
-    /**
-     * TODO add check if the cost category is reasonable for the skill.
-     * I.e. compare the default cost category of the skill with the given category.
-     * The category must equal -1/+0/+1 of default or be zero (free increase)
-     */
-    const costCategory = CostCategory.parse(params.costCategory);
+    const adjustedCostCategory = CostCategory.adjustCategory(
+      CostCategory.parse(defaultCostCategory.toString()), // Without parse CostCategory is interpreted as string and not as a number
+      LearningMethod.parse(params.learningMethod),
+    );
 
+    console.log(`Default cost category: ${defaultCostCategory}`);
+    console.log(`Adjusted cost category: ${adjustedCostCategory}`);
     console.log(`Skill total cost before increasing: ${totalCost}`);
     console.log(`Available adventure points before increasing: ${availableAdventurePoints}`);
 
@@ -61,7 +62,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     for (let i = 0; i < params.increasedPoints; i++) {
       console.debug("---------------------------");
-      const increaseCost = getSkillIncreaseCost(skillValue, costCategory);
+      const increaseCost = getSkillIncreaseCost(skillValue, adjustedCostCategory);
 
       if (increaseCost > availableAdventurePoints) {
         console.error("Not enough adventure points to increase the skill!");
@@ -162,7 +163,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
     typeof event.pathParameters?.skillName !== "string" ||
     typeof body?.initialValue !== "number" ||
     typeof body?.increasedPoints !== "number" ||
-    typeof body?.costCategory !== "string"
+    typeof body?.learningMethod !== "string"
   ) {
     console.error("Invalid input values!");
     throw {
@@ -179,7 +180,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
     skillName: event.pathParameters.skillName,
     initialSkillValue: body.initialValue,
     increasedPoints: body.increasedPoints,
-    costCategory: body.costCategory,
+    learningMethod: body.learningMethod,
   };
 
   if (params.increasedPoints <= 0) {

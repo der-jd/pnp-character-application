@@ -1,18 +1,31 @@
-// TODO Not used atm. this needs to be placed in the frontend as dropdown menu to calc the actual cost category to send to the backend
 export enum LearningMethod {
-  FREE, // Cost Category 0
-  LOW_PRICED, // Cost Category -1
-  NORMAL, // Default Cost Category
-  EXPENSIVE, // Cost Category +1
+  FREE = 99, // Cost Category 0
+  LOW_PRICED = -1, // Cost Category -1
+  NORMAL = 0, // Default Cost Category
+  EXPENSIVE = 1, // Cost Category +1
+}
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace LearningMethod {
+  export function parse(method: string): LearningMethod {
+    /**
+     * The function itself is added as a key to the enum, because it is part of a namespace with the same name.
+     * Therefore, Exclude<> is used to remove the function name from the keys of the enum.
+     */
+    return LearningMethod[method.toUpperCase() as Exclude<keyof typeof LearningMethod, "parse">];
+  }
 }
 
 export enum CostCategory {
-  CAT_0,
-  CAT_1,
-  CAT_2,
-  CAT_3,
-  CAT_4,
+  CAT_0 = 0,
+  CAT_1 = 1,
+  CAT_2 = 2,
+  CAT_3 = 3,
+  CAT_4 = 4,
 }
+
+const MAX_COST_CATEGORY = CostCategory.CAT_4;
+const MIN_COST_CATEGORY = CostCategory.CAT_0;
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace CostCategory {
@@ -21,7 +34,23 @@ export namespace CostCategory {
      * The function itself is added as a key to the enum, because it is part of a namespace with the same name.
      * Therefore, Exclude<> is used to remove the function name from the keys of the enum.
      */
-    return CostCategory[category.toUpperCase() as Exclude<keyof typeof CostCategory, "parse">];
+    return CostCategory[category.toUpperCase() as Exclude<keyof typeof CostCategory, "parse" | "adjustCategory">];
+  }
+
+  export function adjustCategory(defaultCostCategory: CostCategory, learningMethod: LearningMethod): CostCategory {
+    if (learningMethod === LearningMethod.FREE) {
+      return CostCategory.CAT_0;
+    }
+
+    const adjustedCategory = Number(defaultCostCategory) + Number(learningMethod);
+
+    if (adjustedCategory > MAX_COST_CATEGORY) {
+      return MAX_COST_CATEGORY;
+    } else if (adjustedCategory < MIN_COST_CATEGORY) {
+      return MIN_COST_CATEGORY;
+    }
+
+    return adjustedCategory as CostCategory;
   }
 }
 
