@@ -87,6 +87,13 @@ resource "aws_api_gateway_integration" "create_tenant_id_options_integration" {
   resource_id = aws_api_gateway_resource.create_tenant_id_resource.id
   http_method = aws_api_gateway_method.create_tenant_id_options.http_method
   type        = "MOCK"
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
 }
 
 resource "aws_api_gateway_integration_response" "create_tenant_id_options_integration_response" {
@@ -147,6 +154,14 @@ resource "aws_api_gateway_integration" "increase_skill_options_integration" {
   resource_id = aws_api_gateway_resource.increase_skill_resource.id
   http_method = aws_api_gateway_method.increase_skill_options.http_method
   type        = "MOCK"
+
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
 }
 
 resource "aws_api_gateway_integration_response" "increase_skill_options_integragion_response" {
@@ -176,6 +191,14 @@ resource "aws_api_gateway_integration" "get_skill_increase_cost_options_integrat
   resource_id = aws_api_gateway_resource.get_skill_increase_cost_resource.id
   http_method = aws_api_gateway_method.get_skill_increase_cost_options.http_method
   type        = "MOCK"
+
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
 }
 
 resource "aws_api_gateway_integration_response" "get_skill_increase_cost_options_integration_response" {
