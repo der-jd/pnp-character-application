@@ -87,6 +87,10 @@ resource "aws_api_gateway_integration" "create_tenant_id_options_integration" {
   resource_id = aws_api_gateway_resource.create_tenant_id_resource.id
   http_method = aws_api_gateway_method.create_tenant_id_options.http_method
   type        = "MOCK"
+
+  // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
+  //  For a method with the mock integration to return a 200 response, configure the 
+  // integration request body mapping template to return the following.
   request_templates = {
     "application/json" = jsonencode(
       {
