@@ -1,7 +1,6 @@
 export const createTenantId = async (token: string | undefined, refresh_token: string | undefined) => {
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/tenant-id";
   console.log(url);
-  console.log("fuck this shit!!!!!");
 
   if (!token || !refresh_token) {
     throw new Error("Token or refresh token is undefined!");
