@@ -72,6 +72,170 @@ resource "aws_api_gateway_integration" "create_tenant_id_integration" {
   uri                     = aws_lambda_function.create_tenant_id_lambda.invoke_arn
 }
 
+resource "aws_api_gateway_method" "create_tenant_id_options" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.create_tenant_id_resource.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "create_tenant_id_options_integration" {
+
+  depends_on = [aws_api_gateway_method.create_tenant_id_options]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.create_tenant_id_resource.id
+  http_method = aws_api_gateway_method.create_tenant_id_options.http_method
+  type        = "MOCK"
+
+  // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
+  // For a method with the mock integration to return a 200 response, configure the 
+  // integration request body mapping template to return the following:
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
+}
+
+resource "aws_api_gateway_integration_response" "create_tenant_id_options_integration_response" {
+
+  depends_on = [aws_api_gateway_integration.create_tenant_id_options_integration]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.create_tenant_id_resource.id
+  http_method = aws_api_gateway_method.create_tenant_id_options.http_method
+  status_code = 200
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,RefreshToken'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,POST'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "create_tenant_id_options_response" {
+  depends_on = [aws_api_gateway_method.create_tenant_id_options]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.create_tenant_id_resource.id
+  http_method = aws_api_gateway_method.create_tenant_id_options.http_method
+
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  }
+}
+
+resource "aws_api_gateway_method" "increase_skill_options" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.increase_skill_resource.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "increase_skill_options_response" {
+  depends_on  = [aws_api_gateway_method.increase_skill_options]
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.increase_skill_resource.id
+  http_method = aws_api_gateway_method.increase_skill_options.http_method
+
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  }
+}
+
+resource "aws_api_gateway_integration" "increase_skill_options_integration" {
+  depends_on  = [aws_api_gateway_method.increase_skill_options]
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.increase_skill_resource.id
+  http_method = aws_api_gateway_method.increase_skill_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
+}
+
+resource "aws_api_gateway_integration_response" "increase_skill_options_integragion_response" {
+  depends_on = [aws_api_gateway_integration.increase_skill_integration]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.increase_skill_resource.id
+  http_method = aws_api_gateway_method.increase_skill_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,PATCH'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+}
+
+resource "aws_api_gateway_method" "get_skill_increase_cost_options" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.get_skill_increase_cost_resource.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "get_skill_increase_cost_options_integration" {
+  depends_on  = [aws_api_gateway_method.get_skill_increase_cost_options]
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.get_skill_increase_cost_resource.id
+  http_method = aws_api_gateway_method.get_skill_increase_cost_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
+}
+
+resource "aws_api_gateway_integration_response" "get_skill_increase_cost_options_integration_response" {
+  depends_on = [aws_api_gateway_integration.get_skill_increase_cost_options_integration]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.get_skill_increase_cost_resource.id
+  http_method = aws_api_gateway_method.get_skill_increase_cost_options.http_method
+
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "get_skill_increase_cost_options_response" {
+
+  depends_on = [aws_api_gateway_method.get_skill_increase_cost_options]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.get_skill_increase_cost_resource.id
+  http_method = aws_api_gateway_method.get_skill_increase_cost_options.http_method
+
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  }
+}
+
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
     aws_api_gateway_integration.increase_skill_integration,
@@ -99,4 +263,3 @@ output "api_gateway_url" {
   value     = "https://${aws_api_gateway_rest_api.pnp_rest_api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_stage.prod.stage_name}"
   sensitive = true
 }
-
