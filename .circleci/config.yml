@@ -170,8 +170,11 @@ jobs:
             PREVIOUS_COMMIT=$(git rev-parse HEAD^)
             echo "Saving previous commit hash:"
             echo "$PREVIOUS_COMMIT" | tee cachekey
+            echo "Saving current commit hash:"
+            echo "$CIRCLE_SHA1" | tee current_commit
       - restore_cache:
           keys:
+            - frontend-cache-{{ .Branch }}-{{ checksum "./current_commit" }}
             - frontend-cache-{{ .Branch }}-{{ checksum "./cachekey" }}
             - frontend-cache-main-{{ checksum "./cachekey" }}
       - run:

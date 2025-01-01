@@ -17,9 +17,6 @@ file_env_variables=$1
 # Note: This excludes certain files of the frontend folder.
 # Note: If the s3 bucket is empty, an upload will take place even if the frontend did not change
 
-# TODO script sometimes produces empty checksum files 
-
-
 find . -type f \( \
     -path './src/*' \
     -or -path './public/*' \
@@ -29,14 +26,24 @@ find . -type f \( \
     -or -name 'public' \
     -or -name 'lib' \
     -or -name 'components' \) \
-    -wholename $file_env_variables \
     ! -name 'checksum.txt' \
     ! -name 'build_on_change.sh' \
-    -exec md5sum {} \; > current_checksum.txt
+    -exec md5sum {} \; | tee current_checksum.txt
+
+if [ -f "$file_env_variables" ]; then
+    md5sum $file_env_variables| tee current_checksum.txt
+else
+    echo "Error: No terraform output file specified, exiting..."
+    exit 2
+fi
 
 if [ ! -f "$CACHED_CHECKSUM" ]; then
     echo "No Checksum file found, regenerating build!"
 else
+
+    echo "Current checksum: $(md5sum current_checksum.txt)"
+    echo "Old checksum: $(md5sum $CACHED_CHECKSUM)"
+
     diff $CACHED_CHECKSUM current_checksum.txt > /dev/null
     if [ $? -eq 0 ]; then
         echo "No changes detected in frontend folder, checking bucket content!"
@@ -53,7 +60,7 @@ else
         # Bucket should be empty if recreated, in this case we want to build and deploy
         if [ -n "$BUCKET_EMPTY" ]; then
             echo "Bucket populated, skipping build!"
-            exit 0
+            exit 0 
         fi
 
         echo "Bucket is empty! Regenerating build files"
