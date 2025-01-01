@@ -40,7 +40,10 @@ fi
 if [ ! -f "$CACHED_CHECKSUM" ]; then
     echo "No Checksum file found, regenerating build!"
 else
-    echo "Current checksum: $(cat current_checksum.txt) old checksum: $CACHED_CHECKSUM"
+
+    echo "Current checksum: $(md5sum current_checksum.txt)"
+    echo "Old checksum: $(md5sum $CACHED_CHECKSUM)"
+
     diff $CACHED_CHECKSUM current_checksum.txt > /dev/null
     if [ $? -eq 0 ]; then
         echo "No changes detected in frontend folder, checking bucket content!"
