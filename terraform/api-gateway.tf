@@ -4,7 +4,7 @@ resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   endpoint_configuration {
     // Distribute the regional API only via our own CloudFront distribution.
     // See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-endpoint-types.html#api-gateway-api-endpoint-types-regional
-    types = ["REGION"]
+    types = ["REGIONAL"]
   }
 }
 
