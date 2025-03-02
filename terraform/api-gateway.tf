@@ -1,6 +1,9 @@
 resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   name        = "pnp-app-api"
   description = "REST API for the PnP character application"
+  endpoint_configuration {
+    types = ["REGION"] // Distribute the regional API only via our own CloudFront distribution
+  }
 }
 
 resource "aws_api_gateway_resource" "increase_skill_resource" {
