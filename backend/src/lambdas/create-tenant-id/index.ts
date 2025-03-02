@@ -25,7 +25,7 @@ async function refreshTokens(refreshToken: string, clientId: string) {
       return api_error("Could not refresh token");
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return api_error("Could not refresh tokens!");
   }
 }
@@ -60,7 +60,7 @@ export const handler = async (event: APIGatewayProxyEvent) => {
 
     sub = decoded.sub;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return api_error("Invalid token!");
   }
 
@@ -80,7 +80,7 @@ export const handler = async (event: APIGatewayProxyEvent) => {
     if (error instanceof Error) {
       return api_error("Processing request failed!");
     } else {
-      return api_error("Unknown error occured!");
+      return api_error("Unknown error occurred!");
     }
   }
 
@@ -100,7 +100,7 @@ export const handler = async (event: APIGatewayProxyEvent) => {
     });
   } catch (error) {
     if (error instanceof Error) {
-      console.log(error);
+      console.error(error);
       return api_error("Failed to refresh tokens!");
     }
   }
