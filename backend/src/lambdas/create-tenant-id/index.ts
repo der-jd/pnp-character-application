@@ -80,7 +80,7 @@ export const handler = async (event: APIGatewayProxyEvent) => {
     if (error instanceof Error) {
       return api_error("Processing request failed!");
     } else {
-      return api_error("Unknown error occured!");
+      return api_error("Unknown error occurred!");
     }
   }
 
