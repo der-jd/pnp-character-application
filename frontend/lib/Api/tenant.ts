@@ -12,7 +12,7 @@ export const createTenantId = async (idToken: string | undefined, refreshToken: 
     RefreshToken: refreshToken,
   };
 
-  console.log(headers);
+  console.log(headers); // TODO remove after test?! Is it secure to log the headers that include the tokens?
 
   try {
     const response = await fetch(url, {
@@ -26,7 +26,7 @@ export const createTenantId = async (idToken: string | undefined, refreshToken: 
     }
 
     const data = await response.json();
-    console.log("Response from API:", data);
+    console.log("Response from API:", data); // TODO remove after test?! Is it secure to log the response that includes the tenant ID?
 
     return data;
   } catch (error) {
