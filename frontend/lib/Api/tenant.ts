@@ -1,18 +1,18 @@
-export const createTenantId = async (token: string | undefined, refresh_token: string | undefined) => {
+export const createTenantId = async (idToken: string | undefined, refreshToken: string | undefined) => {
   const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/tenant-id";
   console.log(url);
 
-  if (!token || !refresh_token) {
+  if (!idToken || !refreshToken) {
     throw new Error("Token or refresh token is undefined!");
   }
 
   const headers = {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-    RefreshToken: refresh_token,
+    Authorization: `Bearer ${idToken}`,
+    RefreshToken: refreshToken,
   };
 
-  console.log(headers);
+  console.log(headers); // TODO remove after test?! Is it secure to log the headers that include the tokens?
 
   try {
     const response = await fetch(url, {
@@ -26,7 +26,7 @@ export const createTenantId = async (token: string | undefined, refresh_token: s
     }
 
     const data = await response.json();
-    console.log("Response from API:", data);
+    console.log("Response from API:", data); // TODO remove after test?! Is it secure to log the response that includes the tenant ID?
 
     return data;
   } catch (error) {
