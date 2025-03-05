@@ -147,7 +147,7 @@ export interface CharacterSheet {
       tracking: Skill;
       knottingSkills: Skill;
       trapping: Skill;
-      fishingAnd: Skill;
+      fishing: Skill;
       orientation: Skill;
       wildernessLife: Skill;
     };
