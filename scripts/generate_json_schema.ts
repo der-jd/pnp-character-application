@@ -1,27 +1,46 @@
 import * as fs from "fs";
-import { parseString, parseStringPromise } from "xml2js"; // xml2js for parsing XML
+import { parseStringPromise } from "xml2js"; // xml2js for parsing XML
+import { v4 as uuidv4 } from "uuid";
+import unidecode from "unidecode"; // unidecode for converting Unicode to ASCII
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+import { marshall } from "@aws-sdk/util-dynamodb";
 
 //import { CostCategory } from "../backend/src/config/cost.js";
 import { Character } from "../backend/src/config/character.js";
-import { Attribute } from "../backend/src/config/character.js";
-import { sample_char } from "./sample_char.js";
-import yargs, { parsed } from "yargs";
-import { hideBin } from "yargs/helpers";
-import { v4 as uuidv4 } from "uuid";
-import unidecode from "unidecode"; // unidecode for converting Unicode to ASCII
 
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb"; // SDK V3, but worked the same in V2
+const argv = yargs(hideBin(process.argv))
+  .usage("Usage: $0 --input <file> --output <file>")
+  .option("input", {
+    alias: "i",
+    type: "string",
+    demandOption: true,
+    describe: "Path to input XML file (v6.1)",
+  })
+  .option("output", {
+    alias: "o",
+    type: "string",
+    demandOption: true,
+    describe: "Path to output JSON file",
+  })
+  .help()
+  .parseSync();
 
-//const { exec } = require("child_process");
+async function parseXmlFile(filePath: string): Promise<any> {
+  if (!fs.existsSync(filePath)) {
+    throw new Error("Error: File does not exist - " + filePath);
+  }
 
-const pathToTsFile = "../backend/src/config/character.ts";
-const pathToTsconfigFile = "../backend/tsconfig.json";
-const interfaceName = "Character";
-const outputSchema = "character_schema.json";
-
-//console.log(sample_char);
-
-//console.log(jsonString)
+  const data = fs.readFileSync(filePath, "utf8");
+  const result = await parseStringPromise(data); // parse XML
+  if (!result) {
+    throw new Error("Error: Parsed data is undefined or ");
+  }
+  if (!result.character_sheet) {
+    throw new Error("Error: Missing root element.");
+  }
+  return result.character_sheet;
+}
 
 // Custom function to replace German umlauts and ß with proper ASCII equivalents
 function convertToAscii(input: string): string {
@@ -52,51 +71,12 @@ function convertToAscii(input: string): string {
   return converted;
 }
 
-// Define the interface that matches the XML fields
-interface MyData {
-  name: string;
-  age: number;
-  city: string;
-  description: string;
-}
-
-// Function to read XML file, map it to the interface, and handle Unicode
-async function readAndMapXmlToInterface(filePath: string): Promise<Character> {
-  console.log("Current working directory:", process.cwd());
-  console.log("Reading file:", filePath);
-  if (!fs.existsSync(filePath)) {
-    throw new Error("Error: File does not exist - " + filePath);
-  }
-
-  const data = fs.readFileSync(filePath, "utf8"); // ✅ Use synchronous file reading
-  let parsedData: any;
-
-  const result = await parseStringPromise(data);
-  console.log("XML data:");
-  console.log(result);
-  if (!result || !result.character_sheet) {
-    throw new Error("Error: Parsed data is undefined or missing root element.");
-  }
-  parsedData = result.character_sheet; // Adjust based on XML structure
-  //console.log("Parsed data:");
-  //console.log(parsedData);
-
-  if (!parsedData) {
-    throw new Error("Error: Parsed data is undefined.");
-  }
-
-  //return {
-  //  characterId: uuidv4(),
-  //  characterSheet: {
-  //    name: convertToAscii(parsedData.name?.[0] || ""),
-  //    age: parseInt(parsedData.age?.[0], 10) || 0,
-  //    city: convertToAscii(parsedData.city?.[0] || ""),
-  //    description: convertToAscii(parsedData.description?.[0] || ""),
-  //  },
-  //};
-  console.log("parsedData.attributes.Mutu0020u0028MUu0029");
+function mapXmlToCharacterInterface(parsedData: any): Character {
+  // TODO delete after test
+  console.log("parsedData.attributes[0]");
   console.log(parsedData.attributes[0]);
   console.log("====");
+
   return {
     characterId: uuidv4(),
     characterSheet: {
@@ -130,7 +110,9 @@ async function readAndMapXmlToInterface(filePath: string): Promise<Character> {
         },
         attributePoints: {
           start: 40,
-          available: (40 + parsedData.calculation_points[0].attribute_points[0].additional?.[0] || 0) - parsedData.calculation_points[0].attribute_points[0].spent?.[0] || 0,
+          available:
+            (40 + parsedData.calculation_points[0].attribute_points[0].additional?.[0] || 0) -
+              parsedData.calculation_points[0].attribute_points[0].spent?.[0] || 0,
           total: 40 + parsedData.calculation_points[0].attribute_points[0].additional?.[0] || 0,
         },
       },
@@ -266,68 +248,41 @@ async function readAndMapXmlToInterface(filePath: string): Promise<Character> {
           totalCost: parsedData.attributes[0].Kraftu0020u0028KRu0029.totalCost?.[0] || 0,
         },
       },
-      skills: { // TODO
-        combat: {
-        },
-        body: {
-        },
-        social: {
-        },
-        nature: {
-        },
-        knowledge: {
-        },
-        handcraft: {
-        },
+      skills: {
+        // TODO
+        combat: {},
+        body: {},
+        social: {},
+        nature: {},
+        knowledge: {},
+        handcraft: {},
       },
-      combatSkills: { // TODO
-        melee: {
-
-        },
-        ranged: {
-        },
-      }
+      combatSkills: {
+        // TODO
+        melee: {},
+        ranged: {},
+      },
     },
   };
 }
 
-const argv = yargs(hideBin(process.argv))
-  .usage("Usage: $0 --input <file> --output <file>")
-  .option("input", {
-    alias: "i",
-    type: "string",
-    demandOption: true,
-    describe: "Path to input XML file (v6.1)",
-  })
-  .option("output", {
-    alias: "o",
-    type: "string",
-    demandOption: true,
-    describe: "Path to output JSON file",
-  })
-  .help()
-  .parseSync();
-
 // Main function to execute the logic
 (async () => {
   try {
-    const character: Character = await readAndMapXmlToInterface(argv.input);
+    const parsedData = await parseXmlFile(argv.input);
+    const character: Character = mapXmlToCharacterInterface(parsedData);
 
-    // Convert the character data to a formatted JSON string
-    let jsonString = JSON.stringify(character, null, 2);
-
-    // Write the JSON string to a file
-    fs.writeFileSync(`${argv.output}.json`, jsonString); // Synchronous file write
+    const characterJson = JSON.stringify(character, null, 2);
+    fs.writeFileSync(`${argv.output}.json`, characterJson);
     console.log("JSON string saved to:", argv.output + ".json");
 
     // Marshal the character data to DynamoDB format and save
-    const marshalled = marshall(character);
-    const jsonString2 = JSON.stringify(marshalled, null, 2);
-    fs.writeFileSync(`${argv.output}_dynamodb.json`, jsonString2);
+    const marshalledCharacter = marshall(character);
+    const characterJsonDynamoDb = JSON.stringify(marshalledCharacter, null, 2);
+    fs.writeFileSync(`${argv.output}_dynamodb.json`, characterJsonDynamoDb);
     console.log("DynamoDB JSON saved to:", argv.output + "_dynamodb.json");
 
     console.warn("Warning: Check the generated JSON file for correctness!");
-
     console.warn("Warning: The following fields need to be filled out manually:");
     console.warn("- characterSheet.calculationPoints.adventurePoints.available (number)");
     console.warn("- characterSheet.specialAbilities (string[])");
