@@ -6,8 +6,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   return getCharacter(event);
 };
 
-// TODO update API to include user id --> .../{userId}/character/{characterId}
-// TODO also add API to get all characters for a user .../{userId}/characters
+// TODO also add API to get all characters for a user .../characters
 async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
     const characterId = verifyParameters(event);
