@@ -231,9 +231,10 @@ resource "aws_api_gateway_method_response" "tenant_id_options_response" {
 
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
+    aws_api_gateway_integration.character_id_get_integration,
+    aws_api_gateway_integration.skill_name_get_integration,
     aws_api_gateway_integration.skill_name_patch_integration,
     aws_api_gateway_integration.tenant_id_post_integration,
-    aws_api_gateway_integration.skill_name_get_integration
   ]
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
