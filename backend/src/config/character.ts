@@ -1,6 +1,7 @@
 import { CostCategory } from "./cost.js";
 
 export interface Character {
+  userId: string;
   characterId: string;
   characterSheet: CharacterSheet;
 }

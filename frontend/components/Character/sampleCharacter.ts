@@ -1,6 +1,7 @@
 import { Character, CostCategory } from "./character";
 
 export const sample_char: Character = {
+  userId: "94043f19-d196-4f46-928b-f5be255c934d",
   characterId: "123e4567-e89b-12d3-a456-426614174000",
   characterSheet: {
     generalInformation: {
