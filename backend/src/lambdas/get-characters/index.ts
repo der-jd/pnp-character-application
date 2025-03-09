@@ -1,16 +1,17 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  return getCharacter(event);
+  return getCharacters(event);
 };
 
-async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const characterId = verifyParameters(event);
+    const userId = verifyRequest(event);
 
-    console.log(`Get character ${characterId} from DynamoDB`);
+    console.log(`Get characters for user ${userId} from DynamoDB`);
 
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
     const client = new DynamoDBClient({});
@@ -18,7 +19,7 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     const command = new GetCommand({
       TableName: process.env.TABLE_NAME,
       Key: {
-        characterId: characterId,
+        userId: userId,
       },
       ConsistentRead: true,
     });
@@ -40,7 +41,7 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     const response = {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Successfully got character",
+        message: "Successfully got characters",
         character: dynamoDbResponse.Item,
       }),
     };
@@ -62,31 +63,34 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
   }
 }
 
-function verifyParameters(event: APIGatewayProxyEvent): string {
-  console.log("Verify request parameters");
+function verifyRequest(event: APIGatewayProxyEvent): string {
+  console.log("Verify request");
 
-  if (typeof event.pathParameters?.characterId !== "string") {
-    console.error("Invalid input values!");
+  const authHeader = event.headers.Authorization || event.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Invalid input values!",
-      }),
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: No token provided!" }),
     };
   }
 
-  const characterId = event.pathParameters?.characterId;
-
-  const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
-  if (!uuidRegex.test(characterId)) {
-    console.error("Character id is not a valid UUID format!");
+  const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
+  // Decode the token without verification (the access to the API itself is already protected by the authorizer)
+  const decoded = jwt.decode(token) as JwtPayload | null;
+  if (!decoded) {
     throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Character id is not a valid UUID format!",
-      }),
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: Invalid token!" }),
     };
   }
 
-  return characterId;
+  const userId = decoded.sub; // Cognito User ID
+  if (!userId) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: User ID not found in token!" }),
+    };
+  }
+
+  return userId;
 }
