@@ -74,6 +74,8 @@ resource "aws_api_gateway_integration" "character_id_options_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "character_id_options_integration_response" {
+  depends_on = [aws_api_gateway_integration.character_id_options_integration]
+
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.character_id.id
   http_method = aws_api_gateway_method.character_id_options.http_method
@@ -202,6 +204,8 @@ resource "aws_api_gateway_integration" "skill_name_options_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "skill_name_options_integration_response" {
+  depends_on = [aws_api_gateway_integration.skill_name_options_integration]
+
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.skill_name.id
   http_method = aws_api_gateway_method.skill_name_options.http_method
@@ -281,6 +285,8 @@ resource "aws_api_gateway_integration" "tenant_id_options_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "tenant_id_options_integration_response" {
+  depends_on = [aws_api_gateway_integration.tenant_id_options_integration]
+
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.tenant_id.id
   http_method = aws_api_gateway_method.tenant_id_options.http_method
