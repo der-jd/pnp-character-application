@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getCharacter(event);
@@ -72,7 +73,33 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
 function verifyRequest(event: APIGatewayProxyEvent): Parameters {
   console.log("Verify request");
 
-  if (typeof event.pathParameters?.userId !== "string" || typeof event.pathParameters?.characterId !== "string") {
+  const authHeader = event.headers.Authorization || event.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: No token provided!" }),
+    };
+  }
+
+  const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
+  // Decode the token without verification (the access to the API itself is already protected by the authorizer)
+  const decoded = jwt.decode(token) as JwtPayload | null;
+  if (!decoded) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: Invalid token!" }),
+    };
+  }
+
+  const userId = decoded.sub; // Cognito User ID
+  if (!userId) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: User ID not found in token!" }),
+    };
+  }
+
+  if (typeof event.pathParameters?.characterId !== "string") {
     console.error("Invalid input values!");
     throw {
       statusCode: 400,
@@ -82,7 +109,6 @@ function verifyRequest(event: APIGatewayProxyEvent): Parameters {
     };
   }
 
-  const userId = event.pathParameters?.userId;
   const characterId = event.pathParameters?.characterId;
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
