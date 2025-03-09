@@ -45,6 +45,59 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
   }
 }
 
+resource "aws_api_gateway_method" "character_id_options" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = "OPTIONS"
+  // Authorization needs to be NONE for the preflight request to work which is sent automatically by the browser without any authorization header.
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.header.Origin" : false
+  }
+}
+
+resource "aws_api_gateway_integration" "character_id_options_integration" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = aws_api_gateway_method.character_id_options.http_method
+  type        = "MOCK"
+  // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
+  // For a method with the mock integration to return a 200 response, configure the
+  // integration request body mapping template to return the following:
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
+}
+
+resource "aws_api_gateway_integration_response" "character_id_options_integration_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = aws_api_gateway_method.character_id_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "character_id_options_method_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = aws_api_gateway_method.character_id_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  }
+}
+
 resource "aws_api_gateway_resource" "skills" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.character_id.id
@@ -120,37 +173,25 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
   }
 }
 
-// TODO remove after testing (not needed anymore)
 resource "aws_api_gateway_method" "skill_name_options" {
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.skill_name.id
-  http_method   = "OPTIONS"
-  authorization = "NONE"
-}
-
-// TODO remove after testing (not needed anymore)
-resource "aws_api_gateway_method_response" "skill_name_options_response" {
-  depends_on  = [aws_api_gateway_method.skill_name_options]
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.skill_name.id
-  http_method = aws_api_gateway_method.skill_name_options.http_method
-
-  status_code = 200
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "true"
-    "method.response.header.Access-Control-Allow-Methods" = "true"
-    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  http_method = "OPTIONS"
+  // Authorization needs to be NONE for the preflight request to work which is sent automatically by the browser without any authorization header.
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.header.Origin" : false
   }
 }
 
-// TODO remove after testing (not needed anymore)
 resource "aws_api_gateway_integration" "skill_name_options_integration" {
-  depends_on  = [aws_api_gateway_method.skill_name_options]
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.skill_name.id
   http_method = aws_api_gateway_method.skill_name_options.http_method
   type        = "MOCK"
-
+  // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
+  // For a method with the mock integration to return a 200 response, configure the
+  // integration request body mapping template to return the following:
   request_templates = {
     "application/json" = jsonencode(
       {
@@ -160,18 +201,28 @@ resource "aws_api_gateway_integration" "skill_name_options_integration" {
   }
 }
 
-// TODO remove after testing (not needed anymore)
 resource "aws_api_gateway_integration_response" "skill_name_options_integration_response" {
-  depends_on = [aws_api_gateway_integration.skill_name_options_integration]
-
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.skill_name.id
   http_method = aws_api_gateway_method.skill_name_options.http_method
   status_code = 200
   response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
     "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "skill_name_options_method_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.skill_name.id
+  http_method = aws_api_gateway_method.skill_name_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
   }
 }
 
@@ -202,21 +253,21 @@ resource "aws_api_gateway_integration" "tenant_id_post_integration" {
 }
 
 resource "aws_api_gateway_method" "tenant_id_options" {
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.tenant_id.id
-  http_method   = "OPTIONS"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.tenant_id.id
+  http_method = "OPTIONS"
+  // Authorization needs to be NONE for the preflight request to work which is sent automatically by the browser without any authorization header.
   authorization = "NONE"
+  request_parameters = {
+    "method.request.header.Origin" : false
+  }
 }
 
 resource "aws_api_gateway_integration" "tenant_id_options_integration" {
-
-  depends_on = [aws_api_gateway_method.tenant_id_options]
-
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.tenant_id.id
   http_method = aws_api_gateway_method.tenant_id_options.http_method
   type        = "MOCK"
-
   // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
   // For a method with the mock integration to return a 200 response, configure the
   // integration request body mapping template to return the following:
@@ -230,28 +281,22 @@ resource "aws_api_gateway_integration" "tenant_id_options_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "tenant_id_options_integration_response" {
-
-  depends_on = [aws_api_gateway_integration.tenant_id_options_integration]
-
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.tenant_id.id
   http_method = aws_api_gateway_method.tenant_id_options.http_method
   status_code = 200
-
   response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,RefreshToken'"
     "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,POST'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
-resource "aws_api_gateway_method_response" "tenant_id_options_response" {
-  depends_on = [aws_api_gateway_method.tenant_id_options]
-
+resource "aws_api_gateway_method_response" "tenant_id_options_method_response" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.tenant_id.id
   http_method = aws_api_gateway_method.tenant_id_options.http_method
-
   status_code = 200
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "true"
