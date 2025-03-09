@@ -6,12 +6,17 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   return getCharacter(event);
 };
 
+interface Parameters {
+  userId: string;
+  characterId: string;
+}
+
 // TODO also add API to get all characters for a user .../characters
 async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const characterId = verifyParameters(event);
+    const params = verifyRequest(event);
 
-    console.log(`Get character ${characterId} from DynamoDB`);
+    console.log(`Get character ${params.characterId} of user ${params.userId} from DynamoDB`);
 
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
     const client = new DynamoDBClient({});
@@ -19,7 +24,8 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     const command = new GetCommand({
       TableName: process.env.TABLE_NAME,
       Key: {
-        characterId: characterId,
+        userId: params.userId,
+        characterId: params.characterId,
       },
       ConsistentRead: true,
     });
@@ -63,10 +69,10 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
   }
 }
 
-function verifyParameters(event: APIGatewayProxyEvent): string {
-  console.log("Verify request parameters");
+function verifyRequest(event: APIGatewayProxyEvent): Parameters {
+  console.log("Verify request");
 
-  if (typeof event.pathParameters?.characterId !== "string") {
+  if (typeof event.pathParameters?.userId !== "string" || typeof event.pathParameters?.characterId !== "string") {
     console.error("Invalid input values!");
     throw {
       statusCode: 400,
@@ -76,9 +82,19 @@ function verifyParameters(event: APIGatewayProxyEvent): string {
     };
   }
 
+  const userId = event.pathParameters?.userId;
   const characterId = event.pathParameters?.characterId;
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
+  if (!uuidRegex.test(userId)) {
+    console.error("User id is not a valid UUID format!");
+    throw {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "User id is not a valid UUID format!",
+      }),
+    };
+  }
   if (!uuidRegex.test(characterId)) {
     console.error("Character id is not a valid UUID format!");
     throw {
@@ -89,5 +105,8 @@ function verifyParameters(event: APIGatewayProxyEvent): string {
     };
   }
 
-  return characterId;
+  return {
+    userId: userId,
+    characterId: characterId,
+  };
 }
