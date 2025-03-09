@@ -12,7 +12,6 @@ interface Parameters {
   characterId: string;
 }
 
-// TODO also add API to get all characters for a user .../characters
 async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
     const params = verifyRequest(event);

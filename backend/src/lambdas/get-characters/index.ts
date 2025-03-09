@@ -66,7 +66,9 @@ async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 function verifyRequest(event: APIGatewayProxyEvent): string {
   console.log("Verify request");
 
-  const authHeader = event.headers.Authorization || event.headers.authorization;
+  // TODO move handling of authorization token to Lambda layer
+  // Trim the authorization header as it could contain spaces at the beginning
+  const authHeader = event.headers.Authorization?.trim() || event.headers.authorization?.trim();
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw {
       statusCode: 401,
