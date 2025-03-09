@@ -21,6 +21,23 @@ resource "aws_api_gateway_resource" "characters" {
   path_part   = "characters" // .../characters
 }
 
+resource "aws_api_gateway_method" "characters_get" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.characters.id
+  http_method   = "GET"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+}
+
+resource "aws_api_gateway_integration" "characters_get_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id             = aws_api_gateway_resource.characters.id
+  http_method             = aws_api_gateway_method.characters_get.http_method
+  integration_http_method = "GET"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.get_characters_lambda.invoke_arn
+}
+
 resource "aws_api_gateway_resource" "character_id" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.characters.id
