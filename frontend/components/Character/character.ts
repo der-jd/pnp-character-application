@@ -14,6 +14,7 @@ export enum CostCategory {
 }
 
 export interface Character {
+  userId: string;
   characterId: string;
   characterSheet: CharacterSheet;
 }

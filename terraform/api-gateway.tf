@@ -28,15 +28,76 @@ resource "aws_api_gateway_method" "character_id_get" {
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  request_parameters = {
+    "method.request.path.character-id" = true
+  }
 }
 
 resource "aws_api_gateway_integration" "character_id_get_integration" {
   rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id             = aws_api_gateway_resource.character_id.id
   http_method             = aws_api_gateway_method.character_id_get.http_method
-  integration_http_method = "GET"
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.get_character_lambda.invoke_arn
+  request_parameters = {
+    "integration.request.path.character-id" = "method.request.path.character-id"
+  }
+}
+
+resource "aws_api_gateway_method" "character_id_options" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = "OPTIONS"
+  // Authorization needs to be NONE for the preflight request to work which is sent automatically by the browser without any authorization header.
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.header.Origin" : false
+  }
+}
+
+resource "aws_api_gateway_integration" "character_id_options_integration" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = aws_api_gateway_method.character_id_options.http_method
+  type        = "MOCK"
+  // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
+  // For a method with the mock integration to return a 200 response, configure the
+  // integration request body mapping template to return the following:
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
+}
+
+resource "aws_api_gateway_integration_response" "character_id_options_integration_response" {
+  depends_on = [aws_api_gateway_integration.character_id_options_integration]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = aws_api_gateway_method.character_id_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "character_id_options_method_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = aws_api_gateway_method.character_id_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  }
 }
 
 resource "aws_api_gateway_resource" "skills" {
@@ -63,8 +124,12 @@ resource "aws_api_gateway_method" "skill_name_get" {
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  // .../characters/{character-id}/skills/{skill-category}/{skill-name}?{learning-method}"
   request_parameters = {
-    "method.request.querystring.learning_method" = true // .../characters/{character-id}/skills/{skill-category}/{skill-name}?{learning-method}"
+    "method.request.path.character-id"           = true
+    "method.request.path.skill-category"         = true
+    "method.request.path.skill-name"             = true
+    "method.request.querystring.learning-method" = true
   }
 }
 
@@ -72,9 +137,15 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
   rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id             = aws_api_gateway_resource.skill_name.id
   http_method             = aws_api_gateway_method.skill_name_get.http_method
-  integration_http_method = "GET"
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.get_skill_increase_cost_lambda.invoke_arn
+  request_parameters = {
+    "integration.request.path.character-id"           = "method.request.path.character-id"
+    "integration.request.path.skill-category"         = "method.request.path.skill-category"
+    "integration.request.path.skill-name"             = "method.request.path.skill-name"
+    "integration.request.querystring.learning-method" = "method.request.querystring.learning-method"
+  }
 }
 
 resource "aws_api_gateway_method" "skill_name_patch" {
@@ -83,48 +154,46 @@ resource "aws_api_gateway_method" "skill_name_patch" {
   http_method   = "PATCH"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  request_parameters = {
+    "method.request.path.character-id"   = true
+    "method.request.path.skill-category" = true
+    "method.request.path.skill-name"     = true
+  }
 }
 
 resource "aws_api_gateway_integration" "skill_name_patch_integration" {
   rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id             = aws_api_gateway_resource.skill_name.id
   http_method             = aws_api_gateway_method.skill_name_patch.http_method
-  integration_http_method = "PATCH"
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.increase_skill_lambda.invoke_arn
-}
-
-// TODO remove after testing (not needed anymore)
-resource "aws_api_gateway_method" "skill_name_options" {
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.skill_name.id
-  http_method   = "OPTIONS"
-  authorization = "NONE"
-}
-
-// TODO remove after testing (not needed anymore)
-resource "aws_api_gateway_method_response" "skill_name_options_response" {
-  depends_on  = [aws_api_gateway_method.skill_name_options]
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.skill_name.id
-  http_method = aws_api_gateway_method.skill_name_options.http_method
-
-  status_code = 200
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "true"
-    "method.response.header.Access-Control-Allow-Methods" = "true"
-    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  request_parameters = {
+    "integration.request.path.character-id"   = "method.request.path.character-id"
+    "integration.request.path.skill-category" = "method.request.path.skill-category"
+    "integration.request.path.skill-name"     = "method.request.path.skill-name"
   }
 }
 
-// TODO remove after testing (not needed anymore)
+resource "aws_api_gateway_method" "skill_name_options" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.skill_name.id
+  http_method = "OPTIONS"
+  // Authorization needs to be NONE for the preflight request to work which is sent automatically by the browser without any authorization header.
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.header.Origin" : false
+  }
+}
+
 resource "aws_api_gateway_integration" "skill_name_options_integration" {
-  depends_on  = [aws_api_gateway_method.skill_name_options]
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.skill_name.id
   http_method = aws_api_gateway_method.skill_name_options.http_method
   type        = "MOCK"
-
+  // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
+  // For a method with the mock integration to return a 200 response, configure the
+  // integration request body mapping template to return the following:
   request_templates = {
     "application/json" = jsonencode(
       {
@@ -134,7 +203,6 @@ resource "aws_api_gateway_integration" "skill_name_options_integration" {
   }
 }
 
-// TODO remove after testing (not needed anymore)
 resource "aws_api_gateway_integration_response" "skill_name_options_integration_response" {
   depends_on = [aws_api_gateway_integration.skill_name_options_integration]
 
@@ -143,9 +211,22 @@ resource "aws_api_gateway_integration_response" "skill_name_options_integration_
   http_method = aws_api_gateway_method.skill_name_options.http_method
   status_code = 200
   response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
     "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "skill_name_options_method_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.skill_name.id
+  http_method = aws_api_gateway_method.skill_name_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
   }
 }
 
@@ -176,21 +257,21 @@ resource "aws_api_gateway_integration" "tenant_id_post_integration" {
 }
 
 resource "aws_api_gateway_method" "tenant_id_options" {
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.tenant_id.id
-  http_method   = "OPTIONS"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.tenant_id.id
+  http_method = "OPTIONS"
+  // Authorization needs to be NONE for the preflight request to work which is sent automatically by the browser without any authorization header.
   authorization = "NONE"
+  request_parameters = {
+    "method.request.header.Origin" : false
+  }
 }
 
 resource "aws_api_gateway_integration" "tenant_id_options_integration" {
-
-  depends_on = [aws_api_gateway_method.tenant_id_options]
-
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.tenant_id.id
   http_method = aws_api_gateway_method.tenant_id_options.http_method
   type        = "MOCK"
-
   // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
   // For a method with the mock integration to return a 200 response, configure the
   // integration request body mapping template to return the following:
@@ -204,28 +285,24 @@ resource "aws_api_gateway_integration" "tenant_id_options_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "tenant_id_options_integration_response" {
-
   depends_on = [aws_api_gateway_integration.tenant_id_options_integration]
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.tenant_id.id
   http_method = aws_api_gateway_method.tenant_id_options.http_method
   status_code = 200
-
   response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,RefreshToken'"
     "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,POST'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
-resource "aws_api_gateway_method_response" "tenant_id_options_response" {
-  depends_on = [aws_api_gateway_method.tenant_id_options]
-
+resource "aws_api_gateway_method_response" "tenant_id_options_method_response" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.tenant_id.id
   http_method = aws_api_gateway_method.tenant_id_options.http_method
-
   status_code = 200
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "true"

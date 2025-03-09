@@ -158,9 +158,9 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
   // The conditional parse is necessary for Lambda tests via the AWS console
   const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
   if (
-    typeof event.pathParameters?.characterId !== "string" ||
-    typeof event.pathParameters?.skillCategory !== "string" ||
-    typeof event.pathParameters?.skillName !== "string" ||
+    typeof event.pathParameters?.["character-id"] !== "string" ||
+    typeof event.pathParameters?.["skill-category"] !== "string" ||
+    typeof event.pathParameters?.["skill-name"] !== "string" ||
     typeof body?.initialValue !== "number" ||
     typeof body?.increasedPoints !== "number" ||
     typeof body?.learningMethod !== "string"
@@ -175,9 +175,9 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
   }
 
   const params: Parameters = {
-    characterId: event.pathParameters.characterId,
-    skillCategory: event.pathParameters.skillCategory,
-    skillName: event.pathParameters.skillName,
+    characterId: event.pathParameters["character-id"],
+    skillCategory: event.pathParameters["skill-category"],
+    skillName: event.pathParameters["skill-name"],
     initialSkillValue: body.initialValue,
     increasedPoints: body.increasedPoints,
     learningMethod: body.learningMethod,

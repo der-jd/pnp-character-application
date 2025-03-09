@@ -60,6 +60,7 @@ function mapXmlToCharacterInterface(parsedData: any): Character {
   console.log("====");
 
   return {
+    userId: "",
     characterId: uuidv4(),
     characterSheet: {
       generalInformation: {
@@ -283,6 +284,7 @@ const argv = yargs(hideBin(process.argv))
 
     console.warn("Warning: Check the generated JSON file for correctness!");
     console.warn("Warning: The following fields need to be filled out manually:");
+    console.warn("- userId (uuid4; take from Cognito user pool to link character to an user)");
     console.warn("- characterSheet.calculationPoints.adventurePoints.available (number)");
     console.warn("- characterSheet.specialAbilities (string[])");
     console.warn("- characterSheet.attributes.XXX.totalCost (number)");

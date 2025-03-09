@@ -5,16 +5,16 @@ locals {
 resource "aws_dynamodb_table" "characters" {
   name         = local.characters_table_name
   billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "cognitoUserId"
+  hash_key     = "userId"
   range_key    = "characterId"
 
   attribute {
-    name = "cognitoUserId"
+    name = "userId"
     type = "S"
   }
 
   attribute {
-    name = "cognitoGroupId"
+    name = "groupId"
     type = "S"
   }
 
@@ -25,7 +25,7 @@ resource "aws_dynamodb_table" "characters" {
 
   global_secondary_index {
     name            = "indexForCognitoGroup"
-    hash_key        = "cognitoGroupId"
+    hash_key        = "groupId"
     range_key       = "characterId"
     projection_type = "ALL"
   }

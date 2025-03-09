@@ -13,6 +13,7 @@ import { APIGatewayProxyResult } from "aws-lambda";
  **/
 
 // TODO: Allow-Headers and Allow-Methods must be adjusted to match exactly what the application uses
+// TODO this can be deleted when CORS is enabled on API Gateway level?
 export function add_cors_headers(reply: APIGatewayProxyResult): APIGatewayProxyResult {
   const cors_headers = {
     "Access-Control-Allow-Headers":

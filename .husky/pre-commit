@@ -1,5 +1,5 @@
 npm run format
-make format-terraform
+make check-format-terraform
 make lint-terraform
 
 cd backend

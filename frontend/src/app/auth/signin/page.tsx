@@ -14,7 +14,7 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const { setIsAuthenticated, isAuthenticated, setAccessToken } = useAuth();
+  const { setIsAuthenticated, isAuthenticated, setAccessToken, setIdToken } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -39,6 +39,9 @@ export default function SignIn() {
 
       if (response.AuthenticationResult?.AccessToken) {
         setAccessToken(response.AuthenticationResult.AccessToken);
+        setIdToken(response.AuthenticationResult.IdToken ?? null);
+        console.log("ID TOKEN:");
+        //console.log(response.AuthenticationResult.IdToken); // TODO remove after test and only activate locally
         setIsAuthenticated(true);
         createTenantId(response.AuthenticationResult.IdToken, response.AuthenticationResult.RefreshToken);
         router.push("/protected/dashboard");
