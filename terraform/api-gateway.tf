@@ -71,10 +71,10 @@ resource "aws_api_gateway_method" "skill_name_get" {
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   // .../characters/{character-id}/skills/{skill-category}/{skill-name}?{learning-method}"
   request_parameters = {
-    "method.request.path.character-id" = true
-    "method.request.path.skill-category" = true
-    "method.request.path.skill-name" = true
-    "method.request.querystring.learning-method" = true 
+    "method.request.path.character-id"           = true
+    "method.request.path.skill-category"         = true
+    "method.request.path.skill-name"             = true
+    "method.request.querystring.learning-method" = true
   }
 }
 
@@ -86,9 +86,9 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.get_skill_increase_cost_lambda.invoke_arn
   request_parameters = {
-    "integration.request.path.character-id" = "method.request.path.character-id"
-    "integration.request.path.skill-category" = "method.request.path.skill-category"
-    "integration.request.path.skill-name" = "method.request.path.skill-name"
+    "integration.request.path.character-id"           = "method.request.path.character-id"
+    "integration.request.path.skill-category"         = "method.request.path.skill-category"
+    "integration.request.path.skill-name"             = "method.request.path.skill-name"
     "integration.request.querystring.learning-method" = "method.request.querystring.learning-method"
   }
 }
@@ -100,9 +100,9 @@ resource "aws_api_gateway_method" "skill_name_patch" {
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   request_parameters = {
-    "method.request.path.character-id" = true
+    "method.request.path.character-id"   = true
     "method.request.path.skill-category" = true
-    "method.request.path.skill-name" = true
+    "method.request.path.skill-name"     = true
   }
 }
 
@@ -114,9 +114,9 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.increase_skill_lambda.invoke_arn
   request_parameters = {
-    "integration.request.path.character-id" = "method.request.path.character-id"
+    "integration.request.path.character-id"   = "method.request.path.character-id"
     "integration.request.path.skill-category" = "method.request.path.skill-category"
-    "integration.request.path.skill-name" = "method.request.path.skill-name"
+    "integration.request.path.skill-name"     = "method.request.path.skill-name"
   }
 }
 
