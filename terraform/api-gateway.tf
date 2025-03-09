@@ -82,7 +82,7 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
   rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id             = aws_api_gateway_resource.skill_name.id
   http_method             = aws_api_gateway_method.skill_name_get.http_method
-  integration_http_method = "GET"
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.get_skill_increase_cost_lambda.invoke_arn
   request_parameters = {
@@ -110,7 +110,7 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
   rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id             = aws_api_gateway_resource.skill_name.id
   http_method             = aws_api_gateway_method.skill_name_patch.http_method
-  integration_http_method = "PATCH"
+  integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.increase_skill_lambda.invoke_arn
   request_parameters = {
