@@ -6,25 +6,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { marshall } from "@aws-sdk/util-dynamodb";
 
-//import { CostCategory } from "../backend/src/config/cost.js";
 import { Character } from "../backend/src/config/character.js";
-
-const argv = yargs(hideBin(process.argv))
-  .usage("Usage: $0 --input <file> --output <file>")
-  .option("input", {
-    alias: "i",
-    type: "string",
-    demandOption: true,
-    describe: "Path to input XML file (v6.1)",
-  })
-  .option("output", {
-    alias: "o",
-    type: "string",
-    demandOption: true,
-    describe: "Path to output JSON file",
-  })
-  .help()
-  .parseSync();
 
 async function parseXmlFile(filePath: string): Promise<any> {
   if (!fs.existsSync(filePath)) {
@@ -265,6 +247,23 @@ function mapXmlToCharacterInterface(parsedData: any): Character {
     },
   };
 }
+
+const argv = yargs(hideBin(process.argv))
+  .usage("Usage: $0 --input <file> --output <file_without_extension>")
+  .option("input", {
+    alias: "i",
+    type: "string",
+    demandOption: true,
+    describe: "Path to input XML file (v6.1)",
+  })
+  .option("output", {
+    alias: "o",
+    type: "string",
+    demandOption: true,
+    describe: "Path for output JSON files without extension",
+  })
+  .help()
+  .parseSync();
 
 // Main function to execute the logic
 (async () => {
