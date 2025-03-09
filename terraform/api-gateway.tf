@@ -94,6 +94,7 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
   uri                     = aws_lambda_function.increase_skill_lambda.invoke_arn
 }
 
+// TODO remove after testing (not needed anymore)
 resource "aws_api_gateway_method" "skill_name_options" {
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.skill_name.id
@@ -101,6 +102,7 @@ resource "aws_api_gateway_method" "skill_name_options" {
   authorization = "NONE"
 }
 
+// TODO remove after testing (not needed anymore)
 resource "aws_api_gateway_method_response" "skill_name_options_response" {
   depends_on  = [aws_api_gateway_method.skill_name_options]
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
@@ -115,6 +117,7 @@ resource "aws_api_gateway_method_response" "skill_name_options_response" {
   }
 }
 
+// TODO remove after testing (not needed anymore)
 resource "aws_api_gateway_integration" "skill_name_options_integration" {
   depends_on  = [aws_api_gateway_method.skill_name_options]
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
@@ -131,6 +134,7 @@ resource "aws_api_gateway_integration" "skill_name_options_integration" {
   }
 }
 
+// TODO remove after testing (not needed anymore)
 resource "aws_api_gateway_integration_response" "skill_name_options_integration_response" {
   depends_on = [aws_api_gateway_integration.skill_name_options_integration]
 
@@ -145,6 +149,7 @@ resource "aws_api_gateway_integration_response" "skill_name_options_integration_
   }
 }
 
+// TODO remove whole section after testing (not needed anymore)
 // ================== tenant-id ==================
 
 resource "aws_api_gateway_resource" "tenant_id" {
