@@ -73,7 +73,7 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
 function verifyRequest(event: APIGatewayProxyEvent): Parameters {
   console.log("Verify request");
 
-  const authHeader = event.headers.Authorization || event.headers.authorization;
+  const authHeader = event.headers.Authorization?.trim() || event.headers.authorization?.trim();
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw {
       statusCode: 401,
