@@ -112,15 +112,6 @@ function verifyRequest(event: APIGatewayProxyEvent): Parameters {
   const characterId = event.pathParameters?.characterId;
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
-  if (!uuidRegex.test(userId)) {
-    console.error("User id is not a valid UUID format!");
-    throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "User id is not a valid UUID format!",
-      }),
-    };
-  }
   if (!uuidRegex.test(characterId)) {
     console.error("Character id is not a valid UUID format!");
     throw {
