@@ -41,7 +41,7 @@ export default function SignIn() {
         setAccessToken(response.AuthenticationResult.AccessToken);
         setIdToken(response.AuthenticationResult.IdToken ?? null);
         console.log("ID TOKEN:");
-        console.log(response.AuthenticationResult.IdToken);
+        //console.log(response.AuthenticationResult.IdToken); // TODO remove after test and only activate locally
         setIsAuthenticated(true);
         createTenantId(response.AuthenticationResult.IdToken, response.AuthenticationResult.RefreshToken);
         router.push("/protected/dashboard");
