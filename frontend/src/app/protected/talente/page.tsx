@@ -5,6 +5,8 @@ import { sample_char } from "@/components/Character/sampleCharacter";
 import SkillCategory from "@/components/Skill/SkillCategory";
 import { extract_properties_data } from "@/components/Skill/SkillDefinitions";
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { getCharacter } from "@/lib/Api/character";
 
 export default function SkillsPage() {
   const [isEditMode, setEditMode] = useState(false);
@@ -13,6 +15,8 @@ export default function SkillsPage() {
   const discard_values = () => {
     setEditMode(false);
   };
+
+  const { idToken } = useAuth();
 
   return (
     <div className="container mx-auto py-5">
@@ -23,6 +27,13 @@ export default function SkillsPage() {
           onClick={toggle_edit_mode}
         >
           {isEditMode ? "Save" : "Edit"}
+        </Button>
+        <Button
+          variant="outline"
+          className="bg-black font-bold text-white hover:bg-gray-300 rounded-lg"
+          onClick={() => getCharacter(idToken, "123e4567-e89b-12d3-a456-426614174000")}
+        >
+          Get Character
         </Button>
         {isEditMode ? (
           <Button

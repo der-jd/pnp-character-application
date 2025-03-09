@@ -36,6 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.error("Error verifying token:", error);
           setIsAuthenticated(false);
           setAccessToken(null);
+          setIdToken(null);
         }
       } else {
         setIsAuthenticated(false);
