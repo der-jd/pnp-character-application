@@ -69,10 +69,10 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
   console.log("Verify request parameters");
 
   if (
-    typeof event.pathParameters?.characterId !== "string" ||
-    typeof event.pathParameters?.skillCategory !== "string" ||
-    typeof event.pathParameters?.skillName !== "string" ||
-    typeof event.queryStringParameters?.learningMethod !== "string"
+    typeof event.pathParameters?.["character-id"] !== "string" ||
+    typeof event.pathParameters?.["skill-category"] !== "string" ||
+    typeof event.pathParameters?.["skill-name"] !== "string" ||
+    typeof event.queryStringParameters?.["learning-method"] !== "string"
   ) {
     console.error("Invalid input values!");
     throw {
@@ -84,10 +84,10 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
   }
 
   const params: Parameters = {
-    characterId: event.pathParameters.characterId,
-    skillCategory: event.pathParameters.skillCategory,
-    skillName: event.pathParameters.skillName,
-    learningMethod: event.queryStringParameters.learningMethod,
+    characterId: event.pathParameters["character-id"],
+    skillCategory: event.pathParameters["skill-category"],
+    skillName: event.pathParameters["skill-name"],
+    learningMethod: event.queryStringParameters["learning-method"],
   };
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");

@@ -73,6 +73,7 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
 function verifyRequest(event: APIGatewayProxyEvent): Parameters {
   console.log("Verify request");
 
+  // Trim the authorization header as it could contain spaces at the beginning
   const authHeader = event.headers.Authorization?.trim() || event.headers.authorization?.trim();
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw {
@@ -99,7 +100,7 @@ function verifyRequest(event: APIGatewayProxyEvent): Parameters {
     };
   }
 
-  if (typeof event.pathParameters?.characterId !== "string") {
+  if (typeof event.pathParameters?.["character-id"] !== "string") {
     console.error("Invalid input values!");
     throw {
       statusCode: 400,
@@ -109,7 +110,7 @@ function verifyRequest(event: APIGatewayProxyEvent): Parameters {
     };
   }
 
-  const characterId = event.pathParameters?.characterId;
+  const characterId = event.pathParameters?.["character-id"];
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
   if (!uuidRegex.test(characterId)) {
