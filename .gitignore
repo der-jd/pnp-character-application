@@ -3,6 +3,8 @@
 terraform.tfstate
 terraform.tfstate.*
 
+.venv/
+
 node_modules/
 build/
 dist/

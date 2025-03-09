@@ -6,6 +6,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   return getCharacter(event);
 };
 
+// TODO also add API to get all characters for a user .../characters
 async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
     const characterId = verifyParameters(event);
