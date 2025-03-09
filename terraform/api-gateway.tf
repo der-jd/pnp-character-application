@@ -28,6 +28,9 @@ resource "aws_api_gateway_method" "character_id_get" {
   http_method   = "GET"
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  request_parameters = {
+    "method.request.path.character-id" = true
+  }
 }
 
 resource "aws_api_gateway_integration" "character_id_get_integration" {
