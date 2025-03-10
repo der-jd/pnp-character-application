@@ -90,6 +90,11 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
     $inputRoot.body
     EOT
   }
+
+  depends_on = [
+    // integration response creation will fail if there is no corresponding method response
+    aws_api_gateway_method_response.character_id_get_method_response
+  ]
 }
 
 resource "aws_api_gateway_method" "character_id_options" {
