@@ -1,6 +1,6 @@
 variable "status_codes" {
   type    = list(string)
-  default = ["200", "400", "401", "403", "404", "500"]
+  default = ["400", "401", "403", "404", "500", "200"]
 }
 
 resource "aws_api_gateway_rest_api" "pnp_rest_api" {
@@ -116,7 +116,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
     aws_api_gateway_integration.character_id_get_integration
   ]
 
-  selection_pattern = each.value == "200" ? "" : each.value # Use specific patterns for non-200 status codes
+  selection_pattern = each.value == "200" ? ".*" : ".*Error ${each.value}.*"
 }
 
 resource "aws_api_gateway_method" "character_id_options" {
@@ -296,7 +296,7 @@ resource "aws_api_gateway_integration_response" "skill_name_get_integration_resp
     aws_api_gateway_integration.skill_name_get_integration
   ]
 
-  selection_pattern = each.value == "200" ? "" : each.value # Use specific patterns for non-200 status codes
+  selection_pattern = each.value == "200" ? ".*" : ".*Error ${each.value}.*"
 }
 
 resource "aws_api_gateway_method" "skill_name_patch" {
@@ -393,7 +393,7 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
     aws_api_gateway_integration.skill_name_patch_integration
   ]
 
-  selection_pattern = each.value == "200" ? "" : each.value # Use specific patterns for non-200 status codes
+  selection_pattern = each.value == "200" ? ".*" : ".*Error ${each.value}.*"
 }
 
 resource "aws_api_gateway_method" "skill_name_options" {
