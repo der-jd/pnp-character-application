@@ -35,6 +35,7 @@ resource "aws_api_gateway_method" "character_id_get" {
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   request_parameters = {
     "method.request.path.character-id" = true
+    "method.request.headers.*"         = true
     "method.request.header.*"          = true
   }
 }
