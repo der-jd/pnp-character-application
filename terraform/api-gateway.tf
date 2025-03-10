@@ -73,7 +73,7 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
     {
       "body": "$input.body",
       "headers": "$input.headers",
-      "query": "$input.params().querystring"
+      "path": "$input.params().path"
     }
     EOF
   }
@@ -237,7 +237,8 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
     {
       "body": "$input.body",
       "headers": "$input.headers",
-      "query": "$input.params().querystring"
+      "query": "$input.params().querystring",
+      "path": "$input.params().path"
     }
     EOF
   }
@@ -324,7 +325,7 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
     {
       "body": "$input.body",
       "headers": "$input.headers",
-      "query": "$input.params().querystring"
+      "path": "$input.params().path"
     }
     EOF
   }
