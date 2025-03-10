@@ -1,3 +1,8 @@
+variable "status_codes" {
+  type = list(string)
+  default = ["200", "400", "401", "500"]
+}
+
 resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   name        = "pnp-app-api"
   description = "REST API for the PnP character application"
@@ -42,6 +47,29 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
   uri                     = aws_lambda_function.get_character_lambda.invoke_arn
   request_parameters = {
     "integration.request.path.character-id" = "method.request.path.character-id"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "character_id_get_integration_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = aws_api_gateway_method.character_id_get.http_method
+  status_code = each.value
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+
+  response_templates = {
+    "application/json" = <<EOT
+    #set($inputRoot = $input.path('$'))
+    $inputRoot.body
+    EOT
   }
 }
 
