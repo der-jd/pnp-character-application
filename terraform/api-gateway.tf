@@ -43,7 +43,7 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
   resource_id             = aws_api_gateway_resource.character_id.id
   http_method             = aws_api_gateway_method.character_id_get.http_method
   integration_http_method = "POST"
-  type                    = "AWS_PROXY"
+  type                    = "AWS"
   uri                     = aws_lambda_function.get_character_lambda.invoke_arn
   request_parameters = {
     "integration.request.path.character-id" = "method.request.path.character-id"
@@ -371,6 +371,8 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     aws_api_gateway_integration.skill_name_get_integration,
     aws_api_gateway_integration.skill_name_patch_integration,
     aws_api_gateway_integration.tenant_id_post_integration,
+    aws_api_gateway_method_response.character_id_get_method_response,
+    aws_api_gateway_integration_response.character_id_get_integration_response,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
