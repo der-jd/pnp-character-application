@@ -245,10 +245,25 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
   request_templates = {
     "application/json" = <<EOF
     {
-      "body": "$input.body",
-      "headers": "$input.headers",
-      "query": "$input.params().querystring",
-      "path": "$input.params().path"
+      "body": $input.json('$'),
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      },
+      "headers": {
+        #foreach($param in $input.params().header.keySet())
+        "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      },
+      "queryString": {
+        #foreach($param in $input.params().querystring.keySet())
+        "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }
     }
     EOF
   }
@@ -333,9 +348,19 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
   request_templates = {
     "application/json" = <<EOF
     {
-      "body": "$input.body",
-      "headers": "$input.headers",
-      "path": "$input.params().path"
+      "body": $input.json('$'),
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      },
+      "headers": {
+        #foreach($param in $input.params().header.keySet())
+        "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }
     }
     EOF
   }
