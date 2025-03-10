@@ -113,7 +113,8 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
 
   depends_on = [
     // integration response creation will fail if there is no corresponding method response
-    aws_api_gateway_integration.character_id_get_integration
+    aws_api_gateway_integration.character_id_get_integration,
+    each.value == "200" ? aws_api_gateway_integration_response.response : ""
   ]
 
   selection_pattern = each.value == "200" ? ".*" : ".*Error ${each.value}.*"
