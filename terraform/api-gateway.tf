@@ -66,8 +66,8 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
   type                    = "AWS"
   uri                     = aws_lambda_function.get_character_lambda.invoke_arn
   request_parameters = {
-    "integration.request.path.character-id"     = "method.request.path.character-id"
-    "integration.request.headers.Authorization" = "method.request.header.Authorization"
+    "integration.request.path.character-id"    = "method.request.path.character-id"
+    "integration.request.header.Authorization" = "method.request.header.Authorization"
   }
 
   request_templates = {
@@ -75,7 +75,7 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
     {
       "body": "$input.body",
       "headers": "$input.headers",
-      "path": "$input.params().path"
+      "pathParameters": "$input.params().path"
     }
     EOF
   }
