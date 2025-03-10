@@ -13,7 +13,7 @@ resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   }
 }
 
-// ================== characters & skills ==================
+// ================== characters get  ==================
 
 resource "aws_api_gateway_resource" "characters" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
@@ -67,8 +67,6 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
   request_parameters = {
     "integration.request.path.character-id" = "method.request.path.character-id"
   }
-
-  depends_on = [aws_api_gateway_method.character_id_get]
 }
 
 resource "aws_api_gateway_integration_response" "character_id_get_integration_response" {
@@ -156,6 +154,8 @@ resource "aws_api_gateway_method_response" "character_id_options_method_response
   }
 }
 
+// ================== skills  ==================
+
 resource "aws_api_gateway_resource" "skills" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.character_id.id
@@ -189,12 +189,31 @@ resource "aws_api_gateway_method" "skill_name_get" {
   }
 }
 
+resource "aws_api_gateway_method_response" "skill_name_get_method_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.skill_name.id
+  http_method = aws_api_gateway_method.skill_name_get.http_method
+  status_code = each.value
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
 resource "aws_api_gateway_integration" "skill_name_get_integration" {
   rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id             = aws_api_gateway_resource.skill_name.id
   http_method             = aws_api_gateway_method.skill_name_get.http_method
   integration_http_method = "POST"
-  type                    = "AWS_PROXY"
+  type                    = "AWS"
   uri                     = aws_lambda_function.get_skill_increase_cost_lambda.invoke_arn
   request_parameters = {
     "integration.request.path.character-id"           = "method.request.path.character-id"
@@ -202,6 +221,36 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
     "integration.request.path.skill-name"             = "method.request.path.skill-name"
     "integration.request.querystring.learning-method" = "method.request.querystring.learning-method"
   }
+}
+
+resource "aws_api_gateway_integration_response" "skill_name_get_integration_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.skill_name.id
+  http_method = aws_api_gateway_method.skill_name_get.http_method
+  status_code = each.value
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+
+  response_templates = {
+    "application/json" = <<EOT
+    #set($inputRoot = $input.path('$'))
+    $inputRoot.body
+    EOT
+  }
+
+  depends_on = [
+    // integration response creation will fail if there is no corresponding method response
+    aws_api_gateway_integration.skill_name_get_integration
+  ]
+
+  selection_pattern = each.value == "200" ? "" : each.value # Use specific patterns for non-200 status codes
 }
 
 resource "aws_api_gateway_method" "skill_name_patch" {
@@ -217,18 +266,68 @@ resource "aws_api_gateway_method" "skill_name_patch" {
   }
 }
 
+resource "aws_api_gateway_method_response" "skill_name_patch_method_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.skill_name.id
+  http_method = aws_api_gateway_method.skill_name_patch.http_method
+  status_code = each.value
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
+
 resource "aws_api_gateway_integration" "skill_name_patch_integration" {
   rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id             = aws_api_gateway_resource.skill_name.id
   http_method             = aws_api_gateway_method.skill_name_patch.http_method
   integration_http_method = "POST"
-  type                    = "AWS_PROXY"
+  type                    = "AWS"
   uri                     = aws_lambda_function.increase_skill_lambda.invoke_arn
   request_parameters = {
     "integration.request.path.character-id"   = "method.request.path.character-id"
     "integration.request.path.skill-category" = "method.request.path.skill-category"
     "integration.request.path.skill-name"     = "method.request.path.skill-name"
   }
+}
+
+resource "aws_api_gateway_integration_response" "skill_name_patch_integration_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.skill_name.id
+  http_method = aws_api_gateway_method.skill_name_patch.http_method
+  status_code = each.value
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+
+  response_templates = {
+    "application/json" = <<EOT
+    #set($inputRoot = $input.path('$'))
+    $inputRoot.body
+    EOT
+  }
+
+  depends_on = [
+    // integration response creation will fail if there is no corresponding method response
+    aws_api_gateway_integration.skill_name_patch_integration
+  ]
+
+  selection_pattern = each.value == "200" ? "" : each.value # Use specific patterns for non-200 status codes
 }
 
 resource "aws_api_gateway_method" "skill_name_options" {
@@ -370,12 +469,18 @@ resource "aws_api_gateway_method_response" "tenant_id_options_method_response" {
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
     aws_api_gateway_method.character_id_get,
-    aws_api_gateway_integration.character_id_get_integration,
-    aws_api_gateway_integration.skill_name_get_integration,
-    aws_api_gateway_integration.skill_name_patch_integration,
-    aws_api_gateway_integration.tenant_id_post_integration,
     aws_api_gateway_method_response.character_id_get_method_response,
+    aws_api_gateway_integration.character_id_get_integration,
     aws_api_gateway_integration_response.character_id_get_integration_response,
+    aws_api_gateway_method.skill_name_get,
+    aws_api_gateway_method_response.skill_name_get_method_response,
+    aws_api_gateway_integration.skill_name_get_integration,
+    aws_api_gateway_integration_response.skill_name_get_integration_response,
+    aws_api_gateway_method.skill_name_patch,
+    aws_api_gateway_method_response.skill_name_patch_method_response,
+    aws_api_gateway_integration.skill_name_patch_integration,
+    aws_api_gateway_integration_response.skill_name_patch_integration_response,
+    aws_api_gateway_integration.tenant_id_post_integration,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
