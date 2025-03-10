@@ -48,6 +48,8 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
   request_parameters = {
     "integration.request.path.character-id" = "method.request.path.character-id"
   }
+
+  depends_on = [aws_api_gateway_method.character_id_get]
 }
 
 resource "aws_api_gateway_method_response" "character_id_get_method_response" {
