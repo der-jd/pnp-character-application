@@ -72,7 +72,12 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
     "application/json" = <<EOF
     {
       "body": $input.json('$'),
-      "pathParameters": "$input.params().path",
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      },
       "headers": {
         #foreach($param in $input.params().header.keySet())
         "$param": "$util.escapeJavaScript($input.params().header.get($param))"
