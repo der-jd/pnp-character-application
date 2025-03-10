@@ -68,7 +68,7 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
     "integration.request.path.character-id" = "method.request.path.character-id"
   }
 
-  passthrough_behavior = WHEN_NO_TEMPLATES
+  passthrough_behavior = "WHEN_NO_TEMPLATES"
 }
 
 resource "aws_api_gateway_integration_response" "character_id_get_integration_response" {
@@ -224,7 +224,7 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
     "integration.request.querystring.learning-method" = "method.request.querystring.learning-method"
   }
 
-  passthrough_behavior = WHEN_NO_TEMPLATES
+  passthrough_behavior = "WHEN_NO_TEMPLATES"
 
 }
 
@@ -304,7 +304,7 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
     "integration.request.path.skill-name"     = "method.request.path.skill-name"
   }
 
-  passthrough_behavior = WHEN_NO_TEMPLATES
+  passthrough_behavior = "WHEN_NO_TEMPLATES"
 
 }
 
