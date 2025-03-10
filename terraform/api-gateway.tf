@@ -35,6 +35,7 @@ resource "aws_api_gateway_method" "character_id_get" {
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   request_parameters = {
     "method.request.path.character-id" = true
+    "method.request.header.*"          = true
   }
 }
 
@@ -196,6 +197,7 @@ resource "aws_api_gateway_method" "skill_name_get" {
     "method.request.path.skill-category"         = true
     "method.request.path.skill-name"             = true
     "method.request.querystring.learning-method" = true
+    "method.request.header.*"                    = true
   }
 }
 
@@ -284,6 +286,7 @@ resource "aws_api_gateway_method" "skill_name_patch" {
     "method.request.path.character-id"   = true
     "method.request.path.skill-category" = true
     "method.request.path.skill-name"     = true
+    "method.request.header.*"            = true
   }
 }
 
