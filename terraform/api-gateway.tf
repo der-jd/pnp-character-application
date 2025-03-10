@@ -35,7 +35,6 @@ resource "aws_api_gateway_method" "character_id_get" {
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   request_parameters = {
     "method.request.path.character-id" = true
-    "method.request.headers.*"         = true
     "method.request.header.*"          = true
   }
 }
@@ -68,6 +67,7 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
   uri                     = aws_lambda_function.get_character_lambda.invoke_arn
   request_parameters = {
     "integration.request.path.character-id" = "method.request.path.character-id"
+    "integration.request.header.*"          = "method.request.header.*"
   }
 
   request_templates = {
@@ -75,7 +75,7 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
     {
       "body": "$input.body",
       "headers": "$input.headers",
-      "path": "$input.params().path"
+      "pathParameters": "$input.params().path"
     }
     EOF
   }
