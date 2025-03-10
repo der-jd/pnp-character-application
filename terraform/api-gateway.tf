@@ -50,6 +50,25 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
   }
 }
 
+resource "aws_api_gateway_method_response" "character_id_get_method_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = aws_api_gateway_method.character_id_get.http_method
+  status_code = each.value
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
 resource "aws_api_gateway_integration_response" "character_id_get_integration_response" {
   for_each = toset(var.status_codes)
 
