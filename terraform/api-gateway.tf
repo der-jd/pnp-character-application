@@ -66,15 +66,19 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
   uri                     = aws_lambda_function.get_character_lambda.invoke_arn
   request_parameters = {
     "integration.request.path.character-id"    = "method.request.path.character-id"
-    "integration.request.header.authorization" = "method.request.header.authorization"
   }
 
   request_templates = {
     "application/json" = <<EOF
     {
-      "body": "$input.body",
-      "headers": "$input.headers",
-      "pathParameters": "$input.params().path"
+      "body": $input.json('$'),
+      "pathParameters": "$input.params().path",
+      "headers": {
+        #foreach($param in $input.params().header.keySet())
+        "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }
     }
     EOF
   }
