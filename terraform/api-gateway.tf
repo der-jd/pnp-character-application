@@ -34,8 +34,8 @@ resource "aws_api_gateway_method" "character_id_get" {
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   request_parameters = {
-    "method.request.path.character-id" = true
-    "method.request.header.*"          = true
+    "method.request.path.character-id"    = true
+    "method.request.header.Authorization" = true
   }
 }
 
@@ -66,8 +66,8 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
   type                    = "AWS"
   uri                     = aws_lambda_function.get_character_lambda.invoke_arn
   request_parameters = {
-    "integration.request.path.character-id" = "method.request.path.character-id"
-    "integration.request.header.*"          = "method.request.header.*"
+    "integration.request.path.character-id"     = "method.request.path.character-id"
+    "integration.request.headers.Authorization" = "method.request.header.Authorization"
   }
 
   request_templates = {
@@ -75,7 +75,7 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
     {
       "body": "$input.body",
       "headers": "$input.headers",
-      "pathParameters": "$input.params().path"
+      "path": "$input.params().path"
     }
     EOF
   }
@@ -198,7 +198,6 @@ resource "aws_api_gateway_method" "skill_name_get" {
     "method.request.path.skill-category"         = true
     "method.request.path.skill-name"             = true
     "method.request.querystring.learning-method" = true
-    "method.request.header.*"                    = true
   }
 }
 
@@ -287,7 +286,6 @@ resource "aws_api_gateway_method" "skill_name_patch" {
     "method.request.path.character-id"   = true
     "method.request.path.skill-category" = true
     "method.request.path.skill-name"     = true
-    "method.request.header.*"            = true
   }
 }
 
