@@ -1,5 +1,5 @@
 variable "status_codes" {
-  type = list(string)
+  type    = list(string)
   default = ["200", "400", "401", "500"]
 }
 
