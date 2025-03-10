@@ -68,15 +68,7 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
     "integration.request.path.character-id" = "method.request.path.character-id"
   }
 
-  request_templates = {
-    "application/json" = <<REQUEST_TEMPLATE
-    {
-      "body": "$input.body",
-      "headers": "$input.headers",
-      "pathParameters": "$input.params().path"
-    }
-    REQUEST_TEMPLATE
-  }
+  passthrough_behavior = WHEN_NO_TEMPLATES
 }
 
 resource "aws_api_gateway_integration_response" "character_id_get_integration_response" {
@@ -232,16 +224,8 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
     "integration.request.querystring.learning-method" = "method.request.querystring.learning-method"
   }
 
-  request_templates = {
-    "application/json" = <<EOF
-    {
-      "body": "$input.body",
-      "headers": "$input.headers",
-      "query": "$input.params().querystring",
-      "path": "$input.params().path"
-    }
-    EOF
-  }
+  passthrough_behavior = WHEN_NO_TEMPLATES
+
 }
 
 resource "aws_api_gateway_integration_response" "skill_name_get_integration_response" {
@@ -320,15 +304,8 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
     "integration.request.path.skill-name"     = "method.request.path.skill-name"
   }
 
-  request_templates = {
-    "application/json" = <<EOF
-    {
-      "body": "$input.body",
-      "headers": "$input.headers",
-      "path": "$input.params().path"
-    }
-    EOF
-  }
+  passthrough_behavior = WHEN_NO_TEMPLATES
+
 }
 
 resource "aws_api_gateway_integration_response" "skill_name_patch_integration_response" {
