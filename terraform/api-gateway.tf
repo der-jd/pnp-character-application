@@ -95,6 +95,8 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
     // integration response creation will fail if there is no corresponding method response
     aws_api_gateway_method_response.character_id_get_method_response
   ]
+
+  selection_pattern = each.value == "200" ? "" : each.value # Use specific patterns for non-200 status codes
 }
 
 resource "aws_api_gateway_method" "character_id_options" {
