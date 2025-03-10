@@ -1,6 +1,6 @@
 variable "status_codes" {
   type    = list(string)
-  default = ["200", "400", "401", "500"]
+  default = ["200", "400", "401", "403", "404", "500"]
 }
 
 resource "aws_api_gateway_rest_api" "pnp_rest_api" {
