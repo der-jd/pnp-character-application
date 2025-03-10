@@ -38,20 +38,6 @@ resource "aws_api_gateway_method" "character_id_get" {
   }
 }
 
-resource "aws_api_gateway_integration" "character_id_get_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id             = aws_api_gateway_resource.character_id.id
-  http_method             = aws_api_gateway_method.character_id_get.http_method
-  integration_http_method = "POST"
-  type                    = "AWS"
-  uri                     = aws_lambda_function.get_character_lambda.invoke_arn
-  request_parameters = {
-    "integration.request.path.character-id" = "method.request.path.character-id"
-  }
-
-  depends_on = [aws_api_gateway_method.character_id_get]
-}
-
 resource "aws_api_gateway_method_response" "character_id_get_method_response" {
   for_each = toset(var.status_codes)
 
@@ -69,6 +55,20 @@ resource "aws_api_gateway_method_response" "character_id_get_method_response" {
     "method.response.header.Access-Control-Allow-Methods" = true
     "method.response.header.Access-Control-Allow-Headers" = true
   }
+}
+
+resource "aws_api_gateway_integration" "character_id_get_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id             = aws_api_gateway_resource.character_id.id
+  http_method             = aws_api_gateway_method.character_id_get.http_method
+  integration_http_method = "POST"
+  type                    = "AWS"
+  uri                     = aws_lambda_function.get_character_lambda.invoke_arn
+  request_parameters = {
+    "integration.request.path.character-id" = "method.request.path.character-id"
+  }
+
+  depends_on = [aws_api_gateway_method.character_id_get]
 }
 
 resource "aws_api_gateway_integration_response" "character_id_get_integration_response" {
@@ -95,7 +95,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
 
   depends_on = [
     // integration response creation will fail if there is no corresponding method response
-    aws_api_gateway_method_response.character_id_get_method_response
+    aws_api_gateway_integration.character_id_get_integration
   ]
 
   selection_pattern = each.value == "200" ? "" : each.value # Use specific patterns for non-200 status codes
