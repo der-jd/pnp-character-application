@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -16,33 +16,37 @@ async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
     const client = new DynamoDBClient({});
     const docClient = DynamoDBDocumentClient.from(client);
-    const command = new GetCommand({
+    const command = new QueryCommand({
       TableName: process.env.TABLE_NAME,
-      Key: {
-        userId: userId,
+      KeyConditionExpression: "userId = :userId",
+      ExpressionAttributeValues: {
+        ":userId": userId,
       },
       ConsistentRead: true,
     });
 
     const dynamoDbResponse = await docClient.send(command);
 
-    if (!dynamoDbResponse.Item) {
-      console.error("Item from DynamoDB table is missing in the request response");
+    if (!dynamoDbResponse.Items || dynamoDbResponse.Items.length === 0) {
+      console.error("No characters found for the given userId");
       throw {
-        statusCode: 500,
+        statusCode: 404,
         body: JSON.stringify({
-          message: "Item from DynamoDB table is missing in the request response",
+          message: "No characters found for the given userId",
         }),
       };
     }
 
-    console.log("Successfully got DynamoDB item");
+    console.log("Successfully got DynamoDB items");
+
+    // TODO return only character ids with character names
+    console.log(dynamoDbResponse.Items);
 
     const response = {
       statusCode: 200,
       body: JSON.stringify({
         message: "Successfully got characters",
-        character: dynamoDbResponse.Item,
+        characters: dynamoDbResponse.Items,
       }),
     };
     console.log(response);
