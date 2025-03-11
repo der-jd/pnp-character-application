@@ -1,6 +1,6 @@
 variable "status_codes" {
   type    = list(string)
-  default = ["400", "401", "403", "404", "500"]
+  default = ["400", "401", "403", "404", "500", "200"]
 }
 
 resource "aws_api_gateway_rest_api" "pnp_rest_api" {
@@ -109,7 +109,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
     #set ($response = $util.parseJson($input.body))
     #set ($context.responseOverride.status = $response.statusCode)
     {
-      "statusCode": "$response.statusCode",
+      "statusCode": $response.statusCode,
       "body": $response.body
     }
     EOT
@@ -128,35 +128,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
    * See: https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/
    */
   # selection_pattern = each.value == "200" ? ".*Success.*" : ".*Error ${each.value}.*"
-  selection_pattern = ".*\"statusCode\"\\s*:\\s*${each.value}.*"
-}
-
-resource "aws_api_gateway_integration_response" "character_id_get_integration_response_default" {
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.character_id.id
-  http_method = aws_api_gateway_method.character_id_get.http_method
-  status_code = 200
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
-    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
-    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
-  }
-
-  response_templates = {
-    "application/json" = <<EOT
-    #set($inputRoot = $input.path('$'))
-    $inputRoot.body
-    EOT
-  }
-
-  depends_on = [
-    aws_api_gateway_integration.character_id_get_integration,
-    aws_api_gateway_integration_response.character_id_get_integration_response
-  ]
-
-  selection_pattern = ".*Success.*"
+  selection_pattern = ".*${each.value}.*"
 }
 
 resource "aws_api_gateway_method" "character_id_options" {
