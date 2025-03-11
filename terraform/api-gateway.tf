@@ -106,10 +106,10 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
 
   response_templates = {
     "application/json" = <<EOT
-    #set ($message = $util.parseJson($input.path('$.message')))
+    #set ($response = $util.parseJson($input.body))
     {
-      "statusCode" : "$message.statusCode",
-      "body" : "$errorMessageObj.body",
+      "statusCode": "$response.statusCode",
+      "body": "$response.body"
     }
     EOT
   }
