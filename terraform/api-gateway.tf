@@ -95,7 +95,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.character_id.id
   http_method = aws_api_gateway_method.character_id_get.http_method
-  status_code = each.value
+  status_code = 200
 
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
