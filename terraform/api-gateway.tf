@@ -317,8 +317,24 @@ resource "aws_api_gateway_integration_response" "skill_name_get_integration_resp
 
   response_templates = {
     "application/json" = <<EOT
-    #set($inputRoot = $input.path('$'))
-    $inputRoot.body
+    #set($lambdaReply = $util.parseJson($input.path('$')))
+    #set($status = $lambdaReply.statusCode)
+    #if($status == 400)
+        #set($context.responseOverride.status = 400)
+    #end
+    #if($status == 401)
+        #set($context.responseOverride.status = 401)
+    #end
+    #if($status == 403)
+        #set($context.responseOverride.status = 403)
+    #end
+    #if($status == 404)
+        #set($context.responseOverride.status = 404)
+    #end
+    #if($status == 500)
+        #set($context.responseOverride.status = 500)
+    #end
+    $lambdaReply.body
     EOT
   }
 
@@ -414,8 +430,24 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
 
   response_templates = {
     "application/json" = <<EOT
-    #set($inputRoot = $input.path('$'))
-    $inputRoot.body
+    #set($lambdaReply = $util.parseJson($input.path('$')))
+    #set($status = $lambdaReply.statusCode)
+    #if($status == 400)
+        #set($context.responseOverride.status = 400)
+    #end
+    #if($status == 401)
+        #set($context.responseOverride.status = 401)
+    #end
+    #if($status == 403)
+        #set($context.responseOverride.status = 403)
+    #end
+    #if($status == 404)
+        #set($context.responseOverride.status = 404)
+    #end
+    #if($status == 500)
+        #set($context.responseOverride.status = 500)
+    #end
+    $lambdaReply.body
     EOT
   }
 
