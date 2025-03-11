@@ -301,12 +301,10 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "skill_name_get_integration_response" {
-  for_each = toset(var.status_codes)
-
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.skill_name.id
   http_method = aws_api_gateway_method.skill_name_get.http_method
-  status_code = each.value
+  status_code = 200
 
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
@@ -343,7 +341,7 @@ resource "aws_api_gateway_integration_response" "skill_name_get_integration_resp
     aws_api_gateway_integration.skill_name_get_integration
   ]
 
-  selection_pattern = each.value == "200" ? ".*" : ".*Error ${each.value}.*"
+  selection_pattern = ".*"
 }
 
 resource "aws_api_gateway_method" "skill_name_patch" {
@@ -414,12 +412,10 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "skill_name_patch_integration_response" {
-  for_each = toset(var.status_codes)
-
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.skill_name.id
   http_method = aws_api_gateway_method.skill_name_patch.http_method
-  status_code = each.value
+  status_code = 200
 
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
@@ -456,7 +452,7 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
     aws_api_gateway_integration.skill_name_patch_integration
   ]
 
-  selection_pattern = each.value == "200" ? ".*" : ".*Error ${each.value}.*"
+  selection_pattern = ".*"
 }
 
 resource "aws_api_gateway_method" "skill_name_options" {
