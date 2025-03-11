@@ -128,7 +128,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
    * See: https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/
    */
   # selection_pattern = each.value == "200" ? ".*Success.*" : ".*Error ${each.value}.*"
-  # selection_pattern = ".*${each.value}.*"
+  selection_pattern = ".*"
 }
 
 resource "aws_api_gateway_method" "character_id_options" {
