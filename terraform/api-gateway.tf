@@ -104,14 +104,34 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
     "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
   }
 
+  /**
+   * This overwrites the response integrations status code with the status code from the Lambda response.
+   * This is necessary because the Lambda function returns a status code in the body of the response, which
+   * is not the status code of the HTTP response. The status code of the HTTP response is always 200 if left unchanged
+   * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-override-request-response-parameters.html
+   * Note that using #set($context.responseOverride.status = $lambdaReply.statusCode) does not work because the
+   * response is already sent to the client before the response override is applied.
+   */
   response_templates = {
     "application/json" = <<EOT
-    #set ($response = $util.parseJson($input.body))
-    #set ($context.responseOverride.status = $response.statusCode)
-    {
-      "statusCode": $response.statusCode,
-      "body": $response.body
-    }
+    #set($lambdaReply = $util.parseJson($input.path('$')))
+    #set($status = $lambdaReply.statusCode)
+    #if($status == 400)
+        #set($context.responseOverride.status = 400)
+    #end
+    #if($status == 401)
+        #set($context.responseOverride.status = 401)
+    #end
+    #if($status == 403)
+        #set($context.responseOverride.status = 403)
+    #end
+    #if($status == 404)
+        #set($context.responseOverride.status = 404)
+    #end
+    #if($status == 500)
+        #set($context.responseOverride.status = 500)
+    #end
+    $lambdaReply.body
     EOT
   }
 
@@ -127,7 +147,6 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
    * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-method-settings-execution-console.html Section 8
    * See: https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/
    */
-  # selection_pattern = each.value == "200" ? ".*Success.*" : ".*Error ${each.value}.*"
   selection_pattern = ".*"
 }
 
