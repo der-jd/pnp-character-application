@@ -90,7 +90,7 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "character_id_get_integration_response" {
-  for_each = toset(var.status_codes)
+  //for_each = toset(var.status_codes)
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.character_id.id
@@ -128,7 +128,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
    * See: https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/
    */
   # selection_pattern = each.value == "200" ? ".*Success.*" : ".*Error ${each.value}.*"
-  selection_pattern = ".*${each.value}.*"
+  # selection_pattern = ".*${each.value}.*"
 }
 
 resource "aws_api_gateway_method" "character_id_options" {
