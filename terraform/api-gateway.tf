@@ -109,8 +109,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
    * This is necessary because the Lambda function returns a status code in the body of the response, which
    * is not the status code of the HTTP response. The status code of the HTTP response is always 200 if left unchanged
    * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-override-request-response-parameters.html
-   * Note that using #set($context.responseOverride.status = $lambdaReply.statusCode) does not work because the
-   * response is already sent to the client before the response override is applied.
+   * Note that using #set($context.responseOverride.status = $lambdaReply.statusCode) does not work
    */
   response_templates = {
     "application/json" = <<EOT
@@ -140,10 +139,8 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
   ]
 
   /**
-   * API Gateway uses Java pattern-style regexes for response mapping. For more information, see Pattern
-   * in the Oracle documentation. The error patterns are matched against the entire string of the errorMessage property in the Lambda response, which is populated by callback(errorMessage) in Node.js or by throw new MyException(errorMessage) in Java. Also, escaped characters are unescaped before the regular expression is applied.
-   * If you use '.+' as the selection pattern to filter responses, be aware that it may not match 
-   * a response containing a newline ('\n') character. 
+   * API Gateway uses Java pattern-style regexes for selecting the correct response integration. Since
+   * we want to select the integration for all status codes, we use the regex ".*" which matches everything. 
    * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-method-settings-execution-console.html Section 8
    * See: https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/
    */
