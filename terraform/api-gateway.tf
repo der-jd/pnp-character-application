@@ -107,9 +107,10 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
   response_templates = {
     "application/json" = <<EOT
     #set ($response = $util.parseJson($input.body))
+    #set ($context.responseOverride.status = $response.statusCode)
     {
       "statusCode": "$response.statusCode",
-      "body": "$response.body"
+      "body": $response.body
     }
     EOT
   }
@@ -127,7 +128,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
    * See: https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/
    */
   # selection_pattern = each.value == "200" ? ".*Success.*" : ".*Error ${each.value}.*"
-  selection_pattern = ".*\"statusCode\":\\s*${each.value}.*"
+  selection_pattern = ".*\"statusCode\"\\s*:\\s*${each.value}.*"
 }
 
 resource "aws_api_gateway_integration_response" "character_id_get_integration_response_default" {
