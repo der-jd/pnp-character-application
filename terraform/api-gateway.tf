@@ -1,3 +1,8 @@
+variable "status_codes" {
+  type    = list(string)
+  default = ["400", "401", "403", "404", "500", "200"]
+}
+
 resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   name        = "pnp-app-api"
   description = "REST API for the PnP character application"
@@ -8,7 +13,7 @@ resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   }
 }
 
-// ================== characters & skills ==================
+// ================== characters get  ==================
 
 resource "aws_api_gateway_resource" "characters" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
@@ -33,16 +38,108 @@ resource "aws_api_gateway_method" "character_id_get" {
   }
 }
 
+resource "aws_api_gateway_method_response" "character_id_get_method_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = aws_api_gateway_method.character_id_get.http_method
+  status_code = each.value
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
 resource "aws_api_gateway_integration" "character_id_get_integration" {
   rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id             = aws_api_gateway_resource.character_id.id
   http_method             = aws_api_gateway_method.character_id_get.http_method
   integration_http_method = "POST"
-  type                    = "AWS_PROXY"
+  type                    = "AWS"
   uri                     = aws_lambda_function.get_character_lambda.invoke_arn
   request_parameters = {
     "integration.request.path.character-id" = "method.request.path.character-id"
   }
+
+  request_templates = {
+    "application/json" = <<EOF
+    {
+      "body": $input.json('$'),
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      },
+      "headers": {
+        #foreach($param in $input.params().header.keySet())
+        "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }
+    }
+    EOF
+  }
+}
+
+resource "aws_api_gateway_integration_response" "character_id_get_integration_response" {
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id.id
+  http_method = aws_api_gateway_method.character_id_get.http_method
+  status_code = 200
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+
+  /**
+   * This overwrites the response integrations status code with the status code from the Lambda response.
+   * This is necessary because the Lambda function returns a status code in the body of the response, which
+   * is not the status code of the HTTP response. The status code of the HTTP response is always 200 if left unchanged
+   * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-override-request-response-parameters.html
+   * Note that using #set($context.responseOverride.status = $lambdaReply.statusCode) does not work
+   */
+  response_templates = {
+    "application/json" = <<EOT
+    #set($lambdaReply = $util.parseJson($input.path('$')))
+    #set($status = $lambdaReply.statusCode)
+    #if($status == 400)
+        #set($context.responseOverride.status = 400)
+    #end
+    #if($status == 401)
+        #set($context.responseOverride.status = 401)
+    #end
+    #if($status == 403)
+        #set($context.responseOverride.status = 403)
+    #end
+    #if($status == 404)
+        #set($context.responseOverride.status = 404)
+    #end
+    #if($status == 500)
+        #set($context.responseOverride.status = 500)
+    #end
+    $lambdaReply.body
+    EOT
+  }
+
+  /**
+   * API Gateway uses Java pattern-style regexes for selecting the correct response integration. Since
+   * we want to select the integration for all status codes, we use the regex ".*" which matches everything. 
+   * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-method-settings-execution-console.html Section 8
+   * See: https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/
+   */
+  selection_pattern = ".*"
 }
 
 resource "aws_api_gateway_method" "character_id_options" {
@@ -100,6 +197,8 @@ resource "aws_api_gateway_method_response" "character_id_options_method_response
   }
 }
 
+// ================== skills  ==================
+
 resource "aws_api_gateway_resource" "skills" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.character_id.id
@@ -133,12 +232,31 @@ resource "aws_api_gateway_method" "skill_name_get" {
   }
 }
 
+resource "aws_api_gateway_method_response" "skill_name_get_method_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.skill_name.id
+  http_method = aws_api_gateway_method.skill_name_get.http_method
+  status_code = each.value
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
 resource "aws_api_gateway_integration" "skill_name_get_integration" {
   rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id             = aws_api_gateway_resource.skill_name.id
   http_method             = aws_api_gateway_method.skill_name_get.http_method
   integration_http_method = "POST"
-  type                    = "AWS_PROXY"
+  type                    = "AWS"
   uri                     = aws_lambda_function.get_skill_increase_cost_lambda.invoke_arn
   request_parameters = {
     "integration.request.path.character-id"           = "method.request.path.character-id"
@@ -146,6 +264,71 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
     "integration.request.path.skill-name"             = "method.request.path.skill-name"
     "integration.request.querystring.learning-method" = "method.request.querystring.learning-method"
   }
+
+  request_templates = {
+    "application/json" = <<EOF
+    {
+      "body": $input.json('$'),
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      },
+      "headers": {
+        #foreach($param in $input.params().header.keySet())
+        "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      },
+      "queryString": {
+        #foreach($param in $input.params().querystring.keySet())
+        "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }
+    }
+    EOF
+  }
+}
+
+resource "aws_api_gateway_integration_response" "skill_name_get_integration_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.skill_name.id
+  http_method = aws_api_gateway_method.skill_name_get.http_method
+  status_code = 200
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+
+  response_templates = {
+    "application/json" = <<EOT
+    #set($lambdaReply = $util.parseJson($input.path('$')))
+    #set($status = $lambdaReply.statusCode)
+    #if($status == 400)
+        #set($context.responseOverride.status = 400)
+    #end
+    #if($status == 401)
+        #set($context.responseOverride.status = 401)
+    #end
+    #if($status == 403)
+        #set($context.responseOverride.status = 403)
+    #end
+    #if($status == 404)
+        #set($context.responseOverride.status = 404)
+    #end
+    #if($status == 500)
+        #set($context.responseOverride.status = 500)
+    #end
+    $lambdaReply.body
+    EOT
+  }
+
+  selection_pattern = ".*"
 }
 
 resource "aws_api_gateway_method" "skill_name_patch" {
@@ -161,18 +344,97 @@ resource "aws_api_gateway_method" "skill_name_patch" {
   }
 }
 
+resource "aws_api_gateway_method_response" "skill_name_patch_method_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.skill_name.id
+  http_method = aws_api_gateway_method.skill_name_patch.http_method
+  status_code = each.value
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
+
 resource "aws_api_gateway_integration" "skill_name_patch_integration" {
   rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id             = aws_api_gateway_resource.skill_name.id
   http_method             = aws_api_gateway_method.skill_name_patch.http_method
   integration_http_method = "POST"
-  type                    = "AWS_PROXY"
+  type                    = "AWS"
   uri                     = aws_lambda_function.increase_skill_lambda.invoke_arn
   request_parameters = {
     "integration.request.path.character-id"   = "method.request.path.character-id"
     "integration.request.path.skill-category" = "method.request.path.skill-category"
     "integration.request.path.skill-name"     = "method.request.path.skill-name"
   }
+
+  request_templates = {
+    "application/json" = <<EOF
+    {
+      "body": $input.json('$'),
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      },
+      "headers": {
+        #foreach($param in $input.params().header.keySet())
+        "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }
+    }
+    EOF
+  }
+}
+
+resource "aws_api_gateway_integration_response" "skill_name_patch_integration_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.skill_name.id
+  http_method = aws_api_gateway_method.skill_name_patch.http_method
+  status_code = 200
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+
+  response_templates = {
+    "application/json" = <<EOT
+    #set($lambdaReply = $util.parseJson($input.path('$')))
+    #set($status = $lambdaReply.statusCode)
+    #if($status == 400)
+        #set($context.responseOverride.status = 400)
+    #end
+    #if($status == 401)
+        #set($context.responseOverride.status = 401)
+    #end
+    #if($status == 403)
+        #set($context.responseOverride.status = 403)
+    #end
+    #if($status == 404)
+        #set($context.responseOverride.status = 404)
+    #end
+    #if($status == 500)
+        #set($context.responseOverride.status = 500)
+    #end
+    $lambdaReply.body
+    EOT
+  }
+
+  selection_pattern = ".*"
 }
 
 resource "aws_api_gateway_method" "skill_name_options" {
@@ -313,9 +575,18 @@ resource "aws_api_gateway_method_response" "tenant_id_options_method_response" {
 
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
+    aws_api_gateway_method.character_id_get,
+    aws_api_gateway_method_response.character_id_get_method_response,
     aws_api_gateway_integration.character_id_get_integration,
+    aws_api_gateway_integration_response.character_id_get_integration_response,
+    aws_api_gateway_method.skill_name_get,
+    aws_api_gateway_method_response.skill_name_get_method_response,
     aws_api_gateway_integration.skill_name_get_integration,
+    aws_api_gateway_integration_response.skill_name_get_integration_response,
+    aws_api_gateway_method.skill_name_patch,
+    aws_api_gateway_method_response.skill_name_patch_method_response,
     aws_api_gateway_integration.skill_name_patch_integration,
+    aws_api_gateway_integration_response.skill_name_patch_integration_response,
     aws_api_gateway_integration.tenant_id_post_integration,
   ]
 
