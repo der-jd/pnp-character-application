@@ -133,9 +133,9 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
     EOT
   }
 
-  depends_on = [
-    aws_api_gateway_integration.character_id_get_integration
-  ]
+  //depends_on = [
+  //aws_api_gateway_integration.character_id_get_integration
+  //]
 
   /**
    * API Gateway uses Java pattern-style regexes for selecting the correct response integration. Since
@@ -332,10 +332,10 @@ resource "aws_api_gateway_integration_response" "skill_name_get_integration_resp
     EOT
   }
 
-  depends_on = [
-    // integration response creation will fail if there is no corresponding method response
-    aws_api_gateway_integration.skill_name_get_integration
-  ]
+  //depends_on = [
+  // integration response creation will fail if there is no corresponding method response
+  //aws_api_gateway_integration.skill_name_get_integration
+  //]
 
   selection_pattern = ".*"
 }
@@ -443,10 +443,10 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
     EOT
   }
 
-  depends_on = [
-    // integration response creation will fail if there is no corresponding method response
-    aws_api_gateway_integration.skill_name_patch_integration
-  ]
+  //depends_on = [
+  // integration response creation will fail if there is no corresponding method response
+  //aws_api_gateway_integration.skill_name_patch_integration
+  //]
 
   selection_pattern = ".*"
 }
