@@ -133,10 +133,6 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
     EOT
   }
 
-  //depends_on = [
-  //aws_api_gateway_integration.character_id_get_integration
-  //]
-
   /**
    * API Gateway uses Java pattern-style regexes for selecting the correct response integration. Since
    * we want to select the integration for all status codes, we use the regex ".*" which matches everything. 
@@ -332,11 +328,6 @@ resource "aws_api_gateway_integration_response" "skill_name_get_integration_resp
     EOT
   }
 
-  //depends_on = [
-  // integration response creation will fail if there is no corresponding method response
-  //aws_api_gateway_integration.skill_name_get_integration
-  //]
-
   selection_pattern = ".*"
 }
 
@@ -442,11 +433,6 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
     $lambdaReply.body
     EOT
   }
-
-  //depends_on = [
-  // integration response creation will fail if there is no corresponding method response
-  //aws_api_gateway_integration.skill_name_patch_integration
-  //]
 
   selection_pattern = ".*"
 }
