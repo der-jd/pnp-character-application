@@ -90,7 +90,6 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "character_id_get_integration_response" {
-  //for_each = toset(var.status_codes)
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.character_id.id
