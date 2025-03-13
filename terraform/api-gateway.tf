@@ -21,6 +21,164 @@ resource "aws_api_gateway_resource" "characters" {
   path_part   = "characters" // .../characters
 }
 
+resource "aws_api_gateway_method" "characters_get" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.characters.id
+  http_method   = "GET"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  request_parameters = {
+    "method.request.querystring.character-short" = true
+  }
+}
+
+resource "aws_api_gateway_method_response" "characters_get_method_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.characters.id
+  http_method = aws_api_gateway_method.characters_get.http_method
+  status_code = each.value
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
+resource "aws_api_gateway_integration" "characters_get_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id             = aws_api_gateway_resource.characters.id
+  http_method             = aws_api_gateway_method.characters_get.http_method
+  integration_http_method = "POST"
+  type                    = "AWS"
+  uri                     = aws_lambda_function.get_characters_lambda.invoke_arn
+  request_parameters = {
+    "integration.request.querystring.character-short" = "method.request.querystring.character-short"
+  }
+
+  request_templates = {
+    "application/json" = <<EOF
+    {
+      "body": $input.json('$'),
+      "headers": {
+        #foreach($param in $input.params().header.keySet())
+        "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      },
+      "queryString": {
+        #foreach($param in $input.params().querystring.keySet())
+        "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }
+    }
+    EOF
+  }
+}
+
+resource "aws_api_gateway_integration_response" "characters_get_integration_response" {
+  depends_on = [aws_api_gateway_integration.characters_get_integration]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.characters.id
+  http_method = aws_api_gateway_method.characters_get.http_method
+  status_code = 200
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+
+  response_templates = {
+    "application/json" = <<EOT
+    #set($lambdaReply = $util.parseJson($input.path('$')))
+    #set($status = $lambdaReply.statusCode)
+    #if($status == 400)
+        #set($context.responseOverride.status = 400)
+    #end
+    #if($status == 401)
+        #set($context.responseOverride.status = 401)
+    #end
+    #if($status == 403)
+        #set($context.responseOverride.status = 403)
+    #end
+    #if($status == 404)
+        #set($context.responseOverride.status = 404)
+    #end
+    #if($status == 500)
+        #set($context.responseOverride.status = 500)
+    #end
+    $lambdaReply.body
+    EOT
+  }
+
+  selection_pattern = ".*"
+}
+
+resource "aws_api_gateway_method" "characters_options" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.characters.id
+  http_method = "OPTIONS"
+  // Authorization needs to be NONE for the preflight request to work which is sent automatically by the browser without any authorization header.
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.header.Origin" : false
+  }
+}
+
+resource "aws_api_gateway_integration" "characters_options_integration" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.characters.id
+  http_method = aws_api_gateway_method.characters_options.http_method
+  type        = "MOCK"
+  // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
+  // For a method with the mock integration to return a 200 response, configure the
+  // integration request body mapping template to return the following:
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
+}
+
+resource "aws_api_gateway_integration_response" "characters_options_integration_response" {
+  depends_on = [aws_api_gateway_integration.characters_options_integration]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.characters.id
+  http_method = aws_api_gateway_method.characters_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "characters_options_method_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.characters.id
+  http_method = aws_api_gateway_method.characters_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  }
+}
+
 resource "aws_api_gateway_resource" "character_id" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.characters.id
@@ -90,7 +248,6 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "character_id_get_integration_response" {
-
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.character_id.id
   http_method = aws_api_gateway_method.character_id_get.http_method
@@ -573,8 +730,13 @@ resource "aws_api_gateway_method_response" "tenant_id_options_method_response" {
   }
 }
 
+// TODO there is a new stage deployment with each CircleCI run -> fix this
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
+    aws_api_gateway_method.characters_get,
+    aws_api_gateway_method_response.characters_get_method_response,
+    aws_api_gateway_integration.characters_get_integration,
+    aws_api_gateway_integration_response.characters_get_integration_response,
     aws_api_gateway_method.character_id_get,
     aws_api_gateway_method_response.character_id_get_method_response,
     aws_api_gateway_integration.character_id_get_integration,
