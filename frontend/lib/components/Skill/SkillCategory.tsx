@@ -36,11 +36,11 @@ const SkillCategory = ({ data, isEditMode }: SkillCategoryProps) => {
   });
 
   return (
-    <div className="flex flex-wrap -m-4">
+    <div className="flex flex-wrap m-4 rounded-lg shadow-lg">
       {skillsInOrder.map(({ category, skills }) => (
-        <div key={category} className="w-1/2 p-4">
-          <div className="border border-gray-300 rounded-lg">
-            <h2 className="p-1 text-xl font-semibold rounded-t-lg bg-black text-white">{category}</h2>
+        <div key={category} className="w-1/2 p-4 rounded-lg">
+          <div className="">
+            <h2 className="p-1 text-xl font-semibold rounded-t-lg bg-black text-white">{category.charAt(0).toUpperCase() + category.slice(1)}</h2>
             <SkillsTable data={skills} is_edit_mode={isEditMode} />
           </div>
         </div>
