@@ -154,7 +154,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="bg-gray-200 h-10">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className={header.column.id === "actions" ? "text-right" : ""} >
+                  <TableHead key={header.id} className={header.column.id === "actions" ? "text-right" : ""}>
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}

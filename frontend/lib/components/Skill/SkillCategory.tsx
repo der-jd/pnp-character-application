@@ -40,7 +40,9 @@ const SkillCategory = ({ data, isEditMode }: SkillCategoryProps) => {
       {skillsInOrder.map(({ category, skills }) => (
         <div key={category} className="w-1/2 p-4 rounded-lg">
           <div className="">
-            <h2 className="p-1 text-xl font-semibold rounded-t-lg bg-black text-white">{category.charAt(0).toUpperCase() + category.slice(1)}</h2>
+            <h2 className="p-1 text-xl font-semibold rounded-t-lg bg-black text-white">
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </h2>
             <SkillsTable data={skills} is_edit_mode={isEditMode} />
           </div>
         </div>
