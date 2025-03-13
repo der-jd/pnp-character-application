@@ -84,6 +84,8 @@ resource "aws_api_gateway_integration" "characters_get_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "characters_get_integration_response" {
+  depends_on = [aws_api_gateway_integration.characters_get_integration]
+
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.characters.id
   http_method = aws_api_gateway_method.characters_get.http_method
