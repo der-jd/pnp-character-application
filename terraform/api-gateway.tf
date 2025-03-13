@@ -732,9 +732,12 @@ resource "aws_api_gateway_method_response" "tenant_id_options_method_response" {
 // TODO there is a new stage deployment with each CircleCI run -> fix this
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
+    aws_api_gateway_method.characters_get,
+    aws_api_gateway_method_response.characters_get_method_response,
+    aws_api_gateway_integration.characters_get_integration,
+    aws_api_gateway_integration_response.characters_get_integration_response,
     aws_api_gateway_method.character_id_get,
     aws_api_gateway_method_response.character_id_get_method_response,
-    aws_api_gateway_integration.characters_get_integration,
     aws_api_gateway_integration.character_id_get_integration,
     aws_api_gateway_integration_response.character_id_get_integration_response,
     aws_api_gateway_method.skill_name_get,
