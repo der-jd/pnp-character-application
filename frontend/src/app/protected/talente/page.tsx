@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { sample_char } from "@/components/Character/sampleCharacter";
-import SkillCategory from "@/components/Skill/SkillCategory";
-import { extract_properties_data } from "@/components/Skill/SkillDefinitions";
+import { Button } from "@/lib/components/ui/button";
+import { sample_char } from "@/lib/components/Character/sampleCharacter";
+import SkillCategory from "@/lib/components/Skill/SkillCategory";
+import { extract_properties_data } from "@/lib/components/Skill/SkillDefinitions";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { getCharacter } from "@/lib/Api/character";
@@ -56,7 +56,7 @@ export default function SkillsPage() {
           </Button>
         ) : null}
       </div>
-      <div className="flex flex-wrap -m-4 rounded-lg w-full p-4">
+      <div className="flex flex-wrap rounded-lg w-full p-4">
         <SkillCategory data={extract_properties_data(characterSheet)} isEditMode={isEditMode} />
       </div>
     </div>

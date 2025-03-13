@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/lib/components/ui/table";
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/lib/components/ui/button";
+import { Checkbox } from "@/lib/components/ui/checkbox";
 import { ISkillProps, render_skill_icon } from "./SkillDefinitions";
-import { LearningMethod } from "@/components/Character/character";
+import { LearningMethod } from "@/lib/components/Character/character";
 
 const getCostCategoryLabel = (category: LearningMethod): string => {
   switch (category) {
@@ -51,12 +51,12 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
     {
       accessorKey: "icon",
       header: "",
-      cell: ({ row }) => <div className="h-4 w-4 ">{render_skill_icon(row.getValue("name"))}</div>,
+      cell: ({ row }) => <div className="w-full p-0">{render_skill_icon(row.getValue("name"))}</div>,
     },
     {
       accessorKey: "name",
-      header: () => <div className="text-right text-bold">Name</div>,
-      cell: ({ row }) => <div className="font-medium p-1">{row.getValue("name")}</div>,
+      header: () => <div className="text-left text-bold">Name</div>,
+      cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
     },
     {
       accessorKey: "level",
@@ -93,7 +93,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
     {
       accessorKey: "cost_category",
       header: () => <div className="text-center">Cost Category</div>,
-      cell: ({ row }) => <div className="text-left">{getCostCategoryLabel(row.original.learning_method)}</div>,
+      cell: ({ row }) => <div className="text-center">{getCostCategoryLabel(row.original.learning_method)}</div>,
     },
     {
       accessorKey: "skilling",
@@ -152,7 +152,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-gray-300">
+              <TableRow key={headerGroup.id} className="bg-gray-200 h-10">
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id} className={header.column.id === "actions" ? "text-right" : ""}>
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
@@ -164,9 +164,9 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} className="items-center justify-center">
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="space-x-6">
+                    <TableCell key={cell.id} className="p-0.5">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -174,7 +174,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell colSpan={columns.length} className="h-10 text-center">
                   No results.
                 </TableCell>
               </TableRow>
