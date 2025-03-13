@@ -7,11 +7,16 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   return getCharacters(event);
 };
 
+interface Parameters {
+  userId: string;
+  characterShort: boolean;
+}
+
 async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const userId = verifyRequest(event);
+    const params = verifyRequest(event);
 
-    console.log(`Get characters for user ${userId} from DynamoDB`);
+    console.log(`Get characters for user ${params.userId} from DynamoDB`);
 
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
     const client = new DynamoDBClient({});
@@ -20,7 +25,7 @@ async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       TableName: process.env.TABLE_NAME,
       KeyConditionExpression: "userId = :userId",
       ExpressionAttributeValues: {
-        ":userId": userId,
+        ":userId": params.userId,
       },
       ConsistentRead: true,
     });
@@ -39,14 +44,25 @@ async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     console.log("Successfully got DynamoDB items");
 
-    // TODO return only character ids with character names
-    console.log(dynamoDbResponse.Items);
+    let characters = [];
+    if (params.characterShort) {
+      for (const item of dynamoDbResponse.Items) {
+        characters.push({
+          userId: item.userId,
+          characterId: item.characterId,
+          name: item.characterSheet.generalInformation.name,
+          level: item.characterSheet.generalInformation.level,
+        });
+      }
+    } else {
+      characters = dynamoDbResponse.Items;
+    }
 
     const response = {
       statusCode: 200,
       body: JSON.stringify({
         message: "Successfully got characters",
-        characters: dynamoDbResponse.Items,
+        characters: characters,
       }),
     };
     console.log(response);
@@ -67,7 +83,7 @@ async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayPro
   }
 }
 
-function verifyRequest(event: APIGatewayProxyEvent): string {
+function verifyRequest(event: APIGatewayProxyEvent): Parameters {
   console.log("Verify request");
 
   // TODO move handling of authorization token to Lambda layer
@@ -98,5 +114,23 @@ function verifyRequest(event: APIGatewayProxyEvent): string {
     };
   }
 
-  return userId;
+  if (
+    event.queryStringParameters?.["character-short"] &&
+    typeof event.queryStringParameters?.["character-short"] !== "string"
+  ) {
+    console.error("Invalid input values!");
+    throw {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "Invalid input values!",
+      }),
+    };
+  }
+
+  const params: Parameters = {
+    userId: userId,
+    characterShort: event.queryStringParameters?.["character-short"] === "true",
+  };
+
+  return params;
 }
