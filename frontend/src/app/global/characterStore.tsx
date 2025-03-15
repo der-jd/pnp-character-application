@@ -1,4 +1,4 @@
-import { CharacterSheet } from "@/components/Character/character";
+import { CharacterSheet } from "@components/Character/character";
 import { create } from "zustand";
 
 export interface CharacterStore {

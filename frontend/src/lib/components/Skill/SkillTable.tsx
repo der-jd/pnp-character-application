@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/lib/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@lib/components/ui/table";
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { Button } from "@/lib/components/ui/button";
-import { Checkbox } from "@/lib/components/ui/checkbox";
+import { Button } from "@lib/components/ui/button";
+import { Checkbox } from "@lib/components/ui/checkbox";
 import { ISkillProps, render_skill_icon } from "./SkillDefinitions";
-import { LearningMethod } from "@/lib/components/Character/character";
+import { LearningMethod } from "@lib/components/Character/character";
 
 const getCostCategoryLabel = (category: LearningMethod): string => {
   switch (category) {

@@ -4,7 +4,7 @@ module.exports = {
   content: [
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/protected/**/*.{js,ts,jsx,tsx,mdx}",
-    "./lib/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/lib/components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {

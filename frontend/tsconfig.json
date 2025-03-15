@@ -21,9 +21,9 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@lib/*": ["./lib/*"],
-      "@components/*": ["./lib/components/*"],
-      "@api/*": ["./lib/api/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@components/*": ["./src/lib/components/*"],
+      "@api/*": ["./src/lib/api/*"],
       "@global/*": ["./src/app/global/*"]
     }
   },
