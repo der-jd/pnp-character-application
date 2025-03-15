@@ -49,7 +49,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       const updateCharacterSheet = path.reduce<CharacterSheet>((acc, key, index) => {
         // last step, sufficient depth is reached, update the value
         if (index === path.length - 1) {
-          if(typeof acc[key] === 'object' && acc[key] !== null) {
+          if (typeof acc[key] === "object" && acc[key] !== null) {
             return {
               ...acc,
               [key]: {
@@ -60,8 +60,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
                 },
               },
             };
-          }
-          else {
+          } else {
             throw new Error("Expected an object at " + key + " but found a non-object value");
           }
         }
