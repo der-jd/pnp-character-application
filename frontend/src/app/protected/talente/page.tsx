@@ -6,7 +6,7 @@ import SkillCategory from "@/lib/components/Skill/SkillCategory";
 import { extract_properties_data } from "@/lib/components/Skill/SkillDefinitions";
 import { useState } from "react";
 import { useAuth } from "../../global/AuthContext";
-import { getCharacter } from "@/lib/Api/character";
+import { getCharacter } from "@/lib/api/character";
 
 export default function SkillsPage() {
   const [isEditMode, setEditMode] = useState(false);

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cognitoConfig, cognitoClient } from "../../global/CognitoConfig";
 import { useAuth } from "../../global/AuthContext";
-import { createTenantId } from "@/lib/Api/tenant";
+import { createTenantId } from "@/lib/api/tenant";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
