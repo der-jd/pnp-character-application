@@ -43,22 +43,27 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
   updateValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: number) =>
     set((state) => {
       if (!state.characterSheet) {
-        throw new Error("No character sheet has been loaded yet, updating value failed");
+        throw new Error("No character sheet has been loaded yet, updating value " + name + " failed");
       }
 
       const updateCharacterSheet = path.reduce<CharacterSheet>((acc, key, index) => {
         // last step, sufficient depth is reached, update the value
         if (index === path.length - 1) {
-          return {
-            ...acc,
-            [key]: {
-              ...acc[key as keyof CharacterSheet],
-              [name]: {
-                ...(acc[key as keyof CharacterSheet] as Record<string, NonNullable<unknown>>)[name],
-                current: newValue,
+          if(typeof acc[key] === 'object' && acc[key] !== null) {
+            return {
+              ...acc,
+              [key]: {
+                ...acc[key as keyof CharacterSheet],
+                [name]: {
+                  ...(acc[key as keyof CharacterSheet] as Record<string, object>)[name],
+                  current: newValue,
+                },
               },
-            },
-          };
+            };
+          }
+          else {
+            throw new Error("Expected an object at " + key + " but found a non-object value");
+          }
         }
 
         // intermediate step, spread the current level if final depth not reached
