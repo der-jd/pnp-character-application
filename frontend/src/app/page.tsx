@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "./global/AuthContext";
 
 export default function SplashScreen() {
   const { isAuthenticated, loading } = useAuth();

@@ -5,7 +5,7 @@ import { sample_char } from "@/components/Character/sampleCharacter";
 import SkillCategory from "@/components/Skill/SkillCategory";
 import { extract_properties_data } from "@/components/Skill/SkillDefinitions";
 import { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../global/AuthContext";
 import { getCharacter } from "@/lib/Api/character";
 
 export default function SkillsPage() {
