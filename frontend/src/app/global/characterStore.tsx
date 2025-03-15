@@ -1,4 +1,4 @@
-import { CharacterSheet } from "@components/Character/character";
+import { CharacterSheet } from "@/src/lib/api/models/Character/character";
 import { create } from "zustand";
 
 export interface CharacterStore {
@@ -13,6 +13,9 @@ export interface CharacterStore {
   setAvailableCharacters: (chars: Array<string>) => void;
 
   updateValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: number) => void;
+
+  // loadAllCharacters: () => void;
+  // loadCharacter: (id: string) => void;
 }
 
 /**

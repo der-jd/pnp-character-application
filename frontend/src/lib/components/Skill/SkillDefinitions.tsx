@@ -79,7 +79,7 @@ import {
   Attribute,
   BaseValue,
   CharacterSheet,
-} from "../Character/character";
+} from "@api/models/Character/character";
 
 export interface ISkillProps {
   name: string;

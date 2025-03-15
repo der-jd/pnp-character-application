@@ -1,12 +1,11 @@
 "use client";
 
 import { Button } from "@lib/components/ui/button";
-import { sample_char } from "@lib/components/Character/sampleCharacter";
+import { sample_char } from "@/src/lib/api/models/Character/sampleCharacter";
 import SkillCategory from "@lib/components/Skill/SkillCategory";
 import { extract_properties_data } from "@lib/components/Skill/SkillDefinitions";
 import { useState } from "react";
 import { useAuth } from "@global/AuthContext";
-import { getCharacter } from "@lib/api/character";
 
 export default function SkillsPage() {
   const [isEditMode, setEditMode] = useState(false);
