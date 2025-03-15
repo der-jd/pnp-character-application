@@ -1,54 +1,68 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  return getCharacter(event);
+  return getCharacters(event);
 };
 
 interface Parameters {
   userId: string;
-  characterId: string;
+  characterShort: boolean;
 }
 
-async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
     const params = verifyRequest(event);
 
-    console.log(`Get character ${params.characterId} of user ${params.userId} from DynamoDB`);
+    console.log(`Get characters for user ${params.userId} from DynamoDB`);
 
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
     const client = new DynamoDBClient({});
     const docClient = DynamoDBDocumentClient.from(client);
-    const command = new GetCommand({
+    const command = new QueryCommand({
       TableName: process.env.TABLE_NAME,
-      Key: {
-        userId: params.userId,
-        characterId: params.characterId,
+      KeyConditionExpression: "userId = :userId",
+      ExpressionAttributeValues: {
+        ":userId": params.userId,
       },
       ConsistentRead: true,
     });
 
     const dynamoDbResponse = await docClient.send(command);
 
-    if (!dynamoDbResponse.Item) {
-      console.error("Item from DynamoDB table is missing in the request response");
+    if (!dynamoDbResponse.Items || dynamoDbResponse.Items.length === 0) {
+      console.error("No characters found for the given userId");
       throw {
-        statusCode: 500,
+        statusCode: 404,
         body: JSON.stringify({
-          message: "Item from DynamoDB table is missing in the request response",
+          message: "No characters found for the given userId",
         }),
       };
     }
 
-    console.log("Successfully got DynamoDB item");
+    console.log("Successfully got DynamoDB items");
+
+    let characters = [];
+    if (params.characterShort) {
+      for (const item of dynamoDbResponse.Items) {
+        characters.push({
+          userId: item.userId,
+          characterId: item.characterId,
+          name: item.characterSheet.generalInformation.name,
+          level: item.characterSheet.generalInformation.level,
+        });
+      }
+    } else {
+      characters = dynamoDbResponse.Items;
+    }
 
     const response = {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Successfully got character",
-        character: dynamoDbResponse.Item,
+        message: "Successfully got characters",
+        characters: characters,
       }),
     };
     console.log(response);
@@ -72,6 +86,7 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
 function verifyRequest(event: APIGatewayProxyEvent): Parameters {
   console.log("Verify request");
 
+  // TODO move handling of authorization token to Lambda layer
   // Trim the authorization header as it could contain spaces at the beginning
   const authHeader = event.headers.Authorization?.trim() || event.headers.authorization?.trim();
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -99,7 +114,10 @@ function verifyRequest(event: APIGatewayProxyEvent): Parameters {
     };
   }
 
-  if (typeof event.pathParameters?.["character-id"] !== "string") {
+  if (
+    event.queryStringParameters?.["character-short"] &&
+    typeof event.queryStringParameters?.["character-short"] !== "string"
+  ) {
     console.error("Invalid input values!");
     throw {
       statusCode: 400,
@@ -109,21 +127,10 @@ function verifyRequest(event: APIGatewayProxyEvent): Parameters {
     };
   }
 
-  const characterId = event.pathParameters?.["character-id"];
-
-  const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
-  if (!uuidRegex.test(characterId)) {
-    console.error("Character id is not a valid UUID format!");
-    throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Character id is not a valid UUID format!",
-      }),
-    };
-  }
-
-  return {
+  const params: Parameters = {
     userId: userId,
-    characterId: characterId,
+    characterShort: event.queryStringParameters?.["character-short"] === "true",
   };
+
+  return params;
 }

@@ -224,6 +224,7 @@ export function parseCharacterSheet(json: string): Character | null {
 }
 
 export function render_skill_icon(skill_name: string): JSX.Element {
+  console.log("getting skill: ", skill_name);
   switch (skill_name) {
     case "Athletik":
       return <GiDiscobolus size={25} />;
@@ -293,7 +294,7 @@ export function render_skill_icon(skill_name: string): JSX.Element {
       return <GiPathDistance size={25} />;
     case "Wildnisleben":
       return <GiCampfire size={25} />;
-    case "Anatomie":
+    case "anatomy":
       return <GiAnatomy size={25} />;
     case "Baukunst":
       return <GiBrickWall size={25} />;

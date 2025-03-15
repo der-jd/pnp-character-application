@@ -1,9 +1,9 @@
 import Link from "next/link";
 // import { useRouter } from 'next/navigation'
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/lib/components/ui/button";
 
-import "../src/app/styles/globals.css";
+import "../../src/app/styles/globals.css";
 
 export default function Header() {
   //const { logout } = useAuth()
