@@ -1,11 +1,11 @@
 export interface AllCharactersCharacter {
-  userId: string,
-  charId: string,
-  name: string,
-  level: number,
+  userId: string;
+  charId: string;
+  name: string;
+  level: number;
 }
-  
+
 export interface AllCharactersReply {
-  message: string,
-  characters: Array<AllCharactersCharacter>
+  message: string;
+  characters: Array<AllCharactersCharacter>;
 }

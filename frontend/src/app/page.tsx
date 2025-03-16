@@ -20,11 +20,12 @@ export default function SplashScreen() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-       <div className="m-auto"><RouletteSpinner/></div>
+        <div className="m-auto">
+          <RouletteSpinner />
+        </div>
       </div>
     );
   }
-
 
   if (isAuthenticated) {
     return null;

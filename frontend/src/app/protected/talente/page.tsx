@@ -5,21 +5,17 @@ import { sample_char } from "@/src/lib/api/models/Character/sampleCharacter";
 import SkillCategory from "@lib/components/Skill/SkillCategory";
 import { extract_properties_data } from "@lib/components/Skill/SkillDefinitions";
 import { useState } from "react";
-import { useAuth } from "@global/AuthContext";
 
 export default function SkillsPage() {
   const [isEditMode, setEditMode] = useState(false);
   const toggle_edit_mode = () => setEditMode(!isEditMode);
-  const [characterSheet, setCharacterSheet] = useState(sample_char.characterSheet);
-  const { idToken } = useAuth();
+  const [characterSheet] = useState(sample_char.characterSheet);
 
   const discard_values = () => {
     setEditMode(false);
   };
 
-  const fetchCharacter = async () => {
-    
-  };
+  const fetchCharacter = async () => {};
 
   return (
     <div className="container mx-auto py-5">

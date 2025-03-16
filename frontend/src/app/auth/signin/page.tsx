@@ -7,15 +7,15 @@ import { useRouter } from "next/navigation";
 import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cognitoConfig, cognitoClient } from "../../global/CognitoConfig";
 import { useAuth } from "../../global/AuthContext";
-import { CharacterStore, useCharacterStore } from "../../global/characterStore";
-import { RouletteSpinner } from "react-spinner-overlay";
+import { useCharacterStore } from "../../global/characterStore";
+// import { RouletteSpinner } from "react-spinner-overlay";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const { setIsAuthenticated, isAuthenticated, setAccessToken, setIdToken, loading } = useAuth();
+  const { setIsAuthenticated, isAuthenticated, setAccessToken, setIdToken } = useAuth();
 
   const updateAvailableCharacters = useCharacterStore((state) => state.updateAvailableCharacters);
 
@@ -45,7 +45,6 @@ export default function SignIn() {
         setAccessToken(response.AuthenticationResult.AccessToken);
         setIdToken(response.AuthenticationResult.IdToken ?? null);
         setIsAuthenticated(true);
-        // updateCharacter(response.AuthenticationResult.IdToken ?? "", "123e4567-e89b-12d3-a456-426614174000");
         router.push("/protected/dashboard");
       } else {
         throw new Error("Authentication failed");

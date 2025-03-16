@@ -1,5 +1,5 @@
 import { CharacterSheet } from "@/src/lib/api/models/Character/character";
-import { AllCharactersCharacter, AllCharactersReply } from "@/src/lib/api/models/allCharacters/interface";
+import { AllCharactersCharacter } from "@/src/lib/api/models/allCharacters/interface";
 import { getAllCharacters, getCharacter } from "@/src/lib/api/utils/api_calls";
 import { create } from "zustand";
 
@@ -82,23 +82,22 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       return { characterSheet: updateCharacterSheet };
     }),
 
-    updateAvailableCharacters: async (idToken: string) => {
-      console.log("updating Characters!");
-      try {
-        const characters = await getAllCharacters(idToken);
-        set({availableCharacters: characters.characters});
-      } catch(error) {
-        console.log(`Failed to fetch all characters!`);
-      }
-    },
+  updateAvailableCharacters: async (idToken: string) => {
+    console.log("updating Characters!");
+    try {
+      const characters = await getAllCharacters(idToken);
+      set({ availableCharacters: characters.characters });
+    } catch (error) {
+      console.log(`Failed to fetch all characters!`);
+    }
+  },
 
-    updateCharacter: async (idToken: string, charId: string) => {
-      try {
-        const character = await getCharacter(idToken, charId);
-        set({characterSheet: character.characterSheet});
-      } catch(error) {
-        console.log(`Failed to fetch character: ${charId}!`);
-      }
-    }   
-
+  updateCharacter: async (idToken: string, charId: string) => {
+    try {
+      const character = await getCharacter(idToken, charId);
+      set({ characterSheet: character.characterSheet });
+    } catch (error) {
+      console.log(`Failed to fetch character: ${charId}!`);
+    }
+  },
 }));
