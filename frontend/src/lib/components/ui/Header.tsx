@@ -14,7 +14,7 @@ export default function Header() {
   // }
 
   return (
-    <header className="p-4 w-full bg-gray-300">
+    <header className="p-4 w-full bg-gray-200">
       <div className="container max-w-5xl mx-auto flex justify-center items-center px-4">
         {/* Navigation */}
         <nav className="relative">

@@ -224,7 +224,6 @@ export function parseCharacterSheet(json: string): Character | null {
 }
 
 export function render_skill_icon(skill_name: string): JSX.Element {
-  console.log("getting skill: ", skill_name);
   switch (skill_name) {
     case "Athletik":
       return <GiDiscobolus size={25} />;

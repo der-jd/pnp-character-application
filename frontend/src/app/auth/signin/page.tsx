@@ -7,14 +7,17 @@ import { useRouter } from "next/navigation";
 import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cognitoConfig, cognitoClient } from "../../global/CognitoConfig";
 import { useAuth } from "../../global/AuthContext";
-import { createTenantId } from "@/lib/api/tenant";
+import { CharacterStore, useCharacterStore } from "../../global/characterStore";
+import { RouletteSpinner } from "react-spinner-overlay";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const { setIsAuthenticated, isAuthenticated, setAccessToken, setIdToken } = useAuth();
+  const { setIsAuthenticated, isAuthenticated, setAccessToken, setIdToken, loading } = useAuth();
+
+  const updateAvailableCharacters = useCharacterStore((state) => state.updateAvailableCharacters);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -38,12 +41,11 @@ export default function SignIn() {
       const response = await cognitoClient.send(command);
 
       if (response.AuthenticationResult?.AccessToken) {
+        updateAvailableCharacters(response.AuthenticationResult.IdToken ?? "");
         setAccessToken(response.AuthenticationResult.AccessToken);
         setIdToken(response.AuthenticationResult.IdToken ?? null);
-        console.log("ID TOKEN:");
-        //console.log(response.AuthenticationResult.IdToken); // TODO remove after test and only activate locally
         setIsAuthenticated(true);
-        createTenantId(response.AuthenticationResult.IdToken, response.AuthenticationResult.RefreshToken);
+        // updateCharacter(response.AuthenticationResult.IdToken ?? "", "123e4567-e89b-12d3-a456-426614174000");
         router.push("/protected/dashboard");
       } else {
         throw new Error("Authentication failed");
@@ -53,6 +55,16 @@ export default function SignIn() {
       console.error("Error signing in:", error);
     }
   };
+
+  // TODO activate and fix this to show spinner during initial character load
+  // TODO maybe change all characters lamba to by default return the character owned by this account
+  // if(!isAuthenticated && loading) {
+  //   return (
+  //     <div className="flex h-screen items-center justify-center">
+  //       <div className="m-auto"><RouletteSpinner/></div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="flex h-screen">

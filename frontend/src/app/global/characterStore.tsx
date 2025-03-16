@@ -1,8 +1,10 @@
 import { CharacterSheet } from "@/src/lib/api/models/Character/character";
+import { AllCharactersCharacter, AllCharactersReply } from "@/src/lib/api/models/allCharacters/interface";
+import { getAllCharacters, getCharacter } from "@/src/lib/api/utils/api_calls";
 import { create } from "zustand";
 
 export interface CharacterStore {
-  availableCharacters: Array<string>;
+  availableCharacters: Array<AllCharactersCharacter>;
   selectedCharacter: string | null;
   isEditable: boolean;
   characterSheet: CharacterSheet | null;
@@ -10,12 +12,12 @@ export interface CharacterStore {
   setCharacterSheet: (data: CharacterSheet) => void;
   setEditable: (isEditable: boolean) => void;
   setSelectedCharacter: (char: string) => void;
-  setAvailableCharacters: (chars: Array<string>) => void;
+  setAvailableCharacters: (chars: Array<AllCharactersCharacter>) => void;
 
   updateValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: number) => void;
 
-  // loadAllCharacters: () => void;
-  // loadCharacter: (id: string) => void;
+  updateAvailableCharacters: (idToken: string) => void;
+  updateCharacter: (idToken: string, charId: string) => void;
 }
 
 /**
@@ -24,7 +26,7 @@ export interface CharacterStore {
  * saved by the backend.
  */
 export const useCharacterStore = create<CharacterStore>((set) => ({
-  availableCharacters: [],
+  availableCharacters: Array<AllCharactersCharacter>(),
   selectedCharacter: null,
   isEditable: false,
   characterSheet: null,
@@ -79,4 +81,24 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
 
       return { characterSheet: updateCharacterSheet };
     }),
+
+    updateAvailableCharacters: async (idToken: string) => {
+      console.log("updating Characters!");
+      try {
+        const characters = await getAllCharacters(idToken);
+        set({availableCharacters: characters.characters});
+      } catch(error) {
+        console.log(`Failed to fetch all characters!`);
+      }
+    },
+
+    updateCharacter: async (idToken: string, charId: string) => {
+      try {
+        const character = await getCharacter(idToken, charId);
+        set({characterSheet: character.characterSheet});
+      } catch(error) {
+        console.log(`Failed to fetch character: ${charId}!`);
+      }
+    }   
+
 }));

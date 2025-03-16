@@ -1,3 +1,4 @@
+import { AllCharactersReply } from "../models/allCharacters/interface";
 import { Character } from "../models/Character/character";
 import { SkillIncreaseReply, SkillIncreaseRequest } from "../models/skillIncrease/interface";
 
@@ -60,9 +61,9 @@ export async function getCharacter(idToken: string, id: string): Promise<Charact
  * Gets all characters owned or shared with the current user
  * @returns A string array holding all the character ids
  */
-export async function getAllCharacters(idToken: string): Promise<Array<string>> {
+export async function getAllCharacters(idToken: string): Promise<AllCharactersReply> {
   const endpoint_url = `characters`;
-  return get<Array<string>>(idToken, endpoint_url);
+  return get<AllCharactersReply>(idToken, endpoint_url);
 }
 
 /**
