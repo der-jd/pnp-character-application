@@ -100,8 +100,9 @@ resource "aws_api_gateway_integration_response" "characters_get_integration_resp
 
   response_templates = {
     "application/json" = <<EOT
-    #set($lambdaReply = $util.parseJson($input.path('$')))
-    #set($status = $lambdaReply.statusCode)
+    #set($rawBody = $input.json('$.body'))
+    #set($parsedBody = $util.parseJson($rawBody))
+    #set($status = $input.json('$.statusCode'))
     #if($status == 400)
         #set($context.responseOverride.status = 400)
     #end
@@ -117,7 +118,7 @@ resource "aws_api_gateway_integration_response" "characters_get_integration_resp
     #if($status == 500)
         #set($context.responseOverride.status = 500)
     #end
-    $lambdaReply.body
+    $parsedBody
     EOT
   }
 
@@ -269,8 +270,9 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
    */
   response_templates = {
     "application/json" = <<EOT
-    #set($lambdaReply = $util.parseJson($input.path('$')))
-    #set($status = $lambdaReply.statusCode)
+    #set($rawBody = $input.json('$.body'))
+    #set($parsedBody = $util.parseJson($rawBody))
+    #set($status = $input.json('$.statusCode'))
     #if($status == 400)
         #set($context.responseOverride.status = 400)
     #end
@@ -286,7 +288,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
     #if($status == 500)
         #set($context.responseOverride.status = 500)
     #end
-    $lambdaReply.body
+    $parsedBody
     EOT
   }
 
@@ -464,8 +466,9 @@ resource "aws_api_gateway_integration_response" "skill_name_get_integration_resp
 
   response_templates = {
     "application/json" = <<EOT
-    #set($lambdaReply = $util.parseJson($input.path('$')))
-    #set($status = $lambdaReply.statusCode)
+    #set($rawBody = $input.json('$.body'))
+    #set($parsedBody = $util.parseJson($rawBody))
+    #set($status = $input.json('$.statusCode'))
     #if($status == 400)
         #set($context.responseOverride.status = 400)
     #end
@@ -481,7 +484,7 @@ resource "aws_api_gateway_integration_response" "skill_name_get_integration_resp
     #if($status == 500)
         #set($context.responseOverride.status = 500)
     #end
-    $lambdaReply.body
+    $parsedBody
     EOT
   }
 
@@ -570,8 +573,9 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
 
   response_templates = {
     "application/json" = <<EOT
-    #set($lambdaReply = $util.parseJson($input.path('$')))
-    #set($status = $lambdaReply.statusCode)
+    #set($rawBody = $input.json('$.body'))
+    #set($parsedBody = $util.parseJson($rawBody))
+    #set($status = $input.json('$.statusCode'))
     #if($status == 400)
         #set($context.responseOverride.status = 400)
     #end
@@ -587,7 +591,7 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
     #if($status == 500)
         #set($context.responseOverride.status = 500)
     #end
-    $lambdaReply.body
+    $parsedBody
     EOT
   }
 
