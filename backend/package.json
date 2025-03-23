@@ -9,6 +9,7 @@
   "dependencies": {
     "config": "file:src/config",
     "get-character": "file:src/lambdas/get-character",
+    "get-characters": "file:src/lambdas/get-characters",
     "increase-skill": "file:src/lambdas/increase-skill",
     "create-tenant-id": "file:src/lambdas/create-tenant-id",
     "get-skill-increase-cost": "file:src/lambdas/get-skill-increase-cost"
