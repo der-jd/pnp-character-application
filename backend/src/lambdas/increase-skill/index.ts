@@ -24,7 +24,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     console.log(`Update character ${params.characterId} of user ${params.userId}`);
     console.log(
-      `Increase value of skill '${params.skillName}' from ${params.initialSkillValue} to ${params.initialSkillValue + params.increasedPoints} by learning method '${params.learningMethod}'`,
+      `Increase value of skill '${params.skillCategory}/${params.skillName}' from ${params.initialSkillValue} to ${params.initialSkillValue + params.increasedPoints} by learning method '${params.learningMethod}'`,
     );
 
     const character = await getCharacterItem(params);

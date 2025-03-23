@@ -21,7 +21,7 @@ async function getSkillCost(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     const params = verifyRequest(event);
 
     console.log(
-      `Get increase cost for skill '${params.skillName}' (learning method '${params.learningMethod}') of character ${params.characterId} of user ${params.userId}`,
+      `Get increase cost for skill '${params.skillCategory}/${params.skillName}' (learning method '${params.learningMethod}') of character ${params.characterId} of user ${params.userId}`,
     );
 
     const character = await getCharacterItem(params);
