@@ -532,9 +532,12 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
   type                    = "AWS"
   uri                     = aws_lambda_function.increase_skill_lambda.invoke_arn
   request_parameters = {
-    "integration.request.path.character-id"   = "method.request.path.character-id"
-    "integration.request.path.skill-category" = "method.request.path.skill-category"
-    "integration.request.path.skill-name"     = "method.request.path.skill-name"
+    "integration.request.path.character-id"    = "method.request.path.character-id"
+    "integration.request.path.skill-category"  = "method.request.path.skill-category"
+    "integration.request.path.skill-name"      = "method.request.path.skill-name"
+    "integration.request.body.initialValue"    = "method.request.body.initialValue"
+    "integration.request.body.increasedPoints" = "method.request.body.increasedPoints"
+    "integration.request.body.learningMethod"  = "method.request.body.learningMethod"
   }
 
   request_templates = {
