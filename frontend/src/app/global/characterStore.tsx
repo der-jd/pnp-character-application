@@ -5,7 +5,7 @@ import { create } from "zustand";
 
 export interface CharacterStore {
   availableCharacters: Array<AllCharactersCharacter>;
-  selectedCharacter: string | null;
+  selectedCharacterId: string | null;
   isEditable: boolean;
   characterSheet: CharacterSheet | null;
 
@@ -27,14 +27,14 @@ export interface CharacterStore {
  */
 export const useCharacterStore = create<CharacterStore>((set) => ({
   availableCharacters: Array<AllCharactersCharacter>(),
-  selectedCharacter: null,
+  selectedCharacterId: null,
   isEditable: false,
   characterSheet: null,
 
-  setCharacterSheet: (sheet) => set({ characterSheet: sheet }),
+  setCharacterSheet: (sheet) => set({ characterSheet: { ...sheet } }),
   setEditable: (isEditable) => set({ isEditable }),
-  setSelectedCharacter: (char) => set({ selectedCharacter: char }),
-  setAvailableCharacters: (chars) => set({ availableCharacters: chars }),
+  setSelectedCharacter: (char) => set({ selectedCharacterId: char }),
+  setAvailableCharacters: (chars) => set({ availableCharacters: [...chars] }),
 
   /**
    * Updates a specified value in the character sheet and updates the value in the character store
@@ -86,18 +86,28 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
     console.log("updating Characters!");
     try {
       const characters = await getAllCharacters(idToken);
-      set({ availableCharacters: characters.characters });
+      set(() => ({
+        availableCharacters: [...characters.characters],
+      }));
     } catch (error) {
       console.log(`Failed to fetch all characters!`);
     }
+    console.log("update finished");
   },
 
   updateCharacter: async (idToken: string, charId: string) => {
     try {
       const character = await getCharacter(idToken, charId);
-      set({ characterSheet: character.characterSheet });
+      set(() => ({
+        characterSheet: { ...character.characterSheet },
+      }));
     } catch (error) {
       console.log(`Failed to fetch character: ${charId}!`);
     }
+    console.log("get character finished");
+  },
+
+  selectCharacter: (charId: string) => {
+    set({ selectedCharacterId: charId });
   },
 }));

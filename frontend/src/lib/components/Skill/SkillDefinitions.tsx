@@ -184,12 +184,20 @@ export const nodeExtractors: NodeExtractor[] = [
   { key: "baseValues", type: "BaseValue", category: "BaseValues" },
 ];
 
-export function extract_properties_data(characterSheet: CharacterSheet): ISkillProps[] {
+export function extract_properties_data(characterSheet: CharacterSheet | null): ISkillProps[] {
+  if (!characterSheet) {
+    return [];
+  }
+
+  console.log("extract_properties_data");
   const result: ISkillProps[] = [];
 
   for (const extractor of nodeExtractors) {
+    console.log(characterSheet);
     const node = characterSheet[extractor.key];
     const category = extractor.category || extractor.key;
+    console.log(node);
+    console.log(category);
 
     // Check if the node has nested structures
     if (category === "skills") {

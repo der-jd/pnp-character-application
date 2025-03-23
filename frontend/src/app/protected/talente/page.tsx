@@ -1,21 +1,39 @@
 "use client";
 
 import { Button } from "@lib/components/ui/button";
-import { sample_char } from "@/src/lib/api/models/Character/sampleCharacter";
 import SkillCategory from "@lib/components/Skill/SkillCategory";
 import { extract_properties_data } from "@lib/components/Skill/SkillDefinitions";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useCharacterStore } from "@global/characterStore";
+import { useAuth } from "@global/AuthContext";
 
 export default function SkillsPage() {
   const [isEditMode, setEditMode] = useState(false);
   const toggle_edit_mode = () => setEditMode(!isEditMode);
-  const [characterSheet] = useState(sample_char.characterSheet);
+  const currentCharacterSheet = useCharacterStore((state) => state.characterSheet);
+  const updateCharacter = useCharacterStore((state) => state.updateCharacter);
+  const selectedCharacterId = useCharacterStore((state) => state.selectedCharacterId);
 
   const discard_values = () => {
     setEditMode(false);
   };
 
-  const fetchCharacter = async () => {};
+  const charId = selectedCharacterId;
+  const idToken = useAuth().idToken;
+
+  // Sync `characterSheet` state with `currentCharacter`
+  useEffect(() => {
+    console.log("Character sheet updated:", currentCharacterSheet);
+  }, [currentCharacterSheet]);
+
+  const fetchCharacter = async () => {
+    if (idToken && charId) {
+      await updateCharacter(idToken, charId);
+    } else {
+      console.log("no id token provided");
+      throw new Error("No id token provided");
+    }
+  };
 
   return (
     <div className="container mx-auto py-5">
@@ -45,7 +63,7 @@ export default function SkillsPage() {
         ) : null}
       </div>
       <div className="flex flex-wrap rounded-lg w-full p-4">
-        <SkillCategory data={extract_properties_data(characterSheet)} isEditMode={isEditMode} />
+        <SkillCategory data={extract_properties_data(currentCharacterSheet)} isEditMode={isEditMode} />
       </div>
     </div>
   );

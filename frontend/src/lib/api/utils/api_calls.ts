@@ -74,7 +74,7 @@ export async function getCharacter(idToken: string, id: string): Promise<Charact
  * @returns A string array holding all the character ids
  */
 export async function getAllCharacters(idToken: string): Promise<AllCharactersReply> {
-  const endpoint_url = `characters`;
+  const endpoint_url = `characters?character-short=true`;
   return get<AllCharactersReply>(idToken, endpoint_url);
 }
 
@@ -92,6 +92,6 @@ export async function increaseSkill(
   category: string,
   body: SkillIncreaseRequest,
 ): Promise<SkillIncreaseReply> {
-  const endpoint_url = `character/${charId}/skills/${category}/${name}`;
+  const endpoint_url = `characters/${charId}/skills/${category}/${name}`;
   return patch<SkillIncreaseReply, SkillIncreaseRequest>(idToken, endpoint_url, body);
 }

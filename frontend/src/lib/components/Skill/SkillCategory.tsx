@@ -11,6 +11,10 @@ interface SkillCategoryProps {
 }
 
 const SkillCategory = ({ data, isEditMode }: SkillCategoryProps) => {
+  if (!data) {
+    return <div />;
+  }
+
   const groupedSkills = data.reduce(
     (acc, skill) => {
       const category = skill.category;
