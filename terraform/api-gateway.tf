@@ -72,7 +72,7 @@ resource "aws_api_gateway_integration" "characters_get_integration" {
         #if($foreach.hasNext),#end
         #end
       },
-      "queryString": {
+      "queryStringParameters": {
         #foreach($param in $input.params().querystring.keySet())
         "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
         #if($foreach.hasNext),#end
@@ -438,7 +438,7 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
         #if($foreach.hasNext),#end
         #end
       },
-      "queryString": {
+      "queryStringParameters": {
         #foreach($param in $input.params().querystring.keySet())
         "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
         #if($foreach.hasNext),#end
