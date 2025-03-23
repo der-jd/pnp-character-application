@@ -41,7 +41,6 @@ async function getSkillCost(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     const response = {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Successfully got skill cost",
         characterId: params.characterId,
         skillName: params.skillName,
         increaseCost: increaseCost,

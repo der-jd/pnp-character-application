@@ -47,7 +47,6 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       const response = {
         statusCode: 200,
         body: JSON.stringify({
-          message: "Skill already increased to target value. Nothing to do!",
           characterId: params.characterId,
           skillName: params.skillName,
           skillValue: skillValue,
@@ -126,7 +125,6 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const response = {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Successfully increased skill",
         characterId: params.characterId,
         skillName: params.skillName,
         skillValue: skillValue,

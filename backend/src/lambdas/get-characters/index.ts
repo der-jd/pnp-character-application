@@ -61,7 +61,6 @@ async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const response = {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Successfully got characters",
         characters: characters,
       }),
     };

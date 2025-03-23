@@ -47,7 +47,6 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
     const response = {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Successfully got character",
         character: dynamoDbResponse.Item,
       }),
     };
