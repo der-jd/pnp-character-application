@@ -18,7 +18,7 @@ interface CharacterOptions {
 let counter = 17;
 
 const SidebarRight: React.FC = () => {
-  const [/*selectedValue*/, selectValue] = useState<string>("");
+  const [, /*selectedValue*/ selectValue] = useState<string>("");
 
   const handleChange = (value: SingleValue<CharacterOptions>) => {
     if (value) {
