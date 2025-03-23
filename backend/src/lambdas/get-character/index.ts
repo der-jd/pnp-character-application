@@ -16,7 +16,7 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
   try {
     const params = verifyRequest(event);
 
-    console.log(`Get character ${params.characterId} of user ${params.userId} from DynamoDB`);
+    console.log(`Get character ${params.characterId} of user ${params.userId}`);
 
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
     const client = new DynamoDBClient({});
