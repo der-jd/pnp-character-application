@@ -36,7 +36,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     let skillValue = getSkill(characterSheet.skills, skillCategory, params.skillName).current;
     let totalCost = getSkill(characterSheet.skills, skillCategory, params.skillName).totalCost;
     const adjustedCostCategory = CostCategory.adjustCategory(
-      CostCategory.parse(defaultCostCategory.toString()), // Without parse CostCategory is interpreted as string and not as a number
+      defaultCostCategory,
       LearningMethod.parse(params.learningMethod),
     );
 

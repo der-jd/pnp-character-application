@@ -536,6 +536,7 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
     "integration.request.path.skill-category" = "method.request.path.skill-category"
     "integration.request.path.skill-name"     = "method.request.path.skill-name"
   }
+  // TODO add request body model for method request. Optional?!
 
   request_templates = {
     "application/json" = <<EOF
