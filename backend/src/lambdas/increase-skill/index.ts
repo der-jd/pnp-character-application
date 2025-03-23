@@ -245,6 +245,7 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
   const command = new GetCommand({
     TableName: process.env.TABLE_NAME,
     Key: {
+      userId: params.userId,
       characterId: params.characterId,
     },
   });
