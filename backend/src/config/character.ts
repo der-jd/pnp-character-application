@@ -6,6 +6,12 @@ export interface Character {
   characterSheet: CharacterSheet;
 }
 
+export interface CalculationPoints {
+  start: number;
+  available: number;
+  total: number;
+}
+
 export interface Attribute {
   start: number;
   current: number;
@@ -60,16 +66,8 @@ export interface CharacterSheet {
     specialCharacteristics: string;
   };
   calculationPoints: {
-    adventurePoints: {
-      start: number;
-      available: number;
-      total: number;
-    };
-    attributePoints: {
-      start: number;
-      available: number;
-      total: number;
-    };
+    adventurePoints: CalculationPoints;
+    attributePoints: CalculationPoints;
   };
   advantages: string[];
   disadvantages: string[];
