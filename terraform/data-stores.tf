@@ -1,5 +1,6 @@
 locals {
   characters_table_name = "pnp-app-characters"
+  history_table_name    = "pnp-app-characters-history"
 }
 
 resource "aws_dynamodb_table" "characters" {
@@ -32,10 +33,11 @@ resource "aws_dynamodb_table" "characters" {
 }
 
 resource "aws_dynamodb_table" "characters_history" {
-  name         = "pnp-app-characters-history"
+  name         = local.history_table_name
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "historyId"
 
+  // TODO update schema
   attribute {
     name = "historyId"
     type = "S"
