@@ -356,6 +356,184 @@ resource "aws_api_gateway_method_response" "character_id_options_method_response
   }
 }
 
+// ================== history ==================
+
+resource "aws_api_gateway_resource" "history" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "history" // .../characters/{character-id}/history
+}
+
+resource "aws_api_gateway_method" "history_post" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.history.id
+  http_method   = "POST"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  request_parameters = {
+    "method.request.path.character-id" = true
+  }
+}
+
+resource "aws_api_gateway_method_response" "history_post_method_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = aws_api_gateway_method.history_post.http_method
+  status_code = each.value
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
+resource "aws_api_gateway_integration" "history_post_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id             = aws_api_gateway_resource.history.id
+  http_method             = aws_api_gateway_method.history_post.http_method
+  integration_http_method = "POST"
+  type                    = "AWS"
+  uri                     = aws_lambda_function.write_history_lambda.invoke_arn
+  request_parameters = {
+    "integration.request.path.character-id" = "method.request.path.character-id"
+  }
+
+  request_templates = {
+    "application/json" = <<EOF
+    {
+      "body": $input.json('$'),
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      },
+      "headers": {
+        #foreach($param in $input.params().header.keySet())
+        "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }
+    }
+    EOF
+  }
+}
+
+resource "aws_api_gateway_integration_response" "history_post_integration_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = aws_api_gateway_method.history_post.http_method
+  status_code = 200
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,POST'"
+  }
+
+  /**
+   * This overwrites the response integrations status code with the status code from the Lambda response.
+   * This is necessary because the Lambda function returns a status code in the body of the response, which
+   * is not the status code of the HTTP response. The status code of the HTTP response is always 200 if left unchanged
+   * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-override-request-response-parameters.html
+   * Note that using #set($context.responseOverride.status = $lambdaReply.statusCode) does not work
+   */
+  response_templates = {
+    "application/json" = <<EOT
+    #set($rawBody = $input.json('$.body'))
+    #set($parsedBody = $util.parseJson($rawBody))
+    #set($status = $input.json('$.statusCode'))
+    #if($status == 400)
+        #set($context.responseOverride.status = 400)
+    #end
+    #if($status == 401)
+        #set($context.responseOverride.status = 401)
+    #end
+    #if($status == 403)
+        #set($context.responseOverride.status = 403)
+    #end
+    #if($status == 404)
+        #set($context.responseOverride.status = 404)
+    #end
+    #if($status == 500)
+        #set($context.responseOverride.status = 500)
+    #end
+    $parsedBody
+    EOT
+  }
+
+  /**
+   * API Gateway uses Java pattern-style regexes for selecting the correct response integration. Since
+   * we want to select the integration for all status codes, we use the regex ".*" which matches everything.
+   * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-method-settings-execution-console.html Section 8
+   * See: https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/
+   */
+  selection_pattern = ".*"
+}
+
+resource "aws_api_gateway_method" "history_options" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = "OPTIONS"
+  // Authorization needs to be NONE for the preflight request to work which is sent automatically by the browser without any authorization header.
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.header.Origin" : false
+  }
+}
+
+resource "aws_api_gateway_integration" "history_options_integration" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = aws_api_gateway_method.history_options.http_method
+  type        = "MOCK"
+  // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
+  // For a method with the mock integration to return a 200 response, configure the
+  // integration request body mapping template to return the following:
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
+}
+
+resource "aws_api_gateway_integration_response" "history_options_integration_response" {
+  depends_on = [aws_api_gateway_integration.history_options_integration]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = aws_api_gateway_method.history_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "history_options_method_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = aws_api_gateway_method.history_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  }
+}
+
 // ================== skills  ==================
 
 resource "aws_api_gateway_resource" "skills" {
