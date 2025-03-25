@@ -4,20 +4,23 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "build": "tsc && ./rename-build-files-and-imports.sh && ./include-dependencies.sh"
+    "build": "tsc && ./rename-build-files-and-imports.sh && ./include-dependencies.sh",
+    "generate-zod-schemas": "npx ts-to-zod src/config/character.ts src/config/character_schemas.ts"
   },
   "dependencies": {
+    "add-event-to-history": "file:src/lambdas/add-event-to-history",
     "config": "file:src/config",
+    "create-tenant-id": "file:src/lambdas/create-tenant-id",
     "get-character": "file:src/lambdas/get-character",
     "get-characters": "file:src/lambdas/get-characters",
-    "increase-skill": "file:src/lambdas/increase-skill",
-    "create-tenant-id": "file:src/lambdas/create-tenant-id",
-    "get-skill-increase-cost": "file:src/lambdas/get-skill-increase-cost"
+    "get-skill-increase-cost": "file:src/lambdas/get-skill-increase-cost",
+    "increase-skill": "file:src/lambdas/increase-skill"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "eslint": "^9.13.0",
     "globals": "^15.11.0",
+    "ts-to-zod": "^3.15.0",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.11.0"
   }
