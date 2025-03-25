@@ -400,7 +400,7 @@ resource "aws_api_gateway_integration" "history_post_integration" {
   http_method             = aws_api_gateway_method.history_post.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = aws_lambda_function.write_history_lambda.invoke_arn
+  uri                     = aws_lambda_function.add_event_to_history_lambda.invoke_arn
   request_parameters = {
     "integration.request.path.character-id" = "method.request.path.character-id"
   }
