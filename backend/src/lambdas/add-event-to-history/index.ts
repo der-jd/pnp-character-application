@@ -1,10 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { Event } from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  return getCharacter(event);
+  return addEventToHistory(event);
 };
 
 interface historyBlock {
@@ -16,39 +16,31 @@ interface historyBlock {
 }
 
 interface Change {
-  id: string;
-  event: string;
-  name: string;
-  data: { [key: string]: any };
-  learningMethod: string;
+  id: string; // To be generated in this function
+  event: Event; // input param
+  name: string; // input param
+  // input param
+  data: { [key: string]: any }; // TODO we should use a fixed schema here to validate the incoming data to this function?!
+  learningMethod: string; // input param
   calculationPoints: {
+    // input param
     adjustment: number;
     old: number;
     new: number;
   };
-  date: string; // TODO use timestamp type?!
-  comment: string;
+  // to be generated in this function
+  timestamp: string; // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2025-03-24T16:34:56Z (UTC) or 2025-03-24T16:34:56+02:00
+  comment: string; // input param
 }
-
-/**
- *  TODO save history event for all types
- * - Attribute
- * - BaseValue
- * - Skill
- * - CombatSkill
- * - CalculationPoints
- * - Advantages
- * - Disadvantages
- * - Special abilities
- */
 
 interface Parameters {
   userId: string;
   characterId: string;
 }
 
-async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+async function addEventToHistory(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
+    // TODO only allow access to the character history if the user has access to the character
     const params = verifyRequest(event);
 
     const h: historyBlock = {
@@ -114,33 +106,6 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
 
 function verifyRequest(event: APIGatewayProxyEvent): Parameters {
   console.log("Verify request");
-
-  // Trim the authorization header as it could contain spaces at the beginning
-  const authHeader = event.headers.Authorization?.trim() || event.headers.authorization?.trim();
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw {
-      statusCode: 401,
-      body: JSON.stringify({ message: "Unauthorized: No token provided!" }),
-    };
-  }
-
-  const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
-  // Decode the token without verification (the access to the API itself is already protected by the authorizer)
-  const decoded = jwt.decode(token) as JwtPayload | null;
-  if (!decoded) {
-    throw {
-      statusCode: 401,
-      body: JSON.stringify({ message: "Unauthorized: Invalid token!" }),
-    };
-  }
-
-  const userId = decoded.sub; // Cognito User ID
-  if (!userId) {
-    throw {
-      statusCode: 401,
-      body: JSON.stringify({ message: "Unauthorized: User ID not found in token!" }),
-    };
-  }
 
   // The conditional parse is necessary for Lambda tests via the AWS console
   const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
