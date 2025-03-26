@@ -45,12 +45,22 @@ async function makeRequest<ReturnType, BodyType>(
     ...(body && { body: JSON.stringify(body) }),
   };
 
-  const response = await fetch(url, request);
-  if (!response.ok) {
-    throw new Error(`[Api Error] could not fetch: ${endpoint_url}`);
-  }
+  try {
+    console.log(`[Api Debug] Sending request...`);
+    const response = await fetch(url, request);
+    console.log(`[Api Debug] Response received with status: ${response.status}`);
 
-  return response.json();
+    if (!response.ok) {
+      throw new Error(`[Api Error] Failed to fetch: ${endpoint_url} - ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log(`[Api Debug] Response Data:`, data);
+    return data;
+  } catch (error) {
+    console.error(`[Api Error]`, error);
+    throw error;
+  }
 }
 
 const get = <ReturnType>(idToken: string, endpoint_url: string): Promise<ReturnType> =>
@@ -66,7 +76,7 @@ const patch = <ReturnType, BodyType>(idToken: string, endpoint_url: string, body
  */
 export async function getCharacter(idToken: string, id: string): Promise<Character> {
   const endpoint_url = `characters/${id}`;
-  return get<Character>(idToken, endpoint_url);
+  return await get<Character>(idToken, endpoint_url);
 }
 
 /**
@@ -75,7 +85,7 @@ export async function getCharacter(idToken: string, id: string): Promise<Charact
  */
 export async function getAllCharacters(idToken: string): Promise<AllCharactersReply> {
   const endpoint_url = `characters?character-short=true`;
-  return get<AllCharactersReply>(idToken, endpoint_url);
+  return await get<AllCharactersReply>(idToken, endpoint_url);
 }
 
 /**
@@ -93,5 +103,5 @@ export async function increaseSkill(
   body: SkillIncreaseRequest,
 ): Promise<SkillIncreaseReply> {
   const endpoint_url = `characters/${charId}/skills/${category}/${name}`;
-  return patch<SkillIncreaseReply, SkillIncreaseRequest>(idToken, endpoint_url, body);
+  return await patch<SkillIncreaseReply, SkillIncreaseRequest>(idToken, endpoint_url, body);
 }

@@ -8,17 +8,14 @@ import { useCharacterStore } from "@/src/app/global/characterStore";
 import { AllCharactersCharacter } from "@api/models/allCharacters/interface";
 import { useAuth } from "@/src/app/global/AuthContext";
 import { Button } from "../ui/button";
-import { increaseSkill } from "@api/utils/api_calls";
 
 interface CharacterOptions {
   label: string;
   value: string;
 }
 
-let counter = 17;
-
 const SidebarRight: React.FC = () => {
-  const [, /*selectedValue*/ selectValue] = useState<string>("");
+  const [selectedValue, selectValue] = useState<string>("");
 
   const handleChange = (value: SingleValue<CharacterOptions>) => {
     if (value) {
@@ -29,7 +26,7 @@ const SidebarRight: React.FC = () => {
   };
 
   const updateAvailableCharacters = useCharacterStore((state) => state.updateAvailableCharacters);
-  //const updateCharacter = useCharacterStore((state) => state.updateCharacter);
+  const updateCharacter = useCharacterStore((state) => state.updateCharacter);
   const characters: Array<AllCharactersCharacter> = useCharacterStore((state) => state.availableCharacters);
 
   const idToken = useAuth().idToken;
@@ -69,17 +66,9 @@ const SidebarRight: React.FC = () => {
   };
 
   const loadCharacter = async () => {
-    // TODO remove after testing
-    increaseSkill(idToken!, "dd8801c6-7ae9-402b-8666-a8488d0270c1", "athletics", "body", {
-      initialValue: counter,
-      increasedPoints: 1,
-      learningMethod: "NORMAL",
-    });
-    counter++;
-
-    //if (idToken) {
-    //  await updateCharacter(idToken, selectedValue);
-    //}
+    if (idToken) {
+      updateCharacter(idToken, selectedValue);
+    }
   };
 
   return (
@@ -103,6 +92,13 @@ const SidebarRight: React.FC = () => {
           </li>
           <li className="flex items-center justify-center">
             <AsyncSelect
+              defaultOptions={characters.map((char) => ({
+                value: char.characterId,
+                label: char.name,
+                userId: char.userId,
+                level: char.level,
+              }))}
+              cacheOptions
               onMenuOpen={promiseOptions}
               loadOptions={promiseOptions} // TODO update load options to filter for character names containing the input
               onChange={handleChange}

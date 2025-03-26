@@ -46,9 +46,7 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        character: dynamoDbResponse.Item,
-      }),
+      body: JSON.stringify(dynamoDbResponse.Item),
     };
     console.log(response);
     return response;

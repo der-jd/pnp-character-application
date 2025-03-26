@@ -97,17 +97,23 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
 
   updateCharacter: async (idToken: string, charId: string) => {
     try {
+      console.log(`[Debug] Fetching character: ${charId}`);
       const character = await getCharacter(idToken, charId);
+      console.log(`[Debug] Character fetched:`, character);
+
       set(() => ({
         characterSheet: { ...character.characterSheet },
       }));
+
+      console.log(`[Debug] State updated with character: ${charId}`);
     } catch (error) {
-      console.log(`Failed to fetch character: ${charId}!`);
+      console.error(`[Debug] Failed to fetch character: ${charId}!`, error);
     }
-    console.log("get character finished");
+
+    console.log("[Debug] getCharacter function finished");
   },
 
   selectCharacter: (charId: string) => {
-    set({ selectedCharacterId: charId });
+    set(() => ({ selectedCharacterId: charId }));
   },
 }));
