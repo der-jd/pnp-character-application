@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ConfirmSignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { cognitoClient, cognitoConfig } from "../../global/CognitoConfig";
-import { useAuth } from "../../global/AuthContext";
+import { cognitoClient, cognitoConfig } from "@global/CognitoConfig";
+import { useAuth } from "@global/AuthContext";
 
 export default function ConfirmSignUp() {
   const [code, setCode] = useState("");

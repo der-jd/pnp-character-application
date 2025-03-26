@@ -5,9 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { cognitoConfig, cognitoClient } from "../../global/CognitoConfig";
-import { useAuth } from "../../global/AuthContext";
-import { useCharacterStore } from "../../global/characterStore";
+import { cognitoConfig, cognitoClient } from "@global/CognitoConfig";
+import { useAuth } from "@global/AuthContext";
+import { useCharacterStore } from "@global/characterStore";
 // import { RouletteSpinner } from "react-spinner-overlay";
 
 export default function SignIn() {

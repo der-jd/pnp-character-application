@@ -5,10 +5,10 @@ import { useState } from "react";
 import { SingleValue } from "react-select";
 import AsyncSelect from "react-select/async";
 import { useCharacterStore } from "@/src/app/global/characterStore";
-import { AllCharactersCharacter } from "../../api/models/allCharacters/interface";
+import { AllCharactersCharacter } from "@api/models/allCharacters/interface";
 import { useAuth } from "@/src/app/global/AuthContext";
 import { Button } from "../ui/button";
-import { increaseSkill } from "../../api/utils/api_calls";
+import { increaseSkill } from "@api/utils/api_calls";
 
 interface CharacterOptions {
   label: string;
