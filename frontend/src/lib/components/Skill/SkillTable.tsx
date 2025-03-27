@@ -57,11 +57,16 @@ export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }
     const name = skill.name as keyof CharacterSheet;
     updateValue(path, name, points_to_skill);
     setData((prevData) =>
-      prevData.map((item) => (item.name === skill.name ? { ...item, edited_level: item.edited_level + points_to_skill } : item))
+      prevData.map((item) =>
+        item.name === skill.name ? { ...item, edited_level: item.edited_level + points_to_skill } : item,
+      ),
     );
   };
 
-  const filteredData = useMemo(() => (showActiveOnly ? data.filter((skill) => skill.activated) : data), [data, showActiveOnly]);
+  const filteredData = useMemo(
+    () => (showActiveOnly ? data.filter((skill) => skill.activated) : data),
+    [data, showActiveOnly],
+  );
 
   const columns: ColumnDef<ISkillProps>[] = [
     {
@@ -93,9 +98,7 @@ export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }
               checked={skill.activated}
               onCheckedChange={(checked) => {
                 setData((prevData) =>
-                  prevData.map((item) =>
-                    item.name === skill.name ? { ...item, activated: checked === true } : item
-                  )
+                  prevData.map((item) => (item.name === skill.name ? { ...item, activated: checked === true } : item)),
                 );
               }}
               aria-label={`Set ${skill.name} as active`}

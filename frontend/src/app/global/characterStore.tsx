@@ -20,38 +20,6 @@ export interface CharacterStore {
   updateCharacter: (idToken: string, charId: string) => void;
 }
 
-const updateCharacterSheet = (sheet: CharacterSheet, path: string[], name: string, newValue: any) => {
-  console.log(sheet);
-  console.log(path);
-  console.log(name);
-  return path.reduceRight((acc, key, index, arr) => {
-    console.log("_______________")
-    console.log(acc);
-    console.log(index);
-    console.log(arr.length);
-    console.log(arr[index]);
-    if (index === arr.length - 1) {
-      // At deepest level, update the value
-      return {
-        ...sheet,
-        [key]: {
-          ...(sheet[key as keyof CharacterSheet] as Record<string, any>),
-          [name]: {
-            ...(sheet[key as keyof CharacterSheet] as Record<string, object>)[name],
-            current: newValue,
-          },
-        },
-      };
-    }
-    // Rebuild each level as we go back up
-    console.log("test");
-    return {
-      ...sheet,
-      [key]: acc,
-    };
-  }, structuredClone(sheet));
-};
-
 /**
  * CharacterStore to manage the global state of all character related data
  * This updates the character in place after changes made are approved and
@@ -67,8 +35,6 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
   setEditable: (isEditable) => set({ isEditable }),
   setSelectedCharacter: (char) => set({ selectedCharacterId: char }),
   setAvailableCharacters: (chars) => set({ availableCharacters: [...chars] }),
-
-
 
   /**
    * Updates a specified value in the character sheet and updates the value in the character store
@@ -87,16 +53,13 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       return {
         characterSheet: updateCharacterSheet(state.characterSheet, path as string[], name, newValue),
       };
-
     });
   },
 
-
-
   /**
    * Fetches all own and shared characters for the current user and updates the character store
-   * 
-   * @param idToken The idToken of the user 
+   *
+   * @param idToken The idToken of the user
    */
   updateAvailableCharacters: async (idToken: string) => {
     try {
@@ -111,7 +74,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
 
   /**
    * Fetches the specified character and updates the character store
-   * 
+   *
    * @param idToken The idToken provided by cognito
    * @param charId  The character to fetch
    */
@@ -122,15 +85,17 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       set(() => ({
         characterSheet: { ...character.characterSheet },
       }));
-    } catch(error) {
+    } catch (error) {
       console.log(`[Character store] Error while fetching character data for ${charId}!`);
     }
   },
 
   /**
    * Updates the currently selected character
-   * 
+   *
    * @param charId The selected character
    */
-  selectCharacter: (charId: string) => { set(() => ({ selectedCharacterId: charId })) },
+  selectCharacter: (charId: string) => {
+    set(() => ({ selectedCharacterId: charId }));
+  },
 }));

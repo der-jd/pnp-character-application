@@ -53,9 +53,7 @@ async function makeRequest<ReturnType, BodyType>(
 
     const data = await response.json();
     return data;
-  } 
-  
-  catch (error) {
+  } catch (error) {
     console.error(`[Api Error]`, error);
     throw error;
   }

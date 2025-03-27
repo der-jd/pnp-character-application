@@ -31,7 +31,6 @@ const SidebarRight: React.FC = () => {
   const idToken = useAuth().idToken;
 
   const loadOptions = async (idToken: string) => {
-
     await updateAvailableCharacters(idToken);
 
     return characters.map((char) => ({
@@ -99,8 +98,12 @@ const SidebarRight: React.FC = () => {
             </Button>
           </li>
           <li className="flex items-center justify-center">
-              <div className="items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">Current Character:</div>
-              <div className="items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">{loadedCharacter != null ? loadedCharacter : ""}</div>
+            <div className="items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">
+              Current Character:
+            </div>
+            <div className="items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">
+              {loadedCharacter != null ? loadedCharacter : ""}
+            </div>
           </li>
         </ul>
       </nav>
