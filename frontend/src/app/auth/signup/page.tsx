@@ -42,7 +42,6 @@ export default function SignUp() {
       console.log(response);
 
       if (response.UserSub) {
-        console.log("User signed up successfully:", response.UserSub);
         router.push("/auth/confirmSignup?email=" + encodeURIComponent(email));
       } else {
         throw new Error("Sign up failed");

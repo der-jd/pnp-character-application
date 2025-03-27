@@ -19,27 +19,20 @@ const SidebarRight: React.FC = () => {
 
   const handleChange = (value: SingleValue<CharacterOptions>) => {
     if (value) {
-      console.log(value);
       selectValue(value.value);
-      console.log(`Selected value ${value.value}`);
     }
   };
 
   const updateAvailableCharacters = useCharacterStore((state) => state.updateAvailableCharacters);
   const updateCharacter = useCharacterStore((state) => state.updateCharacter);
   const characters: Array<AllCharactersCharacter> = useCharacterStore((state) => state.availableCharacters);
+  const loadedCharacter = useCharacterStore((state) => state.characterSheet?.generalInformation.name);
 
   const idToken = useAuth().idToken;
 
   const loadOptions = async (idToken: string) => {
-    console.log("loading options");
 
     await updateAvailableCharacters(idToken);
-    console.log("characters: ", characters);
-
-    if (characters.length === 0) {
-      console.log("no characters available, fetching");
-    }
 
     return characters.map((char) => ({
       value: char.characterId,
@@ -51,14 +44,11 @@ const SidebarRight: React.FC = () => {
 
   const promiseOptions = () => {
     return new Promise<CharacterOptions[]>((resolve) => {
-      console.log("loading options");
       setTimeout(async () => {
         if (idToken) {
           const options = await loadOptions(idToken);
-          console.log("options: ", options);
           resolve(options);
         } else {
-          console.log("no id token provided");
           resolve([]);
         }
       }, 0);
@@ -107,6 +97,10 @@ const SidebarRight: React.FC = () => {
             <Button onClick={loadCharacter} className="w-1/2">
               Load Character
             </Button>
+          </li>
+          <li className="flex items-center justify-center">
+              <div className="items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">Current Character:</div>
+              <div className="items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">{loadedCharacter != null ? loadedCharacter : ""}</div>
           </li>
         </ul>
       </nav>

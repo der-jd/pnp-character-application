@@ -46,18 +46,16 @@ async function makeRequest<ReturnType, BodyType>(
   };
 
   try {
-    console.log(`[Api Debug] Sending request...`);
     const response = await fetch(url, request);
-    console.log(`[Api Debug] Response received with status: ${response.status}`);
-
     if (!response.ok) {
       throw new Error(`[Api Error] Failed to fetch: ${endpoint_url} - ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log(`[Api Debug] Response Data:`, data);
     return data;
-  } catch (error) {
+  } 
+  
+  catch (error) {
     console.error(`[Api Error]`, error);
     throw error;
   }

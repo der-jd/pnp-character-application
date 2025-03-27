@@ -189,18 +189,13 @@ export function extract_properties_data(characterSheet: CharacterSheet | null): 
     return [];
   }
 
-  // console.log("extract_properties_data");
   const result: ISkillProps[] = [];
 
   for (const extractor of nodeExtractors) {
-    console.log(characterSheet);
     const node = characterSheet[extractor.key];
     const category = extractor.category || extractor.key;
-    console.log(node);
-    console.log(category);
 
     // Check if the node has nested structures
-    console.log(characterSheet);
     if (category === "skills") {
       Object.entries(node).forEach(([subCategory, subNode]) => {
         Object.entries(subNode).forEach(([name, data]) => {

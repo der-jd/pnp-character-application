@@ -20,6 +20,38 @@ export interface CharacterStore {
   updateCharacter: (idToken: string, charId: string) => void;
 }
 
+const updateCharacterSheet = (sheet: CharacterSheet, path: string[], name: string, newValue: any) => {
+  console.log(sheet);
+  console.log(path);
+  console.log(name);
+  return path.reduceRight((acc, key, index, arr) => {
+    console.log("_______________")
+    console.log(acc);
+    console.log(index);
+    console.log(arr.length);
+    console.log(arr[index]);
+    if (index === arr.length - 1) {
+      // At deepest level, update the value
+      return {
+        ...sheet,
+        [key]: {
+          ...(sheet[key as keyof CharacterSheet] as Record<string, any>),
+          [name]: {
+            ...(sheet[key as keyof CharacterSheet] as Record<string, object>)[name],
+            current: newValue,
+          },
+        },
+      };
+    }
+    // Rebuild each level as we go back up
+    console.log("test");
+    return {
+      ...sheet,
+      [key]: acc,
+    };
+  }, structuredClone(sheet));
+};
+
 /**
  * CharacterStore to manage the global state of all character related data
  * This updates the character in place after changes made are approved and
@@ -36,6 +68,8 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
   setSelectedCharacter: (char) => set({ selectedCharacterId: char }),
   setAvailableCharacters: (chars) => set({ availableCharacters: [...chars] }),
 
+
+
   /**
    * Updates a specified value in the character sheet and updates the value in the character store
    * Note: Updating the character sheet in the store triggers a rerender of components using the sheet
@@ -43,77 +77,60 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
    * @param path The keys to the value in order(!) of key traversal through the object
    * @param name The name of the value to update
    * @param newValue The new value of the value to update
-   * @returns The characterSheet which triggers an update for consumers of the charactersheet if the characterSheet is not null
    */
-  updateValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: number) =>
+  updateValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: number) => {
     set((state) => {
       if (!state.characterSheet) {
-        throw new Error("No character sheet has been loaded yet, updating value " + name + " failed");
+        throw new Error(`No character sheet has been loaded yet, updating value ${name} failed`);
       }
 
-      const updateCharacterSheet = path.reduce<CharacterSheet>((acc, key, index) => {
-        // last step, sufficient depth is reached, update the value
-        if (index === path.length - 1) {
-          if (typeof acc[key] === "object" && acc[key] !== null) {
-            return {
-              ...acc,
-              [key]: {
-                ...acc[key as keyof CharacterSheet],
-                [name]: {
-                  ...(acc[key as keyof CharacterSheet] as Record<string, object>)[name],
-                  current: newValue,
-                },
-              },
-            };
-          } else {
-            throw new Error("Expected an object at " + key + " but found a non-object value");
-          }
-        }
+      return {
+        characterSheet: updateCharacterSheet(state.characterSheet, path as string[], name, newValue),
+      };
 
-        // intermediate step, spread the current level if final depth not reached
-        return {
-          ...acc,
-          [key]: {
-            ...acc[key],
-          },
-        };
-      }, state.characterSheet as CharacterSheet);
+    });
+  },
 
-      return { characterSheet: updateCharacterSheet };
-    }),
 
+
+  /**
+   * Fetches all own and shared characters for the current user and updates the character store
+   * 
+   * @param idToken The idToken of the user 
+   */
   updateAvailableCharacters: async (idToken: string) => {
-    console.log("updating Characters!");
     try {
       const characters = await getAllCharacters(idToken);
       set(() => ({
         availableCharacters: [...characters.characters],
       }));
     } catch (error) {
-      console.log(`Failed to fetch all characters!`);
+      console.log(`[Character store] Error while fetching available characters!`);
     }
-    console.log("update finished");
   },
 
+  /**
+   * Fetches the specified character and updates the character store
+   * 
+   * @param idToken The idToken provided by cognito
+   * @param charId  The character to fetch
+   */
   updateCharacter: async (idToken: string, charId: string) => {
     try {
-      console.log(`[Debug] Fetching character: ${charId}`);
       const character = await getCharacter(idToken, charId);
-      console.log(`[Debug] Character fetched:`, character);
 
       set(() => ({
         characterSheet: { ...character.characterSheet },
       }));
-
-      console.log(`[Debug] State updated with character: ${charId}`);
-    } catch (error) {
-      console.error(`[Debug] Failed to fetch character: ${charId}!`, error);
+    } catch(error) {
+      console.log(`[Character store] Error while fetching character data for ${charId}!`);
     }
-
-    console.log("[Debug] getCharacter function finished");
   },
 
-  selectCharacter: (charId: string) => {
-    set(() => ({ selectedCharacterId: charId }));
-  },
+  /**
+   * Updates the currently selected character
+   * 
+   * @param charId The selected character
+   */
+  selectCharacter: (charId: string) => { set(() => ({ selectedCharacterId: charId })) },
 }));
