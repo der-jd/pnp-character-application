@@ -12,6 +12,11 @@ export interface CalculationPoints {
   total: number;
 }
 
+export interface ProfessionHobby {
+  name: string;
+  skill: string;
+}
+
 export interface Attribute {
   start: number;
   current: number;
@@ -47,14 +52,8 @@ export interface CharacterSheet {
     name: string;
     level: number;
     sex: string;
-    profession: {
-      name: string;
-      skill: string;
-    };
-    hobby: {
-      name: string;
-      skill: string;
-    };
+    profession: ProfessionHobby;
+    hobby: ProfessionHobby;
     birthday: string;
     birthplace: string;
     size: string;

@@ -7,6 +7,11 @@ export const calculationPointsSchema = z.object({
   total: z.number(),
 });
 
+export const professionHobbySchema = z.object({
+  name: z.string(),
+  skill: z.string(),
+});
+
 export const attributeSchema = z.object({
   start: z.number(),
   current: z.number(),
@@ -44,14 +49,8 @@ export const characterSheetSchema = z.object({
     name: z.string(),
     level: z.number(),
     sex: z.string(),
-    profession: z.object({
-      name: z.string(),
-      skill: z.string(),
-    }),
-    hobby: z.object({
-      name: z.string(),
-      skill: z.string(),
-    }),
+    profession: professionHobbySchema,
+    hobby: professionHobbySchema,
     birthday: z.string(),
     birthplace: z.string(),
     size: z.string(),
