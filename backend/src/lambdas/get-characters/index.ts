@@ -14,7 +14,7 @@ interface Parameters {
 
 async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const params = verifyRequest(event);
+    const params = validateRequest(event);
 
     console.log(`Get characters for user ${params.userId}`);
 
@@ -82,8 +82,8 @@ async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayPro
   }
 }
 
-function verifyRequest(event: APIGatewayProxyEvent): Parameters {
-  console.log("Verify request");
+function validateRequest(event: APIGatewayProxyEvent): Parameters {
+  console.log("Validate request");
 
   // TODO move handling of authorization token to Lambda layer
   // Trim the authorization header as it could contain spaces at the beginning
