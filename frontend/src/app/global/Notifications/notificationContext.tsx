@@ -11,19 +11,9 @@ const customContent = (severity: string, title: string, msg: string) => {
   let attributes: string = "text-white text-lg p-1 rounded-lg items-center justify-center rounded-lg w-full";
 
   switch (severity) {
-    case "info": {
-      attributes += " bg-blue-500";
-    }
-    case "error":
-      {
-        attributes += " bg-red-500";
-      }
-      break;
-    case "warning":
-      {
-        attributes += " bg-yellow-500";
-      }
-      break;
+    case "info":    attributes += " bg-blue-500";   break;
+    case "error":   attributes += " bg-red-500";    break;
+    case "warning": attributes += " bg-yellow-500"; break;
   }
 
   return (
