@@ -20,10 +20,12 @@ const SidebarRight: React.FC = () => {
   const handleChange = (value: SingleValue<CharacterOptions>) => {
     if (value) {
       selectValue(value.value);
+      setSelectedCharacter(value.value);
     }
   };
 
   const updateAvailableCharacters = useCharacterStore((state) => state.updateAvailableCharacters);
+  const setSelectedCharacter = useCharacterStore((state) => state.setSelectedCharacter);
   const updateCharacter = useCharacterStore((state) => state.updateCharacter);
   const characters: Array<AllCharactersCharacter> = useCharacterStore((state) => state.availableCharacters);
   const loadedCharacter = useCharacterStore((state) => state.characterSheet?.generalInformation.name);
@@ -98,11 +100,11 @@ const SidebarRight: React.FC = () => {
             </Button>
           </li>
           <li className="flex items-center justify-center">
-            <div className="items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">
+            <div className="p-1 items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">
               Current Character:
             </div>
-            <div className="items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">
-              {loadedCharacter != null ? loadedCharacter : ""}
+            <div className="p-1 items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">
+              {loadedCharacter ?? "No Character selected"}
             </div>
           </li>
         </ul>

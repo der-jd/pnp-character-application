@@ -61,7 +61,9 @@ async function makeRequest<ReturnType, BodyType>(
 
 const get = <ReturnType>(idToken: string, endpoint_url: string): Promise<ReturnType> =>
   makeRequest<ReturnType>(idToken, endpoint_url, HttpMethod.GET);
+
 // const post = <T>(endpoint_url: string): Promise<T> => makeRequest<T, HttpMethod.POST>(endpoint_url, HttpMethod.POST);
+
 const patch = <ReturnType, BodyType>(idToken: string, endpoint_url: string, body: BodyType): Promise<ReturnType> =>
   makeRequest<ReturnType, BodyType>(idToken, endpoint_url, HttpMethod.PATCH, body);
 

@@ -8,6 +8,8 @@ import { Checkbox } from "@lib/components/ui/checkbox";
 import { ISkillProps, render_skill_icon } from "./SkillDefinitions";
 import { CharacterSheet, LearningMethod } from "@/src/lib/api/models/Character/character";
 import { useCharacterStore } from "@/src/app/global/characterStore";
+import { increaseSkill } from "../../api/utils/api_calls";
+import { useAuth } from "@/src/app/global/AuthContext";
 
 const getCostCategoryLabel = (category: LearningMethod): string => {
   switch (category) {
@@ -31,6 +33,7 @@ interface Props {
 
 export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }) => {
   const updateValue = useCharacterStore((state) => state.updateValue);
+  const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
   const [data, setData] = useState(initialData);
   const [showActiveOnly, setShowActiveOnly] = useState(!is_edit_mode);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
@@ -39,6 +42,8 @@ export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }
     cost: is_edit_mode,
     skilling: is_edit_mode,
   });
+
+  const idToken = useAuth().idToken;
 
   useEffect(() => {
     setShowActiveOnly(!is_edit_mode);
@@ -55,7 +60,21 @@ export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }
   const try_increase_skill = async (skill: ISkillProps, points_to_skill: number) => {
     const path = ["skills", skill.category] as (keyof CharacterSheet)[];
     const name = skill.name as keyof CharacterSheet;
+
+    const increasSkillRequest = {
+      initialValue: skill.current_level,
+      increasedPoints: skill.edited_level - skill.current_level,
+      learningMethod: String(skill.learning_method),
+    };
+    console.log(idToken);
+    console.log(selectedChar);
+    if (selectedChar && idToken) {
+      console.log("sending increase request");
+      await increaseSkill(idToken, selectedChar, skill.name, skill.category, increasSkillRequest);
+    }
+
     updateValue(path, name, points_to_skill);
+
     setData((prevData) =>
       prevData.map((item) =>
         item.name === skill.name ? { ...item, edited_level: item.edited_level + points_to_skill } : item,

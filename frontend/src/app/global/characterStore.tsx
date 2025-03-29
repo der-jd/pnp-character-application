@@ -2,6 +2,7 @@ import { CharacterSheet } from "@/src/lib/api/models/Character/character";
 import { AllCharactersCharacter } from "@/src/lib/api/models/allCharacters/interface";
 import { getAllCharacters, getCharacter } from "@/src/lib/api/utils/api_calls";
 import { create } from "zustand";
+import * as R from "ramda";
 
 export interface CharacterStore {
   availableCharacters: Array<AllCharactersCharacter>;
@@ -50,9 +51,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
         throw new Error(`No character sheet has been loaded yet, updating value ${name} failed`);
       }
 
-      return {
-        characterSheet: updateCharacterSheet(state.characterSheet, path as string[], name, newValue),
-      };
+      return { characterSheet: R.modifyPath([...path, name, "current"], () => newValue, state.characterSheet) };
     });
   },
 
