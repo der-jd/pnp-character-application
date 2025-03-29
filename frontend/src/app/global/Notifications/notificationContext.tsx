@@ -85,7 +85,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <ToastContext.Provider value={{ showError, showWarning, showInfo }}>
-      <Toast ref={toastRef} position="bottom-right" className="bg-grey-300 rounded-lg justify-center items-center" />
+      <Toast ref={toastRef} position="bottom-right"/>
       {children}
     </ToastContext.Provider>
   );
