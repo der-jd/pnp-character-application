@@ -18,7 +18,7 @@ async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
     console.log(`Get characters for user ${params.userId}`);
 
-    // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
+    // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/query.js
     const client = new DynamoDBClient({});
     const docClient = DynamoDBDocumentClient.from(client);
     const command = new QueryCommand({
