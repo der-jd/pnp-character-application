@@ -59,7 +59,6 @@ const booleanSchema = z.object({
   value: z.boolean(),
 });
 
-// TODO create schema for record (without to be generated data) and use it for input body validation?!
 interface Record {
   id: string; // To be generated in this function
   type: RecordType; // input param
@@ -228,15 +227,10 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
           errors: error.errors,
         }),
       };
-    } else {
-      console.error("Unknown validation error:", error);
-      throw {
-        statusCode: 400,
-        body: JSON.stringify({
-          message: "Unknown validation error for input values!",
-        }),
-      };
     }
+
+    // Rethrow other errors
+    throw error;
   }
 
   const characterId = event.pathParameters?.["character-id"];
