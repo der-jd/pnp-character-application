@@ -1,6 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { marshall } from "@aws-sdk/util-dynamodb";
+import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { RecordType } from "config/index.js";
 import {
@@ -12,23 +14,18 @@ import {
   skillSchema,
 } from "config/character_schemas.js";
 
+const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return addRecordToHistory(event);
 };
 
-interface historyBlock {
+interface HistoryBlock {
   characterId: string;
   blockId: string;
   blockNumber: number;
-  previousBlockId: string;
-  nextBlockId: string;
+  previousBlockId: string | null;
   changes: Record[];
-}
-
-interface CalculationPointsChange {
-  adjustment: number;
-  old: number;
-  new: number;
 }
 
 const bodySchema = z.object({
@@ -59,25 +56,16 @@ const booleanSchema = z.object({
   value: z.boolean(),
 });
 
-interface Record {
-  id: string; // To be generated in this function
-  type: RecordType; // input param
-  name: string; // input param
-  // input param
-  data: {
-    old: { [key: string]: any };
-    new: { [key: string]: any };
-  }; // TODO we should use a fixed schema here to validate the incoming data to this function?!
-  learningMethod: string; // input param
-  calculationPointsChange: CalculationPointsChange; // input param
-  // to be generated in this function
+type Body = z.infer<typeof bodySchema>;
+
+interface Record extends Body {
+  id: string;
   timestamp: string; // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2025-03-24T16:34:56Z (UTC) or 2025-03-24T16:34:56+02:00
-  comment: string; // input param
 }
 
 interface Parameters {
-  userId: string;
   characterId: string;
+  body: Body;
 }
 
 async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
@@ -85,48 +73,58 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
     // TODO only allow access to the character history if the user has access to the character
     const params = validateRequest(event);
 
-    const h: historyBlock = {
-      characterId: "123",
-      blockId: "123",
-      blockNumber: 1,
-      previousBlockId: "123",
-      nextBlockId: "153",
-      changes: [],
-    };
-    console.log(h);
-
-    console.log(`Get character ${params.characterId} of user ${params.userId}`);
-
-    // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
+    console.log(`Get history of character ${params.characterId}`);
     const client = new DynamoDBClient({});
     const docClient = DynamoDBDocumentClient.from(client);
-    const command = new GetCommand({
+    const command = new QueryCommand({
       TableName: process.env.TABLE_NAME,
-      Key: {
-        userId: params.userId,
-        characterId: params.characterId,
+      KeyConditionExpression: "characterId = :characterId",
+      ExpressionAttributeValues: {
+        ":characterId": params.characterId,
       },
       ConsistentRead: true,
+      ScanIndexForward: false, // Sort descending to get highest block number (latest item) first
+      Limit: 1, // Only need the top result
     });
 
     const dynamoDbResponse = await docClient.send(command);
+    console.log("Successfully got DynamoDB items");
 
-    if (!dynamoDbResponse.Item) {
-      console.error("Item from DynamoDB table is missing in the request response");
+    const record: Record = {
+      id: uuidv4(),
+      timestamp: new Date().toISOString(),
+      ...params.body,
+    };
+    if (!dynamoDbResponse.Items || dynamoDbResponse.Items.length === 0) {
+      console.log("No history found for the given characterId.");
+      const newBlock = await createHistoryBlock(params.characterId);
+
+      addRecord(record, newBlock);
+    } else if (dynamoDbResponse.Items.length !== 1) {
+      console.error("More than one latest history block found for the given characterId");
       throw {
         statusCode: 500,
         body: JSON.stringify({
-          message: "Item from DynamoDB table is missing in the request response",
+          message: "More than one latest history block found for the given characterId",
         }),
       };
-    }
+    } else {
+      const latestBlock = dynamoDbResponse.Items[0] as HistoryBlock; // TODO parse to HistoryBlock
+      console.log("Latest history block:", latestBlock);
 
-    console.log("Successfully got DynamoDB item");
+      if (estimateItemSize(latestBlock) + estimateItemSize(record) > MAX_ITEM_SIZE) {
+        console.log(`Item size exceeds the maximum limit of ${MAX_ITEM_SIZE} bytes`);
+        const newBlock = await createHistoryBlock(params.characterId);
+        addRecord(record, newBlock);
+      } else {
+        addRecord(record, latestBlock);
+      }
+    }
 
     const response = {
       statusCode: 200,
       body: JSON.stringify({
-        character: dynamoDbResponse.Item,
+        record: record,
       }),
     };
     console.log(response);
@@ -156,6 +154,18 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
       statusCode: 400,
       body: JSON.stringify({
         message: "Invalid input values!",
+      }),
+    };
+  }
+
+  const characterId = event.pathParameters?.["character-id"];
+  const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
+  if (!uuidRegex.test(characterId)) {
+    console.error("Character id is not a valid UUID format!");
+    throw {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "Character id is not a valid UUID format!",
       }),
     };
   }
@@ -217,6 +227,11 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
           }),
         };
     }
+
+    return {
+      characterId,
+      body: body,
+    };
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error("Validation errors:", error.errors);
@@ -232,21 +247,72 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
     // Rethrow other errors
     throw error;
   }
+}
 
-  const characterId = event.pathParameters?.["character-id"];
-  const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
-  if (!uuidRegex.test(characterId)) {
-    console.error("Character id is not a valid UUID format!");
-    throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Character id is not a valid UUID format!",
-      }),
-    };
-  }
+async function createHistoryBlock(
+  characterId: string,
+  previousBlockNumber: number | undefined = undefined,
+  previousBlockId: string | undefined = undefined,
+): Promise<HistoryBlock> {
+  console.log("Create new history block");
+  const blockNumber = previousBlockNumber ? previousBlockNumber + 1 : 1;
+  const _previousBlockId = previousBlockId ? previousBlockId : null;
 
-  return {
-    userId: "userId",
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/put.js
+  const client = new DynamoDBClient({});
+  const docClient = DynamoDBDocumentClient.from(client);
+  const blockId = uuidv4();
+  const command = new PutCommand({
+    TableName: process.env.TABLE_NAME,
+    Item: {
+      characterId: characterId,
+      blockNumber: blockNumber,
+      blockId: blockId,
+      previousBlockId: _previousBlockId,
+      changes: [],
+    },
+  });
+  await docClient.send(command);
+
+  const newBlock: HistoryBlock = {
     characterId: characterId,
+    blockId: blockId,
+    blockNumber: blockNumber,
+    previousBlockId: _previousBlockId,
+    changes: [],
   };
+  console.log("Successfully created new history block in DynamoDB", newBlock);
+
+  return newBlock;
+}
+
+async function addRecord(record: Record, block: HistoryBlock) {
+  console.log(`Add record to history block #${block.blockNumber}, id ${block.blockId}`);
+  console.log("Record:", record);
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
+  const client = new DynamoDBClient({});
+  const docClient = DynamoDBDocumentClient.from(client);
+  const command = new UpdateCommand({
+    TableName: process.env.TABLE_NAME,
+    Key: {
+      characterId: block.characterId,
+      blockNumber: block.blockNumber,
+    },
+    UpdateExpression: "SET #changes = :changes",
+    ExpressionAttributeNames: {
+      "#changes": "changes",
+    },
+    ExpressionAttributeValues: {
+      ":changes": "TODO add record",
+    },
+  });
+  await docClient.send(command);
+  console.log(`Successfully added record ${record.id} to history block in DynamoDB`);
+}
+
+function estimateItemSize(item: any): number {
+  const marshalled = marshall(item);
+  const json = JSON.stringify(marshalled);
+  return Buffer.byteLength(json, "utf8");
 }
