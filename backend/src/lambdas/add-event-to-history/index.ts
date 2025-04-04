@@ -47,7 +47,7 @@ const bodySchema = z.object({
   comment: z.string(),
 });
 
-const levelSchema = z.object({
+const numberSchema = z.object({
   value: z.number(),
 });
 
@@ -172,8 +172,8 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
         calculationPointsSchema.parse(body.data.new);
         break;
       case RecordType.EVENT_LEVEL_UP:
-        levelSchema.parse(body.data.old);
-        levelSchema.parse(body.data.new);
+        numberSchema.parse(body.data.old);
+        numberSchema.parse(body.data.new);
         break;
       case RecordType.EVENT_BASE_VALUE:
         baseValueSchema.parse(body.data.old);
