@@ -1,5 +1,5 @@
 {
-  "name": "add-event-to-history",
+  "name": "add-history-record",
   "version": "1.0.0",
   "main": "index.mjs",
   "type": "module",

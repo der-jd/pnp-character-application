@@ -84,7 +84,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       skillValue += 1;
       totalCost += increaseCost;
       availableAdventurePoints -= increaseCost;
-      // TODO add event to history event list --> apply all events in the end when it is clear if there are enough ap
+      // TODO add record to history --> apply all records in the end when it is clear if there are enough ap
     }
 
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
@@ -120,7 +120,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     await docClient.send(command);
     console.log("Successfully updated DynamoDB item");
 
-    // TODO save event in history
+    // TODO save record in history
     /** TODO check latency for increase skill
      *  If latency high: return cost for next skill point for given cost category
      *  If latency low: let frontend call separate Lambda for cost for given skill value and cost category

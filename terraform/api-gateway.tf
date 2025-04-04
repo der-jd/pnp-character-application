@@ -294,7 +294,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
 
   /**
    * API Gateway uses Java pattern-style regexes for selecting the correct response integration. Since
-   * we want to select the integration for all status codes, we use the regex ".*" which matches everything. 
+   * we want to select the integration for all status codes, we use the regex ".*" which matches everything.
    * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-method-settings-execution-console.html Section 8
    * See: https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/
    */
@@ -400,7 +400,7 @@ resource "aws_api_gateway_integration" "history_post_integration" {
   http_method             = aws_api_gateway_method.history_post.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = aws_lambda_function.add_event_to_history_lambda.invoke_arn
+  uri                     = aws_lambda_function.add_history_record_lambda.invoke_arn
   request_parameters = {
     "integration.request.path.character-id" = "method.request.path.character-id"
   }
