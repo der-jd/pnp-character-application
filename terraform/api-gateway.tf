@@ -490,6 +490,18 @@ resource "aws_api_gateway_method" "history_options" {
   }
 }
 
+resource "aws_api_gateway_method_response" "history_options_method_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = aws_api_gateway_method.history_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  }
+}
+
 resource "aws_api_gateway_integration" "history_options_integration" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.history.id
@@ -519,18 +531,6 @@ resource "aws_api_gateway_integration_response" "history_options_integration_res
     //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
     "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
-  }
-}
-
-resource "aws_api_gateway_method_response" "history_options_method_response" {
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.history.id
-  http_method = aws_api_gateway_method.history_options.http_method
-  status_code = 200
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "true"
-    "method.response.header.Access-Control-Allow-Methods" = "true"
-    "method.response.header.Access-Control-Allow-Origin"  = "true"
   }
 }
 
