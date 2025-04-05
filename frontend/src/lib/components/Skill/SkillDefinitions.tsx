@@ -79,7 +79,7 @@ import {
   Attribute,
   BaseValue,
   CharacterSheet,
-} from "../Character/character";
+} from "@api/models/Character/character";
 
 export interface ISkillProps {
   name: string;
@@ -184,7 +184,11 @@ export const nodeExtractors: NodeExtractor[] = [
   { key: "baseValues", type: "BaseValue", category: "BaseValues" },
 ];
 
-export function extract_properties_data(characterSheet: CharacterSheet): ISkillProps[] {
+export function extract_properties_data(characterSheet: CharacterSheet | null): ISkillProps[] {
+  if (!characterSheet) {
+    return [];
+  }
+
   const result: ISkillProps[] = [];
 
   for (const extractor of nodeExtractors) {
@@ -224,7 +228,6 @@ export function parseCharacterSheet(json: string): Character | null {
 }
 
 export function render_skill_icon(skill_name: string): JSX.Element {
-  console.log("getting skill: ", skill_name);
   switch (skill_name) {
     case "Athletik":
       return <GiDiscobolus size={25} />;

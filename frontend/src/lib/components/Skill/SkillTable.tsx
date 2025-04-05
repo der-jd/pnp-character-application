@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/lib/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@lib/components/ui/table";
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable, VisibilityState } from "@tanstack/react-table";
-import { Button } from "@/lib/components/ui/button";
-import { Checkbox } from "@/lib/components/ui/checkbox";
+import { Button } from "@lib/components/ui/button";
+import { Checkbox } from "@lib/components/ui/checkbox";
 import { ISkillProps, render_skill_icon } from "./SkillDefinitions";
-import { LearningMethod } from "@/lib/components/Character/character";
+import { CharacterSheet, LearningMethod } from "@/src/lib/api/models/Character/character";
+import { useCharacterStore } from "@/src/app/global/characterStore";
+import { increaseSkill } from "../../api/utils/api_calls";
+import { useAuth } from "@/src/app/global/AuthContext";
 
 const getCostCategoryLabel = (category: LearningMethod): string => {
   switch (category) {
@@ -23,25 +26,62 @@ const getCostCategoryLabel = (category: LearningMethod): string => {
   }
 };
 
-export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillProps[]; is_edit_mode: boolean }) {
+interface Props {
+  data: ISkillProps[];
+  is_edit_mode: boolean;
+}
+
+export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }) => {
+  const updateValue = useCharacterStore((state) => state.updateValue);
+  const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
   const [data, setData] = useState(initialData);
-  const [showActiveOnly, setShowActiveOnly] = useState(true);
+  const [showActiveOnly, setShowActiveOnly] = useState(!is_edit_mode);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    is_active: false,
-    cost_category: false,
-    cost: false,
-    skilling: false,
+    is_active: is_edit_mode,
+    cost_category: is_edit_mode,
+    cost: is_edit_mode,
+    skilling: is_edit_mode,
   });
 
-  const try_increase_skill = async (skill: ISkillProps, points_to_skill: number) => {
-    // todo async call to api should happen here
+  const idToken = useAuth().idToken;
 
-    const new_level = skill.edited_level + points_to_skill;
-    const updatedData = data.map((item) => (item.name === skill.name ? { ...item, edited_level: new_level } : item));
-    setData(updatedData);
+  useEffect(() => {
+    setShowActiveOnly(!is_edit_mode);
+    setColumnVisibility((prev) => ({
+      ...prev,
+      is_active: is_edit_mode,
+      cost_category: is_edit_mode,
+      cost: is_edit_mode,
+      skilling: is_edit_mode,
+    }));
+    setData(initialData.map((item) => ({ ...item, level: item.edited_level })));
+  }, [is_edit_mode, initialData]);
+
+  const try_increase_skill = async (skill: ISkillProps, points_to_skill: number) => {
+    const path = ["skills", skill.category] as (keyof CharacterSheet)[];
+    const name = skill.name as keyof CharacterSheet;
+
+    const increasSkillRequest = {
+      initialValue: skill.current_level,
+      increasedPoints: skill.edited_level - skill.current_level,
+      learningMethod: String(skill.learning_method),
+    };
+    console.log(idToken);
+    console.log(selectedChar);
+    if (selectedChar && idToken) {
+      console.log("sending increase request");
+      await increaseSkill(idToken, selectedChar, skill.name, skill.category, increasSkillRequest);
+    }
+
+    updateValue(path, name, points_to_skill);
+
+    setData((prevData) =>
+      prevData.map((item) =>
+        item.name === skill.name ? { ...item, edited_level: item.edited_level + points_to_skill } : item,
+      ),
+    );
   };
 
-  // Memoize filteredData to prevent re-computation on every render
   const filteredData = useMemo(
     () => (showActiveOnly ? data.filter((skill) => skill.activated) : data),
     [data, showActiveOnly],
@@ -55,7 +95,7 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
     },
     {
       accessorKey: "name",
-      header: () => <div className="text-left text-bold">Name</div>,
+      header: () => <div className="text-left font-bold">Name</div>,
       cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
     },
     {
@@ -76,12 +116,9 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
             <Checkbox
               checked={skill.activated}
               onCheckedChange={(checked) => {
-                if (checked === true) {
-                  const updatedData = data.map((item) =>
-                    item.name === skill.name ? { ...item, is_active: true } : item,
-                  );
-                  setData(updatedData);
-                }
+                setData((prevData) =>
+                  prevData.map((item) => (item.name === skill.name ? { ...item, activated: checked === true } : item)),
+                );
               }}
               aria-label={`Set ${skill.name} as active`}
               disabled={skill.activated}
@@ -118,33 +155,12 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
     data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    getRowCanExpand: () => true,
-    state: {
-      columnVisibility,
+    onColumnVisibilityChange: (updater) => {
+      setColumnVisibility((prev) => (typeof updater === "function" ? updater(prev) : updater));
     },
+    getRowCanExpand: () => true,
+    state: { columnVisibility },
   });
-
-  useEffect(() => {
-    setShowActiveOnly(!is_edit_mode);
-
-    // Update columnVisibility based on is_edit_mode
-    setColumnVisibility((prevVisibility) => ({
-      ...prevVisibility,
-      is_active: is_edit_mode,
-      cost_category: is_edit_mode,
-      cost: is_edit_mode,
-      skilling: is_edit_mode,
-    }));
-
-    // Update data levels based on edited_level
-    setData((prevData) =>
-      prevData.map((item) => ({
-        ...item,
-        level: item.edited_level,
-      })),
-    );
-  }, [is_edit_mode]);
 
   return (
     <div className="w-full">
@@ -184,4 +200,4 @@ export function SkillsTable({ data: initialData, is_edit_mode }: { data: ISkillP
       </div>
     </div>
   );
-}
+};

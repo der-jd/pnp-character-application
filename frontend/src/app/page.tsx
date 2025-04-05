@@ -4,7 +4,8 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "./global/AuthContext";
+import { RouletteSpinner } from "react-spinner-overlay";
 
 export default function SplashScreen() {
   const { isAuthenticated, loading } = useAuth();
@@ -17,7 +18,13 @@ export default function SplashScreen() {
   }, [isAuthenticated, loading, router]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="m-auto">
+          <RouletteSpinner />
+        </div>
+      </div>
+    );
   }
 
   if (isAuthenticated) {

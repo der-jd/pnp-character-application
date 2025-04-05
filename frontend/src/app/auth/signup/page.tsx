@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { cognitoClient, cognitoConfig } from "../../context/CognitoConfig";
-import { useAuth } from "../../context/AuthContext";
+import { cognitoClient, cognitoConfig } from "../../global/CognitoConfig";
+import { useAuth } from "../../global/AuthContext";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
@@ -42,7 +42,6 @@ export default function SignUp() {
       console.log(response);
 
       if (response.UserSub) {
-        console.log("User signed up successfully:", response.UserSub);
         router.push("/auth/confirmSignup?email=" + encodeURIComponent(email));
       } else {
         throw new Error("Sign up failed");

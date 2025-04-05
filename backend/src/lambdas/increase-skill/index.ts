@@ -2,12 +2,14 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { LearningMethod, CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill(event);
 };
 
 interface Parameters {
+  userId: string;
   characterId: string;
   skillCategory: string;
   skillName: string;
@@ -18,11 +20,11 @@ interface Parameters {
 
 async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const params = verifyParameters(event);
+    const params = verifyRequest(event);
 
-    console.log(`Update character ${params.characterId}`);
+    console.log(`Update character ${params.characterId} of user ${params.userId}`);
     console.log(
-      `Increase value of skill '${params.skillName}' from ${params.initialSkillValue} to ${params.initialSkillValue + params.increasedPoints} by learning method '${params.learningMethod}'`,
+      `Increase value of skill '${params.skillCategory}/${params.skillName}' from ${params.initialSkillValue} to ${params.initialSkillValue + params.increasedPoints} by learning method '${params.learningMethod}'`,
     );
 
     const character = await getCharacterItem(params);
@@ -34,7 +36,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     let skillValue = getSkill(characterSheet.skills, skillCategory, params.skillName).current;
     let totalCost = getSkill(characterSheet.skills, skillCategory, params.skillName).totalCost;
     const adjustedCostCategory = CostCategory.adjustCategory(
-      CostCategory.parse(defaultCostCategory.toString()), // Without parse CostCategory is interpreted as string and not as a number
+      defaultCostCategory,
       LearningMethod.parse(params.learningMethod),
     );
 
@@ -47,7 +49,6 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
       const response = {
         statusCode: 200,
         body: JSON.stringify({
-          message: "Skill already increased to target value. Nothing to do!",
           characterId: params.characterId,
           skillName: params.skillName,
           skillValue: skillValue,
@@ -92,6 +93,7 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const command = new UpdateCommand({
       TableName: process.env.TABLE_NAME,
       Key: {
+        userId: params.userId,
         characterId: params.characterId,
       },
       UpdateExpression:
@@ -126,7 +128,6 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const response = {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Successfully increased skill",
         characterId: params.characterId,
         skillName: params.skillName,
         skillValue: skillValue,
@@ -152,8 +153,35 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
   }
 }
 
-function verifyParameters(event: APIGatewayProxyEvent): Parameters {
-  console.log("Verify request parameters");
+function verifyRequest(event: APIGatewayProxyEvent): Parameters {
+  console.log("Verify request");
+
+  // Trim the authorization header as it could contain spaces at the beginning
+  const authHeader = event.headers.Authorization?.trim() || event.headers.authorization?.trim();
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: No token provided!" }),
+    };
+  }
+
+  const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
+  // Decode the token without verification (the access to the API itself is already protected by the authorizer)
+  const decoded = jwt.decode(token) as JwtPayload | null;
+  if (!decoded) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: Invalid token!" }),
+    };
+  }
+
+  const userId = decoded.sub; // Cognito User ID
+  if (!userId) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: User ID not found in token!" }),
+    };
+  }
 
   // The conditional parse is necessary for Lambda tests via the AWS console
   const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
@@ -175,6 +203,7 @@ function verifyParameters(event: APIGatewayProxyEvent): Parameters {
   }
 
   const params: Parameters = {
+    userId: userId,
     characterId: event.pathParameters["character-id"],
     skillCategory: event.pathParameters["skill-category"],
     skillName: event.pathParameters["skill-name"],
@@ -216,6 +245,7 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
   const command = new GetCommand({
     TableName: process.env.TABLE_NAME,
     Key: {
+      userId: params.userId,
       characterId: params.characterId,
     },
   });

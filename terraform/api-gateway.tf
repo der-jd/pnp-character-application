@@ -72,7 +72,7 @@ resource "aws_api_gateway_integration" "characters_get_integration" {
         #if($foreach.hasNext),#end
         #end
       },
-      "queryString": {
+      "queryStringParameters": {
         #foreach($param in $input.params().querystring.keySet())
         "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
         #if($foreach.hasNext),#end
@@ -100,8 +100,9 @@ resource "aws_api_gateway_integration_response" "characters_get_integration_resp
 
   response_templates = {
     "application/json" = <<EOT
-    #set($lambdaReply = $util.parseJson($input.path('$')))
-    #set($status = $lambdaReply.statusCode)
+    #set($rawBody = $input.json('$.body'))
+    #set($parsedBody = $util.parseJson($rawBody))
+    #set($status = $input.json('$.statusCode'))
     #if($status == 400)
         #set($context.responseOverride.status = 400)
     #end
@@ -117,7 +118,7 @@ resource "aws_api_gateway_integration_response" "characters_get_integration_resp
     #if($status == 500)
         #set($context.responseOverride.status = 500)
     #end
-    $lambdaReply.body
+    $parsedBody
     EOT
   }
 
@@ -269,8 +270,9 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
    */
   response_templates = {
     "application/json" = <<EOT
-    #set($lambdaReply = $util.parseJson($input.path('$')))
-    #set($status = $lambdaReply.statusCode)
+    #set($rawBody = $input.json('$.body'))
+    #set($parsedBody = $util.parseJson($rawBody))
+    #set($status = $input.json('$.statusCode'))
     #if($status == 400)
         #set($context.responseOverride.status = 400)
     #end
@@ -286,7 +288,7 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
     #if($status == 500)
         #set($context.responseOverride.status = 500)
     #end
-    $lambdaReply.body
+    $parsedBody
     EOT
   }
 
@@ -438,7 +440,7 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
         #if($foreach.hasNext),#end
         #end
       },
-      "queryString": {
+      "queryStringParameters": {
         #foreach($param in $input.params().querystring.keySet())
         "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
         #if($foreach.hasNext),#end
@@ -464,8 +466,9 @@ resource "aws_api_gateway_integration_response" "skill_name_get_integration_resp
 
   response_templates = {
     "application/json" = <<EOT
-    #set($lambdaReply = $util.parseJson($input.path('$')))
-    #set($status = $lambdaReply.statusCode)
+    #set($rawBody = $input.json('$.body'))
+    #set($parsedBody = $util.parseJson($rawBody))
+    #set($status = $input.json('$.statusCode'))
     #if($status == 400)
         #set($context.responseOverride.status = 400)
     #end
@@ -481,7 +484,7 @@ resource "aws_api_gateway_integration_response" "skill_name_get_integration_resp
     #if($status == 500)
         #set($context.responseOverride.status = 500)
     #end
-    $lambdaReply.body
+    $parsedBody
     EOT
   }
 
@@ -533,6 +536,7 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
     "integration.request.path.skill-category" = "method.request.path.skill-category"
     "integration.request.path.skill-name"     = "method.request.path.skill-name"
   }
+  // TODO add request body model for method request. Optional?!
 
   request_templates = {
     "application/json" = <<EOF
@@ -570,8 +574,9 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
 
   response_templates = {
     "application/json" = <<EOT
-    #set($lambdaReply = $util.parseJson($input.path('$')))
-    #set($status = $lambdaReply.statusCode)
+    #set($rawBody = $input.json('$.body'))
+    #set($parsedBody = $util.parseJson($rawBody))
+    #set($status = $input.json('$.statusCode'))
     #if($status == 400)
         #set($context.responseOverride.status = 400)
     #end
@@ -587,7 +592,7 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
     #if($status == 500)
         #set($context.responseOverride.status = 500)
     #end
-    $lambdaReply.body
+    $parsedBody
     EOT
   }
 

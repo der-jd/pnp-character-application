@@ -5,9 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { cognitoConfig, cognitoClient } from "../../context/CognitoConfig";
-import { useAuth } from "../../context/AuthContext";
-import { createTenantId } from "@/lib/Api/tenant";
+import { cognitoConfig, cognitoClient } from "@global/CognitoConfig";
+import { useAuth } from "@global/AuthContext";
+import { useCharacterStore } from "@global/characterStore";
+// import { RouletteSpinner } from "react-spinner-overlay";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -15,6 +16,8 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const router = useRouter();
   const { setIsAuthenticated, isAuthenticated, setAccessToken, setIdToken } = useAuth();
+
+  const updateAvailableCharacters = useCharacterStore((state) => state.updateAvailableCharacters);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -38,12 +41,10 @@ export default function SignIn() {
       const response = await cognitoClient.send(command);
 
       if (response.AuthenticationResult?.AccessToken) {
+        updateAvailableCharacters(response.AuthenticationResult.IdToken ?? "");
         setAccessToken(response.AuthenticationResult.AccessToken);
         setIdToken(response.AuthenticationResult.IdToken ?? null);
-        console.log("ID TOKEN:");
-        //console.log(response.AuthenticationResult.IdToken); // TODO remove after test and only activate locally
         setIsAuthenticated(true);
-        createTenantId(response.AuthenticationResult.IdToken, response.AuthenticationResult.RefreshToken);
         router.push("/protected/dashboard");
       } else {
         throw new Error("Authentication failed");
@@ -53,6 +54,16 @@ export default function SignIn() {
       console.error("Error signing in:", error);
     }
   };
+
+  // TODO activate and fix this to show spinner during initial character load
+  // TODO maybe change all characters lamba to by default return the character owned by this account
+  // if(!isAuthenticated && loading) {
+  //   return (
+  //     <div className="flex h-screen items-center justify-center">
+  //       <div className="m-auto"><RouletteSpinner/></div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="flex h-screen">
