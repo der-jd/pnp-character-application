@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "eslint .",
     "build": "tsc && ./rename-build-files-and-imports.sh && ./include-dependencies.sh",
-    "test": "vitest",
+    "test": "vitest --run",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage",

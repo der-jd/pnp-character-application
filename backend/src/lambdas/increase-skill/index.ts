@@ -1,11 +1,15 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { LearningMethod, CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
+import { LearningMethod, CostCategory, Character, getSkillIncreaseCost, getSkill, Request } from "config/index.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  return increaseSkill(event);
+  return increaseSkill({
+    headers: event.headers,
+    pathParameters: event.pathParameters,
+    body: event.body,
+  });
 };
 
 interface Parameters {
@@ -18,9 +22,9 @@ interface Parameters {
   learningMethod: string;
 }
 
-async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+export async function increaseSkill(request: Request): Promise<APIGatewayProxyResult> {
   try {
-    const params = validateRequest(event);
+    const params = validateRequest(request);
 
     console.log(`Update character ${params.characterId} of user ${params.userId}`);
     console.log(
@@ -153,11 +157,11 @@ async function increaseSkill(event: APIGatewayProxyEvent): Promise<APIGatewayPro
   }
 }
 
-function validateRequest(event: APIGatewayProxyEvent): Parameters {
+function validateRequest(request: Request): Parameters {
   console.log("Validate request");
 
   // Trim the authorization header as it could contain spaces at the beginning
-  const authHeader = event.headers.Authorization?.trim() || event.headers.authorization?.trim();
+  const authHeader = request.headers.Authorization?.trim() || request.headers.authorization?.trim();
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw {
       statusCode: 401,
@@ -184,11 +188,11 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
   }
 
   // The conditional parse is necessary for Lambda tests via the AWS console
-  const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+  const body = typeof request.body === "string" ? JSON.parse(request.body) : request.body;
   if (
-    typeof event.pathParameters?.["character-id"] !== "string" ||
-    typeof event.pathParameters?.["skill-category"] !== "string" ||
-    typeof event.pathParameters?.["skill-name"] !== "string" ||
+    typeof request.pathParameters?.["character-id"] !== "string" ||
+    typeof request.pathParameters?.["skill-category"] !== "string" ||
+    typeof request.pathParameters?.["skill-name"] !== "string" ||
     typeof body?.initialValue !== "number" ||
     typeof body?.increasedPoints !== "number" ||
     typeof body?.learningMethod !== "string"
@@ -204,9 +208,9 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
 
   const params: Parameters = {
     userId: userId,
-    characterId: event.pathParameters["character-id"],
-    skillCategory: event.pathParameters["skill-category"],
-    skillName: event.pathParameters["skill-name"],
+    characterId: request.pathParameters["character-id"],
+    skillCategory: request.pathParameters["skill-category"],
+    skillName: request.pathParameters["skill-name"],
     initialSkillValue: body.initialValue,
     increasedPoints: body.increasedPoints,
     learningMethod: body.learningMethod,
