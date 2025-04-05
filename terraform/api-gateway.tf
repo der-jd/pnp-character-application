@@ -427,6 +427,8 @@ resource "aws_api_gateway_integration" "history_post_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "history_post_integration_response" {
+  depends_on = [aws_api_gateway_integration.history_post_integration]
+
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.history.id
   http_method = aws_api_gateway_method.history_post.http_method
