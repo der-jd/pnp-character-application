@@ -18,7 +18,7 @@ interface Parameters {
 
 async function getSkillCost(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
   try {
-    const params = verifyRequest(event);
+    const params = validateRequest(event);
 
     console.log(
       `Get increase cost for skill '${params.skillCategory}/${params.skillName}' (learning method '${params.learningMethod}') of character ${params.characterId} of user ${params.userId}`,
@@ -66,8 +66,8 @@ async function getSkillCost(event: APIGatewayProxyEvent): Promise<APIGatewayProx
   }
 }
 
-function verifyRequest(event: APIGatewayProxyEvent): Parameters {
-  console.log("Verify request");
+function validateRequest(event: APIGatewayProxyEvent): Parameters {
+  console.log("Validate request");
 
   // Trim the authorization header as it could contain spaces at the beginning
   const authHeader = event.headers.Authorization?.trim() || event.headers.authorization?.trim();
