@@ -20,7 +20,6 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   return addRecordToHistory(event);
 };
 
-
 const bodySchema = z.object({
   type: z.string(),
   name: z.string(),
