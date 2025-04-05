@@ -20,13 +20,6 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   return addRecordToHistory(event);
 };
 
-interface HistoryBlock {
-  characterId: string;
-  blockId: string;
-  blockNumber: number;
-  previousBlockId: string | null;
-  changes: Record[];
-}
 
 const bodySchema = z.object({
   type: z.string(),
@@ -58,10 +51,23 @@ const booleanSchema = z.object({
 
 type Body = z.infer<typeof bodySchema>;
 
-interface Record extends Body {
-  id: string;
-  timestamp: string; // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2025-03-24T16:34:56Z (UTC) or 2025-03-24T16:34:56+02:00
-}
+const recordSchema = bodySchema.extend({
+  number: z.number(),
+  id: z.string(),
+  timestamp: z.string().datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2025-03-24T16:34:56Z (UTC) or 2025-03-24T16:34:56+02:00
+});
+
+type Record = z.infer<typeof recordSchema>;
+
+const historyBlockSchema = z.object({
+  characterId: z.string(),
+  blockNumber: z.number(),
+  blockId: z.string(),
+  previousBlockId: z.string().nullable(),
+  changes: z.array(recordSchema),
+});
+
+type HistoryBlock = z.infer<typeof historyBlockSchema>;
 
 interface Parameters {
   characterId: string;
@@ -90,15 +96,17 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
     const dynamoDbResponse = await docClient.send(command);
     console.log("Successfully got DynamoDB items");
 
-    const record: Record = {
-      id: uuidv4(),
-      timestamp: new Date().toISOString(),
-      ...params.body,
-    };
+    let record: Record;
     if (!dynamoDbResponse.Items || dynamoDbResponse.Items.length === 0) {
       console.log("No history found for the given characterId.");
       const newBlock = await createHistoryBlock(params.characterId);
 
+      record = {
+        number: 1,
+        id: uuidv4(),
+        timestamp: new Date().toISOString(),
+        ...params.body,
+      };
       addRecord(record, newBlock);
     } else if (dynamoDbResponse.Items.length !== 1) {
       console.error("More than one latest history block found for the given characterId");
@@ -109,8 +117,15 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
         }),
       };
     } else {
-      const latestBlock = dynamoDbResponse.Items[0] as HistoryBlock; // TODO parse to HistoryBlock
+      const latestBlock = historyBlockSchema.parse(dynamoDbResponse.Items[0]);
       console.log("Latest history block:", latestBlock);
+
+      record = {
+        number: latestBlock.changes[latestBlock.changes.length - 1].number + 1,
+        id: uuidv4(),
+        timestamp: new Date().toISOString(),
+        ...params.body,
+      };
 
       if (estimateItemSize(latestBlock) + estimateItemSize(record) > MAX_ITEM_SIZE) {
         console.log(`Item size exceeds the maximum limit of ${MAX_ITEM_SIZE} bytes`);
@@ -123,9 +138,7 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        record: record,
-      }),
+      body: JSON.stringify(record),
     };
     console.log(response);
     return response;
