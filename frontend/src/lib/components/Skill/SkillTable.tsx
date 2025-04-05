@@ -6,10 +6,9 @@ import { ColumnDef, flexRender, getCoreRowModel, useReactTable, VisibilityState 
 import { Button } from "@lib/components/ui/button";
 import { Checkbox } from "@lib/components/ui/checkbox";
 import { ISkillProps, render_skill_icon } from "./SkillDefinitions";
-import { CharacterSheet, LearningMethod } from "@/src/lib/api/models/Character/character";
-import { useCharacterStore } from "@/src/app/global/characterStore";
-import { increaseSkill } from "../../api/utils/api_calls";
-import { useAuth } from "@/src/app/global/AuthContext";
+import { LearningMethod } from "@/src/lib/api/models/Character/character";
+import { useSkillUpdater } from "@/src/hooks/useSkillUpdate";
+import { useLoadingOverlay } from "@/src/app/global/OverlayContext";
 
 const getCostCategoryLabel = (category: LearningMethod): string => {
   switch (category) {
@@ -32,8 +31,8 @@ interface Props {
 }
 
 export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }) => {
-  const updateValue = useCharacterStore((state) => state.updateValue);
-  const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
+  const { show, hide } = useLoadingOverlay();
+  const { tryIncreaseSkill } = useSkillUpdater();
   const [data, setData] = useState(initialData);
   const [showActiveOnly, setShowActiveOnly] = useState(!is_edit_mode);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
@@ -42,8 +41,6 @@ export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }
     cost: is_edit_mode,
     skilling: is_edit_mode,
   });
-
-  const idToken = useAuth().idToken;
 
   useEffect(() => {
     setShowActiveOnly(!is_edit_mode);
@@ -57,29 +54,11 @@ export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }
     setData(initialData.map((item) => ({ ...item, level: item.edited_level })));
   }, [is_edit_mode, initialData]);
 
-  const try_increase_skill = async (skill: ISkillProps, points_to_skill: number) => {
-    const path = ["skills", skill.category] as (keyof CharacterSheet)[];
-    const name = skill.name as keyof CharacterSheet;
-
-    const increasSkillRequest = {
-      initialValue: skill.current_level,
-      increasedPoints: skill.edited_level - skill.current_level,
-      learningMethod: String(skill.learning_method),
-    };
-    console.log(idToken);
-    console.log(selectedChar);
-    if (selectedChar && idToken) {
-      console.log("sending increase request");
-      await increaseSkill(idToken, selectedChar, skill.name, skill.category, increasSkillRequest);
-    }
-
-    updateValue(path, name, points_to_skill);
-
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.name === skill.name ? { ...item, edited_level: item.edited_level + points_to_skill } : item,
-      ),
-    );
+  const skillButtonPushed = async (skill: ISkillProps, points_to_skill: number) => {
+    console.log(`Increase skill pressed with ${skill} and ${points_to_skill}`);
+    show();
+    await tryIncreaseSkill(skill, points_to_skill);
+    hide();
   };
 
   const filteredData = useMemo(
@@ -141,7 +120,7 @@ export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }
             <Button
               key={points}
               className="flex-1 bg-black hover:bg-gray-300 hover:text-black text-white rounded-lg"
-              onClick={() => try_increase_skill(row.original, points)}
+              onClick={() => skillButtonPushed(row.original, points)}
             >
               {points}
             </Button>
