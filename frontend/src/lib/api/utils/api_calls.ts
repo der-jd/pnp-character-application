@@ -8,6 +8,17 @@ enum HttpMethod {
   PATCH = "PATCH",
 }
 
+export class ApiError extends Error {
+  constructor(
+    public message: string,
+    public statusCode: string,
+    public body: string,
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
 async function makeRequest<ReturnType>(idToken: string, endpoint_url: string, method: HttpMethod): Promise<ReturnType>;
 async function makeRequest<ReturnType, BodyType>(
   idToken: string,
@@ -48,7 +59,10 @@ async function makeRequest<ReturnType, BodyType>(
   try {
     const response = await fetch(url, request);
     if (!response.ok) {
-      throw new Error(`[Api Error] Failed to fetch: ${endpoint_url} - ${response.statusText}`);
+      const statusCode = response.statusText;
+      const body = await response.json();
+
+      throw new ApiError(`Failed to fetch: ${endpoint_url} - ${response.statusText}`, statusCode, body.message);
     }
 
     const data = await response.json();

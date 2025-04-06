@@ -769,6 +769,9 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
     #if($status == 404)
         #set($context.responseOverride.status = 404)
     #end
+    #if($status == 409)
+        #set($context.responseOverride.status = 409)
+    #end
     #if($status == 500)
         #set($context.responseOverride.status = 500)
     #end

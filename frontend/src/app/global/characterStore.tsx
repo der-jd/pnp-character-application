@@ -8,6 +8,7 @@ export interface CharacterStore {
   availableCharacters: Array<AllCharactersCharacter>;
   selectedCharacterId: string | null;
   isEditable: boolean;
+  editMode: boolean;
   characterSheet: CharacterSheet | null;
 
   setCharacterSheet: (data: CharacterSheet) => void;
@@ -16,6 +17,8 @@ export interface CharacterStore {
   setAvailableCharacters: (chars: Array<AllCharactersCharacter>) => void;
 
   updateValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: number) => void;
+
+  toggleEdit: () => void;
 
   updateAvailableCharacters: (idToken: string) => void;
   updateCharacter: (idToken: string, charId: string) => void;
@@ -31,11 +34,21 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
   selectedCharacterId: null,
   isEditable: false,
   characterSheet: null,
+  editMode: false,
 
   setCharacterSheet: (sheet) => set({ characterSheet: { ...sheet } }),
   setEditable: (isEditable) => set({ isEditable }),
   setSelectedCharacter: (char) => set({ selectedCharacterId: char }),
   setAvailableCharacters: (chars) => set({ availableCharacters: [...chars] }),
+
+  /**
+   * Reflects the state of the edit button
+   */
+  toggleEdit: () => {
+    set((state) => {
+      return { editMode: !state.editMode };
+    });
+  },
 
   /**
    * Updates a specified value in the character sheet and updates the value in the character store
