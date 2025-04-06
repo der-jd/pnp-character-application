@@ -24,7 +24,7 @@
                 "S": "Warrior"
               },
               "skill": {
-                "S": "Greatsword Mastery"
+                "S": "greatsword"
               }
             }
           },
@@ -34,7 +34,7 @@
                 "S": "Woodcarving"
               },
               "skill": {
-                "S": "Precision Handcraft"
+                "S": "woodcraft"
               }
             }
           },
@@ -1973,7 +1973,7 @@
                   }
                 }
               },
-              "stoneWork": {
+              "stonework": {
                 "M": {
                   "activated": {
                     "BOOL": false

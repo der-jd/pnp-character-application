@@ -10,11 +10,11 @@ export const sample_char: Character = {
       sex: "Male",
       profession: {
         name: "Warrior",
-        skill: "Greatsword Mastery",
+        skill: "greatsword",
       },
       hobby: {
         name: "Woodcarving",
-        skill: "Precision Handcraft",
+        skill: "woodwork",
       },
       birthday: "2002-05-15",
       birthplace: "Stormhold",
@@ -718,7 +718,7 @@ export const sample_char: Character = {
           totalCost: 15,
           defaultCostCategory: CostCategory.CAT_2,
         },
-        stoneWork: {
+        stonework: {
           activated: false,
           start: 3,
           current: 6,
