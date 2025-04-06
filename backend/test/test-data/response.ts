@@ -8,7 +8,7 @@ export const fakeDynamoDBCharacterResponse = {
 type responseType = typeof fakeDynamoDBCharacterResponse;
 
 export function mockDynamoDBGetResponse(response: responseType = fakeDynamoDBCharacterResponse) {
-  (globalThis as any).dynamoDBMock.on(GetCommand).callsFake((command) => {
+  (globalThis as any).dynamoDBMock.on(GetCommand).callsFake((command: { Key: any }) => {
     const key = command.Key;
     if (key.characterId === response.Item.characterId && key.userId === response.Item.userId) {
       return Promise.resolve(response);
