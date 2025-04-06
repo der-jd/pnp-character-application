@@ -114,15 +114,15 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install make
-          command: apk add make
+          name: Install dependencies
+          command: npm ci
       - run:
-          name: Check format of Terraform code
-          command: make check-format-terraform
+          name: Check Terraform file formatting
+          command: npm run check-format:terraform
 
   lint-terraform-code:
     docker:
-      - image: cimg/base:2024.10
+      - image: cimg/node:22.10
     resource_class: small
     steps:
       - checkout
@@ -132,7 +132,7 @@ jobs:
             make install-lint-terraform
       - run:
           name: Lint Terraform code
-          command: make lint-terraform
+          command: npm run lint:terraform
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
