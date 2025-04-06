@@ -50,11 +50,13 @@ export function useSkillUpdater() {
             variant: "destructive",
           });
         }
+        setLoading(false);
+        return;
       }
     }
-
+    
     setLoading(false);
-    updateValue(path, name, pointsToSkill);
+    updateValue(path, name, skill.current_level + pointsToSkill);
   };
 
   return { tryIncreaseSkill, loading };

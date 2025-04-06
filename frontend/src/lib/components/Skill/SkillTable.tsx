@@ -9,62 +9,44 @@ import { ISkillProps, render_skill_icon } from "./SkillDefinitions";
 import { LearningMethod } from "@/src/lib/api/models/Character/character";
 import { useSkillUpdater } from "@/src/hooks/useSkillUpdate";
 import { useLoadingOverlay } from "@/src/app/global/OverlayContext";
+import { useCharacterStore } from "@/src/app/global/characterStore";
 
-const getCostCategoryLabel = (category: LearningMethod): string => {
-  switch (category) {
-    case LearningMethod.FREE:
-      return "Free";
-    case LearningMethod.LOW_PRICED:
-      return "Low";
-    case LearningMethod.NORMAL:
-      return "Normal";
-    case LearningMethod.EXPENSIVE:
-      return "Expensive";
-    default:
-      return "";
-  }
-};
-
-interface Props {
-  data: ISkillProps[];
-  is_edit_mode: boolean;
-}
-
-export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }) => {
+export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialData }) => {
+  const isEditMode = useCharacterStore((state) => state.editMode);
   const { show, hide } = useLoadingOverlay();
   const { tryIncreaseSkill } = useSkillUpdater();
   const [data, setData] = useState(initialData);
-  const [showActiveOnly, setShowActiveOnly] = useState(!is_edit_mode);
+
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-    is_active: is_edit_mode,
-    cost_category: is_edit_mode,
-    cost: is_edit_mode,
-    skilling: is_edit_mode,
+    is_active: isEditMode,
+    cost_category: isEditMode,
+    cost: isEditMode,
+    skilling: isEditMode,
   });
 
   useEffect(() => {
-    setShowActiveOnly(!is_edit_mode);
+    console.log("initialData updated", initialData);
+    setData(initialData);
+  }, [initialData]);
+
+  useEffect(() => {
+    isEditMode;
     setColumnVisibility((prev) => ({
       ...prev,
-      is_active: is_edit_mode,
-      cost_category: is_edit_mode,
-      cost: is_edit_mode,
-      skilling: is_edit_mode,
+      is_active: isEditMode,
+      cost_category: isEditMode,
+      cost: isEditMode,
+      skilling: isEditMode,
     }));
-    setData(initialData.map((item) => ({ ...item, level: item.edited_level })));
-  }, [is_edit_mode, initialData]);
+  }, [isEditMode]);
 
   const skillButtonPushed = async (skill: ISkillProps, points_to_skill: number) => {
-    console.log(`Increase skill pressed with ${skill} and ${points_to_skill}`);
     show();
     await tryIncreaseSkill(skill, points_to_skill);
     hide();
   };
 
-  const filteredData = useMemo(
-    () => (showActiveOnly ? data.filter((skill) => skill.activated) : data),
-    [data, showActiveOnly],
-  );
+  const filteredData = useMemo(() => (isEditMode ? data.filter((skill) => skill.activated) : data), [data, isEditMode]);
 
   const columns: ColumnDef<ISkillProps>[] = [
     {
@@ -81,7 +63,7 @@ export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }
       accessorKey: "level",
       header: () => <div className="text-center">Level</div>,
       cell: ({ row }) => {
-        const value = is_edit_mode ? row.original.edited_level : row.original.current_level;
+        const value = row.original.current_level;
         return <div className="text-center">{value}</div>;
       },
     },
@@ -96,7 +78,7 @@ export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }
               checked={skill.activated}
               onCheckedChange={(checked) => {
                 setData((prevData) =>
-                  prevData.map((item) => (item.name === skill.name ? { ...item, activated: checked === true } : item)),
+                  prevData.map((item) => (item.name === skill.name ? { ...item, activated: Boolean(checked) } : item)),
                 );
               }}
               aria-label={`Set ${skill.name} as active`}
@@ -109,7 +91,7 @@ export const SkillsTable: React.FC<Props> = ({ data: initialData, is_edit_mode }
     {
       accessorKey: "cost_category",
       header: () => <div className="text-center">Cost Category</div>,
-      cell: ({ row }) => <div className="text-center">{getCostCategoryLabel(row.original.learning_method)}</div>,
+      cell: ({ row }) => <div className="text-center">{LearningMethod[row.original.learning_method]}</div>,
     },
     {
       accessorKey: "skilling",

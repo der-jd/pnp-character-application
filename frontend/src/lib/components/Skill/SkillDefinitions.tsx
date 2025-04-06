@@ -90,8 +90,6 @@ export interface ISkillProps {
   learning_method: LearningMethod;
   defaultCostCategory: CostCategory;
   cost: number;
-  is_edited: boolean;
-  edited_level: number;
 }
 
 function mapSkillToISkillProps(name: string, category: string, skill: Skill): ISkillProps {
@@ -104,8 +102,6 @@ function mapSkillToISkillProps(name: string, category: string, skill: Skill): IS
     learning_method: LearningMethod.NORMAL,
     defaultCostCategory: skill.defaultCostCategory,
     cost: skill.totalCost,
-    is_edited: false,
-    edited_level: skill.current,
   };
 }
 
@@ -119,8 +115,6 @@ function mapAttributeToISkillProps(name: string, category: string, attribute: At
     learning_method: LearningMethod.NORMAL,
     defaultCostCategory: CostCategory.CAT_0,
     cost: 1,
-    is_edited: false,
-    edited_level: attribute.current,
   };
 }
 
@@ -134,8 +128,6 @@ function mapBaseValueToISkillProps(name: string, category: string, baseValue: Ba
     learning_method: LearningMethod.NORMAL,
     defaultCostCategory: CostCategory.CAT_0,
     cost: 1,
-    is_edited: false,
-    edited_level: baseValue.current,
   };
 }
 
@@ -149,8 +141,6 @@ function mapBaseValueToISkillProps(name: string, category: string, baseValue: Ba
 //     learning_method: LearningMethod.NORMAL,
 //     defaultCostCategory: CostCategory.CAT_0,
 //     cost: 0,
-//     is_edited: false,
-//     edited_level: combatSkill.handling,
 //   };
 // }
 

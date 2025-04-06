@@ -7,10 +7,9 @@ import { SkillsTable } from "./SkillTable";
 
 interface SkillCategoryProps {
   data: ISkillProps[];
-  isEditMode: boolean;
 }
 
-const SkillCategory = ({ data, isEditMode }: SkillCategoryProps) => {
+const SkillCategory = ({ data }: SkillCategoryProps) => {
   if (!data) {
     return <div />;
   }
@@ -47,7 +46,7 @@ const SkillCategory = ({ data, isEditMode }: SkillCategoryProps) => {
             <h2 className="p-1 text-xl font-semibold rounded-t-lg bg-black text-white">
               {category.charAt(0).toUpperCase() + category.slice(1)}
             </h2>
-            <SkillsTable data={skills} is_edit_mode={isEditMode} />
+            <SkillsTable initialData={skills} />
           </div>
         </div>
       ))}
