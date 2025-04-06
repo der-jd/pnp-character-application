@@ -68,6 +68,8 @@ jobs:
           command: |
             cd backend
             npm run lint
+            cd ../frontend
+            npm run lint
 
   build-backend:
     docker:
