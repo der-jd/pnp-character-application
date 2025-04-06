@@ -314,9 +314,15 @@ describe("Valid requests", () => {
       const parsedBody = JSON.parse(result.body);
       expect(parsedBody.skillValue).toBe(_case.request.body.initialValue + _case.request.body.increasedPoints);
 
-      const skillCategory = _case.request.pathParameters["skill-category"] as keyof Character["characterSheet"]["skills"];
+      const skillCategory = _case.request.pathParameters[
+        "skill-category"
+      ] as keyof Character["characterSheet"]["skills"];
       const skillName = _case.request.pathParameters["skill-name"];
-      const oldTotalSkillCost = getSkill(fakeDynamoDBCharacterResponse.Item.characterSheet.skills, skillCategory, skillName).totalCost;
+      const oldTotalSkillCost = getSkill(
+        fakeDynamoDBCharacterResponse.Item.characterSheet.skills,
+        skillCategory,
+        skillName,
+      ).totalCost;
       const diffSkillTotalCost = parsedBody.totalCost - oldTotalSkillCost;
       const oldAvailableAdventurePoints =
         fakeDynamoDBCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
