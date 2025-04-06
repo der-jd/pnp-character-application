@@ -174,7 +174,7 @@ export interface CharacterSheet {
       foodProcessing: Skill;
       leatherProcessing: Skill;
       metalwork: Skill;
-      stoneWork: Skill;
+      stonework: Skill;
       fabricProcessing: Skill;
       alcoholProduction: Skill;
       steeringVehicles: Skill;

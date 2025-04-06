@@ -3,8 +3,8 @@
 set -e # Exit immediately if any command exits with a non-zero status. Needed for the for loop below
 
 start_dir=$PWD
-lambdas_build_dir="build/lambdas"
-lambda_layers_build_dir="build/lambda-layers"
+lambdas_build_dir="build/src/lambdas"
+lambda_layers_build_dir="build/src/lambda-layers"
 src_dir="src"
 lambda_layers_src_dir="$src_dir/lambda-layers"
 

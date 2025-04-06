@@ -8,11 +8,11 @@
       "sex": "Male",
       "profession": {
         "name": "Warrior",
-        "skill": "Greatsword Mastery"
+        "skill": "greatsword"
       },
       "hobby": {
         "name": "Woodcarving",
-        "skill": "Precision Handcraft"
+        "skill": "woodcraft"
       },
       "birthday": "2002-05-15",
       "birthplace": "Stormhold",
@@ -716,7 +716,7 @@
           "totalCost": 15,
           "defaultCostCategory": 2
         },
-        "stoneWork": {
+        "stonework": {
           "activated": false,
           "start": 3,
           "current": 6,

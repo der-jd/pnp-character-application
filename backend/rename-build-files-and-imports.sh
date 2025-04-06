@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e # Exit immediately if any command exits with a non-zero status
+
 build_dir="build"
 
 echo "Rename all .js files in '$build_dir' to .mjs so that AWS Lambda recognizes them as ES Modules"

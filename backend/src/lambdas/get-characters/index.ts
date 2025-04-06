@@ -33,11 +33,11 @@ async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const dynamoDbResponse = await docClient.send(command);
 
     if (!dynamoDbResponse.Items || dynamoDbResponse.Items.length === 0) {
-      console.error("No characters found for the given userId");
+      console.error("No characters found for the given user id");
       throw {
         statusCode: 404,
         body: JSON.stringify({
-          message: "No characters found for the given userId",
+          message: "No characters found for the given user id",
         }),
       };
     }

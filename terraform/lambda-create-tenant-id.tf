@@ -43,7 +43,7 @@ resource "aws_iam_role_policy_attachment" "control_plane_lambda_policy_attachmen
 
 data "archive_file" "create-tenant-id" {
   type        = "zip"
-  source_dir  = "../backend/build/lambdas/create-tenant-id"
+  source_dir  = "../backend/build/src/lambdas/create-tenant-id"
   output_path = "../backend/dist/create-tenant-id.zip"
 }
 

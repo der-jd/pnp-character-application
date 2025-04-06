@@ -16,20 +16,22 @@ workflows:
     jobs:
       - check-format-files
       - lint-typescript-code
-      - build-backend:
-          requires:
-            - check-format-files
-            - lint-typescript-code
+      - build-backend
+      - run-backend-tests
       - check-format-terraform-code
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
           requires:
+            - check-format-files
+            - lint-typescript-code
             - build-backend
+            - run-backend-tests
             - check-format-terraform-code
             - lint-terraform-code
       - build-and-deploy-frontend:
           requires:
             - check-format-files
+            - lint-typescript-code
             - deploy-backend-and-infrastructure
 
   delete-services:
@@ -62,10 +64,14 @@ jobs:
           command: |
             cd backend
             npm ci
+            cd ../frontend
+            npm ci
       - run:
           name: Lint TypeScript code
           command: |
             cd backend
+            npm run lint
+            cd ../frontend
             npm run lint
 
   build-backend:
@@ -89,6 +95,23 @@ jobs:
           paths:
             - backend/build
 
+  run-backend-tests:
+    docker:
+      - image: cimg/node:22.10
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm ci
+      - run:
+          name: Run tests
+          command: |
+            cd backend
+            npm run test
+
   check-format-terraform-code:
     docker:
       - image: hashicorp/terraform:1.9
@@ -96,15 +119,15 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install make
-          command: apk add make
+          name: Install npm
+          command: apk add npm
       - run:
-          name: Check format of Terraform code
-          command: make check-format-terraform
+          name: Check Terraform file formatting
+          command: npm run check-format:terraform
 
   lint-terraform-code:
     docker:
-      - image: cimg/base:2024.10
+      - image: cimg/node:22.10
     resource_class: small
     steps:
       - checkout
@@ -114,7 +137,7 @@ jobs:
             make install-lint-terraform
       - run:
           name: Lint Terraform code
-          command: make lint-terraform
+          command: npm run lint:terraform
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:

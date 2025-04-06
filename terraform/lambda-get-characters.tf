@@ -1,6 +1,6 @@
 data "archive_file" "get_characters" {
   type        = "zip"
-  source_dir  = "../backend/build/lambdas/get-characters"
+  source_dir  = "../backend/build/src/lambdas/get-characters"
   output_path = "../backend/dist/get-characters.zip"
 }
 

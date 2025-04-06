@@ -1,6 +1,6 @@
 data "archive_file" "add_history_record" {
   type        = "zip"
-  source_dir  = "../backend/build/lambdas/add-history-record"
+  source_dir  = "../backend/src/lambdas/add-history-record"
   output_path = "../backend/dist/add-history-record.zip"
 }
 
