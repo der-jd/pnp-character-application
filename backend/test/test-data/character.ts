@@ -13,7 +13,7 @@ export const fakeCharacter: Character = {
       sex: "Male",
       profession: {
         name: "Warrior",
-        skill: "greatsword",
+        skill: "slashingWeapons1h",
       },
       hobby: {
         name: "Woodcarving",
@@ -181,7 +181,7 @@ export const fakeCharacter: Character = {
           current: 18,
           mod: 8,
           totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         barehanded: {
           activated: true,
@@ -189,7 +189,7 @@ export const fakeCharacter: Character = {
           current: 18,
           mod: 8,
           totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         thrustingWeapons1h: {
           activated: true,
@@ -197,7 +197,7 @@ export const fakeCharacter: Character = {
           current: 18,
           mod: 8,
           totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         thrustingWeapons2h: {
           activated: true,
@@ -205,15 +205,15 @@ export const fakeCharacter: Character = {
           current: 18,
           mod: 8,
           totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         slashingWeapons1h: {
           activated: true,
           start: 10,
-          current: 18,
-          mod: 8,
-          totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_2,
+          current: 110,
+          mod: 58,
+          totalCost: 200,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         slashingWeapons2h: {
           activated: true,
@@ -221,7 +221,7 @@ export const fakeCharacter: Character = {
           current: 18,
           mod: 8,
           totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         daggers: {
           activated: true,
@@ -229,7 +229,7 @@ export const fakeCharacter: Character = {
           current: 18,
           mod: 8,
           totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         chainWeapons: {
           activated: true,
@@ -237,7 +237,7 @@ export const fakeCharacter: Character = {
           current: 18,
           mod: 8,
           totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         polearms: {
           activated: true,
@@ -245,7 +245,7 @@ export const fakeCharacter: Character = {
           current: 18,
           mod: 8,
           totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         martialArts: {
           activated: false,
@@ -253,7 +253,7 @@ export const fakeCharacter: Character = {
           current: 12,
           mod: 7,
           totalCost: 30,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         firearmSimple: {
           activated: true,
@@ -261,7 +261,7 @@ export const fakeCharacter: Character = {
           current: 10,
           mod: 4,
           totalCost: 20,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         firearmMedium: {
           activated: true,
@@ -269,7 +269,7 @@ export const fakeCharacter: Character = {
           current: 10,
           mod: 4,
           totalCost: 20,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         firearmComplex: {
           activated: true,
@@ -277,7 +277,7 @@ export const fakeCharacter: Character = {
           current: 10,
           mod: 4,
           totalCost: 20,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
         missile: {
           activated: false,
@@ -285,7 +285,7 @@ export const fakeCharacter: Character = {
           current: 8,
           mod: 4,
           totalCost: 15,
-          defaultCostCategory: CostCategory.CAT_2,
+          defaultCostCategory: CostCategory.CAT_3,
         },
       },
       body: {
@@ -840,8 +840,8 @@ export const fakeCharacter: Character = {
         },
         slashingWeapons1h: {
           handling: 18,
-          attackDistributed: 10,
-          paradeDistributed: 8,
+          attackDistributed: 108,
+          paradeDistributed: 78,
         },
         thrustingWeapons1h: {
           handling: 18,
