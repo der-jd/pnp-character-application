@@ -25,12 +25,10 @@ export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialD
   });
 
   useEffect(() => {
-    console.log("initialData updated", initialData);
     setData(initialData);
   }, [initialData]);
 
   useEffect(() => {
-    isEditMode;
     setColumnVisibility((prev) => ({
       ...prev,
       is_active: isEditMode,
