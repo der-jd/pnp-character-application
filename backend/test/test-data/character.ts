@@ -1,8 +1,11 @@
 import { Character, CostCategory } from "config/index.js";
+import { fakeUserId } from "./request.js";
+
+export const fakeCharacterId = "9862f3c9-a065-4e0e-80b2-5bf085535cbe";
 
 export const fakeCharacter: Character = {
-  userId: "afab6615-c93b-4056-8741-e9484360eb0a",
-  characterId: "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+  userId: fakeUserId,
+  characterId: fakeCharacterId,
   characterSheet: {
     generalInformation: {
       name: "Aldred Stormblade",

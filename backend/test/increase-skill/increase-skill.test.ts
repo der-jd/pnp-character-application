@@ -3,7 +3,9 @@ import { GetCommand } from "@aws-sdk/lib-dynamodb";
 
 import { describe, expect, test } from "vitest";
 import { increaseSkill } from "../../src/lambdas/increase-skill/index.js";
-import { fakeHeaders, fakeDynamoDBCharacterResponse } from "../test-data/request.js";
+import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
+import { fakeDynamoDBCharacterResponse } from "../test-data/response.js";
+import { fakeCharacterId } from "../test-data/character.js";
 
 /*expect(mockDynamoDBDocumentClient).toHaveBeenCalledBefore(PutCommand, {
   TableName: "TestUserTable",
@@ -39,7 +41,7 @@ describe("Invalid requests", () => {
       request: {
         headers: fakeHeaders,
         pathParameters: {
-          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "character-id": fakeCharacterId,
           "skill-category": "body",
           "skill-name": "athletics",
         },
@@ -56,7 +58,7 @@ describe("Invalid requests", () => {
       request: {
         headers: fakeHeaders,
         pathParameters: {
-          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "character-id": fakeCharacterId,
           "skill-category": "nature",
           "skill-name": "fishing",
         },
@@ -73,7 +75,7 @@ describe("Invalid requests", () => {
       request: {
         headers: fakeHeaders,
         pathParameters: {
-          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "character-id": fakeCharacterId,
           "skill-category": "body",
           "skill-name": "athletics",
         },
@@ -90,7 +92,7 @@ describe("Invalid requests", () => {
       request: {
         headers: fakeHeaders,
         pathParameters: {
-          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "character-id": fakeCharacterId,
           "skill-category": "body",
           "skill-name": "athletics",
         },
@@ -107,7 +109,7 @@ describe("Invalid requests", () => {
       request: {
         headers: fakeHeaders,
         pathParameters: {
-          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "character-id": fakeCharacterId,
           "skill-category": "body",
           "skill-name": "athletics",
         },
@@ -141,7 +143,7 @@ describe("Invalid requests", () => {
       request: {
         headers: fakeHeaders,
         pathParameters: {
-          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "character-id": fakeCharacterId,
           "skill-category": "body",
           "skill-name": "athletics",
         },
@@ -158,7 +160,7 @@ describe("Invalid requests", () => {
       request: {
         headers: fakeHeaders,
         pathParameters: {
-          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "character-id": fakeCharacterId,
           "skill-category": "body",
           "skill-name": "athletics",
         },
@@ -171,7 +173,7 @@ describe("Invalid requests", () => {
       expectedStatusCode: 400,
     },
     {
-      name: "No character for the given id",
+      name: "No character found for a non existing character id",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -187,13 +189,36 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 404,
     },
+    {
+      name: "No character found for a non existing user id",
+      request: {
+        headers: dummyHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        body: {
+          initialValue: 16,
+          increasedPoints: 3,
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 404,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {
     test(`${_case.name}`, async () => {
-      const fakeResponse = fakeDynamoDBCharacterResponse;
-      fakeResponse.Item.characterSheet.calculationPoints.adventurePoints.available = 3;
-      (globalThis as any).dynamoDBMock.on(GetCommand).resolves(fakeResponse);
+      (globalThis as any).dynamoDBMock.on(GetCommand).callsFake((command) => {
+        const key = command.Key;
+        if (key.characterId === fakeCharacterId && key.userId === fakeUserId) {
+          fakeDynamoDBCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available = 3;
+          return Promise.resolve(fakeDynamoDBCharacterResponse);
+        } else {
+          return Promise.resolve({ Item: undefined });
+        }
+      });
 
       const result = await increaseSkill(_case.request);
 
