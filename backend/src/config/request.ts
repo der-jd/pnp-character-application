@@ -6,6 +6,7 @@ type bodyType = Record<string, string | number | undefined> | null;
 export interface Request {
   headers: Record<string, string | undefined>;
   pathParameters: Record<string, string | undefined> | null;
+  queryStringParameters: Record<string, string | undefined> | null;
   body: bodyType;
 }
 

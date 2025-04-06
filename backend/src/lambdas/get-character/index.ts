@@ -2,9 +2,15 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { Request, parseBody } from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  return getCharacter(event);
+  return getCharacter({
+    headers: event.headers,
+    pathParameters: event.pathParameters,
+    queryStringParameters: event.queryStringParameters,
+    body: parseBody(event.body),
+  });
 };
 
 interface Parameters {
@@ -12,9 +18,9 @@ interface Parameters {
   characterId: string;
 }
 
-async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+export async function getCharacter(request: Request): Promise<APIGatewayProxyResult> {
   try {
-    const params = validateRequest(event);
+    const params = validateRequest(request);
 
     console.log(`Get character ${params.characterId} of user ${params.userId}`);
 
@@ -66,11 +72,11 @@ async function getCharacter(event: APIGatewayProxyEvent): Promise<APIGatewayProx
   }
 }
 
-function validateRequest(event: APIGatewayProxyEvent): Parameters {
+function validateRequest(request: Request): Parameters {
   console.log("Validate request");
 
   // Trim the authorization header as it could contain spaces at the beginning
-  const authHeader = event.headers.Authorization?.trim() || event.headers.authorization?.trim();
+  const authHeader = request.headers.Authorization?.trim() || request.headers.authorization?.trim();
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw {
       statusCode: 401,
@@ -96,7 +102,7 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
     };
   }
 
-  if (typeof event.pathParameters?.["character-id"] !== "string") {
+  if (typeof request.pathParameters?.["character-id"] !== "string") {
     console.error("Invalid input values!");
     throw {
       statusCode: 400,
@@ -106,7 +112,7 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
     };
   }
 
-  const characterId = event.pathParameters?.["character-id"];
+  const characterId = request.pathParameters?.["character-id"];
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
   if (!uuidRegex.test(characterId)) {

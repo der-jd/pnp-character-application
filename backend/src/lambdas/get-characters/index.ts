@@ -2,9 +2,15 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { Request, parseBody } from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  return getCharacters(event);
+  return getCharacters({
+    headers: event.headers,
+    pathParameters: event.pathParameters,
+    queryStringParameters: event.queryStringParameters,
+    body: parseBody(event.body),
+  });
 };
 
 interface Parameters {
@@ -12,9 +18,9 @@ interface Parameters {
   characterShort: boolean;
 }
 
-async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+export async function getCharacters(request: Request): Promise<APIGatewayProxyResult> {
   try {
-    const params = validateRequest(event);
+    const params = validateRequest(request);
 
     console.log(`Get characters for user ${params.userId}`);
 
@@ -82,12 +88,12 @@ async function getCharacters(event: APIGatewayProxyEvent): Promise<APIGatewayPro
   }
 }
 
-function validateRequest(event: APIGatewayProxyEvent): Parameters {
+function validateRequest(request: Request): Parameters {
   console.log("Validate request");
 
   // TODO move handling of authorization token to Lambda layer
   // Trim the authorization header as it could contain spaces at the beginning
-  const authHeader = event.headers.Authorization?.trim() || event.headers.authorization?.trim();
+  const authHeader = request.headers.Authorization?.trim() || request.headers.authorization?.trim();
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw {
       statusCode: 401,
@@ -114,8 +120,8 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
   }
 
   if (
-    event.queryStringParameters?.["character-short"] &&
-    typeof event.queryStringParameters?.["character-short"] !== "string"
+    request.queryStringParameters?.["character-short"] &&
+    typeof request.queryStringParameters?.["character-short"] !== "string"
   ) {
     console.error("Invalid input values!");
     throw {
@@ -128,7 +134,7 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
 
   const params: Parameters = {
     userId: userId,
-    characterShort: event.queryStringParameters?.["character-short"] === "true",
+    characterShort: request.queryStringParameters?.["character-short"] === "true",
   };
 
   return params;
