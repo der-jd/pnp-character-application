@@ -1,6 +1,6 @@
 data "archive_file" "increase_skill" {
   type        = "zip"
-  source_dir  = "../backend/build/lambdas/increase-skill"
+  source_dir  = "../backend/build/src/lambdas/increase-skill"
   output_path = "../backend/dist/increase-skill.zip"
 }
 
