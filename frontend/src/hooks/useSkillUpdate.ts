@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
-import { CharacterSheet } from "../lib/api/models/Character/character";
+import { CharacterSheet, LearningMethod } from "../lib/api/models/Character/character";
 import { increaseSkill } from "../lib/api/utils/api_calls";
 import { ISkillProps } from "../lib/components/Skill/SkillDefinitions";
 import { ApiError } from "@lib/api/utils/api_calls";
@@ -31,17 +31,18 @@ export function useSkillUpdater() {
 
     const increaseSkillRequest = {
       initialValue: skill.current_level,
-      increasedPoints: skill.edited_level - skill.current_level,
-      learningMethod: String(skill.learning_method),
+      increasedPoints: pointsToSkill,
+      learningMethod: LearningMethod[skill.learning_method],
     };
+
+    console.log("calculated values: ");
+    console.log(increaseSkillRequest);
 
     if (selectedChar && idToken) {
       try {
         setLoading(true);
         await increaseSkill(idToken, selectedChar, skill.name, skill.category, increaseSkillRequest);
       } catch (error) {
-        console.log("API ERROR IN UPDATER!!!!");
-        console.log(error);
         if (error instanceof ApiError) {
           toast.toast({
             title: `Error ${error.statusCode}`,

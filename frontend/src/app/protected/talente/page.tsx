@@ -37,7 +37,7 @@ export default function SkillsPage() {
       </div>
       <div className="flex flex-wrap rounded-lg w-full p-4">
         <SkillCategory
-          data={extract_properties_data(currentCharacterSheet ? currentCharacterSheet : null)}
+          data={extract_properties_data(currentCharacterSheet ?? null)}
           isEditMode={isEditMode}
         />
       </div>
