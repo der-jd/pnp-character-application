@@ -6,6 +6,17 @@ export interface Character {
   characterSheet: CharacterSheet;
 }
 
+export interface CalculationPoints {
+  start: number;
+  available: number;
+  total: number;
+}
+
+export interface ProfessionHobby {
+  name: string;
+  skill: string;
+}
+
 export interface Attribute {
   start: number;
   current: number;
@@ -41,14 +52,8 @@ export interface CharacterSheet {
     name: string;
     level: number;
     sex: string;
-    profession: {
-      name: string;
-      skill: string;
-    };
-    hobby: {
-      name: string;
-      skill: string;
-    };
+    profession: ProfessionHobby;
+    hobby: ProfessionHobby;
     birthday: string;
     birthplace: string;
     size: string;
@@ -60,16 +65,8 @@ export interface CharacterSheet {
     specialCharacteristics: string;
   };
   calculationPoints: {
-    adventurePoints: {
-      start: number;
-      available: number;
-      total: number;
-    };
-    attributePoints: {
-      start: number;
-      available: number;
-      total: number;
-    };
+    adventurePoints: CalculationPoints;
+    attributePoints: CalculationPoints;
   };
   advantages: string[];
   disadvantages: string[];
