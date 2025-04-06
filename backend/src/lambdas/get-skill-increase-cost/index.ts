@@ -150,11 +150,11 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
   const response = await docClient.send(command);
 
   if (!response.Item) {
-    console.error("Item from DynamoDB table is missing in the request response");
+    console.error("No character found for the given user and character id");
     throw {
-      statusCode: 500,
+      statusCode: 404,
       body: JSON.stringify({
-        message: "Item from DynamoDB table is missing in the request response",
+        message: "No character found for the given user and character id",
       }),
     };
   }

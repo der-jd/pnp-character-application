@@ -16,6 +16,7 @@ import {
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
 
+// TODO endpoint should only be callable internally?! No need to expose it to the frontend. with a frontend call we would also need to check for an existing character with this id, see TODO below
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return addRecordToHistory(event);
 };
@@ -95,6 +96,7 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
     const dynamoDbResponse = await docClient.send(command);
     console.log("Successfully got DynamoDB items");
 
+    // TODO what to do if there is no character for the given id? -> check and throw error?!
     let record: Record;
     if (!dynamoDbResponse.Items || dynamoDbResponse.Items.length === 0) {
       console.log("No history found for the given characterId.");
