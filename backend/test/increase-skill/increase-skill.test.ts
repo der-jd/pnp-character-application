@@ -201,7 +201,7 @@ describe("Invalid requests", () => {
   ];
 
   invalidTestCases.forEach((_case) => {
-    test(`${_case.name}`, async () => {
+    test(_case.name, async () => {
       const fakeResponse = structuredClone(fakeDynamoDBCharacterResponse);
       fakeResponse.Item.characterSheet.calculationPoints.adventurePoints.available = 3;
       mockDynamoDBGetResponse(fakeResponse);
@@ -303,7 +303,7 @@ describe("Valid requests", () => {
   ];
 
   validTestCases.forEach((_case) => {
-    test(`${_case.name}`, async () => {
+    test(_case.name, async () => {
       mockDynamoDBGetResponse(fakeDynamoDBCharacterResponse);
 
       const result = await increaseSkill(_case.request);
