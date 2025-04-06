@@ -7,11 +7,6 @@ import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeDynamoDBCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 
-/*expect(mockDynamoDBDocumentClient).toHaveBeenCalledBefore(PutCommand, {
-  TableName: "TestUserTable",
-  Item: userToCreate,
-});*/
-
 describe("Invalid requests", () => {
   const invalidTestCases = [
     {
