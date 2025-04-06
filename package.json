@@ -6,8 +6,8 @@
     "format": "prettier . --write",
     "format:terraform": "terraform fmt terraform",
     "check-format": "prettier . --check",
-	  "check-format:terraform": "terraform fmt -check terraform && echo \"SUCCESS: Format is correct!\" ||  (echo \"ERROR: Formatting errors found! Run 'npm run format:terraform' to fix them.\"; exit 1)",
-	  "lint:terraform": "tflint --chdir=terraform && echo \"SUCCESS: No lint errors found!\""
+    "check-format:terraform": "terraform fmt -check terraform && echo \"SUCCESS: Format is correct!\" ||  (echo \"ERROR: Formatting errors found! Run 'npm run format:terraform' to fix them.\"; exit 1)",
+    "lint:terraform": "tflint --chdir=terraform && echo \"SUCCESS: No lint errors found!\""
   },
   "devDependencies": {
     "husky": "^9.1.7",
