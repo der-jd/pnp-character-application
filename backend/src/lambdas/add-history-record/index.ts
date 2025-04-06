@@ -185,6 +185,7 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
   }
 
   try {
+    // TODO use parse function and request object for all lambdas
     // The conditional parse is necessary for Lambda tests via the AWS console
     const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
     bodySchema.parse(body);
