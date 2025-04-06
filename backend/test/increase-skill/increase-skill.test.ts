@@ -1,46 +1,203 @@
-import { expect, test } from "vitest";
-import { increaseSkill } from "increase-skill/index.js";
-//import { Request } from "config/index.js";
+//import "aws-sdk-client-mock-jest/vitest";
+import { GetCommand } from "@aws-sdk/lib-dynamodb";
 
-const cases = [
-  {
-    headers: {},
-    pathParameters: null,
-    body: null,
-  },
-  {
-    headers: {
-      authorization: "randomValue",
-    },
-    pathParameters: null,
-    body: null,
-  },
-  {
-    headers: {
-      authorization: "Bearer 1234567890",
-    },
-    pathParameters: null,
-    body: null,
-  },
-];
-cases.forEach((request) => {
-  test(`Invalid token when authorization header is missing/malformed. headers: ${JSON.stringify(request.headers)}`, async () => {
-    const result = await increaseSkill(request);
+import { describe, expect, test } from "vitest";
+import { increaseSkill } from "../../src/lambdas/increase-skill/index.js";
+import { fakeHeaders, fakeDynamoDBCharacterResponse } from "../test-data/request.js";
 
-    expect(result.statusCode).toBe(401);
+/*expect(mockDynamoDBDocumentClient).toHaveBeenCalledBefore(PutCommand, {
+  TableName: "TestUserTable",
+  Item: userToCreate,
+});*/
+
+describe("Invalid requests", () => {
+  const invalidTestCases = [
+    {
+      name: "Authorization header is malformed",
+      request: {
+        headers: {
+          authorization: "dummyValue",
+        },
+        pathParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 401,
+    },
+    {
+      name: "Authorization token is invalid",
+      request: {
+        headers: {
+          authorization: "Bearer 1234567890",
+        },
+        pathParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 401,
+    },
+    {
+      name: "Passed initial skill value doesn't match the value in the backend",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        body: {
+          initialValue: 10,
+          increasedPoints: 15,
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 409,
+    },
+    {
+      name: "Skill is not activated",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "skill-category": "nature",
+          "skill-name": "fishing",
+        },
+        body: {
+          initialValue: 8,
+          increasedPoints: 3,
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 409,
+    },
+    {
+      name: "Not enough adventure points",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        body: {
+          initialValue: 16,
+          increasedPoints: 1000,
+          learningMethod: "EXPENSIVE",
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Initial skill value is a string, not a number",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        body: {
+          initialValue: "16",
+          increasedPoints: 5,
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Increased points is a string, not a number",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        body: {
+          initialValue: 16,
+          increasedPoints: "5",
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Character id is not an UUID",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": "1234567890",
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        body: {
+          initialValue: 16,
+          increasedPoints: 5,
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Increased points are 0",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        body: {
+          initialValue: 16,
+          increasedPoints: 0,
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Increased points are negative",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": "9862f3c9-a065-4e0e-80b2-5bf085535cbe",
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        body: {
+          initialValue: 16,
+          increasedPoints: -3,
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "No character for the given id",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": "26c5d41d-cef1-455f-a341-b15d8a5b3967",
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        body: {
+          initialValue: 16,
+          increasedPoints: 3,
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 404,
+    },
+  ];
+
+  invalidTestCases.forEach((_case) => {
+    test(`${_case.name}`, async () => {
+      const fakeResponse = fakeDynamoDBCharacterResponse;
+      fakeResponse.Item.characterSheet.calculationPoints.adventurePoints.available = 3;
+      (globalThis as any).dynamoDBMock.on(GetCommand).resolves(fakeResponse);
+
+      const result = await increaseSkill(_case.request);
+
+      expect(result.statusCode).toBe(_case.expectedStatusCode);
+    });
   });
 });
-
-/*it("should throw when authorization header is malformed", async () => {
-    const request: Request = {
-      headers: {
-        authorization: "",
-      },
-      pathParameters: null,
-      body: null,
-    };
-
-    const result = await increaseSkill(request);
-
-    expect(result.statusCode).toBe(401);
-  });*/
