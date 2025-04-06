@@ -328,6 +328,8 @@ describe("Valid requests", () => {
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
       const parsedBody = JSON.parse(result.body);
+      expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
+      expect(parsedBody.skillName).toBe(_case.request.pathParameters["skill-name"]);
       expect(parsedBody.skillValue).toBe(_case.request.body.initialValue + _case.request.body.increasedPoints);
 
       const skillCategory = _case.request.pathParameters[
