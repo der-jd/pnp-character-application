@@ -117,8 +117,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependencies
-          command: npm ci
+          name: Install npm
+          command: apk add npm
       - run:
           name: Check Terraform file formatting
           command: npm run check-format:terraform
