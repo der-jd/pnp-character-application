@@ -1,14 +1,22 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { LearningMethod, CostCategory, Character, getSkillIncreaseCost, getSkill, Request } from "config/index.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import {
+  LearningMethod,
+  CostCategory,
+  Character,
+  getSkillIncreaseCost,
+  getSkill,
+  Request,
+  parseBody,
+} from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill({
     headers: event.headers,
     pathParameters: event.pathParameters,
-    body: event.body,
+    body: parseBody(event.body),
   });
 };
 
@@ -187,15 +195,13 @@ function validateRequest(request: Request): Parameters {
     };
   }
 
-  // The conditional parse is necessary for Lambda tests via the AWS console
-  const body = typeof request.body === "string" ? JSON.parse(request.body) : request.body;
   if (
     typeof request.pathParameters?.["character-id"] !== "string" ||
     typeof request.pathParameters?.["skill-category"] !== "string" ||
     typeof request.pathParameters?.["skill-name"] !== "string" ||
-    typeof body?.initialValue !== "number" ||
-    typeof body?.increasedPoints !== "number" ||
-    typeof body?.learningMethod !== "string"
+    typeof request.body?.initialValue !== "number" ||
+    typeof request.body?.increasedPoints !== "number" ||
+    typeof request.body?.learningMethod !== "string"
   ) {
     console.error("Invalid input values!");
     throw {
@@ -211,9 +217,9 @@ function validateRequest(request: Request): Parameters {
     characterId: request.pathParameters["character-id"],
     skillCategory: request.pathParameters["skill-category"],
     skillName: request.pathParameters["skill-name"],
-    initialSkillValue: body.initialValue,
-    increasedPoints: body.increasedPoints,
-    learningMethod: body.learningMethod,
+    initialSkillValue: request.body.initialValue,
+    increasedPoints: request.body.increasedPoints,
+    learningMethod: request.body.learningMethod,
   };
 
   if (params.increasedPoints <= 0) {
@@ -257,11 +263,11 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
   const response = await docClient.send(command);
 
   if (!response.Item) {
-    console.error("Item from DynamoDB table is missing in the request response");
+    console.error("No character found for the given user and character id");
     throw {
-      statusCode: 500,
+      statusCode: 404,
       body: JSON.stringify({
-        message: "Item from DynamoDB table is missing in the request response",
+        message: "No character found for the given user and character id",
       }),
     };
   }
@@ -299,5 +305,5 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
     };
   }
 
-  return response.Item as Character;
+  return response.Item as Character; // TODO add validation for all returns from DynamoDB in all Lambdas -> zod schemas
 }
