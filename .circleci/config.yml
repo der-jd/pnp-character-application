@@ -31,6 +31,7 @@ workflows:
       - build-and-deploy-frontend:
           requires:
             - check-format-files
+            - lint-typescript-code
             - deploy-backend-and-infrastructure
 
   delete-services:
