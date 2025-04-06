@@ -13,8 +13,16 @@ describe("Invalid requests", () => {
         headers: {
           authorization: "dummyValue",
         },
-        pathParameters: null,
-        body: null,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        body: {
+          initialValue: 16,
+          increasedPoints: 1,
+          learningMethod: "NORMAL",
+        },
       },
       expectedStatusCode: 401,
     },
@@ -24,8 +32,16 @@ describe("Invalid requests", () => {
         headers: {
           authorization: "Bearer 1234567890",
         },
-        pathParameters: null,
-        body: null,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        body: {
+          initialValue: 16,
+          increasedPoints: 1,
+          learningMethod: "NORMAL",
+        },
       },
       expectedStatusCode: 401,
     },
