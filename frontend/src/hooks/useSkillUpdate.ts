@@ -54,7 +54,7 @@ export function useSkillUpdater() {
         return;
       }
     }
-    
+
     setLoading(false);
     updateValue(path, name, skill.current_level + pointsToSkill);
   };
