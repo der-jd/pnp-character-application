@@ -3,4 +3,4 @@ export { Attribute, BaseValue, Skill, CombatSkill, Character, CharacterSheet, ge
 export { add_cors_headers } from "./cors_support.js";
 export { api_error } from "./api_error.js";
 export { RecordType } from "./history.js";
-export { Request } from "./request.js";
+export { Request, parseBody } from "./request.js";
