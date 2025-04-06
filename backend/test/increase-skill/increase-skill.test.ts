@@ -3,6 +3,7 @@ import { increaseSkill } from "../../src/lambdas/increase-skill/index.js";
 import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
 import { fakeDynamoDBCharacterResponse, mockDynamoDBGetResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
+import { Character, getSkill } from "config/index.js";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [
@@ -313,10 +314,9 @@ describe("Valid requests", () => {
       const parsedBody = JSON.parse(result.body);
       expect(parsedBody.skillValue).toBe(_case.request.body.initialValue + _case.request.body.increasedPoints);
 
-      const skillCategory = _case.request.pathParameters["skill-category"];
+      const skillCategory = _case.request.pathParameters["skill-category"] as keyof Character["characterSheet"]["skills"];
       const skillName = _case.request.pathParameters["skill-name"];
-      const skill = fakeDynamoDBCharacterResponse.Item.characterSheet.skills[skillCategory][skillName];
-      const oldTotalSkillCost = skill.totalCost;
+      const oldTotalSkillCost = getSkill(fakeDynamoDBCharacterResponse.Item.characterSheet.skills, skillCategory, skillName).totalCost;
       const diffSkillTotalCost = parsedBody.totalCost - oldTotalSkillCost;
       const oldAvailableAdventurePoints =
         fakeDynamoDBCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
