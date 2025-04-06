@@ -16,6 +16,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   return increaseSkill({
     headers: event.headers,
     pathParameters: event.pathParameters,
+    queryStringParameters: event.queryStringParameters,
     body: parseBody(event.body),
   });
 };
