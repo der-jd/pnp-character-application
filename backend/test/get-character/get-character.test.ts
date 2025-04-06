@@ -15,6 +15,7 @@ describe("Invalid requests", () => {
         pathParameters: {
           "character-id": fakeCharacterId,
         },
+        queryStringParameters: null,
         body: null,
       },
       expectedStatusCode: 401,
@@ -28,6 +29,7 @@ describe("Invalid requests", () => {
         pathParameters: {
           "character-id": fakeCharacterId,
         },
+        queryStringParameters: null,
         body: null,
       },
       expectedStatusCode: 401,
@@ -39,6 +41,7 @@ describe("Invalid requests", () => {
         pathParameters: {
           "character-id": "1234567890",
         },
+        queryStringParameters: null,
         body: null,
       },
       expectedStatusCode: 400,
@@ -50,6 +53,7 @@ describe("Invalid requests", () => {
         pathParameters: {
           "character-id": "26c5d41d-cef1-455f-a341-b15d8a5b3967",
         },
+        queryStringParameters: null,
         body: null,
       },
       expectedStatusCode: 404,
@@ -61,6 +65,7 @@ describe("Invalid requests", () => {
         pathParameters: {
           "character-id": fakeCharacterId,
         },
+        queryStringParameters: null,
         body: null,
       },
       expectedStatusCode: 404,
@@ -87,6 +92,7 @@ describe("Valid requests", () => {
         pathParameters: {
           "character-id": fakeCharacterId,
         },
+        queryStringParameters: null,
         body: null,
       },
       expectedStatusCode: 200,

@@ -18,6 +18,7 @@ describe("Invalid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 1,
@@ -37,6 +38,7 @@ describe("Invalid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 1,
@@ -54,6 +56,7 @@ describe("Invalid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 10,
           increasedPoints: 15,
@@ -71,6 +74,7 @@ describe("Invalid requests", () => {
           "skill-category": "nature",
           "skill-name": "fishing",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 8,
           increasedPoints: 3,
@@ -88,6 +92,7 @@ describe("Invalid requests", () => {
           "skill-category": "combat",
           "skill-name": "slashingWeapons1h",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 110,
           increasedPoints: 5,
@@ -105,6 +110,7 @@ describe("Invalid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: "16",
           increasedPoints: 5,
@@ -122,6 +128,7 @@ describe("Invalid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: "5",
@@ -139,6 +146,7 @@ describe("Invalid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 5,
@@ -156,6 +164,7 @@ describe("Invalid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 0,
@@ -173,6 +182,7 @@ describe("Invalid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: -3,
@@ -190,6 +200,7 @@ describe("Invalid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 3,
@@ -207,6 +218,7 @@ describe("Invalid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 3,
@@ -241,6 +253,7 @@ describe("Valid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 12,
           increasedPoints: 4,
@@ -258,6 +271,7 @@ describe("Valid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 1,
@@ -275,6 +289,7 @@ describe("Valid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 3,
@@ -292,6 +307,7 @@ describe("Valid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 3,
@@ -309,6 +325,7 @@ describe("Valid requests", () => {
           "skill-category": "body",
           "skill-name": "athletics",
         },
+        queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 3,
