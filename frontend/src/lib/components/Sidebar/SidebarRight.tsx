@@ -99,13 +99,16 @@ const SidebarRight: React.FC = () => {
               Load Character
             </Button>
           </li>
-          <li className="flex items-center justify-center">
+          <div className="flex items-center justify-center">
             <div className="p-1 items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">
               Current Character:
             </div>
             <div className="p-1 items-center justify-center flex-1 m-2 bg-black rounded rounded-lg text-white">
               {loadedCharacter ?? "No Character selected"}
             </div>
+          </div>
+          <li>
+            <div></div>
           </li>
         </ul>
       </nav>

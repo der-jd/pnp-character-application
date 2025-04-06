@@ -2,6 +2,7 @@ import Link from "next/link";
 // import { useRouter } from 'next/navigation'
 
 import { Button } from "@lib/components/ui/button";
+
 import "@global/styles/globals.css";
 
 export default function Header() {
@@ -14,8 +15,8 @@ export default function Header() {
   // }
 
   return (
-    <header className="p-4 w-full bg-gray-200">
-      <div className="container max-w-5xl mx-auto flex justify-center items-center px-4">
+    <header className="p-4 w-full bg-gray-300">
+      <div className="container w-full mx-auto flex justify-center items-center px-4">
         {/* Navigation */}
         <nav className="relative">
           <ul className="flex space-x-4 items-center">
@@ -39,6 +40,11 @@ export default function Header() {
             <li>
               <Link href="/protected/inventar">
                 <Button className="bg-black text-white hover:bg-gray-300 hover:text-black px-4 py-2">Inventory</Button>
+              </Link>
+            </li>
+            <li>
+              <Link href="/protected/history">
+                <Button className="bg-black text-white hover:bg-gray-300 hover:text-black px-4 py-2">History</Button>
               </Link>
             </li>
           </ul>
