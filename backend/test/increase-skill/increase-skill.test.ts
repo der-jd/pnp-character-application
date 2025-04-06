@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { increaseSkill } from "../../src/lambdas/increase-skill/index.js";
 import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
-import { fakeDynamoDBCharacterResponse, mockDynamoDBGetResponse } from "../test-data/response.js";
+import { fakeSingleCharacterResponse, mockDynamoDBGetResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { Character, getSkill } from "config/index.js";
 
@@ -231,7 +231,7 @@ describe("Invalid requests", () => {
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      const fakeResponse = structuredClone(fakeDynamoDBCharacterResponse);
+      const fakeResponse = structuredClone(fakeSingleCharacterResponse);
       fakeResponse.Item.characterSheet.calculationPoints.adventurePoints.available = 3;
       mockDynamoDBGetResponse(fakeResponse);
 
@@ -338,7 +338,7 @@ describe("Valid requests", () => {
 
   validTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetResponse(fakeDynamoDBCharacterResponse);
+      mockDynamoDBGetResponse(fakeSingleCharacterResponse);
 
       const result = await increaseSkill(_case.request);
 
@@ -354,15 +354,18 @@ describe("Valid requests", () => {
       ] as keyof Character["characterSheet"]["skills"];
       const skillName = _case.request.pathParameters["skill-name"];
       const oldTotalSkillCost = getSkill(
-        fakeDynamoDBCharacterResponse.Item.characterSheet.skills,
+        fakeSingleCharacterResponse.Item.characterSheet.skills,
         skillCategory,
         skillName,
       ).totalCost;
       const diffSkillTotalCost = parsedBody.totalCost - oldTotalSkillCost;
       const oldAvailableAdventurePoints =
-        fakeDynamoDBCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
+        fakeSingleCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
       const diffAvailableAdventurePoints = oldAvailableAdventurePoints - parsedBody.availableAdventurePoints;
       expect(diffAvailableAdventurePoints).toBe(diffSkillTotalCost);
+
+      // TODO check if an update command to dynamodb has been called --> new skill value actually stored?!
+      // TODO add a check for all test across all Lambdas to validate the response body against the corresponding API schema (zod)
     });
   });
 });

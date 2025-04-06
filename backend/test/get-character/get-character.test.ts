@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
-import { fakeDynamoDBCharacterResponse, mockDynamoDBGetResponse } from "../test-data/response.js";
+import { fakeSingleCharacterResponse, mockDynamoDBGetResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { getCharacter } from "../../src/lambdas/get-character/index.js";
 
@@ -74,7 +74,7 @@ describe("Invalid requests", () => {
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetResponse(fakeDynamoDBCharacterResponse);
+      mockDynamoDBGetResponse(fakeSingleCharacterResponse);
 
       const result = await getCharacter(_case.request);
 
@@ -86,7 +86,7 @@ describe("Invalid requests", () => {
 describe("Valid requests", () => {
   const validTestCases = [
     {
-      name: "Successfully get an existing character",
+      name: "Successfully get a character",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -101,7 +101,7 @@ describe("Valid requests", () => {
 
   validTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetResponse(fakeDynamoDBCharacterResponse);
+      mockDynamoDBGetResponse(fakeSingleCharacterResponse);
 
       const result = await getCharacter(_case.request);
 
