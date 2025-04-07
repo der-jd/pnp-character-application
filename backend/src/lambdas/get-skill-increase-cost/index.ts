@@ -3,9 +3,15 @@ import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { LearningMethod, CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { Request, parseBody } from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  return getSkillCost(event);
+  return getSkillCost({
+    headers: event.headers,
+    pathParameters: event.pathParameters,
+    queryStringParameters: event.queryStringParameters,
+    body: parseBody(event.body),
+  });
 };
 
 interface Parameters {
@@ -16,9 +22,9 @@ interface Parameters {
   learningMethod: string;
 }
 
-async function getSkillCost(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+export async function getSkillCost(request: Request): Promise<APIGatewayProxyResult> {
   try {
-    const params = validateRequest(event);
+    const params = validateRequest(request);
 
     console.log(
       `Get increase cost for skill '${params.skillCategory}/${params.skillName}' (learning method '${params.learningMethod}') of character ${params.characterId} of user ${params.userId}`,
@@ -66,11 +72,11 @@ async function getSkillCost(event: APIGatewayProxyEvent): Promise<APIGatewayProx
   }
 }
 
-function validateRequest(event: APIGatewayProxyEvent): Parameters {
+function validateRequest(request: Request): Parameters {
   console.log("Validate request");
 
   // Trim the authorization header as it could contain spaces at the beginning
-  const authHeader = event.headers.Authorization?.trim() || event.headers.authorization?.trim();
+  const authHeader = request.headers.Authorization?.trim() || request.headers.authorization?.trim();
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw {
       statusCode: 401,
@@ -97,10 +103,10 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
   }
 
   if (
-    typeof event.pathParameters?.["character-id"] !== "string" ||
-    typeof event.pathParameters?.["skill-category"] !== "string" ||
-    typeof event.pathParameters?.["skill-name"] !== "string" ||
-    typeof event.queryStringParameters?.["learning-method"] !== "string"
+    typeof request.pathParameters?.["character-id"] !== "string" ||
+    typeof request.pathParameters?.["skill-category"] !== "string" ||
+    typeof request.pathParameters?.["skill-name"] !== "string" ||
+    typeof request.queryStringParameters?.["learning-method"] !== "string"
   ) {
     console.error("Invalid input values!");
     throw {
@@ -113,10 +119,10 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
 
   const params: Parameters = {
     userId: userId,
-    characterId: event.pathParameters["character-id"],
-    skillCategory: event.pathParameters["skill-category"],
-    skillName: event.pathParameters["skill-name"],
-    learningMethod: event.queryStringParameters["learning-method"],
+    characterId: request.pathParameters["character-id"],
+    skillCategory: request.pathParameters["skill-category"],
+    skillName: request.pathParameters["skill-name"],
+    learningMethod: request.queryStringParameters["learning-method"],
   };
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
