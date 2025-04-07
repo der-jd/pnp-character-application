@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { increaseSkill } from "../../src/lambdas/increase-skill/index.js";
 import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
 import { fakeSingleCharacterResponse, mockDynamoDBGetResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { Character, getSkill } from "config/index.js";
+import { increaseSkill } from "increase-skill/index.js";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [

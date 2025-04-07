@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeSingleCharacterResponse, mockDynamoDBGetResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { getCharacter } from "../../src/lambdas/get-character/index.js";
+import { getCharacter } from "get-character/index.js";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [
