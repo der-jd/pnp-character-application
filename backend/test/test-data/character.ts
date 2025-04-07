@@ -178,7 +178,7 @@ export const fakeCharacter: Character = {
         greatsword: {
           activated: true,
           start: 10,
-          current: 18,
+          current: 75,
           mod: 8,
           totalCost: 50,
           defaultCostCategory: CostCategory.CAT_3,
@@ -186,7 +186,7 @@ export const fakeCharacter: Character = {
         barehanded: {
           activated: true,
           start: 10,
-          current: 18,
+          current: 74,
           mod: 8,
           totalCost: 50,
           defaultCostCategory: CostCategory.CAT_3,
@@ -194,7 +194,7 @@ export const fakeCharacter: Character = {
         thrustingWeapons1h: {
           activated: true,
           start: 10,
-          current: 18,
+          current: 50,
           mod: 8,
           totalCost: 50,
           defaultCostCategory: CostCategory.CAT_3,
@@ -202,7 +202,7 @@ export const fakeCharacter: Character = {
         thrustingWeapons2h: {
           activated: true,
           start: 10,
-          current: 18,
+          current: 49,
           mod: 8,
           totalCost: 50,
           defaultCostCategory: CostCategory.CAT_3,
@@ -446,7 +446,7 @@ export const fakeCharacter: Character = {
         writtenExpression: {
           activated: true,
           start: 7,
-          current: 10,
+          current: 75,
           mod: 3,
           totalCost: 15,
           defaultCostCategory: CostCategory.CAT_2,
@@ -454,7 +454,7 @@ export const fakeCharacter: Character = {
         disguising: {
           activated: true,
           start: 7,
-          current: 10,
+          current: 74,
           mod: 3,
           totalCost: 15,
           defaultCostCategory: CostCategory.CAT_2,
@@ -462,7 +462,7 @@ export const fakeCharacter: Character = {
         streetKnowledge: {
           activated: true,
           start: 7,
-          current: 10,
+          current: 50,
           mod: 3,
           totalCost: 15,
           defaultCostCategory: CostCategory.CAT_2,
@@ -470,7 +470,7 @@ export const fakeCharacter: Character = {
         knowledgeOfHumanNature: {
           activated: true,
           start: 7,
-          current: 10,
+          current: 49,
           mod: 3,
           totalCost: 15,
           defaultCostCategory: CostCategory.CAT_2,
