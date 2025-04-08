@@ -1,8 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { Request, parseBody } from "utils/index.js";
+import { Request, parseBody, getCharacterItems } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getCharacters({
@@ -22,37 +20,11 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
   try {
     const params = validateRequest(request);
 
-    console.log(`Get characters for user ${params.userId}`);
-
-    // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/query.js
-    const client = new DynamoDBClient({});
-    const docClient = DynamoDBDocumentClient.from(client);
-    const command = new QueryCommand({
-      TableName: process.env.TABLE_NAME,
-      KeyConditionExpression: "userId = :userId",
-      ExpressionAttributeValues: {
-        ":userId": params.userId,
-      },
-      ConsistentRead: true,
-    });
-
-    const dynamoDbResponse = await docClient.send(command);
-
-    if (!dynamoDbResponse.Items || dynamoDbResponse.Items.length === 0) {
-      console.error("No characters found for the given user id");
-      throw {
-        statusCode: 404,
-        body: JSON.stringify({
-          message: "No characters found for the given user id",
-        }),
-      };
-    }
-
-    console.log("Successfully got DynamoDB items");
+    const items = await getCharacterItems(params.userId);
 
     let characters = [];
     if (params.characterShort) {
-      for (const item of dynamoDbResponse.Items) {
+      for (const item of items) {
         characters.push({
           userId: item.userId,
           characterId: item.characterId,
@@ -61,7 +33,7 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
         });
       }
     } else {
-      characters = dynamoDbResponse.Items;
+      characters = items;
     }
 
     const response = {

@@ -1,9 +1,7 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { LearningMethod, CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { Request, parseBody } from "utils/index.js";
+import { Request, parseBody, getCharacterItem } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getSkillCost({
@@ -30,7 +28,7 @@ export async function getSkillCost(request: Request): Promise<APIGatewayProxyRes
       `Get increase cost for skill '${params.skillCategory}/${params.skillName}' (learning method '${params.learningMethod}') of character ${params.characterId} of user ${params.userId}`,
     );
 
-    const character = await getCharacterItem(params);
+    const character = await getCharacterItem(params.userId, params.characterId);
 
     const characterSheet = character.characterSheet;
     const skillCategory = params.skillCategory as keyof Character["characterSheet"]["skills"];
@@ -137,35 +135,4 @@ function validateRequest(request: Request): Parameters {
   }
 
   return params;
-}
-
-async function getCharacterItem(params: Parameters): Promise<Character> {
-  console.log("Get Character from DynamoDB");
-
-  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
-  const command = new GetCommand({
-    TableName: process.env.TABLE_NAME,
-    Key: {
-      userId: params.userId,
-      characterId: params.characterId,
-    },
-  });
-
-  const response = await docClient.send(command);
-
-  if (!response.Item) {
-    console.error("No character found for the given user and character id");
-    throw {
-      statusCode: 404,
-      body: JSON.stringify({
-        message: "No character found for the given user and character id",
-      }),
-    };
-  }
-
-  console.log("Successfully got DynamoDB item");
-
-  return response.Item as Character;
 }
