@@ -170,7 +170,7 @@ export const characterSheetSchema = z.object({
       foodProcessing: skillSchema,
       leatherProcessing: skillSchema,
       metalwork: skillSchema,
-      stoneWork: skillSchema,
+      stonework: skillSchema,
       fabricProcessing: skillSchema,
       alcoholProduction: skillSchema,
       steeringVehicles: skillSchema,
