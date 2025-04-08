@@ -1,20 +1,28 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import { RecordType } from "config/index.js";
 import {
   attributeSchema,
   baseValueSchema,
   calculationPointsSchema,
   combatSkillSchema,
   professionHobbySchema,
+  RecordType,
+  Record,
   skillSchema,
-} from "config/character_schemas.js";
+  historyBlockSchema,
+} from "config/index.js";
+import { getHistoryItems, createHistoryItem, addHistoryRecord } from "utils/index.js";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
+
+/**
+ *
+ * TODO
+ * - add unit tests for add history record
+ * - check via getcommand/querycommand if there is an character before creating a new block in the history
+ */
 
 // TODO endpoint should only be callable internally?! No need to expose it to the frontend. with a frontend call we would also need to check for an existing character with this id, see TODO below
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -51,24 +59,6 @@ const booleanSchema = z.object({
 
 type Body = z.infer<typeof bodySchema>;
 
-const recordSchema = bodySchema.extend({
-  number: z.number(),
-  id: z.string(),
-  timestamp: z.string().datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2025-03-24T16:34:56Z (UTC) or 2025-03-24T16:34:56+02:00
-});
-
-type Record = z.infer<typeof recordSchema>;
-
-const historyBlockSchema = z.object({
-  characterId: z.string(),
-  blockNumber: z.number(),
-  blockId: z.string(),
-  previousBlockId: z.string().nullable(),
-  changes: z.array(recordSchema),
-});
-
-type HistoryBlock = z.infer<typeof historyBlockSchema>;
-
 interface Parameters {
   characterId: string;
   body: Body;
@@ -79,28 +69,17 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
     // TODO only allow access to the character history if the user has access to the character
     const params = validateRequest(event);
 
-    console.log(`Get history of character ${params.characterId}`);
-    const client = new DynamoDBClient({});
-    const docClient = DynamoDBDocumentClient.from(client);
-    const command = new QueryCommand({
-      TableName: process.env.TABLE_NAME,
-      KeyConditionExpression: "characterId = :characterId",
-      ExpressionAttributeValues: {
-        ":characterId": params.characterId,
-      },
-      ConsistentRead: true,
-      ScanIndexForward: false, // Sort descending to get highest block number (latest item) first
-      Limit: 1, // Only need the top result
-    });
-
-    const dynamoDbResponse = await docClient.send(command);
-    console.log("Successfully got DynamoDB items");
+    const items = await getHistoryItems(
+      params.characterId,
+      false, // Sort descending to get highest block number (latest item) first
+      1, // Only need the top result
+    );
 
     // TODO what to do if there is no character for the given id? -> check and throw error?!
     let record: Record;
-    if (!dynamoDbResponse.Items || dynamoDbResponse.Items.length === 0) {
+    if (!items || items.length === 0) {
       console.log("No history found for the given characterId.");
-      const newBlock = await createHistoryBlock(params.characterId);
+      const newBlock = await createHistoryItem(params.characterId);
 
       record = {
         number: 1,
@@ -108,8 +87,8 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
         timestamp: new Date().toISOString(),
         ...params.body,
       };
-      addRecord(record, newBlock);
-    } else if (dynamoDbResponse.Items.length !== 1) {
+      await addHistoryRecord(record, newBlock);
+    } else if (items.length !== 1) {
       console.error("More than one latest history block found for the given characterId");
       throw {
         statusCode: 500,
@@ -118,7 +97,7 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
         }),
       };
     } else {
-      const latestBlock = historyBlockSchema.parse(dynamoDbResponse.Items[0]);
+      const latestBlock = historyBlockSchema.parse(items[0]);
       console.log("Latest history block:", latestBlock);
 
       record = {
@@ -130,10 +109,10 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
 
       if (estimateItemSize(latestBlock) + estimateItemSize(record) > MAX_ITEM_SIZE) {
         console.log(`Item size exceeds the maximum limit of ${MAX_ITEM_SIZE} bytes`);
-        const newBlock = await createHistoryBlock(params.characterId);
-        addRecord(record, newBlock);
+        const newBlock = await createHistoryItem(params.characterId);
+        await addHistoryRecord(record, newBlock);
       } else {
-        addRecord(record, latestBlock);
+        await addHistoryRecord(record, latestBlock);
       }
     }
 
@@ -262,68 +241,6 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
     // Rethrow other errors
     throw error;
   }
-}
-
-async function createHistoryBlock(
-  characterId: string,
-  previousBlockNumber: number | undefined = undefined,
-  previousBlockId: string | undefined = undefined,
-): Promise<HistoryBlock> {
-  console.log("Create new history block");
-  const blockNumber = previousBlockNumber ? previousBlockNumber + 1 : 1;
-  const _previousBlockId = previousBlockId ? previousBlockId : null;
-
-  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/put.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
-  const blockId = uuidv4();
-  const command = new PutCommand({
-    TableName: process.env.TABLE_NAME,
-    Item: {
-      characterId: characterId,
-      blockNumber: blockNumber,
-      blockId: blockId,
-      previousBlockId: _previousBlockId,
-      changes: [],
-    },
-  });
-  await docClient.send(command);
-
-  const newBlock: HistoryBlock = {
-    characterId: characterId,
-    blockId: blockId,
-    blockNumber: blockNumber,
-    previousBlockId: _previousBlockId,
-    changes: [],
-  };
-  console.log("Successfully created new history block in DynamoDB", newBlock);
-
-  return newBlock;
-}
-
-async function addRecord(record: Record, block: HistoryBlock) {
-  console.log(`Add record to history block #${block.blockNumber}, id ${block.blockId}`);
-  console.log("Record:", record);
-
-  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
-  const command = new UpdateCommand({
-    TableName: process.env.TABLE_NAME,
-    Key: {
-      characterId: block.characterId,
-      blockNumber: block.blockNumber,
-    },
-    UpdateExpression: "SET #changes = :changes",
-    ExpressionAttributeNames: {
-      "#changes": "changes",
-    },
-    ExpressionAttributeValues: {
-      ":changes": "TODO add record",
-    },
-  });
-  await docClient.send(command);
-  console.log(`Successfully added record ${record.id} to history block in DynamoDB`);
 }
 
 function estimateItemSize(item: any): number {
