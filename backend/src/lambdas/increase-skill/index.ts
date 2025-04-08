@@ -2,15 +2,8 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import {
-  LearningMethod,
-  CostCategory,
-  Character,
-  getSkillIncreaseCost,
-  getSkill,
-  Request,
-  parseBody,
-} from "config/index.js";
+import { LearningMethod, CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
+import { Request, parseBody } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill({

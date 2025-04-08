@@ -18,7 +18,8 @@
     "get-character": "file:src/lambdas/get-character",
     "get-characters": "file:src/lambdas/get-characters",
     "get-skill-increase-cost": "file:src/lambdas/get-skill-increase-cost",
-    "increase-skill": "file:src/lambdas/increase-skill"
+    "increase-skill": "file:src/lambdas/increase-skill",
+    "utils": "file:src/utils"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
