@@ -23,7 +23,7 @@ do
 
   echo "Installing prod dependencies in $lambda_dest_dir..."
   cd $lambda_dest_dir
-  npm install --omit=dev
+  npm ci --omit=dev
 
   cd $start_dir
 done
@@ -49,7 +49,7 @@ do
 
   echo "Installing prod dependencies in $layer_dest_dir..."
   cd $layer_dest_dir
-  npm install --omit=dev
+  npm ci --omit=dev
 
   echo "Moving dependencies into required sub folder for Lambda Layer..."
   mkdir nodejs
