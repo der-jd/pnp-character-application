@@ -12,7 +12,7 @@ resource "aws_lambda_function" "get_characters_lambda" {
 
   filename         = "../backend/dist/get-characters.zip"
   source_code_hash = data.archive_file.get_characters.output_base64sha256
-  layers           = [aws_lambda_layer_version.configuration.arn]
+  layers           = [aws_lambda_layer_version.configuration.arn, aws_lambda_layer_version.utils.arn]
   environment {
     variables = {
       TABLE_NAME = local.characters_table_name
