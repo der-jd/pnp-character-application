@@ -18,14 +18,10 @@ file_env_variables=$1
 # Note: If the s3 bucket is empty, an upload will take place even if the frontend did not change
 
 find . -type f \( \
-    -path './src/*' \
-    -or -path './public/*' \
-    -or -path './lib/*' \
-    -or -path './components/*' \
-    -or -name 'src' \
-    -or -name 'public' \
-    -or -name 'lib' \
-    -or -name 'components' \) \
+    -path './src/lib*' -or \
+    -path './src/hooks*' -or \
+    -path './src/app*' -or \
+    -path './public/*' -or \) -and \
     ! -name 'checksum.txt' \
     ! -name 'build_on_change.sh' \
     -exec md5sum {} \; | tee current_checksum.txt
