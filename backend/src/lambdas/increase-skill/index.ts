@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { LearningMethod, CostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
+import { LearningMethod, adjustCostCategory, Character, getSkillIncreaseCost, getSkill } from "config/index.js";
 import { Request, parseBody, getCharacterItem, updateSkill } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -40,10 +40,7 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
     const defaultCostCategory = getSkill(characterSheet.skills, skillCategory, params.skillName).defaultCostCategory;
     let skillValue = getSkill(characterSheet.skills, skillCategory, params.skillName).current;
     let totalCost = getSkill(characterSheet.skills, skillCategory, params.skillName).totalCost;
-    const adjustedCostCategory = CostCategory.adjustCategory(
-      defaultCostCategory,
-      LearningMethod.parse(params.learningMethod),
-    );
+    const adjustedCostCategory = adjustCostCategory(defaultCostCategory, LearningMethod.parse(params.learningMethod));
 
     console.log(`Default cost category: ${defaultCostCategory}`);
     console.log(`Adjusted cost category: ${adjustedCostCategory}`);
