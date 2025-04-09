@@ -21,7 +21,7 @@ find . -type f \( \
     -path './src/lib*' -or \
     -path './src/hooks*' -or \
     -path './src/app*' -or \
-    -path './public/*' -or \) -and \
+    -path './public/*' \) -and \
     ! -name 'checksum.txt' \
     ! -name 'build_on_change.sh' \
     -exec md5sum {} \; | tee current_checksum.txt
