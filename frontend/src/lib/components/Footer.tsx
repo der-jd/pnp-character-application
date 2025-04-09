@@ -6,6 +6,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 text-center">
         <p>&copy; 2023 XXX Website. Alle Rechte vorbehalten.</p>
       </div>
+      <div>test</div>
     </footer>
   );
 }
