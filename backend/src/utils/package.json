@@ -2,5 +2,10 @@
   "name": "utils",
   "version": "1.0.0",
   "main": "index.mjs",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.786.0",
+    "@aws-sdk/lib-dynamodb": "^3.786.0",
+    "zod": "^3.24.2"
+  }
 }
