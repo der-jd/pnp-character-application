@@ -88,7 +88,6 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
       skill.current += 1;
       skill.totalCost += increaseCost;
       availableAdventurePoints -= increaseCost;
-      // TODO add record to history --> apply all records in the end when it is clear if there are enough ap
     }
 
     await updateSkill(
@@ -100,8 +99,8 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
       skill.totalCost,
       availableAdventurePoints,
     );
+    // TODO add record with changes to history
 
-    // TODO save record in history
     /** TODO check latency for increase skill
      *  If latency high: return cost for next skill point for given cost category
      *  If latency low: let frontend call separate Lambda for cost for given skill value and cost category
