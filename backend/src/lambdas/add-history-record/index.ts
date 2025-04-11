@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { marshall } from "@aws-sdk/util-dynamodb";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import {
@@ -13,7 +14,14 @@ import {
   skillSchema,
   historyBlockSchema,
 } from "config/index.js";
-import { getHistoryItems, createHistoryItem, addHistoryRecord } from "utils/index.js";
+import {
+  getHistoryItems,
+  createHistoryItem,
+  addHistoryRecord,
+  getCharacterItem,
+  Request,
+  parseBody,
+} from "utils/index.js";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
 
@@ -26,10 +34,15 @@ const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
 
 // TODO endpoint should only be callable internally?! No need to expose it to the frontend. with a frontend call we would also need to check for an existing character with this id, see TODO below
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  return addRecordToHistory(event);
+  return addRecordToHistory({
+    headers: event.headers,
+    pathParameters: event.pathParameters,
+    queryStringParameters: event.queryStringParameters,
+    body: parseBody(event.body),
+  });
 };
 
-const bodySchema = z.object({
+const historyBodySchema = z.object({
   type: z.string(),
   name: z.string(),
   data: z.object({
@@ -57,17 +70,20 @@ const booleanSchema = z.object({
   value: z.boolean(),
 });
 
-type Body = z.infer<typeof bodySchema>;
+type HistoryBodySchema = z.infer<typeof historyBodySchema>;
 
 interface Parameters {
+  userId: string;
   characterId: string;
-  body: Body;
+  body: HistoryBodySchema;
 }
 
-async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+async function addRecordToHistory(request: Request): Promise<APIGatewayProxyResult> {
   try {
     // TODO only allow access to the character history if the user has access to the character
-    const params = validateRequest(event);
+    const params = await validateRequest(request);
+
+    console.log(`Add record to history of character ${params.characterId} of user ${params.userId}`);
 
     const items = await getHistoryItems(
       params.characterId,
@@ -75,7 +91,6 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
       1, // Only need the top result
     );
 
-    // TODO what to do if there is no character for the given id? -> check and throw error?!
     let record: Record;
     if (!items || items.length === 0) {
       console.log("No history found for the given characterId.");
@@ -138,10 +153,37 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
   }
 }
 
-function validateRequest(event: APIGatewayProxyEvent): Parameters {
+async function validateRequest(request: Request): Promise<Parameters> {
   console.log("Validate request");
 
-  if (typeof event.pathParameters?.["character-id"] !== "string") {
+  // Trim the authorization header as it could contain spaces at the beginning
+  const authHeader = request.headers.Authorization?.trim() || request.headers.authorization?.trim();
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: No token provided!" }),
+    };
+  }
+
+  const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
+  // Decode the token without verification (the access to the API itself is already protected by the authorizer)
+  const decoded = jwt.decode(token) as JwtPayload | null;
+  if (!decoded) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: Invalid token!" }),
+    };
+  }
+
+  const userId = decoded.sub; // Cognito User ID
+  if (!userId) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: User ID not found in token!" }),
+    };
+  }
+
+  if (typeof request.pathParameters?.["character-id"] !== "string") {
     console.error("Invalid input values!");
     throw {
       statusCode: 400,
@@ -151,7 +193,7 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
     };
   }
 
-  const characterId = event.pathParameters?.["character-id"];
+  const characterId = request.pathParameters?.["character-id"];
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
   if (!uuidRegex.test(characterId)) {
     console.error("Character id is not a valid UUID format!");
@@ -163,11 +205,12 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
     };
   }
 
+  // Check if the character exists
+  await getCharacterItem(userId, characterId);
+
   try {
     // TODO use parse function and request object for all lambdas
-    // The conditional parse is necessary for Lambda tests via the AWS console
-    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-    bodySchema.parse(body);
+    const body = historyBodySchema.parse(request.body);
 
     switch (RecordType.parse(body.type)) {
       case RecordType.EVENT_CALCULATION_POINTS:
@@ -223,7 +266,8 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
     }
 
     return {
-      characterId,
+      userId: userId,
+      characterId: characterId,
       body: body,
     };
   } catch (error) {
