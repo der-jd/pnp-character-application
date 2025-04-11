@@ -29,7 +29,6 @@ const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
  *
  * TODO
  * - add unit tests for add history record
- * - check via getcommand/querycommand if there is an character before creating a new block in the history
  */
 
 // TODO endpoint should only be callable internally?! No need to expose it to the frontend. with a frontend call we would also need to check for an existing character with this id, see TODO below
