@@ -83,12 +83,12 @@ export async function addHistoryRecord(record: Record, block: HistoryBlock) {
       characterId: block.characterId,
       blockNumber: block.blockNumber,
     },
-    UpdateExpression: "SET #changes = :changes",
+    UpdateExpression: "SET #changes = list_append(#changes, :newRecord)",
     ExpressionAttributeNames: {
       "#changes": "changes",
     },
     ExpressionAttributeValues: {
-      ":changes": "TODO add record",
+      ":newRecord": [record],
     },
   });
 
