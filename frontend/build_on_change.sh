@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# TODO check if frontend is re-deployed when Cognito user pool has changed and therefore the env variables for the frontend have changed
-
 AWS_REGION="eu-central-1"
 CACHED_CHECKSUM="checksum.txt"
 
@@ -18,20 +16,16 @@ file_env_variables=$1
 # Note: If the s3 bucket is empty, an upload will take place even if the frontend did not change
 
 find . -type f \( \
-    -path './src/*' \
-    -or -path './public/*' \
-    -or -path './lib/*' \
-    -or -path './components/*' \
-    -or -name 'src' \
-    -or -name 'public' \
-    -or -name 'lib' \
-    -or -name 'components' \) \
+    -path './src/lib*' -or \
+    -path './src/hooks*' -or \
+    -path './src/app*' -or \
+    -path './public/*' \) -and \
     ! -name 'checksum.txt' \
     ! -name 'build_on_change.sh' \
-    -exec md5sum {} \; | tee current_checksum.txt
+    -exec md5sum {} \; | tee -a current_checksum.txt
 
 if [ -f "$file_env_variables" ]; then
-    md5sum $file_env_variables| tee current_checksum.txt
+    md5sum $file_env_variables| tee -a current_checksum.txt
 else
     echo "Error: No terraform output file specified, exiting..."
     exit 2
