@@ -31,7 +31,7 @@ const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
  * - add unit tests for add history record
  */
 
-// TODO endpoint should only be callable internally?! No need to expose it to the frontend. with a frontend call we would also need to check for an existing character with this id, see TODO below
+// TODO endpoint should only be callable internally! It shouldn't be exposed to the frontend because it shouldn't add history records on its own
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return addRecordToHistory({
     headers: event.headers,
@@ -79,7 +79,6 @@ interface Parameters {
 
 async function addRecordToHistory(request: Request): Promise<APIGatewayProxyResult> {
   try {
-    // TODO only allow access to the character history if the user has access to the character
     const params = await validateRequest(request);
 
     console.log(`Add record to history of character ${params.characterId} of user ${params.userId}`);
