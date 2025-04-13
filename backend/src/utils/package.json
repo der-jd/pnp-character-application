@@ -4,8 +4,8 @@
   "main": "index.mjs",
   "type": "module",
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.786.0",
-    "@aws-sdk/lib-dynamodb": "^3.786.0",
+    "@aws-sdk/client-dynamodb": "^3.788.0",
+    "@aws-sdk/lib-dynamodb": "^3.788.0",
     "zod": "^3.24.2"
   }
 }
