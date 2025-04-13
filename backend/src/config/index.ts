@@ -12,4 +12,4 @@ export {
   skillSchema,
 } from "./character_schema.js";
 export { recordSchema, Record, historyBlockSchema, HistoryBlock } from "./history_schema.js";
-export { RecordType } from "./history.js";
+export { RecordType, parseRecordType } from "./history.js";

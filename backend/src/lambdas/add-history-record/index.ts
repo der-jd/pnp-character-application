@@ -42,13 +42,13 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 };
 
 const historyBodySchema = z.object({
-  type: z.string(),
+  type: z.nativeEnum(RecordType),
   name: z.string(),
   data: z.object({
     old: z.record(z.any()),
     new: z.record(z.any()),
   }),
-  learningMethod: z.string(),
+  learningMethod: z.string().optional(),
   calculationPointsChange: z.object({
     adjustment: z.number(),
     old: z.number(),
@@ -69,7 +69,7 @@ const booleanSchema = z.object({
   value: z.boolean(),
 });
 
-type HistoryBodySchema = z.infer<typeof historyBodySchema>;
+export type HistoryBodySchema = z.infer<typeof historyBodySchema>;
 
 interface Parameters {
   userId: string;
@@ -77,7 +77,7 @@ interface Parameters {
   body: HistoryBodySchema;
 }
 
-async function addRecordToHistory(request: Request): Promise<APIGatewayProxyResult> {
+export async function addRecordToHistory(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = await validateRequest(request);
 
@@ -210,7 +210,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
     // TODO use parse function and request object for all lambdas
     const body = historyBodySchema.parse(request.body);
 
-    switch (RecordType.parse(body.type)) {
+    switch (body.type) {
       case RecordType.EVENT_CALCULATION_POINTS:
         calculationPointsSchema.parse(body.data.old);
         calculationPointsSchema.parse(body.data.new);

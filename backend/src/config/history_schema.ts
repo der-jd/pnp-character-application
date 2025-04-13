@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { RecordType } from "./history.js";
 
 export const recordSchema = z.object({
-  type: z.string(),
+  type: z.nativeEnum(RecordType),
   name: z.string(),
   number: z.number(),
   id: z.string(),
@@ -9,7 +10,7 @@ export const recordSchema = z.object({
     old: z.record(z.any()),
     new: z.record(z.any()),
   }),
-  learningMethod: z.string(),
+  learningMethod: z.string().optional(),
   calculationPointsChange: z.object({
     adjustment: z.number(),
     old: z.number(),
