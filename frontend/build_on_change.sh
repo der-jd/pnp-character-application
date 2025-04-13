@@ -27,7 +27,7 @@ find . -type f \( \
     -exec md5sum {} \; | tee -a current_checksum.txt
 
 if [ -f "$file_env_variables" ]; then
-    md5sum $file_env_variables| tee current_checksum.txt
+    md5sum $file_env_variables| tee -a current_checksum.txt
 else
     echo "Error: No terraform output file specified, exiting..."
     exit 2
