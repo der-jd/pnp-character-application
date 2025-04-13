@@ -24,7 +24,7 @@ find . -type f \( \
     -path './public/*' \) -and \
     ! -name 'checksum.txt' \
     ! -name 'build_on_change.sh' \
-    -exec md5sum {} \; | tee current_checksum.txt
+    -exec md5sum {} \; | tee -a current_checksum.txt
 
 if [ -f "$file_env_variables" ]; then
     md5sum $file_env_variables| tee current_checksum.txt
