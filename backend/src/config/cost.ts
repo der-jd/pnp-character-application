@@ -5,15 +5,8 @@ export enum LearningMethod {
   EXPENSIVE = 1, // Cost Category +1
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace LearningMethod {
-  export function parse(method: string): LearningMethod {
-    /**
-     * The function itself is added as a key to the enum, because it is part of a namespace with the same name.
-     * Therefore, Exclude<> is used to remove the function name from the keys of the enum.
-     */
-    return LearningMethod[method.toUpperCase() as Exclude<keyof typeof LearningMethod, "parse">];
-  }
+export function parseLearningMethod(method: string): LearningMethod {
+  return LearningMethod[method.toUpperCase() as keyof typeof LearningMethod];
 }
 
 export enum CostCategory {

@@ -1,6 +1,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { LearningMethod, adjustCostCategory, Character, getSkillIncreaseCost, getSkill, Skill } from "config/index.js";
+import {
+  parseLearningMethod,
+  adjustCostCategory,
+  Character,
+  getSkillIncreaseCost,
+  getSkill,
+  Skill,
+} from "config/index.js";
 import { Request, parseBody, getCharacterItem, updateSkill } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -39,7 +46,7 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
     const skill = getSkill(characterSheet.skills, skillCategory, params.skillName);
     const adjustedCostCategory = adjustCostCategory(
       skill.defaultCostCategory,
-      LearningMethod.parse(params.learningMethod),
+      parseLearningMethod(params.learningMethod),
     );
 
     validatePassedSkillValues(skill, params);

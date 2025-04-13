@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
 import { fakeSingleCharacterResponse, mockDynamoDBGetResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
+import { addRecordToHistory } from "add-history-record/index.js";
 
 const testBody = {
   type: "EVENT_CALCULATION_POINTS",
