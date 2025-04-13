@@ -1,4 +1,4 @@
-type Body = Record<string, string | number | undefined> | null;
+type Body = Record<string, any> | null;
 
 // Abstraction and simplification of APIGatewayProxyEvent to allow testing with less dependencies
 export interface Request {
