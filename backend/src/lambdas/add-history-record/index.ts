@@ -223,9 +223,6 @@ async function validateRequest(request: Request): Promise<Parameters> {
         baseValueSchema.parse(body.data.new);
         break;
       case RecordType.PROFESSION_CHANGED:
-        professionHobbySchema.parse(body.data.old);
-        professionHobbySchema.parse(body.data.new);
-        break;
       case RecordType.HOBBY_CHANGED:
         professionHobbySchema.parse(body.data.old);
         professionHobbySchema.parse(body.data.new);
