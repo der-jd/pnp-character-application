@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
-import { fakeSingleCharacterResponse, mockDynamoDBGetResponse } from "../test-data/response.js";
+import { fakeSingleCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { Character, getSkill } from "config/index.js";
 import { increaseSkill } from "increase-skill/index.js";
@@ -234,7 +234,7 @@ describe("Invalid requests", () => {
     test(_case.name, async () => {
       const fakeResponse = structuredClone(fakeSingleCharacterResponse);
       fakeResponse.Item.characterSheet.calculationPoints.adventurePoints.available = 3;
-      mockDynamoDBGetResponse(fakeResponse);
+      mockDynamoDBGetCharacterResponse(fakeResponse);
 
       const result = await increaseSkill(_case.request);
 
@@ -339,7 +339,7 @@ describe("Valid requests", () => {
 
   validTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetResponse(fakeSingleCharacterResponse);
+      mockDynamoDBGetCharacterResponse(fakeSingleCharacterResponse);
 
       const result = await increaseSkill(_case.request);
 

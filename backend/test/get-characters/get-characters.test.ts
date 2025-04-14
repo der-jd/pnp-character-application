@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
-import { fakeMultipleCharactersResponse, mockDynamoDBQueryResponse } from "../test-data/response.js";
+import { fakeMultipleCharactersResponse, mockDynamoDBQueryCharactersResponse } from "../test-data/response.js";
 import { getCharacters } from "get-characters/index.js";
 import { Character } from "config/index.js";
 
@@ -44,7 +44,7 @@ describe("Invalid requests", () => {
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBQueryResponse(fakeMultipleCharactersResponse);
+      mockDynamoDBQueryCharactersResponse(fakeMultipleCharactersResponse);
 
       const result = await getCharacters(_case.request);
 
@@ -81,7 +81,7 @@ describe("Valid requests", () => {
 
   validTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBQueryResponse(fakeMultipleCharactersResponse);
+      mockDynamoDBQueryCharactersResponse(fakeMultipleCharactersResponse);
 
       const result = await getCharacters(_case.request);
 
