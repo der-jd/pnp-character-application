@@ -1,12 +1,20 @@
 import { describe, expect, test } from "vitest";
+import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
-import { fakeSingleCharacterResponse, mockDynamoDBGetResponse } from "../test-data/response.js";
+import {
+  fakeMultipleHistoryItemsResponse,
+  fakeSingleCharacterResponse,
+  mockDynamoDBGetCharacterResponse,
+  mockDynamoDBQueryHistoryResponse,
+} from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { addRecordToHistory } from "add-history-record/index.js";
+import { fakeHistoryBlock2 } from "../test-data/history.js";
+import { RecordType } from "config/index.js";
 
 const testBody = {
-  type: "EVENT_CALCULATION_POINTS",
-  name: "Epic battle",
+  type: RecordType.EVENT_CALCULATION_POINTS,
+  name: "Adventure Points",
   data: {
     old: {
       start: 0,
@@ -24,6 +32,7 @@ const testBody = {
     old: 100,
     new: 120,
   },
+  learningMethod: undefined,
   comment: "Epic fight against a big monster",
 };
 
@@ -130,9 +139,7 @@ describe("Invalid requests", () => {
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      const fakeResponse = structuredClone(fakeSingleCharacterResponse);
-      fakeResponse.Item.characterSheet.calculationPoints.adventurePoints.available = 3;
-      mockDynamoDBGetResponse(fakeResponse);
+      mockDynamoDBGetCharacterResponse(fakeSingleCharacterResponse);
 
       const result = await addRecordToHistory(_case.request);
 
@@ -141,97 +148,17 @@ describe("Invalid requests", () => {
   });
 });
 
-// TODO fix following tests
-
-/*describe("Valid requests", () => {
+describe("Valid requests", () => {
   const validTestCases = [
     {
-      name: "Skill has already been increased to the target value (idempotency)",
+      name: "Add history record for event 'calculation points' to existing block",
       request: {
         headers: fakeHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
         },
         queryStringParameters: null,
-        body: {
-          initialValue: 12,
-          increasedPoints: 4,
-          learningMethod: "NORMAL",
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Increase skill by 1 point (cost category: NORMAL)",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
-        },
-        queryStringParameters: null,
-        body: {
-          initialValue: 16,
-          increasedPoints: 1,
-          learningMethod: "NORMAL",
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Increase skill by 3 point (cost category: FREE)",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
-        },
-        queryStringParameters: null,
-        body: {
-          initialValue: 16,
-          increasedPoints: 3,
-          learningMethod: "FREE",
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Increase skill by 3 point (cost category: LOW_PRICED)",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
-        },
-        queryStringParameters: null,
-        body: {
-          initialValue: 16,
-          increasedPoints: 3,
-          learningMethod: "LOW_PRICED",
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Increase skill by 3 point (cost category: EXPENSIVE)",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
-        },
-        queryStringParameters: null,
-        body: {
-          initialValue: 16,
-          increasedPoints: 3,
-          learningMethod: "EXPENSIVE",
-        },
+        body: testBody,
       },
       expectedStatusCode: 200,
     },
@@ -239,44 +166,36 @@ describe("Invalid requests", () => {
 
   validTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetResponse(fakeSingleCharacterResponse);
+      mockDynamoDBGetCharacterResponse(fakeSingleCharacterResponse);
+      mockDynamoDBQueryHistoryResponse(fakeMultipleHistoryItemsResponse);
 
       const result = await addRecordToHistory(_case.request);
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
       const parsedBody = JSON.parse(result.body);
-      expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
-      expect(parsedBody.skillName).toBe(_case.request.pathParameters["skill-name"]);
-      expect(parsedBody.skillValue).toBe(_case.request.body.initialValue + _case.request.body.increasedPoints);
+      expect(parsedBody.type).toBe(_case.request.body.type);
+      expect(parsedBody.name).toBe(_case.request.body.name);
+      expect(parsedBody.number).toBe(fakeHistoryBlock2.changes[fakeHistoryBlock2.changes.length - 1].number + 1);
+      expect(parsedBody.id).toBeDefined();
+      expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
+      expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
+      expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
+      expect(parsedBody.calculationPointsChange).toEqual(_case.request.body.calculationPointsChange);
+      expect(parsedBody.comment).toBe(_case.request.body.comment);
+      expect(parsedBody.timestamp).toBeDefined();
 
-      const skillCategory = _case.request.pathParameters[
-        "skill-category"
-      ] as keyof Character["characterSheet"]["skills"];
-      const skillName = _case.request.pathParameters["skill-name"];
-      const skill = getSkill(fakeSingleCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
-      const oldTotalSkillCost = skill.totalCost;
-      const diffSkillTotalCost = parsedBody.totalCost - oldTotalSkillCost;
-      const oldAvailableAdventurePoints =
-        fakeSingleCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
-      const diffAvailableAdventurePoints = oldAvailableAdventurePoints - parsedBody.availableAdventurePoints;
-      expect(diffAvailableAdventurePoints).toBe(diffSkillTotalCost);
+      const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
+      expect(calls).toHaveLength(1);
 
-      // Skill was not already at the target value
-      if (_case.request.body.initialValue + _case.request.body.increasedPoints !== skill.current) {
-        const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
-        expect(calls).toHaveLength(1);
-
-        const matchingCall = calls.find((call: any) => {
-          const input = call.args[0].input;
-          return (
-            input.Key.characterId === _case.request.pathParameters["character-id"] && input.Key.userId === fakeUserId
-          );
-        });
-        expect(matchingCall).toBeTruthy();
-      }
-
-      // TODO add a check for all test across all Lambdas to validate the response body against the corresponding API schema (zod)
+      const matchingCall = calls.find((call: any) => {
+        const input = call.args[0].input;
+        return (
+          input.Key.characterId === _case.request.pathParameters["character-id"] &&
+          input.Key.blockNumber === fakeHistoryBlock2.blockNumber
+        );
+      });
+      expect(matchingCall).toBeTruthy();
     });
   });
-});*/
+});
