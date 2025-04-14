@@ -16,7 +16,7 @@ export const recordSchema = z.object({
     old: z.number(),
     new: z.number(),
   }),
-  comment: z.string(),
+  comment: z.string().optional(),
   timestamp: z.string().datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2025-03-24T16:34:56Z (UTC) or 2025-03-24T16:34:56+02:00
 });
 

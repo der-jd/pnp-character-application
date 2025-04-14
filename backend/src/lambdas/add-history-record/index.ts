@@ -54,7 +54,7 @@ const historyBodySchema = z.object({
     old: z.number(),
     new: z.number(),
   }),
-  comment: z.string(),
+  comment: z.string().optional(),
 });
 
 const numberSchema = z.object({
@@ -111,7 +111,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       };
     } else {
       const latestBlock = historyBlockSchema.parse(items[0]);
-      console.log("Latest history block:", latestBlock);
+      console.log("Latest history block:", { ...latestBlock, changes: ["..."] }); // Don't log changes as this can be a very long list
 
       record = {
         number: latestBlock.changes[latestBlock.changes.length - 1].number + 1,
