@@ -1,5 +1,4 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { marshall } from "@aws-sdk/util-dynamodb";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
@@ -286,7 +285,6 @@ async function validateRequest(request: Request): Promise<Parameters> {
 }
 
 function estimateItemSize(item: any): number {
-  const marshalled = marshall(item);
-  const json = JSON.stringify(marshalled);
+  const json = JSON.stringify(item);
   return Buffer.byteLength(json, "utf8");
 }
