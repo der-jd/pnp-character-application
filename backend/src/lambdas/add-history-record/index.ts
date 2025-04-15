@@ -48,13 +48,13 @@ const historyBodySchema = z.object({
     old: z.record(z.any()),
     new: z.record(z.any()),
   }),
-  learningMethod: z.string().optional(),
+  learningMethod: z.string().nullable(),
   calculationPointsChange: z.object({
     adjustment: z.number(),
     old: z.number(),
     new: z.number(),
   }),
-  comment: z.string().optional(),
+  comment: z.string().nullable(),
 });
 
 const numberSchema = z.object({

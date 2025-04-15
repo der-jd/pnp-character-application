@@ -20,6 +20,7 @@ export const fakeHistoryBlock1: HistoryBlock = {
           value: 1,
         },
       },
+      learningMethod: null,
       calculationPointsChange: {
         adjustment: 0,
         old: 100,
@@ -47,6 +48,7 @@ export const fakeHistoryBlock1: HistoryBlock = {
           totalCost: 1,
         },
       },
+      learningMethod: null,
       calculationPointsChange: {
         adjustment: -1,
         old: 10,
@@ -87,12 +89,13 @@ export const fakeHistoryBlock2: HistoryBlock = {
           defaultCostCategory: CostCategory.CAT_2,
         },
       },
+      learningMethod: "NORMAL",
       calculationPointsChange: {
         adjustment: -10,
         old: 100,
         new: 90,
       },
-      comment: "Marathon training",
+      comment: null,
       timestamp: new Date().toISOString(),
     },
   ],
