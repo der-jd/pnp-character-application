@@ -364,6 +364,7 @@ describe("Valid requests", () => {
 
       // Skill was not already at the target value
       if (_case.request.body.initialValue + _case.request.body.increasedPoints !== skill.current) {
+        // Check if the skill was updated
         const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
         expect(calls).toHaveLength(1);
 

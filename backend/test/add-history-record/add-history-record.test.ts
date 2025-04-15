@@ -1,9 +1,10 @@
 import { describe, expect, test } from "vitest";
-import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
 import {
   fakeMultipleHistoryItemsResponse,
   fakeSingleCharacterResponse,
+  fakeEmptyItemsResponse,
   mockDynamoDBGetCharacterResponse,
   mockDynamoDBQueryHistoryResponse,
 } from "../test-data/response.js";
@@ -148,7 +149,7 @@ describe("Invalid requests", () => {
 });
 
 describe("Valid requests", () => {
-  const validTestCases = [
+  const testCasesForExistingHistoryBlock = [
     {
       name: "Add history record for 'event calculation points' to existing block",
       request: {
@@ -553,7 +554,7 @@ describe("Valid requests", () => {
    * - create new history block because max size of old one exceeded
    */
 
-  validTestCases.forEach((_case) => {
+  testCasesForExistingHistoryBlock.forEach((_case) => {
     test(_case.name, async () => {
       mockDynamoDBGetCharacterResponse(fakeSingleCharacterResponse);
       mockDynamoDBQueryHistoryResponse(fakeMultipleHistoryItemsResponse);
@@ -574,6 +575,7 @@ describe("Valid requests", () => {
       expect(parsedBody.comment).toBe(_case.request.body.comment);
       expect(parsedBody.timestamp).toBeDefined();
 
+      // Check if the history block was updated
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
       expect(calls).toHaveLength(1);
 
@@ -583,6 +585,91 @@ describe("Valid requests", () => {
           input.Key.characterId === _case.request.pathParameters["character-id"] &&
           input.Key.blockNumber === fakeHistoryBlock2.blockNumber
         );
+      });
+      expect(matchingCall).toBeTruthy();
+    });
+  });
+
+  const testCasesForMissingHistory = [
+    {
+      name: "Add history record for 'event calculation points' to newly created history",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          type: RecordType.EVENT_CALCULATION_POINTS,
+          name: "Adventure Points",
+          data: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 100,
+            },
+            new: {
+              start: 0,
+              available: 110,
+              total: 120,
+            },
+          },
+          learningMethod: null,
+          calculationPointsChange: {
+            adjustment: 20,
+            old: 90,
+            new: 110,
+          },
+          comment: "Epic fight against a big monster",
+        },
+      },
+      expectedStatusCode: 200,
+    },
+  ];
+
+  testCasesForMissingHistory.forEach((_case) => {
+    test(_case.name, async () => {
+      mockDynamoDBGetCharacterResponse(fakeSingleCharacterResponse);
+      mockDynamoDBQueryHistoryResponse(fakeEmptyItemsResponse); // Mock a missing history
+
+      const result = await addRecordToHistory(_case.request);
+
+      expect(result.statusCode).toBe(_case.expectedStatusCode);
+
+      const parsedBody = JSON.parse(result.body);
+      expect(parsedBody.type).toBe(_case.request.body.type);
+      expect(parsedBody.name).toBe(_case.request.body.name);
+      expect(parsedBody.number).toBe(1); // first record in a newly created history
+      expect(parsedBody.id).toBeDefined();
+      expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
+      expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
+      expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
+      expect(parsedBody.calculationPointsChange).toEqual(_case.request.body.calculationPointsChange);
+      expect(parsedBody.comment).toBe(_case.request.body.comment);
+      expect(parsedBody.timestamp).toBeDefined();
+
+      // Check if the first history block was created
+      let calls = (globalThis as any).dynamoDBMock.commandCalls(PutCommand);
+      expect(calls).toHaveLength(1);
+
+      let matchingCall = calls.find((call: any) => {
+        const input = call.args[0].input;
+        return (
+          input.Item.characterId === _case.request.pathParameters["character-id"] &&
+          input.Item.blockNumber === 1 &&
+          input.Item.previousBlockId === null &&
+          input.Item.changes.length === 0
+        );
+      });
+      expect(matchingCall).toBeTruthy();
+
+      // Check if the history block was updated
+      calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
+      expect(calls).toHaveLength(1);
+
+      matchingCall = calls.find((call: any) => {
+        const input = call.args[0].input;
+        return input.Key.characterId === _case.request.pathParameters["character-id"] && input.Key.blockNumber === 1;
       });
       expect(matchingCall).toBeTruthy();
     });
