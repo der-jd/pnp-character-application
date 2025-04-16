@@ -118,7 +118,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       const recordSize = estimateItemSize(record);
       if (blockSize + recordSize > MAX_ITEM_SIZE) {
         console.log(
-          `New item size of ~${blockSize + recordSize} bytes would exceed the maximum limit of ${MAX_ITEM_SIZE} bytes`,
+          `Latest block with the new record (total size ~${blockSize + recordSize} bytes) would exceed the maximum allowed size of ${MAX_ITEM_SIZE} bytes/block`,
         );
         const newBlock = await createHistoryItem(params.characterId, latestBlock.blockNumber, latestBlock.blockId);
         await addHistoryRecord(record, newBlock);
