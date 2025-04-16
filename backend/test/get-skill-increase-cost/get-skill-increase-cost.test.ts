@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
-import { fakeSingleCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
+import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { getSkillCost } from "get-skill-increase-cost/index.js";
 
@@ -94,7 +94,7 @@ describe("Invalid requests", () => {
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetCharacterResponse(fakeSingleCharacterResponse);
+      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
       const result = await getSkillCost(_case.request);
 
@@ -367,7 +367,7 @@ describe("Valid requests", () => {
 
   validTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetCharacterResponse(fakeSingleCharacterResponse);
+      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
       for (const r of _case.expectedResults) {
         _case.request.queryStringParameters = {

@@ -1,4 +1,5 @@
-import { CostCategory, HistoryBlock, RecordType } from "config/index.js";
+import { v4 as uuidv4 } from "uuid";
+import { CostCategory, HistoryBlock, RecordType, Record } from "config/index.js";
 import { fakeCharacterId } from "./character.js";
 
 export const fakeHistoryBlock1: HistoryBlock = {
@@ -100,3 +101,50 @@ export const fakeHistoryBlock2: HistoryBlock = {
     },
   ],
 };
+
+export const fakeBigHistoryBlock: HistoryBlock = {
+  characterId: fakeCharacterId,
+  blockNumber: 1,
+  blockId: "8cdda4da-95d0-44f4-a8ab-8a36f539f946",
+  previousBlockId: null,
+  changes: generateLargeChangesList(500), // Enforce exceedance of maximum allowed size of a history block
+};
+
+function generateLargeChangesList(size: number): Record[] {
+  const largeChanges = [];
+  for (let i = 0; i < size; i++) {
+    largeChanges.push({
+      type: RecordType.SKILL_RAISED,
+      name: `Skill ${i}`,
+      number: i + 1,
+      id: uuidv4(),
+      data: {
+        old: {
+          activated: true,
+          start: 0,
+          current: i,
+          mod: 0,
+          totalCost: i,
+          defaultCostCategory: CostCategory.CAT_2,
+        },
+        new: {
+          activated: true,
+          start: 0,
+          current: i + 1,
+          mod: 0,
+          totalCost: i + 1,
+          defaultCostCategory: CostCategory.CAT_2,
+        },
+      },
+      learningMethod: "NORMAL",
+      calculationPointsChange: {
+        adjustment: -i,
+        old: 10000 - i,
+        new: 10000 - (i + 1),
+      },
+      comment: `Change ${i}`,
+      timestamp: new Date().toISOString(),
+    });
+  }
+  return largeChanges;
+}

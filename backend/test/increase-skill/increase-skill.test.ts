@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
-import { fakeSingleCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
+import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { Character, getSkill } from "config/index.js";
 import { increaseSkill } from "increase-skill/index.js";
@@ -232,7 +232,7 @@ describe("Invalid requests", () => {
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      const fakeResponse = structuredClone(fakeSingleCharacterResponse);
+      const fakeResponse = structuredClone(fakeCharacterResponse);
       fakeResponse.Item.characterSheet.calculationPoints.adventurePoints.available = 3;
       mockDynamoDBGetCharacterResponse(fakeResponse);
 
@@ -339,7 +339,7 @@ describe("Valid requests", () => {
 
   validTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetCharacterResponse(fakeSingleCharacterResponse);
+      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
       const result = await increaseSkill(_case.request);
 
@@ -354,11 +354,11 @@ describe("Valid requests", () => {
         "skill-category"
       ] as keyof Character["characterSheet"]["skills"];
       const skillName = _case.request.pathParameters["skill-name"];
-      const skill = getSkill(fakeSingleCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
+      const skill = getSkill(fakeCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
       const oldTotalSkillCost = skill.totalCost;
       const diffSkillTotalCost = parsedBody.totalCost - oldTotalSkillCost;
       const oldAvailableAdventurePoints =
-        fakeSingleCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
+        fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
       const diffAvailableAdventurePoints = oldAvailableAdventurePoints - parsedBody.availableAdventurePoints;
       expect(diffAvailableAdventurePoints).toBe(diffSkillTotalCost);
 

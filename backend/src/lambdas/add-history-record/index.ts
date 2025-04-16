@@ -25,12 +25,6 @@ import {
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
 
-/**
- *
- * TODO
- * - add unit tests for add history record
- */
-
 // TODO endpoint should only be callable internally! It shouldn't be exposed to the frontend because it shouldn't add history records on its own
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return addRecordToHistory({
@@ -91,7 +85,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
 
     let record: Record;
     if (!items || items.length === 0) {
-      console.log("No history found for the given characterId.");
+      console.log("No history found for the given character id");
       const newBlock = await createHistoryItem(params.characterId);
 
       record = {
@@ -102,11 +96,11 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       };
       await addHistoryRecord(record, newBlock);
     } else if (items.length !== 1) {
-      console.error("More than one latest history block found for the given characterId");
+      console.error("More than one latest history block found for the given character id");
       throw {
         statusCode: 500,
         body: JSON.stringify({
-          message: "More than one latest history block found for the given characterId",
+          message: "More than one latest history block found for the given character id",
         }),
       };
     } else {
@@ -120,9 +114,13 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
         ...params.body,
       };
 
-      if (estimateItemSize(latestBlock) + estimateItemSize(record) > MAX_ITEM_SIZE) {
-        console.log(`Item size exceeds the maximum limit of ${MAX_ITEM_SIZE} bytes`);
-        const newBlock = await createHistoryItem(params.characterId);
+      const blockSize = estimateItemSize(latestBlock);
+      const recordSize = estimateItemSize(record);
+      if (blockSize + recordSize > MAX_ITEM_SIZE) {
+        console.log(
+          `New item size of ~${blockSize + recordSize} bytes would exceed the maximum limit of ${MAX_ITEM_SIZE} bytes`,
+        );
+        const newBlock = await createHistoryItem(params.characterId, latestBlock.blockNumber, latestBlock.blockId);
         await addHistoryRecord(record, newBlock);
       } else {
         await addHistoryRecord(record, latestBlock);

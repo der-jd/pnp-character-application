@@ -1,30 +1,34 @@
 import { GetCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeCharacter, fakeCharacter2 } from "./character.js";
-import { fakeHistoryBlock1, fakeHistoryBlock2 } from "./history.js";
+import { fakeHistoryBlock1, fakeHistoryBlock2, fakeBigHistoryBlock } from "./history.js";
 
-export const fakeSingleCharacterResponse = {
+export const fakeCharacterResponse = {
   Item: fakeCharacter,
 };
 
-type singleCharacterResultType = typeof fakeSingleCharacterResponse;
+type FakeCharacterResponse = typeof fakeCharacterResponse;
 
-export const fakeMultipleCharactersResponse = {
+export const fakeCharacterListResponse = {
   Items: [fakeCharacter, fakeCharacter2],
 };
 
-type multipleCharactersResultType = typeof fakeMultipleCharactersResponse;
+type FakeCharacterListResponse = typeof fakeCharacterListResponse;
 
-export const fakeMultipleHistoryItemsResponse = {
+export const fakeHistoryBlockListResponse = {
   Items: [fakeHistoryBlock1, fakeHistoryBlock2],
 };
 
-type multipleHistoryItemsResultType = typeof fakeMultipleHistoryItemsResponse;
+export const fakeBigHistoryBlockListResponse = {
+  Items: [fakeBigHistoryBlock],
+};
 
-export const fakeEmptyItemsResponse = {
+type FakeHistoryBlockListResponse = typeof fakeHistoryBlockListResponse;
+
+export const fakeEmptyListResponse = {
   Items: [],
 };
 
-export function mockDynamoDBGetCharacterResponse(response: singleCharacterResultType) {
+export function mockDynamoDBGetCharacterResponse(response: FakeCharacterResponse) {
   (globalThis as any).dynamoDBMock.on(GetCommand).callsFake((command: { Key: any }) => {
     const key = command.Key;
     if (key.characterId === response.Item.characterId && key.userId === response.Item.userId) {
@@ -35,7 +39,7 @@ export function mockDynamoDBGetCharacterResponse(response: singleCharacterResult
   });
 }
 
-export function mockDynamoDBQueryCharactersResponse(response: multipleCharactersResultType) {
+export function mockDynamoDBQueryCharactersResponse(response: FakeCharacterListResponse) {
   (globalThis as any).dynamoDBMock.on(QueryCommand).callsFake((command: { ExpressionAttributeValues: any }) => {
     if (response.Items.length === 0) {
       return Promise.resolve(response);
@@ -55,7 +59,7 @@ export function mockDynamoDBQueryCharactersResponse(response: multipleCharacters
   });
 }
 
-export function mockDynamoDBQueryHistoryResponse(response: multipleHistoryItemsResultType) {
+export function mockDynamoDBQueryHistoryResponse(response: FakeHistoryBlockListResponse) {
   (globalThis as any).dynamoDBMock
     .on(QueryCommand)
     .callsFake(
