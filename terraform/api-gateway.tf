@@ -430,7 +430,7 @@ resource "aws_api_gateway_integration" "history_post_integration" {
   http_method             = aws_api_gateway_method.history_post.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = aws_lambda_function.add_history_record_lambda.invoke_arn
+  uri                     = "arn:aws:apigateway:eu-central-1:states:action/StartSyncExecution"
   credentials             = aws_iam_role.api_gateway_role.arn
   request_parameters = {
     "integration.request.path.character-id" = "method.request.path.character-id"
