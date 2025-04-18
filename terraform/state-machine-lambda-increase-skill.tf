@@ -48,12 +48,12 @@ resource "aws_iam_role" "step_function_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "step_function_policy" {
+resource "aws_iam_role_policy_attachment" "step_function_lambda_execution_policy" {
   role       = aws_iam_role.step_function_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "step_function_policy" {
+resource "aws_iam_role_policy_attachment" "step_function_lambda_role_policy" {
   role       = aws_iam_role.step_function_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaRole"
 }
