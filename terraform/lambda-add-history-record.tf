@@ -13,7 +13,7 @@ resource "aws_lambda_function" "add_history_record_lambda" {
 
   filename         = "../backend/dist/add-history-record.zip"
   source_code_hash = data.archive_file.add_history_record.output_base64sha256
-  layers           = [aws_lambda_layer_version.configuration.arn, aws_lambda_layer_version.utils.arn]
+  layers           = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
   environment {
     variables = {
       TABLE_NAME = local.history_table_name

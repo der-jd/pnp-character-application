@@ -12,7 +12,7 @@ resource "aws_lambda_function" "increase_skill_lambda" {
 
   filename         = "../backend/dist/increase-skill.zip"
   source_code_hash = data.archive_file.increase_skill.output_base64sha256
-  layers           = [aws_lambda_layer_version.configuration.arn, aws_lambda_layer_version.utils.arn]
+  layers           = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
   environment {
     variables = {
       TABLE_NAME = local.characters_table_name

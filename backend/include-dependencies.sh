@@ -49,7 +49,9 @@ do
 
   echo "Installing prod dependencies in $layer_dest_dir..."
   cd $layer_dest_dir
-  npm ci --omit=dev
+  local_package_dir_relative_to_layer_dir="../../$layer" # NOTE: package dir must have the same name as the layer. Otherwise the path is wrong!
+  # Use --install-links to install transitive dependencies from local packages
+  npm ci --install-links $local_package_dir_relative_to_layer_dir --omit=dev
 
   echo "Moving dependencies into required sub folder for Lambda Layer..."
   mkdir nodejs
