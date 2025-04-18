@@ -434,7 +434,7 @@ resource "aws_api_gateway_integration" "history_post_integration" {
   http_method             = aws_api_gateway_method.history_post.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = "arn:aws:apigateway:eu-central-1:states:action/StartSyncExecution"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/StartSyncExecution"
   passthrough_behavior    = "WHEN_NO_TEMPLATES"
   credentials             = aws_iam_role.api_gateway_role.arn
   request_parameters = {
@@ -458,8 +458,8 @@ resource "aws_api_gateway_integration" "history_post_integration" {
           #if($foreach.hasNext),#end
           #end
         }
-        "stateMachineArn": "${aws_sfn_state_machine.increase_skill_state_machine.arn}"
-      }
+      },
+      "stateMachineArn": "${aws_sfn_state_machine.increase_skill_state_machine.arn}"
     }
     EOF
   }
