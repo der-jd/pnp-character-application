@@ -282,6 +282,8 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "character_id_get_integration_response" {
+  depends_on = [aws_api_gateway_integration.character_id_get_integration]
+
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.character_id.id
   http_method = aws_api_gateway_method.character_id_get.http_method
@@ -782,6 +784,8 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
 }
 
 resource "aws_api_gateway_integration_response" "skill_name_patch_integration_response" {
+  depends_on = [aws_api_gateway_integration.skill_name_patch_integration]
+
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.skill_name.id
   http_method = aws_api_gateway_method.skill_name_patch.http_method
