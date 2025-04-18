@@ -49,7 +49,7 @@ do
 
   echo "Installing prod dependencies in $layer_dest_dir..."
   cd $layer_dest_dir
-  local_package_dir_relative_to_layer_dir="../../$layer" # NOTE: package dir must have the same name as the layer. Otherwise the path is wrong!
+  local_package_dir_relative_to_layer_dir="../../../../src/$layer" # NOTE: package dir must have the same name as the layer. Otherwise the path is wrong!
   # Use --install-links to install transitive dependencies from local packages
   npm ci --install-links $local_package_dir_relative_to_layer_dir --omit=dev
 
