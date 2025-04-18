@@ -3,6 +3,36 @@ variable "status_codes" {
   default = ["400", "401", "403", "404", "500", "200"]
 }
 
+resource "aws_iam_role" "api_gateway_role" {
+  name = "apigateway-stepfunction-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "apigateway.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "api_gateway_policy" {
+  name = "AllowStartSyncExecution"
+  role = aws_iam_role.api_gateway_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect   = "Allow",
+      Action   = "states:StartSyncExecution",
+      Resource = aws_sfn_state_machine.increase_skill_state_machine.arn
+    }]
+  })
+}
+
+
 resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   name        = "pnp-app-api"
   description = "REST API for the PnP character application"
@@ -401,6 +431,7 @@ resource "aws_api_gateway_integration" "history_post_integration" {
   integration_http_method = "POST"
   type                    = "AWS"
   uri                     = aws_lambda_function.add_history_record_lambda.invoke_arn
+  credentials             = aws_iam_role.api_gateway_role.arn
   request_parameters = {
     "integration.request.path.character-id" = "method.request.path.character-id"
   }
@@ -408,18 +439,21 @@ resource "aws_api_gateway_integration" "history_post_integration" {
   request_templates = {
     "application/json" = <<EOF
     {
-      "body": $input.json('$'),
-      "pathParameters": {
-        #foreach($param in $input.params().path.keySet())
-        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
-        #if($foreach.hasNext),#end
-        #end
-      },
-      "headers": {
-        #foreach($param in $input.params().header.keySet())
-        "$param": "$util.escapeJavaScript($input.params().header.get($param))"
-        #if($foreach.hasNext),#end
-        #end
+      "input": {
+        "body": $input.json('$'),
+        "pathParameters": {
+          #foreach($param in $input.params().path.keySet())
+          "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+          #if($foreach.hasNext),#end
+          #end
+        },
+        "headers": {
+          #foreach($param in $input.params().header.keySet())
+          "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+          #if($foreach.hasNext),#end
+          #end
+        }
+        "stateMachineArn": "${aws_sfn_state_machine.lambda_workflow.arn}"
       }
     }
     EOF

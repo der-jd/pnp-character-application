@@ -32,3 +32,48 @@ resource "aws_lambda_permission" "increase_skill_invoke_permission" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.pnp_rest_api.execution_arn}/*/*"
 }
+
+resource "aws_iam_role" "step_function_role" {
+  name = "step-function-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "states.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "step_function_policy" {
+  role       = aws_iam_role.step_function_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSLambdaRole"
+}
+
+resource "aws_sfn_state_machine" "increase_skill_state_machine" {
+  name     = "increase-skill"
+  role_arn = aws_iam_role.step_function_role.arn
+  type     = "EXPRESS"
+
+  definition = jsonencode({
+    StartAt = "IncreaseSkill",
+    States = {
+      IncreaseSkill = {
+        Type       = "Task",
+        Resource   = aws_lambda_function.increase_skill_lambda.arn,
+        ResultPath = "$.IncreaseSkillResult",
+        Next       = "AddHistoryRecord"
+      },
+      AddHistoryRecord = {
+        Type       = "Task",
+        Resource   = aws_lambda_function.add_history_record_lambda.arn,
+        ResultPath = "$.AddHistoryRecordResult",
+        End        = true
+      }
+    }
+  })
+}
+
