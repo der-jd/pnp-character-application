@@ -50,7 +50,7 @@ resource "aws_iam_role" "step_function_role" {
 
 resource "aws_iam_role_policy_attachment" "step_function_policy" {
   role       = aws_iam_role.step_function_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSLambdaRole"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_sfn_state_machine" "increase_skill_state_machine" {
