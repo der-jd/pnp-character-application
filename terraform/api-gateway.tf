@@ -453,7 +453,7 @@ resource "aws_api_gateway_integration" "history_post_integration" {
           #if($foreach.hasNext),#end
           #end
         }
-        "stateMachineArn": "${aws_sfn_state_machine.lambda_workflow.arn}"
+        "stateMachineArn": "${aws_sfn_state_machine.increase_skill_state_machine.arn}"
       }
     }
     EOF
