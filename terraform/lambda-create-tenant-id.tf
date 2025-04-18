@@ -1,5 +1,3 @@
-data "aws_region" "current" {}
-
 resource "aws_iam_role" "control_plane_lambda_exec_role" {
   name = "lambda-execution-role-control-plane"
 
