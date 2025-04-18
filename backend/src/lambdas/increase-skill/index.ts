@@ -57,6 +57,7 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
     console.log(`Available adventure points before increasing: ${availableAdventurePoints}`);
 
     if (params.initialSkillValue + params.increasedPoints === skill.current) {
+      console.log("Skill value already increased to target value. Nothing to do.");
       const response = {
         statusCode: 200,
         body: JSON.stringify({
