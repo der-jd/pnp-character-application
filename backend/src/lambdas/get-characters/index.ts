@@ -75,7 +75,6 @@ function validateRequest(request: Request): Parameters {
     request.queryStringParameters?.["character-short"] &&
     typeof request.queryStringParameters?.["character-short"] !== "string"
   ) {
-    console.error("Invalid input values!");
     throw new HttpError(400, "Invalid input values!");
   }
 
