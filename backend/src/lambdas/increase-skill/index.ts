@@ -169,6 +169,10 @@ function validateRequest(request: Request): Parameters {
     };
   }
 
+  /**
+   * This conversion is necessary if the Lambda is called via AWS Step Functions.
+   * The input data of a state machine is always a string.
+   */
   if (typeof request.body?.initialValue === "string") {
     request.body.initialValue = Number(request.body.initialValue);
   }
