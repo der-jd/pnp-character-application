@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { Request, parseBody, getCharacterItems } from "utils/index.js";
+import { Request, parseBody, getCharacterItems, ensureHttpError, HttpError } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getCharacters({
@@ -44,19 +44,8 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
     };
     console.log(response);
     return response;
-  } catch (error: any) {
-    const response = {
-      statusCode: error.statusCode ?? 500,
-      body:
-        error.body ??
-        JSON.stringify({
-          message: "An error occurred!",
-          error: (error as Error).message,
-        }),
-    };
-    console.error(response);
-
-    return response;
+  } catch (err) {
+    throw ensureHttpError(err);
   }
 }
 
@@ -77,10 +66,7 @@ function validateRequest(request: Request): Parameters {
   // Decode the token without verification (the access to the API itself is already protected by the authorizer)
   const decoded = jwt.decode(token) as JwtPayload | null;
   if (!decoded) {
-    throw {
-      statusCode: 401,
-      body: JSON.stringify({ message: "Unauthorized: Invalid token!" }),
-    };
+    throw new HttpError(401, "Unauthorized: Invalid token!");
   }
 
   const userId = decoded.sub; // Cognito User ID
