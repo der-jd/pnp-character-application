@@ -9,7 +9,7 @@
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage",
-    "generate-zod-schemas": "npx ts-to-zod src/config/character.ts src/config/character_schemas.ts"
+    "generate-zod-schemas": "npx ts-to-zod src/config/character.ts src/config/character_schema.ts"
   },
   "dependencies": {
     "add-history-record": "file:src/lambdas/add-history-record",
@@ -18,7 +18,8 @@
     "get-character": "file:src/lambdas/get-character",
     "get-characters": "file:src/lambdas/get-characters",
     "get-skill-increase-cost": "file:src/lambdas/get-skill-increase-cost",
-    "increase-skill": "file:src/lambdas/increase-skill"
+    "increase-skill": "file:src/lambdas/increase-skill",
+    "utils": "file:src/utils"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

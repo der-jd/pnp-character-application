@@ -5,15 +5,8 @@ export enum LearningMethod {
   EXPENSIVE = 1, // Cost Category +1
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace LearningMethod {
-  export function parse(method: string): LearningMethod {
-    /**
-     * The function itself is added as a key to the enum, because it is part of a namespace with the same name.
-     * Therefore, Exclude<> is used to remove the function name from the keys of the enum.
-     */
-    return LearningMethod[method.toUpperCase() as Exclude<keyof typeof LearningMethod, "parse">];
-  }
+export function parseLearningMethod(method: string): LearningMethod {
+  return LearningMethod[method.toUpperCase() as keyof typeof LearningMethod];
 }
 
 export enum CostCategory {
@@ -27,31 +20,24 @@ export enum CostCategory {
 const MAX_COST_CATEGORY = CostCategory.CAT_4;
 const MIN_COST_CATEGORY = CostCategory.CAT_0;
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace CostCategory {
-  export function parse(category: string): CostCategory {
-    /**
-     * The function itself is added as a key to the enum, because it is part of a namespace with the same name.
-     * Therefore, Exclude<> is used to remove the function name from the keys of the enum.
-     */
-    return CostCategory[category.toUpperCase() as Exclude<keyof typeof CostCategory, "parse" | "adjustCategory">];
+export function parseCostCategory(category: string): CostCategory {
+  return CostCategory[category.toUpperCase() as keyof typeof CostCategory];
+}
+
+export function adjustCostCategory(defaultCostCategory: CostCategory, learningMethod: LearningMethod): CostCategory {
+  if (learningMethod === LearningMethod.FREE) {
+    return CostCategory.CAT_0;
   }
 
-  export function adjustCategory(defaultCostCategory: CostCategory, learningMethod: LearningMethod): CostCategory {
-    if (learningMethod === LearningMethod.FREE) {
-      return CostCategory.CAT_0;
-    }
+  const adjustedCategory = Number(defaultCostCategory) + Number(learningMethod);
 
-    const adjustedCategory = Number(defaultCostCategory) + Number(learningMethod);
-
-    if (adjustedCategory > MAX_COST_CATEGORY) {
-      return MAX_COST_CATEGORY;
-    } else if (adjustedCategory < MIN_COST_CATEGORY) {
-      return MIN_COST_CATEGORY;
-    }
-
-    return adjustedCategory as CostCategory;
+  if (adjustedCategory > MAX_COST_CATEGORY) {
+    return MAX_COST_CATEGORY;
+  } else if (adjustedCategory < MIN_COST_CATEGORY) {
+    return MIN_COST_CATEGORY;
   }
+
+  return adjustedCategory as CostCategory;
 }
 
 const skillThresholds = [50, 75, 99999];

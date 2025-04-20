@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
-import { fakeMultipleCharactersResponse, mockDynamoDBQueryResponse } from "../test-data/response.js";
+import { fakeCharacterListResponse, mockDynamoDBQueryCharactersResponse } from "../test-data/response.js";
 import { getCharacters } from "get-characters/index.js";
 import { Character } from "config/index.js";
 
@@ -44,7 +44,7 @@ describe("Invalid requests", () => {
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBQueryResponse(fakeMultipleCharactersResponse);
+      mockDynamoDBQueryCharactersResponse(fakeCharacterListResponse);
 
       const result = await getCharacters(_case.request);
 
@@ -81,14 +81,14 @@ describe("Valid requests", () => {
 
   validTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBQueryResponse(fakeMultipleCharactersResponse);
+      mockDynamoDBQueryCharactersResponse(fakeCharacterListResponse);
 
       const result = await getCharacters(_case.request);
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
       const parsedBody = JSON.parse(result.body);
-      expect(parsedBody.characters.length).toBe(fakeMultipleCharactersResponse.Items.length);
+      expect(parsedBody.characters.length).toBe(fakeCharacterListResponse.Items.length);
 
       // Check that all characters have the same userId as the input
       parsedBody.characters.forEach((character: Character) => {
@@ -97,7 +97,7 @@ describe("Valid requests", () => {
 
       // Check that all characterIds from the fake response are included in the result
       const resultCharacterIds = parsedBody.characters.map((character: Character) => character.characterId);
-      const fakeCharacterIds = fakeMultipleCharactersResponse.Items.map((item: Character) => item.characterId);
+      const fakeCharacterIds = fakeCharacterListResponse.Items.map((item: Character) => item.characterId);
       expect(resultCharacterIds).toEqual(expect.arrayContaining(fakeCharacterIds));
     });
   });

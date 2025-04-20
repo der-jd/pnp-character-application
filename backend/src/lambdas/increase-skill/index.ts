@@ -1,16 +1,14 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import {
-  LearningMethod,
-  CostCategory,
+  parseLearningMethod,
+  adjustCostCategory,
   Character,
   getSkillIncreaseCost,
   getSkill,
-  Request,
-  parseBody,
+  Skill,
 } from "config/index.js";
+import { Request, parseBody, getCharacterItem, updateSkill } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill({
@@ -40,32 +38,33 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
       `Increase value of skill '${params.skillCategory}/${params.skillName}' from ${params.initialSkillValue} to ${params.initialSkillValue + params.increasedPoints} by learning method '${params.learningMethod}'`,
     );
 
-    const character = await getCharacterItem(params);
+    const character = await getCharacterItem(params.userId, params.characterId);
 
     const characterSheet = character.characterSheet;
     let availableAdventurePoints = characterSheet.calculationPoints.adventurePoints.available;
     const skillCategory = params.skillCategory as keyof Character["characterSheet"]["skills"];
-    const defaultCostCategory = getSkill(characterSheet.skills, skillCategory, params.skillName).defaultCostCategory;
-    let skillValue = getSkill(characterSheet.skills, skillCategory, params.skillName).current;
-    let totalCost = getSkill(characterSheet.skills, skillCategory, params.skillName).totalCost;
-    const adjustedCostCategory = CostCategory.adjustCategory(
-      defaultCostCategory,
-      LearningMethod.parse(params.learningMethod),
+    const skill = getSkill(characterSheet.skills, skillCategory, params.skillName);
+    const adjustedCostCategory = adjustCostCategory(
+      skill.defaultCostCategory,
+      parseLearningMethod(params.learningMethod),
     );
 
-    console.log(`Default cost category: ${defaultCostCategory}`);
+    validatePassedSkillValues(skill, params);
+
+    console.log(`Default cost category: ${skill.defaultCostCategory}`);
     console.log(`Adjusted cost category: ${adjustedCostCategory}`);
-    console.log(`Skill total cost before increasing: ${totalCost}`);
+    console.log(`Skill total cost before increasing: ${skill.totalCost}`);
     console.log(`Available adventure points before increasing: ${availableAdventurePoints}`);
 
-    if (params.initialSkillValue + params.increasedPoints === skillValue) {
+    if (params.initialSkillValue + params.increasedPoints === skill.current) {
+      console.log("Skill value already increased to target value. Nothing to do.");
       const response = {
         statusCode: 200,
         body: JSON.stringify({
           characterId: params.characterId,
           skillName: params.skillName,
-          skillValue: skillValue,
-          totalCost: totalCost,
+          skillValue: skill.current,
+          totalCost: skill.totalCost,
           availableAdventurePoints: availableAdventurePoints,
         }),
       };
@@ -76,7 +75,7 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
 
     for (let i = 0; i < params.increasedPoints; i++) {
       console.debug("---------------------------");
-      const increaseCost = getSkillIncreaseCost(skillValue, adjustedCostCategory);
+      const increaseCost = getSkillIncreaseCost(skill.current, adjustedCostCategory);
 
       if (increaseCost > availableAdventurePoints) {
         console.error("Not enough adventure points to increase the skill!");
@@ -90,61 +89,35 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
         };
       }
 
-      console.debug(`Skill value: ${skillValue}`);
-      console.debug(`Skill total cost: ${totalCost}`);
+      console.debug(`Skill value: ${skill.current}`);
+      console.debug(`Skill total cost: ${skill.totalCost}`);
       console.debug(`Available adventure points: ${availableAdventurePoints}`);
       console.debug(`Increasing skill by 1 for ${increaseCost} AP...`);
-      skillValue += 1;
-      totalCost += increaseCost;
+      skill.current += 1;
+      skill.totalCost += increaseCost;
       availableAdventurePoints -= increaseCost;
-      // TODO add record to history --> apply all records in the end when it is clear if there are enough ap
     }
 
-    // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-    const client = new DynamoDBClient({});
-    const docClient = DynamoDBDocumentClient.from(client);
-    const command = new UpdateCommand({
-      TableName: process.env.TABLE_NAME,
-      Key: {
-        userId: params.userId,
-        characterId: params.characterId,
-      },
-      UpdateExpression:
-        "SET #characterSheet.#skills.#skillCategory.#skillName.#current = :current, " +
-        "#characterSheet.#skills.#skillCategory.#skillName.#totalCost = :totalCost, " +
-        "#characterSheet.#calculationPoints.#adventurePoints.#available = :available",
-      ExpressionAttributeNames: {
-        "#characterSheet": "characterSheet",
-        "#skills": "skills",
-        "#skillCategory": skillCategory,
-        "#skillName": params.skillName,
-        "#current": "current",
-        "#totalCost": "totalCost",
-        "#calculationPoints": "calculationPoints",
-        "#adventurePoints": "adventurePoints",
-        "#available": "available",
-      },
-      ExpressionAttributeValues: {
-        ":current": skillValue,
-        ":totalCost": totalCost,
-        ":available": availableAdventurePoints,
-      },
-    });
-    await docClient.send(command);
-    console.log("Successfully updated DynamoDB item");
+    await updateSkill(
+      params.userId,
+      params.characterId,
+      skillCategory,
+      params.skillName,
+      skill.current,
+      skill.totalCost,
+      availableAdventurePoints,
+    );
+    // TODO add record with changes to history
 
-    // TODO save record in history
-    /** TODO check latency for increase skill
-     *  If latency high: return cost for next skill point for given cost category
-     *  If latency low: let frontend call separate Lambda for cost for given skill value and cost category
-     */
     const response = {
       statusCode: 200,
       body: JSON.stringify({
         characterId: params.characterId,
         skillName: params.skillName,
-        skillValue: skillValue,
-        totalCost: totalCost,
+        skillValue: skill.current,
+        learningMethod: params.learningMethod,
+        increaseCost: getSkillIncreaseCost(skill.current, adjustedCostCategory),
+        totalCost: skill.totalCost,
         availableAdventurePoints: availableAdventurePoints,
       }),
     };
@@ -194,6 +167,17 @@ function validateRequest(request: Request): Parameters {
       statusCode: 401,
       body: JSON.stringify({ message: "Unauthorized: User ID not found in token!" }),
     };
+  }
+
+  /**
+   * This conversion is necessary if the Lambda is called via AWS Step Functions.
+   * The input data of a state machine is a string.
+   */
+  if (typeof request.body?.initialValue === "string") {
+    request.body.initialValue = Number(request.body.initialValue);
+  }
+  if (typeof request.body?.increasedPoints === "string") {
+    request.body.increasedPoints = Number(request.body.increasedPoints);
   }
 
   if (
@@ -247,35 +231,8 @@ function validateRequest(request: Request): Parameters {
   return params;
 }
 
-async function getCharacterItem(params: Parameters): Promise<Character> {
-  console.log("Get Character from DynamoDB");
-
-  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
-  const command = new GetCommand({
-    TableName: process.env.TABLE_NAME,
-    Key: {
-      userId: params.userId,
-      characterId: params.characterId,
-    },
-  });
-
-  const response = await docClient.send(command);
-
-  if (!response.Item) {
-    console.error("No character found for the given user and character id");
-    throw {
-      statusCode: 404,
-      body: JSON.stringify({
-        message: "No character found for the given user and character id",
-      }),
-    };
-  }
-
-  console.log("Successfully got DynamoDB item");
-
-  const skill = response.Item.characterSheet.skills[params.skillCategory][params.skillName];
+function validatePassedSkillValues(skill: Skill, params: Parameters) {
+  console.log("Compare passed skill values with the values in the backend");
 
   if (!skill.activated) {
     console.error("Skill is not activated yet! Activate it before it can be increased.");
@@ -306,5 +263,5 @@ async function getCharacterItem(params: Parameters): Promise<Character> {
     };
   }
 
-  return response.Item as Character; // TODO add validation for all returns from DynamoDB in all Lambdas -> zod schemas
+  console.log("Passed skill values match the values in the backend");
 }

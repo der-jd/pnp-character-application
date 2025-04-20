@@ -1,5 +1,3 @@
-data "aws_region" "current" {}
-
 resource "aws_iam_role" "control_plane_lambda_exec_role" {
   name = "lambda-execution-role-control-plane"
 
@@ -63,7 +61,7 @@ resource "aws_lambda_function" "create_tenant_id_lambda" {
 
   filename         = "../backend/dist/create-tenant-id.zip"
   source_code_hash = data.archive_file.create-tenant-id.output_base64sha256
-  layers           = [aws_lambda_layer_version.configuration.arn]
+  layers           = [aws_lambda_layer_version.config.arn]
   logging_config {
     log_format            = "JSON"
     application_log_level = "INFO"

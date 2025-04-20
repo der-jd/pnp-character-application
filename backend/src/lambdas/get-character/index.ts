@@ -1,8 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { Request, parseBody } from "config/index.js";
+import { Request, parseBody, getCharacterItem } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getCharacter({
@@ -22,37 +20,11 @@ export async function getCharacter(request: Request): Promise<APIGatewayProxyRes
   try {
     const params = validateRequest(request);
 
-    console.log(`Get character ${params.characterId} of user ${params.userId}`);
-
-    // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
-    const client = new DynamoDBClient({});
-    const docClient = DynamoDBDocumentClient.from(client);
-    const command = new GetCommand({
-      TableName: process.env.TABLE_NAME,
-      Key: {
-        userId: params.userId,
-        characterId: params.characterId,
-      },
-      ConsistentRead: true,
-    });
-
-    const dynamoDbResponse = await docClient.send(command);
-
-    if (!dynamoDbResponse.Item) {
-      console.error("No character found for the given user and character id");
-      throw {
-        statusCode: 404,
-        body: JSON.stringify({
-          message: "No character found for the given user and character id",
-        }),
-      };
-    }
-
-    console.log("Successfully got DynamoDB item");
+    const character = await getCharacterItem(params.userId, params.characterId);
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify(dynamoDbResponse.Item),
+      body: JSON.stringify(character),
     };
     console.log(response);
     return response;

@@ -1,9 +1,8 @@
 {
   "name": "config",
   "version": "1.0.0",
-  "main": "index.mjs",
   "type": "module",
   "dependencies": {
-    "zod": "^3.24.2"
+    "config": "file:../../config"
   }
 }
