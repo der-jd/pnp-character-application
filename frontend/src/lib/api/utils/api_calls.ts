@@ -1,6 +1,7 @@
 import { AllCharactersReply } from "../models/allCharacters/interface";
 import { Character } from "../models/Character/character";
 import { SkillIncreaseReply, SkillIncreaseRequest } from "../models/skillIncrease/interface";
+import { HistoryReply } from "../models/history/interface";
 
 enum HttpMethod {
   GET = "GET",
@@ -116,4 +117,15 @@ export async function increaseSkill(
 ): Promise<SkillIncreaseReply> {
   const endpoint_url = `characters/${charId}/skills/${category}/${name}`;
   return await patch<SkillIncreaseReply, SkillIncreaseRequest>(idToken, endpoint_url, body);
+}
+
+/**
+ * Gets the full history for a character
+ * @param idToken The id token of the curren user
+ * @param id The character id of the character
+ * @returns The full history for the provided character id
+ */
+export async function getReversibleEntries(idToken: string, id: string): Promise<HistoryReply> {
+  const endpoint_url = `characters/${id}/history`;
+  return get<HistoryReply>(idToken, endpoint_url);
 }

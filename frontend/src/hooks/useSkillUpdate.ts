@@ -16,14 +16,14 @@ import { useToast } from "./use-toast";
  * @returns The tryIncreaseSkill function object and the loading state of the update proccess
  */
 export function useSkillUpdater() {
-  const { idToken } = useAuth();
-
-  const [loading, setLoading] = useState(false);
-
-  const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
-  const updateValue = useCharacterStore((state) => state.updateValue);
-
   const toast = useToast();
+  const { idToken } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const updateValue = useCharacterStore((state) => state.updateValue);
+  const updateReversibleHistory = useCharacterStore((state) => state.updateHistoryEntries);
+  const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
+  const setCharacterSheet = useCharacterStore((state) => state.setCharacterSheet);
+  const characterSheet = useCharacterStore((state) => state.characterSheet);
 
   const tryIncreaseSkill = async (skill: ISkillProps, pointsToSkill: number) => {
     const path = ["skills", skill.category] as (keyof CharacterSheet)[];
@@ -35,13 +35,32 @@ export function useSkillUpdater() {
       learningMethod: LearningMethod[skill.learning_method],
     };
 
-    console.log("calculated values: ");
-    console.log(increaseSkillRequest);
-
     if (selectedChar && idToken) {
       try {
         setLoading(true);
-        await increaseSkill(idToken, selectedChar, skill.name, skill.category, increaseSkillRequest);
+        const response = await increaseSkill(idToken, selectedChar, skill.name, skill.category, increaseSkillRequest);
+        const { availableAdventurePoints, availableAttributePoints } = response;
+
+        if (!characterSheet) {
+          toast.toast({
+            title: `Error increasing ${skill.name} character sheet not defined!`,
+            description: `The character sheet is missing in the store. Please reload the character and try again!`,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const updatedCharacterSheet = { ...characterSheet };
+
+        if (availableAdventurePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
+          updatedCharacterSheet.calculationPoints.adventurePoints.available = availableAdventurePoints;
+        }
+
+        if (availableAttributePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
+          updatedCharacterSheet.calculationPoints.attributePoints.available = availableAttributePoints;
+        }
+
+        setCharacterSheet(updatedCharacterSheet);
       } catch (error) {
         if (error instanceof ApiError) {
           toast.toast({
@@ -57,6 +76,7 @@ export function useSkillUpdater() {
 
     setLoading(false);
     updateValue(path, name, skill.current_level + pointsToSkill);
+    updateReversibleHistory(selectedChar ?? "", name, skill.current_level, skill.current_level + pointsToSkill);
   };
 
   return { tryIncreaseSkill, loading };
