@@ -58,36 +58,16 @@ resource "aws_iam_role_policy_attachment" "step_function_lambda_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaRole"
 }
 
+// https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AWS-logs-and-resource-policy.html#AWS-vended-logs-permissions
+resource "aws_iam_role_policy_attachment" "step_function_cloudwatch_policy" {
+  role       = aws_iam_role.step_function_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
 resource "aws_cloudwatch_log_group" "increase_skill_state_machine_log_group" {
   name              = "/aws/states/increase-skill"
   retention_in_days = 0
 }
-
-resource "aws_cloudwatch_log_resource_policy" "step_function_logging" {
-  policy_name = "AllowStepFunctionsLogging"
-  policy_document = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          Service = "states.amazonaws.com"
-        },
-        Action = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
-        Resource = "${aws_cloudwatch_log_group.increase_skill_state_machine_log_group.arn}:*",
-        Condition = {
-          ArnLike = {
-            "aws:SourceArn" : "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-          }
-        }
-      }
-    ]
-  })
-}
-
 
 resource "aws_sfn_state_machine" "increase_skill_state_machine" {
   name     = "increase-skill"
