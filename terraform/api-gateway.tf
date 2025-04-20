@@ -486,22 +486,63 @@ resource "aws_api_gateway_integration" "history_post_integration" {
   // Request template according to the answers in https://stackoverflow.com/questions/71139155/pass-url-path-parameters-from-api-gateway-to-step-function
   request_templates = {
     "application/json" = <<EOF
+    ## Template taken from https://github.com/aws/aws-cdk/blob/v1-main/packages/@aws-cdk/aws-apigateway/lib/integrations/stepfunctions.vtl
+    ## and adapted slightly.
+    ##
+    ## This template forwards the request header, path, query string and body if available
+    ## to the execution input of the state machine.
+    ##
+    ## "@@" is used here as a placeholder for '"' to avoid using escape characters.
+
+    #set($inputString = '')
+    #set($allParams = $input.params())
+
+    ## Include header if available
+    #if($allParams.header && $allParams.header.keySet().size() > 0)
+      #set($inputString = "$inputString, @@headers@@: {")
+      #foreach($paramName in $allParams.header.keySet())
+        #set($inputString = "$inputString @@$paramName@@: @@$util.escapeJavaScript($allParams.header.get($paramName))@@")
+        #if($foreach.hasNext)
+          #set($inputString = "$inputString,")
+        #end
+      #end
+      #set($inputString = "$inputString }")
+    #end
+
+    ## Include path if available
+    #if($allParams.path && $allParams.path.keySet().size() > 0)
+      #set($inputString = "$inputString, @@pathParameters@@: {")
+      #foreach($paramName in $allParams.path.keySet())
+        #set($inputString = "$inputString @@$paramName@@: @@$util.escapeJavaScript($allParams.path.get($paramName))@@")
+        #if($foreach.hasNext)
+          #set($inputString = "$inputString,")
+        #end
+      #end
+      #set($inputString = "$inputString }")
+    #end
+
+    ## Include query string if available
+    #if($allParams.querystring && $allParams.querystring.keySet().size() > 0)
+      #set($inputString = "$inputString, @@queryStringParameters@@: {")
+      #foreach($paramName in $allParams.querystring.keySet())
+        #set($inputString = "$inputString @@$paramName@@: @@$util.escapeJavaScript($allParams.querystring.get($paramName))@@")
+        #if($foreach.hasNext)
+          #set($inputString = "$inputString,")
+        #end
+      #end
+      #set($inputString = "$inputString }")
+    #end
+
+    ## Include body if available
+    #if($input.body != {})
+      #set($inputString = "$inputString, @@body@@: $input.body")
+    #end
+
+    #set($inputString = $inputString.replaceAll("@@", '"'))
+
     {
-      "input": {
-        "body": $input.json('$'),
-        "pathParameters": {
-          #foreach($param in $input.params().path.keySet())
-          "$param": "$util.escapeJavaScript($input.params().path.get($param))"
-          #if($foreach.hasNext),#end
-          #end
-        },
-        "headers": {
-          #foreach($param in $input.params().header.keySet())
-          "$param": "$util.escapeJavaScript($input.params().header.get($param))"
-          #if($foreach.hasNext),#end
-          #end
-        }
-      },
+      "input": "{$util.escapeJavaScript($inputString.substring(1, $inputString.length()))}", ## Remove the leading comma
+      "name": "$context.requestId",
       "stateMachineArn": "${aws_sfn_state_machine.increase_skill_state_machine.arn}"
     }
     EOF
