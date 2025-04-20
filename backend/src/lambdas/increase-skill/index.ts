@@ -171,6 +171,13 @@ function validateRequest(request: Request): Parameters {
     };
   }
 
+  if (typeof request.body?.initialValue === "string") {
+    request.body.initialValue = Number(request.body.initialValue);
+  }
+  if (typeof request.body?.increasedPoints === "string") {
+    request.body.increasedPoints = Number(request.body.increasedPoints);
+  }
+
   if (
     typeof request.pathParameters?.["character-id"] !== "string" ||
     typeof request.pathParameters?.["skill-category"] !== "string" ||
