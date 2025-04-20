@@ -71,7 +71,7 @@ resource "aws_cloudwatch_log_resource_policy" "step_function_logging" {
       {
         Effect = "Allow",
         Principal = {
-          Service = "delivery.logs.amazonaws.com"
+          Service = "states.amazonaws.com"
         },
         Action = [
           "logs:CreateLogStream",
