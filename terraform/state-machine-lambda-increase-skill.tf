@@ -68,7 +68,7 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
   role_arn = aws_iam_role.step_function_role.arn
   type     = "EXPRESS"
   logging_configuration {
-    log_destination        = aws_cloudwatch_log_group.increase_skill_state_machine_log_group.arn
+    log_destination        = "${aws_cloudwatch_log_group.increase_skill_state_machine_log_group.arn}:*"
     include_execution_data = true
     level                  = "ALL"
   }
