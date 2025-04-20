@@ -96,19 +96,39 @@ resource "aws_api_gateway_integration" "characters_get_integration" {
   request_templates = {
     "application/json" = <<EOF
     {
-      "body": $input.json('$'),
+      ## Headers are always available
       "headers": {
         #foreach($param in $input.params().header.keySet())
         "$param": "$util.escapeJavaScript($input.params().header.get($param))"
         #if($foreach.hasNext),#end
         #end
-      },
+      }
+
+      ## Include pathParameters if available
+      #if($input.params().path.keySet().size() > 0)
+      , ## Add a comma for the following block
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }#end
+
+      ## Include querystring if available
+      #if($input.params().querystring.keySet().size() > 0)
+      , ## Add a comma for the following block
       "queryStringParameters": {
         #foreach($param in $input.params().querystring.keySet())
         "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
         #if($foreach.hasNext),#end
         #end
-      }
+      }#end
+
+      ## Include body if available
+      #if($input.body != {})
+      , ## Add a comma for the following block
+      "body": $input.json('$')
+      #end
     }
     EOF
   }
@@ -263,19 +283,39 @@ resource "aws_api_gateway_integration" "character_id_get_integration" {
   request_templates = {
     "application/json" = <<EOF
     {
-      "body": $input.json('$'),
-      "pathParameters": {
-        #foreach($param in $input.params().path.keySet())
-        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
-        #if($foreach.hasNext),#end
-        #end
-      },
+      ## Headers are always available
       "headers": {
         #foreach($param in $input.params().header.keySet())
         "$param": "$util.escapeJavaScript($input.params().header.get($param))"
         #if($foreach.hasNext),#end
         #end
       }
+
+      ## Include pathParameters if available
+      #if($input.params().path.keySet().size() > 0)
+      , ## Add a comma for the following block
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }#end
+
+      ## Include querystring if available
+      #if($input.params().querystring.keySet().size() > 0)
+      , ## Add a comma for the following block
+      "queryStringParameters": {
+        #foreach($param in $input.params().querystring.keySet())
+        "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }#end
+
+      ## Include body if available
+      #if($input.body != {})
+      , ## Add a comma for the following block
+      "body": $input.json('$')
+      #end
     }
     EOF
   }
@@ -443,6 +483,7 @@ resource "aws_api_gateway_integration" "history_post_integration" {
     "integration.request.path.character-id" = "method.request.path.character-id"
   }
 
+  // Request template according to the answers in https://stackoverflow.com/questions/71139155/pass-url-path-parameters-from-api-gateway-to-step-function
   request_templates = {
     "application/json" = <<EOF
     {
@@ -650,25 +691,39 @@ resource "aws_api_gateway_integration" "skill_name_get_integration" {
   request_templates = {
     "application/json" = <<EOF
     {
-      "body": $input.json('$'),
-      "pathParameters": {
-        #foreach($param in $input.params().path.keySet())
-        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
-        #if($foreach.hasNext),#end
-        #end
-      },
+      ## Headers are always available
       "headers": {
         #foreach($param in $input.params().header.keySet())
         "$param": "$util.escapeJavaScript($input.params().header.get($param))"
         #if($foreach.hasNext),#end
         #end
-      },
+      }
+
+      ## Include pathParameters if available
+      #if($input.params().path.keySet().size() > 0)
+      , ## Add a comma for the following block
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }#end
+
+      ## Include querystring if available
+      #if($input.params().querystring.keySet().size() > 0)
+      , ## Add a comma for the following block
       "queryStringParameters": {
         #foreach($param in $input.params().querystring.keySet())
         "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
         #if($foreach.hasNext),#end
         #end
-      }
+      }#end
+
+      ## Include body if available
+      #if($input.body != {})
+      , ## Add a comma for the following block
+      "body": $input.json('$')
+      #end
     }
     EOF
   }
@@ -765,19 +820,39 @@ resource "aws_api_gateway_integration" "skill_name_patch_integration" {
   request_templates = {
     "application/json" = <<EOF
     {
-      "body": $input.json('$'),
-      "pathParameters": {
-        #foreach($param in $input.params().path.keySet())
-        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
-        #if($foreach.hasNext),#end
-        #end
-      },
+      ## Headers are always available
       "headers": {
         #foreach($param in $input.params().header.keySet())
         "$param": "$util.escapeJavaScript($input.params().header.get($param))"
         #if($foreach.hasNext),#end
         #end
       }
+
+      ## Include pathParameters if available
+      #if($input.params().path.keySet().size() > 0)
+      , ## Add a comma for the following block
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }#end
+
+      ## Include querystring if available
+      #if($input.params().querystring.keySet().size() > 0)
+      , ## Add a comma for the following block
+      "queryStringParameters": {
+        #foreach($param in $input.params().querystring.keySet())
+        "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }#end
+
+      ## Include body if available
+      #if($input.body != {})
+      , ## Add a comma for the following block
+      "body": $input.json('$')
+      #end
     }
     EOF
   }
