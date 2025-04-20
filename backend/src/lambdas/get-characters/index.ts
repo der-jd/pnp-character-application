@@ -56,10 +56,7 @@ function validateRequest(request: Request): Parameters {
   // Trim the authorization header as it could contain spaces at the beginning
   const authHeader = request.headers.Authorization?.trim() || request.headers.authorization?.trim();
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw {
-      statusCode: 401,
-      body: JSON.stringify({ message: "Unauthorized: No token provided!" }),
-    };
+    throw new HttpError(401, "Unauthorized: No token provided!");
   }
 
   const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
@@ -71,10 +68,7 @@ function validateRequest(request: Request): Parameters {
 
   const userId = decoded.sub; // Cognito User ID
   if (!userId) {
-    throw {
-      statusCode: 401,
-      body: JSON.stringify({ message: "Unauthorized: User ID not found in token!" }),
-    };
+    throw new HttpError(401, "Unauthorized: User ID not found in token!");
   }
 
   if (
@@ -82,12 +76,7 @@ function validateRequest(request: Request): Parameters {
     typeof request.queryStringParameters?.["character-short"] !== "string"
   ) {
     console.error("Invalid input values!");
-    throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Invalid input values!",
-      }),
-    };
+    throw new HttpError(400, "Invalid input values!");
   }
 
   const params: Parameters = {
