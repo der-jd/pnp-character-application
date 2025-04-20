@@ -17,7 +17,7 @@ export class HttpError extends Error {
   public context?: Record<string, unknown>;
 
   constructor(httpStatusCode: number, message: string, context?: Record<string, unknown>) {
-    super(JSON.stringify({ message: message, statusCode: httpStatusCode }));
+    super(JSON.stringify({ message: message, statusCode: httpStatusCode, context: context }));
     this.statusCode = httpStatusCode;
     this.name = "HttpError";
     this.context = context;
