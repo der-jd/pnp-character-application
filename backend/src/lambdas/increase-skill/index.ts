@@ -109,16 +109,14 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
     );
     // TODO add record with changes to history
 
-    /** TODO check latency for increase skill
-     *  If latency high: return cost for next skill point for given cost category
-     *  If latency low: let frontend call separate Lambda for cost for given skill value and cost category
-     */
     const response = {
       statusCode: 200,
       body: JSON.stringify({
         characterId: params.characterId,
         skillName: params.skillName,
         skillValue: skill.current,
+        learningMethod: params.learningMethod,
+        increaseCost: getSkillIncreaseCost(skill.current, adjustedCostCategory),
         totalCost: skill.totalCost,
         availableAdventurePoints: availableAdventurePoints,
       }),
