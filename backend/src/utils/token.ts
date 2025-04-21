@@ -3,7 +3,7 @@ import { HttpError } from "./errors.js";
 
 export function decodeUserId(authorizationHeader: string | undefined): string {
   // Trim the authorization header as it could contain spaces at the beginning
-  const authHeader = authorizationHeader?.trim() || authorizationHeader?.trim();
+  const authHeader = authorizationHeader?.trim();
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw new HttpError(401, "Unauthorized: No token provided!");
   }

@@ -7,7 +7,15 @@ import {
   getSkill,
   Skill,
 } from "config/index.js";
-import { Request, parseBody, getCharacterItem, updateSkill, decodeUserId } from "utils/index.js";
+import {
+  Request,
+  parseBody,
+  getCharacterItem,
+  updateSkill,
+  decodeUserId,
+  HttpError,
+  ensureHttpError,
+} from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return increaseSkill({
@@ -77,15 +85,10 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
       const increaseCost = getSkillIncreaseCost(skill.current, adjustedCostCategory);
 
       if (increaseCost > availableAdventurePoints) {
-        console.error("Not enough adventure points to increase the skill!");
-        throw {
-          statusCode: 400,
-          body: JSON.stringify({
-            message: "Not enough adventure points to increase the skill!",
-            characterId: params.characterId,
-            skillName: params.skillName,
-          }),
-        };
+        throw new HttpError(400, "Not enough adventure points to increase the skill!", {
+          characterId: params.characterId,
+          skillName: params.skillName,
+        });
       }
 
       console.debug(`Skill value: ${skill.current}`);
@@ -122,26 +125,15 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
     };
     console.log(response);
     return response;
-  } catch (error: any) {
-    const response = {
-      statusCode: error.statusCode ?? 500,
-      body:
-        error.body ??
-        JSON.stringify({
-          message: "An error occurred!",
-          error: (error as Error).message,
-        }),
-    };
-    console.error(response);
-
-    return response;
+  } catch (error) {
+    throw ensureHttpError(error);
   }
 }
 
 function validateRequest(request: Request): Parameters {
   console.log("Validate request");
 
-  const userId = decodeUserId(request.headers.Authorization);
+  const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
 
   /**
    * This conversion is necessary if the Lambda is called via AWS Step Functions.
@@ -162,13 +154,7 @@ function validateRequest(request: Request): Parameters {
     typeof request.body?.increasedPoints !== "number" ||
     typeof request.body?.learningMethod !== "string"
   ) {
-    console.error("Invalid input values!");
-    throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Invalid input values!",
-      }),
-    };
+    throw new HttpError(400, "Invalid input values!");
   }
 
   const params: Parameters = {
@@ -182,24 +168,14 @@ function validateRequest(request: Request): Parameters {
   };
 
   if (params.increasedPoints <= 0) {
-    console.error(`Points to increase are ${params.increasedPoints}! The value must be greater than or equal 1.`);
-    throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: `Points to increase are ${params.increasedPoints}! The value must be greater than or equal 1.`,
-      }),
-    };
+    throw new HttpError(400, "Points to increase are negative! The value must be greater than or equal 1.", {
+      increasedPoints: params.increasedPoints,
+    });
   }
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
   if (!uuidRegex.test(params.characterId)) {
-    console.error("Character id is not a valid UUID format!");
-    throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Character id is not a valid UUID format!",
-      }),
-    };
+    throw new HttpError(400, "Character id is not a valid UUID format!");
   }
 
   return params;
@@ -209,32 +185,22 @@ function validatePassedSkillValues(skill: Skill, params: Parameters) {
   console.log("Compare passed skill values with the values in the backend");
 
   if (!skill.activated) {
-    console.error("Skill is not activated yet! Activate it before it can be increased.");
-    throw {
-      statusCode: 409,
-      body: JSON.stringify({
-        message: "Skill is not activated yet! Activate it before it can be increased.",
-        characterId: params.characterId,
-        skillName: params.skillName,
-      }),
-    };
+    throw new HttpError(409, "Skill is not activated yet! Activate it before it can be increased.", {
+      characterId: params.characterId,
+      skillName: params.skillName,
+    });
   }
 
   if (
     params.initialSkillValue !== skill.current &&
     params.initialSkillValue + params.increasedPoints !== skill.current
   ) {
-    console.error("The passed skill value doesn't match the value in the backend!");
-    throw {
-      statusCode: 409,
-      body: JSON.stringify({
-        message: "The passed skill value doesn't match the value in the backend!",
-        characterId: params.characterId,
-        skillName: params.skillName,
-        passedSkillValue: params.initialSkillValue,
-        backendSkillValue: skill.current,
-      }),
-    };
+    throw new HttpError(409, "The passed skill value doesn't match the value in the backend!", {
+      characterId: params.characterId,
+      skillName: params.skillName,
+      passedSkillValue: params.initialSkillValue,
+      backendSkillValue: skill.current,
+    });
   }
 
   console.log("Passed skill values match the values in the backend");

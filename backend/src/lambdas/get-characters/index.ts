@@ -51,7 +51,7 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
 function validateRequest(request: Request): Parameters {
   console.log("Validate request");
 
-  const userId = decodeUserId(request.headers.Authorization);
+  const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
 
   if (
     request.queryStringParameters?.["character-short"] &&

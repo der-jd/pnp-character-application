@@ -5,6 +5,7 @@ import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test
 import { fakeCharacterId } from "../test-data/character.js";
 import { Character, getSkill } from "config/index.js";
 import { increaseSkill } from "increase-skill/index.js";
+import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [
@@ -236,9 +237,7 @@ describe("Invalid requests", () => {
       fakeResponse.Item.characterSheet.calculationPoints.adventurePoints.available = 3;
       mockDynamoDBGetCharacterResponse(fakeResponse);
 
-      const result = await increaseSkill(_case.request);
-
-      expect(result.statusCode).toBe(_case.expectedStatusCode);
+      await expectHttpError(() => increaseSkill(_case.request), _case.expectedStatusCode);
     });
   });
 });

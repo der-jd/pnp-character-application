@@ -136,7 +136,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
 async function validateRequest(request: Request): Promise<Parameters> {
   console.log("Validate request");
 
-  const userId = decodeUserId(request.headers.Authorization);
+  const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
 
   if (typeof request.pathParameters?.["character-id"] !== "string") {
     throw new HttpError(400, "Invalid input values!");
