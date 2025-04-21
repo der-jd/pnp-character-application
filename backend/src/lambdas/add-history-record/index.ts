@@ -102,12 +102,23 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       const latestBlock = historyBlockSchema.parse(items[0]);
       console.log("Latest history block:", { ...latestBlock, changes: ["..."] }); // Don't log changes as this can be a very long list
 
+      const latestRecord = latestBlock.changes[latestBlock.changes.length - 1];
       record = {
-        number: latestBlock.changes[latestBlock.changes.length - 1].number + 1,
+        number: latestRecord.number + 1,
         id: uuidv4(),
         timestamp: new Date().toISOString(),
         ...params.body,
       };
+
+      if (isDuplicate(latestRecord, record)) {
+        console.log("The new record is the same as the latest record in the history. No action is needed.");
+        const response = {
+          statusCode: 200,
+          body: JSON.stringify(latestRecord),
+        };
+        console.log(response);
+        return response;
+      }
 
       const blockSize = estimateItemSize(latestBlock);
       const recordSize = estimateItemSize(record);
@@ -219,4 +230,17 @@ function estimateItemSize(item: any): number {
   const marshalled = marshall(item);
   const json = JSON.stringify(marshalled);
   return Buffer.byteLength(json, "utf8");
+}
+
+function isDuplicate(record_1: Record, record_2: Record): boolean {
+  const isDuplicate =
+    record_1.type === record_2.type &&
+    record_1.name === record_2.name &&
+    JSON.stringify(record_1.data) === JSON.stringify(record_2.data) &&
+    record_1.learningMethod === record_2.learningMethod &&
+    record_1.calculationPointsChange.adjustment === record_2.calculationPointsChange.adjustment &&
+    record_1.calculationPointsChange.old === record_2.calculationPointsChange.old &&
+    record_1.calculationPointsChange.new === record_2.calculationPointsChange.new;
+
+  return isDuplicate;
 }
