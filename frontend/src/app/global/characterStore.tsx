@@ -3,6 +3,7 @@ import { AllCharactersCharacter } from "@/src/lib/api/models/allCharacters/inter
 import { getAllCharacters, getCharacter } from "@/src/lib/api/utils/api_calls";
 import { create } from "zustand";
 import * as R from "ramda";
+import { RecordEntry } from "@/src/lib/api/models/history/interface";
 
 export interface CharacterStore {
   availableCharacters: Array<AllCharactersCharacter>;
@@ -10,11 +11,13 @@ export interface CharacterStore {
   isEditable: boolean;
   editMode: boolean;
   characterSheet: CharacterSheet | null;
+  historyEntries: Array<RecordEntry> | null;
 
   setCharacterSheet: (data: CharacterSheet) => void;
   setEditable: (isEditable: boolean) => void;
   setSelectedCharacter: (char: string) => void;
   setAvailableCharacters: (chars: Array<AllCharactersCharacter>) => void;
+  setHistoryEntries: (entries: Array<RecordEntry>) => void;
 
   updateValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: number) => void;
 
@@ -22,6 +25,7 @@ export interface CharacterStore {
 
   updateAvailableCharacters: (idToken: string) => void;
   updateCharacter: (idToken: string, charId: string) => void;
+  updateHistoryEntries: (charId: string, newEntry: RecordEntry) => void;
 }
 
 /**
@@ -35,12 +39,13 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
   isEditable: false,
   characterSheet: null,
   editMode: false,
+  historyEntries: null,
 
   setCharacterSheet: (sheet) => set({ characterSheet: { ...sheet } }),
   setEditable: (isEditable) => set({ isEditable }),
   setSelectedCharacter: (char) => set({ selectedCharacterId: char }),
   setAvailableCharacters: (chars) => set({ availableCharacters: [...chars] }),
-
+  setHistoryEntries: (entries) => set({ historyEntries: entries }),
   /**
    * Reflects the state of the edit button
    */
@@ -101,6 +106,11 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       console.log(`[Character store] Error while fetching character data for ${charId}!`);
     }
   },
+
+  updateHistoryEntries: (charId: string, newEntry: RecordEntry) =>
+    set((state) => {
+      return { historyEntries: [...(state.historyEntries ?? []), newEntry] };
+    }),
 
   /**
    * Updates the currently selected character
