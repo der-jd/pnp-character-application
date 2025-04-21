@@ -44,8 +44,8 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
     };
     console.log(response);
     return response;
-  } catch (err) {
-    throw ensureHttpError(err);
+  } catch (error) {
+    throw ensureHttpError(error);
   }
 }
 
