@@ -1,40 +1,54 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { marshall } from "@aws-sdk/util-dynamodb";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
-import { RecordType } from "config/index.js";
 import {
   attributeSchema,
   baseValueSchema,
   calculationPointsSchema,
   combatSkillSchema,
   professionHobbySchema,
+  RecordType,
+  Record,
   skillSchema,
-} from "config/character_schemas.js";
+  historyBlockSchema,
+} from "config/index.js";
+import {
+  getHistoryItems,
+  createHistoryItem,
+  addHistoryRecord,
+  getCharacterItem,
+  Request,
+  parseBody,
+} from "utils/index.js";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
 
-// TODO endpoint should only be callable internally?! No need to expose it to the frontend. with a frontend call we would also need to check for an existing character with this id, see TODO below
+// TODO endpoint should only be callable internally! It shouldn't be exposed to the frontend because it shouldn't add history records on its own
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  return addRecordToHistory(event);
+  return addRecordToHistory({
+    headers: event.headers,
+    pathParameters: event.pathParameters,
+    queryStringParameters: event.queryStringParameters,
+    body: parseBody(event.body),
+  });
 };
 
-const bodySchema = z.object({
-  type: z.string(),
+const historyBodySchema = z.object({
+  type: z.nativeEnum(RecordType),
   name: z.string(),
   data: z.object({
     old: z.record(z.any()),
     new: z.record(z.any()),
   }),
-  learningMethod: z.string(),
+  learningMethod: z.string().nullable(),
   calculationPointsChange: z.object({
     adjustment: z.number(),
     old: z.number(),
     new: z.number(),
   }),
-  comment: z.string(),
+  comment: z.string().nullable(),
 });
 
 const numberSchema = z.object({
@@ -49,58 +63,30 @@ const booleanSchema = z.object({
   value: z.boolean(),
 });
 
-type Body = z.infer<typeof bodySchema>;
-
-const recordSchema = bodySchema.extend({
-  number: z.number(),
-  id: z.string(),
-  timestamp: z.string().datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2025-03-24T16:34:56Z (UTC) or 2025-03-24T16:34:56+02:00
-});
-
-type Record = z.infer<typeof recordSchema>;
-
-const historyBlockSchema = z.object({
-  characterId: z.string(),
-  blockNumber: z.number(),
-  blockId: z.string(),
-  previousBlockId: z.string().nullable(),
-  changes: z.array(recordSchema),
-});
-
-type HistoryBlock = z.infer<typeof historyBlockSchema>;
+export type HistoryBodySchema = z.infer<typeof historyBodySchema>;
 
 interface Parameters {
+  userId: string;
   characterId: string;
-  body: Body;
+  body: HistoryBodySchema;
 }
 
-async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+export async function addRecordToHistory(request: Request): Promise<APIGatewayProxyResult> {
   try {
-    // TODO only allow access to the character history if the user has access to the character
-    const params = validateRequest(event);
+    const params = await validateRequest(request);
 
-    console.log(`Get history of character ${params.characterId}`);
-    const client = new DynamoDBClient({});
-    const docClient = DynamoDBDocumentClient.from(client);
-    const command = new QueryCommand({
-      TableName: process.env.TABLE_NAME,
-      KeyConditionExpression: "characterId = :characterId",
-      ExpressionAttributeValues: {
-        ":characterId": params.characterId,
-      },
-      ConsistentRead: true,
-      ScanIndexForward: false, // Sort descending to get highest block number (latest item) first
-      Limit: 1, // Only need the top result
-    });
+    console.log(`Add record to history of character ${params.characterId} of user ${params.userId}`);
 
-    const dynamoDbResponse = await docClient.send(command);
-    console.log("Successfully got DynamoDB items");
+    const items = await getHistoryItems(
+      params.characterId,
+      false, // Sort descending to get highest block number (latest item) first
+      1, // Only need the top result
+    );
 
-    // TODO what to do if there is no character for the given id? -> check and throw error?!
     let record: Record;
-    if (!dynamoDbResponse.Items || dynamoDbResponse.Items.length === 0) {
-      console.log("No history found for the given characterId.");
-      const newBlock = await createHistoryBlock(params.characterId);
+    if (!items || items.length === 0) {
+      console.log("No history found for the given character id");
+      const newBlock = await createHistoryItem(params.characterId);
 
       record = {
         number: 1,
@@ -108,18 +94,18 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
         timestamp: new Date().toISOString(),
         ...params.body,
       };
-      addRecord(record, newBlock);
-    } else if (dynamoDbResponse.Items.length !== 1) {
-      console.error("More than one latest history block found for the given characterId");
+      await addHistoryRecord(record, newBlock);
+    } else if (items.length !== 1) {
+      console.error("More than one latest history block found for the given character id");
       throw {
         statusCode: 500,
         body: JSON.stringify({
-          message: "More than one latest history block found for the given characterId",
+          message: "More than one latest history block found for the given character id",
         }),
       };
     } else {
-      const latestBlock = historyBlockSchema.parse(dynamoDbResponse.Items[0]);
-      console.log("Latest history block:", latestBlock);
+      const latestBlock = historyBlockSchema.parse(items[0]);
+      console.log("Latest history block:", { ...latestBlock, changes: ["..."] }); // Don't log changes as this can be a very long list
 
       record = {
         number: latestBlock.changes[latestBlock.changes.length - 1].number + 1,
@@ -128,12 +114,16 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
         ...params.body,
       };
 
-      if (estimateItemSize(latestBlock) + estimateItemSize(record) > MAX_ITEM_SIZE) {
-        console.log(`Item size exceeds the maximum limit of ${MAX_ITEM_SIZE} bytes`);
-        const newBlock = await createHistoryBlock(params.characterId);
-        addRecord(record, newBlock);
+      const blockSize = estimateItemSize(latestBlock);
+      const recordSize = estimateItemSize(record);
+      if (blockSize + recordSize > MAX_ITEM_SIZE) {
+        console.log(
+          `Latest block with the new record (total size ~${blockSize + recordSize} bytes) would exceed the maximum allowed size of ${MAX_ITEM_SIZE} bytes/block`,
+        );
+        const newBlock = await createHistoryItem(params.characterId, latestBlock.blockNumber, latestBlock.blockId);
+        await addHistoryRecord(record, newBlock);
       } else {
-        addRecord(record, latestBlock);
+        await addHistoryRecord(record, latestBlock);
       }
     }
 
@@ -159,10 +149,37 @@ async function addRecordToHistory(event: APIGatewayProxyEvent): Promise<APIGatew
   }
 }
 
-function validateRequest(event: APIGatewayProxyEvent): Parameters {
+async function validateRequest(request: Request): Promise<Parameters> {
   console.log("Validate request");
 
-  if (typeof event.pathParameters?.["character-id"] !== "string") {
+  // Trim the authorization header as it could contain spaces at the beginning
+  const authHeader = request.headers.Authorization?.trim() || request.headers.authorization?.trim();
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: No token provided!" }),
+    };
+  }
+
+  const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
+  // Decode the token without verification (the access to the API itself is already protected by the authorizer)
+  const decoded = jwt.decode(token) as JwtPayload | null;
+  if (!decoded) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: Invalid token!" }),
+    };
+  }
+
+  const userId = decoded.sub; // Cognito User ID
+  if (!userId) {
+    throw {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized: User ID not found in token!" }),
+    };
+  }
+
+  if (typeof request.pathParameters?.["character-id"] !== "string") {
     console.error("Invalid input values!");
     throw {
       statusCode: 400,
@@ -172,7 +189,7 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
     };
   }
 
-  const characterId = event.pathParameters?.["character-id"];
+  const characterId = request.pathParameters?.["character-id"];
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
   if (!uuidRegex.test(characterId)) {
     console.error("Character id is not a valid UUID format!");
@@ -184,13 +201,14 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
     };
   }
 
+  // Check if the character exists
+  await getCharacterItem(userId, characterId);
+
   try {
     // TODO use parse function and request object for all lambdas
-    // The conditional parse is necessary for Lambda tests via the AWS console
-    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-    bodySchema.parse(body);
+    const body = historyBodySchema.parse(request.body);
 
-    switch (RecordType.parse(body.type)) {
+    switch (body.type) {
       case RecordType.EVENT_CALCULATION_POINTS:
         calculationPointsSchema.parse(body.data.old);
         calculationPointsSchema.parse(body.data.new);
@@ -204,9 +222,6 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
         baseValueSchema.parse(body.data.new);
         break;
       case RecordType.PROFESSION_CHANGED:
-        professionHobbySchema.parse(body.data.old);
-        professionHobbySchema.parse(body.data.new);
-        break;
       case RecordType.HOBBY_CHANGED:
         professionHobbySchema.parse(body.data.old);
         professionHobbySchema.parse(body.data.new);
@@ -244,7 +259,8 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
     }
 
     return {
-      characterId,
+      userId: userId,
+      characterId: characterId,
       body: body,
     };
   } catch (error) {
@@ -262,68 +278,6 @@ function validateRequest(event: APIGatewayProxyEvent): Parameters {
     // Rethrow other errors
     throw error;
   }
-}
-
-async function createHistoryBlock(
-  characterId: string,
-  previousBlockNumber: number | undefined = undefined,
-  previousBlockId: string | undefined = undefined,
-): Promise<HistoryBlock> {
-  console.log("Create new history block");
-  const blockNumber = previousBlockNumber ? previousBlockNumber + 1 : 1;
-  const _previousBlockId = previousBlockId ? previousBlockId : null;
-
-  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/put.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
-  const blockId = uuidv4();
-  const command = new PutCommand({
-    TableName: process.env.TABLE_NAME,
-    Item: {
-      characterId: characterId,
-      blockNumber: blockNumber,
-      blockId: blockId,
-      previousBlockId: _previousBlockId,
-      changes: [],
-    },
-  });
-  await docClient.send(command);
-
-  const newBlock: HistoryBlock = {
-    characterId: characterId,
-    blockId: blockId,
-    blockNumber: blockNumber,
-    previousBlockId: _previousBlockId,
-    changes: [],
-  };
-  console.log("Successfully created new history block in DynamoDB", newBlock);
-
-  return newBlock;
-}
-
-async function addRecord(record: Record, block: HistoryBlock) {
-  console.log(`Add record to history block #${block.blockNumber}, id ${block.blockId}`);
-  console.log("Record:", record);
-
-  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
-  const command = new UpdateCommand({
-    TableName: process.env.TABLE_NAME,
-    Key: {
-      characterId: block.characterId,
-      blockNumber: block.blockNumber,
-    },
-    UpdateExpression: "SET #changes = :changes",
-    ExpressionAttributeNames: {
-      "#changes": "changes",
-    },
-    ExpressionAttributeValues: {
-      ":changes": "TODO add record",
-    },
-  });
-  await docClient.send(command);
-  console.log(`Successfully added record ${record.id} to history block in DynamoDB`);
 }
 
 function estimateItemSize(item: any): number {

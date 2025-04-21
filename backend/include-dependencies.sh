@@ -3,8 +3,9 @@
 set -e # Exit immediately if any command exits with a non-zero status. Needed for the for loop below
 
 start_dir=$PWD
-lambdas_build_dir="build/src/lambdas"
-lambda_layers_build_dir="build/src/lambda-layers"
+build_dir="build/src"
+lambdas_build_dir="$build_dir/lambdas"
+lambda_layers_build_dir="$build_dir/lambda-layers"
 src_dir="src"
 lambda_layers_src_dir="$src_dir/lambda-layers"
 
@@ -23,12 +24,12 @@ do
 
   echo "Installing prod dependencies in $lambda_dest_dir..."
   cd $lambda_dest_dir
-  npm install --omit=dev
+  npm ci --omit=dev
 
   cd $start_dir
 done
 
-# Gather the names of all subdirectories (Lambda Layers) in the lambda_layers_build_dir
+# Gather the names of all subdirectories (Lambda Layers) in the lambda_layers_src_dir
 lambda_layers=()
 while IFS= read -r -d '' dir; do
   lambda_layers+=("$(basename "$dir")")
@@ -46,10 +47,14 @@ do
   layer_dest_dir="$lambda_layers_build_dir/$layer"
   mkdir --parent $layer_dest_dir
   cp --verbose $lambda_layers_src_dir/$layer/package*.json $layer_dest_dir
+  layer_packages_dest_dir="$build_dir/$layer"
+  cp --verbose $src_dir/$layer/package*.json $layer_packages_dest_dir
 
   echo "Installing prod dependencies in $layer_dest_dir..."
   cd $layer_dest_dir
-  npm install --omit=dev
+  layer_package_dir_relative_to_layer_dir="../../$layer" # NOTE: package dir must have the same name as the layer. Otherwise the path is wrong!
+  # Use --install-links to install transitive dependencies from local packages
+  npm ci --install-links $layer_package_dir_relative_to_layer_dir --omit=dev
 
   echo "Moving dependencies into required sub folder for Lambda Layer..."
   mkdir nodejs
