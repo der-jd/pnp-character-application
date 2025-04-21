@@ -118,7 +118,7 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         Catch = [
           {
             ErrorEquals = ["States.ALL"], // Fail on all errors if retries not defined or exceeded
-            Next        = "Fallback"
+            Next        = "HandleError"
           }
         ],
         Next = "AddHistoryRecord"
@@ -156,12 +156,12 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         Catch = [
           {
             ErrorEquals = ["States.ALL"], // Fail on all errors if retries not defined or exceeded
-            Next        = "Fallback"
+            Next        = "HandleError"
           }
         ],
         End = true
       },
-      Fallback = {
+      HandleError = {
         Type       = "Pass",
         ResultPath = "$.AddHistoryRecordResult",
         End        = true
