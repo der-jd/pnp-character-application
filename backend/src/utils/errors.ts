@@ -8,8 +8,8 @@ export function ensureHttpError(value: unknown): HttpError {
     stringified = "[Unable to stringify the thrown value]";
   }
 
-  const error = new HttpError(500, `This value was thrown as is, not through an Error: ${stringified}`);
-  return error;
+  console.error(`This value was thrown as is, not through an Error: ${stringified}`);
+  return new HttpError(500, "An internal error occurred!");
 }
 
 export class HttpError extends Error {
