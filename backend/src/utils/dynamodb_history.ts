@@ -14,7 +14,7 @@ export async function getHistoryItems(
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
   const command = new QueryCommand({
-    TableName: process.env.TABLE_NAME,
+    TableName: process.env.TABLE_NAME_HISTORY,
     KeyConditionExpression: "characterId = :characterId",
     ExpressionAttributeValues: {
       ":characterId": characterId,
@@ -45,7 +45,7 @@ export async function createHistoryItem(
   const docClient = DynamoDBDocumentClient.from(client);
   const blockId = uuidv4();
   const command = new PutCommand({
-    TableName: process.env.TABLE_NAME,
+    TableName: process.env.TABLE_NAME_HISTORY,
     Item: {
       characterId: characterId,
       blockNumber: blockNumber,
@@ -78,7 +78,7 @@ export async function addHistoryRecord(record: Record, block: HistoryBlock) {
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
   const command = new UpdateCommand({
-    TableName: process.env.TABLE_NAME,
+    TableName: process.env.TABLE_NAME_HISTORY,
     Key: {
       characterId: block.characterId,
       blockNumber: block.blockNumber,
