@@ -1,6 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { marshall } from "@aws-sdk/util-dynamodb";
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import {
@@ -23,6 +22,7 @@ import {
   parseBody,
   HttpError,
   ensureHttpError,
+  decodeUserId,
 } from "utils/index.js";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
@@ -136,23 +136,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
 async function validateRequest(request: Request): Promise<Parameters> {
   console.log("Validate request");
 
-  // Trim the authorization header as it could contain spaces at the beginning
-  const authHeader = request.headers.Authorization?.trim() || request.headers.authorization?.trim();
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new HttpError(401, "Unauthorized: No token provided!");
-  }
-
-  const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
-  // Decode the token without verification (the access to the API itself is already protected by the authorizer)
-  const decoded = jwt.decode(token) as JwtPayload | null;
-  if (!decoded) {
-    throw new HttpError(401, "Unauthorized: Invalid token!");
-  }
-
-  const userId = decoded.sub; // Cognito User ID
-  if (!userId) {
-    throw new HttpError(401, "Unauthorized: User ID not found in token!");
-  }
+  const userId = decodeUserId(request.headers.Authorization);
 
   if (typeof request.pathParameters?.["character-id"] !== "string") {
     throw new HttpError(400, "Invalid input values!");
