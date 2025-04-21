@@ -268,29 +268,25 @@ const argv = yargs(hideBin(process.argv))
 
 // Main function to execute the logic
 (async () => {
-  try {
-    const parsedData = await parseXmlFile(argv.input);
-    const character: Character = mapXmlToCharacterInterface(parsedData);
+  const parsedData = await parseXmlFile(argv.input);
+  const character: Character = mapXmlToCharacterInterface(parsedData);
 
-    const characterJson = JSON.stringify(character, null, 2);
-    fs.writeFileSync(`${argv.output}.json`, characterJson);
-    console.log("JSON string saved to:", argv.output + ".json");
+  const characterJson = JSON.stringify(character, null, 2);
+  fs.writeFileSync(`${argv.output}.json`, characterJson);
+  console.log("JSON string saved to:", argv.output + ".json");
 
-    // Marshal the character data to DynamoDB format and save
-    const marshalledCharacter = marshall(character);
-    const characterJsonDynamoDb = JSON.stringify(marshalledCharacter, null, 2);
-    fs.writeFileSync(`${argv.output}_dynamodb.json`, characterJsonDynamoDb);
-    console.log("DynamoDB JSON saved to:", argv.output + "_dynamodb.json");
+  // Marshal the character data to DynamoDB format and save
+  const marshalledCharacter = marshall(character);
+  const characterJsonDynamoDb = JSON.stringify(marshalledCharacter, null, 2);
+  fs.writeFileSync(`${argv.output}_dynamodb.json`, characterJsonDynamoDb);
+  console.log("DynamoDB JSON saved to:", argv.output + "_dynamodb.json");
 
-    console.warn("Warning: Check the generated JSON file for correctness!");
-    console.warn("Warning: The following fields need to be filled out manually:");
-    console.warn("- userId (uuid4; take from Cognito user pool to link character to an user)");
-    console.warn("- characterSheet.calculationPoints.adventurePoints.available (number)");
-    console.warn("- characterSheet.specialAbilities (string[])");
-    console.warn("- characterSheet.attributes.XXX.totalCost (number)");
-    console.warn("- characterSheet.baseValues.naturalArmor (number)");
-    console.warn("- characterSheet.baseValues.XXX.current (number)");
-  } catch (error) {
-    console.error("Error:", error);
-  }
+  console.warn("Warning: Check the generated JSON file for correctness!");
+  console.warn("Warning: The following fields need to be filled out manually:");
+  console.warn("- userId (uuid4; take from Cognito user pool to link character to an user)");
+  console.warn("- characterSheet.calculationPoints.adventurePoints.available (number)");
+  console.warn("- characterSheet.specialAbilities (string[])");
+  console.warn("- characterSheet.attributes.XXX.totalCost (number)");
+  console.warn("- characterSheet.baseValues.naturalArmor (number)");
+  console.warn("- characterSheet.baseValues.XXX.current (number)");
 })();
