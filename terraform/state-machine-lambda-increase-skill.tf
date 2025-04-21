@@ -84,14 +84,44 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
     level                  = "ALL"
   }
 
+  // Examples for error handling: https://docs.aws.amazon.com/step-functions/latest/dg/concepts-error-handling.html#error-handling-examples
+  // Best practiceS: https://docs.aws.amazon.com/step-functions/latest/dg/sfn-best-practices.html
   definition = jsonencode({
     StartAt = "IncreaseSkill",
     States = {
       IncreaseSkill = {
-        Type       = "Task",
-        Resource   = aws_lambda_function.increase_skill_lambda.arn,
-        ResultPath = "$.IncreaseSkillResult",
-        Next       = "AddHistoryRecord"
+        Type           = "Task",
+        Resource       = aws_lambda_function.increase_skill_lambda.arn,
+        ResultPath     = "$.IncreaseSkillResult",
+        TimeoutSeconds = 5 // Timeout to avoid waiting for a stuck task
+        Retry = [
+          {
+            // Retry in case of Lambda service exceptions
+            ErrorEquals = [
+              "Lambda.ClientExecutionTimeoutException",
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            IntervalSeconds = 1,
+            MaxAttempts     = 4,
+            BackoffRate     = 1.5, // Multiply the retry IntervalSeconds with this number after each retry -> exponential growth
+            MaxDelaySeconds = 3    // Cap exponential retry interval
+          },
+          {
+            ErrorEquals     = ["States.ALL"],
+            IntervalSeconds = 1,
+            MaxAttempts     = 2,
+            BackoffRate     = 1,
+          },
+        ],
+        Catch = [
+          {
+            ErrorEquals = ["States.ALL"], // Fail on all errors if retries not defined or exceeded
+            Next        = "Fallback"
+          }
+        ],
+        Next = "AddHistoryRecord"
       },
       /**
        * TODO add custom error response for add history record function
@@ -99,8 +129,40 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
        * directly informed about the details.
        */
       AddHistoryRecord = {
-        Type       = "Task",
-        Resource   = aws_lambda_function.add_history_record_lambda.arn,
+        Type           = "Task",
+        Resource       = aws_lambda_function.add_history_record_lambda.arn,
+        ResultPath     = "$.AddHistoryRecordResult",
+        TimeoutSeconds = 5
+        Retry = [
+          {
+            ErrorEquals = [
+              "Lambda.ClientExecutionTimeoutException",
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            IntervalSeconds = 1,
+            MaxAttempts     = 4,
+            BackoffRate     = 1.5,
+            MaxDelaySeconds = 3
+          },
+          {
+            ErrorEquals     = ["States.ALL"],
+            IntervalSeconds = 1,
+            MaxAttempts     = 2,
+            BackoffRate     = 1,
+          },
+        ],
+        Catch = [
+          {
+            ErrorEquals = ["States.ALL"], // Fail on all errors if retries not defined or exceeded
+            Next        = "Fallback"
+          }
+        ],
+        End = true
+      },
+      Fallback = {
+        Type       = "Pass",
         ResultPath = "$.AddHistoryRecordResult",
         End        = true
       }
