@@ -125,7 +125,7 @@ export async function increaseSkill(
  * @param id The character id of the character
  * @returns The full history for the provided character id
  */
-export async function getReversibleEntries(idToken: string, id: string): Promise<HistoryReply> {
+export async function getHistory(idToken: string, id: string): Promise<HistoryReply> {
   const endpoint_url = `characters/${id}/history`;
   return get<HistoryReply>(idToken, endpoint_url);
 }

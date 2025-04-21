@@ -39,7 +39,7 @@ export function useSkillUpdater() {
       try {
         setLoading(true);
         const response = await increaseSkill(idToken, selectedChar, skill.name, skill.category, increaseSkillRequest);
-        const { availableAdventurePoints, availableAttributePoints } = response;
+        const { availableAdventurePoints, availableAttributePoints, historyRecord } = response;
 
         if (!characterSheet) {
           toast.toast({
@@ -61,6 +61,17 @@ export function useSkillUpdater() {
         }
 
         setCharacterSheet(updatedCharacterSheet);
+
+        if (!historyRecord) {
+          toast.toast({
+            title: `Error increasing ${skill.name}!`,
+            description: `History Entry from the missing from the backend reply!`,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        updateReversibleHistory(selectedChar ?? "", historyRecord);
       } catch (error) {
         if (error instanceof ApiError) {
           toast.toast({
@@ -76,7 +87,6 @@ export function useSkillUpdater() {
 
     setLoading(false);
     updateValue(path, name, skill.current_level + pointsToSkill);
-    updateReversibleHistory(selectedChar ?? "", name, skill.current_level, skill.current_level + pointsToSkill);
   };
 
   return { tryIncreaseSkill, loading };

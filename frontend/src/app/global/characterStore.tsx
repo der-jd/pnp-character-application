@@ -25,7 +25,7 @@ export interface CharacterStore {
 
   updateAvailableCharacters: (idToken: string) => void;
   updateCharacter: (idToken: string, charId: string) => void;
-  updateHistoryEntries: (charId: string, name: string, old: number, current: number) => void;
+  updateHistoryEntries: (charId: string, newEntry: RecordEntry) => void;
 }
 
 /**
@@ -107,42 +107,10 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
     }
   },
 
-  updateHistoryEntries: (charId: string, name: string, old: number, current: number) => {
+  updateHistoryEntries: (charId: string, newEntry: RecordEntry) =>
     set((state) => {
-      const newEntry = {
-        number: (state.historyEntries?.length ?? 0) + 1,
-        id: "",
-        timestamp: new Date().toISOString(),
-        name,
-        type: "test type",
-        data: {
-          old: { value: old },
-          new: { value: current },
-        },
-        learningMethod: "test method",
-        calculationPointsChange: {
-          old,
-          new: current,
-          adjustment: current - old,
-        },
-        comment: "",
-      };
-
       return { historyEntries: [...(state.historyEntries ?? []), newEntry] };
-    });
-
-    // getReversibleEntries(idToken, charId)
-    //   .then((newEntries) => {
-    //     set(() => ({
-    //       historyEntries: {
-    //         ...newEntries.blocks,
-    //       },
-    //     }));
-    //   })
-    //   .catch((error) => {
-    //     console.error("Failed to update history entries:", error);
-    //   });
-  },
+    }),
 
   /**
    * Updates the currently selected character

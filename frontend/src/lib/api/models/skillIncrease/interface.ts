@@ -1,3 +1,5 @@
+import { RecordEntry } from "../history/interface";
+
 export interface SkillIncreaseReply {
   characterId: string;
   skillName: string;
@@ -5,6 +7,7 @@ export interface SkillIncreaseReply {
   totalCost: number;
   availableAdventurePoints?: number;
   availableAttributePoints?: number;
+  historyRecord?: RecordEntry;
 }
 
 export interface SkillIncreaseRequest {
