@@ -1,6 +1,6 @@
 variable "status_codes" {
   type    = list(string)
-  default = ["400", "401", "403", "404", "500", "200"]
+  default = ["400", "401", "403", "404", "409", "500", "200"]
 }
 
 resource "aws_iam_role" "api_gateway_role" {
