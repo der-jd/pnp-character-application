@@ -44,10 +44,9 @@ const historyBodySchema = z.object({
     new: z.record(z.any()),
   }),
   learningMethod: z.string().nullable(),
-  calculationPointsChange: z.object({
-    adjustment: z.number(),
-    old: z.number(),
-    new: z.number(),
+  calculationPoints: z.object({
+    old: calculationPointsSchema,
+    new: calculationPointsSchema,
   }),
   comment: z.string().nullable(),
 });
@@ -238,9 +237,7 @@ function isDuplicate(record_1: Record, record_2: Record): boolean {
     record_1.name === record_2.name &&
     JSON.stringify(record_1.data) === JSON.stringify(record_2.data) &&
     record_1.learningMethod === record_2.learningMethod &&
-    record_1.calculationPointsChange.adjustment === record_2.calculationPointsChange.adjustment &&
-    record_1.calculationPointsChange.old === record_2.calculationPointsChange.old &&
-    record_1.calculationPointsChange.new === record_2.calculationPointsChange.new;
+    JSON.stringify(record_1.calculationPoints) === JSON.stringify(record_2.calculationPoints);
 
   return isDuplicate;
 }

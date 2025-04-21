@@ -30,10 +30,17 @@ const testBody = {
       total: 120,
     },
   },
-  calculationPointsChange: {
-    adjustment: 20,
-    old: 100,
-    new: 120,
+  calculationPoints: {
+    old: {
+      start: 0,
+      available: 100,
+      total: 200,
+    },
+    new: {
+      start: 0,
+      available: 120,
+      total: 220,
+    },
   },
   comment: "Epic fight against a big monster",
 };
@@ -127,10 +134,17 @@ describe("Invalid requests", () => {
               total: 120,
             },
           },
-          calculationPointsChange: {
-            adjustment: 20,
-            old: 100,
-            new: 120,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 100,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 120,
+              total: 220,
+            },
           },
           comment: "Epic fight against a big monster",
         },
@@ -174,10 +188,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 20,
-            old: 90,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 110,
+              total: 220,
+            },
           },
           comment: "Epic fight against a big monster",
         },
@@ -204,10 +225,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 0,
-            new: 0,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
+            new: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
           },
           comment: "Finished story arc",
         },
@@ -242,10 +270,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 110,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
           },
           comment: "Level 2",
         },
@@ -274,10 +309,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 0,
-            new: 0,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
+            new: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
           },
           comment: null,
         },
@@ -306,10 +348,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 0,
-            new: 0,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
+            new: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
           },
           comment: null,
         },
@@ -336,10 +385,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 110,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
           },
           comment: null,
         },
@@ -366,10 +422,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 110,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
           },
           comment: null,
         },
@@ -396,10 +459,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 110,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
           },
           comment: null,
         },
@@ -432,10 +502,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: -1,
-            old: 9,
-            new: 8,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 9,
+              total: 15,
+            },
+            new: {
+              start: 0,
+              available: 8,
+              total: 15,
+            },
           },
           comment: null,
         },
@@ -462,10 +539,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: "NORMAL",
-          calculationPointsChange: {
-            adjustment: -50,
-            old: 110,
-            new: 60,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 40,
+              total: 200,
+            },
           },
           comment: null,
         },
@@ -502,10 +586,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: "NORMAL",
-          calculationPointsChange: {
-            adjustment: -5,
-            old: 60,
-            new: 55,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 85,
+              total: 200,
+            },
           },
           comment: null,
         },
@@ -536,10 +627,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 0,
-            new: 0,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
+            new: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
           },
           comment: null,
         },
@@ -565,7 +663,7 @@ describe("Valid requests", () => {
       expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
       expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
       expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
-      expect(parsedBody.calculationPointsChange).toEqual(_case.request.body.calculationPointsChange);
+      expect(parsedBody.calculationPoints).toEqual(_case.request.body.calculationPoints);
       expect(parsedBody.comment).toBe(_case.request.body.comment);
       expect(parsedBody.timestamp).toBeDefined();
 
@@ -615,10 +713,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: "NORMAL",
-          calculationPointsChange: {
-            adjustment: -10,
-            old: 100,
-            new: 90,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 100,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
           },
           comment: null,
         },
@@ -644,7 +749,7 @@ describe("Valid requests", () => {
       expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
       expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
       expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
-      expect(parsedBody.calculationPointsChange).toEqual(_case.request.body.calculationPointsChange);
+      expect(parsedBody.calculationPoints).toEqual(_case.request.body.calculationPoints);
       expect(parsedBody.comment).toBe(_case.request.body.comment);
       expect(parsedBody.timestamp).toBeDefined();
     });
@@ -675,10 +780,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 20,
-            old: 90,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 110,
+              total: 220,
+            },
           },
           comment: "Epic fight against a big monster",
         },
@@ -704,7 +816,7 @@ describe("Valid requests", () => {
       expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
       expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
       expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
-      expect(parsedBody.calculationPointsChange).toEqual(_case.request.body.calculationPointsChange);
+      expect(parsedBody.calculationPoints).toEqual(_case.request.body.calculationPoints);
       expect(parsedBody.comment).toBe(_case.request.body.comment);
       expect(parsedBody.timestamp).toBeDefined();
 
@@ -760,10 +872,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 20,
-            old: 90,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 110,
+              total: 220,
+            },
           },
           comment: "Epic fight against a big monster",
         },
@@ -789,7 +908,7 @@ describe("Valid requests", () => {
       expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
       expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
       expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
-      expect(parsedBody.calculationPointsChange).toEqual(_case.request.body.calculationPointsChange);
+      expect(parsedBody.calculationPoints).toEqual(_case.request.body.calculationPoints);
       expect(parsedBody.comment).toBe(_case.request.body.comment);
       expect(parsedBody.timestamp).toBeDefined();
 
