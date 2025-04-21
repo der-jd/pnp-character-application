@@ -93,6 +93,11 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         ResultPath = "$.IncreaseSkillResult",
         Next       = "AddHistoryRecord"
       },
+      /**
+       * TODO add custom error response for add history record function
+       * All errors in this function are internal ones and the user should not be
+       * directly informed about the details.
+       */
       AddHistoryRecord = {
         Type       = "Task",
         Resource   = aws_lambda_function.add_history_record_lambda.arn,

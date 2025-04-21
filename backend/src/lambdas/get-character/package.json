@@ -2,11 +2,5 @@
   "name": "get-character",
   "version": "1.0.0",
   "main": "index.mjs",
-  "type": "module",
-  "dependencies": {
-    "jsonwebtoken": "^9.0.2"
-  },
-  "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.9"
-  }
+  "type": "module"
 }

@@ -3,6 +3,7 @@ import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterListResponse, mockDynamoDBQueryCharactersResponse } from "../test-data/response.js";
 import { getCharacters } from "get-characters/index.js";
 import { Character } from "config/index.js";
+import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [
@@ -46,9 +47,7 @@ describe("Invalid requests", () => {
     test(_case.name, async () => {
       mockDynamoDBQueryCharactersResponse(fakeCharacterListResponse);
 
-      const result = await getCharacters(_case.request);
-
-      expect(result.statusCode).toBe(_case.expectedStatusCode);
+      await expectHttpError(() => getCharacters(_case.request), _case.expectedStatusCode);
     });
   });
 });

@@ -2,6 +2,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
 import { Character, characterSchema } from "config/index.js";
+import { HttpError } from "./errors.js";
 
 export async function getCharacterItem(userId: string, characterId: string): Promise<Character> {
   console.log(`Get character ${characterId} of user ${userId} from DynamoDB`);
@@ -21,13 +22,7 @@ export async function getCharacterItem(userId: string, characterId: string): Pro
   const response = await docClient.send(command);
 
   if (!response.Item) {
-    console.error("No character found for the given user and character id");
-    throw {
-      statusCode: 404,
-      body: JSON.stringify({
-        message: "No character found for the given user and character id",
-      }),
-    };
+    throw new HttpError(404, "No character found for the given user and character id");
   }
 
   console.log("Successfully got DynamoDB item");
@@ -53,13 +48,7 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
   const response = await docClient.send(command);
 
   if (!response.Items || response.Items.length === 0) {
-    console.error("No characters found for the given user id");
-    throw {
-      statusCode: 404,
-      body: JSON.stringify({
-        message: "No characters found for the given user id",
-      }),
-    };
+    throw new HttpError(404, "No characters found for the given user id");
   }
 
   console.log("Successfully got DynamoDB items");

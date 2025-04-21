@@ -1,6 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { Request, parseBody, getCharacterItem } from "utils/index.js";
+import { Request, parseBody, getCharacterItem, HttpError, ensureHttpError, decodeUserId } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getCharacter({
@@ -28,73 +27,25 @@ export async function getCharacter(request: Request): Promise<APIGatewayProxyRes
     };
     console.log(response);
     return response;
-  } catch (error: any) {
-    const response = {
-      statusCode: error.statusCode ?? 500,
-      body:
-        error.body ??
-        JSON.stringify({
-          message: "An error occurred!",
-          error: (error as Error).message,
-        }),
-    };
-    console.error(response);
-
-    return response;
+  } catch (error) {
+    throw ensureHttpError(error);
   }
 }
 
 function validateRequest(request: Request): Parameters {
   console.log("Validate request");
 
-  // Trim the authorization header as it could contain spaces at the beginning
-  const authHeader = request.headers.Authorization?.trim() || request.headers.authorization?.trim();
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw {
-      statusCode: 401,
-      body: JSON.stringify({ message: "Unauthorized: No token provided!" }),
-    };
-  }
-
-  const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
-  // Decode the token without verification (the access to the API itself is already protected by the authorizer)
-  const decoded = jwt.decode(token) as JwtPayload | null;
-  if (!decoded) {
-    throw {
-      statusCode: 401,
-      body: JSON.stringify({ message: "Unauthorized: Invalid token!" }),
-    };
-  }
-
-  const userId = decoded.sub; // Cognito User ID
-  if (!userId) {
-    throw {
-      statusCode: 401,
-      body: JSON.stringify({ message: "Unauthorized: User ID not found in token!" }),
-    };
-  }
+  const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
 
   if (typeof request.pathParameters?.["character-id"] !== "string") {
-    console.error("Invalid input values!");
-    throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Invalid input values!",
-      }),
-    };
+    throw new HttpError(400, "Invalid input values!");
   }
 
   const characterId = request.pathParameters?.["character-id"];
 
   const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
   if (!uuidRegex.test(characterId)) {
-    console.error("Character id is not a valid UUID format!");
-    throw {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Character id is not a valid UUID format!",
-      }),
-    };
+    throw new HttpError(400, "Character id is not a valid UUID format!");
   }
 
   return {
