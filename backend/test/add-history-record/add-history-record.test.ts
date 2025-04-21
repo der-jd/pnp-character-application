@@ -584,6 +584,72 @@ describe("Valid requests", () => {
     });
   });
 
+  const idempotencyTestCasesForExistingHistoryBlock = [
+    {
+      name: "Add a redundant history record to existing block (idempotency)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          type: RecordType.SKILL_RAISED,
+          name: "Athletics",
+          data: {
+            old: {
+              activated: true,
+              start: 0,
+              current: 0,
+              mod: 0,
+              totalCost: 0,
+              defaultCostCategory: CostCategory.CAT_2,
+            },
+            new: {
+              activated: true,
+              start: 0,
+              current: 10,
+              mod: 0,
+              totalCost: 10,
+              defaultCostCategory: CostCategory.CAT_2,
+            },
+          },
+          learningMethod: "NORMAL",
+          calculationPointsChange: {
+            adjustment: -10,
+            old: 100,
+            new: 90,
+          },
+          comment: null,
+        },
+      },
+      expectedStatusCode: 200,
+    },
+  ];
+
+  idempotencyTestCasesForExistingHistoryBlock.forEach((_case) => {
+    test(_case.name, async () => {
+      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
+      mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
+
+      const result = await addRecordToHistory(_case.request);
+
+      expect(result.statusCode).toBe(_case.expectedStatusCode);
+
+      const parsedBody = JSON.parse(result.body);
+      expect(parsedBody.type).toBe(_case.request.body.type);
+      expect(parsedBody.name).toBe(_case.request.body.name);
+      expect(parsedBody.number).toBe(fakeHistoryBlock2.changes[fakeHistoryBlock2.changes.length - 1].number);
+      expect(parsedBody.id).toBeDefined();
+      expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
+      expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
+      expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
+      expect(parsedBody.calculationPointsChange).toEqual(_case.request.body.calculationPointsChange);
+      expect(parsedBody.comment).toBe(_case.request.body.comment);
+      expect(parsedBody.timestamp).toBeDefined();
+    });
+  });
+
   const testCasesForNewHistory = [
     {
       name: "Add history record for 'event calculation points' to new history",
