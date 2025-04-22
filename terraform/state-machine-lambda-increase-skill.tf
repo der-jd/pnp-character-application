@@ -132,7 +132,6 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         QueryLanguage = "JSONata",
         Type          = "Task",
         Resource      = aws_lambda_function.add_history_record_lambda.arn,
-        ResultPath    = "$.AddHistoryRecordResult",
         Arguments = {
           "type"              = "SKILL_RAISED",
           "name"              = "{% $states.input.skillName %}",
