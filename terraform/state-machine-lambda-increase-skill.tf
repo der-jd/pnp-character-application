@@ -129,9 +129,17 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
        * directly informed about the details.
        */
       AddHistoryRecord = {
-        Type           = "Task",
-        Resource       = aws_lambda_function.add_history_record_lambda.arn,
-        ResultPath     = "$.AddHistoryRecordResult",
+        QueryLanguage = "JSONata",
+        Type          = "Task",
+        Resource      = aws_lambda_function.add_history_record_lambda.arn,
+        ResultPath    = "$.AddHistoryRecordResult",
+        Arguments = {
+          "type"              = "SKILL_RAISED",
+          "name"              = "{% $states.input.skillName %}",
+          "data"              = "{% $states.input.skill %}",
+          "learningMethod"    = "{% $states.input.learningMethod %}",
+          "calculationPoints" = "{% $states.input.adventurePoints %}",
+        },
         TimeoutSeconds = 5
         Retry = [
           {
