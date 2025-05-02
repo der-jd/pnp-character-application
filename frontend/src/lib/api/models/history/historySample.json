@@ -1,0 +1,1102 @@
+[
+  {
+    "number": 1,
+    "id": "1c4e1b33-8cf0-4d82-81c4-e573d6eb0e5b",
+    "timestamp": "2024-07-03T08:34:36.670167",
+    "type": "Knowledge",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 71
+      },
+      "new": {
+        "value": 74
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": 3,
+      "old": 71,
+      "new": 74
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 2,
+    "id": "906ab74a-ddcb-4a96-8f47-7cd43a29fdd6",
+    "timestamp": "2024-05-19T07:27:29.670302",
+    "type": "Knowledge",
+    "name": "Stealth",
+    "data": {
+      "old": {
+        "value": 33
+      },
+      "new": {
+        "value": 43
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": 10,
+      "old": 33,
+      "new": 43
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 3,
+    "id": "6e6b71fa-12d8-4ba2-ba48-f2e5d15f5a85",
+    "timestamp": "2024-12-02T13:58:42.670418",
+    "type": "Attribute",
+    "name": "History",
+    "data": {
+      "old": {
+        "value": 48
+      },
+      "new": {
+        "value": 53
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": 5,
+      "old": 48,
+      "new": 53
+    },
+    "comment": "Mentor feedback"
+  },
+  {
+    "number": 4,
+    "id": "ab603eb7-17cb-436e-9acd-6987cde4d280",
+    "timestamp": "2024-10-06T15:50:07.670589",
+    "type": "Attribute",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 58
+      },
+      "new": {
+        "value": 68
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 10,
+      "old": 58,
+      "new": 68
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 5,
+    "id": "501b80eb-9db4-4911-be64-a3a1d57e976d",
+    "timestamp": "2024-06-30T10:00:04.670854",
+    "type": "Skill",
+    "name": "History",
+    "data": {
+      "old": {
+        "value": 42
+      },
+      "new": {
+        "value": 37
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": -5,
+      "old": 42,
+      "new": 37
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 6,
+    "id": "7f024768-759f-4cd0-8f14-00385dd3cd84",
+    "timestamp": "2024-10-27T03:56:28.670978",
+    "type": "Attribute",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 74
+      },
+      "new": {
+        "value": 83
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 9,
+      "old": 74,
+      "new": 83
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 7,
+    "id": "4311c352-ab94-4a59-b5ff-8092daeecb52",
+    "timestamp": "2024-12-07T21:47:29.671075",
+    "type": "Knowledge",
+    "name": "Dexterity",
+    "data": {
+      "old": {
+        "value": 51
+      },
+      "new": {
+        "value": 57
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": 6,
+      "old": 51,
+      "new": 57
+    },
+    "comment": "Mentor feedback"
+  },
+  {
+    "number": 8,
+    "id": "f217b405-7daf-4595-ae72-b9d479164a31",
+    "timestamp": "2024-11-28T22:40:05.671134",
+    "type": "Knowledge",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 54
+      },
+      "new": {
+        "value": 45
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": -9,
+      "old": 54,
+      "new": 45
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 9,
+    "id": "c81e556d-60f5-4d2d-b841-2a6954c100d2",
+    "timestamp": "2024-06-08T10:44:04.671178",
+    "type": "Attribute",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 25
+      },
+      "new": {
+        "value": 26
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": 1,
+      "old": 25,
+      "new": 26
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 10,
+    "id": "43d97222-3f92-4b02-b49e-9b1773591fcc",
+    "timestamp": "2024-12-06T06:43:26.671229",
+    "type": "Skill",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 9
+      },
+      "new": {
+        "value": 6
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": -3,
+      "old": 9,
+      "new": 6
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 11,
+    "id": "59d606a9-d0be-42b0-b1dc-a83a512b18b3",
+    "timestamp": "2025-02-17T15:30:00.671286",
+    "type": "Knowledge",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 49
+      },
+      "new": {
+        "value": 59
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": 10,
+      "old": 49,
+      "new": 59
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 12,
+    "id": "421bee56-afbb-4776-8452-ce1f7bf1b09b",
+    "timestamp": "2024-08-01T07:22:36.671432",
+    "type": "Attribute",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 20
+      },
+      "new": {
+        "value": 29
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": 9,
+      "old": 20,
+      "new": 29
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 13,
+    "id": "55a38ce2-3b15-4f6e-8985-7cd0dd34aa51",
+    "timestamp": "2024-07-06T01:06:31.671596",
+    "type": "Knowledge",
+    "name": "History",
+    "data": {
+      "old": {
+        "value": 93
+      },
+      "new": {
+        "value": 102
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": 9,
+      "old": 93,
+      "new": 102
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 14,
+    "id": "086f5a13-40b8-44d0-8558-f200e86057bc",
+    "timestamp": "2025-03-21T11:49:38.671644",
+    "type": "Skill",
+    "name": "Dexterity",
+    "data": {
+      "old": {
+        "value": 20
+      },
+      "new": {
+        "value": 15
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": -5,
+      "old": 20,
+      "new": 15
+    },
+    "comment": "Mentor feedback"
+  },
+  {
+    "number": 15,
+    "id": "0e1dff20-ccb0-485d-b501-bb524601f31e",
+    "timestamp": "2024-06-01T17:27:33.671690",
+    "type": "Attribute",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 59
+      },
+      "new": {
+        "value": 58
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": -1,
+      "old": 59,
+      "new": 58
+    },
+    "comment": "Mentor feedback"
+  },
+  {
+    "number": 16,
+    "id": "274386eb-9aa6-462c-a83a-5c546b986dc7",
+    "timestamp": "2024-05-07T16:58:52.671719",
+    "type": "Knowledge",
+    "name": "History",
+    "data": {
+      "old": {
+        "value": 39
+      },
+      "new": {
+        "value": 41
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 2,
+      "old": 39,
+      "new": 41
+    },
+    "comment": "Mentor feedback"
+  },
+  {
+    "number": 17,
+    "id": "ebd8f37e-f612-44d1-a7f3-8d0d24d2e115",
+    "timestamp": "2025-02-04T20:00:56.671735",
+    "type": "Knowledge",
+    "name": "Stealth",
+    "data": {
+      "old": {
+        "value": 37
+      },
+      "new": {
+        "value": 42
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": 5,
+      "old": 37,
+      "new": 42
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 18,
+    "id": "07f0ec4b-0a7b-4a13-b0c8-9d9fe562a507",
+    "timestamp": "2025-03-02T07:03:34.671758",
+    "type": "Knowledge",
+    "name": "Stealth",
+    "data": {
+      "old": {
+        "value": 5
+      },
+      "new": {
+        "value": 14
+      }
+    },
+    "learningMethod": "Practice",
+    "calculationPointsChange": {
+      "adjustment": 9,
+      "old": 5,
+      "new": 14
+    },
+    "comment": "Mentor feedback"
+  },
+  {
+    "number": 19,
+    "id": "acba081a-5824-4389-84ff-55e45b195da7",
+    "timestamp": "2025-03-09T01:51:13.671795",
+    "type": "Knowledge",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 75
+      },
+      "new": {
+        "value": 81
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 6,
+      "old": 75,
+      "new": 81
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 20,
+    "id": "45646779-c131-49fd-9132-cb3fd2ab804c",
+    "timestamp": "2024-06-02T05:27:26.671813",
+    "type": "Skill",
+    "name": "History",
+    "data": {
+      "old": {
+        "value": 100
+      },
+      "new": {
+        "value": 110
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 10,
+      "old": 100,
+      "new": 110
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 21,
+    "id": "ae13349e-057b-4297-9b28-80c5a133b0a4",
+    "timestamp": "2024-10-02T18:04:42.671832",
+    "type": "Skill",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 61
+      },
+      "new": {
+        "value": 70
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": 9,
+      "old": 61,
+      "new": 70
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 22,
+    "id": "5d48d26c-db99-458f-ba5f-be55249674f1",
+    "timestamp": "2025-01-16T09:19:45.671863",
+    "type": "Attribute",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 56
+      },
+      "new": {
+        "value": 48
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": -8,
+      "old": 56,
+      "new": 48
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 23,
+    "id": "f177655a-d261-4443-8a4a-a358986117b3",
+    "timestamp": "2025-02-20T02:31:36.671888",
+    "type": "Skill",
+    "name": "History",
+    "data": {
+      "old": {
+        "value": 34
+      },
+      "new": {
+        "value": 38
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 4,
+      "old": 34,
+      "new": 38
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 24,
+    "id": "208021bd-1843-4c20-b1bc-a48021a9fd3d",
+    "timestamp": "2025-01-04T16:54:16.671922",
+    "type": "Knowledge",
+    "name": "Stealth",
+    "data": {
+      "old": {
+        "value": 100
+      },
+      "new": {
+        "value": 99
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": -1,
+      "old": 100,
+      "new": 99
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 25,
+    "id": "ba349f3d-13bf-4cf7-a6cb-47f5d833d401",
+    "timestamp": "2024-12-04T02:20:33.671958",
+    "type": "Skill",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 74
+      },
+      "new": {
+        "value": 65
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": -9,
+      "old": 74,
+      "new": 65
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 26,
+    "id": "92e2bfeb-1529-4b1e-8db8-ba7f6ee3bd5c",
+    "timestamp": "2024-09-21T21:56:44.671987",
+    "type": "Skill",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 50
+      },
+      "new": {
+        "value": 58
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": 8,
+      "old": 50,
+      "new": 58
+    },
+    "comment": "Mentor feedback"
+  },
+  {
+    "number": 27,
+    "id": "300b9980-35eb-448d-b75d-61f7e40d4758",
+    "timestamp": "2024-06-05T01:49:24.672088",
+    "type": "Attribute",
+    "name": "Stealth",
+    "data": {
+      "old": {
+        "value": 84
+      },
+      "new": {
+        "value": 81
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": -3,
+      "old": 84,
+      "new": 81
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 28,
+    "id": "ddf1b797-cb28-44d1-806d-932b21190910",
+    "timestamp": "2024-06-28T19:34:01.672104",
+    "type": "Skill",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 35
+      },
+      "new": {
+        "value": 38
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 3,
+      "old": 35,
+      "new": 38
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 29,
+    "id": "c54eb059-1179-4a3d-92ea-c5241cf54841",
+    "timestamp": "2025-01-26T21:24:25.672118",
+    "type": "Attribute",
+    "name": "Dexterity",
+    "data": {
+      "old": {
+        "value": 51
+      },
+      "new": {
+        "value": 61
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 10,
+      "old": 51,
+      "new": 61
+    },
+    "comment": "Mentor feedback"
+  },
+  {
+    "number": 30,
+    "id": "78bc1edb-76c8-43cb-a291-c4c2270bb828",
+    "timestamp": "2024-09-26T17:26:04.672132",
+    "type": "Skill",
+    "name": "History",
+    "data": {
+      "old": {
+        "value": 62
+      },
+      "new": {
+        "value": 61
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": -1,
+      "old": 62,
+      "new": 61
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 31,
+    "id": "68aae5d6-1c4e-4678-9089-7bb38a1e3dcc",
+    "timestamp": "2024-09-28T06:54:32.672146",
+    "type": "Skill",
+    "name": "Dexterity",
+    "data": {
+      "old": {
+        "value": 13
+      },
+      "new": {
+        "value": 10
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": -3,
+      "old": 13,
+      "new": 10
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 32,
+    "id": "d07c39ff-0289-4128-96c0-0be2d8f1564b",
+    "timestamp": "2024-06-01T11:31:34.672160",
+    "type": "Knowledge",
+    "name": "Stealth",
+    "data": {
+      "old": {
+        "value": 41
+      },
+      "new": {
+        "value": 40
+      }
+    },
+    "learningMethod": "Practice",
+    "calculationPointsChange": {
+      "adjustment": -1,
+      "old": 41,
+      "new": 40
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 33,
+    "id": "888f8488-7308-4540-8c0b-49c53c5cc77e",
+    "timestamp": "2024-12-14T12:43:56.672173",
+    "type": "Skill",
+    "name": "History",
+    "data": {
+      "old": {
+        "value": 2
+      },
+      "new": {
+        "value": 4
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": 2,
+      "old": 2,
+      "new": 4
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 34,
+    "id": "eb4f9816-1f98-4f29-b4d4-b2418b574760",
+    "timestamp": "2025-03-28T17:34:43.672187",
+    "type": "Skill",
+    "name": "Stealth",
+    "data": {
+      "old": {
+        "value": 96
+      },
+      "new": {
+        "value": 97
+      }
+    },
+    "learningMethod": "Practice",
+    "calculationPointsChange": {
+      "adjustment": 1,
+      "old": 96,
+      "new": 97
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 35,
+    "id": "b603eefe-561d-4434-a4ee-f15add16c9cc",
+    "timestamp": "2024-05-31T23:41:10.672211",
+    "type": "Knowledge",
+    "name": "Stealth",
+    "data": {
+      "old": {
+        "value": 22
+      },
+      "new": {
+        "value": 31
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": 9,
+      "old": 22,
+      "new": 31
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 36,
+    "id": "fac6bbe5-4e6f-4140-9d96-f320e832ebd8",
+    "timestamp": "2025-02-17T18:42:44.672253",
+    "type": "Attribute",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 17
+      },
+      "new": {
+        "value": 7
+      }
+    },
+    "learningMethod": "Practice",
+    "calculationPointsChange": {
+      "adjustment": -10,
+      "old": 17,
+      "new": 7
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 37,
+    "id": "65037e8b-9c11-4183-be1e-a4ca9ed3c825",
+    "timestamp": "2025-01-13T23:54:02.672268",
+    "type": "Knowledge",
+    "name": "Dexterity",
+    "data": {
+      "old": {
+        "value": 74
+      },
+      "new": {
+        "value": 64
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": -10,
+      "old": 74,
+      "new": 64
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 38,
+    "id": "2e97706c-65f5-452f-bc02-ce95b93402b6",
+    "timestamp": "2024-05-08T08:27:56.672282",
+    "type": "Knowledge",
+    "name": "History",
+    "data": {
+      "old": {
+        "value": 92
+      },
+      "new": {
+        "value": 94
+      }
+    },
+    "learningMethod": "Training",
+    "calculationPointsChange": {
+      "adjustment": 2,
+      "old": 92,
+      "new": 94
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 39,
+    "id": "67dc4089-63ab-4576-bd46-f5819f30985d",
+    "timestamp": "2025-03-31T14:45:07.672306",
+    "type": "Attribute",
+    "name": "Dexterity",
+    "data": {
+      "old": {
+        "value": 34
+      },
+      "new": {
+        "value": 39
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": 5,
+      "old": 34,
+      "new": 39
+    },
+    "comment": "Improved after training"
+  },
+  {
+    "number": 40,
+    "id": "c3122f1f-1bfe-4c8e-bef5-2e7b31d2d84b",
+    "timestamp": "2024-05-20T10:18:42.672320",
+    "type": "Attribute",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 31
+      },
+      "new": {
+        "value": 34
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 3,
+      "old": 31,
+      "new": 34
+    },
+    "comment": "Mentor feedback"
+  },
+  {
+    "number": 41,
+    "id": "50bbbb40-81a1-457a-ab10-ffdbd4cd8f80",
+    "timestamp": "2024-12-25T13:34:14.672344",
+    "type": "Skill",
+    "name": "History",
+    "data": {
+      "old": {
+        "value": 15
+      },
+      "new": {
+        "value": 8
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": -7,
+      "old": 15,
+      "new": 8
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 42,
+    "id": "07c5efe9-7bd6-4f9b-acd7-374414c17c4f",
+    "timestamp": "2024-06-14T08:34:59.672363",
+    "type": "Skill",
+    "name": "Stealth",
+    "data": {
+      "old": {
+        "value": 95
+      },
+      "new": {
+        "value": 101
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 6,
+      "old": 95,
+      "new": 101
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 43,
+    "id": "3a5218bd-a454-42eb-a2a4-c64318670061",
+    "timestamp": "2025-02-26T15:32:23.672379",
+    "type": "Skill",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 41
+      },
+      "new": {
+        "value": 48
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 7,
+      "old": 41,
+      "new": 48
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 44,
+    "id": "10483cc6-d1ce-494e-9de1-257006df4a3d",
+    "timestamp": "2025-01-06T15:41:16.672392",
+    "type": "Knowledge",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 15
+      },
+      "new": {
+        "value": 18
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 3,
+      "old": 15,
+      "new": 18
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 45,
+    "id": "ddba501f-1ea2-46f6-99d9-3f86ec83c9f2",
+    "timestamp": "2025-01-12T21:06:30.672416",
+    "type": "Attribute",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 45
+      },
+      "new": {
+        "value": 46
+      }
+    },
+    "learningMethod": "Practice",
+    "calculationPointsChange": {
+      "adjustment": 1,
+      "old": 45,
+      "new": 46
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 46,
+    "id": "a082e289-4f63-4005-a74f-d05e3eeeceea",
+    "timestamp": "2024-10-04T10:43:01.672430",
+    "type": "Attribute",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 94
+      },
+      "new": {
+        "value": 100
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": 6,
+      "old": 94,
+      "new": 100
+    },
+    "comment": "Learned from book"
+  },
+  {
+    "number": 47,
+    "id": "c02c0ea4-daf7-4a72-9442-2dd24fa9a9a3",
+    "timestamp": "2024-11-06T12:08:13.672443",
+    "type": "Knowledge",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 88
+      },
+      "new": {
+        "value": 86
+      }
+    },
+    "learningMethod": "Study",
+    "calculationPointsChange": {
+      "adjustment": -2,
+      "old": 88,
+      "new": 86
+    },
+    "comment": "Mentor feedback"
+  },
+  {
+    "number": 48,
+    "id": "413981f3-6408-484c-8351-8da29ab3815a",
+    "timestamp": "2024-08-01T14:03:35.672457",
+    "type": "Knowledge",
+    "name": "Intelligence",
+    "data": {
+      "old": {
+        "value": 22
+      },
+      "new": {
+        "value": 20
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": -2,
+      "old": 22,
+      "new": 20
+    },
+    "comment": "Practiced daily"
+  },
+  {
+    "number": 49,
+    "id": "e883b0dc-30fa-4604-a8d6-64055258b51f",
+    "timestamp": "2024-05-24T02:02:00.672478",
+    "type": "Skill",
+    "name": "Swordsmanship",
+    "data": {
+      "old": {
+        "value": 58
+      },
+      "new": {
+        "value": 53
+      }
+    },
+    "learningMethod": "Experience",
+    "calculationPointsChange": {
+      "adjustment": -5,
+      "old": 58,
+      "new": 53
+    },
+    "comment": "Mentor feedback"
+  },
+  {
+    "number": 50,
+    "id": "037575b1-39f1-4404-aa51-2b432b0bfc1a",
+    "timestamp": "2025-02-09T23:16:35.672517",
+    "type": "Attribute",
+    "name": "Dexterity",
+    "data": {
+      "old": {
+        "value": 77
+      },
+      "new": {
+        "value": 69
+      }
+    },
+    "learningMethod": "Practice",
+    "calculationPointsChange": {
+      "adjustment": -8,
+      "old": 77,
+      "new": 69
+    },
+    "comment": "Improved after training"
+  }
+]
