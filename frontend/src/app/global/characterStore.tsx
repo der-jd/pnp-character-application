@@ -25,7 +25,7 @@ export interface CharacterStore {
 
   updateAvailableCharacters: (idToken: string) => void;
   updateCharacter: (idToken: string, charId: string) => void;
-  updateHistoryEntries: (charId: string, newEntry: RecordEntry) => void;
+  updateHistoryEntries: (newEntries: RecordEntry[]) => void;
 }
 
 /**
@@ -107,10 +107,11 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
     }
   },
 
-  updateHistoryEntries: (charId: string, newEntry: RecordEntry) =>
-    set((state) => {
-      return { historyEntries: [...(state.historyEntries ?? []), newEntry] };
-    }),
+  updateHistoryEntries: (newEntries: RecordEntry[]) => {
+    set((state) => ({
+      historyEntries: [...(state.historyEntries ?? []), ...newEntries],
+    }));
+  },
 
   /**
    * Updates the currently selected character

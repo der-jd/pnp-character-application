@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { ColumnDef } from "@tanstack/react-table"
-import { RecordEntry } from "../../../api/models/history/interface"
-import { ArrowUpDown } from "lucide-react"
-import { Button } from "@components/ui/button" // update path if needed
-import { format } from "date-fns"
+import { ColumnDef } from "@tanstack/react-table";
+import { RecordEntry } from "../../../api/models/history/interface";
+import { ArrowUpDown } from "lucide-react";
+import { Button } from "@components/ui/button"; // update path if needed
+import { format } from "date-fns";
 
 export const columns: ColumnDef<RecordEntry>[] = [
   {
@@ -23,10 +23,10 @@ export const columns: ColumnDef<RecordEntry>[] = [
       </Button>
     ),
     cell: ({ row }) => {
-        const raw = row.getValue("timestamp") as string
-        const formatted = format(new Date(raw), "dd.MM.yyyy HH:mm")
-        return <div>{formatted}</div>
-      },
+      const raw = row.getValue("timestamp") as string;
+      const formatted = format(new Date(raw), "dd.MM.yyyy HH:mm");
+      return <div>{formatted}</div>;
+    },
   },
   {
     accessorKey: "type",
@@ -54,7 +54,7 @@ export const columns: ColumnDef<RecordEntry>[] = [
   },
   {
     id: "spent",
-    accessorFn: row => row.calculationPointsChange?.adjustment ?? 0,
+    accessorFn: (row) => row.calculationPointsChange?.adjustment ?? 0,
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         Points spent <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -64,7 +64,7 @@ export const columns: ColumnDef<RecordEntry>[] = [
   },
   {
     id: "old",
-    accessorFn: row => row.calculationPointsChange?.old ?? 0,
+    accessorFn: (row) => row.calculationPointsChange?.old ?? 0,
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         Old Value <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -74,7 +74,7 @@ export const columns: ColumnDef<RecordEntry>[] = [
   },
   {
     id: "new",
-    accessorFn: row => row.calculationPointsChange?.new ?? 0,
+    accessorFn: (row) => row.calculationPointsChange?.new ?? 0,
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         New Value <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -82,4 +82,4 @@ export const columns: ColumnDef<RecordEntry>[] = [
     ),
     sortingFn: "basic",
   },
-]
+];

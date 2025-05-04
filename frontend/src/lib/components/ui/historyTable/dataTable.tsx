@@ -1,5 +1,5 @@
-"use client"
- 
+"use client";
+
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -10,41 +10,30 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table"
- 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@components/ui/table"
+} from "@tanstack/react-table";
+
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@components/ui/table";
 
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@components/ui/dropdown-menu"
+} from "@components/ui/dropdown-menu";
 
-import React from "react"
-import { Button } from "@components/ui/button"
+import React from "react";
+import { Button } from "@components/ui/button";
 
-interface DataTableProps<TData extends { type: string}, TValue> {
-    columns: ColumnDef<TData, TValue>[]
-    data: TData[]
+interface DataTableProps<TData extends { type: string }, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
 }
 
-export function DataTable<TData extends { type: string }, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
+export function DataTable<TData extends { type: string }, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  
   const table = useReactTable({
     data,
     columns,
@@ -59,49 +48,47 @@ export function DataTable<TData extends { type: string }, TValue>({
       columnFilters,
       columnVisibility,
     },
-  })
+  });
 
-  const typeColumn = table.getColumn("type")
+  const typeColumn = table.getColumn("type");
 
   const typeOptions = React.useMemo(() => {
-    const values = new Set<string>()
+    const values = new Set<string>();
     data.forEach((row) => {
-      if (row.type) values.add(row.type)
-    })
-    return Array.from(values).sort()
-  }, [data])
+      if (row.type) values.add(row.type);
+    });
+    return Array.from(values).sort();
+  }, [data]);
 
   return (
     <div>
       <div className="flex gap-2 items-start py-2 px-2">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="bg-black text-white hover:bg-gray-300 hover:text-black px-4 py-2">
-            {typeColumn?.getFilterValue() ? `Type: ${typeColumn.getFilterValue()}` : "Type"}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuCheckboxItem
-            checked={typeColumn?.getFilterValue() === undefined}
-            onCheckedChange={() => typeColumn?.setFilterValue(undefined)}
-          >
-            All Types
-          </DropdownMenuCheckboxItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="bg-black text-white hover:bg-gray-300 hover:text-black px-4 py-2">
+              {typeColumn?.getFilterValue() ? `Type: ${typeColumn.getFilterValue()}` : "Type"}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuCheckboxItem
+              checked={typeColumn?.getFilterValue() === undefined}
+              onCheckedChange={() => typeColumn?.setFilterValue(undefined)}
+            >
+              All Types
+            </DropdownMenuCheckboxItem>
             {typeOptions.map((type) => (
               <DropdownMenuCheckboxItem
                 key={type}
                 checked={typeColumn?.getFilterValue() === type}
                 onCheckedChange={() =>
-                  typeColumn?.setFilterValue(
-                    typeColumn?.getFilterValue() === type ? undefined : type
-                  )
+                  typeColumn?.setFilterValue(typeColumn?.getFilterValue() === type ? undefined : type)
                 }
               >
                 {type}
               </DropdownMenuCheckboxItem>
             ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="bg-black text-white hover:bg-gray-300 hover:text-black px-4 py-2">
@@ -111,9 +98,7 @@ export function DataTable<TData extends { type: string }, TValue>({
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
-              .filter(
-                (column) => column.getCanHide()
-              )
+              .filter((column) => column.getCanHide())
               .map((column) => {
                 return (
                   <DropdownMenuCheckboxItem
@@ -124,7 +109,7 @@ export function DataTable<TData extends { type: string }, TValue>({
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -139,7 +124,7 @@ export function DataTable<TData extends { type: string }, TValue>({
                     <TableHead key={header.id}>
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -147,14 +132,9 @@ export function DataTable<TData extends { type: string }, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
                 </TableRow>
               ))
@@ -169,5 +149,5 @@ export function DataTable<TData extends { type: string }, TValue>({
         </Table>
       </div>
     </div>
-  )
+  );
 }
