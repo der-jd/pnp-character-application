@@ -22,10 +22,17 @@ export const fakeHistoryBlock1: HistoryBlock = {
         },
       },
       learningMethod: null,
-      calculationPointsChange: {
-        adjustment: 0,
-        old: 100,
-        new: 100,
+      calculationPoints: {
+        old: {
+          start: 0,
+          available: 100,
+          total: 100,
+        },
+        new: {
+          start: 0,
+          available: 100,
+          total: 100,
+        },
       },
       comment: "Character created",
       timestamp: new Date().toISOString(),
@@ -50,10 +57,17 @@ export const fakeHistoryBlock1: HistoryBlock = {
         },
       },
       learningMethod: null,
-      calculationPointsChange: {
-        adjustment: -1,
-        old: 10,
-        new: 9,
+      calculationPoints: {
+        old: {
+          start: 0,
+          available: 10,
+          total: 10,
+        },
+        new: {
+          start: 0,
+          available: 9,
+          total: 10,
+        },
       },
       comment: "Weight training",
       timestamp: new Date().toISOString(),
@@ -91,10 +105,17 @@ export const fakeHistoryBlock2: HistoryBlock = {
         },
       },
       learningMethod: "NORMAL",
-      calculationPointsChange: {
-        adjustment: -10,
-        old: 100,
-        new: 90,
+      calculationPoints: {
+        old: {
+          start: 0,
+          available: 100,
+          total: 200,
+        },
+        new: {
+          start: 0,
+          available: 90,
+          total: 200,
+        },
       },
       comment: null,
       timestamp: new Date().toISOString(),
@@ -137,10 +158,17 @@ function generateLargeChangesList(size: number): Record[] {
         },
       },
       learningMethod: "NORMAL",
-      calculationPointsChange: {
-        adjustment: -i,
-        old: 10000 - i,
-        new: 10000 - (i + 1),
+      calculationPoints: {
+        old: {
+          start: 0,
+          available: 10000 - i,
+          total: 10000,
+        },
+        new: {
+          start: 0,
+          available: 10000 - (i + 1),
+          total: 10000,
+        },
       },
       comment: `Change ${i}`,
       timestamp: new Date().toISOString(),

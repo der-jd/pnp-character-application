@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { RecordType } from "./history.js";
+import { calculationPointsSchema } from "./character_schema.js";
 
 export const recordSchema = z.object({
   type: z.nativeEnum(RecordType),
@@ -11,10 +12,9 @@ export const recordSchema = z.object({
     new: z.record(z.any()),
   }),
   learningMethod: z.string().nullable(),
-  calculationPointsChange: z.object({
-    adjustment: z.number(),
-    old: z.number(),
-    new: z.number(),
+  calculationPoints: z.object({
+    old: calculationPointsSchema,
+    new: calculationPointsSchema,
   }),
   comment: z.string().nullable(),
   timestamp: z.string().datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2025-03-24T16:34:56Z (UTC) or 2025-03-24T16:34:56+02:00

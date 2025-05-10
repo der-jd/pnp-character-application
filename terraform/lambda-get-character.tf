@@ -15,7 +15,7 @@ resource "aws_lambda_function" "get_character_lambda" {
   layers           = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
   environment {
     variables = {
-      TABLE_NAME = local.characters_table_name
+      TABLE_NAME_CHARACTERS = local.characters_table_name
     }
   }
   logging_config {

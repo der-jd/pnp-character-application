@@ -11,7 +11,7 @@ export async function getCharacterItem(userId: string, characterId: string): Pro
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
   const command = new GetCommand({
-    TableName: process.env.TABLE_NAME,
+    TableName: process.env.TABLE_NAME_CHARACTERS,
     Key: {
       userId: userId,
       characterId: characterId,
@@ -37,7 +37,7 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
   const command = new QueryCommand({
-    TableName: process.env.TABLE_NAME,
+    TableName: process.env.TABLE_NAME_CHARACTERS,
     KeyConditionExpression: "userId = :userId",
     ExpressionAttributeValues: {
       ":userId": userId,
@@ -71,7 +71,7 @@ export async function updateSkill(
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
   const command = new UpdateCommand({
-    TableName: process.env.TABLE_NAME,
+    TableName: process.env.TABLE_NAME_CHARACTERS,
     Key: {
       userId: userId,
       characterId: characterId,
