@@ -92,7 +92,6 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
       IncreaseSkill = {
         Type           = "Task",
         Resource       = aws_lambda_function.increase_skill_lambda.arn,
-        ResultPath     = "$.IncreaseSkillResult",
         TimeoutSeconds = 5 // Timeout to avoid waiting for a stuck task
         Retry = [
           {
@@ -133,11 +132,13 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         Type          = "Task",
         Resource      = aws_lambda_function.add_history_record_lambda.arn,
         Arguments = {
-          "type"              = "SKILL_RAISED",
-          "name"              = "{% $states.input.skillName %}",
-          "data"              = "{% $states.input.skill %}",
-          "learningMethod"    = "{% $states.input.learningMethod %}",
-          "calculationPoints" = "{% $states.input.adventurePoints %}",
+          "body" = {
+            "type"              = "SKILL_RAISED",
+            "name"              = "{% $states.input.body.skillName %}",
+            "data"              = "{% $states.input.body.skill %}",
+            "learningMethod"    = "{% $states.input.body.learningMethod %}",
+            "calculationPoints" = "{% $states.input.body.adventurePoints %}",
+          }
         },
         TimeoutSeconds = 5
         Retry = [
