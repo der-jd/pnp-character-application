@@ -134,7 +134,7 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         Resource      = aws_lambda_function.add_history_record_lambda.arn,
         Arguments = {
           "pathParameters" = {
-            "characterId" = "{% $parse($states.input.body).characterId %}"
+            "character-id" = "{% $parse($states.input.body).characterId %}"
           },
           "body" = {
             "userId"            = "{% $parse($states.input.body).userId %}",
