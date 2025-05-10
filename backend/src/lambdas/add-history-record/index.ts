@@ -156,6 +156,13 @@ async function validateRequest(request: Request): Promise<Parameters> {
   }
 
   try {
+    /**
+     * This conversion is necessary if the Lambda is called via AWS Step Functions.
+     * The input data of a state machine is a string.
+     */
+    if (typeof request.body?.type === "string") {
+      request.body.type = Number(request.body.type);
+    }
     // TODO use parse function and request object for all lambdas
     const body = historyBodySchema.parse(request.body);
 
