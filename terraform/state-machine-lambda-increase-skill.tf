@@ -133,6 +133,9 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         Type          = "Task",
         Resource      = aws_lambda_function.add_history_record_lambda.arn,
         Arguments = {
+          "pathParameters" = {
+            "characterId" = "{% $parse($states.input.body).characterId %}"
+          },
           "body" = {
             "userId"            = "{% $parse($states.input.body).userId %}",
             "type"              = "SKILL_RAISED",
