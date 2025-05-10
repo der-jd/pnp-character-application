@@ -1,6 +1,6 @@
 variable "status_codes" {
   type    = list(string)
-  default = ["400", "401", "403", "404", "500", "200"]
+  default = ["400", "401", "403", "404", "409", "500", "200"]
 }
 
 resource "aws_iam_role" "api_gateway_role" {
@@ -151,25 +151,17 @@ resource "aws_api_gateway_integration_response" "characters_get_integration_resp
 
   response_templates = {
     "application/json" = <<EOT
-    #set($rawBody = $input.json('$.body'))
-    #set($parsedBody = $util.parseJson($rawBody))
-    #set($status = $input.json('$.statusCode'))
-    #if($status == 400)
-        #set($context.responseOverride.status = 400)
+    ## --- Handle error case ---
+    #set($errorJson = $input.path('$.errorMessage'))
+    #if($errorJson != "")
+        #set($errorJsonObject = $util.parseJson($errorJson))
+        #set($context.responseOverride.status = $errorJsonObject.statusCode)
+        $errorJson
+    ## --- Handle success case ---
+    #else
+        #set($context.responseOverride.status = $input.path('$.statusCode'))
+        $input.path('$.body')
     #end
-    #if($status == 401)
-        #set($context.responseOverride.status = 401)
-    #end
-    #if($status == 403)
-        #set($context.responseOverride.status = 403)
-    #end
-    #if($status == 404)
-        #set($context.responseOverride.status = 404)
-    #end
-    #if($status == 500)
-        #set($context.responseOverride.status = 500)
-    #end
-    $parsedBody
     EOT
   }
 
@@ -341,29 +333,20 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
    * This is necessary because the Lambda function returns a status code in the body of the response, which
    * is not the status code of the HTTP response. The status code of the HTTP response is always 200 if left unchanged
    * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-override-request-response-parameters.html
-   * Note that using #set($context.responseOverride.status = $lambdaReply.statusCode) does not work
    */
   response_templates = {
     "application/json" = <<EOT
-    #set($rawBody = $input.json('$.body'))
-    #set($parsedBody = $util.parseJson($rawBody))
-    #set($status = $input.json('$.statusCode'))
-    #if($status == 400)
-        #set($context.responseOverride.status = 400)
+    ## --- Handle error case ---
+    #set($errorJson = $input.path('$.errorMessage'))
+    #if($errorJson != "")
+        #set($errorJsonObject = $util.parseJson($errorJson))
+        #set($context.responseOverride.status = $errorJsonObject.statusCode)
+        $errorJson
+    ## --- Handle success case ---
+    #else
+        #set($context.responseOverride.status = $input.path('$.statusCode'))
+        $input.path('$.body')
     #end
-    #if($status == 401)
-        #set($context.responseOverride.status = 401)
-    #end
-    #if($status == 403)
-        #set($context.responseOverride.status = 403)
-    #end
-    #if($status == 404)
-        #set($context.responseOverride.status = 404)
-    #end
-    #if($status == 500)
-        #set($context.responseOverride.status = 500)
-    #end
-    $parsedBody
     EOT
   }
 
@@ -557,25 +540,17 @@ resource "aws_api_gateway_integration_response" "skill_name_get_integration_resp
 
   response_templates = {
     "application/json" = <<EOT
-    #set($rawBody = $input.json('$.body'))
-    #set($parsedBody = $util.parseJson($rawBody))
-    #set($status = $input.json('$.statusCode'))
-    #if($status == 400)
-        #set($context.responseOverride.status = 400)
+    ## --- Handle error case ---
+    #set($errorJson = $input.path('$.errorMessage'))
+    #if($errorJson != "")
+        #set($errorJsonObject = $util.parseJson($errorJson))
+        #set($context.responseOverride.status = $errorJsonObject.statusCode)
+        $errorJson
+    ## --- Handle success case ---
+    #else
+        #set($context.responseOverride.status = $input.path('$.statusCode'))
+        $input.path('$.body')
     #end
-    #if($status == 401)
-        #set($context.responseOverride.status = 401)
-    #end
-    #if($status == 403)
-        #set($context.responseOverride.status = 403)
-    #end
-    #if($status == 404)
-        #set($context.responseOverride.status = 404)
-    #end
-    #if($status == 500)
-        #set($context.responseOverride.status = 500)
-    #end
-    $parsedBody
     EOT
   }
 
@@ -713,28 +688,17 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
 
   response_templates = {
     "application/json" = <<EOT
-    #set($rawBody = $input.json('$.body'))
-    #set($parsedBody = $util.parseJson($rawBody))
-    #set($status = $input.json('$.statusCode'))
-    #if($status == 400)
-        #set($context.responseOverride.status = 400)
+    ## --- Handle error case ---
+    #set($errorJson = $input.path('$.errorMessage'))
+    #if($errorJson != "")
+        #set($errorJsonObject = $util.parseJson($errorJson))
+        #set($context.responseOverride.status = $errorJsonObject.statusCode)
+        $errorJson
+    ## --- Handle success case ---
+    #else
+        #set($context.responseOverride.status = $input.path('$.statusCode'))
+        $input.path('$.body')
     #end
-    #if($status == 401)
-        #set($context.responseOverride.status = 401)
-    #end
-    #if($status == 403)
-        #set($context.responseOverride.status = 403)
-    #end
-    #if($status == 404)
-        #set($context.responseOverride.status = 404)
-    #end
-    #if($status == 409)
-        #set($context.responseOverride.status = 409)
-    #end
-    #if($status == 500)
-        #set($context.responseOverride.status = 500)
-    #end
-    $parsedBody
     EOT
   }
 

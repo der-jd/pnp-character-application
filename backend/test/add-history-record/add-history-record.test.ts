@@ -13,6 +13,7 @@ import {
 } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { fakeBigHistoryBlock, fakeHistoryBlock2 } from "../test-data/history.js";
+import { expectHttpError } from "../utils.js";
 
 const testBody = {
   type: RecordType.EVENT_CALCULATION_POINTS,
@@ -142,9 +143,7 @@ describe("Invalid requests", () => {
     test(_case.name, async () => {
       mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
-      const result = await addRecordToHistory(_case.request);
-
-      expect(result.statusCode).toBe(_case.expectedStatusCode);
+      await expectHttpError(() => addRecordToHistory(_case.request), _case.expectedStatusCode);
     });
   });
 });
