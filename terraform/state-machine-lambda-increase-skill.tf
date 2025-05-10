@@ -90,6 +90,7 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
     StartAt = "IncreaseSkill",
     States = {
       IncreaseSkill = {
+        QueryLanguage  = "JSONata",
         Type           = "Task",
         Resource       = aws_lambda_function.increase_skill_lambda.arn,
         TimeoutSeconds = 5 // Timeout to avoid waiting for a stuck task
