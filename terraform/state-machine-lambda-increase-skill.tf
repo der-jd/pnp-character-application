@@ -134,6 +134,7 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         Resource      = aws_lambda_function.add_history_record_lambda.arn,
         Arguments = {
           "body" = {
+            "userId"            = "{% $parse($states.input.body).userId %}",
             "type"              = "SKILL_RAISED",
             "name"              = "{% $parse($states.input.body).skillName %}",
             "data"              = "{% $parse($states.input.body).skill %}",
@@ -175,7 +176,7 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         Type          = "Pass",
         Output = {
           "errorMessage" = "{% $parse($states.input.Cause).errorMessage %}"
-        }
+        },
         End = true
       }
     }

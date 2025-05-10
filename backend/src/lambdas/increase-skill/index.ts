@@ -71,6 +71,7 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
         statusCode: 200,
         body: JSON.stringify({
           characterId: params.characterId,
+          userId: params.userId,
           skillName: params.skillName,
           skill: {
             old: skillOld,
@@ -123,6 +124,7 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
       statusCode: 200,
       body: JSON.stringify({
         characterId: params.characterId,
+        userId: params.userId,
         skillName: params.skillName,
         skill: {
           old: skillOld,

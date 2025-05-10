@@ -22,7 +22,6 @@ import {
   parseBody,
   HttpError,
   ensureHttpError,
-  decodeUserId,
 } from "utils/index.js";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
@@ -37,6 +36,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 };
 
 const historyBodySchema = z.object({
+  userId: z.string(),
   type: z.nativeEnum(RecordType),
   name: z.string(),
   data: z.object({
@@ -66,7 +66,6 @@ const booleanSchema = z.object({
 export type HistoryBodySchema = z.infer<typeof historyBodySchema>;
 
 interface Parameters {
-  userId: string;
   characterId: string;
   body: HistoryBodySchema;
 }
@@ -75,7 +74,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
   try {
     const params = await validateRequest(request);
 
-    console.log(`Add record to history of character ${params.characterId} of user ${params.userId}`);
+    console.log(`Add record to history of character ${params.characterId} of user ${params.body.userId}`);
 
     const items = await getHistoryItems(
       params.characterId,
@@ -146,8 +145,6 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
 async function validateRequest(request: Request): Promise<Parameters> {
   console.log("Validate request");
 
-  const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
-
   if (typeof request.pathParameters?.["character-id"] !== "string") {
     throw new HttpError(400, "Invalid input values!");
   }
@@ -158,12 +155,12 @@ async function validateRequest(request: Request): Promise<Parameters> {
     throw new HttpError(400, "Character id is not a valid UUID format!");
   }
 
-  // Check if the character exists
-  await getCharacterItem(userId, characterId);
-
   try {
     // TODO use parse function and request object for all lambdas
     const body = historyBodySchema.parse(request.body);
+
+    // Check if the character exists
+    await getCharacterItem(body.userId, characterId);
 
     switch (body.type) {
       case RecordType.EVENT_CALCULATION_POINTS:
@@ -210,7 +207,6 @@ async function validateRequest(request: Request): Promise<Parameters> {
     }
 
     return {
-      userId: userId,
       characterId: characterId,
       body: body,
     };

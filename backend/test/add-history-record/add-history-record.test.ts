@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { CostCategory, RecordType } from "config/index.js";
-import { addRecordToHistory } from "add-history-record/index.js";
-import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
+import { addRecordToHistory, HistoryBodySchema } from "add-history-record/index.js";
+import { fakeUserId } from "../test-data/request.js";
 import {
   fakeHistoryBlockListResponse,
   fakeBigHistoryBlockListResponse,
@@ -15,7 +15,8 @@ import { fakeCharacterId } from "../test-data/character.js";
 import { fakeBigHistoryBlock, fakeHistoryBlock2 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 
-const testBody = {
+const testBody: HistoryBodySchema = {
+  userId: fakeUserId,
   type: RecordType.EVENT_CALCULATION_POINTS,
   name: "Adventure Points",
   data: {
@@ -30,6 +31,7 @@ const testBody = {
       total: 120,
     },
   },
+  learningMethod: null,
   calculationPoints: {
     old: {
       start: 0,
@@ -45,40 +47,15 @@ const testBody = {
   comment: "Epic fight against a big monster",
 };
 
+const testBodyWithDummyUserId = structuredClone(testBody);
+testBodyWithDummyUserId.userId = "fbcc6196-6959-4a76-b647-efae2b78fdfa";
+
 describe("Invalid requests", () => {
   const invalidTestCases = [
     {
-      name: "Authorization header is malformed",
-      request: {
-        headers: {
-          authorization: "dummyValue",
-        },
-        pathParameters: {
-          "character-id": fakeCharacterId,
-        },
-        queryStringParameters: null,
-        body: testBody,
-      },
-      expectedStatusCode: 401,
-    },
-    {
-      name: "Authorization token is invalid",
-      request: {
-        headers: {
-          authorization: "Bearer 1234567890",
-        },
-        pathParameters: {
-          "character-id": fakeCharacterId,
-        },
-        queryStringParameters: null,
-        body: testBody,
-      },
-      expectedStatusCode: 401,
-    },
-    {
       name: "Character id is not an UUID",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": "1234567890",
         },
@@ -90,7 +67,7 @@ describe("Invalid requests", () => {
     {
       name: "No character found for a non existing character id",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": "26c5d41d-cef1-455f-a341-b15d8a5b3967",
         },
@@ -102,24 +79,25 @@ describe("Invalid requests", () => {
     {
       name: "No character found for a non existing user id",
       request: {
-        headers: dummyHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
-        body: testBody,
+        body: testBodyWithDummyUserId,
       },
       expectedStatusCode: 404,
     },
     {
       name: "Invalid record type",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: "Invalid type",
           name: "Epic battle",
           data: {
@@ -167,12 +145,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'event calculation points' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.EVENT_CALCULATION_POINTS,
           name: "Adventure Points",
           data: {
@@ -208,12 +187,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'event level up' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.EVENT_LEVEL_UP,
           name: "Level 2",
           data: {
@@ -245,12 +225,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'event base value' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.EVENT_BASE_VALUE,
           name: "health points",
           data: {
@@ -290,12 +271,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'profession changed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.PROFESSION_CHANGED,
           name: "Profession changed",
           data: {
@@ -329,12 +311,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'hobby changed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.HOBBY_CHANGED,
           name: "Hobby changed",
           data: {
@@ -368,12 +351,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'advantage changed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.ADVANTAGE_CHANGED,
           name: "Advantage changed",
           data: {
@@ -405,12 +389,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'disadvantage changed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.DISADVANTAGE_CHANGED,
           name: "Disadvantage changed",
           data: {
@@ -442,12 +427,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'special ability changed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.SPECIAL_ABILITY_CHANGED,
           name: "Special ability changed",
           data: {
@@ -479,12 +465,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'attribute raised' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.ATTRIBUTE_RAISED,
           name: "Courage",
           data: {
@@ -522,12 +509,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'skill activated' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.SKILL_ACTIVATED,
           name: "Disguising",
           data: {
@@ -559,12 +547,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'skill raised' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.SKILL_RAISED,
           name: "Body Control",
           data: {
@@ -606,12 +595,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'attack/parade distributed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.ATTACK_PARADE_DISTRIBUTED,
           name: "Slashing Weapons 1h",
           data: {
@@ -686,12 +676,13 @@ describe("Valid requests", () => {
     {
       name: "Add a redundant history record to existing block (idempotency)",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.SKILL_RAISED,
           name: "Athletics",
           data: {
@@ -759,12 +750,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'event calculation points' to new history",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.EVENT_CALCULATION_POINTS,
           name: "Adventure Points",
           data: {
@@ -851,12 +843,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'event calculation points' to new block in existing history",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.EVENT_CALCULATION_POINTS,
           name: "Adventure Points",
           data: {
