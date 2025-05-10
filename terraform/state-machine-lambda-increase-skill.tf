@@ -171,9 +171,12 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         End = true
       },
       HandleError = {
-        Type       = "Pass",
-        ResultPath = "$.AddHistoryRecordResult",
-        End        = true
+        QueryLanguage = "JSONata",
+        Type          = "Pass",
+        Output = {
+          "errorMessage" = "{% $parse($states.input.Cause).errorMessage %}"
+        }
+        End = true
       }
     }
   })
