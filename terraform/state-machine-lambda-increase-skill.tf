@@ -135,10 +135,10 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         Arguments = {
           "body" = {
             "type"              = "SKILL_RAISED",
-            "name"              = "{% $states.input.body.skillName %}",
-            "data"              = "{% $states.input.body.skill %}",
-            "learningMethod"    = "{% $states.input.body.learningMethod %}",
-            "calculationPoints" = "{% $states.input.body.adventurePoints %}",
+            "name"              = "{% $parse($states.input.body).skillName %}",
+            "data"              = "{% $parse($states.input.body).skill %}",
+            "learningMethod"    = "{% $parse($states.input.body).learningMethod %}",
+            "calculationPoints" = "{% $parse($states.input.body).adventurePoints %}"
           }
         },
         TimeoutSeconds = 5
