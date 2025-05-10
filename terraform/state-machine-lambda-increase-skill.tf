@@ -142,7 +142,8 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
             "name"              = "{% $parse($states.input.body).skillName %}",
             "data"              = "{% $parse($states.input.body).skill %}",
             "learningMethod"    = "{% $parse($states.input.body).learningMethod %}",
-            "calculationPoints" = "{% $parse($states.input.body).adventurePoints %}"
+            "calculationPoints" = "{% $parse($states.input.body).adventurePoints %}",
+            "comment"           = null
           }
         },
         TimeoutSeconds = 5
