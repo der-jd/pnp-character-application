@@ -138,7 +138,7 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
           },
           "body" = {
             "userId"            = "{% $parse($states.input.body).userId %}",
-            "type"              = "SKILL_RAISED",
+            "type"              = "10", // SKILL_RAISED
             "name"              = "{% $parse($states.input.body).skillName %}",
             "data"              = "{% $parse($states.input.body).skill %}",
             "learningMethod"    = "{% $parse($states.input.body).learningMethod %}",
