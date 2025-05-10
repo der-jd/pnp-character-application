@@ -216,9 +216,6 @@ export function getSkill(
 ): Skill {
   const skillCategory = skills[category] as Record<string, any>;
   const skill = skillCategory[name];
-  // TODO remove after test
-  console.log("DEBUG: skill", skill);
-  console.log("DEBUG: skill name", name);
   if (!skill) {
     throw new Error(`Skill ${name} not found!`);
   }
