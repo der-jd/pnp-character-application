@@ -121,7 +121,18 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
             Next        = "HandleError"
           }
         ],
-        Next = "AddHistoryRecord"
+        Next = "SkillIncreasedChoice"
+      },
+      SkillIncreasedChoice = {
+        QueryLanguage = "JSONata",
+        Type          = "Choice",
+        Choices = [
+          {
+            Condition = "{% $parse($states.input.body).skill.old = $parse($states.input.body).skill.new %}",
+            Next      = "SuccessState"
+          }
+        ],
+        Default = "AddHistoryRecord"
       },
       /**
        * TODO add custom error response for add history record function
@@ -182,6 +193,10 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
           "errorMessage" = "{% $parse($states.input.Cause).errorMessage %}"
         },
         End = true
+      },
+      SuccessState = {
+        QueryLanguage = "JSONata",
+        Type          = "Succeed",
       }
     }
   })
