@@ -140,11 +140,6 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         ],
         Default = "AddHistoryRecord"
       },
-      /**
-       * TODO add custom error response for add history record function
-       * All errors in this function are internal ones and the user should not be
-       * directly informed about the details.
-       */
       AddHistoryRecord = {
         Type          = "Task",
         QueryLanguage = "JSONata",
