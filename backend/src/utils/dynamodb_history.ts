@@ -1,8 +1,35 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand, QueryCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { Record, HistoryBlock, historyBlockSchema } from "config/index.js";
+import { HttpError } from "./errors.js";
+
+export async function getHistoryItem(characterId: string, blockNumber: number): Promise<HistoryBlock> {
+  console.log(`Get history item #${blockNumber} of character ${characterId} from DynamoDB`);
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
+  const client = new DynamoDBClient({});
+  const docClient = DynamoDBDocumentClient.from(client);
+  const command = new GetCommand({
+    TableName: process.env.TABLE_NAME_HISTORY,
+    Key: {
+      characterId: characterId,
+      blockNumber: blockNumber,
+    },
+    ConsistentRead: true,
+  });
+
+  const response = await docClient.send(command);
+
+  if (!response.Item) {
+    throw new HttpError(404, "No history block found for the given character id");
+  }
+
+  console.log("Successfully got DynamoDB item");
+
+  return historyBlockSchema.parse(response.Item);
+}
 
 export async function getHistoryItems(
   characterId: string,

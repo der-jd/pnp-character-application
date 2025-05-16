@@ -14,6 +14,12 @@ export const fakeCharacterListResponse = {
 
 type FakeCharacterListResponse = typeof fakeCharacterListResponse;
 
+export const fakeHistoryBlockResponse = {
+  Item: fakeHistoryBlock1,
+};
+
+type FakeHistoryBlockResponse = typeof fakeHistoryBlockResponse;
+
 export const fakeHistoryBlockListResponse = {
   Items: [fakeHistoryBlock1, fakeHistoryBlock2],
 };
@@ -55,6 +61,17 @@ export function mockDynamoDBQueryCharactersResponse(response: FakeCharacterListR
       } else {
         return Promise.resolve({ Items: [] });
       }
+    }
+  });
+}
+
+export function mockDynamoDBGetHistoryResponse(response: FakeHistoryBlockResponse) {
+  (globalThis as any).dynamoDBMock.on(GetCommand).callsFake((command: { Key: any }) => {
+    const key = command.Key;
+    if (key.characterId === response.Item.characterId && key.blockNumber === response.Item.blockNumber) {
+      return Promise.resolve(response);
+    } else {
+      return Promise.resolve({ Item: undefined });
     }
   });
 }
