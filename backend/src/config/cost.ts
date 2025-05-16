@@ -9,6 +9,11 @@ export function parseLearningMethod(method: string): LearningMethod {
   return LearningMethod[method.toUpperCase() as keyof typeof LearningMethod];
 }
 
+/**
+ * The number values of CostCategory are used for the character sheet, not the string values "CAT_X".
+ * Using the string values leads to multiple cumbersome problems and workarounds when trying to use
+ * schemas with zod.
+ */
 export enum CostCategory {
   CAT_0 = 0,
   CAT_1 = 1,

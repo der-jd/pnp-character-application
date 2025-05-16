@@ -347,22 +347,24 @@ describe("Valid requests", () => {
       const parsedBody = JSON.parse(result.body);
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       expect(parsedBody.skillName).toBe(_case.request.pathParameters["skill-name"]);
-      expect(parsedBody.skillValue).toBe(_case.request.body.initialValue + _case.request.body.increasedPoints);
+      expect(parsedBody.skill.new.current).toBe(_case.request.body.initialValue + _case.request.body.increasedPoints);
 
       const skillCategory = _case.request.pathParameters[
         "skill-category"
       ] as keyof Character["characterSheet"]["skills"];
       const skillName = _case.request.pathParameters["skill-name"];
-      const skill = getSkill(fakeCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
-      const oldTotalSkillCost = skill.totalCost;
-      const diffSkillTotalCost = parsedBody.totalCost - oldTotalSkillCost;
+      const skillOld = getSkill(fakeCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
+      const oldTotalSkillCost = skillOld.totalCost;
+      const diffSkillTotalCost = parsedBody.skill.new.totalCost - oldTotalSkillCost;
       const oldAvailableAdventurePoints =
         fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
-      const diffAvailableAdventurePoints = oldAvailableAdventurePoints - parsedBody.availableAdventurePoints;
+      const diffAvailableAdventurePoints = oldAvailableAdventurePoints - parsedBody.adventurePoints.new.available;
       expect(diffAvailableAdventurePoints).toBe(diffSkillTotalCost);
 
+      expect(parsedBody.skill.old).toStrictEqual(skillOld);
+
       // Skill was not already at the target value
-      if (_case.request.body.initialValue + _case.request.body.increasedPoints !== skill.current) {
+      if (_case.request.body.initialValue + _case.request.body.increasedPoints !== skillOld.current) {
         // Check if the skill was updated
         const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
         expect(calls).toHaveLength(1);
@@ -376,7 +378,10 @@ describe("Valid requests", () => {
         expect(matchingCall).toBeTruthy();
       }
 
-      // TODO add a check for all test across all Lambdas to validate the response body against the corresponding API schema (zod)
+      /**
+       * TODO add a check for all tests across all Lambdas to validate the response body against the corresponding API schema (zod)
+       * Or better add integration tests against the API in API Gateway?! The response body of the Lambda is not the same as the response body of the API Gateway.
+       */
     });
   });
 });

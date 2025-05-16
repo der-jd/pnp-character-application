@@ -688,16 +688,16 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
 
   response_templates = {
     "application/json" = <<EOT
-    ## --- Handle error case ---
-    #set($errorJson = $input.path('$.errorMessage'))
-    #if($errorJson != "")
-        #set($errorJsonObject = $util.parseJson($errorJson))
+    ## --- Handle error case for step function ---
+    #set($output = $util.parseJson($input.path('$.output')))
+    #if($output.errorMessage != "")
+        #set($errorJsonObject = $util.parseJson($output.errorMessage))
         #set($context.responseOverride.status = $errorJsonObject.statusCode)
-        $errorJson
-    ## --- Handle success case ---
+        $output.errorMessage
+    ## --- Handle success case for step function ---
     #else
-        #set($context.responseOverride.status = $input.path('$.statusCode'))
-        $input.path('$.body')
+        #set($context.responseOverride.status = $output.statusCode)
+        $output.body
     #end
     EOT
   }

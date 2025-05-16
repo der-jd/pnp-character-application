@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { CostCategory, RecordType } from "config/index.js";
-import { addRecordToHistory } from "add-history-record/index.js";
-import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
+import { addRecordToHistory, HistoryBodySchema } from "add-history-record/index.js";
+import { fakeUserId } from "../test-data/request.js";
 import {
   fakeHistoryBlockListResponse,
   fakeBigHistoryBlockListResponse,
@@ -15,7 +15,8 @@ import { fakeCharacterId } from "../test-data/character.js";
 import { fakeBigHistoryBlock, fakeHistoryBlock2 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 
-const testBody = {
+const testBody: HistoryBodySchema = {
+  userId: fakeUserId,
   type: RecordType.EVENT_CALCULATION_POINTS,
   name: "Adventure Points",
   data: {
@@ -30,10 +31,18 @@ const testBody = {
       total: 120,
     },
   },
-  calculationPointsChange: {
-    adjustment: 20,
-    old: 100,
-    new: 120,
+  learningMethod: null,
+  calculationPoints: {
+    old: {
+      start: 0,
+      available: 100,
+      total: 200,
+    },
+    new: {
+      start: 0,
+      available: 120,
+      total: 220,
+    },
   },
   comment: "Epic fight against a big monster",
 };
@@ -41,37 +50,9 @@ const testBody = {
 describe("Invalid requests", () => {
   const invalidTestCases = [
     {
-      name: "Authorization header is malformed",
-      request: {
-        headers: {
-          authorization: "dummyValue",
-        },
-        pathParameters: {
-          "character-id": fakeCharacterId,
-        },
-        queryStringParameters: null,
-        body: testBody,
-      },
-      expectedStatusCode: 401,
-    },
-    {
-      name: "Authorization token is invalid",
-      request: {
-        headers: {
-          authorization: "Bearer 1234567890",
-        },
-        pathParameters: {
-          "character-id": fakeCharacterId,
-        },
-        queryStringParameters: null,
-        body: testBody,
-      },
-      expectedStatusCode: 401,
-    },
-    {
       name: "Character id is not an UUID",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": "1234567890",
         },
@@ -81,38 +62,15 @@ describe("Invalid requests", () => {
       expectedStatusCode: 400,
     },
     {
-      name: "No character found for a non existing character id",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": "26c5d41d-cef1-455f-a341-b15d8a5b3967",
-        },
-        queryStringParameters: null,
-        body: testBody,
-      },
-      expectedStatusCode: 404,
-    },
-    {
-      name: "No character found for a non existing user id",
-      request: {
-        headers: dummyHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-        },
-        queryStringParameters: null,
-        body: testBody,
-      },
-      expectedStatusCode: 404,
-    },
-    {
       name: "Invalid record type",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: "Invalid type",
           name: "Epic battle",
           data: {
@@ -127,10 +85,17 @@ describe("Invalid requests", () => {
               total: 120,
             },
           },
-          calculationPointsChange: {
-            adjustment: 20,
-            old: 100,
-            new: 120,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 100,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 120,
+              total: 220,
+            },
           },
           comment: "Epic fight against a big monster",
         },
@@ -153,12 +118,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'event calculation points' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.EVENT_CALCULATION_POINTS,
           name: "Adventure Points",
           data: {
@@ -174,10 +140,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 20,
-            old: 90,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 110,
+              total: 220,
+            },
           },
           comment: "Epic fight against a big monster",
         },
@@ -187,12 +160,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'event level up' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.EVENT_LEVEL_UP,
           name: "Level 2",
           data: {
@@ -204,10 +178,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 0,
-            new: 0,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
+            new: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
           },
           comment: "Finished story arc",
         },
@@ -217,12 +198,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'event base value' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.EVENT_BASE_VALUE,
           name: "health points",
           data: {
@@ -242,10 +224,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 110,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
           },
           comment: "Level 2",
         },
@@ -255,12 +244,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'profession changed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.PROFESSION_CHANGED,
           name: "Profession changed",
           data: {
@@ -274,10 +264,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 0,
-            new: 0,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
+            new: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
           },
           comment: null,
         },
@@ -287,12 +284,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'hobby changed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.HOBBY_CHANGED,
           name: "Hobby changed",
           data: {
@@ -306,10 +304,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 0,
-            new: 0,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
+            new: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
           },
           comment: null,
         },
@@ -319,12 +324,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'advantage changed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.ADVANTAGE_CHANGED,
           name: "Advantage changed",
           data: {
@@ -336,10 +342,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 110,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
           },
           comment: null,
         },
@@ -349,12 +362,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'disadvantage changed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.DISADVANTAGE_CHANGED,
           name: "Disadvantage changed",
           data: {
@@ -366,10 +380,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 110,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
           },
           comment: null,
         },
@@ -379,12 +400,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'special ability changed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.SPECIAL_ABILITY_CHANGED,
           name: "Special ability changed",
           data: {
@@ -396,10 +418,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 110,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
           },
           comment: null,
         },
@@ -409,12 +438,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'attribute raised' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.ATTRIBUTE_RAISED,
           name: "Courage",
           data: {
@@ -432,10 +462,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: -1,
-            old: 9,
-            new: 8,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 9,
+              total: 15,
+            },
+            new: {
+              start: 0,
+              available: 8,
+              total: 15,
+            },
           },
           comment: null,
         },
@@ -445,12 +482,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'skill activated' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.SKILL_ACTIVATED,
           name: "Disguising",
           data: {
@@ -462,10 +500,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: "NORMAL",
-          calculationPointsChange: {
-            adjustment: -50,
-            old: 110,
-            new: 60,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 40,
+              total: 200,
+            },
           },
           comment: null,
         },
@@ -475,12 +520,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'skill raised' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.SKILL_RAISED,
           name: "Body Control",
           data: {
@@ -502,10 +548,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: "NORMAL",
-          calculationPointsChange: {
-            adjustment: -5,
-            old: 60,
-            new: 55,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 85,
+              total: 200,
+            },
           },
           comment: null,
         },
@@ -515,12 +568,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'attack/parade distributed' to existing block",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.ATTACK_PARADE_DISTRIBUTED,
           name: "Slashing Weapons 1h",
           data: {
@@ -536,10 +590,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 0,
-            old: 0,
-            new: 0,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
+            new: {
+              start: 0,
+              available: 0,
+              total: 0,
+            },
           },
           comment: null,
         },
@@ -565,7 +626,7 @@ describe("Valid requests", () => {
       expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
       expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
       expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
-      expect(parsedBody.calculationPointsChange).toEqual(_case.request.body.calculationPointsChange);
+      expect(parsedBody.calculationPoints).toEqual(_case.request.body.calculationPoints);
       expect(parsedBody.comment).toBe(_case.request.body.comment);
       expect(parsedBody.timestamp).toBeDefined();
 
@@ -584,16 +645,91 @@ describe("Valid requests", () => {
     });
   });
 
-  const testCasesForNewHistory = [
+  const idempotencyTestCasesForExistingHistoryBlock = [
     {
-      name: "Add history record for 'event calculation points' to new history",
+      name: "Add a redundant history record to existing block (idempotency)",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
+          type: RecordType.SKILL_RAISED,
+          name: "Athletics",
+          data: {
+            old: {
+              activated: true,
+              start: 0,
+              current: 0,
+              mod: 0,
+              totalCost: 0,
+              defaultCostCategory: CostCategory.CAT_2,
+            },
+            new: {
+              activated: true,
+              start: 0,
+              current: 10,
+              mod: 0,
+              totalCost: 10,
+              defaultCostCategory: CostCategory.CAT_2,
+            },
+          },
+          learningMethod: "NORMAL",
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 100,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+          },
+          comment: null,
+        },
+      },
+      expectedStatusCode: 200,
+    },
+  ];
+
+  idempotencyTestCasesForExistingHistoryBlock.forEach((_case) => {
+    test(_case.name, async () => {
+      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
+      mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
+
+      const result = await addRecordToHistory(_case.request);
+
+      expect(result.statusCode).toBe(_case.expectedStatusCode);
+
+      const parsedBody = JSON.parse(result.body);
+      expect(parsedBody.type).toBe(_case.request.body.type);
+      expect(parsedBody.name).toBe(_case.request.body.name);
+      expect(parsedBody.number).toBe(fakeHistoryBlock2.changes[fakeHistoryBlock2.changes.length - 1].number);
+      expect(parsedBody.id).toBeDefined();
+      expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
+      expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
+      expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
+      expect(parsedBody.calculationPoints).toEqual(_case.request.body.calculationPoints);
+      expect(parsedBody.comment).toBe(_case.request.body.comment);
+      expect(parsedBody.timestamp).toBeDefined();
+    });
+  });
+
+  const testCasesForNewHistory = [
+    {
+      name: "Add history record for 'event calculation points' to new history",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          userId: fakeUserId,
           type: RecordType.EVENT_CALCULATION_POINTS,
           name: "Adventure Points",
           data: {
@@ -609,10 +745,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 20,
-            old: 90,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 110,
+              total: 220,
+            },
           },
           comment: "Epic fight against a big monster",
         },
@@ -638,7 +781,7 @@ describe("Valid requests", () => {
       expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
       expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
       expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
-      expect(parsedBody.calculationPointsChange).toEqual(_case.request.body.calculationPointsChange);
+      expect(parsedBody.calculationPoints).toEqual(_case.request.body.calculationPoints);
       expect(parsedBody.comment).toBe(_case.request.body.comment);
       expect(parsedBody.timestamp).toBeDefined();
 
@@ -673,12 +816,13 @@ describe("Valid requests", () => {
     {
       name: "Add history record for 'event calculation points' to new block in existing history",
       request: {
-        headers: fakeHeaders,
+        headers: {},
         pathParameters: {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: {
+          userId: fakeUserId,
           type: RecordType.EVENT_CALCULATION_POINTS,
           name: "Adventure Points",
           data: {
@@ -694,10 +838,17 @@ describe("Valid requests", () => {
             },
           },
           learningMethod: null,
-          calculationPointsChange: {
-            adjustment: 20,
-            old: 90,
-            new: 110,
+          calculationPoints: {
+            old: {
+              start: 0,
+              available: 90,
+              total: 200,
+            },
+            new: {
+              start: 0,
+              available: 110,
+              total: 220,
+            },
           },
           comment: "Epic fight against a big monster",
         },
@@ -723,7 +874,7 @@ describe("Valid requests", () => {
       expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
       expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
       expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
-      expect(parsedBody.calculationPointsChange).toEqual(_case.request.body.calculationPointsChange);
+      expect(parsedBody.calculationPoints).toEqual(_case.request.body.calculationPoints);
       expect(parsedBody.comment).toBe(_case.request.body.comment);
       expect(parsedBody.timestamp).toBeDefined();
 

@@ -17,12 +17,10 @@ import {
   getHistoryItems,
   createHistoryItem,
   addHistoryRecord,
-  getCharacterItem,
   Request,
   parseBody,
   HttpError,
   ensureHttpError,
-  decodeUserId,
 } from "utils/index.js";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
@@ -37,6 +35,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 };
 
 const historyBodySchema = z.object({
+  userId: z.string(),
   type: z.nativeEnum(RecordType),
   name: z.string(),
   data: z.object({
@@ -44,10 +43,9 @@ const historyBodySchema = z.object({
     new: z.record(z.any()),
   }),
   learningMethod: z.string().nullable(),
-  calculationPointsChange: z.object({
-    adjustment: z.number(),
-    old: z.number(),
-    new: z.number(),
+  calculationPoints: z.object({
+    old: calculationPointsSchema,
+    new: calculationPointsSchema,
   }),
   comment: z.string().nullable(),
 });
@@ -67,7 +65,6 @@ const booleanSchema = z.object({
 export type HistoryBodySchema = z.infer<typeof historyBodySchema>;
 
 interface Parameters {
-  userId: string;
   characterId: string;
   body: HistoryBodySchema;
 }
@@ -76,7 +73,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
   try {
     const params = await validateRequest(request);
 
-    console.log(`Add record to history of character ${params.characterId} of user ${params.userId}`);
+    console.log(`Add record to history of character ${params.characterId} of user ${params.body.userId}`);
 
     const items = await getHistoryItems(
       params.characterId,
@@ -102,12 +99,23 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       const latestBlock = historyBlockSchema.parse(items[0]);
       console.log("Latest history block:", { ...latestBlock, changes: ["..."] }); // Don't log changes as this can be a very long list
 
+      const latestRecord = latestBlock.changes[latestBlock.changes.length - 1];
       record = {
-        number: latestBlock.changes[latestBlock.changes.length - 1].number + 1,
+        number: latestRecord.number + 1,
         id: uuidv4(),
         timestamp: new Date().toISOString(),
         ...params.body,
       };
+
+      if (isDuplicate(latestRecord, record)) {
+        console.log("The new record is the same as the latest record in the history. No action is needed.");
+        const response = {
+          statusCode: 200,
+          body: JSON.stringify(latestRecord),
+        };
+        console.log(response);
+        return response;
+      }
 
       const blockSize = estimateItemSize(latestBlock);
       const recordSize = estimateItemSize(record);
@@ -136,8 +144,6 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
 async function validateRequest(request: Request): Promise<Parameters> {
   console.log("Validate request");
 
-  const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
-
   if (typeof request.pathParameters?.["character-id"] !== "string") {
     throw new HttpError(400, "Invalid input values!");
   }
@@ -148,12 +154,20 @@ async function validateRequest(request: Request): Promise<Parameters> {
     throw new HttpError(400, "Character id is not a valid UUID format!");
   }
 
-  // Check if the character exists
-  await getCharacterItem(userId, characterId);
-
   try {
+    /**
+     * This conversion is necessary if the Lambda is called via AWS Step Functions.
+     * The input data of a state machine is a string.
+     */
+    if (typeof request.body?.type === "string") {
+      request.body.type = Number(request.body.type);
+    }
     // TODO use parse function and request object for all lambdas
     const body = historyBodySchema.parse(request.body);
+
+    // Check if the character exists
+    // Note: This check is currently not necessary as the lambda is called after the increase-skill function. I.e. we can assume that the character exists.
+    //await getCharacterItem(body.userId, characterId);
 
     switch (body.type) {
       case RecordType.EVENT_CALCULATION_POINTS:
@@ -200,7 +214,6 @@ async function validateRequest(request: Request): Promise<Parameters> {
     }
 
     return {
-      userId: userId,
       characterId: characterId,
       body: body,
     };
@@ -219,4 +232,15 @@ function estimateItemSize(item: any): number {
   const marshalled = marshall(item);
   const json = JSON.stringify(marshalled);
   return Buffer.byteLength(json, "utf8");
+}
+
+function isDuplicate(record_1: Record, record_2: Record): boolean {
+  const isDuplicate =
+    record_1.type === record_2.type &&
+    record_1.name === record_2.name &&
+    JSON.stringify(record_1.data) === JSON.stringify(record_2.data) &&
+    record_1.learningMethod === record_2.learningMethod &&
+    JSON.stringify(record_1.calculationPoints) === JSON.stringify(record_2.calculationPoints);
+
+  return isDuplicate;
 }

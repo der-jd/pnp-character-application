@@ -1,14 +1,20 @@
 export function ensureHttpError(value: unknown): HttpError {
-  if (value instanceof HttpError) return value;
-
-  let stringified = "";
-  try {
-    stringified = JSON.stringify(value);
-  } catch {
-    stringified = "[Unable to stringify the thrown value]";
+  if (value instanceof HttpError) {
+    return value;
   }
 
-  console.error(`This value was thrown as is, not through an Error: ${stringified}`);
+  if (value instanceof Error) {
+    console.error(value);
+  } else {
+    let stringified = "";
+    try {
+      stringified = JSON.stringify(value);
+    } catch {
+      stringified = "[Unable to stringify the thrown value]";
+    }
+    console.error(`This value was thrown as is, not through an Error: ${stringified}`);
+  }
+
   return new HttpError(500, "An internal error occurred!");
 }
 

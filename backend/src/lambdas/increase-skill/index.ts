@@ -48,9 +48,11 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
     const character = await getCharacterItem(params.userId, params.characterId);
 
     const characterSheet = character.characterSheet;
-    let availableAdventurePoints = characterSheet.calculationPoints.adventurePoints.available;
+    const adventurePointsOld = characterSheet.calculationPoints.adventurePoints;
+    const adventurePoints = structuredClone(adventurePointsOld);
     const skillCategory = params.skillCategory as keyof Character["characterSheet"]["skills"];
-    const skill = getSkill(characterSheet.skills, skillCategory, params.skillName);
+    const skillOld = getSkill(characterSheet.skills, skillCategory, params.skillName);
+    const skill = structuredClone(skillOld);
     const adjustedCostCategory = adjustCostCategory(
       skill.defaultCostCategory,
       parseLearningMethod(params.learningMethod),
@@ -61,7 +63,7 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
     console.log(`Default cost category: ${skill.defaultCostCategory}`);
     console.log(`Adjusted cost category: ${adjustedCostCategory}`);
     console.log(`Skill total cost before increasing: ${skill.totalCost}`);
-    console.log(`Available adventure points before increasing: ${availableAdventurePoints}`);
+    console.log(`Available adventure points before increasing: ${adventurePoints.available}`);
 
     if (params.initialSkillValue + params.increasedPoints === skill.current) {
       console.log("Skill value already increased to target value. Nothing to do.");
@@ -69,10 +71,18 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
         statusCode: 200,
         body: JSON.stringify({
           characterId: params.characterId,
+          userId: params.userId,
           skillName: params.skillName,
-          skillValue: skill.current,
-          totalCost: skill.totalCost,
-          availableAdventurePoints: availableAdventurePoints,
+          skill: {
+            old: skillOld,
+            new: skill,
+          },
+          learningMethod: params.learningMethod,
+          increaseCost: getSkillIncreaseCost(skill.current, adjustedCostCategory),
+          adventurePoints: {
+            old: adventurePointsOld,
+            new: adventurePoints,
+          },
         }),
       };
       console.log(response);
@@ -84,7 +94,7 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
       console.debug("---------------------------");
       const increaseCost = getSkillIncreaseCost(skill.current, adjustedCostCategory);
 
-      if (increaseCost > availableAdventurePoints) {
+      if (increaseCost > adventurePoints.available) {
         throw new HttpError(400, "Not enough adventure points to increase the skill!", {
           characterId: params.characterId,
           skillName: params.skillName,
@@ -93,11 +103,11 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
 
       console.debug(`Skill value: ${skill.current}`);
       console.debug(`Skill total cost: ${skill.totalCost}`);
-      console.debug(`Available adventure points: ${availableAdventurePoints}`);
+      console.debug(`Available adventure points: ${adventurePoints.available}`);
       console.debug(`Increasing skill by 1 for ${increaseCost} AP...`);
       skill.current += 1;
       skill.totalCost += increaseCost;
-      availableAdventurePoints -= increaseCost;
+      adventurePoints.available -= increaseCost;
     }
 
     await updateSkill(
@@ -107,20 +117,25 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
       params.skillName,
       skill.current,
       skill.totalCost,
-      availableAdventurePoints,
+      adventurePoints.available,
     );
-    // TODO add record with changes to history
 
     const response = {
       statusCode: 200,
       body: JSON.stringify({
         characterId: params.characterId,
+        userId: params.userId,
         skillName: params.skillName,
-        skillValue: skill.current,
+        skill: {
+          old: skillOld,
+          new: skill,
+        },
         learningMethod: params.learningMethod,
         increaseCost: getSkillIncreaseCost(skill.current, adjustedCostCategory),
-        totalCost: skill.totalCost,
-        availableAdventurePoints: availableAdventurePoints,
+        adventurePoints: {
+          old: adventurePointsOld,
+          new: adventurePoints,
+        },
       }),
     };
     console.log(response);

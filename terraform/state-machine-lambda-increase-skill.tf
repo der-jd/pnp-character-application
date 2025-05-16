@@ -15,7 +15,7 @@ resource "aws_lambda_function" "increase_skill_lambda" {
   layers           = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
   environment {
     variables = {
-      TABLE_NAME = local.characters_table_name
+      TABLE_NAME_CHARACTERS = local.characters_table_name
     }
   }
   logging_config {
@@ -84,25 +84,135 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
     level                  = "ALL"
   }
 
+  // Examples for error handling: https://docs.aws.amazon.com/step-functions/latest/dg/concepts-error-handling.html#error-handling-examples
+  // Best practiceS: https://docs.aws.amazon.com/step-functions/latest/dg/sfn-best-practices.html
+  // Transforming input and output with JSONata: https://docs.aws.amazon.com/step-functions/latest/dg/transforming-data.html
   definition = jsonencode({
     StartAt = "IncreaseSkill",
     States = {
       IncreaseSkill = {
-        Type       = "Task",
-        Resource   = aws_lambda_function.increase_skill_lambda.arn,
-        ResultPath = "$.IncreaseSkillResult",
-        Next       = "AddHistoryRecord"
+        Type          = "Task",
+        QueryLanguage = "JSONata",
+        Resource      = aws_lambda_function.increase_skill_lambda.arn,
+        Assign = {
+          statusCode        = "{% $states.result.statusCode %}",
+          increaseSkillBody = "{% $states.result.body %}"
+        },
+        TimeoutSeconds = 5 // Timeout to avoid waiting for a stuck task
+        Retry = [
+          {
+            // Retry in case of Lambda service exceptions
+            ErrorEquals = [
+              "Lambda.ClientExecutionTimeoutException",
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            IntervalSeconds = 1,
+            MaxAttempts     = 4,
+            BackoffRate     = 1.5, // Multiply the retry IntervalSeconds with this number after each retry -> exponential growth
+            MaxDelaySeconds = 3    // Cap exponential retry interval
+          },
+          {
+            ErrorEquals     = ["States.ALL"],
+            IntervalSeconds = 1,
+            MaxAttempts     = 2,
+            BackoffRate     = 1,
+          },
+        ],
+        Catch = [
+          {
+            ErrorEquals = ["States.ALL"], // Fail on all errors if retries not defined or exceeded
+            Next        = "HandleError"
+          }
+        ],
+        Next = "IsHistoryRecordNecessary"
       },
-      /**
-       * TODO add custom error response for add history record function
-       * All errors in this function are internal ones and the user should not be
-       * directly informed about the details.
-       */
+      IsHistoryRecordNecessary = {
+        Type          = "Choice",
+        QueryLanguage = "JSONata",
+        Choices = [
+          {
+            // The skill was not increased, so no history record is necessary
+            Condition = "{% $parse($states.input.body).skill.old = $parse($states.input.body).skill.new %}",
+            Next      = "SuccessState"
+          }
+        ],
+        Default = "AddHistoryRecord"
+      },
       AddHistoryRecord = {
-        Type       = "Task",
-        Resource   = aws_lambda_function.add_history_record_lambda.arn,
-        ResultPath = "$.AddHistoryRecordResult",
-        End        = true
+        Type          = "Task",
+        QueryLanguage = "JSONata",
+        Resource      = aws_lambda_function.add_history_record_lambda.arn,
+        Arguments = {
+          "pathParameters" = {
+            "character-id" = "{% $parse($states.input.body).characterId %}"
+          },
+          "body" = {
+            "userId"            = "{% $parse($states.input.body).userId %}",
+            "type"              = "10", // SKILL_RAISED
+            "name"              = "{% $parse($states.input.body).skillName %}",
+            "data"              = "{% $parse($states.input.body).skill %}",
+            "learningMethod"    = "{% $parse($states.input.body).learningMethod %}",
+            "calculationPoints" = "{% $parse($states.input.body).adventurePoints %}",
+            "comment"           = null
+          }
+        },
+        Assign = {
+          addHistoryRecordBody = "{% $states.result.body %}"
+        },
+        TimeoutSeconds = 5
+        Retry = [
+          {
+            ErrorEquals = [
+              "Lambda.ClientExecutionTimeoutException",
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException"
+            ],
+            IntervalSeconds = 1,
+            MaxAttempts     = 4,
+            BackoffRate     = 1.5,
+            MaxDelaySeconds = 3
+          },
+          {
+            ErrorEquals     = ["States.ALL"],
+            IntervalSeconds = 1,
+            MaxAttempts     = 2,
+            BackoffRate     = 1,
+          },
+        ],
+        Catch = [
+          {
+            ErrorEquals = ["States.ALL"], // Fail on all errors if retries not defined or exceeded
+            Next        = "HandleError"
+          }
+        ],
+        Next = "SuccessState"
+      },
+      HandleError = {
+        Type          = "Pass",
+        QueryLanguage = "JSONata",
+        Output = {
+          "errorMessage" = "{% $parse($states.input.Cause).errorMessage %}"
+        },
+        End = true
+      },
+      SuccessState = {
+        Type          = "Succeed",
+        QueryLanguage = "JSONata",
+        Output = {
+          "statusCode" = "{% $statusCode %}",
+          /**
+           * The content of "body" should be a stringified JSON to be consistent with output coming directly from a Lambda function.
+           * The body of a Lambda function is always a stringified JSON object.
+           * The mapping template for the API Gateway integration will parse the stringified JSON and return it as a JSON object.
+           *
+           * $parse() is used to parse the stringified JSON inside the variables temporarily back to a JSON object before the whole
+           * content is stringified with $string() again.
+           */
+          "body" = "{% $string({'data': $parse($increaseSkillBody),'historyRecord': $addHistoryRecordBody ? $parse($addHistoryRecordBody) : null}) %}"
+        }
       }
     }
   })

@@ -4,7 +4,6 @@ data "archive_file" "add_history_record" {
   output_path = "../backend/dist/add-history-record.zip"
 }
 
-// TODO add step function for increase-skill-lambda -> add-history-record lambda workflow
 resource "aws_lambda_function" "add_history_record_lambda" {
   function_name = "pnp-add-history-record"
   handler       = "index.handler"
@@ -16,7 +15,8 @@ resource "aws_lambda_function" "add_history_record_lambda" {
   layers           = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
   environment {
     variables = {
-      TABLE_NAME = local.history_table_name
+      TABLE_NAME_CHARACTERS = local.characters_table_name
+      TABLE_NAME_HISTORY    = local.history_table_name
     }
   }
   logging_config {
