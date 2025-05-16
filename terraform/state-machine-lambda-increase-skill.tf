@@ -128,6 +128,7 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         Type          = "Choice",
         Choices = [
           {
+            // The skill was not increased, so no history record is necessary
             Condition = "{% $parse($states.input.body).skill.old = $parse($states.input.body).skill.new %}",
             Next      = "SuccessState"
           }
