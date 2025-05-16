@@ -43,13 +43,15 @@ resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   }
 }
 
-// ================== GET /characters ==================
+// ================== /characters ==================
 
 resource "aws_api_gateway_resource" "characters" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_rest_api.pnp_rest_api.root_resource_id
   path_part   = "characters" // .../characters
 }
+
+// ================== GET /characters ==================
 
 resource "aws_api_gateway_method" "characters_get" {
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
