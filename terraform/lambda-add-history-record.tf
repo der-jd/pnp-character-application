@@ -4,7 +4,6 @@ data "archive_file" "add_history_record" {
   output_path = "../backend/dist/add-history-record.zip"
 }
 
-// TODO add step function for increase-skill-lambda -> add-history-record lambda workflow
 resource "aws_lambda_function" "add_history_record_lambda" {
   function_name = "pnp-add-history-record"
   handler       = "index.handler"
