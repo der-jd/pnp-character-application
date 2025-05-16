@@ -47,9 +47,6 @@ const testBody: HistoryBodySchema = {
   comment: "Epic fight against a big monster",
 };
 
-const testBodyWithDummyUserId = structuredClone(testBody);
-testBodyWithDummyUserId.userId = "fbcc6196-6959-4a76-b647-efae2b78fdfa";
-
 describe("Invalid requests", () => {
   const invalidTestCases = [
     {
