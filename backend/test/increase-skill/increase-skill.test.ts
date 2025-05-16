@@ -378,7 +378,10 @@ describe("Valid requests", () => {
         expect(matchingCall).toBeTruthy();
       }
 
-      // TODO add a check for all test across all Lambdas to validate the response body against the corresponding API schema (zod)
+      /**
+       * TODO add a check for all tests across all Lambdas to validate the response body against the corresponding API schema (zod)
+       * Or better add integration tests against the API in API Gateway?! The response body of the Lambda is not the same as the response body of the API Gateway.
+       */
     });
   });
 });
