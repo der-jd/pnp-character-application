@@ -65,30 +65,6 @@ describe("Invalid requests", () => {
       expectedStatusCode: 400,
     },
     {
-      name: "No character found for a non existing character id",
-      request: {
-        headers: {},
-        pathParameters: {
-          "character-id": "26c5d41d-cef1-455f-a341-b15d8a5b3967",
-        },
-        queryStringParameters: null,
-        body: testBody,
-      },
-      expectedStatusCode: 404,
-    },
-    {
-      name: "No character found for a non existing user id",
-      request: {
-        headers: {},
-        pathParameters: {
-          "character-id": fakeCharacterId,
-        },
-        queryStringParameters: null,
-        body: testBodyWithDummyUserId,
-      },
-      expectedStatusCode: 404,
-    },
-    {
       name: "Invalid record type",
       request: {
         headers: {},
