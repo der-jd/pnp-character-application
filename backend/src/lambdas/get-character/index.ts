@@ -1,5 +1,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { Request, parseBody, getCharacterItem, HttpError, ensureHttpError, decodeUserId } from "utils/index.js";
+import {
+  Request,
+  parseBody,
+  getCharacterItem,
+  HttpError,
+  ensureHttpError,
+  decodeUserId,
+  validateCharacterId,
+} from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getCharacter({
@@ -42,11 +50,7 @@ function validateRequest(request: Request): Parameters {
   }
 
   const characterId = request.pathParameters?.["character-id"];
-
-  const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
-  if (!uuidRegex.test(characterId)) {
-    throw new HttpError(400, "Character id is not a valid UUID format!");
-  }
+  validateCharacterId(characterId);
 
   return {
     userId: userId,
