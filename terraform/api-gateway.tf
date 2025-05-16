@@ -43,7 +43,7 @@ resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   }
 }
 
-// ================== characters get  ==================
+// ================== GET /characters ==================
 
 resource "aws_api_gateway_resource" "characters" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
@@ -168,6 +168,8 @@ resource "aws_api_gateway_integration_response" "characters_get_integration_resp
   selection_pattern = ".*"
 }
 
+// ================== OPTIONS /characters ==================
+
 resource "aws_api_gateway_method" "characters_options" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.characters.id
@@ -224,11 +226,15 @@ resource "aws_api_gateway_method_response" "characters_options_method_response" 
   }
 }
 
+// ================== /characters/{character-id} ==================
+
 resource "aws_api_gateway_resource" "character_id" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.characters.id
   path_part   = "{character-id}" // .../characters/{character-id}
 }
+
+// ================== GET /characters/{character-id} ==================
 
 resource "aws_api_gateway_method" "character_id_get" {
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
@@ -359,6 +365,8 @@ resource "aws_api_gateway_integration_response" "character_id_get_integration_re
   selection_pattern = ".*"
 }
 
+// ================== OPTIONS /characters/{character-id} ==================
+
 resource "aws_api_gateway_method" "character_id_options" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.character_id.id
@@ -415,7 +423,7 @@ resource "aws_api_gateway_method_response" "character_id_options_method_response
   }
 }
 
-// ================== skills  ==================
+// ================== /characters/{character-id}/skills ==================
 
 resource "aws_api_gateway_resource" "skills" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
@@ -423,17 +431,23 @@ resource "aws_api_gateway_resource" "skills" {
   path_part   = "skills" // .../characters/{character-id}/skills
 }
 
+// ================== /characters/{character-id}/skills/{skill-category} ==================
+
 resource "aws_api_gateway_resource" "skill_category" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.skills.id
   path_part   = "{skill-category}" // .../characters/{character-id}/skills/{skill-category}
 }
 
+// ================== /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
+
 resource "aws_api_gateway_resource" "skill_name" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.skill_category.id
   path_part   = "{skill-name}" // .../characters/{character-id}/skills/{skill-category}/{skill-name}
 }
+
+// ================== GET /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
 
 resource "aws_api_gateway_method" "skill_name_get" {
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
@@ -556,6 +570,8 @@ resource "aws_api_gateway_integration_response" "skill_name_get_integration_resp
 
   selection_pattern = ".*"
 }
+
+// ================== PATCH /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
 
 resource "aws_api_gateway_method" "skill_name_patch" {
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
@@ -704,6 +720,8 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
 
   selection_pattern = ".*"
 }
+
+// ================== OPTIONS /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
 
 resource "aws_api_gateway_method" "skill_name_options" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
@@ -885,4 +903,189 @@ resource "aws_api_gateway_stage" "prod" {
 output "api_gateway_url" {
   value     = "https://${aws_api_gateway_rest_api.pnp_rest_api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_stage.prod.stage_name}"
   sensitive = true
+}
+
+// ================== /characters/{character-id}/history ==================
+
+resource "aws_api_gateway_resource" "history" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "history" // .../history
+}
+
+// ================== GET /characters/{character-id}/history ==================
+
+resource "aws_api_gateway_method" "history_get" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.history.id
+  http_method   = "GET"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  request_parameters = {
+    "method.request.querystring.block-number" = true
+  }
+}
+
+resource "aws_api_gateway_method_response" "history_get_method_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = aws_api_gateway_method.history_get.http_method
+  status_code = each.value
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
+resource "aws_api_gateway_integration" "history_get_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id             = aws_api_gateway_resource.history.id
+  http_method             = aws_api_gateway_method.history_get.http_method
+  integration_http_method = "POST"
+  type                    = "AWS"
+  uri                     = aws_lambda_function.get_history_lambda.invoke_arn
+  passthrough_behavior    = "WHEN_NO_TEMPLATES"
+  request_parameters = {
+    "integration.request.querystring.block-number" = "method.request.querystring.block-number"
+  }
+
+  request_templates = {
+    "application/json" = <<EOF
+    {
+      ## Headers are always available
+      "headers": {
+        #foreach($param in $input.params().header.keySet())
+        "$param": "$util.escapeJavaScript($input.params().header.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }
+
+      ## Include pathParameters if available
+      #if($input.params().path.keySet().size() > 0)
+      , ## Add a comma for the following block
+      "pathParameters": {
+        #foreach($param in $input.params().path.keySet())
+        "$param": "$util.escapeJavaScript($input.params().path.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }#end
+
+      ## Include querystring if available
+      #if($input.params().querystring.keySet().size() > 0)
+      , ## Add a comma for the following block
+      "queryStringParameters": {
+        #foreach($param in $input.params().querystring.keySet())
+        "$param": "$util.escapeJavaScript($input.params().querystring.get($param))"
+        #if($foreach.hasNext),#end
+        #end
+      }#end
+
+      ## Include body if available
+      #if($input.body != {})
+      , ## Add a comma for the following block
+      "body": $input.json('$')
+      #end
+    }
+    EOF
+  }
+}
+
+resource "aws_api_gateway_integration_response" "history_get_integration_response" {
+  depends_on = [aws_api_gateway_integration.history_get_integration]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = aws_api_gateway_method.history_get.http_method
+  status_code = 200
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+
+  response_templates = {
+    "application/json" = <<EOT
+    ## --- Handle error case ---
+    #set($errorJson = $input.path('$.errorMessage'))
+    #if($errorJson != "")
+        #set($errorJsonObject = $util.parseJson($errorJson))
+        #set($context.responseOverride.status = $errorJsonObject.statusCode)
+        $errorJson
+    ## --- Handle success case ---
+    #else
+        #set($context.responseOverride.status = $input.path('$.statusCode'))
+        $input.path('$.body')
+    #end
+    EOT
+  }
+
+  selection_pattern = ".*"
+}
+
+// ================== OPTIONS /characters/{character-id}/history ==================
+
+resource "aws_api_gateway_method" "history_options" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = "OPTIONS"
+  // Authorization needs to be NONE for the preflight request to work which is sent automatically by the browser without any authorization header.
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.header.Origin" : false
+  }
+}
+
+resource "aws_api_gateway_integration" "history_options_integration" {
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.history.id
+  http_method          = aws_api_gateway_method.history_options.http_method
+  type                 = "MOCK"
+  passthrough_behavior = "WHEN_NO_TEMPLATES"
+  // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
+  // For a method with the mock integration to return a 200 response, configure the
+  // integration request body mapping template to return the following:
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
+}
+
+resource "aws_api_gateway_integration_response" "history_options_integration_response" {
+  depends_on = [aws_api_gateway_integration.history_options_integration]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = aws_api_gateway_method.history_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "history_options_method_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.history.id
+  http_method = aws_api_gateway_method.history_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  }
 }

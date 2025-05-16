@@ -17,6 +17,7 @@
     "create-tenant-id": "file:src/lambdas/create-tenant-id",
     "get-character": "file:src/lambdas/get-character",
     "get-characters": "file:src/lambdas/get-characters",
+    "get-history": "file:src/lambdas/get-history",
     "get-skill-increase-cost": "file:src/lambdas/get-skill-increase-cost",
     "increase-skill": "file:src/lambdas/increase-skill",
     "utils": "file:src/utils"
