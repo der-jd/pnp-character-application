@@ -91,9 +91,13 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
     StartAt = "IncreaseSkill",
     States = {
       IncreaseSkill = {
-        QueryLanguage  = "JSONata",
-        Type           = "Task",
-        Resource       = aws_lambda_function.increase_skill_lambda.arn,
+        Type          = "Task",
+        QueryLanguage = "JSONata",
+        Resource      = aws_lambda_function.increase_skill_lambda.arn,
+        Assign = {
+          statusCode        = "{% $states.result.statusCode %}",
+          increaseSkillBody = "{% $states.result.body %}"
+        },
         TimeoutSeconds = 5 // Timeout to avoid waiting for a stuck task
         Retry = [
           {
@@ -125,8 +129,8 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
         Next = "IsHistoryRecordNecessary"
       },
       IsHistoryRecordNecessary = {
-        QueryLanguage = "JSONata",
         Type          = "Choice",
+        QueryLanguage = "JSONata",
         Choices = [
           {
             // The skill was not increased, so no history record is necessary
@@ -142,8 +146,8 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
        * directly informed about the details.
        */
       AddHistoryRecord = {
-        QueryLanguage = "JSONata",
         Type          = "Task",
+        QueryLanguage = "JSONata",
         Resource      = aws_lambda_function.add_history_record_lambda.arn,
         Arguments = {
           "pathParameters" = {
@@ -158,6 +162,9 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
             "calculationPoints" = "{% $parse($states.input.body).adventurePoints %}",
             "comment"           = null
           }
+        },
+        Assign = {
+          addHistoryRecordBody = "{% $states.result.body %}"
         },
         TimeoutSeconds = 5
         Retry = [
@@ -186,19 +193,31 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
             Next        = "HandleError"
           }
         ],
-        End = true
+        Next = "SuccessState"
       },
       HandleError = {
-        QueryLanguage = "JSONata",
         Type          = "Pass",
+        QueryLanguage = "JSONata",
         Output = {
           "errorMessage" = "{% $parse($states.input.Cause).errorMessage %}"
         },
         End = true
       },
       SuccessState = {
-        QueryLanguage = "JSONata",
         Type          = "Succeed",
+        QueryLanguage = "JSONata",
+        Output = {
+          "statusCode" = "{% $statusCode %}",
+          /**
+           * The content of "body" should be a stringified JSON to be consistent with output coming directly from a Lambda function.
+           * The body of a Lambda function is always a stringified JSON object.
+           * The mapping template for the API Gateway integration will parse the stringified JSON and return it as a JSON object.
+           *
+           * $parse() is used to parse the stringified JSON inside the variables temporarily back to a JSON object before the whole
+           * content is stringified with $string() again.
+           */
+          "body" = "{% $string({'data': $parse($increaseSkillBody),'historyRecord': $addHistoryRecordBody ? $parse($addHistoryRecordBody) : null}) %}"
+        }
       }
     }
   })
