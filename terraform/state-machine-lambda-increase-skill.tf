@@ -121,9 +121,9 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
             Next        = "HandleError"
           }
         ],
-        Next = "SkillIncreasedChoice"
+        Next = "IsHistoryRecordNecessary"
       },
-      SkillIncreasedChoice = {
+      IsHistoryRecordNecessary = {
         QueryLanguage = "JSONata",
         Type          = "Choice",
         Choices = [
