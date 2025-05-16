@@ -694,10 +694,11 @@ resource "aws_api_gateway_integration_response" "skill_name_patch_integration_re
         #set($errorJsonObject = $util.parseJson($errorJson))
         #set($context.responseOverride.status = $errorJsonObject.statusCode)
         $errorJson
-    ## --- Handle success case ---
+    ## --- Handle success case for step function ---
     #else
-        #set($context.responseOverride.status = $input.path('$.statusCode'))
-        $input.path('$.body')
+        #set($output = $util.parseJson($input.path('$.output')))
+        #set($context.responseOverride.status = $output.statusCode)
+        $output.body
     #end
     EOT
   }
