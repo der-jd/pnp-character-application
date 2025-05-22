@@ -1,8 +1,9 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { Character, characterSchema } from "config/index.js";
+import { Attribute, Character, characterSchema } from "config/index.js";
 import { HttpError } from "./errors.js";
+import { CalculationPoints } from "config/character.js";
 
 export async function getCharacterItem(userId: string, characterId: string): Promise<Character> {
   console.log(`Get character ${characterId} of user ${userId} from DynamoDB`);
@@ -54,6 +55,45 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
   console.log("Successfully got DynamoDB items");
 
   return z.array(characterSchema).parse(response.Items);
+}
+
+export async function updateAttribute(
+  userId: string,
+  characterId: string,
+  attributeName: string,
+  attribute: Attribute,
+  attributePoints: CalculationPoints,
+): Promise<void> {
+  console.log(`Update attribute '${attributeName}' of character ${characterId} (user ${userId}) in DynamoDB`);
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
+  const client = new DynamoDBClient({});
+  const docClient = DynamoDBDocumentClient.from(client);
+  const command = new UpdateCommand({
+    TableName: process.env.TABLE_NAME_CHARACTERS,
+    Key: {
+      userId: userId,
+      characterId: characterId,
+    },
+    UpdateExpression:
+      "SET #characterSheet.#attributes.#attributeName = :attribute, " +
+      "#characterSheet.#calculationPoints.#attributePoints = :attributePoints",
+    ExpressionAttributeNames: {
+      "#characterSheet": "characterSheet",
+      "#attributes": "attributes",
+      "#attributeName": attributeName,
+      "#calculationPoints": "calculationPoints",
+      "#attributePoints": "attributePoints",
+    },
+    ExpressionAttributeValues: {
+      ":attribute": attribute,
+      ":attributePoints": attributePoints,
+    },
+  });
+
+  await docClient.send(command);
+
+  console.log("Successfully updated DynamoDB item");
 }
 
 export async function updateSkill(

@@ -209,6 +209,14 @@ export interface CharacterSheet {
   };
 }
 
+export function getAttribute(attributes: Record<string, any>, name: string): Attribute {
+  const attribute = attributes[name];
+  if (!attribute) {
+    throw new Error(`Attribute ${name} not found!`);
+  }
+  return attribute;
+}
+
 export function getSkill(
   skills: CharacterSheet["skills"],
   category: keyof CharacterSheet["skills"],
