@@ -32,7 +32,7 @@ export const fakeCharacter: Character = {
     calculationPoints: {
       adventurePoints: {
         start: 100,
-        available: 150,
+        available: 20,
         total: 300,
       },
       attributePoints: {

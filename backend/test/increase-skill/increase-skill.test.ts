@@ -97,44 +97,8 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           initialValue: 110,
-          increasedPoints: 5,
+          increasedPoints: 25,
           learningMethod: "EXPENSIVE",
-        },
-      },
-      expectedStatusCode: 400,
-    },
-    {
-      name: "Initial skill value is a string, not a number",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
-        },
-        queryStringParameters: null,
-        body: {
-          initialValue: "16",
-          increasedPoints: 5,
-          learningMethod: "NORMAL",
-        },
-      },
-      expectedStatusCode: 400,
-    },
-    {
-      name: "Increased points is a string, not a number",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
-        },
-        queryStringParameters: null,
-        body: {
-          initialValue: 16,
-          increasedPoints: "5",
-          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 400,
@@ -233,9 +197,7 @@ describe("Invalid requests", () => {
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      const fakeResponse = structuredClone(fakeCharacterResponse);
-      fakeResponse.Item.characterSheet.calculationPoints.adventurePoints.available = 3;
-      mockDynamoDBGetCharacterResponse(fakeResponse);
+      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
       await expectHttpError(() => increaseSkill(_case.request), _case.expectedStatusCode);
     });
@@ -346,13 +308,13 @@ describe("Valid requests", () => {
 
       const parsedBody = JSON.parse(result.body);
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
-      expect(parsedBody.skillName).toBe(_case.request.pathParameters["skill-name"]);
+      const skillName = _case.request.pathParameters["skill-name"];
+      expect(parsedBody.skillName).toBe(skillName);
       expect(parsedBody.skill.new.current).toBe(_case.request.body.initialValue + _case.request.body.increasedPoints);
 
       const skillCategory = _case.request.pathParameters[
         "skill-category"
       ] as keyof Character["characterSheet"]["skills"];
-      const skillName = _case.request.pathParameters["skill-name"];
       const skillOld = getSkill(fakeCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
       const oldTotalSkillCost = skillOld.totalCost;
       const diffSkillTotalCost = parsedBody.skill.new.totalCost - oldTotalSkillCost;

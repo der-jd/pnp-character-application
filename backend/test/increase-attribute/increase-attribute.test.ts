@@ -161,9 +161,7 @@ describe("Invalid requests", () => {
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      const fakeResponse = structuredClone(fakeCharacterResponse);
-      fakeResponse.Item.characterSheet.calculationPoints.attributePoints.available = 3;
-      mockDynamoDBGetCharacterResponse(fakeResponse);
+      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
       await expectHttpError(() => increaseAttribute(_case.request), _case.expectedStatusCode);
     });
