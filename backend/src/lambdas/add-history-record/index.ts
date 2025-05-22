@@ -21,6 +21,7 @@ import {
   parseBody,
   HttpError,
   ensureHttpError,
+  validateCharacterId,
 } from "utils/index.js";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
@@ -149,10 +150,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
   }
 
   const characterId = request.pathParameters?.["character-id"];
-  const uuidRegex = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$");
-  if (!uuidRegex.test(characterId)) {
-    throw new HttpError(400, "Character id is not a valid UUID format!");
-  }
+  validateCharacterId(characterId);
 
   try {
     /**

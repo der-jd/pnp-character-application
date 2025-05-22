@@ -6,7 +6,16 @@ export {
   adjustCostCategory,
   getSkillIncreaseCost,
 } from "./cost.js";
-export { Attribute, BaseValue, Skill, CombatSkill, Character, CharacterSheet, getSkill } from "./character.js";
+export {
+  Attribute,
+  BaseValue,
+  Skill,
+  CombatSkill,
+  Character,
+  CharacterSheet,
+  getAttribute,
+  getSkill,
+} from "./character.js";
 export {
   attributeSchema,
   baseValueSchema,

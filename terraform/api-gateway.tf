@@ -24,11 +24,16 @@ resource "aws_iam_role_policy" "api_gateway_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [{
-      Effect   = "Allow",
-      Action   = "states:StartSyncExecution",
-      Resource = aws_sfn_state_machine.increase_skill_state_machine.arn
-    }]
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "states:StartSyncExecution",
+        Resource = [
+          aws_sfn_state_machine.increase_skill_state_machine.arn,
+          aws_sfn_state_machine.increase_attribute_state_machine.arn
+        ]
+      }
+    ]
   })
 }
 
@@ -417,6 +422,228 @@ resource "aws_api_gateway_method_response" "character_id_options_method_response
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.character_id.id
   http_method = aws_api_gateway_method.character_id_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
+  }
+}
+
+// ================== /characters/{character-id}/attributes ==================
+
+resource "aws_api_gateway_resource" "attributes" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "attributes" // .../characters/{character-id}/attributes
+}
+
+// ================== /characters/{character-id}/attributes/{attribute-name} ==================
+
+resource "aws_api_gateway_resource" "attribute_name" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.attributes.id
+  path_part   = "{attribute-name}" // .../characters/{character-id}/attributes/{attribute-name}
+}
+
+// ================== PATCH /characters/{character-id}/attributes/{attribute-name} ==================
+
+resource "aws_api_gateway_method" "attribute_name_patch" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.attribute_name.id
+  http_method   = "PATCH"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  request_parameters = {
+    "method.request.path.character-id"   = true
+    "method.request.path.attribute-name" = true
+  }
+}
+
+resource "aws_api_gateway_method_response" "attribute_name_patch_method_response" {
+  for_each = toset(var.status_codes)
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.attribute_name.id
+  http_method = aws_api_gateway_method.attribute_name_patch.http_method
+  status_code = each.value
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Headers" = true
+  }
+}
+
+
+resource "aws_api_gateway_integration" "attribute_name_patch_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id             = aws_api_gateway_resource.attribute_name.id
+  http_method             = aws_api_gateway_method.attribute_name_patch.http_method
+  integration_http_method = "POST"
+  type                    = "AWS"
+  uri                     = "arn:aws:apigateway:${data.aws_region.current.name}:states:action/StartSyncExecution"
+  passthrough_behavior    = "WHEN_NO_TEMPLATES"
+  credentials             = aws_iam_role.api_gateway_role.arn
+  request_parameters = {
+    "integration.request.path.character-id"   = "method.request.path.character-id"
+    "integration.request.path.attribute-name" = "method.request.path.attribute-name"
+  }
+  // TODO add request body model for method request. Optional?!
+
+  request_templates = {
+    "application/json" = <<EOF
+    ## Template taken from https://github.com/aws/aws-cdk/blob/v1-main/packages/@aws-cdk/aws-apigateway/lib/integrations/stepfunctions.vtl
+    ## and adapted slightly.
+    ##
+    ## This template forwards the request header, path, query string and body if available
+    ## to the execution input of the state machine.
+    ##
+    ## "@@" is used here as a placeholder for '"' to avoid using escape characters.
+
+    #set($inputString = '')
+    #set($allParams = $input.params())
+
+    ## Include header if available
+    #if($allParams.header && $allParams.header.keySet().size() > 0)
+      #set($inputString = "$inputString, @@headers@@: {")
+      #foreach($paramName in $allParams.header.keySet())
+        #set($inputString = "$inputString @@$paramName@@: @@$util.escapeJavaScript($allParams.header.get($paramName))@@")
+        #if($foreach.hasNext)
+          #set($inputString = "$inputString,")
+        #end
+      #end
+      #set($inputString = "$inputString }")
+    #end
+
+    ## Include path if available
+    #if($allParams.path && $allParams.path.keySet().size() > 0)
+      #set($inputString = "$inputString, @@pathParameters@@: {")
+      #foreach($paramName in $allParams.path.keySet())
+        #set($inputString = "$inputString @@$paramName@@: @@$util.escapeJavaScript($allParams.path.get($paramName))@@")
+        #if($foreach.hasNext)
+          #set($inputString = "$inputString,")
+        #end
+      #end
+      #set($inputString = "$inputString }")
+    #end
+
+    ## Include query string if available
+    #if($allParams.querystring && $allParams.querystring.keySet().size() > 0)
+      #set($inputString = "$inputString, @@queryStringParameters@@: {")
+      #foreach($paramName in $allParams.querystring.keySet())
+        #set($inputString = "$inputString @@$paramName@@: @@$util.escapeJavaScript($allParams.querystring.get($paramName))@@")
+        #if($foreach.hasNext)
+          #set($inputString = "$inputString,")
+        #end
+      #end
+      #set($inputString = "$inputString }")
+    #end
+
+    ## Include body if available
+    #if($input.body != {})
+      #set($inputString = "$inputString, @@body@@: $input.body")
+    #end
+
+    #set($inputString = $inputString.replaceAll("@@", '"'))
+
+    {
+      "input": "{$util.escapeJavaScript($inputString.substring(1, $inputString.length()))}", ## Remove the leading comma
+      "name": "$context.requestId",
+      "stateMachineArn": "${aws_sfn_state_machine.increase_attribute_state_machine.arn}"
+    }
+    EOF
+  }
+}
+
+resource "aws_api_gateway_integration_response" "attribute_name_patch_integration_response" {
+  depends_on = [aws_api_gateway_integration.attribute_name_patch_integration]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.attribute_name.id
+  http_method = aws_api_gateway_method.attribute_name_patch.http_method
+  status_code = 200
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET'"
+  }
+
+  response_templates = {
+    "application/json" = <<EOT
+    ## --- Handle error case for step function ---
+    #set($output = $util.parseJson($input.path('$.output')))
+    #if($output.errorMessage != "")
+        #set($errorJsonObject = $util.parseJson($output.errorMessage))
+        #set($context.responseOverride.status = $errorJsonObject.statusCode)
+        $output.errorMessage
+    ## --- Handle success case for step function ---
+    #else
+        #set($context.responseOverride.status = $output.statusCode)
+        $output.body
+    #end
+    EOT
+  }
+
+  selection_pattern = ".*"
+}
+
+// ================== OPTIONS /characters/{character-id}/attributes/{attribute-name} ==================
+
+resource "aws_api_gateway_method" "attribute_name_options" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.attribute_name.id
+  http_method = "OPTIONS"
+  // Authorization needs to be NONE for the preflight request to work which is sent automatically by the browser without any authorization header.
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.header.Origin" : false
+  }
+}
+
+resource "aws_api_gateway_integration" "attribute_name_options_integration" {
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.attribute_name.id
+  http_method          = aws_api_gateway_method.attribute_name_options.http_method
+  type                 = "MOCK"
+  passthrough_behavior = "WHEN_NO_TEMPLATES"
+  // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
+  // For a method with the mock integration to return a 200 response, configure the
+  // integration request body mapping template to return the following:
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
+}
+
+resource "aws_api_gateway_integration_response" "attribute_name_options_integration_response" {
+  depends_on = [aws_api_gateway_integration.attribute_name_options_integration]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.attribute_name.id
+  http_method = aws_api_gateway_method.attribute_name_options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "attribute_name_options_method_response" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.attribute_name.id
+  http_method = aws_api_gateway_method.attribute_name_options.http_method
   status_code = 200
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "true"

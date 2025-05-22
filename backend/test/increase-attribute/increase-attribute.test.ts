@@ -3,8 +3,8 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { Character, getSkill } from "config/index.js";
-import { increaseSkill } from "increase-skill/index.js";
+import { getAttribute } from "config/index.js";
+import { increaseAttribute } from "increase-attribute/index.js";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
@@ -17,14 +17,12 @@ describe("Invalid requests", () => {
         },
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 1,
-          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 401,
@@ -37,68 +35,44 @@ describe("Invalid requests", () => {
         },
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
           initialValue: 16,
           increasedPoints: 1,
-          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 401,
     },
     {
-      name: "Passed initial skill value doesn't match the value in the backend",
+      name: "Passed initial attribute value doesn't match the value in the backend",
       request: {
         headers: fakeHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
           initialValue: 10,
-          increasedPoints: 15,
-          learningMethod: "NORMAL",
+          increasedPoints: 1,
         },
       },
       expectedStatusCode: 409,
     },
     {
-      name: "Skill is not activated",
+      name: "Not enough attribute points",
       request: {
         headers: fakeHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "nature",
-          "skill-name": "fishing",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
-          initialValue: 8,
-          increasedPoints: 3,
-          learningMethod: "NORMAL",
-        },
-      },
-      expectedStatusCode: 409,
-    },
-    {
-      name: "Not enough adventure points",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "skill-category": "combat",
-          "skill-name": "slashingWeapons1h",
-        },
-        queryStringParameters: null,
-        body: {
-          initialValue: 110,
-          increasedPoints: 25,
-          learningMethod: "EXPENSIVE",
+          initialValue: 18,
+          increasedPoints: 8,
         },
       },
       expectedStatusCode: 400,
@@ -109,14 +83,12 @@ describe("Invalid requests", () => {
         headers: fakeHeaders,
         pathParameters: {
           "character-id": "1234567890",
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
-          increasedPoints: 5,
-          learningMethod: "NORMAL",
+          initialValue: 18,
+          increasedPoints: 1,
         },
       },
       expectedStatusCode: 400,
@@ -127,14 +99,12 @@ describe("Invalid requests", () => {
         headers: fakeHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
+          initialValue: 18,
           increasedPoints: 0,
-          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 400,
@@ -145,14 +115,12 @@ describe("Invalid requests", () => {
         headers: fakeHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
+          initialValue: 18,
           increasedPoints: -3,
-          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 400,
@@ -163,14 +131,12 @@ describe("Invalid requests", () => {
         headers: fakeHeaders,
         pathParameters: {
           "character-id": "26c5d41d-cef1-455f-a341-b15d8a5b3967",
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
+          initialValue: 18,
           increasedPoints: 3,
-          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 404,
@@ -181,14 +147,12 @@ describe("Invalid requests", () => {
         headers: dummyHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
+          initialValue: 18,
           increasedPoints: 3,
-          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 404,
@@ -199,7 +163,7 @@ describe("Invalid requests", () => {
     test(_case.name, async () => {
       mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
-      await expectHttpError(() => increaseSkill(_case.request), _case.expectedStatusCode);
+      await expectHttpError(() => increaseAttribute(_case.request), _case.expectedStatusCode);
     });
   });
 });
@@ -207,91 +171,49 @@ describe("Invalid requests", () => {
 describe("Valid requests", () => {
   const validTestCases = [
     {
-      name: "Skill has already been increased to the target value (idempotency)",
+      name: "Attribute has already been increased to the target value (idempotency)",
       request: {
         headers: fakeHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
-          initialValue: 12,
-          increasedPoints: 4,
-          learningMethod: "NORMAL",
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Increase skill by 1 point (cost category: NORMAL)",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
-        },
-        queryStringParameters: null,
-        body: {
-          initialValue: 16,
+          initialValue: 17,
           increasedPoints: 1,
-          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 200,
     },
     {
-      name: "Increase skill by 3 point (cost category: FREE)",
+      name: "Increase attribute by 1 point",
       request: {
         headers: fakeHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
-          increasedPoints: 3,
-          learningMethod: "FREE",
+          initialValue: 18,
+          increasedPoints: 1,
         },
       },
       expectedStatusCode: 200,
     },
     {
-      name: "Increase skill by 3 point (cost category: LOW_PRICED)",
+      name: "Increase attribute by 3 point",
       request: {
         headers: fakeHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "attribute-name": "endurance",
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
+          initialValue: 18,
           increasedPoints: 3,
-          learningMethod: "LOW_PRICED",
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Increase skill by 3 point (cost category: EXPENSIVE)",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
-        },
-        queryStringParameters: null,
-        body: {
-          initialValue: 16,
-          increasedPoints: 3,
-          learningMethod: "EXPENSIVE",
         },
       },
       expectedStatusCode: 200,
@@ -302,32 +224,31 @@ describe("Valid requests", () => {
     test(_case.name, async () => {
       mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
-      const result = await increaseSkill(_case.request);
+      const result = await increaseAttribute(_case.request);
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
       const parsedBody = JSON.parse(result.body);
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
-      const skillName = _case.request.pathParameters["skill-name"];
-      expect(parsedBody.skillName).toBe(skillName);
-      expect(parsedBody.skill.new.current).toBe(_case.request.body.initialValue + _case.request.body.increasedPoints);
+      const attributeName = _case.request.pathParameters["attribute-name"];
+      expect(parsedBody.attributeName).toBe(attributeName);
+      expect(parsedBody.attribute.new.current).toBe(
+        _case.request.body.initialValue + _case.request.body.increasedPoints,
+      );
 
-      const skillCategory = _case.request.pathParameters[
-        "skill-category"
-      ] as keyof Character["characterSheet"]["skills"];
-      const skillOld = getSkill(fakeCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
-      const oldTotalSkillCost = skillOld.totalCost;
-      const diffSkillTotalCost = parsedBody.skill.new.totalCost - oldTotalSkillCost;
-      const oldAvailableAdventurePoints =
-        fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
-      const diffAvailableAdventurePoints = oldAvailableAdventurePoints - parsedBody.adventurePoints.new.available;
-      expect(diffAvailableAdventurePoints).toBe(diffSkillTotalCost);
+      const attributeOld = getAttribute(fakeCharacterResponse.Item.characterSheet.attributes, attributeName);
+      const oldTotalAttributeCost = attributeOld.totalCost;
+      const diffAttributeTotalCost = parsedBody.attribute.new.totalCost - oldTotalAttributeCost;
+      const oldAvailableAttributePoints =
+        fakeCharacterResponse.Item.characterSheet.calculationPoints.attributePoints.available;
+      const diffAvailableAttributePoints = oldAvailableAttributePoints - parsedBody.attributePoints.new.available;
+      expect(diffAvailableAttributePoints).toBe(diffAttributeTotalCost);
 
-      expect(parsedBody.skill.old).toStrictEqual(skillOld);
+      expect(parsedBody.attribute.old).toStrictEqual(attributeOld);
 
-      // Skill was not already at the target value
-      if (_case.request.body.initialValue + _case.request.body.increasedPoints !== skillOld.current) {
-        // Check if the skill was updated
+      // Attribute was not already at the target value
+      if (_case.request.body.initialValue + _case.request.body.increasedPoints !== attributeOld.current) {
+        // Check if the attribute was updated
         const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
         expect(calls).toHaveLength(1);
 
