@@ -808,89 +808,6 @@ module "skill_name_options" {
   resource_id = aws_api_gateway_resource.skill_name.id
 }
 
-// TODO remove whole section after testing (not needed anymore)
-// ================== tenant-id ==================
-
-resource "aws_api_gateway_resource" "tenant_id" {
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  parent_id   = aws_api_gateway_rest_api.pnp_rest_api.root_resource_id
-  path_part   = "tenant-id"
-}
-
-resource "aws_api_gateway_method" "tenant_id_post" {
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.tenant_id.id
-  http_method   = "POST"
-  authorization = "COGNITO_USER_POOLS"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
-}
-
-resource "aws_api_gateway_integration" "tenant_id_post_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id             = aws_api_gateway_resource.tenant_id.id
-  http_method             = aws_api_gateway_method.tenant_id_post.http_method
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.create_tenant_id_lambda.invoke_arn
-  passthrough_behavior    = "WHEN_NO_TEMPLATES"
-}
-
-resource "aws_api_gateway_method" "tenant_id_options" {
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.tenant_id.id
-  http_method = "OPTIONS"
-  // Authorization needs to be NONE for the preflight request to work which is sent automatically by the browser without any authorization header.
-  authorization = "NONE"
-  request_parameters = {
-    "method.request.header.Origin" : false
-  }
-}
-
-resource "aws_api_gateway_integration" "tenant_id_options_integration" {
-  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id          = aws_api_gateway_resource.tenant_id.id
-  http_method          = aws_api_gateway_method.tenant_id_options.http_method
-  type                 = "MOCK"
-  passthrough_behavior = "WHEN_NO_TEMPLATES"
-  // see https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-mock-integration.html#how-to-mock-integration-request-examples
-  // For a method with the mock integration to return a 200 response, configure the
-  // integration request body mapping template to return the following:
-  request_templates = {
-    "application/json" = jsonencode(
-      {
-        statusCode = 200
-      }
-    )
-  }
-}
-
-resource "aws_api_gateway_integration_response" "tenant_id_options_integration_response" {
-  depends_on = [aws_api_gateway_integration.tenant_id_options_integration]
-
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.tenant_id.id
-  http_method = aws_api_gateway_method.tenant_id_options.http_method
-  status_code = 200
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
-    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,RefreshToken'"
-    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,POST'"
-  }
-}
-
-resource "aws_api_gateway_method_response" "tenant_id_options_method_response" {
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.tenant_id.id
-  http_method = aws_api_gateway_method.tenant_id_options.http_method
-  status_code = 200
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "true"
-    "method.response.header.Access-Control-Allow-Methods" = "true"
-    "method.response.header.Access-Control-Allow-Origin"  = "true"
-  }
-}
-
 // TODO there is a new stage deployment with each CircleCI run -> fix this
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
@@ -910,7 +827,6 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     aws_api_gateway_method_response.skill_name_patch_method_response,
     aws_api_gateway_integration.skill_name_patch_integration,
     aws_api_gateway_integration_response.skill_name_patch_integration_response,
-    aws_api_gateway_integration.tenant_id_post_integration,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
