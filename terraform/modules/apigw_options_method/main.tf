@@ -1,17 +1,13 @@
 variable "rest_api_id" {}
 variable "resource_id" {}
-variable "allowed_origin" {
-  type    = string
-  default = "'*'" // TODO delete after testing and implement the following line
-  //default = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
-}
-variable "allowed_headers" {
-  type    = string
-  default = "'Content-Type,Authorization'"
-}
-variable "allowed_methods" {
-  type    = string
-  default = "'OPTIONS,GET,PATCH'"
+variable "integration_response_parameters" {
+  type = map(string)
+  default = {
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
+    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH'"
+  }
 }
 
 resource "aws_api_gateway_method" "options" {
@@ -46,11 +42,7 @@ resource "aws_api_gateway_integration_response" "options" {
   resource_id = var.resource_id
   http_method = aws_api_gateway_method.options.http_method
   status_code = 200
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = var.allowed_origin
-    "method.response.header.Access-Control-Allow-Headers" = var.allowed_headers
-    "method.response.header.Access-Control-Allow-Methods" = var.allowed_methods
-  }
+  response_parameters = var.integration_response_parameters
 }
 
 resource "aws_api_gateway_method_response" "options" {
