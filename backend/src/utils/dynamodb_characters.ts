@@ -3,7 +3,7 @@ import { DynamoDBDocumentClient, GetCommand, QueryCommand, UpdateCommand } from 
 import { z } from "zod";
 import { Attribute, Character, characterSchema } from "config/index.js";
 import { HttpError } from "./errors.js";
-import { CalculationPoints } from "config/character.js";
+import { CalculationPoints, Skill } from "config/character.js";
 
 export async function getCharacterItem(userId: string, characterId: string): Promise<Character> {
   console.log(`Get character ${characterId} of user ${userId} from DynamoDB`);
@@ -101,9 +101,8 @@ export async function updateSkill(
   characterId: string,
   skillCategory: string,
   skillName: string,
-  skillValue: number,
-  skillTotalCost: number,
-  availableAdventurePoints: number,
+  skill: Skill,
+  adventurePoints: CalculationPoints,
 ): Promise<void> {
   console.log(`Update skill '${skillName}' of character ${characterId} (user ${userId}) in DynamoDB`);
 
@@ -117,24 +116,19 @@ export async function updateSkill(
       characterId: characterId,
     },
     UpdateExpression:
-      "SET #characterSheet.#skills.#skillCategory.#skillName.#current = :current, " +
-      "#characterSheet.#skills.#skillCategory.#skillName.#totalCost = :totalCost, " +
-      "#characterSheet.#calculationPoints.#adventurePoints.#available = :available",
+      "SET #characterSheet.#skills.#skillCategory.#skillName = :skill, " +
+      "#characterSheet.#calculationPoints.#adventurePoints = :adventurePoints",
     ExpressionAttributeNames: {
       "#characterSheet": "characterSheet",
       "#skills": "skills",
       "#skillCategory": skillCategory,
       "#skillName": skillName,
-      "#current": "current",
-      "#totalCost": "totalCost",
       "#calculationPoints": "calculationPoints",
       "#adventurePoints": "adventurePoints",
-      "#available": "available",
     },
     ExpressionAttributeValues: {
-      ":current": skillValue,
-      ":totalCost": skillTotalCost,
-      ":available": availableAdventurePoints,
+      ":skill": skill,
+      ":adventurePoints": adventurePoints,
     },
   });
 

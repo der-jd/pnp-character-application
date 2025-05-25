@@ -111,15 +111,7 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
       adventurePoints.available -= increaseCost;
     }
 
-    await updateSkill(
-      params.userId,
-      params.characterId,
-      skillCategory,
-      params.skillName,
-      skill.current,
-      skill.totalCost,
-      adventurePoints.available,
-    );
+    await updateSkill(params.userId, params.characterId, skillCategory, params.skillName, skill, adventurePoints);
 
     const response = {
       statusCode: 200,
