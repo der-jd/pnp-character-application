@@ -73,8 +73,9 @@ interface Parameters {
 export async function addRecordToHistory(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = await validateRequest(request);
+    const { userId, ...bodyWithoutUserId } = params.body;
 
-    console.log(`Add record to history of character ${params.characterId} of user ${params.body.userId}`);
+    console.log(`Add record to history of character ${params.characterId} of user ${userId}`);
 
     const items = await getHistoryItems(
       params.characterId,
@@ -91,7 +92,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
         number: 1,
         id: uuidv4(),
         timestamp: new Date().toISOString(),
-        ...params.body,
+        ...bodyWithoutUserId,
       };
       await addHistoryRecord(record, newBlock);
     } else if (items.length !== 1) {
@@ -105,7 +106,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
         number: latestRecord.number + 1,
         id: uuidv4(),
         timestamp: new Date().toISOString(),
-        ...params.body,
+        ...bodyWithoutUserId,
       };
 
       if (isDuplicate(latestRecord, record)) {
