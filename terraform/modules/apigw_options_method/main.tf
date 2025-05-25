@@ -1,5 +1,9 @@
-variable "rest_api_id" {}
-variable "resource_id" {}
+variable "rest_api_id" {
+  type = string
+}
+variable "resource_id" {
+  type = string
+}
 variable "integration_response_parameters" {
   type = map(string)
   default = {
@@ -38,10 +42,10 @@ resource "aws_api_gateway_integration" "options" {
 resource "aws_api_gateway_integration_response" "options" {
   depends_on = [aws_api_gateway_integration.options, aws_api_gateway_method_response.options]
 
-  rest_api_id = var.rest_api_id
-  resource_id = var.resource_id
-  http_method = aws_api_gateway_method.options.http_method
-  status_code = 200
+  rest_api_id         = var.rest_api_id
+  resource_id         = var.resource_id
+  http_method         = aws_api_gateway_method.options.http_method
+  status_code         = 200
   response_parameters = var.integration_response_parameters
 }
 

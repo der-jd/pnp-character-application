@@ -1,14 +1,28 @@
-variable "rest_api_id" {}
-variable "resource_id" {}
-variable "authorizer_id" {}
-variable "method_request_parameters" { type = map(bool) }
+variable "rest_api_id" {
+  type = string
+}
+variable "resource_id" {
+  type = string
+}
+variable "authorizer_id" {
+  type = string
+}
+variable "method_request_parameters" {
+  type = map(bool)
+}
 variable "status_codes" {
-  type = list(string)
+  type    = list(string)
   default = ["200", "400", "401", "403", "404", "409", "500"]
 }
-variable "aws_region" {}
-variable "credentials" {}
-variable "state_machine_arn" {}
+variable "aws_region" {
+  type = string
+}
+variable "credentials" {
+  type = string
+}
+variable "state_machine_arn" {
+  type = string
+}
 variable "integration_response_parameters" {
   type = map(string)
   default = {
@@ -20,21 +34,21 @@ variable "integration_response_parameters" {
 }
 
 resource "aws_api_gateway_method" "patch" {
-  rest_api_id   = var.rest_api_id
-  resource_id   = var.resource_id
-  http_method   = "PATCH"
-  authorization = "COGNITO_USER_POOLS"
-  authorizer_id = var.authorizer_id
+  rest_api_id        = var.rest_api_id
+  resource_id        = var.resource_id
+  http_method        = "PATCH"
+  authorization      = "COGNITO_USER_POOLS"
+  authorizer_id      = var.authorizer_id
   request_parameters = var.method_request_parameters
 }
 
 resource "aws_api_gateway_method_response" "patch" {
   for_each = toset(var.status_codes)
 
-  rest_api_id = var.rest_api_id
-  resource_id = var.resource_id
-  http_method = aws_api_gateway_method.patch.http_method
-  status_code = each.value
+  rest_api_id     = var.rest_api_id
+  resource_id     = var.resource_id
+  http_method     = aws_api_gateway_method.patch.http_method
+  status_code     = each.value
   response_models = { "application/json" = "Empty" }
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin"  = true
@@ -122,10 +136,10 @@ resource "aws_api_gateway_integration" "patch" {
 resource "aws_api_gateway_integration_response" "patch" {
   depends_on = [aws_api_gateway_integration.patch, aws_api_gateway_method_response.patch]
 
-  rest_api_id = var.rest_api_id
-  resource_id = var.resource_id
-  http_method = aws_api_gateway_method.patch.http_method
-  status_code = 200
+  rest_api_id         = var.rest_api_id
+  resource_id         = var.resource_id
+  http_method         = aws_api_gateway_method.patch.http_method
+  status_code         = 200
   response_parameters = var.integration_response_parameters
   response_templates = {
     "application/json" = <<EOT
@@ -142,5 +156,5 @@ resource "aws_api_gateway_integration_response" "patch" {
     #end
     EOT
   }
-  selection_pattern   = ".*"
+  selection_pattern = ".*"
 }
