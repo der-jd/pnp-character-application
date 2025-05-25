@@ -241,22 +241,17 @@ module "history_options" {
 // TODO there is a new stage deployment with each CircleCI run -> fix this
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
-    aws_api_gateway_method.characters_get,
-    aws_api_gateway_method_response.characters_get_method_response,
-    aws_api_gateway_integration.characters_get_integration,
-    aws_api_gateway_integration_response.characters_get_integration_response,
-    aws_api_gateway_method.character_id_get,
-    aws_api_gateway_method_response.character_id_get_method_response,
-    aws_api_gateway_integration.character_id_get_integration,
-    aws_api_gateway_integration_response.character_id_get_integration_response,
-    aws_api_gateway_method.skill_name_get,
-    aws_api_gateway_method_response.skill_name_get_method_response,
-    aws_api_gateway_integration.skill_name_get_integration,
-    aws_api_gateway_integration_response.skill_name_get_integration_response,
-    aws_api_gateway_method.skill_name_patch,
-    aws_api_gateway_method_response.skill_name_patch_method_response,
-    aws_api_gateway_integration.skill_name_patch_integration,
-    aws_api_gateway_integration_response.skill_name_patch_integration_response,
+    module.attribute_name_patch,
+    module.attribute_name_options,
+    module.characters_get,
+    module.characters_options,
+    module.character_id_get,
+    module.character_id_options,
+    module.skill_name_get,
+    module.skill_name_patch,
+    module.skill_name_options,
+    module.history_get,
+    module.history_options,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
