@@ -25,5 +25,13 @@ export {
   professionHobbySchema,
   skillSchema,
 } from "./character_schema.js";
-export { recordSchema, Record, historyBlockSchema, HistoryBlock } from "./history_schema.js";
+export {
+  recordSchema,
+  Record,
+  historyBlockSchema,
+  HistoryBlock,
+  numberSchema,
+  stringSchema,
+  booleanSchema,
+} from "./history_schema.js";
 export { RecordType, parseRecordType } from "./history.js";

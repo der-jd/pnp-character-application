@@ -12,6 +12,9 @@ import {
   Record,
   skillSchema,
   historyBlockSchema,
+  numberSchema,
+  stringSchema,
+  booleanSchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -49,18 +52,6 @@ const historyBodySchema = z.object({
     new: calculationPointsSchema,
   }),
   comment: z.string().nullable(),
-});
-
-const numberSchema = z.object({
-  value: z.number(),
-});
-
-const stringSchema = z.object({
-  value: z.string(),
-});
-
-const booleanSchema = z.object({
-  value: z.boolean(),
 });
 
 export type HistoryBodySchema = z.infer<typeof historyBodySchema>;

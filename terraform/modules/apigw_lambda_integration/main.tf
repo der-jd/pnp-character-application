@@ -4,6 +4,9 @@ variable "rest_api_id" {
 variable "resource_id" {
   type = string
 }
+variable "http_method" {
+  type = string
+}
 variable "authorizer_id" {
   type = string
 }
@@ -23,25 +26,25 @@ variable "integration_response_parameters" {
     "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
     //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
-    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,DELETE'"
   }
 }
 
-resource "aws_api_gateway_method" "get" {
+resource "aws_api_gateway_method" "lambda" {
   rest_api_id        = var.rest_api_id
   resource_id        = var.resource_id
-  http_method        = "GET"
+  http_method        = var.http_method
   authorization      = "COGNITO_USER_POOLS"
   authorizer_id      = var.authorizer_id
   request_parameters = var.method_request_parameters
 }
 
-resource "aws_api_gateway_method_response" "get" {
+resource "aws_api_gateway_method_response" "lambda" {
   for_each = toset(var.status_codes)
 
   rest_api_id     = var.rest_api_id
   resource_id     = var.resource_id
-  http_method     = aws_api_gateway_method.get.http_method
+  http_method     = aws_api_gateway_method.lambda.http_method
   status_code     = each.value
   response_models = { "application/json" = "Empty" }
   response_parameters = {
@@ -51,10 +54,10 @@ resource "aws_api_gateway_method_response" "get" {
   }
 }
 
-resource "aws_api_gateway_integration" "get" {
+resource "aws_api_gateway_integration" "lambda" {
   rest_api_id             = var.rest_api_id
   resource_id             = var.resource_id
-  http_method             = aws_api_gateway_method.get.http_method
+  http_method             = aws_api_gateway_method.lambda.http_method
   integration_http_method = "POST"
   type                    = "AWS"
   uri                     = var.lambda_uri
@@ -101,12 +104,12 @@ resource "aws_api_gateway_integration" "get" {
   }
 }
 
-resource "aws_api_gateway_integration_response" "get" {
-  depends_on = [aws_api_gateway_integration.get, aws_api_gateway_method_response.get]
+resource "aws_api_gateway_integration_response" "lambda" {
+  depends_on = [aws_api_gateway_integration.lambda, aws_api_gateway_method_response.lambda]
 
   rest_api_id         = var.rest_api_id
   resource_id         = var.resource_id
-  http_method         = aws_api_gateway_method.get.http_method
+  http_method         = aws_api_gateway_method.lambda.http_method
   status_code         = 200
   response_parameters = var.integration_response_parameters
   /**

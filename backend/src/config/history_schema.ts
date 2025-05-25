@@ -31,3 +31,15 @@ export const historyBlockSchema = z.object({
 });
 
 export type HistoryBlock = z.infer<typeof historyBlockSchema>;
+
+export const numberSchema = z.object({
+  value: z.number(),
+});
+
+export const stringSchema = z.object({
+  value: z.string(),
+});
+
+export const booleanSchema = z.object({
+  value: z.boolean(),
+});

@@ -14,13 +14,13 @@
   "dependencies": {
     "add-history-record": "file:src/lambdas/add-history-record",
     "config": "file:src/config",
-    "create-tenant-id": "file:src/lambdas/create-tenant-id",
     "get-character": "file:src/lambdas/get-character",
     "get-characters": "file:src/lambdas/get-characters",
     "get-history": "file:src/lambdas/get-history",
     "get-skill-increase-cost": "file:src/lambdas/get-skill-increase-cost",
     "increase-attribute": "file:src/lambdas/increase-attribute",
     "increase-skill": "file:src/lambdas/increase-skill",
+    "revert-history-record": "file:src/lambdas/revert-history-record",
     "utils": "file:src/utils"
   },
   "devDependencies": {
