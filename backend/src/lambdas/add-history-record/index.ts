@@ -48,8 +48,18 @@ const historyBodySchema = z.object({
   }),
   learningMethod: z.string().nullable(),
   calculationPoints: z.object({
-    old: calculationPointsSchema,
-    new: calculationPointsSchema,
+    adventurePoints: z
+      .object({
+        old: calculationPointsSchema,
+        new: calculationPointsSchema,
+      })
+      .nullable(),
+    attributePoints: z
+      .object({
+        old: calculationPointsSchema,
+        new: calculationPointsSchema,
+      })
+      .nullable(),
   }),
   comment: z.string().nullable(),
 });

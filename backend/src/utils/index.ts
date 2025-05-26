@@ -1,5 +1,12 @@
 export { Request, parseBody } from "./request.js";
-export { getCharacterItem, getCharacterItems, updateAttribute, updateSkill } from "./dynamodb_characters.js";
+export {
+  getCharacterItem,
+  getCharacterItems,
+  updateAttribute,
+  updateSkill,
+  updateAdventurePoints,
+  updateAttributePoints,
+} from "./dynamodb_characters.js";
 export {
   getHistoryItem,
   getHistoryItems,

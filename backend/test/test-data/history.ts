@@ -23,16 +23,8 @@ export const fakeHistoryBlock1: HistoryBlock = {
       },
       learningMethod: null,
       calculationPoints: {
-        old: {
-          start: 0,
-          available: 100,
-          total: 100,
-        },
-        new: {
-          start: 0,
-          available: 100,
-          total: 100,
-        },
+        adventurePoints: null,
+        attributePoints: null,
       },
       comment: "Character created",
       timestamp: new Date().toISOString(),
@@ -58,15 +50,18 @@ export const fakeHistoryBlock1: HistoryBlock = {
       },
       learningMethod: null,
       calculationPoints: {
-        old: {
-          start: 0,
-          available: 10,
-          total: 10,
-        },
-        new: {
-          start: 0,
-          available: 9,
-          total: 10,
+        adventurePoints: null,
+        attributePoints: {
+          old: {
+            start: 0,
+            available: 10,
+            total: 10,
+          },
+          new: {
+            start: 0,
+            available: 9,
+            total: 10,
+          },
         },
       },
       comment: "Weight training",
@@ -106,16 +101,19 @@ export const fakeHistoryBlock2: HistoryBlock = {
       },
       learningMethod: "NORMAL",
       calculationPoints: {
-        old: {
-          start: 0,
-          available: 100,
-          total: 200,
+        adventurePoints: {
+          old: {
+            start: 0,
+            available: 100,
+            total: 200,
+          },
+          new: {
+            start: 0,
+            available: 90,
+            total: 200,
+          },
         },
-        new: {
-          start: 0,
-          available: 90,
-          total: 200,
-        },
+        attributePoints: null,
       },
       comment: null,
       timestamp: new Date().toISOString(),
@@ -159,16 +157,19 @@ function generateLargeChangesList(size: number): Record[] {
       },
       learningMethod: "NORMAL",
       calculationPoints: {
-        old: {
-          start: 0,
-          available: 10000 - i,
-          total: 10000,
+        adventurePoints: {
+          old: {
+            start: 0,
+            available: 10000 - i,
+            total: 10000,
+          },
+          new: {
+            start: 0,
+            available: 10000 - (i + 1),
+            total: 10000,
+          },
         },
-        new: {
-          start: 0,
-          available: 10000 - (i + 1),
-          total: 10000,
-        },
+        attributePoints: null,
       },
       comment: `Change ${i}`,
       timestamp: new Date().toISOString(),

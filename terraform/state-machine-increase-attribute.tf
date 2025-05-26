@@ -113,13 +113,16 @@ resource "aws_sfn_state_machine" "increase_attribute_state_machine" {
             "character-id" = "{% $parse($states.input.body).characterId %}"
           },
           "body" = {
-            "userId"            = "{% $parse($states.input.body).userId %}",
-            "type"              = "8", // ATTRIBUTE_RAISED
-            "name"              = "{% $parse($states.input.body).attributeName %}",
-            "data"              = "{% $parse($states.input.body).attribute %}",
-            "learningMethod"    = null,
-            "calculationPoints" = "{% $parse($states.input.body).attributePoints %}",
-            "comment"           = null
+            "userId"         = "{% $parse($states.input.body).userId %}",
+            "type"           = "8", // ATTRIBUTE_RAISED
+            "name"           = "{% $parse($states.input.body).attributeName %}",
+            "data"           = "{% $parse($states.input.body).attribute %}",
+            "learningMethod" = null,
+            "calculationPoints" = {
+              "adventurePoints" = null,
+              "attributePoints" = "{% $parse($states.input.body).attributePoints %}"
+            },
+            "comment" = null
           }
         },
         Assign = {
