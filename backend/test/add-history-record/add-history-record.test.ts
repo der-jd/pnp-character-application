@@ -446,7 +446,7 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.SKILL_ACTIVATED,
-          name: "Disguising",
+          name: "social/disguising",
           data: {
             old: {
               value: false,
@@ -487,7 +487,7 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.SKILL_RAISED,
-          name: "Body Control",
+          name: "body/bodyControl",
           data: {
             old: {
               activated: true,
@@ -611,7 +611,7 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.SKILL_RAISED,
-          name: "Athletics",
+          name: "body/athletics",
           data: {
             old: {
               activated: true,

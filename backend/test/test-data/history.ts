@@ -31,7 +31,7 @@ export const fakeHistoryBlock1: HistoryBlock = {
     },
     {
       type: RecordType.ATTRIBUTE_RAISED,
-      name: "Strength",
+      name: "strength",
       number: 2,
       id: "fc0a5a71-80ac-47bc-85c2-85fc4c9de99a",
       data: {
@@ -78,7 +78,7 @@ export const fakeHistoryBlock2: HistoryBlock = {
   changes: [
     {
       type: RecordType.SKILL_RAISED,
-      name: "Athletics",
+      name: "body/athletics",
       number: 3,
       id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
       data: {
@@ -134,7 +134,7 @@ function generateLargeChangesList(size: number): Record[] {
   for (let i = 0; i < size; i++) {
     largeChanges.push({
       type: RecordType.SKILL_RAISED,
-      name: `Skill ${i}`,
+      name: `category/skill${i}`,
       number: i + 1,
       id: uuidv4(),
       data: {
