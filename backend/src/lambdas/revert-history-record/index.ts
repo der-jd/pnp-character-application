@@ -14,6 +14,7 @@ import {
   numberSchema,
   stringSchema,
   booleanSchema,
+  CalculationPoints,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -24,6 +25,11 @@ import {
   HttpError,
   ensureHttpError,
   validateCharacterId,
+  updateAdventurePoints,
+  decodeUserId,
+  updateAttributePoints,
+  updateAttribute,
+  updateSkill,
 } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -36,6 +42,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 };
 
 interface Parameters {
+  userId: string;
   characterId: string;
   recordId: string;
 }
@@ -66,7 +73,7 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
       throw new HttpError(404, "The latest record does not match the given id");
     }
 
-    revertChange(latestRecord);
+    revertChange(params.userId, params.characterId, latestRecord);
 
     if (latestBlock.changes.length === 1) {
       console.log("Deleting the complete history block as it only contains the record that should be deleted");
@@ -100,55 +107,84 @@ async function validateRequest(request: Request): Promise<Parameters> {
   validateCharacterId(characterId);
 
   return {
+    userId: decodeUserId(request.headers.authorization ?? request.headers.Authorization),
     characterId: characterId,
     recordId: request.pathParameters["record-id"],
   };
 }
 
-function revertChange(record: Record): void {
+function revertChange(userId: string, characterId: string, record: Record): void {
   console.log("Reverting change:", record);
 
   try {
     recordSchema.parse(record);
 
-    // TODO implement revert logic for each record type
-    // We must call an update function for the dynamodb item to revert the change.
     switch (record.type) {
       case RecordType.EVENT_CALCULATION_POINTS:
         calculationPointsSchema.parse(record.data.old);
+        throw new HttpError(500, "Reverting calculation points change is not implemented yet!"); // TODO
         break;
       case RecordType.EVENT_LEVEL_UP:
         numberSchema.parse(record.data.old);
+        throw new HttpError(500, "Reverting level up is not implemented yet!"); // TODO
         break;
       case RecordType.EVENT_BASE_VALUE:
         baseValueSchema.parse(record.data.old);
+        throw new HttpError(500, "Reverting base value change is not implemented yet!"); // TODO
         break;
       case RecordType.PROFESSION_CHANGED:
         professionHobbySchema.parse(record.data.old);
+        throw new HttpError(500, "Reverting profession change is not implemented yet!"); // TODO
         break;
       case RecordType.HOBBY_CHANGED:
         professionHobbySchema.parse(record.data.old);
+        throw new HttpError(500, "Reverting hobby change is not implemented yet!"); // TODO
         break;
       case RecordType.ADVANTAGE_CHANGED:
         stringSchema.parse(record.data.old);
+        throw new HttpError(500, "Reverting advantage change is not implemented yet!"); // TODO
         break;
       case RecordType.DISADVANTAGE_CHANGED:
         stringSchema.parse(record.data.old);
+        throw new HttpError(500, "Reverting disadvantage change is not implemented yet!"); // TODO
         break;
       case RecordType.SPECIAL_ABILITY_CHANGED:
         stringSchema.parse(record.data.old);
+        throw new HttpError(500, "Reverting special ability change is not implemented yet!"); // TODO
         break;
-      case RecordType.ATTRIBUTE_RAISED:
-        attributeSchema.parse(record.data.old);
+      case RecordType.ATTRIBUTE_RAISED: {
+        const oldAttribute = attributeSchema.parse(record.data.old);
+        updateAttribute(
+          userId,
+          characterId,
+          record.name,
+          oldAttribute,
+          requireProperty(record.calculationPoints.attributePoints?.old, "attributePoints"),
+        );
+        updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
+      }
       case RecordType.SKILL_ACTIVATED:
         booleanSchema.parse(record.data.old);
+        throw new HttpError(500, "Reverting skill activation is not implemented yet!"); // TODO
         break;
-      case RecordType.SKILL_RAISED:
-        skillSchema.parse(record.data.old);
+      case RecordType.SKILL_RAISED: {
+        const oldSkill = skillSchema.parse(record.data.old);
+        const [skillCategory, skillName] = record.name.split("/");
+        updateSkill(
+          userId,
+          characterId,
+          skillCategory,
+          skillName,
+          oldSkill,
+          requireProperty(record.calculationPoints.adventurePoints?.old, "adventurePoints"),
+        );
+        updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         break;
+      }
       case RecordType.ATTACK_PARADE_DISTRIBUTED:
         combatSkillSchema.parse(record.data.old);
+        throw new HttpError(500, "Reverting attack/parade distribution is not implemented yet!"); // TODO
         break;
       default:
         throw new HttpError(500, "Unknown history record type!");
@@ -161,5 +197,32 @@ function revertChange(record: Record): void {
 
     // Rethrow other errors
     throw error;
+  }
+}
+
+function requireProperty<T>(property: T | undefined | null, name: string): T {
+  if (!property) {
+    throw new HttpError(500, `Property ${name} is required but missing or null!`);
+  }
+  return property;
+}
+
+function updateAttributePointsIfExists(
+  userId: string,
+  characterId: string,
+  points: CalculationPoints | undefined,
+): void {
+  if (points) {
+    updateAttributePoints(userId, characterId, points);
+  }
+}
+
+function updateAdventurePointsIfExists(
+  userId: string,
+  characterId: string,
+  points: CalculationPoints | undefined,
+): void {
+  if (points) {
+    updateAdventurePoints(userId, characterId, points);
   }
 }
