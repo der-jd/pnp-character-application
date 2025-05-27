@@ -7,6 +7,8 @@ export {
   getSkillIncreaseCost,
 } from "./cost.js";
 export {
+  CalculationPoints,
+  ProfessionHobby,
   Attribute,
   BaseValue,
   Skill,

@@ -1,9 +1,8 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { Attribute, Character, characterSchema } from "config/index.js";
+import { Attribute, Character, characterSchema, CalculationPoints, Skill } from "config/index.js";
 import { HttpError } from "./errors.js";
-import { CalculationPoints, Skill } from "config/character.js";
 
 export async function getCharacterItem(userId: string, characterId: string): Promise<Character> {
   console.log(`Get character ${characterId} of user ${userId} from DynamoDB`);

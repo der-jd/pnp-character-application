@@ -6,7 +6,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { marshall } from "@aws-sdk/util-dynamodb";
 
-import { Character } from "../backend/src/config/character.js";
+import { Character } from "../backend/src/config/index.js";
 
 async function parseXmlFile(filePath: string): Promise<any> {
   if (!fs.existsSync(filePath)) {
