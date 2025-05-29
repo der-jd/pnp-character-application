@@ -119,7 +119,7 @@ resource "aws_sfn_state_machine" "increase_skill_state_machine" {
       AddHistoryRecord = {
         Type          = "Task",
         QueryLanguage = "JSONata",
-        Resource      = aws_lambda_function.add_history_record_lambda.arn,
+        Resource      = module.add_history_record_lambda.lambda_function.arn,
         Arguments = {
           "pathParameters" = {
             "character-id" = "{% $parse($states.input.body).characterId %}"
