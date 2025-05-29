@@ -1,9 +1,8 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { Attribute, Character, characterSchema } from "config/index.js";
+import { Attribute, Character, characterSchema, CalculationPoints, Skill } from "config/index.js";
 import { HttpError } from "./errors.js";
-import { CalculationPoints, Skill } from "config/character.js";
 
 export async function getCharacterItem(userId: string, characterId: string): Promise<Character> {
   console.log(`Get character ${characterId} of user ${userId} from DynamoDB`);
@@ -55,6 +54,63 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
   console.log("Successfully got DynamoDB items");
 
   return z.array(characterSchema).parse(response.Items);
+}
+
+enum CalculationPointsType {
+  ADVENTURE_POINTS = "adventurePoints",
+  ATTRIBUTE_POINTS = "attributePoints",
+}
+
+export async function updateAdventurePoints(
+  userId: string,
+  characterId: string,
+  adventurePoints: CalculationPoints,
+): Promise<void> {
+  updateCalculationPoints(userId, characterId, adventurePoints, CalculationPointsType.ADVENTURE_POINTS);
+}
+
+export async function updateAttributePoints(
+  userId: string,
+  characterId: string,
+  attributePoints: CalculationPoints,
+): Promise<void> {
+  updateCalculationPoints(userId, characterId, attributePoints, CalculationPointsType.ATTRIBUTE_POINTS);
+}
+
+async function updateCalculationPoints(
+  userId: string,
+  characterId: string,
+  calculationPoints: CalculationPoints,
+  type: CalculationPointsType,
+): Promise<void> {
+  if (!Object.values(CalculationPointsType).includes(type)) {
+    throw new HttpError(400, `Invalid calculation points type: ${type}`);
+  }
+  console.log(`Update ${type} of character ${characterId} (user ${userId}) in DynamoDB`);
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
+  const client = new DynamoDBClient({});
+  const docClient = DynamoDBDocumentClient.from(client);
+  const command = new UpdateCommand({
+    TableName: process.env.TABLE_NAME_CHARACTERS,
+    Key: {
+      userId: userId,
+      characterId: characterId,
+    },
+    UpdateExpression: "SET #characterSheet.#calculationPoints.#type = :calculationPoints",
+    ExpressionAttributeNames: {
+      "#characterSheet": "characterSheet",
+      "#calculationPoints": "calculationPoints",
+      "#type": type,
+    },
+    ExpressionAttributeValues: {
+      ":calculationPoints": calculationPoints,
+    },
+  });
+
+  await docClient.send(command);
+
+  console.log("Successfully updated DynamoDB item");
 }
 
 export async function updateAttribute(

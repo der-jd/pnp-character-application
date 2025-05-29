@@ -54,9 +54,10 @@ resource "aws_api_gateway_resource" "characters" {
 // ================== GET /characters ==================
 
 module "characters_get" {
-  source        = "./modules/apigw_get_method"
+  source        = "./modules/apigw_lambda_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.characters.id
+  http_method   = "GET"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.querystring.character-short" = true
@@ -83,9 +84,10 @@ resource "aws_api_gateway_resource" "character_id" {
 // ================== GET /characters/{character-id} ==================
 
 module "character_id_get" {
-  source        = "./modules/apigw_get_method"
+  source        = "./modules/apigw_lambda_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.character_id.id
+  http_method   = "GET"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id" = true
@@ -120,7 +122,7 @@ resource "aws_api_gateway_resource" "attribute_name" {
 // ================== PATCH /characters/{character-id}/attributes/{attribute-name} ==================
 
 module "attribute_name_patch" {
-  source        = "./modules/apigw_patch_method"
+  source        = "./modules/apigw_stepfunction_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.attribute_name.id
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
@@ -168,9 +170,10 @@ resource "aws_api_gateway_resource" "skill_name" {
 // ================== GET /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
 
 module "skill_name_get" {
-  source        = "./modules/apigw_get_method"
+  source        = "./modules/apigw_lambda_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.skill_name.id
+  http_method   = "GET"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"           = true
@@ -184,7 +187,7 @@ module "skill_name_get" {
 // ================== PATCH /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
 
 module "skill_name_patch" {
-  source        = "./modules/apigw_patch_method"
+  source        = "./modules/apigw_stepfunction_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.skill_name.id
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
@@ -217,9 +220,10 @@ resource "aws_api_gateway_resource" "history" {
 // ================== GET /characters/{character-id}/history ==================
 
 module "history_get" {
-  source        = "./modules/apigw_get_method"
+  source        = "./modules/apigw_lambda_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.history.id
+  http_method   = "GET"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"        = true
@@ -234,6 +238,37 @@ module "history_options" {
   source      = "./modules/apigw_options_method"
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.history.id
+}
+
+// ================== /characters/{character-id}/history/{record-id} ==================
+
+resource "aws_api_gateway_resource" "record_id" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.history.id
+  path_part   = "{record-id}" // .../history/{record-id}
+}
+
+// ================== DELETE /characters/{character-id}/history/{record-id} ==================
+
+module "record_id_delete" {
+  source        = "./modules/apigw_lambda_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.record_id.id
+  http_method   = "DELETE"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+    "method.request.path.record-id"    = true
+  }
+  lambda_uri = aws_lambda_function.revert_history_record_lambda.invoke_arn
+}
+
+// ================== OPTIONS /characters/{character-id}/history/{record-id} ==================
+
+module "record_id_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.record_id.id
 }
 
 // ================================================================================

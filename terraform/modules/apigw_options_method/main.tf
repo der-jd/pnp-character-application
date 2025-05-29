@@ -10,7 +10,7 @@ variable "integration_response_parameters" {
     "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
     //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
-    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,DELETE'"
   }
 }
 
@@ -22,6 +22,18 @@ resource "aws_api_gateway_method" "options" {
   authorization = "NONE"
   request_parameters = {
     "method.request.header.Origin" : false
+  }
+}
+
+resource "aws_api_gateway_method_response" "options" {
+  rest_api_id = var.rest_api_id
+  resource_id = var.resource_id
+  http_method = aws_api_gateway_method.options.http_method
+  status_code = 200
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "true"
+    "method.response.header.Access-Control-Allow-Methods" = "true"
+    "method.response.header.Access-Control-Allow-Origin"  = "true"
   }
 }
 
@@ -47,16 +59,4 @@ resource "aws_api_gateway_integration_response" "options" {
   http_method         = aws_api_gateway_method.options.http_method
   status_code         = 200
   response_parameters = var.integration_response_parameters
-}
-
-resource "aws_api_gateway_method_response" "options" {
-  rest_api_id = var.rest_api_id
-  resource_id = var.resource_id
-  http_method = aws_api_gateway_method.options.http_method
-  status_code = 200
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "true"
-    "method.response.header.Access-Control-Allow-Methods" = "true"
-    "method.response.header.Access-Control-Allow-Origin"  = "true"
-  }
 }

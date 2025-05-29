@@ -13,8 +13,18 @@ export const recordSchema = z.object({
   }),
   learningMethod: z.string().nullable(),
   calculationPoints: z.object({
-    old: calculationPointsSchema,
-    new: calculationPointsSchema,
+    adventurePoints: z
+      .object({
+        old: calculationPointsSchema,
+        new: calculationPointsSchema,
+      })
+      .nullable(),
+    attributePoints: z
+      .object({
+        old: calculationPointsSchema,
+        new: calculationPointsSchema,
+      })
+      .nullable(),
   }),
   comment: z.string().nullable(),
   timestamp: z.string().datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2025-03-24T16:34:56Z (UTC) or 2025-03-24T16:34:56+02:00
@@ -31,3 +41,15 @@ export const historyBlockSchema = z.object({
 });
 
 export type HistoryBlock = z.infer<typeof historyBlockSchema>;
+
+export const numberSchema = z.object({
+  value: z.number(),
+});
+
+export const stringSchema = z.object({
+  value: z.string(),
+});
+
+export const booleanSchema = z.object({
+  value: z.boolean(),
+});

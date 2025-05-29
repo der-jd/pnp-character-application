@@ -2,6 +2,153 @@ import { v4 as uuidv4 } from "uuid";
 import { CostCategory, HistoryBlock, RecordType, Record } from "config/index.js";
 import { fakeCharacterId } from "./character.js";
 
+export function addFakeHistoryRecord(
+  block: HistoryBlock,
+  type: RecordType,
+  removePreviousRecords: boolean = false,
+): Record {
+  let record: Record | undefined;
+
+  switch (type) {
+    case RecordType.EVENT_CALCULATION_POINTS:
+      throw new Error("Fake record not implemented yet!"); // TODO
+      break;
+    case RecordType.EVENT_LEVEL_UP:
+      throw new Error("Fake record not implemented yet!"); // TODO
+      break;
+    case RecordType.EVENT_BASE_VALUE:
+      throw new Error("Fake record not implemented yet!"); // TODO
+      break;
+    case RecordType.PROFESSION_CHANGED:
+      throw new Error("Fake record not implemented yet!"); // TODO
+      break;
+    case RecordType.HOBBY_CHANGED:
+      throw new Error("Fake record not implemented yet!"); // TODO
+      break;
+    case RecordType.ADVANTAGE_CHANGED:
+      throw new Error("Fake record not implemented yet!"); // TODO
+      break;
+    case RecordType.DISADVANTAGE_CHANGED:
+      throw new Error("Fake record not implemented yet!"); // TODO
+      break;
+    case RecordType.SPECIAL_ABILITY_CHANGED:
+      throw new Error("Fake record not implemented yet!"); // TODO
+      break;
+    case RecordType.ATTRIBUTE_RAISED: {
+      record = attributeChangedRecord;
+      break;
+    }
+    case RecordType.SKILL_ACTIVATED:
+      throw new Error("Fake record not implemented yet!"); // TODO
+      break;
+    case RecordType.SKILL_RAISED: {
+      record = skillChangedRecord;
+      break;
+    }
+    case RecordType.ATTACK_PARADE_DISTRIBUTED:
+      throw new Error("Fake record not implemented yet!"); // TODO
+      break;
+    default:
+      throw new Error(`Unknown history record type ${type}!`);
+  }
+
+  if (!record) {
+    throw new Error("No record was created!");
+  }
+
+  if (removePreviousRecords) {
+    record.number = block.changes[block.changes.length - 1].number;
+    block.changes = [record];
+  } else {
+    record.number = block.changes[block.changes.length - 1].number + 1;
+    block.changes.push(record);
+  }
+
+  return record;
+}
+
+const attributeChangedRecord: Record = {
+  type: RecordType.ATTRIBUTE_RAISED,
+  name: "strength",
+  number: 2,
+  id: "fc0a5a71-80ac-47bc-85c2-85fc4c9de99a",
+  data: {
+    old: {
+      start: 0,
+      current: 0,
+      mod: 0,
+      totalCost: 0,
+    },
+    new: {
+      start: 0,
+      current: 1,
+      mod: 0,
+      totalCost: 1,
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: {
+      old: {
+        start: 0,
+        available: 10,
+        total: 10,
+      },
+      new: {
+        start: 0,
+        available: 9,
+        total: 10,
+      },
+    },
+  },
+  comment: "Weight training",
+  timestamp: new Date().toISOString(),
+};
+
+const skillChangedRecord: Record = {
+  type: RecordType.SKILL_RAISED,
+  name: "body/athletics",
+  number: 3,
+  id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
+  data: {
+    old: {
+      activated: true,
+      start: 0,
+      current: 0,
+      mod: 0,
+      totalCost: 0,
+      defaultCostCategory: CostCategory.CAT_2,
+    },
+    new: {
+      activated: true,
+      start: 0,
+      current: 10,
+      mod: 0,
+      totalCost: 10,
+      defaultCostCategory: CostCategory.CAT_2,
+    },
+  },
+  learningMethod: "NORMAL",
+  calculationPoints: {
+    adventurePoints: {
+      old: {
+        start: 0,
+        available: 100,
+        total: 200,
+      },
+      new: {
+        start: 0,
+        available: 90,
+        total: 200,
+      },
+    },
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
 export const fakeHistoryBlock1: HistoryBlock = {
   characterId: fakeCharacterId,
   blockNumber: 1,
@@ -23,55 +170,13 @@ export const fakeHistoryBlock1: HistoryBlock = {
       },
       learningMethod: null,
       calculationPoints: {
-        old: {
-          start: 0,
-          available: 100,
-          total: 100,
-        },
-        new: {
-          start: 0,
-          available: 100,
-          total: 100,
-        },
+        adventurePoints: null,
+        attributePoints: null,
       },
       comment: "Character created",
       timestamp: new Date().toISOString(),
     },
-    {
-      type: RecordType.ATTRIBUTE_RAISED,
-      name: "Strength",
-      number: 2,
-      id: "fc0a5a71-80ac-47bc-85c2-85fc4c9de99a",
-      data: {
-        old: {
-          start: 0,
-          current: 0,
-          mod: 0,
-          totalCost: 0,
-        },
-        new: {
-          start: 0,
-          current: 1,
-          mod: 0,
-          totalCost: 1,
-        },
-      },
-      learningMethod: null,
-      calculationPoints: {
-        old: {
-          start: 0,
-          available: 10,
-          total: 10,
-        },
-        new: {
-          start: 0,
-          available: 9,
-          total: 10,
-        },
-      },
-      comment: "Weight training",
-      timestamp: new Date().toISOString(),
-    },
+    attributeChangedRecord,
   ],
 };
 
@@ -80,47 +185,7 @@ export const fakeHistoryBlock2: HistoryBlock = {
   blockNumber: 2,
   blockId: "370f1082-3c9a-44ff-ad5c-cc6a28eba1fe",
   previousBlockId: "aa13a350-81e6-4c53-add6-3ed7c08db7c2",
-  changes: [
-    {
-      type: RecordType.SKILL_RAISED,
-      name: "Athletics",
-      number: 3,
-      id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
-      data: {
-        old: {
-          activated: true,
-          start: 0,
-          current: 0,
-          mod: 0,
-          totalCost: 0,
-          defaultCostCategory: CostCategory.CAT_2,
-        },
-        new: {
-          activated: true,
-          start: 0,
-          current: 10,
-          mod: 0,
-          totalCost: 10,
-          defaultCostCategory: CostCategory.CAT_2,
-        },
-      },
-      learningMethod: "NORMAL",
-      calculationPoints: {
-        old: {
-          start: 0,
-          available: 100,
-          total: 200,
-        },
-        new: {
-          start: 0,
-          available: 90,
-          total: 200,
-        },
-      },
-      comment: null,
-      timestamp: new Date().toISOString(),
-    },
-  ],
+  changes: [skillChangedRecord],
 };
 
 export const fakeBigHistoryBlock: HistoryBlock = {
@@ -136,7 +201,7 @@ function generateLargeChangesList(size: number): Record[] {
   for (let i = 0; i < size; i++) {
     largeChanges.push({
       type: RecordType.SKILL_RAISED,
-      name: `Skill ${i}`,
+      name: `category/skill${i}`,
       number: i + 1,
       id: uuidv4(),
       data: {
@@ -159,16 +224,19 @@ function generateLargeChangesList(size: number): Record[] {
       },
       learningMethod: "NORMAL",
       calculationPoints: {
-        old: {
-          start: 0,
-          available: 10000 - i,
-          total: 10000,
+        adventurePoints: {
+          old: {
+            start: 0,
+            available: 10000 - i,
+            total: 10000,
+          },
+          new: {
+            start: 0,
+            available: 10000 - (i + 1),
+            total: 10000,
+          },
         },
-        new: {
-          start: 0,
-          available: 10000 - (i + 1),
-          total: 10000,
-        },
+        attributePoints: null,
       },
       comment: `Change ${i}`,
       timestamp: new Date().toISOString(),

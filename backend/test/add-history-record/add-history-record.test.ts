@@ -33,16 +33,19 @@ const testBody: HistoryBodySchema = {
   },
   learningMethod: null,
   calculationPoints: {
-    old: {
-      start: 0,
-      available: 100,
-      total: 200,
+    adventurePoints: {
+      old: {
+        start: 0,
+        available: 100,
+        total: 200,
+      },
+      new: {
+        start: 0,
+        available: 120,
+        total: 220,
+      },
     },
-    new: {
-      start: 0,
-      available: 120,
-      total: 220,
-    },
+    attributePoints: null,
   },
   comment: "Epic fight against a big monster",
 };
@@ -86,16 +89,19 @@ describe("Invalid requests", () => {
             },
           },
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 100,
-              total: 200,
+            adventurePoints: {
+              old: {
+                start: 0,
+                available: 100,
+                total: 200,
+              },
+              new: {
+                start: 0,
+                available: 120,
+                total: 220,
+              },
             },
-            new: {
-              start: 0,
-              available: 120,
-              total: 220,
-            },
+            attributePoints: null,
           },
           comment: "Epic fight against a big monster",
         },
@@ -141,16 +147,19 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 90,
-              total: 200,
+            adventurePoints: {
+              old: {
+                start: 0,
+                available: 90,
+                total: 200,
+              },
+              new: {
+                start: 0,
+                available: 110,
+                total: 220,
+              },
             },
-            new: {
-              start: 0,
-              available: 110,
-              total: 220,
-            },
+            attributePoints: null,
           },
           comment: "Epic fight against a big monster",
         },
@@ -179,16 +188,8 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 0,
-              total: 0,
-            },
-            new: {
-              start: 0,
-              available: 0,
-              total: 0,
-            },
+            adventurePoints: null,
+            attributePoints: null,
           },
           comment: "Finished story arc",
         },
@@ -225,16 +226,8 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 90,
-              total: 200,
-            },
-            new: {
-              start: 0,
-              available: 90,
-              total: 200,
-            },
+            adventurePoints: null,
+            attributePoints: null,
           },
           comment: "Level 2",
         },
@@ -265,16 +258,8 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 0,
-              total: 0,
-            },
-            new: {
-              start: 0,
-              available: 0,
-              total: 0,
-            },
+            adventurePoints: null,
+            attributePoints: null,
           },
           comment: null,
         },
@@ -305,16 +290,8 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 0,
-              total: 0,
-            },
-            new: {
-              start: 0,
-              available: 0,
-              total: 0,
-            },
+            adventurePoints: null,
+            attributePoints: null,
           },
           comment: null,
         },
@@ -343,16 +320,8 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 90,
-              total: 200,
-            },
-            new: {
-              start: 0,
-              available: 90,
-              total: 200,
-            },
+            adventurePoints: null,
+            attributePoints: null,
           },
           comment: null,
         },
@@ -381,16 +350,8 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 90,
-              total: 200,
-            },
-            new: {
-              start: 0,
-              available: 90,
-              total: 200,
-            },
+            adventurePoints: null,
+            attributePoints: null,
           },
           comment: null,
         },
@@ -419,16 +380,8 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 90,
-              total: 200,
-            },
-            new: {
-              start: 0,
-              available: 90,
-              total: 200,
-            },
+            adventurePoints: null,
+            attributePoints: null,
           },
           comment: null,
         },
@@ -463,15 +416,18 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 9,
-              total: 15,
-            },
-            new: {
-              start: 0,
-              available: 8,
-              total: 15,
+            adventurePoints: null,
+            attributePoints: {
+              old: {
+                start: 0,
+                available: 9,
+                total: 15,
+              },
+              new: {
+                start: 0,
+                available: 8,
+                total: 15,
+              },
             },
           },
           comment: null,
@@ -490,7 +446,7 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.SKILL_ACTIVATED,
-          name: "Disguising",
+          name: "social/disguising",
           data: {
             old: {
               value: false,
@@ -501,16 +457,19 @@ describe("Valid requests", () => {
           },
           learningMethod: "NORMAL",
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 90,
-              total: 200,
+            adventurePoints: {
+              old: {
+                start: 0,
+                available: 90,
+                total: 200,
+              },
+              new: {
+                start: 0,
+                available: 40,
+                total: 200,
+              },
             },
-            new: {
-              start: 0,
-              available: 40,
-              total: 200,
-            },
+            attributePoints: null,
           },
           comment: null,
         },
@@ -528,7 +487,7 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.SKILL_RAISED,
-          name: "Body Control",
+          name: "body/bodyControl",
           data: {
             old: {
               activated: true,
@@ -549,16 +508,19 @@ describe("Valid requests", () => {
           },
           learningMethod: "NORMAL",
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 90,
-              total: 200,
+            adventurePoints: {
+              old: {
+                start: 0,
+                available: 90,
+                total: 200,
+              },
+              new: {
+                start: 0,
+                available: 85,
+                total: 200,
+              },
             },
-            new: {
-              start: 0,
-              available: 85,
-              total: 200,
-            },
+            attributePoints: null,
           },
           comment: null,
         },
@@ -591,16 +553,8 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 0,
-              total: 0,
-            },
-            new: {
-              start: 0,
-              available: 0,
-              total: 0,
-            },
+            adventurePoints: null,
+            attributePoints: null,
           },
           comment: null,
         },
@@ -657,7 +611,7 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.SKILL_RAISED,
-          name: "Athletics",
+          name: "body/athletics",
           data: {
             old: {
               activated: true,
@@ -678,16 +632,19 @@ describe("Valid requests", () => {
           },
           learningMethod: "NORMAL",
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 100,
-              total: 200,
+            adventurePoints: {
+              old: {
+                start: 0,
+                available: 100,
+                total: 200,
+              },
+              new: {
+                start: 0,
+                available: 90,
+                total: 200,
+              },
             },
-            new: {
-              start: 0,
-              available: 90,
-              total: 200,
-            },
+            attributePoints: null,
           },
           comment: null,
         },
@@ -746,16 +703,19 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 90,
-              total: 200,
+            adventurePoints: {
+              old: {
+                start: 0,
+                available: 90,
+                total: 200,
+              },
+              new: {
+                start: 0,
+                available: 110,
+                total: 220,
+              },
             },
-            new: {
-              start: 0,
-              available: 110,
-              total: 220,
-            },
+            attributePoints: null,
           },
           comment: "Epic fight against a big monster",
         },
@@ -839,16 +799,19 @@ describe("Valid requests", () => {
           },
           learningMethod: null,
           calculationPoints: {
-            old: {
-              start: 0,
-              available: 90,
-              total: 200,
+            adventurePoints: {
+              old: {
+                start: 0,
+                available: 90,
+                total: 200,
+              },
+              new: {
+                start: 0,
+                available: 110,
+                total: 220,
+              },
             },
-            new: {
-              start: 0,
-              available: 110,
-              total: 220,
-            },
+            attributePoints: null,
           },
           comment: "Epic fight against a big monster",
         },
