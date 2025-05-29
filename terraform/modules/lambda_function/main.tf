@@ -1,4 +1,4 @@
-variable "function_name" {
+variable "function_name" { // Must match the directory name in ../backend/src/lambdas/
   type = string
 }
 variable "handler" {
