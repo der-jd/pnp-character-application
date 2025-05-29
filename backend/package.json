@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "build": "tsc && ./rename-build-files-and-imports.sh && ./include-dependencies.sh",
+    "build": "tsc && bash ./rename-build-files-and-imports.sh && bash ./include-dependencies.sh",
     "test": "vitest --run",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",

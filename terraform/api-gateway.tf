@@ -62,7 +62,7 @@ module "characters_get" {
   method_request_parameters = {
     "method.request.querystring.character-short" = true
   }
-  lambda_uri = aws_lambda_function.get_characters_lambda.invoke_arn
+  lambda_uri = module.get_characters_lambda.lambda_function.invoke_arn
 }
 
 // ================== OPTIONS /characters ==================
@@ -92,7 +92,7 @@ module "character_id_get" {
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
-  lambda_uri = aws_lambda_function.get_character_lambda.invoke_arn
+  lambda_uri = module.get_character_lambda.lambda_function.invoke_arn
 }
 
 // ================== OPTIONS /characters/{character-id} ==================
@@ -181,7 +181,7 @@ module "skill_name_get" {
     "method.request.path.skill-name"             = true
     "method.request.querystring.learning-method" = true
   }
-  lambda_uri = aws_lambda_function.get_skill_increase_cost_lambda.invoke_arn
+  lambda_uri = module.get_skill_increase_cost_lambda.lambda_function.invoke_arn
 }
 
 // ================== PATCH /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
@@ -229,7 +229,7 @@ module "history_get" {
     "method.request.path.character-id"        = true
     "method.request.querystring.block-number" = true
   }
-  lambda_uri = aws_lambda_function.get_history_lambda.invoke_arn
+  lambda_uri = module.get_history_lambda.lambda_function.invoke_arn
 }
 
 // ================== OPTIONS /characters/{character-id}/history ==================
@@ -260,7 +260,7 @@ module "record_id_delete" {
     "method.request.path.character-id" = true
     "method.request.path.record-id"    = true
   }
-  lambda_uri = aws_lambda_function.revert_history_record_lambda.invoke_arn
+  lambda_uri = module.revert_history_record_lambda.lambda_function.invoke_arn
 }
 
 // ================== OPTIONS /characters/{character-id}/history/{record-id} ==================

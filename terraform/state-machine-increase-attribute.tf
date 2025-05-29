@@ -1,38 +1,3 @@
-data "archive_file" "increase_attribute" {
-  type        = "zip"
-  source_dir  = "../backend/build/src/lambdas/increase-attribute"
-  output_path = "../backend/dist/increase-attribute.zip"
-}
-
-resource "aws_lambda_function" "increase_attribute_lambda" {
-  function_name = "pnp-increase-attribute"
-  handler       = "index.handler"
-  runtime       = "nodejs20.x"
-  role          = aws_iam_role.lambda_exec_role.arn
-
-  filename         = "../backend/dist/increase-attribute.zip"
-  source_code_hash = data.archive_file.increase_attribute.output_base64sha256
-  layers           = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
-  environment {
-    variables = {
-      TABLE_NAME_CHARACTERS = local.characters_table_name
-    }
-  }
-  logging_config {
-    log_format            = "JSON"
-    application_log_level = "INFO"
-    system_log_level      = "INFO"
-  }
-}
-
-resource "aws_lambda_permission" "increase_attribute_invoke_permission" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.increase_attribute_lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.pnp_rest_api.execution_arn}/*/*"
-}
-
 resource "aws_cloudwatch_log_group" "increase_attribute_state_machine_log_group" {
   name              = "/aws/vendedlogs/states/increase-attribute"
   retention_in_days = 0
@@ -57,7 +22,7 @@ resource "aws_sfn_state_machine" "increase_attribute_state_machine" {
       IncreaseAttribute = {
         Type          = "Task",
         QueryLanguage = "JSONata",
-        Resource      = aws_lambda_function.increase_attribute_lambda.arn,
+        Resource      = module.increase_attribute_lambda.lambda_function.arn,
         Assign = {
           statusCode            = "{% $states.result.statusCode %}",
           increaseAttributeBody = "{% $states.result.body %}"
@@ -107,7 +72,7 @@ resource "aws_sfn_state_machine" "increase_attribute_state_machine" {
       AddHistoryRecord = {
         Type          = "Task",
         QueryLanguage = "JSONata",
-        Resource      = aws_lambda_function.add_history_record_lambda.arn,
+        Resource      = module.add_history_record_lambda.lambda_function.arn,
         Arguments = {
           "pathParameters" = {
             "character-id" = "{% $parse($states.input.body).characterId %}"
