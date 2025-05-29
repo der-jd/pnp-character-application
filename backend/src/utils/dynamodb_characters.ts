@@ -83,13 +83,8 @@ async function updateCalculationPoints(
   calculationPoints: CalculationPoints,
   type: CalculationPointsType,
 ): Promise<void> {
-  switch (type) {
-    case CalculationPointsType.ADVENTURE_POINTS:
-      break;
-    case CalculationPointsType.ATTRIBUTE_POINTS:
-      break;
-    default:
-      throw new HttpError(400, `Invalid calculation points type: ${type}`);
+  if (!Object.values(CalculationPointsType).includes(type)) {
+    throw new HttpError(400, `Invalid calculation points type: ${type}`);
   }
   console.log(`Update ${type} of character ${characterId} (user ${userId}) in DynamoDB`);
 
