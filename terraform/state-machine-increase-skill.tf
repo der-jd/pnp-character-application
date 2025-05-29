@@ -1,14 +1,3 @@
-module "increase_skill_lambda" {
-  source        = "./modules/lambda_function"
-  function_name = "increase-skill"
-  environment_vars = {
-    TABLE_NAME_CHARACTERS = local.characters_table_name
-  }
-  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
-  role_arn        = aws_iam_role.lambda_exec_role.arn
-  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
-}
-
 resource "aws_iam_role" "step_function_role" {
   name = "step-function-role"
 

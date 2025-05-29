@@ -87,6 +87,28 @@ module "get_skill_increase_cost_lambda" {
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
 }
 
+module "increase_attribute_lambda" {
+  source        = "./modules/lambda_function"
+  function_name = "increase-attribute"
+  environment_vars = {
+    TABLE_NAME_CHARACTERS = local.characters_table_name
+  }
+  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
+  role_arn        = aws_iam_role.lambda_exec_role.arn
+  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
+}
+
+module "increase_skill_lambda" {
+  source        = "./modules/lambda_function"
+  function_name = "increase-skill"
+  environment_vars = {
+    TABLE_NAME_CHARACTERS = local.characters_table_name
+  }
+  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
+  role_arn        = aws_iam_role.lambda_exec_role.arn
+  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
+}
+
 module "revert_history_record_lambda" {
   source        = "./modules/lambda_function"
   function_name = "revert-history-record"

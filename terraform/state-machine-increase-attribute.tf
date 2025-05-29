@@ -1,14 +1,3 @@
-module "increase_attribute_lambda" {
-  source        = "./modules/lambda_function"
-  function_name = "increase-attribute"
-  environment_vars = {
-    TABLE_NAME_CHARACTERS = local.characters_table_name
-  }
-  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
-  role_arn        = aws_iam_role.lambda_exec_role.arn
-  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
-}
-
 resource "aws_cloudwatch_log_group" "increase_attribute_state_machine_log_group" {
   name              = "/aws/vendedlogs/states/increase-attribute"
   retention_in_days = 0
