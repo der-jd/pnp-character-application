@@ -303,6 +303,9 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     module.skill_name_options,
     module.history_get,
     module.history_options,
+    module.record_id_patch,
+    module.record_id_delete,
+    module.record_id_options,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
