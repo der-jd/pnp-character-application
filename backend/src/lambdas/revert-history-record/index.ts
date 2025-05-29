@@ -24,7 +24,7 @@ import {
   parseBody,
   HttpError,
   ensureHttpError,
-  validateCharacterId,
+  validateUUID,
   updateAdventurePoints,
   decodeUserId,
   updateAttributePoints,
@@ -96,20 +96,19 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
 async function validateRequest(request: Request): Promise<Parameters> {
   console.log("Validate request");
 
-  if (
-    typeof request.pathParameters?.["character-id"] !== "string" ||
-    typeof request.pathParameters?.["record-id"] !== "string"
-  ) {
+  const characterId = request.pathParameters?.["character-id"];
+  const recordId = request.pathParameters?.["record-id"];
+  if (typeof characterId !== "string" || typeof recordId !== "string") {
     throw new HttpError(400, "Invalid input values!");
   }
 
-  const characterId = request.pathParameters?.["character-id"];
-  validateCharacterId(characterId);
+  validateUUID(characterId);
+  validateUUID(recordId);
 
   return {
     userId: decodeUserId(request.headers.authorization ?? request.headers.Authorization),
     characterId: characterId,
-    recordId: request.pathParameters["record-id"],
+    recordId: recordId,
   };
 }
 

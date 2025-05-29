@@ -24,7 +24,7 @@ import {
   parseBody,
   HttpError,
   ensureHttpError,
-  validateCharacterId,
+  validateUUID,
 } from "utils/index.js";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
@@ -152,7 +152,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
   }
 
   const characterId = request.pathParameters?.["character-id"];
-  validateCharacterId(characterId);
+  validateUUID(characterId);
 
   try {
     /**

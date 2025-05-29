@@ -58,6 +58,19 @@ describe("Invalid requests", () => {
       expectedStatusCode: 400,
     },
     {
+      name: "Record id is not an UUID",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "1234567890",
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
+    {
       name: "No history for the given character id",
       request: {
         headers: fakeHeaders,

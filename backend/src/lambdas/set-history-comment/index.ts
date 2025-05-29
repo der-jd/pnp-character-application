@@ -7,7 +7,7 @@ import {
   parseBody,
   HttpError,
   ensureHttpError,
-  validateCharacterId,
+  validateUUID,
   getHistoryItem,
   setRecordComment,
 } from "utils/index.js";
@@ -98,7 +98,8 @@ async function validateRequest(request: Request): Promise<Parameters> {
     throw new HttpError(400, "Invalid input values!");
   }
 
-  validateCharacterId(characterId);
+  validateUUID(characterId);
+  validateUUID(recordId);
 
   try {
     const body = bodySchema.parse(request.body);
