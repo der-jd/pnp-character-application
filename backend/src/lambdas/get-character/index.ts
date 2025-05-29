@@ -6,7 +6,7 @@ import {
   HttpError,
   ensureHttpError,
   decodeUserId,
-  validateCharacterId,
+  validateUUID,
 } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -50,7 +50,7 @@ function validateRequest(request: Request): Parameters {
   }
 
   const characterId = request.pathParameters?.["character-id"];
-  validateCharacterId(characterId);
+  validateUUID(characterId);
 
   return {
     userId: userId,

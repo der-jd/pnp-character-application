@@ -7,7 +7,7 @@ import {
   decodeUserId,
   HttpError,
   ensureHttpError,
-  validateCharacterId,
+  validateUUID,
 } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -85,7 +85,7 @@ function validateRequest(request: Request): Parameters {
     learningMethod: request.queryStringParameters["learning-method"],
   };
 
-  validateCharacterId(params.characterId);
+  validateUUID(params.characterId);
 
   return params;
 }

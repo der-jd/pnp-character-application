@@ -1,0 +1,6 @@
+{
+  "name": "set-history-comment",
+  "version": "1.0.0",
+  "main": "index.mjs",
+  "type": "module"
+}
