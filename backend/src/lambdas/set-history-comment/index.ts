@@ -66,7 +66,7 @@ export async function setHistoryComment(request: Request): Promise<APIGatewayPro
       throw new HttpError(404, `Record with id ${params.recordId} not found in history block`);
     }
 
-    setRecordComment(params.characterId, foundBlockNumber, foundRecordIndex, params.body.comment);
+    await setRecordComment(params.characterId, foundBlockNumber, foundRecordIndex, params.body.comment);
 
     const response = {
       statusCode: 200,
