@@ -248,6 +248,22 @@ resource "aws_api_gateway_resource" "record_id" {
   path_part   = "{record-id}" // .../history/{record-id}
 }
 
+// ================== PATCH /characters/{character-id}/history/{record-id} ==================
+
+module "record_id_patch" {
+  source        = "./modules/apigw_lambda_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.record_id.id
+  http_method   = "PATCH"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"        = true
+    "method.request.path.record-id"           = true
+    "method.request.querystring.block-number" = true
+  }
+  lambda_uri = module.set_history_comment_lambda.lambda_function.invoke_arn
+}
+
 // ================== DELETE /characters/{character-id}/history/{record-id} ==================
 
 module "record_id_delete" {

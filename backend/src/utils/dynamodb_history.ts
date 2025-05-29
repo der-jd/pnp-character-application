@@ -133,6 +133,35 @@ export async function addHistoryRecord(record: Record, block: HistoryBlock) {
   console.log(`Successfully added record ${record.id} to history item in DynamoDB`);
 }
 
+export async function setRecordComment(characterId: string, blockNumber: number, recordIndex: number, comment: string) {
+  console.log(
+    `Set comment for record (index: ${recordIndex}) in history block #${blockNumber} of character ${characterId} in DynamoDB`,
+  );
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
+  const client = new DynamoDBClient({});
+  const docClient = DynamoDBDocumentClient.from(client);
+  const command = new UpdateCommand({
+    TableName: process.env.TABLE_NAME_HISTORY,
+    Key: {
+      characterId: characterId,
+      blockNumber: blockNumber,
+    },
+    UpdateExpression: `SET #changes[${recordIndex}].#comment = :comment`,
+    ExpressionAttributeNames: {
+      "#changes": "changes",
+      "#comment": "comment",
+    },
+    ExpressionAttributeValues: {
+      ":comment": comment,
+    },
+  });
+
+  await docClient.send(command);
+
+  console.log("Successfully set history comment for record in DynamoDB");
+}
+
 export async function deleteHistoryItem(block: HistoryBlock) {
   console.log(
     `Delete history item #${block.blockNumber}, id ${block.blockId} of character ${block.characterId} in DynamoDB`,

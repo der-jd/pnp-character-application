@@ -14,6 +14,7 @@ export {
   addHistoryRecord,
   deleteHistoryItem,
   deleteLatestHistoryRecord,
+  setRecordComment,
 } from "./dynamodb_history.js";
 export { ensureHttpError, HttpError } from "./errors.js";
 export { decodeUserId } from "./token.js";
