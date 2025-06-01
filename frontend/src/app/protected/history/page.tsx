@@ -8,7 +8,7 @@ import sampleData from "@api/models/history/historySample.json";
 // import { useEffect } from "react";
 // import { useLoadingOverlay } from "../../global/OverlayContext";
 
-export default async function History() {
+export default function History() {
   // const characterName = useCharacterStore((state) => state.characterSheet?.generalInformation.name);
   // const { updateHistory, isLoading } = useHistory();
   // const { show, hide } = useLoadingOverlay();
