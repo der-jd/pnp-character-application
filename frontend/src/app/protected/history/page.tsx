@@ -3,13 +3,13 @@
 import { columns } from "@/src/lib/components/ui/historyTable/columns";
 import { DataTable } from "@/src/lib/components/ui/historyTable/dataTable";
 import sampleData from "@api/models/history/historySample.json";
-// import { useCharacterStore } from "../../global/characterStore";
+import { useCharacterStore } from "../../global/characterStore";
 // import { useHistory } from "@/src/hooks/useHistory";
 // import { useEffect } from "react";
 // import { useLoadingOverlay } from "../../global/OverlayContext";
 
 export default function History() {
-  // const characterName = useCharacterStore((state) => state.characterSheet?.generalInformation.name);
+  const characterName = useCharacterStore((state) => state.characterSheet?.generalInformation.name);
   // const { updateHistory, isLoading } = useHistory();
   // const { show, hide } = useLoadingOverlay();
 
