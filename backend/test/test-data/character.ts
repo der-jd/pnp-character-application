@@ -811,7 +811,7 @@ export const fakeCharacter: Character = {
         },
       },
     },
-    combatSkills: {
+    combatValues: {
       melee: {
         greatsword: {
           handling: 18,
@@ -1700,7 +1700,7 @@ export const fakeCharacter2: Character = {
         },
       },
     },
-    combatSkills: {
+    combatValues: {
       melee: {
         greatsword: {
           handling: 18,

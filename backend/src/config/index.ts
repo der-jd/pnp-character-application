@@ -12,7 +12,7 @@ export {
   Attribute,
   BaseValue,
   Skill,
-  CombatSkill,
+  CombatValues,
   Character,
   CharacterSheet,
   getAttribute,

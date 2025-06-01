@@ -49,7 +49,7 @@ export interface Skill {
   defaultCostCategory: CostCategory;
 }
 
-export interface CombatSkill {
+export interface CombatValues {
   handling: number;
   attackDistributed: number;
   paradeDistributed: number;
@@ -201,24 +201,24 @@ export interface CharacterSheet {
       lockpicking: Skill;
     };
   };
-  combatSkills: {
+  combatValues: {
     melee: {
-      martialArts: CombatSkill;
-      barehanded: CombatSkill;
-      chainWeapons: CombatSkill;
-      daggers: CombatSkill;
-      slashingWeapons1h: CombatSkill;
-      thrustingWeapons1h: CombatSkill;
-      slashingWeapons2h: CombatSkill;
-      thrustingWeapons2h: CombatSkill;
-      polearms: CombatSkill;
-      greatsword: CombatSkill;
+      martialArts: CombatValues;
+      barehanded: CombatValues;
+      chainWeapons: CombatValues;
+      daggers: CombatValues;
+      slashingWeapons1h: CombatValues;
+      thrustingWeapons1h: CombatValues;
+      slashingWeapons2h: CombatValues;
+      thrustingWeapons2h: CombatValues;
+      polearms: CombatValues;
+      greatsword: CombatValues;
     };
     ranged: {
-      missile: CombatSkill;
-      firearmSimple: CombatSkill;
-      firearmMedium: CombatSkill;
-      firearmComplex: CombatSkill;
+      missile: CombatValues;
+      firearmSimple: CombatValues;
+      firearmMedium: CombatValues;
+      firearmComplex: CombatValues;
     };
   };
 }

@@ -185,7 +185,7 @@ export const characterSheetSchema = z.object({
       lockpicking: skillSchema,
     }),
   }),
-  combatSkills: z.object({
+  combatValues: z.object({
     melee: z.object({
       martialArts: combatSkillSchema,
       barehanded: combatSkillSchema,

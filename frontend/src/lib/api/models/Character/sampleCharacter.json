@@ -806,7 +806,7 @@
         }
       }
     },
-    "combatSkills": {
+    "combatValues": {
       "melee": {
         "greatsword": {
           "handling": 18,

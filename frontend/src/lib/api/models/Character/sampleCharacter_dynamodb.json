@@ -2219,7 +2219,7 @@
           }
         }
       },
-      "combatSkills": {
+      "combatValues": {
         "M": {
           "melee": {
             "M": {

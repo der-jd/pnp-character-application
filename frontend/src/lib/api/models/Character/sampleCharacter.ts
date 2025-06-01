@@ -808,7 +808,7 @@ export const sample_char: Character = {
         },
       },
     },
-    combatSkills: {
+    combatValues: {
       melee: {
         greatsword: {
           handling: 18,
