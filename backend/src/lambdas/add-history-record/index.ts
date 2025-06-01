@@ -6,7 +6,7 @@ import {
   attributeSchema,
   baseValueSchema,
   calculationPointsSchema,
-  combatSkillSchema,
+  combatValuesSchema,
   professionHobbySchema,
   RecordType,
   Record,
@@ -206,8 +206,8 @@ async function validateRequest(request: Request): Promise<Parameters> {
         skillSchema.parse(body.data.new);
         break;
       case RecordType.COMBAT_VALUES_CHANGED:
-        combatSkillSchema.parse(body.data.old);
-        combatSkillSchema.parse(body.data.new);
+        combatValuesSchema.parse(body.data.old);
+        combatValuesSchema.parse(body.data.new);
         break;
       default:
         throw new HttpError(400, "Invalid history record type!");

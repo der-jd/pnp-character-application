@@ -4,7 +4,7 @@ import {
   attributeSchema,
   baseValueSchema,
   calculationPointsSchema,
-  combatSkillSchema,
+  combatValuesSchema,
   professionHobbySchema,
   RecordType,
   Record,
@@ -182,7 +182,7 @@ function revertChange(userId: string, characterId: string, record: Record): void
         break;
       }
       case RecordType.COMBAT_VALUES_CHANGED:
-        combatSkillSchema.parse(record.data.old);
+        combatValuesSchema.parse(record.data.old);
         throw new HttpError(500, "Reverting combat value change is not implemented yet!"); // TODO
         break;
       default:

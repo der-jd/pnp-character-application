@@ -29,7 +29,7 @@ export const baseValueSchema = z.object({
   totalCost: z.number(),
 });
 
-export const combatSkillSchema = z.object({
+export const combatValuesSchema = z.object({
   handling: z.number(),
   attackValue: z.number(),
   paradeValue: z.number(),
@@ -187,22 +187,22 @@ export const characterSheetSchema = z.object({
   }),
   combatValues: z.object({
     melee: z.object({
-      martialArts: combatSkillSchema,
-      barehanded: combatSkillSchema,
-      chainWeapons: combatSkillSchema,
-      daggers: combatSkillSchema,
-      slashingWeapons1h: combatSkillSchema,
-      thrustingWeapons1h: combatSkillSchema,
-      slashingWeapons2h: combatSkillSchema,
-      thrustingWeapons2h: combatSkillSchema,
-      polearms: combatSkillSchema,
-      greatsword: combatSkillSchema,
+      martialArts: combatValuesSchema,
+      barehanded: combatValuesSchema,
+      chainWeapons: combatValuesSchema,
+      daggers: combatValuesSchema,
+      slashingWeapons1h: combatValuesSchema,
+      thrustingWeapons1h: combatValuesSchema,
+      slashingWeapons2h: combatValuesSchema,
+      thrustingWeapons2h: combatValuesSchema,
+      polearms: combatValuesSchema,
+      greatsword: combatValuesSchema,
     }),
     ranged: z.object({
-      missile: combatSkillSchema,
-      firearmSimple: combatSkillSchema,
-      firearmMedium: combatSkillSchema,
-      firearmComplex: combatSkillSchema,
+      missile: combatValuesSchema,
+      firearmSimple: combatValuesSchema,
+      firearmMedium: combatValuesSchema,
+      firearmComplex: combatValuesSchema,
     }),
   }),
 });

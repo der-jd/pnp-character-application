@@ -24,7 +24,7 @@ export {
   baseValueSchema,
   calculationPointsSchema,
   characterSchema,
-  combatSkillSchema,
+  combatValuesSchema,
   professionHobbySchema,
   skillSchema,
 } from "./character_schema.js";
