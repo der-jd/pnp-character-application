@@ -22,6 +22,7 @@
     "increase-skill": "file:src/lambdas/increase-skill",
     "revert-history-record": "file:src/lambdas/revert-history-record",
     "set-history-comment": "file:src/lambdas/set-history-comment",
+    "update-combat-values": "file:src/lambdas/update-combat-values",
     "utils": "file:src/utils"
   },
   "devDependencies": {

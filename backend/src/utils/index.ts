@@ -6,6 +6,7 @@ export {
   updateSkill,
   updateAdventurePoints,
   updateAttributePoints,
+  updateCombatValues,
 } from "./dynamodb_characters.js";
 export {
   getHistoryItem,

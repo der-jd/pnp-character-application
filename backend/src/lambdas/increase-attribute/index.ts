@@ -28,6 +28,7 @@ interface Parameters {
   increasedPoints: number;
 }
 
+// TODO: Consider side effects of increasing attributes: e.g. updated base values -> updated combat values
 export async function increaseAttribute(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);

@@ -17,6 +17,7 @@ export {
   CharacterSheet,
   getAttribute,
   getSkill,
+  getCombatValues,
 } from "./character.js";
 export {
   attributeSchema,

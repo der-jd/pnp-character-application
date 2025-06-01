@@ -43,8 +43,8 @@ export interface Skill {
 
 export interface CombatValues {
   handling: number;
-  attackDistributed: number;
-  paradeDistributed: number;
+  attackDistributed: number; // TODO rename to attackValue
+  paradeDistributed: number; // TODO rename to paradeValue
 }
 
 export interface CharacterSheet {
@@ -228,4 +228,17 @@ export function getSkill(
     throw new Error(`Skill ${name} not found!`);
   }
   return skill;
+}
+
+export function getCombatValues(
+  combatValues: CharacterSheet["combatValues"],
+  category: keyof CharacterSheet["combatValues"],
+  combatSkillName: string,
+): CombatValues {
+  const combatCategory = combatValues[category] as Record<string, any>;
+  const skillCombatValues = combatCategory[combatSkillName];
+  if (!skillCombatValues) {
+    throw new Error(`Combat values for skill ${combatSkillName} not found!`);
+  }
+  return skillCombatValues;
 }

@@ -10,7 +10,7 @@ export enum RecordType {
   ATTRIBUTE_RAISED = 8, // TODO change name to ATTRIBUTE_CHANGED?!
   SKILL_ACTIVATED = 9, // TODO remove and use SKILL_RAISED/SKILL_CHANGED instead?!
   SKILL_RAISED = 10, // TODO change name to SKILL_CHANGED?!
-  ATTACK_PARADE_DISTRIBUTED = 11,
+  ATTACK_PARADE_DISTRIBUTED = 11, // TODO change name to COMBAT_VALUES_CHANGED?!
 }
 
 export function parseRecordType(method: string): RecordType {
