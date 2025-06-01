@@ -542,13 +542,13 @@ describe("Valid requests", () => {
           data: {
             old: {
               handling: 30,
-              attackDistributed: 10,
-              paradeDistributed: 10,
+              attackValue: 10,
+              paradeValue: 10,
             },
             new: {
               handling: 30,
-              attackDistributed: 16,
-              paradeDistributed: 12,
+              attackValue: 16,
+              paradeValue: 12,
             },
           },
           learningMethod: null,

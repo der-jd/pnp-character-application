@@ -31,8 +31,8 @@ export const baseValueSchema = z.object({
 
 export const combatSkillSchema = z.object({
   handling: z.number(),
-  attackDistributed: z.number(), // TODO rename to attackValue
-  paradeDistributed: z.number(), // TODO rename to paradeValue
+  attackValue: z.number(),
+  paradeValue: z.number(),
 });
 
 const costCategorySchema = z.nativeEnum(CostCategory);

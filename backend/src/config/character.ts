@@ -43,8 +43,8 @@ export interface Skill {
 
 export interface CombatValues {
   handling: number;
-  attackDistributed: number; // TODO rename to attackValue
-  paradeDistributed: number; // TODO rename to paradeValue
+  attackValue: number;
+  paradeValue: number;
 }
 
 export interface CharacterSheet {

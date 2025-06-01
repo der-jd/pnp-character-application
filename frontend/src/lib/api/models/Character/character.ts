@@ -51,8 +51,8 @@ export interface Skill {
 
 export interface CombatValues {
   handling: number;
-  attackDistributed: number;
-  paradeDistributed: number;
+  attackValue: number;
+  paradeValue: number;
 }
 
 export interface CharacterSheet {

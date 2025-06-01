@@ -2228,10 +2228,10 @@
                   "handling": {
                     "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2241,10 +2241,10 @@
                   "handling": {
                     "N": "12"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "6"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "6"
                   }
                 }
@@ -2254,10 +2254,10 @@
                   "handling": {
                     "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2267,10 +2267,10 @@
                   "handling": {
                     "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2280,10 +2280,10 @@
                   "handling": {
                     "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2293,10 +2293,10 @@
                   "handling": {
                     "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2306,10 +2306,10 @@
                   "handling": {
                     "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2319,10 +2319,10 @@
                   "handling": {
                     "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2332,10 +2332,10 @@
                   "handling": {
                     "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2345,10 +2345,10 @@
                   "handling": {
                     "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2362,10 +2362,10 @@
                   "handling": {
                     "N": "10"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "6"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "4"
                   }
                 }
@@ -2375,10 +2375,10 @@
                   "handling": {
                     "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2388,10 +2388,10 @@
                   "handling": {
                     "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2401,10 +2401,10 @@
                   "handling": {
                     "N": "8"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "5"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "3"
                   }
                 }

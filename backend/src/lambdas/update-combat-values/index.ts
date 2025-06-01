@@ -82,8 +82,8 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
     const combatSkill = getSkill(characterSheet.skills, skillCategory, params.combatSkillName);
 
     if (
-      params.attackValue.initialValue + params.attackValue.increasedPoints === skillCombatValues.attackDistributed &&
-      params.paradeValue.initialValue + params.paradeValue.increasedPoints === skillCombatValues.paradeDistributed &&
+      params.attackValue.initialValue + params.attackValue.increasedPoints === skillCombatValues.attackValue &&
+      params.paradeValue.initialValue + params.paradeValue.increasedPoints === skillCombatValues.paradeValue &&
       params.handling.new === skillCombatValues.handling
     ) {
       console.log("Combat values already updated to target value. Nothing to do.");
@@ -177,24 +177,24 @@ function validatePassedValues(combatSkill: Skill, combatValues: CombatValues, pa
 
   // Values are valid if the passed values have already been applied (idempotent operation)
   if (
-    (params.attackValue.initialValue !== combatValues.attackDistributed &&
-      params.attackValue.initialValue + params.attackValue.increasedPoints !== combatValues.attackDistributed) ||
-    (params.paradeValue.initialValue !== combatValues.paradeDistributed &&
-      params.paradeValue.initialValue + params.paradeValue.increasedPoints !== combatValues.paradeDistributed) ||
+    (params.attackValue.initialValue !== combatValues.attackValue &&
+      params.attackValue.initialValue + params.attackValue.increasedPoints !== combatValues.attackValue) ||
+    (params.paradeValue.initialValue !== combatValues.paradeValue &&
+      params.paradeValue.initialValue + params.paradeValue.increasedPoints !== combatValues.paradeValue) ||
     (params.handling.old !== combatValues.handling && params.handling.new !== combatValues.handling)
   ) {
     throw new HttpError(409, "The passed skill combat values doesn't match the values in the backend!", {
       characterId: params.characterId,
       combatSkillName: params.combatSkillName,
       passedAttackValue: params.attackValue.initialValue,
-      backendAttackValue: combatValues.attackDistributed,
+      backendAttackValue: combatValues.attackValue,
       passedParadeValue: params.paradeValue.initialValue,
-      backendParadeValue: combatValues.paradeDistributed,
+      backendParadeValue: combatValues.paradeValue,
     });
   }
 
   const totalCombatPoints = combatSkill.current + combatSkill.mod + combatValues.handling;
-  const availableCombatPoints = totalCombatPoints - combatValues.attackDistributed - combatValues.paradeDistributed;
+  const availableCombatPoints = totalCombatPoints - combatValues.attackValue - combatValues.paradeValue;
   if (params.attackValue.increasedPoints + params.paradeValue.increasedPoints > availableCombatPoints) {
     throw new HttpError(409, "Not enough combat points available to distribute the passed values!", {
       characterId: params.characterId,
