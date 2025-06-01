@@ -233,7 +233,7 @@ resource "aws_api_gateway_resource" "combat_skill_name" {
   path_part   = "{combat-skill-name}" // .../characters/{character-id}/combat-values/{combat-category}/{combat-skill-name}
 }
 
-// ================== PATCH /characters/{character-id}/combat-values ==================
+// ================== PATCH /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
 
 module "combat_skill_name_patch" {
   source        = "./modules/apigw_stepfunction_integration"
@@ -253,7 +253,7 @@ module "combat_skill_name_patch" {
 
 // ================== OPTIONS /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
 
-module "combat_values_options" {
+module "combat_skill_name_options" {
   source      = "./modules/apigw_options_method"
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.combat_skill_name.id
