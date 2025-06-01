@@ -21,6 +21,8 @@ const SkillHistoryContent: React.FC = () => {
     }, 300); // TODO remove timeout when async call to history for reverting is ready
   };
 
+  console.log(historyEntries);
+
   return (
     <div className="p-4 bg-grey-300 shadow-md rounded-lg">
       <div className="p-4">
@@ -44,8 +46,8 @@ const SkillHistoryContent: React.FC = () => {
               </div>
               <div className="font-medium">{entry.name}</div>
               <div className="text-sm text-gray-700">
-                <span className="text-red-500 line-through">{entry.data.old.value}</span> →{" "}
-                <span className="text-green-600">{entry.data.new.value}</span>
+                <span className="text-red-500 line-through">{entry.data.old.current}</span> →{" "}
+                <span className="text-green-600">{entry.data.new.current}</span>
               </div>
               {entry.comment && <div className="text-xs text-gray-500 mt-2 italic">{entry.comment}</div>}
             </div>

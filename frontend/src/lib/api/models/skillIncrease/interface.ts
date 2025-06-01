@@ -1,12 +1,16 @@
 import { RecordEntry } from "../history/interface";
 
-export interface SkillIncreaseReply {
+export interface SkillIncreaseData {
   characterId: string;
   skillName: string;
   skillValue: number;
   totalCost: number;
   availableAdventurePoints?: number;
   availableAttributePoints?: number;
+}
+
+export interface SkillIncreaseReply {
+  data: SkillIncreaseData;
   historyRecord?: RecordEntry;
 }
 

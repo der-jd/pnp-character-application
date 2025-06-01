@@ -39,7 +39,8 @@ export function useSkillUpdater() {
       try {
         setLoading(true);
         const response = await increaseSkill(idToken, selectedChar, skill.name, skill.category, increaseSkillRequest);
-        const { availableAdventurePoints, availableAttributePoints, historyRecord } = response;
+        console.log(response);
+        const { data, historyRecord } = response;
 
         if (!characterSheet) {
           toast.toast({
@@ -52,12 +53,12 @@ export function useSkillUpdater() {
 
         const updatedCharacterSheet = { ...characterSheet };
 
-        if (availableAdventurePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
-          updatedCharacterSheet.calculationPoints.adventurePoints.available = availableAdventurePoints;
+        if (data.availableAdventurePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
+          updatedCharacterSheet.calculationPoints.adventurePoints.available = data.availableAdventurePoints;
         }
 
-        if (availableAttributePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
-          updatedCharacterSheet.calculationPoints.attributePoints.available = availableAttributePoints;
+        if (data.availableAttributePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
+          updatedCharacterSheet.calculationPoints.attributePoints.available = data.availableAttributePoints;
         }
 
         setCharacterSheet(updatedCharacterSheet);
@@ -71,7 +72,7 @@ export function useSkillUpdater() {
           return;
         }
 
-        updateReversibleHistory(selectedChar ?? "", historyRecord);
+        updateReversibleHistory([historyRecord]);
       } catch (error) {
         if (error instanceof ApiError) {
           toast.toast({
