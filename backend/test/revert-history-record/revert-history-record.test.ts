@@ -111,7 +111,7 @@ describe("Valid requests", () => {
   const testCasesForRevertingRecord = [
     {
       name: "Revert history record for a changed attribute",
-      fakeRecordType: RecordType.ATTRIBUTE_RAISED,
+      fakeRecordType: RecordType.ATTRIBUTE_CHANGED,
       request: {
         headers: fakeHeaders,
         pathParameters: {

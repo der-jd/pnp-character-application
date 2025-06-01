@@ -151,7 +151,7 @@ function revertChange(userId: string, characterId: string, record: Record): void
         stringSchema.parse(record.data.old);
         throw new HttpError(500, "Reverting special ability change is not implemented yet!"); // TODO
         break;
-      case RecordType.ATTRIBUTE_RAISED: {
+      case RecordType.ATTRIBUTE_CHANGED: {
         const oldAttribute = attributeSchema.parse(record.data.old);
         updateAttribute(
           userId,
@@ -181,9 +181,9 @@ function revertChange(userId: string, characterId: string, record: Record): void
         updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         break;
       }
-      case RecordType.ATTACK_PARADE_DISTRIBUTED:
+      case RecordType.COMBAT_VALUES_CHANGED:
         combatSkillSchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting attack/parade distribution is not implemented yet!"); // TODO
+        throw new HttpError(500, "Reverting combat value change is not implemented yet!"); // TODO
         break;
       default:
         throw new HttpError(500, "Unknown history record type!");

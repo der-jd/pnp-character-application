@@ -398,7 +398,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.ATTRIBUTE_RAISED,
+          type: RecordType.ATTRIBUTE_CHANGED,
           name: "Courage",
           data: {
             old: {
@@ -537,7 +537,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.ATTACK_PARADE_DISTRIBUTED,
+          type: RecordType.COMBAT_VALUES_CHANGED,
           name: "Slashing Weapons 1h",
           data: {
             old: {

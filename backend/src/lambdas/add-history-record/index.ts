@@ -193,7 +193,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
         stringSchema.parse(body.data.old);
         stringSchema.parse(body.data.new);
         break;
-      case RecordType.ATTRIBUTE_RAISED:
+      case RecordType.ATTRIBUTE_CHANGED:
         attributeSchema.parse(body.data.old);
         attributeSchema.parse(body.data.new);
         break;
@@ -205,7 +205,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
         skillSchema.parse(body.data.old);
         skillSchema.parse(body.data.new);
         break;
-      case RecordType.ATTACK_PARADE_DISTRIBUTED:
+      case RecordType.COMBAT_VALUES_CHANGED:
         combatSkillSchema.parse(body.data.old);
         combatSkillSchema.parse(body.data.new);
         break;

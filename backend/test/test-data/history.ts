@@ -34,7 +34,7 @@ export function addFakeHistoryRecord(
     case RecordType.SPECIAL_ABILITY_CHANGED:
       throw new Error("Fake record not implemented yet!"); // TODO
       break;
-    case RecordType.ATTRIBUTE_RAISED: {
+    case RecordType.ATTRIBUTE_CHANGED: {
       record = attributeChangedRecord;
       break;
     }
@@ -45,7 +45,7 @@ export function addFakeHistoryRecord(
       record = skillChangedRecord;
       break;
     }
-    case RecordType.ATTACK_PARADE_DISTRIBUTED:
+    case RecordType.COMBAT_VALUES_CHANGED:
       throw new Error("Fake record not implemented yet!"); // TODO
       break;
     default:
@@ -68,7 +68,7 @@ export function addFakeHistoryRecord(
 }
 
 const attributeChangedRecord: Record = {
-  type: RecordType.ATTRIBUTE_RAISED,
+  type: RecordType.ATTRIBUTE_CHANGED,
   name: "strength",
   number: 2,
   id: "fc0a5a71-80ac-47bc-85c2-85fc4c9de99a",
