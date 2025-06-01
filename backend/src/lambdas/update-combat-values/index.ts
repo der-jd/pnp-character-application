@@ -36,7 +36,7 @@ const bodySchema = z.object({
   }),
 });
 
-export type DistributeCombatValuesBodySchema = z.infer<typeof bodySchema>;
+export type UpdateCombatValuesBodySchema = z.infer<typeof bodySchema>;
 
 interface Parameters {
   userId: string;
