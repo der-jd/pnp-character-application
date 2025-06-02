@@ -868,22 +868,22 @@ export const fakeCharacter: Character = {
         firearmSimple: {
           handling: 10,
           attackValue: 6,
-          paradeValue: 4,
+          paradeValue: 0,
         },
         firearmMedium: {
           handling: 18,
           attackValue: 10,
-          paradeValue: 8,
+          paradeValue: 0,
         },
         firearmComplex: {
           handling: 18,
           attackValue: 10,
-          paradeValue: 8,
+          paradeValue: 0,
         },
         missile: {
           handling: 8,
           attackValue: 5,
-          paradeValue: 3,
+          paradeValue: 0,
         },
       },
     },
@@ -1757,22 +1757,22 @@ export const fakeCharacter2: Character = {
         firearmSimple: {
           handling: 10,
           attackValue: 6,
-          paradeValue: 4,
+          paradeValue: 0,
         },
         firearmMedium: {
           handling: 18,
           attackValue: 10,
-          paradeValue: 8,
+          paradeValue: 0,
         },
         firearmComplex: {
           handling: 18,
           attackValue: 10,
-          paradeValue: 8,
+          paradeValue: 0,
         },
         missile: {
           handling: 8,
           attackValue: 5,
-          paradeValue: 3,
+          paradeValue: 0,
         },
       },
     },
