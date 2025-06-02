@@ -37,6 +37,7 @@ interface Parameters {
   learningMethod: string;
 }
 
+// TODO Update whole skill not only current value. I.e. include activated, start and mod
 export async function increaseSkill(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
