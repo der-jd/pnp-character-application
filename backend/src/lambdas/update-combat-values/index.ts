@@ -107,6 +107,10 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
 
     validatePassedValues(combatSkill, skillCombatValues, params);
 
+    skillCombatValues.handling = params.handling.new;
+    skillCombatValues.attackValue = params.attackValue.initialValue + params.attackValue.increasedPoints;
+    skillCombatValues.paradeValue = params.paradeValue.initialValue + params.paradeValue.increasedPoints;
+
     await updateCombatValues(
       params.userId,
       params.characterId,
@@ -142,7 +146,7 @@ function validateRequest(request: Request): Parameters {
 
     const characterId = request.pathParameters?.["character-id"];
     const combatCategory = request.pathParameters?.["combat-category"];
-    const combatSkillName = request.pathParameters?.["combat-combatSkill-name"];
+    const combatSkillName = request.pathParameters?.["combat-skill-name"];
 
     if (typeof characterId !== "string" || typeof combatCategory !== "string" || typeof combatSkillName !== "string") {
       throw new HttpError(400, "Invalid input values!");
@@ -151,6 +155,10 @@ function validateRequest(request: Request): Parameters {
     validateUUID(characterId);
 
     const body = bodySchema.parse(request.body);
+
+    if (combatCategory === "ranged" && body.paradeValue.increasedPoints != 0) {
+      throw new HttpError(400, "Parade value for a ranged combat skill must be 0!");
+    }
 
     return {
       userId: userId,
@@ -196,7 +204,7 @@ function validatePassedValues(combatSkill: Skill, combatValues: CombatValues, pa
   const totalCombatPoints = combatSkill.current + combatSkill.mod + combatValues.handling;
   const availableCombatPoints = totalCombatPoints - combatValues.attackValue - combatValues.paradeValue;
   if (params.attackValue.increasedPoints + params.paradeValue.increasedPoints > availableCombatPoints) {
-    throw new HttpError(409, "Not enough combat points available to distribute the passed values!", {
+    throw new HttpError(400, "Not enough combat points available to increase the passed values!", {
       characterId: params.characterId,
       combatSkillName: params.combatSkillName,
       totalCombatPoints: totalCombatPoints,
