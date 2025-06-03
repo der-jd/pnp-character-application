@@ -814,74 +814,60 @@ export const fakeCharacter: Character = {
     combatValues: {
       melee: {
         greatsword: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         martialArts: {
-          handling: 12,
           attackValue: 6,
           paradeValue: 6,
         },
         barehanded: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         chainWeapons: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         daggers: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeapons1h: {
-          handling: 18,
           attackValue: 108,
           paradeValue: 78,
         },
         thrustingWeapons1h: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeapons2h: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         thrustingWeapons2h: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         polearms: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
       },
       ranged: {
         firearmSimple: {
-          handling: 10,
           attackValue: 6,
           paradeValue: 0,
         },
         firearmMedium: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 0,
         },
         firearmComplex: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 0,
         },
         missile: {
-          handling: 8,
           attackValue: 5,
           paradeValue: 0,
         },
@@ -1703,74 +1689,60 @@ export const fakeCharacter2: Character = {
     combatValues: {
       melee: {
         greatsword: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         martialArts: {
-          handling: 12,
           attackValue: 6,
           paradeValue: 6,
         },
         barehanded: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         chainWeapons: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         daggers: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeapons1h: {
-          handling: 18,
           attackValue: 108,
           paradeValue: 78,
         },
         thrustingWeapons1h: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeapons2h: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         thrustingWeapons2h: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
         polearms: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 8,
         },
       },
       ranged: {
         firearmSimple: {
-          handling: 10,
           attackValue: 6,
           paradeValue: 0,
         },
         firearmMedium: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 0,
         },
         firearmComplex: {
-          handling: 18,
           attackValue: 10,
           paradeValue: 0,
         },
         missile: {
-          handling: 8,
           attackValue: 5,
           paradeValue: 0,
         },

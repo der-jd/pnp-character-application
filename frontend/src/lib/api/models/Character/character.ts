@@ -50,7 +50,6 @@ export interface Skill {
 }
 
 export interface CombatValues {
-  handling: number;
   attackValue: number;
   paradeValue: number;
 }

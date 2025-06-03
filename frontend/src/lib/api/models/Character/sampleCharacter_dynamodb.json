@@ -2225,9 +2225,6 @@
             "M": {
               "greatsword": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2238,9 +2235,6 @@
               },
               "martialArts": {
                 "M": {
-                  "handling": {
-                    "N": "12"
-                  },
                   "attackValue": {
                     "N": "6"
                   },
@@ -2251,9 +2245,6 @@
               },
               "barehanded": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2264,9 +2255,6 @@
               },
               "chainWeapons": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2277,9 +2265,6 @@
               },
               "daggers": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2290,9 +2275,6 @@
               },
               "slashingWeapons1h": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2303,9 +2285,6 @@
               },
               "thrustingWeapons1h": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2316,9 +2295,6 @@
               },
               "slashingWeapons2h": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2329,9 +2305,6 @@
               },
               "thrustingWeapons2h": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2342,9 +2315,6 @@
               },
               "polearms": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2359,9 +2329,6 @@
             "M": {
               "firearmSimple": {
                 "M": {
-                  "handling": {
-                    "N": "10"
-                  },
                   "attackValue": {
                     "N": "6"
                   },
@@ -2372,9 +2339,6 @@
               },
               "firearmMedium": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2385,9 +2349,6 @@
               },
               "firearmComplex": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2398,9 +2359,6 @@
               },
               "missile": {
                 "M": {
-                  "handling": {
-                    "N": "8"
-                  },
                   "attackValue": {
                     "N": "5"
                   },

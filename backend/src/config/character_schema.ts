@@ -30,7 +30,6 @@ export const baseValueSchema = z.object({
 });
 
 export const combatValuesSchema = z.object({
-  handling: z.number(),
   attackValue: z.number(),
   paradeValue: z.number(),
 });

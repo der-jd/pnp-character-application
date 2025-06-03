@@ -528,7 +528,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'attack/parade distributed' to existing block",
+      name: "Add history record for 'combat values changed' to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -538,15 +538,13 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.COMBAT_VALUES_CHANGED,
-          name: "Slashing Weapons 1h",
+          name: "melee/slashingWeapons1h",
           data: {
             old: {
-              handling: 30,
               attackValue: 10,
               paradeValue: 10,
             },
             new: {
-              handling: 30,
               attackValue: 16,
               paradeValue: 12,
             },

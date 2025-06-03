@@ -3,7 +3,7 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { Character, CombatValues, getCombatValues } from "config/index.js";
+import { Character, getCombatValues } from "config/index.js";
 import { expectHttpError } from "../utils.js";
 import { _updateCombatValues } from "update-combat-values/index.js";
 
@@ -23,12 +23,10 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
-            handling: 18,
             attackValue: 13,
             paradeValue: 10,
           },
@@ -50,12 +48,10 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
-            handling: 18,
             attackValue: 13,
             paradeValue: 10,
           },
@@ -75,12 +71,10 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
-            handling: 18,
             attackValue: 13,
             paradeValue: 10,
           },
@@ -100,12 +94,10 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 10,
             attackValue: 5,
             paradeValue: 3,
           },
           new: {
-            handling: 14,
             attackValue: 7,
             paradeValue: 4,
           },
@@ -125,12 +117,10 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
-            handling: 18,
             attackValue: 60,
             paradeValue: 58,
           },
@@ -150,12 +140,10 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 0,
           },
           new: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 2,
           },
@@ -175,12 +163,10 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
-            handling: 18,
             attackValue: 13,
             paradeValue: 10,
           },
@@ -200,12 +186,10 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
-            handling: 18,
             attackValue: 13,
             paradeValue: 10,
           },
@@ -238,37 +222,10 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 15,
             attackValue: 7,
             paradeValue: 6,
           },
           new: {
-            handling: 18,
-            attackValue: 10,
-            paradeValue: 8,
-          },
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Update handling (melee combat skill)",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "combat-category": "melee",
-          "combat-skill-name": "thrustingWeapons1h",
-        },
-        queryStringParameters: null,
-        body: {
-          old: {
-            handling: 18,
-            attackValue: 10,
-            paradeValue: 8,
-          },
-          new: {
-            handling: 25,
             attackValue: 10,
             paradeValue: 8,
           },
@@ -288,12 +245,10 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
-            handling: 18,
             attackValue: 15,
             paradeValue: 8,
           },
@@ -313,12 +268,10 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 12,
           },
@@ -338,39 +291,12 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
-            handling: 20,
             attackValue: 15,
             paradeValue: 13,
-          },
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Update handling (ranged combat skill)",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "combat-category": "ranged",
-          "combat-skill-name": "firearmMedium",
-        },
-        queryStringParameters: null,
-        body: {
-          old: {
-            handling: 18,
-            attackValue: 10,
-            paradeValue: 0,
-          },
-          new: {
-            handling: 30,
-            attackValue: 10,
-            paradeValue: 0,
           },
         },
       },
@@ -388,12 +314,10 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
-            handling: 18,
             attackValue: 10,
             paradeValue: 0,
           },
           new: {
-            handling: 18,
             attackValue: 20,
             paradeValue: 0,
           },
@@ -427,13 +351,7 @@ describe("Valid requests", () => {
         skillName,
       );
       expect(parsedBody.combatValues.old).toStrictEqual(oldSkillCombatValues);
-
-      const newCombatValues: CombatValues = {
-        handling: _case.request.body.new.handling,
-        attackValue: _case.request.body.new.attackValue,
-        paradeValue: _case.request.body.new.paradeValue,
-      };
-      expect(parsedBody.combatValues.new).toStrictEqual(newCombatValues);
+      expect(parsedBody.combatValues.new).toStrictEqual(_case.request.body.new);
 
       // Skill was not already at the target value
       if (JSON.stringify(parsedBody.combatValues.new) !== JSON.stringify(parsedBody.combatValues.old)) {
