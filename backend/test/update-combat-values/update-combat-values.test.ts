@@ -22,15 +22,13 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 58,
-            attackValue: 10,
-            paradeValue: 8,
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 3,
           },
-          new: {
-            availablePoints: 53,
-            attackValue: 13,
-            paradeValue: 10,
+          paradeValue: {
+            initialValue: 8,
+            increasedPoints: 2,
           },
         },
       },
@@ -49,15 +47,13 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 58,
-            attackValue: 10,
-            paradeValue: 8,
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 3,
           },
-          new: {
-            availablePoints: 53,
-            attackValue: 13,
-            paradeValue: 10,
+          paradeValue: {
+            initialValue: 8,
+            increasedPoints: 2,
           },
         },
       },
@@ -74,15 +70,13 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 58,
-            attackValue: 10,
-            paradeValue: 8,
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 3,
           },
-          new: {
-            availablePoints: 53,
-            attackValue: 13,
-            paradeValue: 10,
+          paradeValue: {
+            initialValue: 8,
+            increasedPoints: 2,
           },
         },
       },
@@ -99,15 +93,13 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 14,
-            attackValue: 5,
-            paradeValue: 3,
+          attackValue: {
+            initialValue: 5,
+            increasedPoints: 2,
           },
-          new: {
-            availablePoints: 11,
-            attackValue: 7,
-            paradeValue: 4,
+          paradeValue: {
+            initialValue: 3,
+            increasedPoints: 1,
           },
         },
       },
@@ -124,15 +116,13 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 58,
-            attackValue: 10,
-            paradeValue: 8,
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 50,
           },
-          new: {
-            availablePoints: -42,
-            attackValue: 60,
-            paradeValue: 58,
+          paradeValue: {
+            initialValue: 8,
+            increasedPoints: 50,
           },
         },
       },
@@ -149,15 +139,13 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 22,
-            attackValue: 10,
-            paradeValue: 0,
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 0,
           },
-          new: {
-            availablePoints: 20,
-            attackValue: 10,
-            paradeValue: 2,
+          paradeValue: {
+            initialValue: 0,
+            increasedPoints: 2,
           },
         },
       },
@@ -174,15 +162,13 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 58,
-            attackValue: 10,
-            paradeValue: 8,
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 3,
           },
-          new: {
-            availablePoints: 53,
-            attackValue: 13,
-            paradeValue: 10,
+          paradeValue: {
+            initialValue: 8,
+            increasedPoints: 2,
           },
         },
       },
@@ -199,15 +185,13 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 58,
-            attackValue: 10,
-            paradeValue: 8,
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 3,
           },
-          new: {
-            availablePoints: 53,
-            attackValue: 13,
-            paradeValue: 10,
+          paradeValue: {
+            initialValue: 8,
+            increasedPoints: 2,
           },
         },
       },
@@ -237,15 +221,13 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 63,
-            attackValue: 7,
-            paradeValue: 6,
+          attackValue: {
+            initialValue: 7,
+            increasedPoints: 3,
           },
-          new: {
-            availablePoints: 58,
-            attackValue: 10,
-            paradeValue: 8,
+          paradeValue: {
+            initialValue: 6,
+            increasedPoints: 2,
           },
         },
       },
@@ -262,15 +244,13 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 58,
-            attackValue: 10,
-            paradeValue: 8,
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 5,
           },
-          new: {
-            availablePoints: 53,
-            attackValue: 15,
-            paradeValue: 8,
+          paradeValue: {
+            initialValue: 8,
+            increasedPoints: 0,
           },
         },
       },
@@ -287,15 +267,13 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 58,
-            attackValue: 10,
-            paradeValue: 8,
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 0,
           },
-          new: {
-            availablePoints: 54,
-            attackValue: 10,
-            paradeValue: 12,
+          paradeValue: {
+            initialValue: 8,
+            increasedPoints: 4,
           },
         },
       },
@@ -312,15 +290,13 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 58,
-            attackValue: 10,
-            paradeValue: 8,
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 5,
           },
-          new: {
-            availablePoints: 48,
-            attackValue: 15,
-            paradeValue: 13,
+          paradeValue: {
+            initialValue: 8,
+            increasedPoints: 5,
           },
         },
       },
@@ -337,15 +313,13 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          old: {
-            availablePoints: 22,
-            attackValue: 10,
-            paradeValue: 0,
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 10,
           },
-          new: {
-            availablePoints: 12,
-            attackValue: 20,
-            paradeValue: 0,
+          paradeValue: {
+            initialValue: 0,
+            increasedPoints: 0,
           },
         },
       },
@@ -377,7 +351,13 @@ describe("Valid requests", () => {
         skillName,
       );
       expect(parsedBody.combatValues.old).toStrictEqual(oldSkillCombatValues);
-      expect(parsedBody.combatValues.new).toStrictEqual(_case.request.body.new);
+
+      expect(parsedBody.combatValues.new.attackValue).toBe(
+        _case.request.body.attackValue.initialValue + _case.request.body.attackValue.increasedPoints,
+      );
+      expect(parsedBody.combatValues.new.paradeValue).toBe(
+        _case.request.body.paradeValue.initialValue + _case.request.body.paradeValue.increasedPoints,
+      );
 
       const oldAvailablePoints = oldSkillCombatValues.availablePoints;
       const diffAvailablePoints = oldAvailablePoints - parsedBody.combatValues.new.availablePoints;

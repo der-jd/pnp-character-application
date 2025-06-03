@@ -235,13 +235,13 @@ resource "aws_api_gateway_resource" "combat_skill_name" {
   path_part   = "{combat-skill-name}" // .../characters/{character-id}/combat-values/{combat-category}/{combat-skill-name}
 }
 
-// ================== PUT /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
+// ================== PATCH /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
 
 module "combat_skill_name_patch" {
   source        = "./modules/apigw_stepfunction_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.combat_skill_name.id
-  http_method   = "PUT"
+  http_method   = "PATCH"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"      = true

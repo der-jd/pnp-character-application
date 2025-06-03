@@ -1,14 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
-import {
-  Character,
-  getSkill,
-  Skill,
-  getCombatValues,
-  CombatValues,
-  combatValuesSchema,
-  getCombatSkillHandling,
-} from "config/index.js";
+import { Character, getSkill, Skill, getCombatValues, CombatValues } from "config/index.js";
 import {
   Request,
   parseBody,
@@ -30,8 +22,14 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 };
 
 const bodySchema = z.object({
-  old: combatValuesSchema,
-  new: combatValuesSchema,
+  attackValue: z.object({
+    initialValue: z.number(),
+    increasedPoints: z.number(),
+  }),
+  paradeValue: z.object({
+    initialValue: z.number(),
+    increasedPoints: z.number(),
+  }),
 });
 
 export type UpdateCombatValuesBodySchema = z.infer<typeof bodySchema>;
@@ -51,8 +49,8 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
     console.log(`Update character ${params.characterId} of user ${params.userId}`);
     console.log(
       `Update attack/parade value of combat skill '${params.combatCategory}/${params.combatSkillName}' from ` +
-        `${params.combatValues.old.attackValue}/${params.combatValues.old.paradeValue} to ` +
-        `${params.combatValues.new.attackValue}/${params.combatValues.new.paradeValue}`,
+        `${params.combatValues.attackValue.initialValue}/${params.combatValues.paradeValue.initialValue} to ` +
+        `${params.combatValues.attackValue.initialValue + params.combatValues.attackValue.increasedPoints}/${params.combatValues.paradeValue.initialValue + params.combatValues.paradeValue.increasedPoints}`,
     );
 
     const character = await getCharacterItem(params.userId, params.characterId);
@@ -66,8 +64,10 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
     const combatSkill = getSkill(characterSheet.skills, skillCategory, params.combatSkillName);
 
     if (
-      params.combatValues.new.attackValue === skillCombatValues.attackValue &&
-      params.combatValues.new.paradeValue === skillCombatValues.paradeValue
+      params.combatValues.attackValue.initialValue + params.combatValues.attackValue.increasedPoints ===
+        skillCombatValues.attackValue &&
+      params.combatValues.paradeValue.initialValue + params.combatValues.paradeValue.increasedPoints ===
+        skillCombatValues.paradeValue
     ) {
       console.log("Combat values already updated to target value. Nothing to do.");
       const response = {
@@ -90,11 +90,17 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
 
     validatePassedValues(combatSkill, skillCombatValues, params);
 
-    const increasedPointsAttack = params.combatValues.new.attackValue - params.combatValues.old.attackValue;
-    const increasedPointsParade = params.combatValues.new.paradeValue - params.combatValues.old.paradeValue;
     const combatValuesWithIncreases = [
-      { valueName: "attack value", value: skillCombatValues.attackValue, increased: increasedPointsAttack },
-      { valueName: "parade value", value: skillCombatValues.paradeValue, increased: increasedPointsParade },
+      {
+        valueName: "attack value",
+        value: skillCombatValues.attackValue,
+        increased: params.combatValues.attackValue.increasedPoints,
+      },
+      {
+        valueName: "parade value",
+        value: skillCombatValues.paradeValue,
+        increased: params.combatValues.paradeValue.increasedPoints,
+      },
     ];
     const increaseCost = 1; // Increase cost are always 1 for combat values
 
@@ -167,7 +173,7 @@ function validateRequest(request: Request): Parameters {
 
     const body = bodySchema.parse(request.body);
 
-    if (combatCategory === "ranged" && body.new.paradeValue != 0) {
+    if (combatCategory === "ranged" && body.paradeValue.increasedPoints != 0) {
       throw new HttpError(400, "Parade value for a ranged combat skill must be 0!");
     }
 
@@ -194,33 +200,20 @@ function validatePassedValues(combatSkill: Skill, combatValues: CombatValues, pa
 
   // Values are valid if the passed values have already been applied (idempotent operation)
   if (
-    (params.combatValues.old.attackValue !== combatValues.attackValue &&
-      params.combatValues.new.attackValue !== combatValues.attackValue) ||
-    (params.combatValues.old.paradeValue !== combatValues.paradeValue &&
-      params.combatValues.new.paradeValue !== combatValues.paradeValue)
+    (params.combatValues.attackValue.initialValue !== combatValues.attackValue &&
+      params.combatValues.attackValue.initialValue + params.combatValues.attackValue.increasedPoints !==
+        combatValues.attackValue) ||
+    (params.combatValues.paradeValue.initialValue !== combatValues.paradeValue &&
+      params.combatValues.paradeValue.initialValue + params.combatValues.paradeValue.increasedPoints !==
+        combatValues.paradeValue)
   ) {
-    throw new HttpError(409, "The passed skill combat values doesn't match the values in the backend!", {
+    throw new HttpError(409, "The passed skill combat values don't match the values in the backend!", {
       characterId: params.characterId,
       combatSkillName: params.combatSkillName,
-      passedAttackValue: params.combatValues.old.attackValue,
+      passedAttackValue: params.combatValues.attackValue.initialValue,
       backendAttackValue: combatValues.attackValue,
-      passedParadeValue: params.combatValues.old.paradeValue,
+      passedParadeValue: params.combatValues.paradeValue.initialValue,
       backendParadeValue: combatValues.paradeValue,
-    });
-  }
-
-  const totalCombatPoints = combatSkill.current + combatSkill.mod + getCombatSkillHandling(params.combatSkillName);
-  const availableCombatPoints = totalCombatPoints - combatValues.attackValue - combatValues.paradeValue;
-  const passedIncreaseAttackValue = params.combatValues.new.attackValue - params.combatValues.old.attackValue;
-  const passedIncreaseParadeValue = params.combatValues.new.paradeValue - params.combatValues.old.paradeValue;
-  if (passedIncreaseAttackValue + passedIncreaseParadeValue > availableCombatPoints) {
-    throw new HttpError(400, "Not enough combat points available to increase the passed values!", {
-      characterId: params.characterId,
-      combatSkillName: params.combatSkillName,
-      totalCombatPoints: totalCombatPoints,
-      availableCombatPoints: availableCombatPoints,
-      passedIncreaseAttackValue: passedIncreaseAttackValue,
-      passedIncreaseParadeValue: passedIncreaseParadeValue,
     });
   }
 
