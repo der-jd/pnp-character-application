@@ -90,8 +90,37 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
 
     validatePassedValues(combatSkill, skillCombatValues, params);
 
-    skillCombatValues.attackValue = params.combatValues.new.attackValue;
-    skillCombatValues.paradeValue = params.combatValues.new.paradeValue;
+    const increasedPointsAttack = params.combatValues.new.attackValue - params.combatValues.old.attackValue;
+    const increasedPointsParade = params.combatValues.new.paradeValue - params.combatValues.old.paradeValue;
+    const combatValuesWithIncreases = [
+      { valueName: "attack value", value: skillCombatValues.attackValue, increased: increasedPointsAttack },
+      { valueName: "parade value", value: skillCombatValues.paradeValue, increased: increasedPointsParade },
+    ];
+    const increaseCost = 1; // Increase cost are always 1 for combat values
+
+    console.log(`Available points before increasing: ${skillCombatValues.availablePoints}`);
+    for (const combatValue of combatValuesWithIncreases) {
+      const { valueName, increased } = combatValue;
+      let value = combatValue.value;
+      console.log(`Increasing ${valueName} from ${value} by ${increased} points...`);
+      for (let i = 0; i < increased; i++) {
+        console.debug("---------------------------");
+
+        if (increaseCost > skillCombatValues.availablePoints) {
+          throw new HttpError(400, "Not enough points to increase the combat value!", {
+            characterId: params.characterId,
+            combatValueName: valueName,
+          });
+        }
+
+        console.debug(`Combat value: ${value}`);
+        console.debug(`Available points: ${skillCombatValues.availablePoints}`);
+        console.debug(`Increasing combat value by 1 for ${increaseCost} point...`);
+        value += 1;
+        skillCombatValues.availablePoints -= increaseCost;
+      }
+      skillCombatValues[valueName === "attack value" ? "attackValue" : "paradeValue"] = value;
+    }
 
     await updateCombatValues(
       params.userId,

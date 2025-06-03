@@ -112,6 +112,7 @@ export async function increaseSkill(request: Request): Promise<APIGatewayProxyRe
       skill.totalCost += increaseCost;
       adventurePoints.available -= increaseCost;
     }
+    // TODO update available combat points if skill is a combat skill
 
     await updateSkill(params.userId, params.characterId, skillCategory, params.skillName, skill, adventurePoints);
 

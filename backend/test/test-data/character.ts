@@ -210,7 +210,7 @@ export const fakeCharacter: Character = {
         slashingWeapons1h: {
           activated: true,
           start: 10,
-          current: 110,
+          current: 120,
           mod: 58,
           totalCost: 200,
           defaultCostCategory: CostCategory.CAT_3,
@@ -814,60 +814,74 @@ export const fakeCharacter: Character = {
     combatValues: {
       melee: {
         greatsword: {
+          availablePoints: 83,
           attackValue: 10,
           paradeValue: 8,
         },
         martialArts: {
+          availablePoints: 19,
           attackValue: 6,
           paradeValue: 6,
         },
         barehanded: {
+          availablePoints: 82,
           attackValue: 10,
           paradeValue: 8,
         },
         chainWeapons: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         daggers: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeapons1h: {
+          availablePoints: 10,
           attackValue: 108,
           paradeValue: 78,
         },
         thrustingWeapons1h: {
+          availablePoints: 58,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeapons2h: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         thrustingWeapons2h: {
+          availablePoints: 57,
           attackValue: 10,
           paradeValue: 8,
         },
         polearms: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
       },
       ranged: {
         firearmSimple: {
+          availablePoints: 18,
           attackValue: 6,
           paradeValue: 0,
         },
         firearmMedium: {
+          availablePoints: 22,
           attackValue: 10,
           paradeValue: 0,
         },
         firearmComplex: {
+          availablePoints: 22,
           attackValue: 10,
           paradeValue: 0,
         },
         missile: {
+          availablePoints: 15,
           attackValue: 5,
           paradeValue: 0,
         },
@@ -1689,60 +1703,74 @@ export const fakeCharacter2: Character = {
     combatValues: {
       melee: {
         greatsword: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         martialArts: {
+          availablePoints: 19,
           attackValue: 6,
           paradeValue: 6,
         },
         barehanded: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         chainWeapons: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         daggers: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeapons1h: {
+          availablePoints: 0,
           attackValue: 108,
           paradeValue: 78,
         },
         thrustingWeapons1h: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeapons2h: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         thrustingWeapons2h: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         polearms: {
+          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
       },
       ranged: {
         firearmSimple: {
+          availablePoints: 18,
           attackValue: 6,
           paradeValue: 0,
         },
         firearmMedium: {
+          availablePoints: 22,
           attackValue: 10,
           paradeValue: 0,
         },
         firearmComplex: {
+          availablePoints: 22,
           attackValue: 10,
           paradeValue: 0,
         },
         missile: {
+          availablePoints: 15,
           attackValue: 5,
           paradeValue: 0,
         },

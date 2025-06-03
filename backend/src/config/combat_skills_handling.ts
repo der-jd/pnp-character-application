@@ -2,6 +2,7 @@ import { CharacterSheet } from "./character.js";
 
 type CombatSkillNames = keyof CharacterSheet["combatValues"]["melee"] | keyof CharacterSheet["combatValues"]["ranged"];
 
+// TODO add correct handling values
 const combatSkillHandlingMap: Record<CombatSkillNames, number> = {
   // melee
   martialArts: 12,

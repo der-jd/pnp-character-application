@@ -42,6 +42,7 @@ export interface Skill {
 }
 
 export interface CombatValues {
+  availablePoints: number;
   attackValue: number;
   paradeValue: number;
 }

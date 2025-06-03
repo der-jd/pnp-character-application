@@ -23,10 +23,12 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 58,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
+            availablePoints: 53,
             attackValue: 13,
             paradeValue: 10,
           },
@@ -48,10 +50,12 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 58,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
+            availablePoints: 53,
             attackValue: 13,
             paradeValue: 10,
           },
@@ -71,10 +75,12 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 58,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
+            availablePoints: 53,
             attackValue: 13,
             paradeValue: 10,
           },
@@ -94,10 +100,12 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 14,
             attackValue: 5,
             paradeValue: 3,
           },
           new: {
+            availablePoints: 11,
             attackValue: 7,
             paradeValue: 4,
           },
@@ -117,10 +125,12 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 58,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
+            availablePoints: -42,
             attackValue: 60,
             paradeValue: 58,
           },
@@ -140,10 +150,12 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 22,
             attackValue: 10,
             paradeValue: 0,
           },
           new: {
+            availablePoints: 20,
             attackValue: 10,
             paradeValue: 2,
           },
@@ -163,10 +175,12 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 58,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
+            availablePoints: 53,
             attackValue: 13,
             paradeValue: 10,
           },
@@ -186,10 +200,12 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 58,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
+            availablePoints: 53,
             attackValue: 13,
             paradeValue: 10,
           },
@@ -222,10 +238,12 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 63,
             attackValue: 7,
             paradeValue: 6,
           },
           new: {
+            availablePoints: 58,
             attackValue: 10,
             paradeValue: 8,
           },
@@ -245,10 +263,12 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 58,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
+            availablePoints: 53,
             attackValue: 15,
             paradeValue: 8,
           },
@@ -268,10 +288,12 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 58,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
+            availablePoints: 54,
             attackValue: 10,
             paradeValue: 12,
           },
@@ -291,10 +313,12 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 58,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
+            availablePoints: 48,
             attackValue: 15,
             paradeValue: 13,
           },
@@ -314,10 +338,12 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           old: {
+            availablePoints: 22,
             attackValue: 10,
             paradeValue: 0,
           },
           new: {
+            availablePoints: 12,
             attackValue: 20,
             paradeValue: 0,
           },

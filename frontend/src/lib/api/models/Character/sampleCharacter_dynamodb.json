@@ -2225,6 +2225,9 @@
             "M": {
               "greatsword": {
                 "M": {
+                  "availablePoints": {
+                    "N": "83"
+                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2235,6 +2238,9 @@
               },
               "martialArts": {
                 "M": {
+                  "availablePoints": {
+                    "N": "19"
+                  },
                   "attackValue": {
                     "N": "6"
                   },
@@ -2245,6 +2251,9 @@
               },
               "barehanded": {
                 "M": {
+                  "availablePoints": {
+                    "N": "82"
+                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2255,6 +2264,9 @@
               },
               "chainWeapons": {
                 "M": {
+                  "availablePoints": {
+                    "N": "26"
+                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2265,6 +2277,9 @@
               },
               "daggers": {
                 "M": {
+                  "availablePoints": {
+                    "N": "26"
+                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2275,6 +2290,9 @@
               },
               "slashingWeapons1h": {
                 "M": {
+                  "availablePoints": {
+                    "N": "10"
+                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2285,6 +2303,9 @@
               },
               "thrustingWeapons1h": {
                 "M": {
+                  "availablePoints": {
+                    "N": "58"
+                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2295,6 +2316,9 @@
               },
               "slashingWeapons2h": {
                 "M": {
+                  "availablePoints": {
+                    "N": "26"
+                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2305,6 +2329,9 @@
               },
               "thrustingWeapons2h": {
                 "M": {
+                  "availablePoints": {
+                    "N": "57"
+                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2315,6 +2342,9 @@
               },
               "polearms": {
                 "M": {
+                  "availablePoints": {
+                    "N": "26"
+                  },
                   "attackValue": {
                     "N": "10"
                   },
@@ -2329,41 +2359,53 @@
             "M": {
               "firearmSimple": {
                 "M": {
+                  "availablePoints": {
+                    "N": "18"
+                  },
                   "attackValue": {
                     "N": "6"
                   },
                   "paradeValue": {
-                    "N": "4"
+                    "N": "0"
                   }
                 }
               },
               "firearmMedium": {
                 "M": {
+                  "availablePoints": {
+                    "N": "22"
+                  },
                   "attackValue": {
                     "N": "10"
                   },
                   "paradeValue": {
-                    "N": "8"
+                    "N": "0"
                   }
                 }
               },
               "firearmComplex": {
                 "M": {
+                  "availablePoints": {
+                    "N": "22"
+                  },
                   "attackValue": {
                     "N": "10"
                   },
                   "paradeValue": {
-                    "N": "8"
+                    "N": "0"
                   }
                 }
               },
               "missile": {
                 "M": {
+                  "availablePoints": {
+                    "N": "15"
+                  },
                   "attackValue": {
                     "N": "5"
                   },
                   "paradeValue": {
-                    "N": "3"
+                    "N": "0"
                   }
                 }
               }

@@ -53,10 +53,12 @@ export function addFakeHistoryRecord(
         id: "0f6b98a5-33c3-416e-bf1f-fde4ef49b166",
         data: {
           old: {
+            availablePoints: 58,
             attackValue: 10,
             paradeValue: 8,
           },
           new: {
+            availablePoints: 55,
             attackValue: 12,
             paradeValue: 9,
           },

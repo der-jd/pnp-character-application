@@ -96,7 +96,7 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 110,
+          initialValue: 120,
           increasedPoints: 25,
           learningMethod: "EXPENSIVE",
         },

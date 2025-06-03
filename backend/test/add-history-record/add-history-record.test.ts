@@ -541,12 +541,14 @@ describe("Valid requests", () => {
           name: "melee/slashingWeapons1h",
           data: {
             old: {
-              attackValue: 10,
-              paradeValue: 10,
+              availablePoints: 10,
+              attackValue: 108,
+              paradeValue: 78,
             },
             new: {
-              attackValue: 16,
-              paradeValue: 12,
+              availablePoints: 2,
+              attackValue: 110,
+              paradeValue: 84,
             },
           },
           learningMethod: null,
