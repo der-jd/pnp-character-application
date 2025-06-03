@@ -30,6 +30,7 @@ import {
   updateAttributePoints,
   updateAttribute,
   updateSkill,
+  updateCombatValues,
 } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -181,10 +182,14 @@ function revertChange(userId: string, characterId: string, record: Record): void
         updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         break;
       }
-      case RecordType.COMBAT_VALUES_CHANGED:
-        combatValuesSchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting combat value change is not implemented yet!"); // TODO
+      case RecordType.COMBAT_VALUES_CHANGED: {
+        const oldSkillCombatValues = combatValuesSchema.parse(record.data.old);
+        const [combatCategory, combatSkillName] = record.name.split("/");
+        updateCombatValues(userId, characterId, combatCategory, combatSkillName, oldSkillCombatValues);
+        updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
+        updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
+      }
       default:
         throw new HttpError(500, "Unknown history record type!");
     }

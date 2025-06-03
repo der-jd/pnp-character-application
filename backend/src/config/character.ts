@@ -42,7 +42,7 @@ export interface Skill {
 }
 
 export interface CombatValues {
-  handling: number;
+  handling: number; // TODO extract value for handling so that it is the same for all characters?!
   attackValue: number;
   paradeValue: number;
 }

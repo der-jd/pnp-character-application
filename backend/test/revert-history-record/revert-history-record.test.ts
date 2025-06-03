@@ -137,6 +137,20 @@ describe("Valid requests", () => {
       },
       expectedStatusCode: 200,
     },
+    {
+      name: "Revert history record for changed combat values",
+      fakeRecordType: RecordType.COMBAT_VALUES_CHANGED,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
   ];
 
   testCasesForRevertingRecord.forEach((_case) => {

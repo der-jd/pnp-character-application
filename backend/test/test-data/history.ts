@@ -46,7 +46,31 @@ export function addFakeHistoryRecord(
       break;
     }
     case RecordType.COMBAT_VALUES_CHANGED:
-      throw new Error("Fake record not implemented yet!"); // TODO
+      record = {
+        type: RecordType.COMBAT_VALUES_CHANGED,
+        name: "melee/thrustingWeapons1h",
+        number: 0, // will be set below
+        id: "0f6b98a5-33c3-416e-bf1f-fde4ef49b166",
+        data: {
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
+          },
+          new: {
+            handling: 18,
+            attackValue: 12,
+            paradeValue: 9,
+          },
+        },
+        learningMethod: null,
+        calculationPoints: {
+          adventurePoints: null,
+          attributePoints: null,
+        },
+        comment: null,
+        timestamp: new Date().toISOString(),
+      };
       break;
     default:
       throw new Error(`Unknown history record type ${type}!`);
