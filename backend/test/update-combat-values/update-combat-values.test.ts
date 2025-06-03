@@ -22,17 +22,15 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 18,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 3,
-          },
-          paradeValue: {
-            initialValue: 8,
-            increasedPoints: 2,
+          new: {
+            handling: 18,
+            attackValue: 13,
+            paradeValue: 10,
           },
         },
       },
@@ -51,17 +49,15 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 18,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 3,
-          },
-          paradeValue: {
-            initialValue: 8,
-            increasedPoints: 2,
+          new: {
+            handling: 18,
+            attackValue: 13,
+            paradeValue: 10,
           },
         },
       },
@@ -78,17 +74,15 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 18,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 3,
-          },
-          paradeValue: {
-            initialValue: 8,
-            increasedPoints: 2,
+          new: {
+            handling: 18,
+            attackValue: 13,
+            paradeValue: 10,
           },
         },
       },
@@ -105,17 +99,15 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 10,
-            new: 14,
+          old: {
+            handling: 10,
+            attackValue: 5,
+            paradeValue: 3,
           },
-          attackValue: {
-            initialValue: 5,
-            increasedPoints: 2,
-          },
-          paradeValue: {
-            initialValue: 3,
-            increasedPoints: 1,
+          new: {
+            handling: 14,
+            attackValue: 7,
+            paradeValue: 4,
           },
         },
       },
@@ -132,17 +124,15 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 18,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 50,
-          },
-          paradeValue: {
-            initialValue: 8,
-            increasedPoints: 50,
+          new: {
+            handling: 18,
+            attackValue: 60,
+            paradeValue: 58,
           },
         },
       },
@@ -159,17 +149,15 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 18,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 0,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 0,
-          },
-          paradeValue: {
-            initialValue: 0,
-            increasedPoints: 2,
+          new: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 2,
           },
         },
       },
@@ -186,17 +174,15 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 18,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 3,
-          },
-          paradeValue: {
-            initialValue: 8,
-            increasedPoints: 2,
+          new: {
+            handling: 18,
+            attackValue: 13,
+            paradeValue: 10,
           },
         },
       },
@@ -213,17 +199,15 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 18,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 3,
-          },
-          paradeValue: {
-            initialValue: 8,
-            increasedPoints: 2,
+          new: {
+            handling: 18,
+            attackValue: 13,
+            paradeValue: 10,
           },
         },
       },
@@ -253,17 +237,15 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 15,
-            new: 18,
+          old: {
+            handling: 15,
+            attackValue: 7,
+            paradeValue: 6,
           },
-          attackValue: {
-            initialValue: 7,
-            increasedPoints: 3,
-          },
-          paradeValue: {
-            initialValue: 6,
-            increasedPoints: 2,
+          new: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
           },
         },
       },
@@ -280,17 +262,15 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 25,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 0,
-          },
-          paradeValue: {
-            initialValue: 8,
-            increasedPoints: 0,
+          new: {
+            handling: 25,
+            attackValue: 10,
+            paradeValue: 8,
           },
         },
       },
@@ -307,17 +287,15 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 18,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 5,
-          },
-          paradeValue: {
-            initialValue: 8,
-            increasedPoints: 0,
+          new: {
+            handling: 18,
+            attackValue: 15,
+            paradeValue: 8,
           },
         },
       },
@@ -334,17 +312,15 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 18,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 0,
-          },
-          paradeValue: {
-            initialValue: 8,
-            increasedPoints: 4,
+          new: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 12,
           },
         },
       },
@@ -361,17 +337,15 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 20,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 8,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 5,
-          },
-          paradeValue: {
-            initialValue: 8,
-            increasedPoints: 5,
+          new: {
+            handling: 20,
+            attackValue: 15,
+            paradeValue: 13,
           },
         },
       },
@@ -388,17 +362,15 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 30,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 0,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 0,
-          },
-          paradeValue: {
-            initialValue: 0,
-            increasedPoints: 0,
+          new: {
+            handling: 30,
+            attackValue: 10,
+            paradeValue: 0,
           },
         },
       },
@@ -415,17 +387,15 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          handling: {
-            old: 18,
-            new: 18,
+          old: {
+            handling: 18,
+            attackValue: 10,
+            paradeValue: 0,
           },
-          attackValue: {
-            initialValue: 10,
-            increasedPoints: 10,
-          },
-          paradeValue: {
-            initialValue: 0,
-            increasedPoints: 0,
+          new: {
+            handling: 18,
+            attackValue: 20,
+            paradeValue: 0,
           },
         },
       },
@@ -459,9 +429,9 @@ describe("Valid requests", () => {
       expect(parsedBody.combatValues.old).toStrictEqual(oldSkillCombatValues);
 
       const newCombatValues: CombatValues = {
-        handling: _case.request.body.handling.new,
-        attackValue: _case.request.body.attackValue.initialValue + _case.request.body.attackValue.increasedPoints,
-        paradeValue: _case.request.body.paradeValue.initialValue + _case.request.body.paradeValue.increasedPoints,
+        handling: _case.request.body.new.handling,
+        attackValue: _case.request.body.new.attackValue,
+        paradeValue: _case.request.body.new.paradeValue,
       };
       expect(parsedBody.combatValues.new).toStrictEqual(newCombatValues);
 

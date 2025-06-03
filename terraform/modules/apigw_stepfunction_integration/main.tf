@@ -4,6 +4,9 @@ variable "rest_api_id" {
 variable "resource_id" {
   type = string
 }
+variable "http_method" {
+  type = string
+}
 variable "authorizer_id" {
   type = string
 }
@@ -29,25 +32,25 @@ variable "integration_response_parameters" {
     "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
     //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
-    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,PUT'"
   }
 }
 
-resource "aws_api_gateway_method" "patch" {
+resource "aws_api_gateway_method" "step_function" {
   rest_api_id        = var.rest_api_id
   resource_id        = var.resource_id
-  http_method        = "PATCH"
+  http_method        = var.http_method
   authorization      = "COGNITO_USER_POOLS"
   authorizer_id      = var.authorizer_id
   request_parameters = var.method_request_parameters
 }
 
-resource "aws_api_gateway_method_response" "patch" {
+resource "aws_api_gateway_method_response" "step_function" {
   for_each = toset(var.status_codes)
 
   rest_api_id     = var.rest_api_id
   resource_id     = var.resource_id
-  http_method     = aws_api_gateway_method.patch.http_method
+  http_method     = aws_api_gateway_method.step_function.http_method
   status_code     = each.value
   response_models = { "application/json" = "Empty" }
   response_parameters = {
@@ -57,10 +60,10 @@ resource "aws_api_gateway_method_response" "patch" {
   }
 }
 
-resource "aws_api_gateway_integration" "patch" {
+resource "aws_api_gateway_integration" "step_function" {
   rest_api_id             = var.rest_api_id
   resource_id             = var.resource_id
-  http_method             = aws_api_gateway_method.patch.http_method
+  http_method             = aws_api_gateway_method.step_function.http_method
   integration_http_method = "POST"
   type                    = "AWS"
   uri                     = "arn:aws:apigateway:${var.aws_region}:states:action/StartSyncExecution"
@@ -133,12 +136,12 @@ resource "aws_api_gateway_integration" "patch" {
   }
 }
 
-resource "aws_api_gateway_integration_response" "patch" {
-  depends_on = [aws_api_gateway_integration.patch, aws_api_gateway_method_response.patch]
+resource "aws_api_gateway_integration_response" "step_function" {
+  depends_on = [aws_api_gateway_integration.step_function, aws_api_gateway_method_response.step_function]
 
   rest_api_id         = var.rest_api_id
   resource_id         = var.resource_id
-  http_method         = aws_api_gateway_method.patch.http_method
+  http_method         = aws_api_gateway_method.step_function.http_method
   status_code         = 200
   response_parameters = var.integration_response_parameters
   response_templates = {
