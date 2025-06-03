@@ -379,6 +379,14 @@ describe("Valid requests", () => {
       expect(parsedBody.combatValues.old).toStrictEqual(oldSkillCombatValues);
       expect(parsedBody.combatValues.new).toStrictEqual(_case.request.body.new);
 
+      const oldAvailablePoints = oldSkillCombatValues.availablePoints;
+      const diffAvailablePoints = oldAvailablePoints - parsedBody.combatValues.new.availablePoints;
+      const diffCombatValues =
+        parsedBody.combatValues.new.attackValue -
+        oldSkillCombatValues.attackValue +
+        (parsedBody.combatValues.new.paradeValue - oldSkillCombatValues.paradeValue);
+      expect(diffAvailablePoints).toBe(diffCombatValues);
+
       // Skill was not already at the target value
       if (JSON.stringify(parsedBody.combatValues.new) !== JSON.stringify(parsedBody.combatValues.old)) {
         // Check if the skill was updated
