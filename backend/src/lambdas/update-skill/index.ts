@@ -108,7 +108,6 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
 
     let combatValues:
       | {
-          combatCategory: string;
           old: CombatValues;
           new: CombatValues;
         }
@@ -120,7 +119,6 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
       const skillCombatValues = structuredClone(skillCombatValuesOld);
       skillCombatValues.availablePoints += skill.current - skillOld.current + (skill.mod - skillOld.mod);
       combatValues = {
-        combatCategory: combatCategory,
         old: skillCombatValuesOld,
         new: skillCombatValues,
       };
@@ -135,7 +133,10 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
         userId: params.userId,
         skillCategory: params.skillCategory,
         skillName: params.skillName,
-        combatCategory: combatValues?.combatCategory,
+        combatCategory:
+          params.skillCategory === "combat"
+            ? getCombatCategory(characterSheet.combatValues, params.skillName)
+            : undefined,
         changes: {
           old: {
             skillValues: skillOld,
