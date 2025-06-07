@@ -38,31 +38,39 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const historyBodySchema = z.object({
-  userId: z.string(),
-  type: z.nativeEnum(RecordType),
-  name: z.string(),
-  data: z.object({
-    old: z.record(z.any()),
-    new: z.record(z.any()),
-  }),
-  learningMethod: z.string().nullable(),
-  calculationPoints: z.object({
-    adventurePoints: z
+const historyBodySchema = z
+  .object({
+    userId: z.string(),
+    type: z.nativeEnum(RecordType),
+    name: z.string(),
+    data: z
       .object({
-        old: calculationPointsSchema,
-        new: calculationPointsSchema,
+        old: z.record(z.any()),
+        new: z.record(z.any()),
       })
-      .nullable(),
-    attributePoints: z
+      .strict(),
+    learningMethod: z.string().nullable(),
+    calculationPoints: z
       .object({
-        old: calculationPointsSchema,
-        new: calculationPointsSchema,
+        adventurePoints: z
+          .object({
+            old: calculationPointsSchema,
+            new: calculationPointsSchema,
+          })
+          .strict()
+          .nullable(),
+        attributePoints: z
+          .object({
+            old: calculationPointsSchema,
+            new: calculationPointsSchema,
+          })
+          .strict()
+          .nullable(),
       })
-      .nullable(),
-  }),
-  comment: z.string().nullable(),
-});
+      .strict(),
+    comment: z.string().nullable(),
+  })
+  .strict();
 
 export type HistoryBodySchema = z.infer<typeof historyBodySchema>;
 

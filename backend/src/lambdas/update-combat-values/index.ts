@@ -21,16 +21,22 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const bodySchema = z.object({
-  attackValue: z.object({
-    initialValue: z.number(),
-    increasedPoints: z.number(),
-  }),
-  paradeValue: z.object({
-    initialValue: z.number(),
-    increasedPoints: z.number(),
-  }),
-});
+const bodySchema = z
+  .object({
+    attackValue: z
+      .object({
+        initialValue: z.number(),
+        increasedPoints: z.number(),
+      })
+      .strict(),
+    paradeValue: z
+      .object({
+        initialValue: z.number(),
+        increasedPoints: z.number(),
+      })
+      .strict(),
+  })
+  .strict();
 
 export type UpdateCombatValuesBodySchema = z.infer<typeof bodySchema>;
 

@@ -34,27 +34,32 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const bodySchema = z.object({
-  start: z
-    .object({
-      initialValue: z.number(),
-      newValue: z.number(),
-    })
-    .optional(),
-  current: z
-    .object({
-      initialValue: z.number(),
-      increasedPoints: z.number(),
-      learningMethod: z.string(),
-    })
-    .optional(),
-  mod: z
-    .object({
-      initialValue: z.number(),
-      newValue: z.number(),
-    })
-    .optional(),
-});
+const bodySchema = z
+  .object({
+    start: z
+      .object({
+        initialValue: z.number(),
+        newValue: z.number(),
+      })
+      .strict()
+      .optional(),
+    current: z
+      .object({
+        initialValue: z.number(),
+        increasedPoints: z.number(),
+        learningMethod: z.string(),
+      })
+      .strict()
+      .optional(),
+    mod: z
+      .object({
+        initialValue: z.number(),
+        newValue: z.number(),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
 
 interface Parameters {
   userId: string;
