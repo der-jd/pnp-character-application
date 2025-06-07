@@ -66,7 +66,7 @@ export async function updateAdventurePoints(
   characterId: string,
   adventurePoints: CalculationPoints,
 ): Promise<void> {
-  updateCalculationPoints(userId, characterId, adventurePoints, CalculationPointsType.ADVENTURE_POINTS);
+  await updateCalculationPoints(userId, characterId, adventurePoints, CalculationPointsType.ADVENTURE_POINTS);
 }
 
 export async function updateAttributePoints(
@@ -74,7 +74,7 @@ export async function updateAttributePoints(
   characterId: string,
   attributePoints: CalculationPoints,
 ): Promise<void> {
-  updateCalculationPoints(userId, characterId, attributePoints, CalculationPointsType.ATTRIBUTE_POINTS);
+  await updateCalculationPoints(userId, characterId, attributePoints, CalculationPointsType.ATTRIBUTE_POINTS);
 }
 
 async function updateCalculationPoints(
