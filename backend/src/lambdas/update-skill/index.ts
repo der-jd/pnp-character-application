@@ -157,38 +157,48 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
 }
 
 function validateRequest(request: Request): Parameters {
-  console.log("Validate request");
+  try {
+    console.log("Validate request");
 
-  const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
+    const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
 
-  const characterId = request.pathParameters?.["character-id"];
-  const skillCategory = request.pathParameters?.["skill-category"];
-  const skillName = request.pathParameters?.["skill-name"];
-  if (typeof characterId !== "string" || typeof skillCategory !== "string" || typeof skillName !== "string") {
-    throw new HttpError(400, "Invalid input values!");
+    const characterId = request.pathParameters?.["character-id"];
+    const skillCategory = request.pathParameters?.["skill-category"];
+    const skillName = request.pathParameters?.["skill-name"];
+    if (typeof characterId !== "string" || typeof skillCategory !== "string" || typeof skillName !== "string") {
+      throw new HttpError(400, "Invalid input values!");
+    }
+
+    validateUUID(characterId);
+
+    const body = bodySchema.parse(request.body);
+
+    if (body.current && body.current.increasedPoints <= 0) {
+      throw new HttpError(
+        400,
+        "Points to increase skill value are negative or null! The value must be greater than or equal 1.",
+        {
+          increasedPoints: body.current?.increasedPoints,
+        },
+      );
+    }
+
+    return {
+      userId: userId,
+      characterId: characterId,
+      skillCategory: skillCategory,
+      skillName: skillName,
+      body: body,
+    };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("Validation errors:", error.errors);
+      throw new HttpError(400, "Invalid input values!");
+    }
+
+    // Rethrow other errors
+    throw error;
   }
-
-  validateUUID(characterId);
-
-  const body = bodySchema.parse(request.body);
-
-  if (body.current && body.current.increasedPoints <= 0) {
-    throw new HttpError(
-      400,
-      "Points to increase skill value are negative or null! The value must be greater than or equal 1.",
-      {
-        increasedPoints: body.current?.increasedPoints,
-      },
-    );
-  }
-
-  return {
-    userId: userId,
-    characterId: characterId,
-    skillCategory: skillCategory,
-    skillName: skillName,
-    body: body,
-  };
 }
 
 function updateStartValue(skill: Skill, startValue: any): Skill {
