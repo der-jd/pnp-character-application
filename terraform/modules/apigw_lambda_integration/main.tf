@@ -26,7 +26,7 @@ variable "integration_response_parameters" {
     "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
     //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
-    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,PUT,DELETE'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,DELETE'"
   }
 }
 
