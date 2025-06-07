@@ -30,6 +30,7 @@ interface Parameters {
 
 // TODO Consider side effects of increasing attributes -> updated base values
 // TODO Update whole attribute not only current value. I.e. include start and mod
+// TODO rename function, etc. to update-attribute
 export async function increaseAttribute(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
