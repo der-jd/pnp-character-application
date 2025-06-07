@@ -3,7 +3,7 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { Character, getSkill } from "config/index.js";
+import { Character, getCombatCategory, getCombatValues, getSkill } from "config/index.js";
 import { _updateSkill, availableCombatPointsChanged } from "../../src/lambdas/update-skill/index.js";
 import { expectHttpError } from "../utils.js";
 
@@ -380,23 +380,23 @@ describe("Valid requests", () => {
       expect(parsedBody.skillName).toBe(skillName);
 
       if (_case.request.body.start) {
-        expect(parsedBody.skill.new.start).toBeCloseTo(_case.request.body.start.newValue);
+        expect(parsedBody.changes.new.skillValues.start).toBe(_case.request.body.start.newValue);
       }
 
       if (_case.request.body.current) {
-        expect(parsedBody.skill.new.current).toBeCloseTo(
+        expect(parsedBody.changes.new.skillValues.current).toBe(
           _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
         );
         expect(parsedBody.learningMethod).toBe(_case.request.body.current.learningMethod);
       }
 
       if (_case.request.body.mod) {
-        expect(parsedBody.skill.new.mod).toBeCloseTo(_case.request.body.mod.newValue);
+        expect(parsedBody.changes.new.skillValues.mod).toBe(_case.request.body.mod.newValue);
       }
 
       const skillOld = getSkill(fakeCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
-      expect(parsedBody.skill.old).toStrictEqual(skillOld);
-      expect(parsedBody.skill.new).toStrictEqual(parsedBody.skill.old);
+      expect(parsedBody.changes.old.skillValues).toStrictEqual(skillOld);
+      expect(parsedBody.changes.new.skillValues).toStrictEqual(parsedBody.changes.old.skillValues);
 
       const oldAvailableAdventurePoints =
         fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
@@ -404,7 +404,7 @@ describe("Valid requests", () => {
       expect(diffAvailableAdventurePoints).toBeCloseTo(0);
 
       const oldTotalSkillCost = skillOld.totalCost;
-      const diffSkillTotalCost = parsedBody.skill.new.totalCost - oldTotalSkillCost;
+      const diffSkillTotalCost = parsedBody.changes.new.skillValues.totalCost - oldTotalSkillCost;
       expect(diffAvailableAdventurePoints).toBeCloseTo(diffSkillTotalCost);
     });
   });
@@ -528,6 +528,58 @@ describe("Valid requests", () => {
       },
       expectedStatusCode: 200,
     },
+    {
+      name: "Update all skill values (start, current, mod)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          start: {
+            initialValue: 12,
+            newValue: 15,
+          },
+          current: {
+            initialValue: 16,
+            increasedPoints: 1,
+            learningMethod: "NORMAL",
+          },
+          mod: {
+            initialValue: 4,
+            newValue: 7,
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Update combat skill values",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "combat",
+          "skill-name": "slashingWeapons1h",
+        },
+        queryStringParameters: null,
+        body: {
+          current: {
+            initialValue: 120,
+            increasedPoints: 10,
+            learningMethod: "FREE", // 'FREE' so that there is no interference with the other test cases that are checked against the adventure points
+          },
+          mod: {
+            initialValue: 58,
+            newValue: 65,
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
   ];
 
   updateTestCases.forEach((_case) => {
@@ -548,7 +600,7 @@ describe("Valid requests", () => {
       expect(parsedBody.skillName).toBe(skillName);
 
       if (_case.request.body.start) {
-        expect(parsedBody.skill.new.start).toBeCloseTo(_case.request.body.start.newValue);
+        expect(parsedBody.changes.new.skillValues.start).toBe(_case.request.body.start.newValue);
       }
 
       const oldAvailableAdventurePoints =
@@ -556,7 +608,7 @@ describe("Valid requests", () => {
       const diffAvailableAdventurePoints = oldAvailableAdventurePoints - parsedBody.adventurePoints.new.available;
 
       if (_case.request.body.current) {
-        expect(parsedBody.skill.new.current).toBeCloseTo(
+        expect(parsedBody.changes.new.skillValues.current).toBe(
           _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
         );
         expect(parsedBody.learningMethod).toBe(_case.request.body.current.learningMethod);
@@ -580,22 +632,49 @@ describe("Valid requests", () => {
       }
 
       if (_case.request.body.mod) {
-        expect(parsedBody.skill.new.mod).toBeCloseTo(_case.request.body.mod.newValue);
+        expect(parsedBody.changes.new.skillValues.mod).toBe(_case.request.body.mod.newValue);
       }
 
       const skillOld = getSkill(fakeCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
       const oldTotalSkillCost = skillOld.totalCost;
-      const diffSkillTotalCost = parsedBody.skill.new.totalCost - oldTotalSkillCost;
+      const diffSkillTotalCost = parsedBody.changes.new.skillValues.totalCost - oldTotalSkillCost;
       expect(diffAvailableAdventurePoints).toBeCloseTo(diffSkillTotalCost);
 
-      expect(parsedBody.skill.old).toStrictEqual(skillOld);
+      expect(parsedBody.changes.old.skillValues).toStrictEqual(skillOld);
 
       // Check if the skill was updated
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
 
       // Skill and combat values are updated
-      if (availableCombatPointsChanged(skillOld, parsedBody.skill.new, skillCategory)) {
+      if (
+        availableCombatPointsChanged(
+          parsedBody.changes.old.skillValues,
+          parsedBody.changes.new.skillValues,
+          skillCategory,
+        )
+      ) {
         expect(calls.length).toBe(2);
+
+        expect(parsedBody.changes.old.combatValues).toBeDefined();
+        expect(parsedBody.changes.new.combatValues).toBeDefined();
+
+        const combatCategory = getCombatCategory(fakeCharacterResponse.Item.characterSheet.combatValues, skillName);
+        expect(parsedBody.combatCategory).toBe(combatCategory);
+
+        const skillCombatValuesOld = getCombatValues(
+          fakeCharacterResponse.Item.characterSheet.combatValues,
+          combatCategory,
+          skillName,
+        );
+        expect(parsedBody.changes.old.combatValues).toStrictEqual(skillCombatValuesOld);
+        expect(parsedBody.changes.new.combatValues.attackValue).toBe(skillCombatValuesOld.attackValue);
+        expect(parsedBody.changes.new.combatValues.paradeValue).toBe(skillCombatValuesOld.paradeValue);
+
+        const availableCombatPointsNew =
+          skillCombatValuesOld.availablePoints +
+          (parsedBody.changes.new.skillValues.current - parsedBody.changes.old.skillValues.current) +
+          (parsedBody.changes.new.skillValues.mod - parsedBody.changes.old.skillValues.mod);
+        expect(parsedBody.changes.new.combatValues.availablePoints).toBe(availableCombatPointsNew);
       }
       // Only skill is updated
       else {

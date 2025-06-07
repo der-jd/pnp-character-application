@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { RecordType } from "./history.js";
-import { calculationPointsSchema } from "./character_schema.js";
+import { calculationPointsSchema, combatValuesSchema, skillSchema } from "./character_schema.js";
 
 export const recordSchema = z.object({
   type: z.nativeEnum(RecordType),
@@ -52,4 +52,9 @@ export const stringSchema = z.object({
 
 export const booleanSchema = z.object({
   value: z.boolean(),
+});
+
+export const skillChangeSchema = z.object({
+  skillValues: skillSchema,
+  combatValues: combatValuesSchema.optional(),
 });

@@ -11,6 +11,7 @@ import {
   CostCategory,
   getCombatValues,
   getCombatCategory,
+  CombatValues,
 } from "config/index.js";
 import {
   Request,
@@ -100,11 +101,25 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
 
     await updateSkill(params.userId, params.characterId, skillCategory, params.skillName, skill, adventurePoints);
 
+    let combatValues:
+      | {
+          combatCategory: string;
+          old: CombatValues;
+          new: CombatValues;
+        }
+      | undefined;
     if (availableCombatPointsChanged(skillOld, skill, params.skillCategory)) {
       console.log("Available combat points changed. Update combat values.");
       const combatCategory = getCombatCategory(characterSheet.combatValues, params.skillName);
-      const skillCombatValues = getCombatValues(characterSheet.combatValues, combatCategory, params.skillName);
+      const skillCombatValuesOld = getCombatValues(characterSheet.combatValues, combatCategory, params.skillName);
+      const skillCombatValues = structuredClone(skillCombatValuesOld);
       skillCombatValues.availablePoints += skill.current - skillOld.current + (skill.mod - skillOld.mod);
+      combatValues = {
+        combatCategory: combatCategory,
+        old: skillCombatValuesOld,
+        new: skillCombatValues,
+      };
+
       await updateCombatValues(params.userId, params.characterId, combatCategory, params.skillName, skillCombatValues);
     }
 
@@ -115,9 +130,16 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
         userId: params.userId,
         skillCategory: params.skillCategory,
         skillName: params.skillName,
-        skill: {
-          old: skillOld,
-          new: skill,
+        combatCategory: combatValues?.combatCategory,
+        changes: {
+          old: {
+            skillValues: skillOld,
+            combatValues: combatValues?.old,
+          },
+          new: {
+            skillValues: skill,
+            combatValues: combatValues?.new,
+          },
         },
         learningMethod: params.body.current?.learningMethod,
         increaseCost: increaseCost,
@@ -269,12 +291,12 @@ function updateModValue(skill: Skill, modValue: any): Skill {
   }
 }
 
-export function availableCombatPointsChanged(skillOld: Skill, skill: Skill, skillCategory: string): boolean {
+export function availableCombatPointsChanged(skillOld: Skill, skillNew: Skill, skillCategory: string): boolean {
   const isCombatSkill = skillCategory === "combat";
   if (!isCombatSkill) return false;
 
   // No relevant change in combat skill points
-  if (skillOld.current === skill.current && skillOld.mod === skill.mod) return false;
+  if (skillOld.current === skillNew.current && skillOld.mod === skillNew.mod) return false;
 
   return true;
 }

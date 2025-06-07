@@ -8,13 +8,13 @@ import {
   professionHobbySchema,
   RecordType,
   Record,
-  skillSchema,
   historyBlockSchema,
   recordSchema,
   numberSchema,
   stringSchema,
   booleanSchema,
   CalculationPoints,
+  skillChangeSchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -74,7 +74,7 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
       throw new HttpError(404, "The latest record does not match the given id");
     }
 
-    revertChange(params.userId, params.characterId, latestRecord);
+    await revertChange(params.userId, params.characterId, latestRecord);
 
     if (latestBlock.changes.length === 1) {
       console.log("Deleting the complete history block as it only contains the record that should be deleted");
@@ -113,7 +113,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
   };
 }
 
-function revertChange(userId: string, characterId: string, record: Record): void {
+async function revertChange(userId: string, characterId: string, record: Record): Promise<void> {
   console.log("Reverting change:", record);
 
   try {
@@ -154,14 +154,14 @@ function revertChange(userId: string, characterId: string, record: Record): void
         break;
       case RecordType.ATTRIBUTE_CHANGED: {
         const oldAttribute = attributeSchema.parse(record.data.old);
-        updateAttribute(
+        await updateAttribute(
           userId,
           characterId,
           record.name,
           oldAttribute,
           requireProperty(record.calculationPoints.attributePoints?.old, "attributePoints"),
         );
-        updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
+        await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
       }
       case RecordType.SKILL_ACTIVATED:
@@ -169,26 +169,37 @@ function revertChange(userId: string, characterId: string, record: Record): void
         throw new HttpError(500, "Reverting skill activation is not implemented yet!"); // TODO
         break;
       case RecordType.SKILL_RAISED: {
-        const oldSkill = skillSchema.parse(record.data.old);
-        const [skillCategory, skillName] = record.name.split("/");
-        updateSkill(
+        const oldData = skillChangeSchema.parse(record.data.old);
+
+        let skillCategory: string;
+        let skillName: string;
+        if (oldData.combatValues) {
+          // name pattern is "skillCategory/skillName (combatCategory)"
+          [skillCategory, skillName] = record.name.split(" (")[0].split("/");
+          const combatCategory = record.name.split(" (")[1].slice(0, -1); // Remove the trailing ")"
+          await updateCombatValues(userId, characterId, combatCategory, skillName, oldData.combatValues);
+        } else {
+          // name pattern is "skillCategory/skillName"
+          [skillCategory, skillName] = record.name.split("/");
+        }
+
+        await updateSkill(
           userId,
           characterId,
           skillCategory,
           skillName,
-          oldSkill,
+          oldData.skillValues,
           requireProperty(record.calculationPoints.adventurePoints?.old, "adventurePoints"),
         );
-        updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
-        // TODO update combat values if available combat points changed
+        await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         break;
       }
       case RecordType.COMBAT_VALUES_CHANGED: {
         const oldSkillCombatValues = combatValuesSchema.parse(record.data.old);
         const [combatCategory, combatSkillName] = record.name.split("/");
-        updateCombatValues(userId, characterId, combatCategory, combatSkillName, oldSkillCombatValues);
-        updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
-        updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
+        await updateCombatValues(userId, characterId, combatCategory, combatSkillName, oldSkillCombatValues);
+        await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
+        await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
       }
       default:
@@ -212,22 +223,22 @@ function requireProperty<T>(property: T | undefined | null, name: string): T {
   return property;
 }
 
-function updateAttributePointsIfExists(
+async function updateAttributePointsIfExists(
   userId: string,
   characterId: string,
   points: CalculationPoints | undefined,
-): void {
+): Promise<void> {
   if (points) {
-    updateAttributePoints(userId, characterId, points);
+    await updateAttributePoints(userId, characterId, points);
   }
 }
 
-function updateAdventurePointsIfExists(
+async function updateAdventurePointsIfExists(
   userId: string,
   characterId: string,
   points: CalculationPoints | undefined,
-): void {
+): Promise<void> {
   if (points) {
-    updateAdventurePoints(userId, characterId, points);
+    await updateAdventurePoints(userId, characterId, points);
   }
 }

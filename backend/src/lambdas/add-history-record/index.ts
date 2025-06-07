@@ -10,11 +10,11 @@ import {
   professionHobbySchema,
   RecordType,
   Record,
-  skillSchema,
   historyBlockSchema,
   numberSchema,
   stringSchema,
   booleanSchema,
+  skillChangeSchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -202,8 +202,8 @@ async function validateRequest(request: Request): Promise<Parameters> {
         booleanSchema.parse(body.data.new);
         break;
       case RecordType.SKILL_RAISED:
-        skillSchema.parse(body.data.old);
-        skillSchema.parse(body.data.new);
+        skillChangeSchema.parse(body.data.old);
+        skillChangeSchema.parse(body.data.new);
         break;
       case RecordType.COMBAT_VALUES_CHANGED:
         combatValuesSchema.parse(body.data.old);

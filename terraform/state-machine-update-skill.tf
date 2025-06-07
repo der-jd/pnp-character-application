@@ -114,11 +114,15 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
             "character-id" = "{% $parse($states.input.body).characterId %}"
           },
           "body" = {
-            "userId"         = "{% $parse($states.input.body).userId %}",
-            "type"           = "10", // SKILL_RAISED
-            "name"           = "{% $parse($states.input.body).skillCategory & '/' & $parse($states.input.body).skillName %}",
-            "data"           = "{% $parse($states.input.body).skill %}",
-            "learningMethod" = "{% $parse($states.input.body).learningMethod %}",
+            "userId" = "{% $parse($states.input.body).userId %}",
+            "type"   = "10", // SKILL_RAISED
+            // name pattern combat skill: "skillCategory/skillName (combatCategory)"
+            // e.g. "combat/sword1h (melee)"
+            // name pattern other skills: "skillCategory/skillName"
+            // e.g. "knowledge/history"
+            "name"           = "{% $parse($states.input.body).skillCategory & '/' & $parse($states.input.body).skillName & ($parse($states.input.body).combatCategory ? ' (' & $parse($states.input.body).combatCategory & ')' : '') %}",
+            "data"           = "{% $parse($states.input.body).changes %}",
+            "learningMethod" = "{% $parse($states.input.body).learningMethod ? $parse($states.input.body).learningMethod : null %}",
             "calculationPoints" = {
               "adventurePoints" = "{% $parse($states.input.body).adventurePoints %}",
               "attributePoints" = null
