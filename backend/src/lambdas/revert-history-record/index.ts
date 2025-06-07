@@ -171,16 +171,20 @@ async function revertChange(userId: string, characterId: string, record: Record)
       case RecordType.SKILL_CHANGED: {
         const oldData = skillChangeSchema.parse(record.data.old);
 
-        let skillCategory: string;
+        const skillCategory = record.name.split("/")[0];
         let skillName: string;
-        if (oldData.combatValues) {
+        if (skillCategory === "combat") {
           // name pattern is "skillCategory/skillName (combatCategory)"
-          [skillCategory, skillName] = record.name.split(" (")[0].split("/");
-          const combatCategory = record.name.split(" (")[1].slice(0, -1); // Remove the trailing ")"
-          await updateCombatValues(userId, characterId, combatCategory, skillName, oldData.combatValues);
+          skillName = record.name.split(" (")[0].split("/")[1];
         } else {
           // name pattern is "skillCategory/skillName"
-          [skillCategory, skillName] = record.name.split("/");
+          skillName = record.name.split("/")[1];
+        }
+
+        if (oldData.combatValues) {
+          // name pattern is "skillCategory/skillName (combatCategory)"
+          const combatCategory = record.name.split(" (")[1].slice(0, -1); // Remove the trailing ")"
+          await updateCombatValues(userId, characterId, combatCategory, skillName, oldData.combatValues);
         }
 
         await updateSkill(
