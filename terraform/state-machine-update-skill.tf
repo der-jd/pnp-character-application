@@ -99,7 +99,7 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
         Choices = [
           {
             // The skill was not updated, so no history record is necessary
-            Condition = "{% $parse($states.input.body).skill.old = $parse($states.input.body).skill.new %}",
+            Condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}",
             Next      = "SuccessState"
           }
         ],
