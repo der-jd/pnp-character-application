@@ -486,7 +486,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.SKILL_RAISED,
+          type: RecordType.SKILL_CHANGED,
           name: "body/bodyControl",
           data: {
             old: {
@@ -614,7 +614,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.SKILL_RAISED,
+          type: RecordType.SKILL_CHANGED,
           name: "combat/polearms (melee)",
           data: {
             old: {

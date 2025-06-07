@@ -168,7 +168,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
         booleanSchema.parse(record.data.old);
         throw new HttpError(500, "Reverting skill activation is not implemented yet!"); // TODO
         break;
-      case RecordType.SKILL_RAISED: {
+      case RecordType.SKILL_CHANGED: {
         const oldData = skillChangeSchema.parse(record.data.old);
 
         let skillCategory: string;

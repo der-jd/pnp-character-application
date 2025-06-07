@@ -125,7 +125,7 @@ describe("Valid requests", () => {
     },
     {
       name: "Revert history record for a changed skill",
-      fakeRecordType: RecordType.SKILL_RAISED,
+      fakeRecordType: RecordType.SKILL_CHANGED,
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -188,7 +188,7 @@ describe("Valid requests", () => {
   const testCasesForRevertingWholeBlock = [
     {
       name: "Delete history block that contains only the reverted record",
-      fakeRecordType: RecordType.SKILL_RAISED,
+      fakeRecordType: RecordType.SKILL_CHANGED,
       request: {
         headers: fakeHeaders,
         pathParameters: {

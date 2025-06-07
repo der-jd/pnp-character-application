@@ -41,7 +41,7 @@ export function addFakeHistoryRecord(
     case RecordType.SKILL_ACTIVATED:
       throw new Error("Fake record not implemented yet!"); // TODO
       break;
-    case RecordType.SKILL_RAISED: {
+    case RecordType.SKILL_CHANGED: {
       record = skillChangedRecord;
       break;
     }
@@ -131,7 +131,7 @@ const attributeChangedRecord: Record = {
 };
 
 const skillChangedRecord: Record = {
-  type: RecordType.SKILL_RAISED,
+  type: RecordType.SKILL_CHANGED,
   name: "combat/polearms (melee)",
   number: 3,
   id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
@@ -238,7 +238,7 @@ function generateLargeChangesList(size: number): Record[] {
   const largeChanges = [];
   for (let i = 0; i < size; i++) {
     largeChanges.push({
-      type: RecordType.SKILL_RAISED,
+      type: RecordType.SKILL_CHANGED,
       name: `category/skill${i}`,
       number: i + 1,
       id: uuidv4(),

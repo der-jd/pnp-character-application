@@ -201,7 +201,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
         booleanSchema.parse(body.data.old);
         booleanSchema.parse(body.data.new);
         break;
-      case RecordType.SKILL_RAISED:
+      case RecordType.SKILL_CHANGED:
         skillChangeSchema.parse(body.data.old);
         skillChangeSchema.parse(body.data.new);
         break;
