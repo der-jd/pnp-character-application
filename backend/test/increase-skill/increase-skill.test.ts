@@ -4,7 +4,7 @@ import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { Character, getSkill } from "config/index.js";
-import { increaseSkill } from "increase-skill/index.js";
+import { _updateSkill, availableCombatPointsChanged } from "increase-skill/index.js";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
@@ -22,9 +22,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
-          increasedPoints: 1,
-          learningMethod: "NORMAL",
+          current: {
+            initialValue: 16,
+            increasedPoints: 1,
+            learningMethod: "NORMAL",
+          },
         },
       },
       expectedStatusCode: 401,
@@ -42,15 +44,17 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
-          increasedPoints: 1,
-          learningMethod: "NORMAL",
+          current: {
+            initialValue: 16,
+            increasedPoints: 1,
+            learningMethod: "NORMAL",
+          },
         },
       },
       expectedStatusCode: 401,
     },
     {
-      name: "Passed initial skill value doesn't match the value in the backend",
+      name: "Passed initial start skill value doesn't match the value in the backend",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -60,15 +64,55 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 10,
-          increasedPoints: 15,
-          learningMethod: "NORMAL",
+          start: {
+            initialValue: 5,
+            newValue: 8,
+          },
         },
       },
       expectedStatusCode: 409,
     },
     {
-      name: "Skill is not activated",
+      name: "Passed initial current skill value doesn't match the value in the backend",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          current: {
+            initialValue: 10,
+            increasedPoints: 15,
+            learningMethod: "NORMAL",
+          },
+        },
+      },
+      expectedStatusCode: 409,
+    },
+    {
+      name: "Passed initial mod value doesn't match the value in the backend",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          mod: {
+            initialValue: 7,
+            newValue: 10,
+          },
+        },
+      },
+      expectedStatusCode: 409,
+    },
+    {
+      name: "Skill is not activated (start value updated)",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -78,9 +122,49 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 8,
-          increasedPoints: 3,
-          learningMethod: "NORMAL",
+          start: {
+            initialValue: 5,
+            newValue: 6,
+          },
+        },
+      },
+      expectedStatusCode: 409,
+    },
+    {
+      name: "Skill is not activated (current value updated)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "nature",
+          "skill-name": "fishing",
+        },
+        queryStringParameters: null,
+        body: {
+          current: {
+            initialValue: 8,
+            increasedPoints: 1,
+            learningMethod: "NORMAL",
+          },
+        },
+      },
+      expectedStatusCode: 409,
+    },
+    {
+      name: "Skill is not activated (mod value updated)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "nature",
+          "skill-name": "fishing",
+        },
+        queryStringParameters: null,
+        body: {
+          mod: {
+            initialValue: 3,
+            newValue: 5,
+          },
         },
       },
       expectedStatusCode: 409,
@@ -96,9 +180,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 120,
-          increasedPoints: 25,
-          learningMethod: "EXPENSIVE",
+          current: {
+            initialValue: 120,
+            increasedPoints: 25,
+            learningMethod: "EXPENSIVE",
+          },
         },
       },
       expectedStatusCode: 400,
@@ -114,9 +200,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
-          increasedPoints: 5,
-          learningMethod: "NORMAL",
+          current: {
+            initialValue: 16,
+            increasedPoints: 1,
+            learningMethod: "NORMAL",
+          },
         },
       },
       expectedStatusCode: 400,
@@ -132,9 +220,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
-          increasedPoints: 0,
-          learningMethod: "NORMAL",
+          current: {
+            initialValue: 16,
+            increasedPoints: 0,
+            learningMethod: "NORMAL",
+          },
         },
       },
       expectedStatusCode: 400,
@@ -150,9 +240,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
-          increasedPoints: -3,
-          learningMethod: "NORMAL",
+          current: {
+            initialValue: 16,
+            increasedPoints: -3,
+            learningMethod: "NORMAL",
+          },
         },
       },
       expectedStatusCode: 400,
@@ -168,9 +260,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
-          increasedPoints: 3,
-          learningMethod: "NORMAL",
+          current: {
+            initialValue: 16,
+            increasedPoints: 1,
+            learningMethod: "NORMAL",
+          },
         },
       },
       expectedStatusCode: 404,
@@ -186,9 +280,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
-          increasedPoints: 3,
-          learningMethod: "NORMAL",
+          current: {
+            initialValue: 16,
+            increasedPoints: 1,
+            learningMethod: "NORMAL",
+          },
         },
       },
       expectedStatusCode: 404,
@@ -199,15 +295,15 @@ describe("Invalid requests", () => {
     test(_case.name, async () => {
       mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
-      await expectHttpError(() => increaseSkill(_case.request), _case.expectedStatusCode);
+      await expectHttpError(() => _updateSkill(_case.request), _case.expectedStatusCode);
     });
   });
 });
 
 describe("Valid requests", () => {
-  const validTestCases = [
+  const idempotentTestCases = [
     {
-      name: "Skill has already been increased to the target value (idempotency)",
+      name: "Skill has already been updated to the target start value (idempotency)",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -217,15 +313,16 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 12,
-          increasedPoints: 4,
-          learningMethod: "NORMAL",
+          start: {
+            initialValue: 9,
+            newValue: 12,
+          },
         },
       },
       expectedStatusCode: 200,
     },
     {
-      name: "Increase skill by 1 point (cost category: NORMAL)",
+      name: "Skill has already been increased to the target current value (idempotency)",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -235,15 +332,17 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
-          increasedPoints: 1,
-          learningMethod: "NORMAL",
+          current: {
+            initialValue: 12,
+            increasedPoints: 4,
+            learningMethod: "NORMAL",
+          },
         },
       },
       expectedStatusCode: 200,
     },
     {
-      name: "Increase skill by 3 point (cost category: FREE)",
+      name: "Skill has already been updated to the target mod value (idempotency)",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -253,92 +352,263 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialValue: 16,
-          increasedPoints: 3,
-          learningMethod: "FREE",
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Increase skill by 3 point (cost category: LOW_PRICED)",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
-        },
-        queryStringParameters: null,
-        body: {
-          initialValue: 16,
-          increasedPoints: 3,
-          learningMethod: "LOW_PRICED",
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Increase skill by 3 point (cost category: EXPENSIVE)",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
-        },
-        queryStringParameters: null,
-        body: {
-          initialValue: 16,
-          increasedPoints: 3,
-          learningMethod: "EXPENSIVE",
+          mod: {
+            initialValue: 2,
+            newValue: 4,
+          },
         },
       },
       expectedStatusCode: 200,
     },
   ];
 
-  validTestCases.forEach((_case) => {
+  idempotentTestCases.forEach((_case) => {
     test(_case.name, async () => {
       mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
-      const result = await increaseSkill(_case.request);
+      const result = await _updateSkill(_case.request);
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
       const parsedBody = JSON.parse(result.body);
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
-      const skillName = _case.request.pathParameters["skill-name"];
-      expect(parsedBody.skillName).toBe(skillName);
-      expect(parsedBody.skill.new.current).toBe(_case.request.body.initialValue + _case.request.body.increasedPoints);
-
       const skillCategory = _case.request.pathParameters[
         "skill-category"
       ] as keyof Character["characterSheet"]["skills"];
+      expect(parsedBody.skillCategory).toBe(skillCategory);
+      const skillName = _case.request.pathParameters["skill-name"];
+      expect(parsedBody.skillName).toBe(skillName);
+
+      if (_case.request.body.start) {
+        expect(parsedBody.skill.new.start).toBeCloseTo(_case.request.body.start.newValue);
+      }
+
+      if (_case.request.body.current) {
+        expect(parsedBody.skill.new.current).toBeCloseTo(
+          _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
+        );
+        expect(parsedBody.learningMethod).toBe(_case.request.body.current.learningMethod);
+      }
+
+      if (_case.request.body.mod) {
+        expect(parsedBody.skill.new.mod).toBeCloseTo(_case.request.body.mod.newValue);
+      }
+
       const skillOld = getSkill(fakeCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
-      const oldTotalSkillCost = skillOld.totalCost;
-      const diffSkillTotalCost = parsedBody.skill.new.totalCost - oldTotalSkillCost;
+      expect(parsedBody.skill.old).toStrictEqual(skillOld);
+      expect(parsedBody.skill.new).toStrictEqual(parsedBody.skill.old);
+
       const oldAvailableAdventurePoints =
         fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
       const diffAvailableAdventurePoints = oldAvailableAdventurePoints - parsedBody.adventurePoints.new.available;
-      expect(diffAvailableAdventurePoints).toBe(diffSkillTotalCost);
+      expect(diffAvailableAdventurePoints).toBeCloseTo(0);
+
+      const oldTotalSkillCost = skillOld.totalCost;
+      const diffSkillTotalCost = parsedBody.skill.new.totalCost - oldTotalSkillCost;
+      expect(diffAvailableAdventurePoints).toBeCloseTo(diffSkillTotalCost);
+    });
+  });
+
+  const updateTestCases = [
+    {
+      name: "Update start skill value",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          start: {
+            initialValue: 12,
+            newValue: 15,
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Increase current skill value by 1 point (cost category: NORMAL)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          current: {
+            initialValue: 16,
+            increasedPoints: 1,
+            learningMethod: "NORMAL",
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Increase current skill value by 3 point (cost category: FREE)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          current: {
+            initialValue: 16,
+            increasedPoints: 3,
+            learningMethod: "FREE",
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Increase current skill value by 3 point (cost category: LOW_PRICED)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          current: {
+            initialValue: 16,
+            increasedPoints: 3,
+            learningMethod: "LOW_PRICED",
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Increase current skill value by 3 point (cost category: EXPENSIVE)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          current: {
+            initialValue: 16,
+            increasedPoints: 3,
+            learningMethod: "EXPENSIVE",
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Update mod value",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          mod: {
+            initialValue: 4,
+            newValue: 7,
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+  ];
+
+  updateTestCases.forEach((_case) => {
+    test(_case.name, async () => {
+      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
+
+      const result = await _updateSkill(_case.request);
+
+      expect(result.statusCode).toBe(_case.expectedStatusCode);
+
+      const parsedBody = JSON.parse(result.body);
+      expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
+      const skillCategory = _case.request.pathParameters[
+        "skill-category"
+      ] as keyof Character["characterSheet"]["skills"];
+      expect(parsedBody.skillCategory).toBe(skillCategory);
+      const skillName = _case.request.pathParameters["skill-name"];
+      expect(parsedBody.skillName).toBe(skillName);
+
+      if (_case.request.body.start) {
+        expect(parsedBody.skill.new.start).toBeCloseTo(_case.request.body.start.newValue);
+      }
+
+      const oldAvailableAdventurePoints =
+        fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
+      const diffAvailableAdventurePoints = oldAvailableAdventurePoints - parsedBody.adventurePoints.new.available;
+
+      if (_case.request.body.current) {
+        expect(parsedBody.skill.new.current).toBeCloseTo(
+          _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
+        );
+        expect(parsedBody.learningMethod).toBe(_case.request.body.current.learningMethod);
+
+        switch (_case.request.body.current.learningMethod) {
+          case "FREE":
+            expect(diffAvailableAdventurePoints).toBeCloseTo(0);
+            break;
+          case "LOW_PRICED":
+            expect(diffAvailableAdventurePoints).toBeCloseTo(1.5);
+            break;
+          case "NORMAL":
+            expect(diffAvailableAdventurePoints).toBeCloseTo(1);
+            break;
+          case "EXPENSIVE":
+            expect(diffAvailableAdventurePoints).toBeCloseTo(6);
+            break;
+          default:
+            throw new Error(`Unknown learning method: ${_case.request.body.current.learningMethod}`);
+        }
+      }
+
+      if (_case.request.body.mod) {
+        expect(parsedBody.skill.new.mod).toBeCloseTo(_case.request.body.mod.newValue);
+      }
+
+      const skillOld = getSkill(fakeCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
+      const oldTotalSkillCost = skillOld.totalCost;
+      const diffSkillTotalCost = parsedBody.skill.new.totalCost - oldTotalSkillCost;
+      expect(diffAvailableAdventurePoints).toBeCloseTo(diffSkillTotalCost);
 
       expect(parsedBody.skill.old).toStrictEqual(skillOld);
 
-      // Skill was not already at the target value
-      if (_case.request.body.initialValue + _case.request.body.increasedPoints !== skillOld.current) {
-        // Check if the skill was updated
-        const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
-        expect(calls).toHaveLength(1);
+      // Check if the skill was updated
+      const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
 
-        const matchingCall = calls.find((call: any) => {
-          const input = call.args[0].input;
-          return (
-            input.Key.characterId === _case.request.pathParameters["character-id"] && input.Key.userId === fakeUserId
-          );
-        });
-        expect(matchingCall).toBeTruthy();
+      // Skill and combat values are updated
+      if (availableCombatPointsChanged(skillOld, parsedBody.skill.new, skillCategory)) {
+        expect(calls.length).toBe(2);
       }
+      // Only skill is updated
+      else {
+        expect(calls.length).toBe(1);
+      }
+
+      const matchingCall = calls.find((call: any) => {
+        const input = call.args[0].input;
+        return (
+          input.Key.characterId === _case.request.pathParameters["character-id"] && input.Key.userId === fakeUserId
+        );
+      });
+      expect(matchingCall).toBeTruthy();
 
       /**
        * TODO add a check for all tests across all Lambdas to validate the response body against the corresponding API schema (zod)

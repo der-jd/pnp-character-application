@@ -180,6 +180,7 @@ function revertChange(userId: string, characterId: string, record: Record): void
           requireProperty(record.calculationPoints.adventurePoints?.old, "adventurePoints"),
         );
         updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
+        // TODO update combat values if available combat points changed
         break;
       }
       case RecordType.COMBAT_VALUES_CHANGED: {

@@ -242,3 +242,16 @@ export function getCombatValues(
   }
   return skillCombatValues;
 }
+
+export function getCombatCategory(
+  combatValues: CharacterSheet["combatValues"],
+  combatSkillName: string,
+): keyof CharacterSheet["combatValues"] {
+  for (const category in combatValues) {
+    const combatCategory = combatValues[category as keyof CharacterSheet["combatValues"]] as Record<string, any>;
+    if (combatCategory[combatSkillName]) {
+      return category as keyof CharacterSheet["combatValues"];
+    }
+  }
+  throw new Error(`Combat category for skill ${combatSkillName} not found!`);
+}

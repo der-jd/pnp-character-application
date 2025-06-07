@@ -18,6 +18,7 @@ export {
   getAttribute,
   getSkill,
   getCombatValues,
+  getCombatCategory,
 } from "./character.js";
 export {
   attributeSchema,
