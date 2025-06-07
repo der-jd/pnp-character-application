@@ -109,9 +109,9 @@ module "increase_attribute_lambda" {
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
 }
 
-module "increase_skill_lambda" {
+module "update_skill_lambda" {
   source        = "./modules/lambda_function"
-  function_name = "increase-skill"
+  function_name = "update-skill"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
   }

@@ -24,7 +24,7 @@ resource "aws_iam_role_policy" "api_gateway_policy" {
         Effect = "Allow",
         Action = "states:StartSyncExecution",
         Resource = [
-          aws_sfn_state_machine.increase_skill_state_machine.arn,
+          aws_sfn_state_machine.update_skill_state_machine.arn,
           aws_sfn_state_machine.increase_attribute_state_machine.arn
         ]
       }
@@ -200,7 +200,7 @@ module "skill_name_patch" {
   }
   aws_region        = data.aws_region.current.name
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.increase_skill_state_machine.arn
+  state_machine_arn = aws_sfn_state_machine.update_skill_state_machine.arn
 }
 
 // ================== OPTIONS /characters/{character-id}/skills/{skill-category}/{skill-name} ==================

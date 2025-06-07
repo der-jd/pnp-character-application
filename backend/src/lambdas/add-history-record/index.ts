@@ -166,7 +166,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
     const body = historyBodySchema.parse(request.body);
 
     // Check if the character exists
-    // Note: This check is currently not necessary as the lambda is called after the increase-skill function. I.e. we can assume that the character exists.
+    // Note: This check is currently not necessary as the lambda is called after the update-skill function. I.e. we can assume that the character exists.
     //await getCharacterItem(body.userId, characterId);
 
     switch (body.type) {
