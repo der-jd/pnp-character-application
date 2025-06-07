@@ -2219,136 +2219,136 @@
           }
         }
       },
-      "combatSkills": {
+      "combatValues": {
         "M": {
           "melee": {
             "M": {
               "greatsword": {
                 "M": {
-                  "handling": {
-                    "N": "18"
+                  "availablePoints": {
+                    "N": "83"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
               },
               "martialArts": {
                 "M": {
-                  "handling": {
-                    "N": "12"
+                  "availablePoints": {
+                    "N": "19"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "6"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "6"
                   }
                 }
               },
               "barehanded": {
                 "M": {
-                  "handling": {
-                    "N": "18"
+                  "availablePoints": {
+                    "N": "82"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
               },
               "chainWeapons": {
                 "M": {
-                  "handling": {
-                    "N": "18"
+                  "availablePoints": {
+                    "N": "26"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
               },
               "daggers": {
                 "M": {
-                  "handling": {
-                    "N": "18"
+                  "availablePoints": {
+                    "N": "26"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
               },
               "slashingWeapons1h": {
                 "M": {
-                  "handling": {
-                    "N": "18"
-                  },
-                  "attackDistributed": {
+                  "availablePoints": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "attackValue": {
+                    "N": "10"
+                  },
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
               },
               "thrustingWeapons1h": {
                 "M": {
-                  "handling": {
-                    "N": "18"
+                  "availablePoints": {
+                    "N": "58"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
               },
               "slashingWeapons2h": {
                 "M": {
-                  "handling": {
-                    "N": "18"
+                  "availablePoints": {
+                    "N": "26"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
               },
               "thrustingWeapons2h": {
                 "M": {
-                  "handling": {
-                    "N": "18"
+                  "availablePoints": {
+                    "N": "57"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
               },
               "polearms": {
                 "M": {
-                  "handling": {
-                    "N": "18"
+                  "availablePoints": {
+                    "N": "26"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
+                  "paradeValue": {
                     "N": "8"
                   }
                 }
@@ -2359,53 +2359,53 @@
             "M": {
               "firearmSimple": {
                 "M": {
-                  "handling": {
-                    "N": "10"
+                  "availablePoints": {
+                    "N": "18"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "6"
                   },
-                  "paradeDistributed": {
-                    "N": "4"
+                  "paradeValue": {
+                    "N": "0"
                   }
                 }
               },
               "firearmMedium": {
                 "M": {
-                  "handling": {
-                    "N": "18"
+                  "availablePoints": {
+                    "N": "22"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
-                    "N": "8"
+                  "paradeValue": {
+                    "N": "0"
                   }
                 }
               },
               "firearmComplex": {
                 "M": {
-                  "handling": {
-                    "N": "18"
+                  "availablePoints": {
+                    "N": "22"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "10"
                   },
-                  "paradeDistributed": {
-                    "N": "8"
+                  "paradeValue": {
+                    "N": "0"
                   }
                 }
               },
               "missile": {
                 "M": {
-                  "handling": {
-                    "N": "8"
+                  "availablePoints": {
+                    "N": "15"
                   },
-                  "attackDistributed": {
+                  "attackValue": {
                     "N": "5"
                   },
-                  "paradeDistributed": {
-                    "N": "3"
+                  "paradeValue": {
+                    "N": "0"
                   }
                 }
               }

@@ -12,18 +12,20 @@ export {
   Attribute,
   BaseValue,
   Skill,
-  CombatSkill,
+  CombatValues,
   Character,
   CharacterSheet,
   getAttribute,
   getSkill,
+  getCombatValues,
+  getCombatCategory,
 } from "./character.js";
 export {
   attributeSchema,
   baseValueSchema,
   calculationPointsSchema,
   characterSchema,
-  combatSkillSchema,
+  combatValuesSchema,
   professionHobbySchema,
   skillSchema,
 } from "./character_schema.js";
@@ -35,5 +37,7 @@ export {
   numberSchema,
   stringSchema,
   booleanSchema,
+  skillChangeSchema,
 } from "./history_schema.js";
+export { getCombatSkillHandling } from "./combat_skills_handling.js";
 export { RecordType, parseRecordType } from "./history.js";

@@ -3,212 +3,256 @@
 import { z } from "zod";
 import { CostCategory } from "./cost.js";
 
-export const calculationPointsSchema = z.object({
-  start: z.number(),
-  available: z.number(),
-  total: z.number(),
-});
+export const calculationPointsSchema = z
+  .object({
+    start: z.number(),
+    available: z.number(),
+    total: z.number(),
+  })
+  .strict();
 
-export const professionHobbySchema = z.object({
-  name: z.string(),
-  skill: z.string(),
-});
+export const professionHobbySchema = z
+  .object({
+    name: z.string(),
+    skill: z.string(),
+  })
+  .strict();
 
-export const attributeSchema = z.object({
-  start: z.number(),
-  current: z.number(),
-  mod: z.number(),
-  totalCost: z.number(),
-});
+export const attributeSchema = z
+  .object({
+    start: z.number(),
+    current: z.number(),
+    mod: z.number(),
+    totalCost: z.number(),
+  })
+  .strict();
 
-export const baseValueSchema = z.object({
-  start: z.number(),
-  current: z.number(),
-  byLvlUp: z.number(),
-  mod: z.number(),
-  totalCost: z.number(),
-});
+export const baseValueSchema = z
+  .object({
+    start: z.number(),
+    current: z.number(),
+    byLvlUp: z.number(),
+    mod: z.number(),
+    totalCost: z.number(),
+  })
+  .strict();
 
-export const combatSkillSchema = z.object({
-  handling: z.number(),
-  attackDistributed: z.number(),
-  paradeDistributed: z.number(),
-});
+export const combatValuesSchema = z
+  .object({
+    availablePoints: z.number(),
+    attackValue: z.number(),
+    paradeValue: z.number(),
+  })
+  .strict();
 
 const costCategorySchema = z.nativeEnum(CostCategory);
 
-export const skillSchema = z.object({
-  activated: z.boolean(),
-  start: z.number(),
-  current: z.number(),
-  mod: z.number(),
-  totalCost: z.number(),
-  defaultCostCategory: costCategorySchema,
-});
+export const skillSchema = z
+  .object({
+    activated: z.boolean(),
+    start: z.number(),
+    current: z.number(),
+    mod: z.number(),
+    totalCost: z.number(),
+    defaultCostCategory: costCategorySchema,
+  })
+  .strict();
 
-export const characterSheetSchema = z.object({
-  generalInformation: z.object({
-    name: z.string(),
-    level: z.number(),
-    sex: z.string(),
-    profession: professionHobbySchema,
-    hobby: professionHobbySchema,
-    birthday: z.string(),
-    birthplace: z.string(),
-    size: z.string(),
-    weight: z.string(),
-    hairColor: z.string(),
-    eyeColor: z.string(),
-    residence: z.string(),
-    appearance: z.string(),
-    specialCharacteristics: z.string(),
-  }),
-  calculationPoints: z.object({
-    adventurePoints: calculationPointsSchema,
-    attributePoints: calculationPointsSchema,
-  }),
-  advantages: z.array(z.string()),
-  disadvantages: z.array(z.string()),
-  specialAbilities: z.array(z.string()),
-  baseValues: z.object({
-    healthPoints: baseValueSchema,
-    mentalHealth: baseValueSchema,
-    armorLevel: baseValueSchema,
-    naturalArmor: baseValueSchema,
-    initiativeBaseValue: baseValueSchema,
-    attackBaseValue: baseValueSchema,
-    paradeBaseValue: baseValueSchema,
-    rangedAttackBaseValue: baseValueSchema,
-    luckPoints: baseValueSchema,
-    bonusActionsPerCombatRound: baseValueSchema,
-    legendaryActions: baseValueSchema,
-  }),
-  attributes: z.object({
-    courage: attributeSchema,
-    intelligence: attributeSchema,
-    concentration: attributeSchema,
-    charisma: attributeSchema,
-    mentalResilience: attributeSchema,
-    dexterity: attributeSchema,
-    endurance: attributeSchema,
-    strength: attributeSchema,
-  }),
-  skills: z.object({
-    combat: z.object({
-      martialArts: skillSchema,
-      barehanded: skillSchema,
-      chainWeapons: skillSchema,
-      daggers: skillSchema,
-      slashingWeapons1h: skillSchema,
-      thrustingWeapons1h: skillSchema,
-      slashingWeapons2h: skillSchema,
-      thrustingWeapons2h: skillSchema,
-      polearms: skillSchema,
-      greatsword: skillSchema,
-      missile: skillSchema,
-      firearmSimple: skillSchema,
-      firearmMedium: skillSchema,
-      firearmComplex: skillSchema,
-    }),
-    body: z.object({
-      athletics: skillSchema,
-      juggleries: skillSchema,
-      climbing: skillSchema,
-      bodyControl: skillSchema,
-      riding: skillSchema,
-      sneaking: skillSchema,
-      swimming: skillSchema,
-      selfControl: skillSchema,
-      hiding: skillSchema,
-      singing: skillSchema,
-      sharpnessOfSenses: skillSchema,
-      imitatingVoices: skillSchema,
-      dancing: skillSchema,
-      quaffing: skillSchema,
-      pickpocketing: skillSchema,
-    }),
-    social: z.object({
-      seduction: skillSchema,
-      etiquette: skillSchema,
-      teaching: skillSchema,
-      acting: skillSchema,
-      writtenExpression: skillSchema,
-      disguising: skillSchema,
-      streetKnowledge: skillSchema,
-      knowledgeOfHumanNature: skillSchema,
-      persuading: skillSchema,
-      convincing: skillSchema,
-    }),
-    nature: z.object({
-      tracking: skillSchema,
-      knottingSkills: skillSchema,
-      trapping: skillSchema,
-      fishing: skillSchema,
-      orientation: skillSchema,
-      wildernessLife: skillSchema,
-    }),
-    knowledge: z.object({
-      anatomy: skillSchema,
-      architecture: skillSchema,
-      geography: skillSchema,
-      history: skillSchema,
-      petrology: skillSchema,
-      botany: skillSchema,
-      philosophy: skillSchema,
-      astronomy: skillSchema,
-      mathematics: skillSchema,
-      knowledgeOfTheLaw: skillSchema,
-      estimating: skillSchema,
-      zoology: skillSchema,
-      technology: skillSchema,
-      chemistry: skillSchema,
-      warfare: skillSchema,
-      itSkills: skillSchema,
-      mechanics: skillSchema,
-    }),
-    handcraft: z.object({
-      training: skillSchema,
-      woodwork: skillSchema,
-      foodProcessing: skillSchema,
-      leatherProcessing: skillSchema,
-      metalwork: skillSchema,
-      stonework: skillSchema,
-      fabricProcessing: skillSchema,
-      alcoholProduction: skillSchema,
-      steeringVehicles: skillSchema,
-      cheating: skillSchema,
-      bargaining: skillSchema,
-      firstAid: skillSchema,
-      calmingSbDown: skillSchema,
-      drawingAndPainting: skillSchema,
-      makingMusic: skillSchema,
-      lockpicking: skillSchema,
-    }),
-  }),
-  combatSkills: z.object({
-    melee: z.object({
-      martialArts: combatSkillSchema,
-      barehanded: combatSkillSchema,
-      chainWeapons: combatSkillSchema,
-      daggers: combatSkillSchema,
-      slashingWeapons1h: combatSkillSchema,
-      thrustingWeapons1h: combatSkillSchema,
-      slashingWeapons2h: combatSkillSchema,
-      thrustingWeapons2h: combatSkillSchema,
-      polearms: combatSkillSchema,
-      greatsword: combatSkillSchema,
-    }),
-    ranged: z.object({
-      missile: combatSkillSchema,
-      firearmSimple: combatSkillSchema,
-      firearmMedium: combatSkillSchema,
-      firearmComplex: combatSkillSchema,
-    }),
-  }),
-});
+export const characterSheetSchema = z
+  .object({
+    generalInformation: z
+      .object({
+        name: z.string(),
+        level: z.number(),
+        sex: z.string(),
+        profession: professionHobbySchema,
+        hobby: professionHobbySchema,
+        birthday: z.string(),
+        birthplace: z.string(),
+        size: z.string(),
+        weight: z.string(),
+        hairColor: z.string(),
+        eyeColor: z.string(),
+        residence: z.string(),
+        appearance: z.string(),
+        specialCharacteristics: z.string(),
+      })
+      .strict(),
+    calculationPoints: z
+      .object({
+        adventurePoints: calculationPointsSchema,
+        attributePoints: calculationPointsSchema,
+      })
+      .strict(),
+    advantages: z.array(z.string()),
+    disadvantages: z.array(z.string()),
+    specialAbilities: z.array(z.string()),
+    baseValues: z
+      .object({
+        healthPoints: baseValueSchema,
+        mentalHealth: baseValueSchema,
+        armorLevel: baseValueSchema,
+        naturalArmor: baseValueSchema,
+        initiativeBaseValue: baseValueSchema,
+        attackBaseValue: baseValueSchema,
+        paradeBaseValue: baseValueSchema,
+        rangedAttackBaseValue: baseValueSchema,
+        luckPoints: baseValueSchema,
+        bonusActionsPerCombatRound: baseValueSchema,
+        legendaryActions: baseValueSchema,
+      })
+      .strict(),
+    attributes: z
+      .object({
+        courage: attributeSchema,
+        intelligence: attributeSchema,
+        concentration: attributeSchema,
+        charisma: attributeSchema,
+        mentalResilience: attributeSchema,
+        dexterity: attributeSchema,
+        endurance: attributeSchema,
+        strength: attributeSchema,
+      })
+      .strict(),
+    skills: z
+      .object({
+        combat: z
+          .object({
+            martialArts: skillSchema,
+            barehanded: skillSchema,
+            chainWeapons: skillSchema,
+            daggers: skillSchema,
+            slashingWeapons1h: skillSchema,
+            thrustingWeapons1h: skillSchema,
+            slashingWeapons2h: skillSchema,
+            thrustingWeapons2h: skillSchema,
+            polearms: skillSchema,
+            greatsword: skillSchema,
+            missile: skillSchema,
+            firearmSimple: skillSchema,
+            firearmMedium: skillSchema,
+            firearmComplex: skillSchema,
+          })
+          .strict(),
+        body: z
+          .object({
+            athletics: skillSchema,
+            juggleries: skillSchema,
+            climbing: skillSchema,
+            bodyControl: skillSchema,
+            riding: skillSchema,
+            sneaking: skillSchema,
+            swimming: skillSchema,
+            selfControl: skillSchema,
+            hiding: skillSchema,
+            singing: skillSchema,
+            sharpnessOfSenses: skillSchema,
+            imitatingVoices: skillSchema,
+            dancing: skillSchema,
+            quaffing: skillSchema,
+            pickpocketing: skillSchema,
+          })
+          .strict(),
+        social: z
+          .object({
+            seduction: skillSchema,
+            etiquette: skillSchema,
+            teaching: skillSchema,
+            acting: skillSchema,
+            writtenExpression: skillSchema,
+            disguising: skillSchema,
+            streetKnowledge: skillSchema,
+            knowledgeOfHumanNature: skillSchema,
+            persuading: skillSchema,
+            convincing: skillSchema,
+          })
+          .strict(),
+        nature: z
+          .object({
+            tracking: skillSchema,
+            knottingSkills: skillSchema,
+            trapping: skillSchema,
+            fishing: skillSchema,
+            orientation: skillSchema,
+            wildernessLife: skillSchema,
+          })
+          .strict(),
+        knowledge: z
+          .object({
+            anatomy: skillSchema,
+            architecture: skillSchema,
+            geography: skillSchema,
+            history: skillSchema,
+            petrology: skillSchema,
+            botany: skillSchema,
+            philosophy: skillSchema,
+            astronomy: skillSchema,
+            mathematics: skillSchema,
+            knowledgeOfTheLaw: skillSchema,
+            estimating: skillSchema,
+            zoology: skillSchema,
+            technology: skillSchema,
+            chemistry: skillSchema,
+            warfare: skillSchema,
+            itSkills: skillSchema,
+            mechanics: skillSchema,
+          })
+          .strict(),
+        handcraft: z
+          .object({
+            training: skillSchema,
+            woodwork: skillSchema,
+            foodProcessing: skillSchema,
+            leatherProcessing: skillSchema,
+            metalwork: skillSchema,
+            stonework: skillSchema,
+            fabricProcessing: skillSchema,
+            alcoholProduction: skillSchema,
+            steeringVehicles: skillSchema,
+            cheating: skillSchema,
+            bargaining: skillSchema,
+            firstAid: skillSchema,
+            calmingSbDown: skillSchema,
+            drawingAndPainting: skillSchema,
+            makingMusic: skillSchema,
+            lockpicking: skillSchema,
+          })
+          .strict(),
+      })
+      .strict(),
+    combatValues: z
+      .object({
+        melee: z
+          .object({
+            martialArts: combatValuesSchema,
+            barehanded: combatValuesSchema,
+            chainWeapons: combatValuesSchema,
+            daggers: combatValuesSchema,
+            slashingWeapons1h: combatValuesSchema,
+            thrustingWeapons1h: combatValuesSchema,
+            slashingWeapons2h: combatValuesSchema,
+            thrustingWeapons2h: combatValuesSchema,
+            polearms: combatValuesSchema,
+            greatsword: combatValuesSchema,
+          })
+          .strict(),
+        ranged: z
+          .object({
+            missile: combatValuesSchema,
+            firearmSimple: combatValuesSchema,
+            firearmMedium: combatValuesSchema,
+            firearmComplex: combatValuesSchema,
+          })
+          .strict(),
+      })
+      .strict(),
+  })
+  .strict();
 
-export const characterSchema = z.object({
-  userId: z.string(),
-  characterId: z.string(),
-  characterSheet: characterSheetSchema,
-});
+export const characterSchema = z
+  .object({
+    userId: z.string(),
+    characterId: z.string(),
+    characterSheet: characterSheetSchema,
+  })
+  .strict();

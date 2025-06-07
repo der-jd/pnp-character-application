@@ -41,10 +41,10 @@ export interface Skill {
   defaultCostCategory: CostCategory;
 }
 
-export interface CombatSkill {
-  handling: number;
-  attackDistributed: number;
-  paradeDistributed: number;
+export interface CombatValues {
+  availablePoints: number;
+  attackValue: number;
+  paradeValue: number;
 }
 
 export interface CharacterSheet {
@@ -187,24 +187,24 @@ export interface CharacterSheet {
       lockpicking: Skill;
     };
   };
-  combatSkills: {
+  combatValues: {
     melee: {
-      martialArts: CombatSkill;
-      barehanded: CombatSkill;
-      chainWeapons: CombatSkill;
-      daggers: CombatSkill;
-      slashingWeapons1h: CombatSkill;
-      thrustingWeapons1h: CombatSkill;
-      slashingWeapons2h: CombatSkill;
-      thrustingWeapons2h: CombatSkill;
-      polearms: CombatSkill;
-      greatsword: CombatSkill;
+      martialArts: CombatValues;
+      barehanded: CombatValues;
+      chainWeapons: CombatValues;
+      daggers: CombatValues;
+      slashingWeapons1h: CombatValues;
+      thrustingWeapons1h: CombatValues;
+      slashingWeapons2h: CombatValues;
+      thrustingWeapons2h: CombatValues;
+      polearms: CombatValues;
+      greatsword: CombatValues;
     };
     ranged: {
-      missile: CombatSkill;
-      firearmSimple: CombatSkill;
-      firearmMedium: CombatSkill;
-      firearmComplex: CombatSkill;
+      missile: CombatValues;
+      firearmSimple: CombatValues;
+      firearmMedium: CombatValues;
+      firearmComplex: CombatValues;
     };
   };
 }
@@ -228,4 +228,30 @@ export function getSkill(
     throw new Error(`Skill ${name} not found!`);
   }
   return skill;
+}
+
+export function getCombatValues(
+  combatValues: CharacterSheet["combatValues"],
+  category: keyof CharacterSheet["combatValues"],
+  combatSkillName: string,
+): CombatValues {
+  const combatCategory = combatValues[category] as Record<string, any>;
+  const skillCombatValues = combatCategory[combatSkillName];
+  if (!skillCombatValues) {
+    throw new Error(`Combat values for skill ${combatSkillName} not found!`);
+  }
+  return skillCombatValues;
+}
+
+export function getCombatCategory(
+  combatValues: CharacterSheet["combatValues"],
+  combatSkillName: string,
+): keyof CharacterSheet["combatValues"] {
+  for (const category in combatValues) {
+    const combatCategory = combatValues[category as keyof CharacterSheet["combatValues"]] as Record<string, any>;
+    if (combatCategory[combatSkillName]) {
+      return category as keyof CharacterSheet["combatValues"];
+    }
+  }
+  throw new Error(`Combat category for skill ${combatSkillName} not found!`);
 }

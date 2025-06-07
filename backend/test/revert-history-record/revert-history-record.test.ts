@@ -111,7 +111,7 @@ describe("Valid requests", () => {
   const testCasesForRevertingRecord = [
     {
       name: "Revert history record for a changed attribute",
-      fakeRecordType: RecordType.ATTRIBUTE_RAISED,
+      fakeRecordType: RecordType.ATTRIBUTE_CHANGED,
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -125,7 +125,21 @@ describe("Valid requests", () => {
     },
     {
       name: "Revert history record for a changed skill",
-      fakeRecordType: RecordType.SKILL_RAISED,
+      fakeRecordType: RecordType.SKILL_CHANGED,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for changed combat values",
+      fakeRecordType: RecordType.COMBAT_VALUES_CHANGED,
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -174,7 +188,7 @@ describe("Valid requests", () => {
   const testCasesForRevertingWholeBlock = [
     {
       name: "Delete history block that contains only the reverted record",
-      fakeRecordType: RecordType.SKILL_RAISED,
+      fakeRecordType: RecordType.SKILL_CHANGED,
       request: {
         headers: fakeHeaders,
         pathParameters: {

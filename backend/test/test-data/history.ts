@@ -34,19 +34,43 @@ export function addFakeHistoryRecord(
     case RecordType.SPECIAL_ABILITY_CHANGED:
       throw new Error("Fake record not implemented yet!"); // TODO
       break;
-    case RecordType.ATTRIBUTE_RAISED: {
+    case RecordType.ATTRIBUTE_CHANGED: {
       record = attributeChangedRecord;
       break;
     }
     case RecordType.SKILL_ACTIVATED:
       throw new Error("Fake record not implemented yet!"); // TODO
       break;
-    case RecordType.SKILL_RAISED: {
+    case RecordType.SKILL_CHANGED: {
       record = skillChangedRecord;
       break;
     }
-    case RecordType.ATTACK_PARADE_DISTRIBUTED:
-      throw new Error("Fake record not implemented yet!"); // TODO
+    case RecordType.COMBAT_VALUES_CHANGED:
+      record = {
+        type: RecordType.COMBAT_VALUES_CHANGED,
+        name: "melee/thrustingWeapons1h",
+        number: 0, // will be set below
+        id: "0f6b98a5-33c3-416e-bf1f-fde4ef49b166",
+        data: {
+          old: {
+            availablePoints: 58,
+            attackValue: 10,
+            paradeValue: 8,
+          },
+          new: {
+            availablePoints: 55,
+            attackValue: 12,
+            paradeValue: 9,
+          },
+        },
+        learningMethod: null,
+        calculationPoints: {
+          adventurePoints: null,
+          attributePoints: null,
+        },
+        comment: null,
+        timestamp: new Date().toISOString(),
+      };
       break;
     default:
       throw new Error(`Unknown history record type ${type}!`);
@@ -68,7 +92,7 @@ export function addFakeHistoryRecord(
 }
 
 const attributeChangedRecord: Record = {
-  type: RecordType.ATTRIBUTE_RAISED,
+  type: RecordType.ATTRIBUTE_CHANGED,
   name: "strength",
   number: 2,
   id: "fc0a5a71-80ac-47bc-85c2-85fc4c9de99a",
@@ -107,26 +131,40 @@ const attributeChangedRecord: Record = {
 };
 
 const skillChangedRecord: Record = {
-  type: RecordType.SKILL_RAISED,
-  name: "body/athletics",
+  type: RecordType.SKILL_CHANGED,
+  name: "combat/polearms (melee)",
   number: 3,
   id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
   data: {
     old: {
-      activated: true,
-      start: 0,
-      current: 0,
-      mod: 0,
-      totalCost: 0,
-      defaultCostCategory: CostCategory.CAT_2,
+      skillValues: {
+        activated: true,
+        start: 0,
+        current: 0,
+        mod: 0,
+        totalCost: 0,
+        defaultCostCategory: CostCategory.CAT_2,
+      },
+      combatValues: {
+        availablePoints: 20,
+        attackValue: 10,
+        paradeValue: 10,
+      },
     },
     new: {
-      activated: true,
-      start: 0,
-      current: 10,
-      mod: 0,
-      totalCost: 10,
-      defaultCostCategory: CostCategory.CAT_2,
+      skillValues: {
+        activated: true,
+        start: 0,
+        current: 10,
+        mod: 0,
+        totalCost: 10,
+        defaultCostCategory: CostCategory.CAT_2,
+      },
+      combatValues: {
+        availablePoints: 30,
+        attackValue: 15,
+        paradeValue: 15,
+      },
     },
   },
   learningMethod: "NORMAL",
@@ -200,26 +238,30 @@ function generateLargeChangesList(size: number): Record[] {
   const largeChanges = [];
   for (let i = 0; i < size; i++) {
     largeChanges.push({
-      type: RecordType.SKILL_RAISED,
+      type: RecordType.SKILL_CHANGED,
       name: `category/skill${i}`,
       number: i + 1,
       id: uuidv4(),
       data: {
         old: {
-          activated: true,
-          start: 0,
-          current: i,
-          mod: 0,
-          totalCost: i,
-          defaultCostCategory: CostCategory.CAT_2,
+          skillValues: {
+            activated: true,
+            start: 0,
+            current: i,
+            mod: 0,
+            totalCost: i,
+            defaultCostCategory: CostCategory.CAT_2,
+          },
         },
         new: {
-          activated: true,
-          start: 0,
-          current: i + 1,
-          mod: 0,
-          totalCost: i + 1,
-          defaultCostCategory: CostCategory.CAT_2,
+          skillValues: {
+            activated: true,
+            start: 0,
+            current: i + 1,
+            mod: 0,
+            totalCost: i + 1,
+            defaultCostCategory: CostCategory.CAT_2,
+          },
         },
       },
       learningMethod: "NORMAL",

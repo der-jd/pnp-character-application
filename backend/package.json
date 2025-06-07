@@ -19,9 +19,10 @@
     "get-history": "file:src/lambdas/get-history",
     "get-skill-increase-cost": "file:src/lambdas/get-skill-increase-cost",
     "increase-attribute": "file:src/lambdas/increase-attribute",
-    "increase-skill": "file:src/lambdas/increase-skill",
     "revert-history-record": "file:src/lambdas/revert-history-record",
     "set-history-comment": "file:src/lambdas/set-history-comment",
+    "update-combat-values": "file:src/lambdas/update-combat-values",
+    "update-skill": "file:src/lambdas/update-skill",
     "utils": "file:src/utils"
   },
   "devDependencies": {

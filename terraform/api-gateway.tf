@@ -24,7 +24,7 @@ resource "aws_iam_role_policy" "api_gateway_policy" {
         Effect = "Allow",
         Action = "states:StartSyncExecution",
         Resource = [
-          aws_sfn_state_machine.increase_skill_state_machine.arn,
+          aws_sfn_state_machine.update_skill_state_machine.arn,
           aws_sfn_state_machine.increase_attribute_state_machine.arn
         ]
       }
@@ -125,6 +125,7 @@ module "attribute_name_patch" {
   source        = "./modules/apigw_stepfunction_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.attribute_name.id
+  http_method   = "PATCH"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"   = true
@@ -190,6 +191,7 @@ module "skill_name_patch" {
   source        = "./modules/apigw_stepfunction_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.skill_name.id
+  http_method   = "PATCH"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"   = true
@@ -198,7 +200,7 @@ module "skill_name_patch" {
   }
   aws_region        = data.aws_region.current.name
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.increase_skill_state_machine.arn
+  state_machine_arn = aws_sfn_state_machine.update_skill_state_machine.arn
 }
 
 // ================== OPTIONS /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
@@ -207,6 +209,57 @@ module "skill_name_options" {
   source      = "./modules/apigw_options_method"
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.skill_name.id
+}
+
+// ================== /characters/{character-id}/combat-values ==================
+
+resource "aws_api_gateway_resource" "combat_values" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "combat-values" // .../characters/{character-id}/combat-values
+}
+
+// ================== /characters/{character-id}/combat-values/{combat-category} ==================
+
+resource "aws_api_gateway_resource" "combat_category" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.combat_values.id
+  path_part   = "{combat-category}" // .../characters/{character-id}/combat-values/{combat-category}
+}
+
+// ================== /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
+
+resource "aws_api_gateway_resource" "combat_skill_name" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.combat_category.id
+  path_part   = "{combat-skill-name}" // .../characters/{character-id}/combat-values/{combat-category}/{combat-skill-name}
+}
+
+// ================== PATCH /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
+
+module "combat_skill_name_patch" {
+  source        = "./modules/apigw_stepfunction_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.combat_skill_name.id
+  http_method   = "PATCH"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"      = true
+    "method.request.path.combat-category"   = true
+    "method.request.path.combat-skill-name" = true
+  }
+  aws_region        = data.aws_region.current.name
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = aws_sfn_state_machine.update_combat_values_state_machine.arn
+}
+
+
+// ================== OPTIONS /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
+
+module "combat_skill_name_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.combat_skill_name.id
 }
 
 // ================== /characters/{character-id}/history ==================
@@ -306,6 +359,8 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     module.record_id_patch,
     module.record_id_delete,
     module.record_id_options,
+    module.combat_skill_name_patch,
+    module.combat_skill_name_options,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id

@@ -131,7 +131,7 @@ function mapBaseValueToISkillProps(name: string, category: string, baseValue: Ba
   };
 }
 
-// function mapCombatSkillToISkillProps(name: string, category: string, combatSkill: CombatSkill): ISkillProps {
+// function mapCombatSkillToISkillProps(name: string, category: string, combatSkill: CombatValues): ISkillProps {
 //   return {
 //     name,
 //     category,

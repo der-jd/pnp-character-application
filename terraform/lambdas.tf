@@ -43,6 +43,17 @@ module "add_history_record_lambda" {
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
 }
 
+module "update_combat_values_lambda" {
+  source        = "./modules/lambda_function"
+  function_name = "update-combat-values"
+  environment_vars = {
+    TABLE_NAME_CHARACTERS = local.characters_table_name
+  }
+  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
+  role_arn        = aws_iam_role.lambda_exec_role.arn
+  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
+}
+
 module "get_character_lambda" {
   source        = "./modules/lambda_function"
   function_name = "get-character"
@@ -98,9 +109,9 @@ module "increase_attribute_lambda" {
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
 }
 
-module "increase_skill_lambda" {
+module "update_skill_lambda" {
   source        = "./modules/lambda_function"
-  function_name = "increase-skill"
+  function_name = "update-skill"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
   }

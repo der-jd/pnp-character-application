@@ -398,7 +398,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.ATTRIBUTE_RAISED,
+          type: RecordType.ATTRIBUTE_CHANGED,
           name: "Courage",
           data: {
             old: {
@@ -486,24 +486,28 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.SKILL_RAISED,
+          type: RecordType.SKILL_CHANGED,
           name: "body/bodyControl",
           data: {
             old: {
-              activated: true,
-              start: 0,
-              current: 30,
-              mod: 0,
-              totalCost: 30,
-              defaultCostCategory: CostCategory.CAT_2,
+              skillValues: {
+                activated: true,
+                start: 0,
+                current: 30,
+                mod: 0,
+                totalCost: 30,
+                defaultCostCategory: CostCategory.CAT_2,
+              },
             },
             new: {
-              activated: true,
-              start: 0,
-              current: 35,
-              mod: 0,
-              totalCost: 35,
-              defaultCostCategory: CostCategory.CAT_2,
+              skillValues: {
+                activated: true,
+                start: 0,
+                current: 35,
+                mod: 0,
+                totalCost: 35,
+                defaultCostCategory: CostCategory.CAT_2,
+              },
             },
           },
           learningMethod: "NORMAL",
@@ -528,7 +532,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'attack/parade distributed' to existing block",
+      name: "Add history record for 'combat values changed' to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -537,18 +541,18 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.ATTACK_PARADE_DISTRIBUTED,
-          name: "Slashing Weapons 1h",
+          type: RecordType.COMBAT_VALUES_CHANGED,
+          name: "melee/slashingWeapons1h",
           data: {
             old: {
-              handling: 30,
-              attackDistributed: 10,
-              paradeDistributed: 10,
+              availablePoints: 10,
+              attackValue: 108,
+              paradeValue: 78,
             },
             new: {
-              handling: 30,
-              attackDistributed: 16,
-              paradeDistributed: 12,
+              availablePoints: 2,
+              attackValue: 110,
+              paradeValue: 84,
             },
           },
           learningMethod: null,
@@ -610,24 +614,38 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.SKILL_RAISED,
-          name: "body/athletics",
+          type: RecordType.SKILL_CHANGED,
+          name: "combat/polearms (melee)",
           data: {
             old: {
-              activated: true,
-              start: 0,
-              current: 0,
-              mod: 0,
-              totalCost: 0,
-              defaultCostCategory: CostCategory.CAT_2,
+              skillValues: {
+                activated: true,
+                start: 0,
+                current: 0,
+                mod: 0,
+                totalCost: 0,
+                defaultCostCategory: CostCategory.CAT_2,
+              },
+              combatValues: {
+                availablePoints: 20,
+                attackValue: 10,
+                paradeValue: 10,
+              },
             },
             new: {
-              activated: true,
-              start: 0,
-              current: 10,
-              mod: 0,
-              totalCost: 10,
-              defaultCostCategory: CostCategory.CAT_2,
+              skillValues: {
+                activated: true,
+                start: 0,
+                current: 10,
+                mod: 0,
+                totalCost: 10,
+                defaultCostCategory: CostCategory.CAT_2,
+              },
+              combatValues: {
+                availablePoints: 30,
+                attackValue: 15,
+                paradeValue: 15,
+              },
             },
           },
           learningMethod: "NORMAL",
