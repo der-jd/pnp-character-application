@@ -1,14 +1,14 @@
-resource "aws_cloudwatch_log_group" "increase_attribute_state_machine_log_group" {
-  name              = "/aws/vendedlogs/states/increase-attribute"
+resource "aws_cloudwatch_log_group" "update_attribute_state_machine_log_group" {
+  name              = "/aws/vendedlogs/states/update-attribute"
   retention_in_days = 0
 }
 
-resource "aws_sfn_state_machine" "increase_attribute_state_machine" {
-  name     = "increase-attribute"
+resource "aws_sfn_state_machine" "update_attribute_state_machine" {
+  name     = "update-attribute"
   role_arn = aws_iam_role.step_function_role.arn
   type     = "EXPRESS"
   logging_configuration {
-    log_destination        = "${aws_cloudwatch_log_group.increase_attribute_state_machine_log_group.arn}:*"
+    log_destination        = "${aws_cloudwatch_log_group.update_attribute_state_machine_log_group.arn}:*"
     include_execution_data = true
     level                  = "ALL"
   }
@@ -17,15 +17,15 @@ resource "aws_sfn_state_machine" "increase_attribute_state_machine" {
   // Best practiceS: https://docs.aws.amazon.com/step-functions/latest/dg/sfn-best-practices.html
   // Transforming input and output with JSONata: https://docs.aws.amazon.com/step-functions/latest/dg/transforming-data.html
   definition = jsonencode({
-    StartAt = "IncreaseAttribute",
+    StartAt = "UpdateAttribute",
     States = {
-      IncreaseAttribute = {
+      UpdateAttribute = {
         Type          = "Task",
         QueryLanguage = "JSONata",
-        Resource      = module.increase_attribute_lambda.lambda_function.arn,
+        Resource      = module.update_attribute_lambda.lambda_function.arn,
         Assign = {
-          statusCode            = "{% $states.result.statusCode %}",
-          increaseAttributeBody = "{% $states.result.body %}"
+          statusCode          = "{% $states.result.statusCode %}",
+          updateAttributeBody = "{% $states.result.body %}"
         },
         TimeoutSeconds = 5 // Timeout to avoid waiting for a stuck task
         Retry = [
@@ -62,7 +62,7 @@ resource "aws_sfn_state_machine" "increase_attribute_state_machine" {
         QueryLanguage = "JSONata",
         Choices = [
           {
-            // The attribute was not increased, so no history record is necessary
+            // The attribute was not updated, so no history record is necessary
             Condition = "{% $parse($states.input.body).attribute.old = $parse($states.input.body).attribute.new %}",
             Next      = "SuccessState"
           }
@@ -143,7 +143,7 @@ resource "aws_sfn_state_machine" "increase_attribute_state_machine" {
            * $parse() is used to parse the stringified JSON inside the variables temporarily back to a JSON object before the whole
            * content is stringified with $string() again.
            */
-          "body" = "{% $string({'data': $parse($increaseAttributeBody),'historyRecord': $addHistoryRecordBody ? $parse($addHistoryRecordBody) : null}) %}"
+          "body" = "{% $string({'data': $parse($updateAttributeBody),'historyRecord': $addHistoryRecordBody ? $parse($addHistoryRecordBody) : null}) %}"
         }
       }
     }

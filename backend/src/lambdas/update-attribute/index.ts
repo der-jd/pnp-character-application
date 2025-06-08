@@ -54,7 +54,6 @@ interface Parameters {
   body: z.infer<typeof bodySchema>;
 }
 
-// TODO rename function, etc. to update-attribute
 export async function _updateAttribute(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);

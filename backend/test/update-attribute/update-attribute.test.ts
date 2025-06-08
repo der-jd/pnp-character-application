@@ -4,7 +4,7 @@ import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { getAttribute } from "config/index.js";
-import { _updateAttribute } from "increase-attribute/index.js";
+import { _updateAttribute } from "update-attribute/index.js";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
@@ -225,7 +225,7 @@ describe("Invalid requests", () => {
 describe("Valid requests", () => {
   const idempotentTestCases = [
     {
-      name: "Attribute has already been increased to the target start value (idempotency)",
+      name: "Attribute has already been updated to the target start value (idempotency)",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -261,7 +261,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Attribute has already been increased to the target mod value (idempotency)",
+      name: "Attribute has already been updated to the target mod value (idempotency)",
       request: {
         headers: fakeHeaders,
         pathParameters: {
