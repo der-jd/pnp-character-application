@@ -13,7 +13,7 @@ export const fakeCharacter: Character = {
       sex: "Male",
       profession: {
         name: "Warrior",
-        skill: "slashingWeapons1h",
+        skill: "slashingWeaponsSharp1h",
       },
       hobby: {
         name: "Woodcarving",
@@ -175,14 +175,6 @@ export const fakeCharacter: Character = {
     },
     skills: {
       combat: {
-        greatsword: {
-          activated: true,
-          start: 10,
-          current: 75,
-          mod: 8,
-          totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_3,
-        },
         barehanded: {
           activated: true,
           start: 10,
@@ -207,7 +199,7 @@ export const fakeCharacter: Character = {
           totalCost: 50,
           defaultCostCategory: CostCategory.CAT_3,
         },
-        slashingWeapons1h: {
+        slashingWeaponsSharp1h: {
           activated: true,
           start: 10,
           current: 120,
@@ -215,7 +207,23 @@ export const fakeCharacter: Character = {
           totalCost: 200,
           defaultCostCategory: CostCategory.CAT_3,
         },
-        slashingWeapons2h: {
+        slashingWeaponsBlunt1h: {
+          activated: true,
+          start: 10,
+          current: 120,
+          mod: 58,
+          totalCost: 200,
+          defaultCostCategory: CostCategory.CAT_3,
+        },
+        slashingWeaponsSharp2h: {
+          activated: true,
+          start: 10,
+          current: 75,
+          mod: 8,
+          totalCost: 50,
+          defaultCostCategory: CostCategory.CAT_3,
+        },
+        slashingWeaponsBlunt2h: {
           activated: true,
           start: 10,
           current: 18,
@@ -232,14 +240,6 @@ export const fakeCharacter: Character = {
           defaultCostCategory: CostCategory.CAT_3,
         },
         chainWeapons: {
-          activated: true,
-          start: 10,
-          current: 18,
-          mod: 8,
-          totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_3,
-        },
-        polearms: {
           activated: true,
           start: 10,
           current: 18,
@@ -272,6 +272,14 @@ export const fakeCharacter: Character = {
           defaultCostCategory: CostCategory.CAT_3,
         },
         firearmComplex: {
+          activated: true,
+          start: 6,
+          current: 10,
+          mod: 4,
+          totalCost: 20,
+          defaultCostCategory: CostCategory.CAT_3,
+        },
+        heavyWeapons: {
           activated: true,
           start: 6,
           current: 10,
@@ -377,14 +385,6 @@ export const fakeCharacter: Character = {
           totalCost: 40,
           defaultCostCategory: CostCategory.CAT_2,
         },
-        imitatingVoices: {
-          activated: true,
-          start: 12,
-          current: 16,
-          mod: 4,
-          totalCost: 40,
-          defaultCostCategory: CostCategory.CAT_2,
-        },
         dancing: {
           activated: true,
           start: 12,
@@ -438,7 +438,7 @@ export const fakeCharacter: Character = {
         acting: {
           activated: true,
           start: 7,
-          current: 10,
+          current: 74,
           mod: 3,
           totalCost: 15,
           defaultCostCategory: CostCategory.CAT_2,
@@ -447,14 +447,6 @@ export const fakeCharacter: Character = {
           activated: true,
           start: 7,
           current: 75,
-          mod: 3,
-          totalCost: 15,
-          defaultCostCategory: CostCategory.CAT_2,
-        },
-        disguising: {
-          activated: true,
-          start: 7,
-          current: 74,
           mod: 3,
           totalCost: 15,
           defaultCostCategory: CostCategory.CAT_2,
@@ -753,6 +745,14 @@ export const fakeCharacter: Character = {
           totalCost: 15,
           defaultCostCategory: CostCategory.CAT_2,
         },
+        fineMechanics: {
+          activated: true,
+          start: 7,
+          current: 10,
+          mod: 3,
+          totalCost: 15,
+          defaultCostCategory: CostCategory.CAT_2,
+        },
         cheating: {
           activated: true,
           start: 7,
@@ -813,11 +813,6 @@ export const fakeCharacter: Character = {
     },
     combatValues: {
       melee: {
-        greatsword: {
-          availablePoints: 83,
-          attackValue: 10,
-          paradeValue: 8,
-        },
         martialArts: {
           availablePoints: 19,
           attackValue: 6,
@@ -838,7 +833,12 @@ export const fakeCharacter: Character = {
           attackValue: 10,
           paradeValue: 8,
         },
-        slashingWeapons1h: {
+        slashingWeaponsSharp1h: {
+          availablePoints: 10,
+          attackValue: 108,
+          paradeValue: 78,
+        },
+        slashingWeaponsBlunt1h: {
           availablePoints: 10,
           attackValue: 108,
           paradeValue: 78,
@@ -848,18 +848,18 @@ export const fakeCharacter: Character = {
           attackValue: 10,
           paradeValue: 8,
         },
-        slashingWeapons2h: {
+        slashingWeaponsSharp2h: {
+          availablePoints: 83,
+          attackValue: 10,
+          paradeValue: 8,
+        },
+        slashingWeaponsBlunt2h: {
           availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         thrustingWeapons2h: {
           availablePoints: 57,
-          attackValue: 10,
-          paradeValue: 8,
-        },
-        polearms: {
-          availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
@@ -876,6 +876,11 @@ export const fakeCharacter: Character = {
           paradeValue: 0,
         },
         firearmComplex: {
+          availablePoints: 22,
+          attackValue: 10,
+          paradeValue: 0,
+        },
+        heavyWeapons: {
           availablePoints: 22,
           attackValue: 10,
           paradeValue: 0,
@@ -902,7 +907,7 @@ export const fakeCharacter2: Character = {
       sex: "Female",
       profession: {
         name: "Warrior",
-        skill: "slashingWeapons1h",
+        skill: "slashingWeaponsSharp1h",
       },
       hobby: {
         name: "Woodcarving",
@@ -1064,14 +1069,6 @@ export const fakeCharacter2: Character = {
     },
     skills: {
       combat: {
-        greatsword: {
-          activated: true,
-          start: 10,
-          current: 18,
-          mod: 8,
-          totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_3,
-        },
         barehanded: {
           activated: true,
           start: 10,
@@ -1096,7 +1093,7 @@ export const fakeCharacter2: Character = {
           totalCost: 50,
           defaultCostCategory: CostCategory.CAT_3,
         },
-        slashingWeapons1h: {
+        slashingWeaponsSharp1h: {
           activated: true,
           start: 10,
           current: 110,
@@ -1104,7 +1101,23 @@ export const fakeCharacter2: Character = {
           totalCost: 200,
           defaultCostCategory: CostCategory.CAT_3,
         },
-        slashingWeapons2h: {
+        slashingWeaponsBlunt1h: {
+          activated: true,
+          start: 10,
+          current: 110,
+          mod: 58,
+          totalCost: 200,
+          defaultCostCategory: CostCategory.CAT_3,
+        },
+        slashingWeaponsSharp2h: {
+          activated: true,
+          start: 10,
+          current: 18,
+          mod: 8,
+          totalCost: 50,
+          defaultCostCategory: CostCategory.CAT_3,
+        },
+        slashingWeaponsBlunt2h: {
           activated: true,
           start: 10,
           current: 18,
@@ -1121,14 +1134,6 @@ export const fakeCharacter2: Character = {
           defaultCostCategory: CostCategory.CAT_3,
         },
         chainWeapons: {
-          activated: true,
-          start: 10,
-          current: 18,
-          mod: 8,
-          totalCost: 50,
-          defaultCostCategory: CostCategory.CAT_3,
-        },
-        polearms: {
           activated: true,
           start: 10,
           current: 18,
@@ -1161,6 +1166,14 @@ export const fakeCharacter2: Character = {
           defaultCostCategory: CostCategory.CAT_3,
         },
         firearmComplex: {
+          activated: true,
+          start: 6,
+          current: 10,
+          mod: 4,
+          totalCost: 20,
+          defaultCostCategory: CostCategory.CAT_3,
+        },
+        heavyWeapons: {
           activated: true,
           start: 6,
           current: 10,
@@ -1266,14 +1279,6 @@ export const fakeCharacter2: Character = {
           totalCost: 40,
           defaultCostCategory: CostCategory.CAT_2,
         },
-        imitatingVoices: {
-          activated: true,
-          start: 12,
-          current: 16,
-          mod: 4,
-          totalCost: 40,
-          defaultCostCategory: CostCategory.CAT_2,
-        },
         dancing: {
           activated: true,
           start: 12,
@@ -1333,14 +1338,6 @@ export const fakeCharacter2: Character = {
           defaultCostCategory: CostCategory.CAT_2,
         },
         writtenExpression: {
-          activated: true,
-          start: 7,
-          current: 10,
-          mod: 3,
-          totalCost: 15,
-          defaultCostCategory: CostCategory.CAT_2,
-        },
-        disguising: {
           activated: true,
           start: 7,
           current: 10,
@@ -1642,6 +1639,14 @@ export const fakeCharacter2: Character = {
           totalCost: 15,
           defaultCostCategory: CostCategory.CAT_2,
         },
+        fineMechanics: {
+          activated: true,
+          start: 7,
+          current: 10,
+          mod: 3,
+          totalCost: 15,
+          defaultCostCategory: CostCategory.CAT_2,
+        },
         cheating: {
           activated: true,
           start: 7,
@@ -1702,11 +1707,6 @@ export const fakeCharacter2: Character = {
     },
     combatValues: {
       melee: {
-        greatsword: {
-          availablePoints: 26,
-          attackValue: 10,
-          paradeValue: 8,
-        },
         martialArts: {
           availablePoints: 19,
           attackValue: 6,
@@ -1727,7 +1727,12 @@ export const fakeCharacter2: Character = {
           attackValue: 10,
           paradeValue: 8,
         },
-        slashingWeapons1h: {
+        slashingWeaponsSharp1h: {
+          availablePoints: 0,
+          attackValue: 108,
+          paradeValue: 78,
+        },
+        slashingWeaponsBlunt1h: {
           availablePoints: 0,
           attackValue: 108,
           paradeValue: 78,
@@ -1737,17 +1742,17 @@ export const fakeCharacter2: Character = {
           attackValue: 10,
           paradeValue: 8,
         },
-        slashingWeapons2h: {
+        slashingWeaponsSharp2h: {
+          availablePoints: 26,
+          attackValue: 10,
+          paradeValue: 8,
+        },
+        slashingWeaponsBlunt2h: {
           availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
         },
         thrustingWeapons2h: {
-          availablePoints: 26,
-          attackValue: 10,
-          paradeValue: 8,
-        },
-        polearms: {
           availablePoints: 26,
           attackValue: 10,
           paradeValue: 8,
@@ -1765,6 +1770,11 @@ export const fakeCharacter2: Character = {
           paradeValue: 0,
         },
         firearmComplex: {
+          availablePoints: 22,
+          attackValue: 10,
+          paradeValue: 0,
+        },
+        heavyWeapons: {
           availablePoints: 22,
           attackValue: 10,
           paradeValue: 0,

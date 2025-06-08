@@ -176,7 +176,7 @@ describe("Valid requests", () => {
         pathParameters: {
           "character-id": fakeCharacterId,
           "skill-category": "social",
-          "skill-name": "disguising",
+          "skill-name": "acting",
         },
         queryStringParameters: {}, // will be defined in the test,
         body: null,
@@ -337,7 +337,7 @@ describe("Valid requests", () => {
         pathParameters: {
           "character-id": fakeCharacterId,
           "skill-category": "combat",
-          "skill-name": "greatsword",
+          "skill-name": "slashingWeaponsSharp2h",
         },
         queryStringParameters: {}, // will be defined in the test,
         body: null,

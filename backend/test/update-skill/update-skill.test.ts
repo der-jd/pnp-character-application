@@ -176,7 +176,7 @@ describe("Invalid requests", () => {
         pathParameters: {
           "character-id": fakeCharacterId,
           "skill-category": "combat",
-          "skill-name": "slashingWeapons1h",
+          "skill-name": "slashingWeaponsSharp1h",
         },
         queryStringParameters: null,
         body: {
@@ -563,7 +563,7 @@ describe("Valid requests", () => {
         pathParameters: {
           "character-id": fakeCharacterId,
           "skill-category": "combat",
-          "skill-name": "slashingWeapons1h",
+          "skill-name": "slashingWeaponsSharp1h",
         },
         queryStringParameters: null,
         body: {

@@ -94,23 +94,23 @@ export interface CharacterSheet {
     endurance: Attribute;
     strength: Attribute;
   };
-  // TODO consolidate skills. Some of them are too special and probably never used
   skills: {
     combat: {
       martialArts: Skill;
       barehanded: Skill;
       chainWeapons: Skill;
       daggers: Skill;
-      slashingWeapons1h: Skill;
+      slashingWeaponsSharp1h: Skill;
+      slashingWeaponsBlunt1h: Skill;
       thrustingWeapons1h: Skill;
-      slashingWeapons2h: Skill;
+      slashingWeaponsSharp2h: Skill;
+      slashingWeaponsBlunt2h: Skill;
       thrustingWeapons2h: Skill;
-      polearms: Skill;
-      greatsword: Skill;
       missile: Skill;
       firearmSimple: Skill;
       firearmMedium: Skill;
       firearmComplex: Skill;
+      heavyWeapons: Skill;
     };
     body: {
       athletics: Skill;
@@ -124,7 +124,6 @@ export interface CharacterSheet {
       hiding: Skill;
       singing: Skill;
       sharpnessOfSenses: Skill;
-      imitatingVoices: Skill;
       dancing: Skill;
       quaffing: Skill;
       pickpocketing: Skill;
@@ -135,7 +134,6 @@ export interface CharacterSheet {
       teaching: Skill;
       acting: Skill;
       writtenExpression: Skill;
-      disguising: Skill;
       streetKnowledge: Skill;
       knowledgeOfHumanNature: Skill;
       persuading: Skill;
@@ -178,6 +176,7 @@ export interface CharacterSheet {
       fabricProcessing: Skill;
       alcoholProduction: Skill;
       steeringVehicles: Skill;
+      fineMechanics: Skill;
       cheating: Skill;
       bargaining: Skill;
       firstAid: Skill;
@@ -193,18 +192,19 @@ export interface CharacterSheet {
       barehanded: CombatValues;
       chainWeapons: CombatValues;
       daggers: CombatValues;
-      slashingWeapons1h: CombatValues;
+      slashingWeaponsSharp1h: CombatValues;
+      slashingWeaponsBlunt1h: CombatValues;
       thrustingWeapons1h: CombatValues;
-      slashingWeapons2h: CombatValues;
+      slashingWeaponsSharp2h: CombatValues;
+      slashingWeaponsBlunt2h: CombatValues;
       thrustingWeapons2h: CombatValues;
-      polearms: CombatValues;
-      greatsword: CombatValues;
     };
     ranged: {
       missile: CombatValues;
       firearmSimple: CombatValues;
       firearmMedium: CombatValues;
       firearmComplex: CombatValues;
+      heavyWeapons: CombatValues;
     };
   };
 }

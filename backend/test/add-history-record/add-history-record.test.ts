@@ -446,7 +446,7 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.SKILL_ACTIVATED,
-          name: "social/disguising",
+          name: "social/acting",
           data: {
             old: {
               value: false,
@@ -542,7 +542,7 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.COMBAT_VALUES_CHANGED,
-          name: "melee/slashingWeapons1h",
+          name: "melee/slashingWeaponsSharp1h",
           data: {
             old: {
               availablePoints: 10,
@@ -615,7 +615,7 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.SKILL_CHANGED,
-          name: "combat/polearms (melee)",
+          name: "combat/daggers (melee)",
           data: {
             old: {
               skillValues: {
