@@ -98,9 +98,9 @@ module "get_skill_increase_cost_lambda" {
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
 }
 
-module "increase_attribute_lambda" {
+module "update_attribute_lambda" {
   source        = "./modules/lambda_function"
-  function_name = "increase-attribute"
+  function_name = "update-attribute"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
   }

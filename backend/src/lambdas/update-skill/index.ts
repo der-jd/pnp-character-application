@@ -184,7 +184,7 @@ function validateRequest(request: Request): Parameters {
         400,
         "Points to increase skill value are negative or null! The value must be greater than or equal 1.",
         {
-          increasedPoints: body.current?.increasedPoints,
+          increasedPoints: body.current.increasedPoints,
         },
       );
     }
