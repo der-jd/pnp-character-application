@@ -615,36 +615,26 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.SKILL_CHANGED,
-          name: "combat/daggers (melee)",
+          name: "body/athletics",
           data: {
             old: {
               skill: {
                 activated: true,
-                start: 0,
-                current: 0,
-                mod: 0,
-                totalCost: 0,
+                start: 12,
+                current: 16,
+                mod: 4,
+                totalCost: 40,
                 defaultCostCategory: CostCategory.CAT_2,
-              },
-              combatValues: {
-                availablePoints: 20,
-                attackValue: 10,
-                paradeValue: 10,
               },
             },
             new: {
               skill: {
                 activated: true,
-                start: 0,
-                current: 10,
-                mod: 0,
-                totalCost: 10,
+                start: 14,
+                current: 20,
+                mod: 5,
+                totalCost: 44,
                 defaultCostCategory: CostCategory.CAT_2,
-              },
-              combatValues: {
-                availablePoints: 30,
-                attackValue: 15,
-                paradeValue: 15,
               },
             },
           },
@@ -658,7 +648,7 @@ describe("Valid requests", () => {
               },
               new: {
                 start: 0,
-                available: 90,
+                available: 96,
                 total: 200,
               },
             },

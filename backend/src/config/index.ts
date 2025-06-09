@@ -37,6 +37,7 @@ export {
   numberSchema,
   stringSchema,
   booleanSchema,
+  attributeChangeSchema,
   skillChangeSchema,
 } from "./history_schema.js";
 export { calculateBaseValues } from "./formulas.js";
