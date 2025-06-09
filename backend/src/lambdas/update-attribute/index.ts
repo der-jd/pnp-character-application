@@ -92,6 +92,7 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
     attributesNew[params.attributeName as keyof CharacterSheet["attributes"]] = attribute;
     const newBaseValuesByFormula = calculateBaseValues(attributesNew);
     const updates: Promise<void>[] = [];
+    const changedBaseValues: Partial<CharacterSheet["baseValues"]> = {};
 
     for (const baseValueName of Object.keys(baseValuesOld) as (keyof CharacterSheet["baseValues"])[]) {
       const oldBaseValue = baseValuesOld[baseValueName];
@@ -105,6 +106,7 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
         const diffByFormula = newFormulaValue - oldBaseValue.byFormula;
         baseValuesNew[baseValueName].byFormula = newFormulaValue;
         baseValuesNew[baseValueName].current += diffByFormula;
+        changedBaseValues[baseValueName] = baseValuesNew[baseValueName];
         updates.push(updateBaseValue(params.userId, params.characterId, baseValueName, baseValuesNew[baseValueName]));
       }
     }
@@ -122,11 +124,14 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
         changes: {
           old: {
             attribute: attributeOld,
-            baseValues: baseValuesNew ? baseValuesOld : undefined,
+            baseValues:
+              Object.keys(changedBaseValues).length > 0
+                ? Object.fromEntries(Object.entries(baseValuesOld).filter(([k]) => k in changedBaseValues))
+                : undefined,
           },
           new: {
             attribute: attribute,
-            baseValues: baseValuesNew,
+            baseValues: Object.keys(changedBaseValues).length > 0 ? changedBaseValues : undefined,
           },
         },
         attributePoints: {

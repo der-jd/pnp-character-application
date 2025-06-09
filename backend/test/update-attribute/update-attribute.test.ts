@@ -590,62 +590,54 @@ describe("Valid requests", () => {
         expect(calls.length).toBeGreaterThan(1);
 
         expect(parsedBody.changes.old.baseValues).toBeDefined();
-        expect(parsedBody.changes.old.baseValues).toStrictEqual(fakeCharacterResponse.Item.characterSheet.baseValues);
         expect(parsedBody.changes.new.baseValues).toBeDefined();
 
-        const baseValuesAffectedByAttributes =
-          attributeToBaseValuesMap[attributeName as keyof CharacterSheet["attributes"]] ?? [];
         for (const baseValueName of Object.keys(
           parsedBody.changes.old.baseValues,
         ) as (keyof CharacterSheet["baseValues"])[]) {
           const oldVal = parsedBody.changes.old.baseValues[baseValueName];
           const newVal = parsedBody.changes.new.baseValues[baseValueName];
 
-          if (baseValuesAffectedByAttributes.includes(baseValueName)) {
-            // Only byFormula and current should differ
-            for (const key of Object.keys(oldVal) as (keyof typeof oldVal)[]) {
-              if (key === "byFormula" || key === "current") continue;
-              expect(newVal[key]).toStrictEqual(oldVal[key]);
-            }
+          // Only byFormula and current should differ
+          for (const key of Object.keys(oldVal) as (keyof typeof oldVal)[]) {
+            if (key === "byFormula" || key === "current") continue;
+            expect(newVal[key]).toStrictEqual(oldVal[key]);
+          }
 
-            const diffCurrent = newVal.current - oldVal.current;
-            const diffByFormula = newVal.byFormula - oldVal.byFormula;
-            expect(diffCurrent).toBe(diffByFormula);
+          const diffCurrent = newVal.current - oldVal.current;
+          const diffByFormula = newVal.byFormula - oldVal.byFormula;
+          expect(diffCurrent).toBe(diffByFormula);
 
-            switch (baseValueName) {
-              case "healthPoints":
-                expect(newVal.current).toBe(102);
-                expect(newVal.byFormula).toBe(79);
-                break;
-              case "mentalHealth":
-                expect(newVal.current).toBe(57);
-                expect(newVal.byFormula).toBe(57);
-                break;
-              case "initiativeBaseValue":
-                expect(newVal.current).toBe(27);
-                expect(newVal.byFormula).toBe(17);
-                break;
-              case "attackBaseValue":
-                if (attributeName === "strength") {
-                  expect(newVal.current).toBe(114);
-                  expect(newVal.byFormula).toBe(114);
-                } else if (attributeName === "courage") {
-                  expect(newVal.current).toBe(124);
-                  expect(newVal.byFormula).toBe(124);
-                }
-                break;
-              case "paradeBaseValue":
-                expect(newVal.current).toBe(116);
-                expect(newVal.byFormula).toBe(116);
-                break;
-              case "rangedAttackBaseValue":
-                expect(newVal.current).toBe(112);
-                expect(newVal.byFormula).toBe(112);
-                break;
-            }
-          } else {
-            // Nothing should differ
-            expect(newVal).toStrictEqual(oldVal);
+          switch (baseValueName) {
+            case "healthPoints":
+              expect(newVal.current).toBe(102);
+              expect(newVal.byFormula).toBe(79);
+              break;
+            case "mentalHealth":
+              expect(newVal.current).toBe(57);
+              expect(newVal.byFormula).toBe(57);
+              break;
+            case "initiativeBaseValue":
+              expect(newVal.current).toBe(27);
+              expect(newVal.byFormula).toBe(17);
+              break;
+            case "attackBaseValue":
+              if (attributeName === "strength") {
+                expect(newVal.current).toBe(114);
+                expect(newVal.byFormula).toBe(114);
+              } else if (attributeName === "courage") {
+                expect(newVal.current).toBe(124);
+                expect(newVal.byFormula).toBe(124);
+              }
+              break;
+            case "paradeBaseValue":
+              expect(newVal.current).toBe(116);
+              expect(newVal.byFormula).toBe(116);
+              break;
+            case "rangedAttackBaseValue":
+              expect(newVal.current).toBe(112);
+              expect(newVal.byFormula).toBe(112);
+              break;
           }
         }
       }
@@ -678,14 +670,3 @@ function baseValuesChanged(body: any): boolean {
 
   return true;
 }
-
-const attributeToBaseValuesMap: Partial<
-  Record<keyof CharacterSheet["attributes"], (keyof CharacterSheet["baseValues"])[]>
-> = {
-  strength: ["healthPoints", "attackBaseValue", "paradeBaseValue", "rangedAttackBaseValue"],
-  endurance: ["healthPoints", "initiativeBaseValue", "paradeBaseValue"],
-  courage: ["mentalHealth", "initiativeBaseValue", "attackBaseValue"],
-  mentalResilience: ["mentalHealth"],
-  dexterity: ["initiativeBaseValue", "attackBaseValue", "paradeBaseValue", "rangedAttackBaseValue"],
-  concentration: ["rangedAttackBaseValue"],
-};
