@@ -106,8 +106,8 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
 
     await updateSkill(params.userId, params.characterId, skillCategory, params.skillName, skill, adventurePoints);
 
-    let combatValues:
-      | {
+    let combatValues: // TODO omit this var and use skillCombatValuesOld and skillCombatValues directly
+    | {
           old: CombatValues;
           new: CombatValues;
         }
@@ -139,11 +139,11 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
             : undefined,
         changes: {
           old: {
-            skillValues: skillOld,
+            skill: skillOld,
             combatValues: combatValues?.old,
           },
           new: {
-            skillValues: skill,
+            skill: skill,
             combatValues: combatValues?.new,
           },
         },

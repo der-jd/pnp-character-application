@@ -72,7 +72,7 @@ export const booleanSchema = z
 
 export const skillChangeSchema = z
   .object({
-    skillValues: skillSchema,
+    skill: skillSchema,
     combatValues: combatValuesSchema.optional(),
   })
   .strict();

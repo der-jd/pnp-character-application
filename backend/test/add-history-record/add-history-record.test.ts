@@ -490,7 +490,7 @@ describe("Valid requests", () => {
           name: "body/bodyControl",
           data: {
             old: {
-              skillValues: {
+              skill: {
                 activated: true,
                 start: 0,
                 current: 30,
@@ -500,7 +500,7 @@ describe("Valid requests", () => {
               },
             },
             new: {
-              skillValues: {
+              skill: {
                 activated: true,
                 start: 0,
                 current: 35,
@@ -618,7 +618,7 @@ describe("Valid requests", () => {
           name: "combat/daggers (melee)",
           data: {
             old: {
-              skillValues: {
+              skill: {
                 activated: true,
                 start: 0,
                 current: 0,
@@ -633,7 +633,7 @@ describe("Valid requests", () => {
               },
             },
             new: {
-              skillValues: {
+              skill: {
                 activated: true,
                 start: 0,
                 current: 10,

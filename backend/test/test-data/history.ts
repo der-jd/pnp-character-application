@@ -137,7 +137,7 @@ const skillChangedRecord: Record = {
   id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
   data: {
     old: {
-      skillValues: {
+      skill: {
         activated: true,
         start: 0,
         current: 0,
@@ -152,7 +152,7 @@ const skillChangedRecord: Record = {
       },
     },
     new: {
-      skillValues: {
+      skill: {
         activated: true,
         start: 0,
         current: 10,
@@ -244,7 +244,7 @@ function generateLargeChangesList(size: number): Record[] {
       id: uuidv4(),
       data: {
         old: {
-          skillValues: {
+          skill: {
             activated: true,
             start: 0,
             current: i,
@@ -254,7 +254,7 @@ function generateLargeChangesList(size: number): Record[] {
           },
         },
         new: {
-          skillValues: {
+          skill: {
             activated: true,
             start: 0,
             current: i + 1,

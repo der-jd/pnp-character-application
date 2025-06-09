@@ -192,7 +192,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
           characterId,
           skillCategory,
           skillName,
-          oldData.skillValues,
+          oldData.skill,
           requireProperty(record.calculationPoints.adventurePoints?.old, "adventurePoints"),
         );
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
