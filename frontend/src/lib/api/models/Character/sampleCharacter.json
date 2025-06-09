@@ -93,79 +93,70 @@
       "healthPoints": {
         "start": 120,
         "current": 130,
+        "byFormula": 10,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "mentalHealth": {
         "start": 90,
         "current": 85,
-        "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "byFormula": 10,
+        "mod": 10
       },
       "armorLevel": {
         "start": 20,
         "current": 30,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "naturalArmor": {
         "start": 5,
         "current": 10,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "initiativeBaseValue": {
         "start": 13,
         "current": 15,
+        "byFormula": 10,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "attackBaseValue": {
         "start": 18,
         "current": 22,
-        "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "byFormula": 10,
+        "mod": 10
       },
       "paradeBaseValue": {
         "start": 15,
         "current": 20,
-        "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "byFormula": 10,
+        "mod": 10
       },
       "rangedAttackBaseValue": {
         "start": 12,
         "current": 14,
-        "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "byFormula": 10,
+        "mod": 10
       },
       "luckPoints": {
         "start": 3,
         "current": 4,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "bonusActionsPerCombatRound": {
         "start": 1,
         "current": 1,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "legendaryActions": {
         "start": 0,
         "current": 0,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       }
     },
     "skills": {

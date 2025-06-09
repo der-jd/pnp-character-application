@@ -37,9 +37,10 @@ export const baseValueSchema = z
   .object({
     start: z.number(),
     current: z.number(),
-    byLvlUp: z.number(),
+    byFormula: z.number().optional(),
+    byLvlUp: z.number().optional(),
     mod: z.number(),
-    totalCost: z.number(),
+    totalCost: z.number().optional(),
   })
   .strict();
 

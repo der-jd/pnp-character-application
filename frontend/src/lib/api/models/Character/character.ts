@@ -34,10 +34,11 @@ export interface Attribute {
 
 export interface BaseValue {
   start: number;
-  current: number;
-  byLvlUp: number;
+  current: number; // byFormula + byLvlUp + increased (not implemented atm)
+  byFormula?: number; // Some base values are not changed by a formula
+  byLvlUp?: number; // Some base values can't be changed by level up
   mod: number;
-  totalCost: number;
+  totalCost?: number; // No base values can be increased by points atm
 }
 
 export interface Skill {

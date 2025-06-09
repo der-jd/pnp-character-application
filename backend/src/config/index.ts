@@ -39,4 +39,5 @@ export {
   booleanSchema,
   skillChangeSchema,
 } from "./history_schema.js";
+export { calculateBaseValues } from "./formulas.js";
 export { RecordType, parseRecordType } from "./history.js";

@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
-import { getAttribute, Attribute, CalculationPoints } from "config/index.js";
+import { getAttribute, Attribute, CalculationPoints, CharacterSheet, calculateBaseValues } from "config/index.js";
 import {
   Request,
   parseBody,
@@ -10,6 +10,7 @@ import {
   HttpError,
   ensureHttpError,
   validateUUID,
+  updateBaseValue,
 } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -84,7 +85,33 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
 
     await updateAttribute(params.userId, params.characterId, params.attributeName, attribute, attributePoints);
 
-    // TODO Consider side effects of increasing attributes -> updated base values
+    console.log("Calculate base values");
+    const baseValuesOld = characterSheet.baseValues;
+    let baseValuesNew: CharacterSheet["baseValues"] | undefined;
+    const attributesNew = structuredClone(characterSheet.attributes);
+    attributesNew[params.attributeName as keyof CharacterSheet["attributes"]] = attribute;
+    const newBaseValuesByFormula = calculateBaseValues(attributesNew);
+    const updates: Promise<void>[] = [];
+
+    for (const baseValueName of Object.keys(baseValuesOld) as (keyof CharacterSheet["baseValues"])[]) {
+      const oldBaseValue = baseValuesOld[baseValueName];
+      const newFormulaValue = newBaseValuesByFormula[baseValueName];
+
+      if (oldBaseValue.byFormula && newFormulaValue !== oldBaseValue.byFormula) {
+        if (!baseValuesNew) {
+          baseValuesNew = structuredClone(baseValuesOld);
+        }
+
+        const diffByFormula = newFormulaValue - oldBaseValue.byFormula;
+        baseValuesNew[baseValueName].byFormula = newFormulaValue;
+        baseValuesNew[baseValueName].current += diffByFormula;
+        updates.push(updateBaseValue(params.userId, params.characterId, baseValueName, baseValuesNew[baseValueName]));
+      }
+    }
+
+    if (updates.length > 0) {
+      await Promise.allSettled(updates);
+    }
 
     const response = {
       statusCode: 200,
@@ -92,9 +119,15 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
         characterId: params.characterId,
         userId: params.userId,
         attributeName: params.attributeName,
-        attribute: {
-          old: attributeOld,
-          new: attribute,
+        changes: {
+          old: {
+            attribute: attributeOld,
+            baseValues: baseValuesNew ? baseValuesOld : undefined,
+          },
+          new: {
+            attribute: attribute,
+            baseValues: baseValuesNew,
+          },
         },
         attributePoints: {
           old: attributePointsOld,
