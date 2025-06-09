@@ -406,6 +406,10 @@ describe("Valid requests", () => {
       const oldTotalSkillCost = skillOld.totalCost;
       const diffSkillTotalCost = parsedBody.changes.new.skill.totalCost - oldTotalSkillCost;
       expect(diffAvailableAdventurePoints).toBeCloseTo(diffSkillTotalCost);
+
+      expect(parsedBody.combatCategory).toBeUndefined();
+      expect(parsedBody.changes.old.combatValues).toBeUndefined();
+      expect(parsedBody.changes.new.combatValues).toBeUndefined();
     });
   });
 
@@ -642,7 +646,7 @@ describe("Valid requests", () => {
 
       expect(parsedBody.changes.old.skill).toStrictEqual(skillOld);
 
-      // Check if the skill was updated
+      // Check for DynamoDB updates
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
 
       // Skill and combat values are updated
