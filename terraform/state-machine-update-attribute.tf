@@ -149,4 +149,3 @@ resource "aws_sfn_state_machine" "update_attribute_state_machine" {
     }
   })
 }
-
