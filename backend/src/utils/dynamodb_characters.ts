@@ -184,7 +184,7 @@ export async function updateBaseValue(
       "#baseValueName": baseValueName,
     },
     ExpressionAttributeValues: {
-      ":baseValues": baseValue,
+      ":baseValue": baseValue,
     },
   });
 
