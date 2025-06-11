@@ -116,6 +116,8 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
 
     if (updates.length > 0) {
       await Promise.allSettled(updates);
+    } else {
+      console.log("No base values changed, nothing to update.");
     }
 
     const response = {
