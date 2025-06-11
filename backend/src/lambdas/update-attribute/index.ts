@@ -107,6 +107,8 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
         baseValuesNew[baseValueName].byFormula = newFormulaValue;
         baseValuesNew[baseValueName].current += diffByFormula;
         changedBaseValues[baseValueName] = baseValuesNew[baseValueName];
+        console.log(`Update base value '${baseValueName}'`);
+        console.log(`Old base value: ${oldBaseValue}, new base value: ${changedBaseValues[baseValueName]}`);
         updates.push(updateBaseValue(params.userId, params.characterId, baseValueName, baseValuesNew[baseValueName]));
       }
     }
