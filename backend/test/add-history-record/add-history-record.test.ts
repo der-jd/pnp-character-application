@@ -399,19 +399,23 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.ATTRIBUTE_CHANGED,
-          name: "Courage",
+          name: "charisma",
           data: {
             old: {
-              start: 0,
-              current: 0,
-              mod: 0,
-              totalCost: 0,
+              attribute: {
+                start: 0,
+                current: 0,
+                mod: 0,
+                totalCost: 0,
+              },
             },
             new: {
-              start: 0,
-              current: 1,
-              mod: 0,
-              totalCost: 1,
+              attribute: {
+                start: 0,
+                current: 1,
+                mod: 0,
+                totalCost: 1,
+              },
             },
           },
           learningMethod: null,
