@@ -3,7 +3,7 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { getAttribute } from "config/index.js";
+import { CharacterSheet, getAttribute } from "config/index.js";
 import { _updateAttribute } from "update-attribute/index.js";
 import { expectHttpError } from "../utils.js";
 
@@ -294,22 +294,22 @@ describe("Valid requests", () => {
       expect(parsedBody.attributeName).toBe(attributeName);
 
       if (_case.request.body.start) {
-        expect(parsedBody.attribute.new.start).toBe(_case.request.body.start.newValue);
+        expect(parsedBody.changes.new.attribute.start).toBe(_case.request.body.start.newValue);
       }
 
       if (_case.request.body.current) {
-        expect(parsedBody.attribute.new.current).toBe(
+        expect(parsedBody.changes.new.attribute.current).toBe(
           _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
         );
       }
 
       if (_case.request.body.mod) {
-        expect(parsedBody.attribute.new.mod).toBe(_case.request.body.mod.newValue);
+        expect(parsedBody.changes.new.attribute.mod).toBe(_case.request.body.mod.newValue);
       }
 
       const attributeOld = getAttribute(fakeCharacterResponse.Item.characterSheet.attributes, attributeName);
-      expect(parsedBody.attribute.old).toStrictEqual(attributeOld);
-      expect(parsedBody.attribute.new).toStrictEqual(parsedBody.attribute.old);
+      expect(parsedBody.changes.old.attribute).toStrictEqual(attributeOld);
+      expect(parsedBody.changes.new.attribute).toStrictEqual(parsedBody.changes.old.attribute);
 
       const oldAvailableAttributePoints =
         fakeCharacterResponse.Item.characterSheet.calculationPoints.attributePoints.available;
@@ -317,8 +317,11 @@ describe("Valid requests", () => {
       expect(diffAvailableAttributePoints).toBe(0);
 
       const oldTotalAttributeCost = attributeOld.totalCost;
-      const diffAttributeTotalCost = parsedBody.attribute.new.totalCost - oldTotalAttributeCost;
+      const diffAttributeTotalCost = parsedBody.changes.new.attribute.totalCost - oldTotalAttributeCost;
       expect(diffAvailableAttributePoints).toBe(diffAttributeTotalCost);
+
+      expect(parsedBody.changes.old.baseValues).toBeUndefined();
+      expect(parsedBody.changes.new.baseValues).toBeUndefined();
     });
   });
 
@@ -437,7 +440,7 @@ describe("Valid requests", () => {
       expect(parsedBody.attributeName).toBe(attributeName);
 
       if (_case.request.body.start) {
-        expect(parsedBody.attribute.new.start).toBe(_case.request.body.start.newValue);
+        expect(parsedBody.changes.new.attribute.start).toBe(_case.request.body.start.newValue);
       }
 
       const oldAvailableAttributePoints =
@@ -445,7 +448,7 @@ describe("Valid requests", () => {
       const diffAvailableAttributePoints = oldAvailableAttributePoints - parsedBody.attributePoints.new.available;
 
       if (_case.request.body.current) {
-        expect(parsedBody.attribute.new.current).toBe(
+        expect(parsedBody.changes.new.attribute.current).toBe(
           _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
         );
 
@@ -462,19 +465,188 @@ describe("Valid requests", () => {
       }
 
       if (_case.request.body.mod) {
-        expect(parsedBody.attribute.new.mod).toBe(_case.request.body.mod.newValue);
+        expect(parsedBody.changes.new.attribute.mod).toBe(_case.request.body.mod.newValue);
       }
 
       const attributeOld = getAttribute(fakeCharacterResponse.Item.characterSheet.attributes, attributeName);
       const oldTotalAttributeCost = attributeOld.totalCost;
-      const diffAttributeTotalCost = parsedBody.attribute.new.totalCost - oldTotalAttributeCost;
+      const diffAttributeTotalCost = parsedBody.changes.new.attribute.totalCost - oldTotalAttributeCost;
       expect(diffAvailableAttributePoints).toBe(diffAttributeTotalCost);
 
-      expect(parsedBody.attribute.old).toStrictEqual(attributeOld);
+      expect(parsedBody.changes.old.attribute).toStrictEqual(attributeOld);
 
-      // Check if the attribute was updated
+      // Check for DynamoDB updates
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
-      expect(calls.length).toBe(1);
+
+      // Attribute and base values are updated
+      expect(calls.length).toBeGreaterThanOrEqual(1);
+
+      const matchingCall = calls.find((call: any) => {
+        const input = call.args[0].input;
+        return (
+          input.Key.characterId === _case.request.pathParameters["character-id"] && input.Key.userId === fakeUserId
+        );
+      });
+      expect(matchingCall).toBeTruthy();
+    });
+  });
+
+  const baseValuesChangedTestCases = [
+    {
+      name: "Update start value of attribute 'strength' -> unchanged base values",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "attribute-name": "strength",
+        },
+        queryStringParameters: null,
+        body: {
+          start: {
+            initialValue: 17,
+            newValue: 20,
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Increase current value of attribute 'intelligence' -> unchanged base values",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "attribute-name": "intelligence",
+        },
+        queryStringParameters: null,
+        body: {
+          current: {
+            initialValue: 12,
+            increasedPoints: 5,
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Update mod value of attribute 'courage' -> changed base values",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "attribute-name": "courage",
+        },
+        queryStringParameters: null,
+        body: {
+          mod: {
+            initialValue: 3,
+            newValue: 10,
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Update current and mod value of attribute 'strength' -> changed base values",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "attribute-name": "strength",
+        },
+        queryStringParameters: null,
+        body: {
+          current: {
+            initialValue: 18,
+            increasedPoints: 1,
+          },
+          mod: {
+            initialValue: 1,
+            newValue: 2,
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+  ];
+
+  baseValuesChangedTestCases.forEach((_case) => {
+    test(_case.name, async () => {
+      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
+
+      const result = await _updateAttribute(_case.request);
+
+      expect(result.statusCode).toBe(_case.expectedStatusCode);
+
+      const parsedBody = JSON.parse(result.body);
+      const attributeName = _case.request.pathParameters["attribute-name"];
+      expect(parsedBody.attributeName).toBe(attributeName);
+
+      // Check for DynamoDB updates
+      const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
+
+      // Attribute and base values are updated
+      if (baseValuesChanged(parsedBody)) {
+        expect(calls.length).toBeGreaterThan(1);
+
+        expect(parsedBody.changes.old.baseValues).toBeDefined();
+        expect(parsedBody.changes.new.baseValues).toBeDefined();
+
+        for (const baseValueName of Object.keys(
+          parsedBody.changes.old.baseValues,
+        ) as (keyof CharacterSheet["baseValues"])[]) {
+          const oldVal = parsedBody.changes.old.baseValues[baseValueName];
+          const newVal = parsedBody.changes.new.baseValues[baseValueName];
+
+          // Only byFormula and current should differ
+          for (const key of Object.keys(oldVal) as (keyof typeof oldVal)[]) {
+            if (key === "byFormula" || key === "current") continue;
+            expect(newVal[key]).toStrictEqual(oldVal[key]);
+          }
+
+          const diffCurrent = newVal.current - oldVal.current;
+          const diffByFormula = newVal.byFormula - oldVal.byFormula;
+          expect(diffCurrent).toBe(diffByFormula);
+
+          switch (baseValueName) {
+            case "healthPoints":
+              expect(newVal.current).toBe(102);
+              expect(newVal.byFormula).toBe(79);
+              break;
+            case "mentalHealth":
+              expect(newVal.current).toBe(57);
+              expect(newVal.byFormula).toBe(57);
+              break;
+            case "initiativeBaseValue":
+              expect(newVal.current).toBe(27);
+              expect(newVal.byFormula).toBe(17);
+              break;
+            case "attackBaseValue":
+              if (attributeName === "strength") {
+                expect(newVal.current).toBe(114);
+                expect(newVal.byFormula).toBe(114);
+              } else if (attributeName === "courage") {
+                expect(newVal.current).toBe(124);
+                expect(newVal.byFormula).toBe(124);
+              }
+              break;
+            case "paradeBaseValue":
+              expect(newVal.current).toBe(116);
+              expect(newVal.byFormula).toBe(116);
+              break;
+            case "rangedAttackBaseValue":
+              expect(newVal.current).toBe(112);
+              expect(newVal.byFormula).toBe(112);
+              break;
+          }
+        }
+      }
+      // Only attribute is updated
+      else {
+        expect(calls.length).toBe(1);
+        expect(parsedBody.changes.old.baseValues).toBeUndefined();
+        expect(parsedBody.changes.new.baseValues).toBeUndefined();
+      }
 
       const matchingCall = calls.find((call: any) => {
         const input = call.args[0].input;
@@ -486,3 +658,15 @@ describe("Valid requests", () => {
     });
   });
 });
+
+function baseValuesChanged(body: any): boolean {
+  if (body.attributeName === "intelligence" || body.attributeName === "charisma") return false;
+
+  if (
+    body.changes.new.attribute.current === body.changes.old.attribute.current &&
+    body.changes.new.attribute.mod === body.changes.old.attribute.mod
+  )
+    return false;
+
+  return true;
+}

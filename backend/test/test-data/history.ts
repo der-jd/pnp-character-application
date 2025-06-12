@@ -4,82 +4,9 @@ import { fakeCharacterId } from "./character.js";
 
 export function addFakeHistoryRecord(
   block: HistoryBlock,
-  type: RecordType,
+  record: Record,
   removePreviousRecords: boolean = false,
-): Record {
-  let record: Record | undefined;
-
-  switch (type) {
-    case RecordType.EVENT_CALCULATION_POINTS:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.EVENT_LEVEL_UP:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.EVENT_BASE_VALUE:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.PROFESSION_CHANGED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.HOBBY_CHANGED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.ADVANTAGE_CHANGED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.DISADVANTAGE_CHANGED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.SPECIAL_ABILITY_CHANGED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.ATTRIBUTE_CHANGED: {
-      record = attributeChangedRecord;
-      break;
-    }
-    case RecordType.SKILL_ACTIVATED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.SKILL_CHANGED: {
-      record = skillChangedRecord;
-      break;
-    }
-    case RecordType.COMBAT_VALUES_CHANGED:
-      record = {
-        type: RecordType.COMBAT_VALUES_CHANGED,
-        name: "melee/thrustingWeapons1h",
-        number: 0, // will be set below
-        id: "0f6b98a5-33c3-416e-bf1f-fde4ef49b166",
-        data: {
-          old: {
-            availablePoints: 58,
-            attackValue: 10,
-            paradeValue: 8,
-          },
-          new: {
-            availablePoints: 55,
-            attackValue: 12,
-            paradeValue: 9,
-          },
-        },
-        learningMethod: null,
-        calculationPoints: {
-          adventurePoints: null,
-          attributePoints: null,
-        },
-        comment: null,
-        timestamp: new Date().toISOString(),
-      };
-      break;
-    default:
-      throw new Error(`Unknown history record type ${type}!`);
-  }
-
-  if (!record) {
-    throw new Error("No record was created!");
-  }
-
+): void {
   if (removePreviousRecords) {
     record.number = block.changes[block.changes.length - 1].number;
     block.changes = [record];
@@ -87,27 +14,126 @@ export function addFakeHistoryRecord(
     record.number = block.changes[block.changes.length - 1].number + 1;
     block.changes.push(record);
   }
-
-  return record;
 }
 
-const attributeChangedRecord: Record = {
+export const attributeAndBaseValueChangedRecord: Record = {
   type: RecordType.ATTRIBUTE_CHANGED,
   name: "strength",
   number: 2,
   id: "fc0a5a71-80ac-47bc-85c2-85fc4c9de99a",
   data: {
     old: {
-      start: 0,
-      current: 0,
-      mod: 0,
-      totalCost: 0,
+      attribute: {
+        start: 17,
+        current: 18,
+        mod: 1,
+        totalCost: 15,
+      },
+      baseValues: {
+        healthPoints: {
+          start: 40,
+          current: 100,
+          byFormula: 77,
+          byLvlUp: 23,
+          mod: 10,
+        },
+        attackBaseValue: {
+          start: 30,
+          current: 110,
+          byFormula: 110,
+          mod: 0,
+        },
+        paradeBaseValue: {
+          start: 30,
+          current: 112,
+          byFormula: 112,
+          mod: 0,
+        },
+        rangedAttackBaseValue: {
+          start: 25,
+          current: 108,
+          byFormula: 108,
+          mod: 0,
+        },
+      },
     },
     new: {
-      start: 0,
-      current: 1,
-      mod: 0,
-      totalCost: 1,
+      attribute: {
+        start: 17,
+        current: 20,
+        mod: 1,
+        totalCost: 17,
+      },
+      baseValues: {
+        healthPoints: {
+          start: 40,
+          current: 102,
+          byFormula: 79,
+          byLvlUp: 23,
+          mod: 10,
+        },
+        attackBaseValue: {
+          start: 30,
+          current: 114,
+          byFormula: 114,
+          mod: 0,
+        },
+        paradeBaseValue: {
+          start: 30,
+          current: 116,
+          byFormula: 116,
+          mod: 0,
+        },
+        rangedAttackBaseValue: {
+          start: 25,
+          current: 112,
+          byFormula: 112,
+          mod: 0,
+        },
+      },
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: {
+      old: {
+        start: 0,
+        available: 10,
+        total: 10,
+      },
+      new: {
+        start: 0,
+        available: 8,
+        total: 10,
+      },
+    },
+  },
+  comment: "Weight training",
+  timestamp: new Date().toISOString(),
+};
+
+export const attributeChangedRecord: Record = {
+  type: RecordType.ATTRIBUTE_CHANGED,
+  name: "intelligence",
+  number: 2,
+  id: "3d95138c-058e-445c-b366-ecdb3cb938ae",
+  data: {
+    old: {
+      attribute: {
+        start: 10,
+        current: 12,
+        mod: 2,
+        totalCost: 15,
+      },
+    },
+    new: {
+      attribute: {
+        start: 11,
+        current: 13,
+        mod: 3,
+        totalCost: 16,
+      },
     },
   },
   learningMethod: null,
@@ -126,44 +152,34 @@ const attributeChangedRecord: Record = {
       },
     },
   },
-  comment: "Weight training",
+  comment: null,
   timestamp: new Date().toISOString(),
 };
 
-const skillChangedRecord: Record = {
+export const skillChangedRecord: Record = {
   type: RecordType.SKILL_CHANGED,
-  name: "combat/polearms (melee)",
+  name: "body/athletics",
   number: 3,
-  id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
+  id: "f18003ae-a678-4273-b6be-e0f9bb6b023a",
   data: {
     old: {
-      skillValues: {
+      skill: {
         activated: true,
-        start: 0,
-        current: 0,
-        mod: 0,
-        totalCost: 0,
+        start: 12,
+        current: 16,
+        mod: 4,
+        totalCost: 40,
         defaultCostCategory: CostCategory.CAT_2,
-      },
-      combatValues: {
-        availablePoints: 20,
-        attackValue: 10,
-        paradeValue: 10,
       },
     },
     new: {
-      skillValues: {
+      skill: {
         activated: true,
-        start: 0,
-        current: 10,
-        mod: 0,
-        totalCost: 10,
+        start: 14,
+        current: 20,
+        mod: 5,
+        totalCost: 44,
         defaultCostCategory: CostCategory.CAT_2,
-      },
-      combatValues: {
-        availablePoints: 30,
-        attackValue: 15,
-        paradeValue: 15,
       },
     },
   },
@@ -177,10 +193,93 @@ const skillChangedRecord: Record = {
       },
       new: {
         start: 0,
-        available: 90,
+        available: 96,
         total: 200,
       },
     },
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const combatSkillChangedRecord: Record = {
+  type: RecordType.SKILL_CHANGED,
+  name: "combat/daggers (melee)",
+  number: 3,
+  id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
+  data: {
+    old: {
+      skill: {
+        activated: true,
+        start: 10,
+        current: 18,
+        mod: 8,
+        totalCost: 50,
+        defaultCostCategory: CostCategory.CAT_3,
+      },
+      combatValues: {
+        availablePoints: 26,
+        attackValue: 10,
+        paradeValue: 8,
+      },
+    },
+    new: {
+      skill: {
+        activated: true,
+        start: 11,
+        current: 22,
+        mod: 10,
+        totalCost: 58,
+        defaultCostCategory: CostCategory.CAT_3,
+      },
+      combatValues: {
+        availablePoints: 33,
+        attackValue: 10,
+        paradeValue: 8,
+      },
+    },
+  },
+  learningMethod: "NORMAL",
+  calculationPoints: {
+    adventurePoints: {
+      old: {
+        start: 0,
+        available: 100,
+        total: 200,
+      },
+      new: {
+        start: 0,
+        available: 92,
+        total: 200,
+      },
+    },
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const combatValuesChangedRecord: Record = {
+  type: RecordType.COMBAT_VALUES_CHANGED,
+  name: "melee/thrustingWeapons1h",
+  number: 3,
+  id: "0f6b98a5-33c3-416e-bf1f-fde4ef49b166",
+  data: {
+    old: {
+      availablePoints: 58,
+      attackValue: 10,
+      paradeValue: 8,
+    },
+    new: {
+      availablePoints: 55,
+      attackValue: 12,
+      paradeValue: 9,
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
     attributePoints: null,
   },
   comment: null,
@@ -244,7 +343,7 @@ function generateLargeChangesList(size: number): Record[] {
       id: uuidv4(),
       data: {
         old: {
-          skillValues: {
+          skill: {
             activated: true,
             start: 0,
             current: i,
@@ -254,7 +353,7 @@ function generateLargeChangesList(size: number): Record[] {
           },
         },
         new: {
-          skillValues: {
+          skill: {
             activated: true,
             start: 0,
             current: i + 1,

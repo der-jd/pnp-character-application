@@ -176,7 +176,7 @@ describe("Invalid requests", () => {
         pathParameters: {
           "character-id": fakeCharacterId,
           "skill-category": "combat",
-          "skill-name": "slashingWeapons1h",
+          "skill-name": "slashingWeaponsSharp1h",
         },
         queryStringParameters: null,
         body: {
@@ -380,23 +380,23 @@ describe("Valid requests", () => {
       expect(parsedBody.skillName).toBe(skillName);
 
       if (_case.request.body.start) {
-        expect(parsedBody.changes.new.skillValues.start).toBe(_case.request.body.start.newValue);
+        expect(parsedBody.changes.new.skill.start).toBe(_case.request.body.start.newValue);
       }
 
       if (_case.request.body.current) {
-        expect(parsedBody.changes.new.skillValues.current).toBe(
+        expect(parsedBody.changes.new.skill.current).toBe(
           _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
         );
         expect(parsedBody.learningMethod).toBe(_case.request.body.current.learningMethod);
       }
 
       if (_case.request.body.mod) {
-        expect(parsedBody.changes.new.skillValues.mod).toBe(_case.request.body.mod.newValue);
+        expect(parsedBody.changes.new.skill.mod).toBe(_case.request.body.mod.newValue);
       }
 
       const skillOld = getSkill(fakeCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
-      expect(parsedBody.changes.old.skillValues).toStrictEqual(skillOld);
-      expect(parsedBody.changes.new.skillValues).toStrictEqual(parsedBody.changes.old.skillValues);
+      expect(parsedBody.changes.old.skill).toStrictEqual(skillOld);
+      expect(parsedBody.changes.new.skill).toStrictEqual(parsedBody.changes.old.skill);
 
       const oldAvailableAdventurePoints =
         fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
@@ -404,8 +404,12 @@ describe("Valid requests", () => {
       expect(diffAvailableAdventurePoints).toBeCloseTo(0);
 
       const oldTotalSkillCost = skillOld.totalCost;
-      const diffSkillTotalCost = parsedBody.changes.new.skillValues.totalCost - oldTotalSkillCost;
+      const diffSkillTotalCost = parsedBody.changes.new.skill.totalCost - oldTotalSkillCost;
       expect(diffAvailableAdventurePoints).toBeCloseTo(diffSkillTotalCost);
+
+      expect(parsedBody.combatCategory).toBeUndefined();
+      expect(parsedBody.changes.old.combatValues).toBeUndefined();
+      expect(parsedBody.changes.new.combatValues).toBeUndefined();
     });
   });
 
@@ -563,7 +567,7 @@ describe("Valid requests", () => {
         pathParameters: {
           "character-id": fakeCharacterId,
           "skill-category": "combat",
-          "skill-name": "slashingWeapons1h",
+          "skill-name": "slashingWeaponsSharp1h",
         },
         queryStringParameters: null,
         body: {
@@ -600,7 +604,7 @@ describe("Valid requests", () => {
       expect(parsedBody.skillName).toBe(skillName);
 
       if (_case.request.body.start) {
-        expect(parsedBody.changes.new.skillValues.start).toBe(_case.request.body.start.newValue);
+        expect(parsedBody.changes.new.skill.start).toBe(_case.request.body.start.newValue);
       }
 
       const oldAvailableAdventurePoints =
@@ -608,7 +612,7 @@ describe("Valid requests", () => {
       const diffAvailableAdventurePoints = oldAvailableAdventurePoints - parsedBody.adventurePoints.new.available;
 
       if (_case.request.body.current) {
-        expect(parsedBody.changes.new.skillValues.current).toBe(
+        expect(parsedBody.changes.new.skill.current).toBe(
           _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
         );
         expect(parsedBody.learningMethod).toBe(_case.request.body.current.learningMethod);
@@ -632,27 +636,21 @@ describe("Valid requests", () => {
       }
 
       if (_case.request.body.mod) {
-        expect(parsedBody.changes.new.skillValues.mod).toBe(_case.request.body.mod.newValue);
+        expect(parsedBody.changes.new.skill.mod).toBe(_case.request.body.mod.newValue);
       }
 
       const skillOld = getSkill(fakeCharacterResponse.Item.characterSheet.skills, skillCategory, skillName);
       const oldTotalSkillCost = skillOld.totalCost;
-      const diffSkillTotalCost = parsedBody.changes.new.skillValues.totalCost - oldTotalSkillCost;
+      const diffSkillTotalCost = parsedBody.changes.new.skill.totalCost - oldTotalSkillCost;
       expect(diffAvailableAdventurePoints).toBeCloseTo(diffSkillTotalCost);
 
-      expect(parsedBody.changes.old.skillValues).toStrictEqual(skillOld);
+      expect(parsedBody.changes.old.skill).toStrictEqual(skillOld);
 
-      // Check if the skill was updated
+      // Check for DynamoDB updates
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
 
       // Skill and combat values are updated
-      if (
-        availableCombatPointsChanged(
-          parsedBody.changes.old.skillValues,
-          parsedBody.changes.new.skillValues,
-          skillCategory,
-        )
-      ) {
+      if (availableCombatPointsChanged(parsedBody.changes.old.skill, parsedBody.changes.new.skill, skillCategory)) {
         expect(calls.length).toBe(2);
 
         expect(parsedBody.changes.old.combatValues).toBeDefined();
@@ -672,8 +670,8 @@ describe("Valid requests", () => {
 
         const availableCombatPointsNew =
           skillCombatValuesOld.availablePoints +
-          (parsedBody.changes.new.skillValues.current - parsedBody.changes.old.skillValues.current) +
-          (parsedBody.changes.new.skillValues.mod - parsedBody.changes.old.skillValues.mod);
+          (parsedBody.changes.new.skill.current - parsedBody.changes.old.skill.current) +
+          (parsedBody.changes.new.skill.mod - parsedBody.changes.old.skill.mod);
         expect(parsedBody.changes.new.combatValues.availablePoints).toBe(availableCombatPointsNew);
       }
       // Only skill is updated

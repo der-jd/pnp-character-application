@@ -399,19 +399,23 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.ATTRIBUTE_CHANGED,
-          name: "Courage",
+          name: "charisma",
           data: {
             old: {
-              start: 0,
-              current: 0,
-              mod: 0,
-              totalCost: 0,
+              attribute: {
+                start: 0,
+                current: 0,
+                mod: 0,
+                totalCost: 0,
+              },
             },
             new: {
-              start: 0,
-              current: 1,
-              mod: 0,
-              totalCost: 1,
+              attribute: {
+                start: 0,
+                current: 1,
+                mod: 0,
+                totalCost: 1,
+              },
             },
           },
           learningMethod: null,
@@ -446,7 +450,7 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.SKILL_ACTIVATED,
-          name: "social/disguising",
+          name: "social/acting",
           data: {
             old: {
               value: false,
@@ -490,7 +494,7 @@ describe("Valid requests", () => {
           name: "body/bodyControl",
           data: {
             old: {
-              skillValues: {
+              skill: {
                 activated: true,
                 start: 0,
                 current: 30,
@@ -500,7 +504,7 @@ describe("Valid requests", () => {
               },
             },
             new: {
-              skillValues: {
+              skill: {
                 activated: true,
                 start: 0,
                 current: 35,
@@ -542,7 +546,7 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.COMBAT_VALUES_CHANGED,
-          name: "melee/slashingWeapons1h",
+          name: "melee/slashingWeaponsSharp1h",
           data: {
             old: {
               availablePoints: 10,
@@ -615,36 +619,26 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.SKILL_CHANGED,
-          name: "combat/polearms (melee)",
+          name: "body/athletics",
           data: {
             old: {
-              skillValues: {
+              skill: {
                 activated: true,
-                start: 0,
-                current: 0,
-                mod: 0,
-                totalCost: 0,
+                start: 12,
+                current: 16,
+                mod: 4,
+                totalCost: 40,
                 defaultCostCategory: CostCategory.CAT_2,
-              },
-              combatValues: {
-                availablePoints: 20,
-                attackValue: 10,
-                paradeValue: 10,
               },
             },
             new: {
-              skillValues: {
+              skill: {
                 activated: true,
-                start: 0,
-                current: 10,
-                mod: 0,
-                totalCost: 10,
+                start: 14,
+                current: 20,
+                mod: 5,
+                totalCost: 44,
                 defaultCostCategory: CostCategory.CAT_2,
-              },
-              combatValues: {
-                availablePoints: 30,
-                attackValue: 15,
-                paradeValue: 15,
               },
             },
           },
@@ -658,7 +652,7 @@ describe("Valid requests", () => {
               },
               new: {
                 start: 0,
-                available: 90,
+                available: 96,
                 total: 200,
               },
             },

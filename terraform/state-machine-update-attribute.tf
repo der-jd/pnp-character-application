@@ -63,7 +63,7 @@ resource "aws_sfn_state_machine" "update_attribute_state_machine" {
         Choices = [
           {
             // The attribute was not updated, so no history record is necessary
-            Condition = "{% $parse($states.input.body).attribute.old = $parse($states.input.body).attribute.new %}",
+            Condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}",
             Next      = "SuccessState"
           }
         ],
@@ -81,7 +81,7 @@ resource "aws_sfn_state_machine" "update_attribute_state_machine" {
             "userId"         = "{% $parse($states.input.body).userId %}",
             "type"           = "8", // ATTRIBUTE_CHANGED
             "name"           = "{% $parse($states.input.body).attributeName %}",
-            "data"           = "{% $parse($states.input.body).attribute %}",
+            "data"           = "{% $parse($states.input.body).changes %}",
             "learningMethod" = null,
             "calculationPoints" = {
               "adventurePoints" = null,
@@ -149,4 +149,3 @@ resource "aws_sfn_state_machine" "update_attribute_state_machine" {
     }
   })
 }
-

@@ -139,11 +139,11 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
             : undefined,
         changes: {
           old: {
-            skillValues: skillOld,
+            skill: skillOld,
             combatValues: combatValues?.old,
           },
           new: {
-            skillValues: skill,
+            skill: skill,
             combatValues: combatValues?.new,
           },
         },

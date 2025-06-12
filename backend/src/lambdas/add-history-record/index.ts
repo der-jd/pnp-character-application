@@ -3,7 +3,6 @@ import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import {
-  attributeSchema,
   baseValueSchema,
   calculationPointsSchema,
   combatValuesSchema,
@@ -15,6 +14,7 @@ import {
   stringSchema,
   booleanSchema,
   skillChangeSchema,
+  attributeChangeSchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -202,8 +202,8 @@ async function validateRequest(request: Request): Promise<Parameters> {
         stringSchema.parse(body.data.new);
         break;
       case RecordType.ATTRIBUTE_CHANGED:
-        attributeSchema.parse(body.data.old);
-        attributeSchema.parse(body.data.new);
+        attributeChangeSchema.parse(body.data.old);
+        attributeChangeSchema.parse(body.data.new);
         break;
       case RecordType.SKILL_ACTIVATED:
         booleanSchema.parse(body.data.old);

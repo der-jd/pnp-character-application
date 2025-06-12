@@ -24,7 +24,7 @@
                 "S": "Warrior"
               },
               "skill": {
-                "S": "greatsword"
+                "S": "slashingWeaponsSharp2h"
               }
             }
           },
@@ -272,14 +272,14 @@
               "current": {
                 "N": "130"
               },
+              "byFormula": {
+                "N": "10"
+              },
               "byLvlUp": {
                 "N": "10"
               },
               "mod": {
                 "N": "10"
-              },
-              "totalCost": {
-                "N": "15"
               }
             }
           },
@@ -291,14 +291,11 @@
               "current": {
                 "N": "85"
               },
-              "byLvlUp": {
+              "byFormula": {
                 "N": "10"
               },
               "mod": {
                 "N": "10"
-              },
-              "totalCost": {
-                "N": "15"
               }
             }
           },
@@ -315,9 +312,6 @@
               },
               "mod": {
                 "N": "10"
-              },
-              "totalCost": {
-                "N": "15"
               }
             }
           },
@@ -334,9 +328,6 @@
               },
               "mod": {
                 "N": "10"
-              },
-              "totalCost": {
-                "N": "15"
               }
             }
           },
@@ -348,14 +339,14 @@
               "current": {
                 "N": "15"
               },
+              "byFormula": {
+                "N": "10"
+              },
               "byLvlUp": {
                 "N": "10"
               },
               "mod": {
                 "N": "10"
-              },
-              "totalCost": {
-                "N": "15"
               }
             }
           },
@@ -367,14 +358,11 @@
               "current": {
                 "N": "22"
               },
-              "byLvlUp": {
+              "byFormula": {
                 "N": "10"
               },
               "mod": {
                 "N": "10"
-              },
-              "totalCost": {
-                "N": "15"
               }
             }
           },
@@ -386,14 +374,11 @@
               "current": {
                 "N": "20"
               },
-              "byLvlUp": {
+              "byFormula": {
                 "N": "10"
               },
               "mod": {
                 "N": "10"
-              },
-              "totalCost": {
-                "N": "15"
               }
             }
           },
@@ -405,14 +390,11 @@
               "current": {
                 "N": "14"
               },
-              "byLvlUp": {
+              "byFormula": {
                 "N": "10"
               },
               "mod": {
                 "N": "10"
-              },
-              "totalCost": {
-                "N": "15"
               }
             }
           },
@@ -429,9 +411,6 @@
               },
               "mod": {
                 "N": "10"
-              },
-              "totalCost": {
-                "N": "15"
               }
             }
           },
@@ -448,9 +427,6 @@
               },
               "mod": {
                 "N": "10"
-              },
-              "totalCost": {
-                "N": "15"
               }
             }
           },
@@ -467,9 +443,6 @@
               },
               "mod": {
                 "N": "10"
-              },
-              "totalCost": {
-                "N": "15"
               }
             }
           }
@@ -479,28 +452,6 @@
         "M": {
           "combat": {
             "M": {
-              "greatsword": {
-                "M": {
-                  "activated": {
-                    "BOOL": true
-                  },
-                  "start": {
-                    "N": "10"
-                  },
-                  "current": {
-                    "N": "18"
-                  },
-                  "mod": {
-                    "N": "8"
-                  },
-                  "totalCost": {
-                    "N": "50"
-                  },
-                  "defaultCostCategory": {
-                    "N": "2"
-                  }
-                }
-              },
               "barehanded": {
                 "M": {
                   "activated": {
@@ -567,7 +518,7 @@
                   }
                 }
               },
-              "slashingWeapons1h": {
+              "slashingWeaponsSharp1h": {
                 "M": {
                   "activated": {
                     "BOOL": true
@@ -589,7 +540,51 @@
                   }
                 }
               },
-              "slashingWeapons2h": {
+              "slashingWeaponsBlunt1h": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "start": {
+                    "N": "10"
+                  },
+                  "current": {
+                    "N": "18"
+                  },
+                  "mod": {
+                    "N": "8"
+                  },
+                  "totalCost": {
+                    "N": "50"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  }
+                }
+              },
+              "slashingWeaponsSharp2h": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "start": {
+                    "N": "10"
+                  },
+                  "current": {
+                    "N": "18"
+                  },
+                  "mod": {
+                    "N": "8"
+                  },
+                  "totalCost": {
+                    "N": "50"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  }
+                }
+              },
+              "slashingWeaponsBlunt2h": {
                 "M": {
                   "activated": {
                     "BOOL": true
@@ -634,28 +629,6 @@
                 }
               },
               "chainWeapons": {
-                "M": {
-                  "activated": {
-                    "BOOL": true
-                  },
-                  "start": {
-                    "N": "10"
-                  },
-                  "current": {
-                    "N": "18"
-                  },
-                  "mod": {
-                    "N": "8"
-                  },
-                  "totalCost": {
-                    "N": "50"
-                  },
-                  "defaultCostCategory": {
-                    "N": "2"
-                  }
-                }
-              },
-              "polearms": {
                 "M": {
                   "activated": {
                     "BOOL": true
@@ -744,6 +717,28 @@
                 }
               },
               "firearmComplex": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "start": {
+                    "N": "6"
+                  },
+                  "current": {
+                    "N": "10"
+                  },
+                  "mod": {
+                    "N": "4"
+                  },
+                  "totalCost": {
+                    "N": "20"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  }
+                }
+              },
+              "heavyWeapons": {
                 "M": {
                   "activated": {
                     "BOOL": true
@@ -1033,28 +1028,6 @@
                   }
                 }
               },
-              "imitatingVoices": {
-                "M": {
-                  "activated": {
-                    "BOOL": true
-                  },
-                  "start": {
-                    "N": "12"
-                  },
-                  "current": {
-                    "N": "16"
-                  },
-                  "mod": {
-                    "N": "4"
-                  },
-                  "totalCost": {
-                    "N": "40"
-                  },
-                  "defaultCostCategory": {
-                    "N": "2"
-                  }
-                }
-              },
               "dancing": {
                 "M": {
                   "activated": {
@@ -1214,28 +1187,6 @@
                 }
               },
               "writtenExpression": {
-                "M": {
-                  "activated": {
-                    "BOOL": true
-                  },
-                  "start": {
-                    "N": "7"
-                  },
-                  "current": {
-                    "N": "10"
-                  },
-                  "mod": {
-                    "N": "3"
-                  },
-                  "totalCost": {
-                    "N": "15"
-                  },
-                  "defaultCostCategory": {
-                    "N": "2"
-                  }
-                }
-              },
-              "disguising": {
                 "M": {
                   "activated": {
                     "BOOL": true
@@ -2061,6 +2012,28 @@
                   }
                 }
               },
+              "fineMechanics": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "start": {
+                    "N": "7"
+                  },
+                  "current": {
+                    "N": "10"
+                  },
+                  "mod": {
+                    "N": "3"
+                  },
+                  "totalCost": {
+                    "N": "15"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  }
+                }
+              },
               "cheating": {
                 "M": {
                   "activated": {
@@ -2223,19 +2196,6 @@
         "M": {
           "melee": {
             "M": {
-              "greatsword": {
-                "M": {
-                  "availablePoints": {
-                    "N": "83"
-                  },
-                  "attackValue": {
-                    "N": "10"
-                  },
-                  "paradeValue": {
-                    "N": "8"
-                  }
-                }
-              },
               "martialArts": {
                 "M": {
                   "availablePoints": {
@@ -2288,7 +2248,20 @@
                   }
                 }
               },
-              "slashingWeapons1h": {
+              "slashingWeaponsSharp1h": {
+                "M": {
+                  "availablePoints": {
+                    "N": "10"
+                  },
+                  "attackValue": {
+                    "N": "10"
+                  },
+                  "paradeValue": {
+                    "N": "8"
+                  }
+                }
+              },
+              "slashingWeaponsBlunt1h": {
                 "M": {
                   "availablePoints": {
                     "N": "10"
@@ -2314,7 +2287,20 @@
                   }
                 }
               },
-              "slashingWeapons2h": {
+              "slashingWeaponsSharp2h": {
+                "M": {
+                  "availablePoints": {
+                    "N": "26"
+                  },
+                  "attackValue": {
+                    "N": "10"
+                  },
+                  "paradeValue": {
+                    "N": "8"
+                  }
+                }
+              },
+              "slashingWeaponsBlunt2h": {
                 "M": {
                   "availablePoints": {
                     "N": "26"
@@ -2331,19 +2317,6 @@
                 "M": {
                   "availablePoints": {
                     "N": "57"
-                  },
-                  "attackValue": {
-                    "N": "10"
-                  },
-                  "paradeValue": {
-                    "N": "8"
-                  }
-                }
-              },
-              "polearms": {
-                "M": {
-                  "availablePoints": {
-                    "N": "26"
                   },
                   "attackValue": {
                     "N": "10"
@@ -2384,6 +2357,19 @@
                 }
               },
               "firearmComplex": {
+                "M": {
+                  "availablePoints": {
+                    "N": "22"
+                  },
+                  "attackValue": {
+                    "N": "10"
+                  },
+                  "paradeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "heavyWeapons": {
                 "M": {
                   "availablePoints": {
                     "N": "22"

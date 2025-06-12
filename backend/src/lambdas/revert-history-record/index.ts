@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
 import {
-  attributeSchema,
   baseValueSchema,
   calculationPointsSchema,
   combatValuesSchema,
@@ -15,6 +14,8 @@ import {
   booleanSchema,
   CalculationPoints,
   skillChangeSchema,
+  attributeChangeSchema,
+  CharacterSheet,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -31,6 +32,7 @@ import {
   updateAttribute,
   updateSkill,
   updateCombatValues,
+  updateBaseValue,
 } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -153,12 +155,36 @@ async function revertChange(userId: string, characterId: string, record: Record)
         throw new HttpError(500, "Reverting special ability change is not implemented yet!"); // TODO
         break;
       case RecordType.ATTRIBUTE_CHANGED: {
-        const oldAttribute = attributeSchema.parse(record.data.old);
+        const oldData = attributeChangeSchema.parse(record.data.old);
+        const newData = attributeChangeSchema.parse(record.data.new);
+
+        if (oldData.baseValues && newData.baseValues) {
+          const updates: Promise<void>[] = [];
+          for (const baseValueName of Object.keys(oldData.baseValues) as (keyof CharacterSheet["baseValues"])[]) {
+            const oldBaseValue = oldData.baseValues[baseValueName];
+            const newBaseValue = newData.baseValues[baseValueName];
+
+            // This check shouldn't be necessary as we loop over only existing base values. However, TypeScript complains without it.
+            if (oldBaseValue === undefined || newBaseValue === undefined) {
+              throw new HttpError(500, `Base value '${String(baseValueName)}' is missing in old / new data`);
+            }
+
+            /**
+             * This check is obsolete because the record only contains the base values that have changed.
+             * However, it is kept here for safety and efficiency in case the record is modified in the future.
+             */
+            if (oldBaseValue.byFormula && oldBaseValue.byFormula !== newBaseValue.byFormula) {
+              updates.push(updateBaseValue(userId, characterId, baseValueName, oldBaseValue));
+            }
+          }
+          await Promise.allSettled(updates);
+        }
+
         await updateAttribute(
           userId,
           characterId,
           record.name,
-          oldAttribute,
+          oldData.attribute,
           requireProperty(record.calculationPoints.attributePoints?.old, "attributePoints"),
         );
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
@@ -192,7 +218,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
           characterId,
           skillCategory,
           skillName,
-          oldData.skillValues,
+          oldData.skill,
           requireProperty(record.calculationPoints.adventurePoints?.old, "adventurePoints"),
         );
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);

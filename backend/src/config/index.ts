@@ -37,7 +37,8 @@ export {
   numberSchema,
   stringSchema,
   booleanSchema,
+  attributeChangeSchema,
   skillChangeSchema,
 } from "./history_schema.js";
-export { getCombatSkillHandling } from "./combat_skills_handling.js";
+export { calculateBaseValues } from "./formulas.js";
 export { RecordType, parseRecordType } from "./history.js";

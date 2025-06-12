@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { RecordType } from "./history.js";
-import { calculationPointsSchema, combatValuesSchema, skillSchema } from "./character_schema.js";
+import {
+  attributeSchema,
+  calculationPointsSchema,
+  characterSheetSchema,
+  combatValuesSchema,
+  skillSchema,
+} from "./character_schema.js";
 
 export const recordSchema = z
   .object({
@@ -70,9 +76,16 @@ export const booleanSchema = z
   })
   .strict();
 
+export const attributeChangeSchema = z
+  .object({
+    attribute: attributeSchema,
+    baseValues: characterSheetSchema.shape.baseValues.partial().optional(),
+  })
+  .strict();
+
 export const skillChangeSchema = z
   .object({
-    skillValues: skillSchema,
+    skill: skillSchema,
     combatValues: combatValuesSchema.optional(),
   })
   .strict();

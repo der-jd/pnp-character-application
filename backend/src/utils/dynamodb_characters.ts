@@ -1,7 +1,15 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { Attribute, Character, characterSchema, CalculationPoints, Skill, CombatValues } from "config/index.js";
+import {
+  Attribute,
+  Character,
+  characterSchema,
+  CalculationPoints,
+  Skill,
+  CombatValues,
+  BaseValue,
+} from "config/index.js";
 import { HttpError } from "./errors.js";
 
 export async function getCharacterItem(userId: string, characterId: string): Promise<Character> {
@@ -144,6 +152,39 @@ export async function updateAttribute(
     ExpressionAttributeValues: {
       ":attribute": attribute,
       ":attributePoints": attributePoints,
+    },
+  });
+
+  await docClient.send(command);
+
+  console.log("Successfully updated DynamoDB item");
+}
+
+export async function updateBaseValue(
+  userId: string,
+  characterId: string,
+  baseValueName: string,
+  baseValue: BaseValue,
+): Promise<void> {
+  console.log(`Update base value '${baseValueName}' of character ${characterId} (user ${userId}) in DynamoDB`);
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
+  const client = new DynamoDBClient({});
+  const docClient = DynamoDBDocumentClient.from(client);
+  const command = new UpdateCommand({
+    TableName: process.env.TABLE_NAME_CHARACTERS,
+    Key: {
+      userId: userId,
+      characterId: characterId,
+    },
+    UpdateExpression: "SET #characterSheet.#baseValues.#baseValueName = :baseValue",
+    ExpressionAttributeNames: {
+      "#characterSheet": "characterSheet",
+      "#baseValues": "baseValues",
+      "#baseValueName": baseValueName,
+    },
+    ExpressionAttributeValues: {
+      ":baseValue": baseValue,
     },
   });
 
