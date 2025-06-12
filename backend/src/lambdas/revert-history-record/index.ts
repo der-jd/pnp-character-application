@@ -130,7 +130,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
         numberSchema.parse(record.data.old);
         throw new HttpError(500, "Reverting level up is not implemented yet!"); // TODO
         break;
-      case RecordType.EVENT_BASE_VALUE:
+      case RecordType.BASE_VALUE_CHANGED:
         baseValueSchema.parse(record.data.old);
         throw new HttpError(500, "Reverting base value change is not implemented yet!"); // TODO
         break;
