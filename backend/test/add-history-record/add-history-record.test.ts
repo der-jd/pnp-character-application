@@ -206,7 +206,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.EVENT_BASE_VALUE,
+          type: RecordType.BASE_VALUE_CHANGED,
           name: "health points",
           data: {
             old: {

@@ -186,7 +186,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
         numberSchema.parse(body.data.old);
         numberSchema.parse(body.data.new);
         break;
-      case RecordType.EVENT_BASE_VALUE:
+      case RecordType.BASE_VALUE_CHANGED:
         baseValueSchema.parse(body.data.old);
         baseValueSchema.parse(body.data.new);
         break;

@@ -16,6 +16,7 @@ export {
   Character,
   CharacterSheet,
   getAttribute,
+  getBaseValue,
   getSkill,
   getCombatValues,
   getCombatCategory,

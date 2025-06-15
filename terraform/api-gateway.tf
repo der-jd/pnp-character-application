@@ -144,6 +144,47 @@ module "attribute_name_options" {
   resource_id = aws_api_gateway_resource.attribute_name.id
 }
 
+// ================== /characters/{character-id}/base-values ==================
+
+resource "aws_api_gateway_resource" "base_values" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "base-values" // .../characters/{character-id}/base-values
+}
+
+// ================== /characters/{character-id}/base-values/{base-value-name} ==================
+
+resource "aws_api_gateway_resource" "base_value_name" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.base_values.id
+  path_part   = "{base-value-name}" // .../characters/{character-id}/base-values/{base-value-name}
+}
+
+// ================== PATCH /characters/{character-id}/base-values/{base-value-name} ==================
+
+module "base_value_name_patch" {
+  source        = "./modules/apigw_stepfunction_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.base_value_name.id
+  http_method   = "PATCH"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"    = true
+    "method.request.path.base-value-name" = true
+  }
+  aws_region        = data.aws_region.current.name
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = aws_sfn_state_machine.update_base_value_state_machine.arn
+}
+
+// ================== OPTIONS /characters/{character-id}/base-values/{base-value-name} ==================
+
+module "base_value_name_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.base_value_name.id
+}
+
 // ================== /characters/{character-id}/skills ==================
 
 resource "aws_api_gateway_resource" "skills" {
@@ -347,6 +388,8 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
     module.attribute_name_patch,
     module.attribute_name_options,
+    module.base_value_name_patch,
+    module.base_value_name_options,
     module.characters_get,
     module.characters_options,
     module.character_id_get,
