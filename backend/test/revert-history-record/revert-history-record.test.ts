@@ -7,6 +7,7 @@ import {
   addFakeHistoryRecord,
   attributeAndBaseValueChangedRecord,
   attributeChangedRecord,
+  baseValueChangedRecord,
   combatSkillChangedRecord,
   combatValuesChangedRecord,
   skillChangedRecord,
@@ -115,6 +116,20 @@ describe("Invalid requests", () => {
 
 describe("Valid requests", () => {
   const testCasesForRevertingRecord = [
+    {
+      name: "Revert history record for a changed base value",
+      fakeRecord: baseValueChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
     {
       name: "Revert history record for a changed attribute",
       fakeRecord: attributeChangedRecord,

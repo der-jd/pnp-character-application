@@ -16,6 +16,36 @@ export function addFakeHistoryRecord(
   }
 }
 
+export const baseValueChangedRecord: Record = {
+  type: RecordType.BASE_VALUE_CHANGED,
+  name: "healthPoints",
+  number: 2,
+  id: "abc2e95b-a1f6-47e0-84da-1eca56dbb192",
+  data: {
+    old: {
+      start: 50,
+      current: 97,
+      byFormula: 77,
+      byLvlUp: 20,
+      mod: 5,
+    },
+    new: {
+      start: 40,
+      current: 100,
+      byFormula: 77,
+      byLvlUp: 23,
+      mod: 10,
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
 export const attributeAndBaseValueChangedRecord: Record = {
   type: RecordType.ATTRIBUTE_CHANGED,
   name: "strength",

@@ -30,7 +30,7 @@ export interface BaseValue {
   byFormula?: number; // Some base values are not changed by a formula
   byLvlUp?: number; // Some base values can't be changed by level up
   mod: number;
-  totalCost?: number; // No base values can be increased by points atm
+  //totalCost?: number; // No base value can be increased by points atm
 }
 
 export interface Skill {
@@ -210,20 +210,35 @@ export interface CharacterSheet {
   };
 }
 
-export function getAttribute(attributes: Record<string, any>, name: string): Attribute {
-  const attribute = attributes[name];
+export function getAttribute(attributes: CharacterSheet["attributes"], name: string): Attribute {
+  const attribute = (attributes as Record<string, Attribute>)[name];
   if (!attribute) {
     throw new Error(`Attribute ${name} not found!`);
   }
   return attribute;
 }
 
+export function getBaseValue(baseValues: CharacterSheet["baseValues"], name: string): BaseValue {
+  const baseValue = (baseValues as Record<string, BaseValue>)[name];
+  if (!baseValue) {
+    throw new Error(`Base value ${name} not found!`);
+  }
+  return baseValue;
+}
+
+export const baseValuesNotUpdatableByLvlUp: (keyof CharacterSheet["baseValues"])[] = [
+  "mentalHealth",
+  "attackBaseValue",
+  "paradeBaseValue",
+  "rangedAttackBaseValue",
+];
+
 export function getSkill(
   skills: CharacterSheet["skills"],
   category: keyof CharacterSheet["skills"],
   name: string,
 ): Skill {
-  const skillCategory = skills[category] as Record<string, any>;
+  const skillCategory = skills[category] as Record<string, Skill>;
   const skill = skillCategory[name];
   if (!skill) {
     throw new Error(`Skill ${name} not found!`);
@@ -236,7 +251,7 @@ export function getCombatValues(
   category: keyof CharacterSheet["combatValues"],
   combatSkillName: string,
 ): CombatValues {
-  const combatCategory = combatValues[category] as Record<string, any>;
+  const combatCategory = combatValues[category] as Record<string, CombatValues>;
   const skillCombatValues = combatCategory[combatSkillName];
   if (!skillCombatValues) {
     throw new Error(`Combat values for skill ${combatSkillName} not found!`);

@@ -122,7 +122,7 @@ describe("Invalid requests", () => {
 describe("Valid requests", () => {
   const testCasesForExistingHistoryBlock = [
     {
-      name: "Add history record for 'event calculation points' to existing block",
+      name: "Add history record for 'calculation points changed' to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -167,7 +167,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'event level up' to existing block",
+      name: "Add history record for 'level up' to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -197,7 +197,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'event base value' to existing block",
+      name: "Add history record for 'base value changed' to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -206,7 +206,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.EVENT_BASE_VALUE,
+          type: RecordType.BASE_VALUE_CHANGED,
           name: "health points",
           data: {
             old: {
@@ -214,14 +214,12 @@ describe("Valid requests", () => {
               current: 20,
               byLvlUp: 0,
               mod: 0,
-              totalCost: 0,
             },
             new: {
               start: 20,
               current: 26,
               byLvlUp: 6,
               mod: 0,
-              totalCost: 0,
             },
           },
           learningMethod: null,
@@ -389,7 +387,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'attribute raised' to existing block",
+      name: "Add history record for 'attribute changed' to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -481,7 +479,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'skill raised' to existing block",
+      name: "Add history record for 'skill changed' to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -690,7 +688,7 @@ describe("Valid requests", () => {
 
   const testCasesForNewHistory = [
     {
-      name: "Add history record for 'event calculation points' to new history",
+      name: "Add history record for 'calculation points changed' to new history",
       request: {
         headers: {},
         pathParameters: {
@@ -786,7 +784,7 @@ describe("Valid requests", () => {
 
   const testCasesForNewHistoryBlockInExistingHistory = [
     {
-      name: "Add history record for 'event calculation points' to new block in existing history",
+      name: "Add history record for 'calculation points changed' to new block in existing history",
       request: {
         headers: {},
         pathParameters: {

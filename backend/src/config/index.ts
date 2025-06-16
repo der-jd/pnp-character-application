@@ -16,9 +16,11 @@ export {
   Character,
   CharacterSheet,
   getAttribute,
+  getBaseValue,
   getSkill,
   getCombatValues,
   getCombatCategory,
+  baseValuesNotUpdatableByLvlUp,
 } from "./character.js";
 export {
   attributeSchema,
