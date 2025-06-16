@@ -20,6 +20,7 @@ export {
   getSkill,
   getCombatValues,
   getCombatCategory,
+  baseValuesNotUpdatableByLvlUp,
 } from "./character.js";
 export {
   attributeSchema,

@@ -226,6 +226,13 @@ export function getBaseValue(baseValues: CharacterSheet["baseValues"], name: str
   return baseValue;
 }
 
+export const baseValuesNotUpdatableByLvlUp: (keyof CharacterSheet["baseValues"])[] = [
+  "mentalHealth",
+  "attackBaseValue",
+  "paradeBaseValue",
+  "rangedAttackBaseValue",
+];
+
 export function getSkill(
   skills: CharacterSheet["skills"],
   category: keyof CharacterSheet["skills"],

@@ -157,6 +157,78 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 404,
     },
+    {
+      name: "No byLvlUp change allowed for base value 'mentalHealth'",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "base-value-name": "mentalHealth",
+        },
+        queryStringParameters: null,
+        body: {
+          byLvlUp: {
+            initialValue: 0,
+            newValue: 2,
+          },
+        },
+      },
+      expectedStatusCode: 409,
+    },
+    {
+      name: "No byLvlUp change allowed for base value 'attackBaseValue'",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "base-value-name": "attackBaseValue",
+        },
+        queryStringParameters: null,
+        body: {
+          byLvlUp: {
+            initialValue: 0,
+            newValue: 2,
+          },
+        },
+      },
+      expectedStatusCode: 409,
+    },
+    {
+      name: "No byLvlUp change allowed for base value 'paradeBaseValue'",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "base-value-name": "paradeBaseValue",
+        },
+        queryStringParameters: null,
+        body: {
+          byLvlUp: {
+            initialValue: 0,
+            newValue: 2,
+          },
+        },
+      },
+      expectedStatusCode: 409,
+    },
+    {
+      name: "No byLvlUp change allowed for base value 'rangedAttackBaseValue'",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "base-value-name": "rangedAttackBaseValue",
+        },
+        queryStringParameters: null,
+        body: {
+          byLvlUp: {
+            initialValue: 0,
+            newValue: 2,
+          },
+        },
+      },
+      expectedStatusCode: 409,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {

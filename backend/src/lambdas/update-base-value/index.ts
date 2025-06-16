@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
-import { BaseValue, getBaseValue } from "config/index.js";
+import { CharacterSheet, BaseValue, baseValuesNotUpdatableByLvlUp, getBaseValue } from "config/index.js";
 import {
   Request,
   parseBody,
@@ -71,7 +71,7 @@ export async function _updateBaseValue(request: Request): Promise<APIGatewayProx
     }
 
     if (params.body.byLvlUp) {
-      baseValue = updateByLvlUpValue(baseValue, params.body.byLvlUp);
+      baseValue = updateByLvlUpValue(params.baseValueName, baseValue, params.body.byLvlUp);
     }
 
     if (params.body.mod) {
@@ -151,8 +151,18 @@ function updateStartValue(baseValue: BaseValue, startValue: any): BaseValue {
   }
 }
 
-function updateByLvlUpValue(baseValue: BaseValue, byLvlUp: any): BaseValue {
+function updateByLvlUpValue(
+  baseValueName: keyof CharacterSheet["baseValues"] | string,
+  baseValue: BaseValue,
+  byLvlUp: any,
+): BaseValue {
   console.log(`Update byLvlUp value of the base value from ${byLvlUp.initialValue} to ${byLvlUp.newValue}`);
+
+  if (baseValuesNotUpdatableByLvlUp.includes(baseValueName as keyof CharacterSheet["baseValues"])) {
+    throw new HttpError(409, "'By level up' changes are not allowed for this base value!", {
+      baseValueName: baseValueName,
+    });
+  }
 
   if (byLvlUp.initialValue !== baseValue.byLvlUp && byLvlUp.newValue !== baseValue.byLvlUp) {
     throw new HttpError(409, "The passed byLvlUp value doesn't match the value in the backend!", {
