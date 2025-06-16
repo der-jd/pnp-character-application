@@ -40,7 +40,6 @@ export const baseValueSchema = z
     byFormula: z.number().optional(),
     byLvlUp: z.number().optional(),
     mod: z.number(),
-    totalCost: z.number().optional(),
   })
   .strict();
 

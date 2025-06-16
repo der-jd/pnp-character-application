@@ -30,7 +30,7 @@ export interface BaseValue {
   byFormula?: number; // Some base values are not changed by a formula
   byLvlUp?: number; // Some base values can't be changed by level up
   mod: number;
-  totalCost?: number; // No base values can be increased by points atm
+  //totalCost?: number; // No base value can be increased by points atm
 }
 
 export interface Skill {
