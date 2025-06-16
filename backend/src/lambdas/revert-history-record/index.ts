@@ -130,10 +130,13 @@ async function revertChange(userId: string, characterId: string, record: Record)
         numberSchema.parse(record.data.old);
         throw new HttpError(500, "Reverting level up is not implemented yet!"); // TODO
         break;
-      case RecordType.BASE_VALUE_CHANGED:
-        baseValueSchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting base value change is not implemented yet!"); // TODO
+      case RecordType.BASE_VALUE_CHANGED: {
+        const oldBaseValue = baseValueSchema.parse(record.data.old);
+        await updateBaseValue(userId, characterId, record.name, oldBaseValue);
+        await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
+        await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
+      }
       case RecordType.PROFESSION_CHANGED:
         professionHobbySchema.parse(record.data.old);
         throw new HttpError(500, "Reverting profession change is not implemented yet!"); // TODO
