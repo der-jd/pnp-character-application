@@ -16,6 +16,7 @@ export {
   getHistoryItems,
   createHistoryItem,
   createBatchHistoryItems,
+  deleteBatchHistoryItems,
   addHistoryRecord,
   deleteHistoryItem,
   deleteLatestHistoryRecord,

@@ -8,7 +8,7 @@ import {
   validateUUID,
   getHistoryItems,
   deleteCharacterItem,
-  deleteHistoryItem,
+  deleteBatchHistoryItems,
 } from "utils/index.js";
 import { historyBlockSchema } from "config/index.js";
 
@@ -40,9 +40,7 @@ export async function deleteCharacter(request: Request): Promise<APIGatewayProxy
     if (!items || items.length === 0) {
       console.log(`No history found for character ${params.characterId}, skipping delete`);
     } else {
-      for (const item of items) {
-        deleteCalls.push(deleteHistoryItem(historyBlockSchema.parse(item)));
-      }
+      deleteCalls.push(deleteBatchHistoryItems(items.map((item) => historyBlockSchema.parse(item))));
     }
 
     await Promise.all(deleteCalls);

@@ -11,6 +11,8 @@ import { Record, HistoryBlock, historyBlockSchema } from "config/index.js";
 import { HttpError } from "./errors.js";
 import { dynamoDBDocClient } from "./dynamodb_client.js";
 
+const DYNAMODB_BATCH_WRITE_LIMIT = 25;
+
 /**
  * Local convenience function. It takes an array and returns
  * a generator function. The generator function yields every N items.
@@ -88,7 +90,6 @@ export async function createHistoryItem(historyItem: HistoryBlock): Promise<void
 export async function createBatchHistoryItems(historyItems: HistoryBlock[]): Promise<void> {
   console.log(`Create new history items for ${historyItems.length} items in DynamoDB`);
 
-  const DYNAMODB_BATCH_WRITE_LIMIT = 25;
   const historyChunks = chunkArray(historyItems, DYNAMODB_BATCH_WRITE_LIMIT);
 
   for (const chunk of historyChunks) {
@@ -109,6 +110,34 @@ export async function createBatchHistoryItems(historyItems: HistoryBlock[]): Pro
   }
 
   console.log("Successfully created new history items in DynamoDB");
+}
+
+export async function deleteBatchHistoryItems(historyItems: HistoryBlock[]): Promise<void> {
+  console.log(`Delete ${historyItems.length} history items in DynamoDB`);
+
+  const historyChunks = chunkArray(historyItems, DYNAMODB_BATCH_WRITE_LIMIT);
+
+  for (const chunk of historyChunks) {
+    const deleteRequests = chunk.map((historyItem) => ({
+      DeleteRequest: {
+        Key: {
+          characterId: historyItem.characterId,
+          blockNumber: historyItem.blockNumber,
+        },
+      },
+    }));
+
+    // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/batch-write.js
+    const command = new BatchWriteCommand({
+      RequestItems: {
+        [process.env.TABLE_NAME_HISTORY!]: deleteRequests,
+      },
+    });
+
+    await dynamoDBDocClient.send(command);
+  }
+
+  console.log("Successfully deleted history items in DynamoDB");
 }
 
 export async function addHistoryRecord(record: Record, block: HistoryBlock) {
