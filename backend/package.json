@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "add-history-record": "file:src/lambdas/add-history-record",
+    "clone-character": "file:src/lambdas/clone-character",
     "config": "file:src/config",
     "get-character": "file:src/lambdas/get-character",
     "get-characters": "file:src/lambdas/get-characters",

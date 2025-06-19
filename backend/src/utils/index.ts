@@ -13,6 +13,7 @@ export {
   getHistoryItem,
   getHistoryItems,
   createHistoryItem,
+  createBatchHistoryItems,
   addHistoryRecord,
   deleteHistoryItem,
   deleteLatestHistoryRecord,
