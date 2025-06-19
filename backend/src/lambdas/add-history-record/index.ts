@@ -15,6 +15,7 @@ import {
   booleanSchema,
   skillChangeSchema,
   attributeChangeSchema,
+  HistoryBlock,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -95,7 +96,15 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
     let record: Record;
     if (!items || items.length === 0) {
       console.log("No history found for the given character id");
-      const newBlock = await createHistoryItem(params.characterId);
+
+      const newBlock: HistoryBlock = {
+        characterId: params.characterId,
+        blockId: uuidv4(),
+        blockNumber: 1,
+        previousBlockId: null,
+        changes: [],
+      };
+      await createHistoryItem(newBlock);
 
       record = {
         number: 1,
@@ -134,7 +143,16 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
         console.log(
           `Latest block with the new record (total size ~${blockSize + recordSize} bytes) would exceed the maximum allowed size of ${MAX_ITEM_SIZE} bytes/block`,
         );
-        const newBlock = await createHistoryItem(params.characterId, latestBlock.blockNumber, latestBlock.blockId);
+
+        const newBlock: HistoryBlock = {
+          characterId: params.characterId,
+          blockId: uuidv4(),
+          blockNumber: latestBlock.blockNumber + 1,
+          previousBlockId: latestBlock.blockId,
+          changes: [],
+        };
+        await createHistoryItem(newBlock);
+
         await addHistoryRecord(record, newBlock);
       } else {
         await addHistoryRecord(record, latestBlock);

@@ -8,7 +8,6 @@ import {
   DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { v4 as uuidv4 } from "uuid";
 import { Record, HistoryBlock, historyBlockSchema } from "config/index.js";
 import { HttpError } from "./errors.js";
 
@@ -65,43 +64,20 @@ export async function getHistoryItems(
   return z.array(historyBlockSchema).parse(response.Items);
 }
 
-export async function createHistoryItem(
-  characterId: string,
-  previousBlockNumber: number | undefined = undefined,
-  previousBlockId: string | undefined = undefined,
-): Promise<HistoryBlock> {
-  console.log(`Create new history item for character ${characterId} in DynamoDB`);
-  const blockNumber = previousBlockNumber ? previousBlockNumber + 1 : 1;
-  const _previousBlockId = previousBlockId ? previousBlockId : null;
+export async function createHistoryItem(historyItem: HistoryBlock): Promise<void> {
+  console.log(`Create new history item for character ${historyItem.characterId} in DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/put.js
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
-  const blockId = uuidv4();
   const command = new PutCommand({
     TableName: process.env.TABLE_NAME_HISTORY,
-    Item: {
-      characterId: characterId,
-      blockNumber: blockNumber,
-      blockId: blockId,
-      previousBlockId: _previousBlockId,
-      changes: [],
-    },
+    Item: historyItem,
   });
 
   await docClient.send(command);
 
-  const newBlock: HistoryBlock = {
-    characterId: characterId,
-    blockId: blockId,
-    blockNumber: blockNumber,
-    previousBlockId: _previousBlockId,
-    changes: [],
-  };
-
-  console.log("Successfully created new history item in DynamoDB", newBlock);
-
-  return newBlock;
+  console.log("Successfully created new history item in DynamoDB", historyItem);
 }
 
 export async function addHistoryRecord(record: Record, block: HistoryBlock) {
