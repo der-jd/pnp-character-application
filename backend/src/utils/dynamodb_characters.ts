@@ -1,5 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
 import {
   Attribute,
@@ -62,6 +62,22 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
   console.log("Successfully got DynamoDB items");
 
   return z.array(characterSchema).parse(response.Items);
+}
+
+export async function createCharacterItem(character: Character): Promise<void> {
+  console.log(`Create new character item ${character.characterId} (user ${character.userId}) in DynamoDB`);
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/put.js
+  const client = new DynamoDBClient({});
+  const docClient = DynamoDBDocumentClient.from(client);
+  const command = new PutCommand({
+    TableName: process.env.TABLE_NAME_CHARACTERS,
+    Item: character,
+  });
+
+  await docClient.send(command);
+
+  console.log("Successfully created new character item in DynamoDB", character);
 }
 
 enum CalculationPointsType {

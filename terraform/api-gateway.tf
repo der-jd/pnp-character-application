@@ -103,6 +103,36 @@ module "character_id_options" {
   resource_id = aws_api_gateway_resource.character_id.id
 }
 
+// ================== /characters/{character-id}/clone ==================
+
+resource "aws_api_gateway_resource" "character_id_clone" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "clone" // .../characters/{character-id}/clone
+}
+
+// ================== POST /characters/{character-id}/clone ==================
+
+module "character_id_clone_post" {
+  source        = "./modules/apigw_lambda_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.character_id_clone.id
+  http_method   = "POST"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  lambda_uri = module.clone_character_lambda.lambda_function.invoke_arn
+}
+
+// ================== OPTIONS /characters/{character-id}/clone ==================
+
+module "character_id_clone_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id_clone.id
+}
+
 // ================== /characters/{character-id}/attributes ==================
 
 resource "aws_api_gateway_resource" "attributes" {
@@ -394,6 +424,8 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     module.characters_options,
     module.character_id_get,
     module.character_id_options,
+    module.character_id_clone_post,
+    module.character_id_clone_options,
     module.skill_name_get,
     module.skill_name_patch,
     module.skill_name_options,

@@ -6,11 +6,21 @@ import {
   PutCommand,
   UpdateCommand,
   DeleteCommand,
+  BatchWriteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { v4 as uuidv4 } from "uuid";
 import { Record, HistoryBlock, historyBlockSchema } from "config/index.js";
 import { HttpError } from "./errors.js";
+
+/**
+ * Local convenience function. It takes an array and returns
+ * a generator function. The generator function yields every N items.
+ */
+function* chunkArray<T>(arr: T[], stride: number = 1): Generator<T[], void, unknown> {
+  for (let i = 0; i < arr.length; i += stride) {
+    yield arr.slice(i, Math.min(i + stride, arr.length));
+  }
+}
 
 export async function getHistoryItem(characterId: string, blockNumber: number): Promise<HistoryBlock> {
   console.log(`Get history item #${blockNumber} of character ${characterId} from DynamoDB`);
@@ -41,7 +51,7 @@ export async function getHistoryItem(characterId: string, blockNumber: number): 
 export async function getHistoryItems(
   characterId: string,
   scanIndexForward: boolean,
-  limit: number,
+  limit?: number,
 ): Promise<HistoryBlock[]> {
   console.log(`Get history items of character ${characterId} from DynamoDB`);
 
@@ -65,43 +75,49 @@ export async function getHistoryItems(
   return z.array(historyBlockSchema).parse(response.Items);
 }
 
-export async function createHistoryItem(
-  characterId: string,
-  previousBlockNumber: number | undefined = undefined,
-  previousBlockId: string | undefined = undefined,
-): Promise<HistoryBlock> {
-  console.log(`Create new history item for character ${characterId} in DynamoDB`);
-  const blockNumber = previousBlockNumber ? previousBlockNumber + 1 : 1;
-  const _previousBlockId = previousBlockId ? previousBlockId : null;
+export async function createHistoryItem(historyItem: HistoryBlock): Promise<void> {
+  console.log(`Create new history item for character ${historyItem.characterId} in DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/put.js
   const client = new DynamoDBClient({});
   const docClient = DynamoDBDocumentClient.from(client);
-  const blockId = uuidv4();
   const command = new PutCommand({
     TableName: process.env.TABLE_NAME_HISTORY,
-    Item: {
-      characterId: characterId,
-      blockNumber: blockNumber,
-      blockId: blockId,
-      previousBlockId: _previousBlockId,
-      changes: [],
-    },
+    Item: historyItem,
   });
 
   await docClient.send(command);
 
-  const newBlock: HistoryBlock = {
-    characterId: characterId,
-    blockId: blockId,
-    blockNumber: blockNumber,
-    previousBlockId: _previousBlockId,
-    changes: [],
-  };
+  console.log("Successfully created new history item in DynamoDB", historyItem);
+}
 
-  console.log("Successfully created new history item in DynamoDB", newBlock);
+export async function createBatchHistoryItems(historyItems: HistoryBlock[]): Promise<void> {
+  console.log(`Create new history items for ${historyItems.length} items in DynamoDB`);
 
-  return newBlock;
+  const DYNAMODB_BATCH_WRITE_LIMIT = 25;
+  const historyChunks = chunkArray(historyItems, DYNAMODB_BATCH_WRITE_LIMIT);
+
+  const client = new DynamoDBClient({});
+  const docClient = DynamoDBDocumentClient.from(client);
+
+  for (const chunk of historyChunks) {
+    const putRequests = chunk.map((historyItem) => ({
+      PutRequest: {
+        Item: historyItem,
+      },
+    }));
+
+    // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/batch-write.js
+    const command = new BatchWriteCommand({
+      RequestItems: {
+        [process.env.TABLE_NAME_HISTORY!]: putRequests,
+      },
+    });
+
+    await docClient.send(command);
+  }
+
+  console.log("Successfully created new history items in DynamoDB");
 }
 
 export async function addHistoryRecord(record: Record, block: HistoryBlock) {
