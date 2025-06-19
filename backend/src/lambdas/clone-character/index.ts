@@ -45,6 +45,7 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
 
     character.userId = params.currentUserId;
     character.characterId = uuidv4();
+    character.characterSheet.generalInformation.name = `${character.characterSheet.generalInformation.name} (Copy)`;
 
     const createCalls: Promise<void>[] = [];
     createCalls.push(createCharacterItem(character));
