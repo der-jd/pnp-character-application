@@ -70,6 +70,8 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
       body: JSON.stringify({
         userId: character.userId,
         characterId: character.characterId,
+        name: character.characterSheet.generalInformation.name,
+        level: character.characterSheet.generalInformation.level,
       }),
     };
     console.log(response);
