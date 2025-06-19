@@ -15,7 +15,7 @@ import {
 } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  return _createCharacter({
+  return cloneCharacter({
     headers: event.headers,
     pathParameters: event.pathParameters,
     queryStringParameters: event.queryStringParameters,
@@ -25,7 +25,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 const bodySchema = z
   .object({
-    userId: z.string().uuid(),
+    userIdOfCharacter: z.string().uuid(),
   })
   .strict();
 
@@ -35,7 +35,7 @@ interface Parameters {
   userIdOfCharacter: string;
 }
 
-export async function _createCharacter(request: Request): Promise<APIGatewayProxyResult> {
+export async function cloneCharacter(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
 
@@ -47,8 +47,8 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
     character.characterId = uuidv4();
     character.characterSheet.generalInformation.name = `${character.characterSheet.generalInformation.name} (Copy)`;
 
-    const createCalls: Promise<void>[] = [];
-    createCalls.push(createCharacterItem(character));
+    const putCalls: Promise<void>[] = [];
+    putCalls.push(createCharacterItem(character));
 
     console.log(`Clone history of character ${params.characterId} for new character ${character.characterId}`);
 
@@ -59,11 +59,11 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
       for (const item of items) {
         item.characterId = character.characterId;
       }
-      createCalls.push(createBatchHistoryItems(items));
+      putCalls.push(createBatchHistoryItems(items));
     }
 
     console.log("Save new character and history items to DynamoDB");
-    await Promise.all(createCalls);
+    await Promise.all(putCalls);
 
     const response = {
       statusCode: 200,
@@ -95,12 +95,12 @@ function validateRequest(request: Request): Parameters {
     validateUUID(characterId);
 
     const body = bodySchema.parse(request.body);
-    validateUUID(body.userId);
+    validateUUID(body.userIdOfCharacter);
 
     return {
       currentUserId: currentUserId,
       characterId: characterId,
-      userIdOfCharacter: body.userId,
+      userIdOfCharacter: body.userIdOfCharacter,
     };
   } catch (error) {
     if (error instanceof z.ZodError) {
