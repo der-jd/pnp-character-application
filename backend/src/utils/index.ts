@@ -2,6 +2,7 @@ export { Request, parseBody } from "./request.js";
 export {
   getCharacterItem,
   getCharacterItems,
+  createCharacterItem,
   updateAttribute,
   updateSkill,
   updateAdventurePoints,

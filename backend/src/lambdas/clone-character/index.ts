@@ -11,8 +11,8 @@ import {
   validateUUID,
   getHistoryItems,
   createBatchHistoryItems,
+  createCharacterItem,
 } from "utils/index.js";
-import { createCharacterItem } from "utils/dynamodb_characters.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _createCharacter({
