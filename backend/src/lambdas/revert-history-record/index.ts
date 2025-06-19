@@ -11,7 +11,6 @@ import {
   recordSchema,
   numberSchema,
   stringSchema,
-  booleanSchema,
   CalculationPoints,
   skillChangeSchema,
   attributeChangeSchema,
@@ -193,10 +192,6 @@ async function revertChange(userId: string, characterId: string, record: Record)
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
       }
-      case RecordType.SKILL_ACTIVATED:
-        booleanSchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting skill activation is not implemented yet!"); // TODO
-        break;
       case RecordType.SKILL_CHANGED: {
         const oldData = skillChangeSchema.parse(record.data.old);
 

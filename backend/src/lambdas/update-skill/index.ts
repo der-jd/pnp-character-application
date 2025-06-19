@@ -12,7 +12,7 @@ import {
   getCombatValues,
   getCombatCategory,
   CombatValues,
-  SKILL_ACTIVATION_COST,
+  getSkillActivationCost,
 } from "config/index.js";
 import {
   Request,
@@ -49,7 +49,6 @@ const bodySchema = z
       .object({
         initialValue: z.number(),
         increasedPoints: z.number(),
-        learningMethod: z.string(),
       })
       .strict()
       .optional(),
@@ -60,6 +59,7 @@ const bodySchema = z
       })
       .strict()
       .optional(),
+    learningMethod: z.string().optional(),
   })
   .strict();
 
@@ -86,8 +86,16 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
     const adventurePointsOld = characterSheet.calculationPoints.adventurePoints;
     let adventurePoints = structuredClone(adventurePointsOld);
 
+    let adjustedCostCategory: CostCategory;
+    if (params.body.activated || params.body.current) {
+      adjustedCostCategory = adjustCostCategory(
+        skill.defaultCostCategory,
+        parseLearningMethod(params.body.learningMethod!), // Learning method is checked in validateRequest
+      );
+    }
+
     if (params.body.activated) {
-      const result = activateSkill(skill, params.body.activated, adventurePoints);
+      const result = activateSkill(skill, params.body.activated, adjustedCostCategory!, adventurePoints);
       skill = result.skill;
       adventurePoints = result.adventurePoints;
     }
@@ -98,14 +106,10 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
 
     let increaseCost: number | undefined;
     if (params.body.current) {
-      const adjustedCostCategory = adjustCostCategory(
-        skill.defaultCostCategory,
-        parseLearningMethod(params.body.current.learningMethod),
-      );
-      const result = updateCurrentValue(skill, params.body.current, adjustedCostCategory, adventurePoints);
+      const result = updateCurrentValue(skill, params.body.current, adjustedCostCategory!, adventurePoints);
       skill = result.skill;
       adventurePoints = result.adventurePoints;
-      increaseCost = getSkillIncreaseCost(skill.current, adjustedCostCategory);
+      increaseCost = getSkillIncreaseCost(skill.current, adjustedCostCategory!);
     }
 
     if (params.body.mod) {
@@ -155,7 +159,7 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
             combatValues: combatValues?.new,
           },
         },
-        learningMethod: params.body.current?.learningMethod,
+        learningMethod: params.body.learningMethod,
         increaseCost: increaseCost,
         adventurePoints: {
           old: adventurePointsOld,
@@ -187,6 +191,13 @@ function validateRequest(request: Request): Parameters {
 
     const body = bodySchema.parse(request.body);
 
+    if ((body.activated || body.current) && !body.learningMethod) {
+      throw new HttpError(
+        409,
+        "Learning method must be given if skill should be activated or the current value should be increased!",
+      );
+    }
+
     if (body.current && body.current.increasedPoints <= 0) {
       throw new HttpError(
         400,
@@ -195,6 +206,10 @@ function validateRequest(request: Request): Parameters {
           increasedPoints: body.current.increasedPoints,
         },
       );
+    }
+
+    if (body.activated !== undefined && body.activated === false) {
+      throw new HttpError(409, "Deactivating a skill is not allowed!");
     }
 
     return {
@@ -218,12 +233,9 @@ function validateRequest(request: Request): Parameters {
 function activateSkill(
   skill: Skill,
   activated: boolean,
+  adjustedCostCategory: CostCategory,
   adventurePoints: CalculationPoints,
 ): { skill: Skill; adventurePoints: CalculationPoints } {
-  if (!activated) {
-    throw new HttpError(409, "Deactivating a skill is not allowed!");
-  }
-
   if (skill.activated && activated) {
     console.log("Skill already activated. Nothing to do.");
     return { skill, adventurePoints };
@@ -231,15 +243,17 @@ function activateSkill(
     console.log(`Skill total cost before activation: ${skill.totalCost}`);
     console.log(`Available adventure points before activation: ${adventurePoints.available}`);
 
-    console.log(`Activating skill for ${SKILL_ACTIVATION_COST} AP...`);
+    const activationCost = getSkillActivationCost(adjustedCostCategory);
 
-    if (SKILL_ACTIVATION_COST > adventurePoints.available) {
+    console.log(`Activating skill for ${activationCost} AP...`);
+
+    if (activationCost > adventurePoints.available) {
       throw new HttpError(400, "Not enough adventure points to activate the skill!");
     }
 
     skill.activated = true;
-    skill.totalCost += SKILL_ACTIVATION_COST;
-    adventurePoints.available -= SKILL_ACTIVATION_COST;
+    skill.totalCost += activationCost;
+    adventurePoints.available -= activationCost;
     console.log(`Skill total cost: ${skill.totalCost}`);
     console.log(`Available adventure points: ${adventurePoints.available}`);
 

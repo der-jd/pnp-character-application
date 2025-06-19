@@ -5,7 +5,7 @@ export {
   parseCostCategory,
   adjustCostCategory,
   getSkillIncreaseCost,
-  SKILL_ACTIVATION_COST,
+  getSkillActivationCost,
 } from "./cost.js";
 export {
   CalculationPoints,
@@ -39,7 +39,6 @@ export {
   HistoryBlock,
   numberSchema,
   stringSchema,
-  booleanSchema,
   attributeChangeSchema,
   skillChangeSchema,
 } from "./history_schema.js";

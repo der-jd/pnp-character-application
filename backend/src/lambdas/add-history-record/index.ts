@@ -12,7 +12,6 @@ import {
   historyBlockSchema,
   numberSchema,
   stringSchema,
-  booleanSchema,
   skillChangeSchema,
   attributeChangeSchema,
   HistoryBlock,
@@ -222,10 +221,6 @@ async function validateRequest(request: Request): Promise<Parameters> {
       case RecordType.ATTRIBUTE_CHANGED:
         attributeChangeSchema.parse(body.data.old);
         attributeChangeSchema.parse(body.data.new);
-        break;
-      case RecordType.SKILL_ACTIVATED:
-        booleanSchema.parse(body.data.old);
-        booleanSchema.parse(body.data.new);
         break;
       case RecordType.SKILL_CHANGED:
         skillChangeSchema.parse(body.data.old);

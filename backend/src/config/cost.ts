@@ -71,4 +71,19 @@ export function getSkillIncreaseCost(skillValue: number, costCategory: CostCateg
   return costMatrix[costCategory][columnIndex];
 }
 
-export const SKILL_ACTIVATION_COST = 50;
+/**
+ * +------------+-------------+
+ * |  Category  |    Cost     |
+ * +------------+-------------+
+ * |     0      |      x      |
+ * |     1      |      x      |
+ * |     2      |      x      |
+ * |     3      |      x      |
+ * |     4      |      x      |
+ * +------------+-------------+
+ */
+const activationCosts: number[] = [0, 40, 50, 60, 70];
+
+export function getSkillActivationCost(costCategory: CostCategory): number {
+  return activationCosts[costCategory];
+}

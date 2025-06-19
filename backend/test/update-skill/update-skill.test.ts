@@ -25,8 +25,8 @@ describe("Invalid requests", () => {
           current: {
             initialValue: 16,
             increasedPoints: 1,
-            learningMethod: "NORMAL",
           },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 401,
@@ -47,11 +47,27 @@ describe("Invalid requests", () => {
           current: {
             initialValue: 16,
             increasedPoints: 1,
-            learningMethod: "NORMAL",
           },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 401,
+    },
+    {
+      name: "Deactivating a skill is not allowed",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          activated: false,
+        },
+      },
+      expectedStatusCode: 409,
     },
     {
       name: "Passed initial start skill value doesn't match the value in the backend",
@@ -86,8 +102,8 @@ describe("Invalid requests", () => {
           current: {
             initialValue: 10,
             increasedPoints: 15,
-            learningMethod: "NORMAL",
           },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 409,
@@ -144,8 +160,8 @@ describe("Invalid requests", () => {
           current: {
             initialValue: 8,
             increasedPoints: 1,
-            learningMethod: "NORMAL",
           },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 409,
@@ -183,8 +199,8 @@ describe("Invalid requests", () => {
           current: {
             initialValue: 120,
             increasedPoints: 25,
-            learningMethod: "EXPENSIVE",
           },
+          learningMethod: "EXPENSIVE",
         },
       },
       expectedStatusCode: 400,
@@ -203,8 +219,8 @@ describe("Invalid requests", () => {
           current: {
             initialValue: 16,
             increasedPoints: 1,
-            learningMethod: "NORMAL",
           },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 400,
@@ -223,8 +239,8 @@ describe("Invalid requests", () => {
           current: {
             initialValue: 16,
             increasedPoints: 0,
-            learningMethod: "NORMAL",
           },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 400,
@@ -243,8 +259,8 @@ describe("Invalid requests", () => {
           current: {
             initialValue: 16,
             increasedPoints: -3,
-            learningMethod: "NORMAL",
           },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 400,
@@ -263,8 +279,8 @@ describe("Invalid requests", () => {
           current: {
             initialValue: 16,
             increasedPoints: 1,
-            learningMethod: "NORMAL",
           },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 404,
@@ -283,8 +299,8 @@ describe("Invalid requests", () => {
           current: {
             initialValue: 16,
             increasedPoints: 1,
-            learningMethod: "NORMAL",
           },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 404,
@@ -302,6 +318,23 @@ describe("Invalid requests", () => {
 
 describe("Valid requests", () => {
   const idempotentTestCases = [
+    {
+      name: "Skill already activated (idempotency)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          activated: true,
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 200,
+    },
     {
       name: "Skill has already been updated to the target start value (idempotency)",
       request: {
@@ -335,8 +368,8 @@ describe("Valid requests", () => {
           current: {
             initialValue: 12,
             increasedPoints: 4,
-            learningMethod: "NORMAL",
           },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 200,
@@ -379,6 +412,11 @@ describe("Valid requests", () => {
       const skillName = _case.request.pathParameters["skill-name"];
       expect(parsedBody.skillName).toBe(skillName);
 
+      if (_case.request.body.activated) {
+        expect(parsedBody.changes.new.skill.activated).toBe(_case.request.body.activated);
+        expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
+      }
+
       if (_case.request.body.start) {
         expect(parsedBody.changes.new.skill.start).toBe(_case.request.body.start.newValue);
       }
@@ -387,7 +425,7 @@ describe("Valid requests", () => {
         expect(parsedBody.changes.new.skill.current).toBe(
           _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
         );
-        expect(parsedBody.learningMethod).toBe(_case.request.body.current.learningMethod);
+        expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
       }
 
       if (_case.request.body.mod) {
@@ -414,6 +452,74 @@ describe("Valid requests", () => {
   });
 
   const updateTestCases = [
+    {
+      name: "Activate skill (cost category: FREE)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "nature",
+          "skill-name": "fishing",
+        },
+        queryStringParameters: null,
+        body: {
+          activated: true,
+          learningMethod: "FREE",
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Activate skill (cost category: LOW_PRICED)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "nature",
+          "skill-name": "fishing",
+        },
+        queryStringParameters: null,
+        body: {
+          activated: true,
+          learningMethod: "LOW_PRICED",
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Activate skill (cost category: NORMAL)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "nature",
+          "skill-name": "fishing",
+        },
+        queryStringParameters: null,
+        body: {
+          activated: true,
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Activate skill (cost category: EXPENSIVE)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "nature",
+          "skill-name": "fishing",
+        },
+        queryStringParameters: null,
+        body: {
+          activated: true,
+          learningMethod: "EXPENSIVE",
+        },
+      },
+      expectedStatusCode: 200,
+    },
     {
       name: "Update start skill value",
       request: {
@@ -447,8 +553,8 @@ describe("Valid requests", () => {
           current: {
             initialValue: 16,
             increasedPoints: 1,
-            learningMethod: "NORMAL",
           },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 200,
@@ -467,8 +573,8 @@ describe("Valid requests", () => {
           current: {
             initialValue: 16,
             increasedPoints: 3,
-            learningMethod: "FREE",
           },
+          learningMethod: "FREE",
         },
       },
       expectedStatusCode: 200,
@@ -487,8 +593,8 @@ describe("Valid requests", () => {
           current: {
             initialValue: 16,
             increasedPoints: 3,
-            learningMethod: "LOW_PRICED",
           },
+          learningMethod: "LOW_PRICED",
         },
       },
       expectedStatusCode: 200,
@@ -507,8 +613,8 @@ describe("Valid requests", () => {
           current: {
             initialValue: 16,
             increasedPoints: 3,
-            learningMethod: "EXPENSIVE",
           },
+          learningMethod: "EXPENSIVE",
         },
       },
       expectedStatusCode: 200,
@@ -533,29 +639,30 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Update all skill values (start, current, mod)",
+      name: "Update all skill values (activated, start, current, mod)",
       request: {
         headers: fakeHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
-          "skill-category": "body",
-          "skill-name": "athletics",
+          "skill-category": "nature",
+          "skill-name": "fishing",
         },
         queryStringParameters: null,
         body: {
+          activated: true,
           start: {
-            initialValue: 12,
-            newValue: 15,
-          },
-          current: {
-            initialValue: 16,
-            increasedPoints: 1,
-            learningMethod: "NORMAL",
-          },
-          mod: {
-            initialValue: 4,
+            initialValue: 5,
             newValue: 7,
           },
+          current: {
+            initialValue: 8,
+            increasedPoints: 1,
+          },
+          mod: {
+            initialValue: 3,
+            newValue: 6,
+          },
+          learningMethod: "NORMAL",
         },
       },
       expectedStatusCode: 200,
@@ -574,12 +681,12 @@ describe("Valid requests", () => {
           current: {
             initialValue: 120,
             increasedPoints: 10,
-            learningMethod: "FREE", // 'FREE' so that there is no interference with the other test cases that are checked against the adventure points
           },
           mod: {
             initialValue: 58,
             newValue: 65,
           },
+          learningMethod: "FREE", // 'FREE' so that there is no interference with the other test cases that are checked against the adventure points
         },
       },
       expectedStatusCode: 200,
@@ -603,35 +710,62 @@ describe("Valid requests", () => {
       const skillName = _case.request.pathParameters["skill-name"];
       expect(parsedBody.skillName).toBe(skillName);
 
-      if (_case.request.body.start) {
-        expect(parsedBody.changes.new.skill.start).toBe(_case.request.body.start.newValue);
-      }
-
       const oldAvailableAdventurePoints =
         fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints.available;
       const diffAvailableAdventurePoints = oldAvailableAdventurePoints - parsedBody.adventurePoints.new.available;
+
+      if (_case.request.body.activated) {
+        expect(parsedBody.changes.new.skill.activated).toBe(_case.request.body.activated);
+        expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
+
+        if (!_case.request.body.current) {
+          switch (_case.request.body.learningMethod) {
+            case "FREE":
+              expect(diffAvailableAdventurePoints).toBeCloseTo(0);
+              break;
+            case "LOW_PRICED":
+              expect(diffAvailableAdventurePoints).toBeCloseTo(40);
+              break;
+            case "NORMAL":
+              expect(diffAvailableAdventurePoints).toBeCloseTo(50);
+              break;
+            case "EXPENSIVE":
+              expect(diffAvailableAdventurePoints).toBeCloseTo(60);
+              break;
+            default:
+              throw new Error(`Unknown learning method: ${_case.request.body.learningMethod}`);
+          }
+        }
+      }
+
+      if (_case.request.body.start) {
+        expect(parsedBody.changes.new.skill.start).toBe(_case.request.body.start.newValue);
+      }
 
       if (_case.request.body.current) {
         expect(parsedBody.changes.new.skill.current).toBe(
           _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
         );
-        expect(parsedBody.learningMethod).toBe(_case.request.body.current.learningMethod);
+        expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
 
-        switch (_case.request.body.current.learningMethod) {
+        switch (_case.request.body.learningMethod) {
           case "FREE":
             expect(diffAvailableAdventurePoints).toBeCloseTo(0);
             break;
           case "LOW_PRICED":
-            expect(diffAvailableAdventurePoints).toBeCloseTo(1.5);
+            if (_case.request.body.activated) expect(diffAvailableAdventurePoints).toBeCloseTo(41.5);
+            else expect(diffAvailableAdventurePoints).toBeCloseTo(1.5);
             break;
           case "NORMAL":
-            expect(diffAvailableAdventurePoints).toBeCloseTo(1);
+            if (_case.request.body.activated) expect(diffAvailableAdventurePoints).toBeCloseTo(51);
+            else expect(diffAvailableAdventurePoints).toBeCloseTo(1);
             break;
           case "EXPENSIVE":
-            expect(diffAvailableAdventurePoints).toBeCloseTo(6);
+            if (_case.request.body.activated) expect(diffAvailableAdventurePoints).toBeCloseTo(66);
+            else expect(diffAvailableAdventurePoints).toBeCloseTo(6);
             break;
           default:
-            throw new Error(`Unknown learning method: ${_case.request.body.current.learningMethod}`);
+            throw new Error(`Unknown learning method: ${_case.request.body.learningMethod}`);
         }
       }
 
