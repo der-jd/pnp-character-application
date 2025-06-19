@@ -1,5 +1,4 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand, GetCommand, PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
 import {
   Attribute,
@@ -11,13 +10,12 @@ import {
   BaseValue,
 } from "config/index.js";
 import { HttpError } from "./errors.js";
+import { dynamoDBDocClient } from "./dynamodb_client.js";
 
 export async function getCharacterItem(userId: string, characterId: string): Promise<Character> {
   console.log(`Get character ${characterId} of user ${userId} from DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new GetCommand({
     TableName: process.env.TABLE_NAME_CHARACTERS,
     Key: {
@@ -27,7 +25,7 @@ export async function getCharacterItem(userId: string, characterId: string): Pro
     ConsistentRead: true,
   });
 
-  const response = await docClient.send(command);
+  const response = await dynamoDBDocClient.send(command);
 
   if (!response.Item) {
     throw new HttpError(404, "No character found for the given user and character id");
@@ -42,8 +40,6 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
   console.log(`Get characters for user ${userId} from DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/query.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new QueryCommand({
     TableName: process.env.TABLE_NAME_CHARACTERS,
     KeyConditionExpression: "userId = :userId",
@@ -53,7 +49,7 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
     ConsistentRead: true,
   });
 
-  const response = await docClient.send(command);
+  const response = await dynamoDBDocClient.send(command);
 
   if (!response.Items || response.Items.length === 0) {
     throw new HttpError(404, "No characters found for the given user id");
@@ -68,16 +64,31 @@ export async function createCharacterItem(character: Character): Promise<void> {
   console.log(`Create new character item ${character.characterId} (user ${character.userId}) in DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/put.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new PutCommand({
     TableName: process.env.TABLE_NAME_CHARACTERS,
     Item: character,
   });
 
-  await docClient.send(command);
+  await dynamoDBDocClient.send(command);
 
   console.log("Successfully created new character item in DynamoDB", character);
+}
+
+export async function deleteCharacterItem(userId: string, characterId: string) {
+  console.log(`Delete character ${characterId} of user ${userId} in DynamoDB`);
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/delete.js
+  const command = new DeleteCommand({
+    TableName: process.env.TABLE_NAME_CHARACTERS,
+    Key: {
+      userId: userId,
+      characterId: characterId,
+    },
+  });
+
+  await dynamoDBDocClient.send(command);
+
+  console.log(`Successfully deleted character ${characterId} of user ${userId} in DynamoDB`);
 }
 
 enum CalculationPointsType {
@@ -113,8 +124,6 @@ async function updateCalculationPoints(
   console.log(`Update ${type} of character ${characterId} (user ${userId}) in DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new UpdateCommand({
     TableName: process.env.TABLE_NAME_CHARACTERS,
     Key: {
@@ -132,7 +141,7 @@ async function updateCalculationPoints(
     },
   });
 
-  await docClient.send(command);
+  await dynamoDBDocClient.send(command);
 
   console.log("Successfully updated DynamoDB item");
 }
@@ -147,8 +156,6 @@ export async function updateAttribute(
   console.log(`Update attribute '${attributeName}' of character ${characterId} (user ${userId}) in DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new UpdateCommand({
     TableName: process.env.TABLE_NAME_CHARACTERS,
     Key: {
@@ -171,7 +178,7 @@ export async function updateAttribute(
     },
   });
 
-  await docClient.send(command);
+  await dynamoDBDocClient.send(command);
 
   console.log("Successfully updated DynamoDB item");
 }
@@ -185,8 +192,6 @@ export async function updateBaseValue(
   console.log(`Update base value '${baseValueName}' of character ${characterId} (user ${userId}) in DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new UpdateCommand({
     TableName: process.env.TABLE_NAME_CHARACTERS,
     Key: {
@@ -204,7 +209,7 @@ export async function updateBaseValue(
     },
   });
 
-  await docClient.send(command);
+  await dynamoDBDocClient.send(command);
 
   console.log("Successfully updated DynamoDB item");
 }
@@ -220,8 +225,6 @@ export async function updateSkill(
   console.log(`Update skill '${skillName}' of character ${characterId} (user ${userId}) in DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new UpdateCommand({
     TableName: process.env.TABLE_NAME_CHARACTERS,
     Key: {
@@ -245,7 +248,7 @@ export async function updateSkill(
     },
   });
 
-  await docClient.send(command);
+  await dynamoDBDocClient.send(command);
 
   console.log("Successfully updated DynamoDB item");
 }
@@ -262,8 +265,6 @@ export async function updateCombatValues(
   );
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new UpdateCommand({
     TableName: process.env.TABLE_NAME_CHARACTERS,
     Key: {
@@ -282,7 +283,7 @@ export async function updateCombatValues(
     },
   });
 
-  await docClient.send(command);
+  await dynamoDBDocClient.send(command);
 
   console.log("Successfully updated DynamoDB item");
 }

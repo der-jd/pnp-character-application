@@ -1,6 +1,4 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
-  DynamoDBDocumentClient,
   GetCommand,
   QueryCommand,
   PutCommand,
@@ -11,6 +9,9 @@ import {
 import { z } from "zod";
 import { Record, HistoryBlock, historyBlockSchema } from "config/index.js";
 import { HttpError } from "./errors.js";
+import { dynamoDBDocClient } from "./dynamodb_client.js";
+
+const DYNAMODB_BATCH_WRITE_LIMIT = 25;
 
 /**
  * Local convenience function. It takes an array and returns
@@ -26,8 +27,6 @@ export async function getHistoryItem(characterId: string, blockNumber: number): 
   console.log(`Get history item #${blockNumber} of character ${characterId} from DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/get.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new GetCommand({
     TableName: process.env.TABLE_NAME_HISTORY,
     Key: {
@@ -37,7 +36,7 @@ export async function getHistoryItem(characterId: string, blockNumber: number): 
     ConsistentRead: true,
   });
 
-  const response = await docClient.send(command);
+  const response = await dynamoDBDocClient.send(command);
 
   if (!response.Item) {
     throw new HttpError(404, "No history block found for the given character id");
@@ -55,8 +54,7 @@ export async function getHistoryItems(
 ): Promise<HistoryBlock[]> {
   console.log(`Get history items of character ${characterId} from DynamoDB`);
 
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/query.js
   const command = new QueryCommand({
     TableName: process.env.TABLE_NAME_HISTORY,
     KeyConditionExpression: "characterId = :characterId",
@@ -68,7 +66,7 @@ export async function getHistoryItems(
     Limit: limit,
   });
 
-  const response = await docClient.send(command);
+  const response = await dynamoDBDocClient.send(command);
 
   console.log("Successfully got DynamoDB items");
 
@@ -79,14 +77,12 @@ export async function createHistoryItem(historyItem: HistoryBlock): Promise<void
   console.log(`Create new history item for character ${historyItem.characterId} in DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/put.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new PutCommand({
     TableName: process.env.TABLE_NAME_HISTORY,
     Item: historyItem,
   });
 
-  await docClient.send(command);
+  await dynamoDBDocClient.send(command);
 
   console.log("Successfully created new history item in DynamoDB", historyItem);
 }
@@ -94,11 +90,7 @@ export async function createHistoryItem(historyItem: HistoryBlock): Promise<void
 export async function createBatchHistoryItems(historyItems: HistoryBlock[]): Promise<void> {
   console.log(`Create new history items for ${historyItems.length} items in DynamoDB`);
 
-  const DYNAMODB_BATCH_WRITE_LIMIT = 25;
   const historyChunks = chunkArray(historyItems, DYNAMODB_BATCH_WRITE_LIMIT);
-
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
 
   for (const chunk of historyChunks) {
     const putRequests = chunk.map((historyItem) => ({
@@ -114,10 +106,38 @@ export async function createBatchHistoryItems(historyItems: HistoryBlock[]): Pro
       },
     });
 
-    await docClient.send(command);
+    await dynamoDBDocClient.send(command);
   }
 
   console.log("Successfully created new history items in DynamoDB");
+}
+
+export async function deleteBatchHistoryItems(historyItems: HistoryBlock[]): Promise<void> {
+  console.log(`Delete ${historyItems.length} history items in DynamoDB`);
+
+  const historyChunks = chunkArray(historyItems, DYNAMODB_BATCH_WRITE_LIMIT);
+
+  for (const chunk of historyChunks) {
+    const deleteRequests = chunk.map((historyItem) => ({
+      DeleteRequest: {
+        Key: {
+          characterId: historyItem.characterId,
+          blockNumber: historyItem.blockNumber,
+        },
+      },
+    }));
+
+    // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/batch-write.js
+    const command = new BatchWriteCommand({
+      RequestItems: {
+        [process.env.TABLE_NAME_HISTORY!]: deleteRequests,
+      },
+    });
+
+    await dynamoDBDocClient.send(command);
+  }
+
+  console.log("Successfully deleted history items in DynamoDB");
 }
 
 export async function addHistoryRecord(record: Record, block: HistoryBlock) {
@@ -127,8 +147,6 @@ export async function addHistoryRecord(record: Record, block: HistoryBlock) {
   console.log("Record:", record);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new UpdateCommand({
     TableName: process.env.TABLE_NAME_HISTORY,
     Key: {
@@ -144,7 +162,7 @@ export async function addHistoryRecord(record: Record, block: HistoryBlock) {
     },
   });
 
-  await docClient.send(command);
+  await dynamoDBDocClient.send(command);
 
   console.log(`Successfully added record ${record.id} to history item in DynamoDB`);
 }
@@ -155,8 +173,6 @@ export async function setRecordComment(characterId: string, blockNumber: number,
   );
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new UpdateCommand({
     TableName: process.env.TABLE_NAME_HISTORY,
     Key: {
@@ -173,7 +189,7 @@ export async function setRecordComment(characterId: string, blockNumber: number,
     },
   });
 
-  await docClient.send(command);
+  await dynamoDBDocClient.send(command);
 
   console.log("Successfully set history comment for record in DynamoDB");
 }
@@ -184,8 +200,6 @@ export async function deleteHistoryItem(block: HistoryBlock) {
   );
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/delete.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new DeleteCommand({
     TableName: process.env.TABLE_NAME_HISTORY,
     Key: {
@@ -194,7 +208,7 @@ export async function deleteHistoryItem(block: HistoryBlock) {
     },
   });
 
-  await docClient.send(command);
+  await dynamoDBDocClient.send(command);
 
   console.log(`Successfully deleted history item #${block.blockNumber} of character ${block.characterId} in DynamoDB`);
 }
@@ -207,8 +221,6 @@ export async function deleteLatestHistoryRecord(block: HistoryBlock) {
   );
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-  const client = new DynamoDBClient({});
-  const docClient = DynamoDBDocumentClient.from(client);
   const command = new UpdateCommand({
     TableName: process.env.TABLE_NAME_HISTORY,
     Key: {
@@ -221,7 +233,7 @@ export async function deleteLatestHistoryRecord(block: HistoryBlock) {
     },
   });
 
-  await docClient.send(command);
+  await dynamoDBDocClient.send(command);
 
   console.log(`Successfully deleted record ${latestRecordId} from history item in DynamoDB`);
 }
