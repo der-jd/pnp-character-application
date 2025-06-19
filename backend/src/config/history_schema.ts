@@ -70,12 +70,6 @@ export const stringSchema = z
   })
   .strict();
 
-export const booleanSchema = z
-  .object({
-    value: z.boolean(),
-  })
-  .strict();
-
 export const attributeChangeSchema = z
   .object({
     attribute: attributeSchema,

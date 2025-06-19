@@ -438,47 +438,6 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'skill activated' to existing block",
-      request: {
-        headers: {},
-        pathParameters: {
-          "character-id": fakeCharacterId,
-        },
-        queryStringParameters: null,
-        body: {
-          userId: fakeUserId,
-          type: RecordType.SKILL_ACTIVATED,
-          name: "social/acting",
-          data: {
-            old: {
-              value: false,
-            },
-            new: {
-              value: true,
-            },
-          },
-          learningMethod: "NORMAL",
-          calculationPoints: {
-            adventurePoints: {
-              old: {
-                start: 0,
-                available: 90,
-                total: 200,
-              },
-              new: {
-                start: 0,
-                available: 40,
-                total: 200,
-              },
-            },
-            attributePoints: null,
-          },
-          comment: null,
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
       name: "Add history record for 'skill changed' to existing block",
       request: {
         headers: {},
