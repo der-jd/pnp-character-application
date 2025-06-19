@@ -110,7 +110,7 @@ export async function createBatchHistoryItems(historyItems: HistoryBlock[]): Pro
     // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/batch-write.js
     const command = new BatchWriteCommand({
       RequestItems: {
-        [process.env.TABLE_NAME_CHARACTER_HISTORY!]: putRequests,
+        [process.env.TABLE_NAME_HISTORY!]: putRequests,
       },
     });
 
