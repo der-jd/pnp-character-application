@@ -60,20 +60,6 @@ describe("Invalid requests", () => {
       expectedStatusCode: 400,
     },
     {
-      name: "User id is not an UUID",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-        },
-        queryStringParameters: null,
-        body: {
-          userIdOfCharacter: "1234567890",
-        },
-      },
-      expectedStatusCode: 400,
-    },
-    {
       name: "No character found for a non existing character id",
       request: {
         headers: fakeHeaders,

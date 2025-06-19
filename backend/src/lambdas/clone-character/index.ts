@@ -95,7 +95,6 @@ function validateRequest(request: Request): Parameters {
     validateUUID(characterId);
 
     const body = bodySchema.parse(request.body);
-    validateUUID(body.userIdOfCharacter);
 
     return {
       currentUserId: currentUserId,
