@@ -177,10 +177,10 @@ describe("Valid requests", () => {
       expect(parsedBody.level).toBe(fakeCharacter.characterSheet.generalInformation.level);
 
       // Check if the character has been cloned
-      let calls = (globalThis as any).dynamoDBMock.commandCalls(PutCommand);
+      const calls = (globalThis as any).dynamoDBMock.commandCalls(PutCommand);
       expect(calls).toHaveLength(1);
 
-      let matchingCall = calls.find((call: any) => {
+      const matchingCall = calls.find((call: any) => {
         const input = call.args[0].input;
         // Expect characterSheet to be identical except for the name
         const expectedSheet = {
