@@ -70,3 +70,5 @@ export function getSkillIncreaseCost(skillValue: number, costCategory: CostCateg
   const columnIndex = skillThresholds.findIndex((threshold) => skillValue < threshold);
   return costMatrix[costCategory][columnIndex];
 }
+
+export const SKILL_ACTIVATION_COST = 50;

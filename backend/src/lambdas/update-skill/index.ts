@@ -12,6 +12,7 @@ import {
   getCombatValues,
   getCombatCategory,
   CombatValues,
+  SKILL_ACTIVATION_COST,
 } from "config/index.js";
 import {
   Request,
@@ -36,6 +37,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 const bodySchema = z
   .object({
+    activated: z.boolean().optional(),
     start: z
       .object({
         initialValue: z.number(),
@@ -83,6 +85,12 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
     let skill = structuredClone(skillOld);
     const adventurePointsOld = characterSheet.calculationPoints.adventurePoints;
     let adventurePoints = structuredClone(adventurePointsOld);
+
+    if (params.body.activated) {
+      const result = activateSkill(skill, params.body.activated, adventurePoints);
+      skill = result.skill;
+      adventurePoints = result.adventurePoints;
+    }
 
     if (params.body.start) {
       skill = updateStartValue(skill, params.body.start);
@@ -204,6 +212,38 @@ function validateRequest(request: Request): Parameters {
 
     // Rethrow other errors
     throw error;
+  }
+}
+
+function activateSkill(
+  skill: Skill,
+  activated: boolean,
+  adventurePoints: CalculationPoints,
+): { skill: Skill; adventurePoints: CalculationPoints } {
+  if (!activated) {
+    throw new HttpError(409, "Deactivating a skill is not allowed!");
+  }
+
+  if (skill.activated && activated) {
+    console.log("Skill already activated. Nothing to do.");
+    return { skill, adventurePoints };
+  } else {
+    console.log(`Skill total cost before activation: ${skill.totalCost}`);
+    console.log(`Available adventure points before activation: ${adventurePoints.available}`);
+
+    console.log(`Activating skill for ${SKILL_ACTIVATION_COST} AP...`);
+
+    if (SKILL_ACTIVATION_COST > adventurePoints.available) {
+      throw new HttpError(400, "Not enough adventure points to activate the skill!");
+    }
+
+    skill.activated = true;
+    skill.totalCost += SKILL_ACTIVATION_COST;
+    adventurePoints.available -= SKILL_ACTIVATION_COST;
+    console.log(`Skill total cost: ${skill.totalCost}`);
+    console.log(`Available adventure points: ${adventurePoints.available}`);
+
+    return { skill, adventurePoints };
   }
 }
 

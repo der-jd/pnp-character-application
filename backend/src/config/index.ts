@@ -5,6 +5,7 @@ export {
   parseCostCategory,
   adjustCostCategory,
   getSkillIncreaseCost,
+  SKILL_ACTIVATION_COST,
 } from "./cost.js";
 export {
   CalculationPoints,
