@@ -180,7 +180,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
               updates.push(updateBaseValue(userId, characterId, baseValueName, oldBaseValue));
             }
           }
-          await Promise.allSettled(updates);
+          await Promise.all(updates);
         }
 
         await updateAttribute(

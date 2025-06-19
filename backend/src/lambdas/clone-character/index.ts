@@ -62,7 +62,7 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
     }
 
     console.log("Save new character and history items to DynamoDB");
-    await Promise.allSettled(createCalls);
+    await Promise.all(createCalls);
 
     const response = {
       statusCode: 200,
