@@ -48,6 +48,7 @@ module "clone_character_lambda" {
   function_name = "clone-character"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
+    TABLE_NAME_HISTORY    = local.history_table_name
   }
   layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
   role_arn        = aws_iam_role.lambda_exec_role.arn
