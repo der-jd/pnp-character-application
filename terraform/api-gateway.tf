@@ -95,6 +95,20 @@ module "character_id_get" {
   lambda_uri = module.get_character_lambda.lambda_function.invoke_arn
 }
 
+// ================== DELETE /characters/{character-id} ==================
+
+module "character_id_delete" {
+  source        = "./modules/apigw_lambda_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.character_id.id
+  http_method   = "DELETE"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  lambda_uri = module.delete_character_lambda.lambda_function.invoke_arn
+}
+
 // ================== OPTIONS /characters/{character-id} ==================
 
 module "character_id_options" {
@@ -423,6 +437,7 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     module.characters_get,
     module.characters_options,
     module.character_id_get,
+    module.character_id_delete,
     module.character_id_options,
     module.character_id_clone_post,
     module.character_id_clone_options,

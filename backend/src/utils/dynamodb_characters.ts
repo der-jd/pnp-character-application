@@ -1,5 +1,12 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  DeleteCommand,
+  DynamoDBDocumentClient,
+  GetCommand,
+  PutCommand,
+  QueryCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
 import {
   Attribute,
@@ -78,6 +85,25 @@ export async function createCharacterItem(character: Character): Promise<void> {
   await docClient.send(command);
 
   console.log("Successfully created new character item in DynamoDB", character);
+}
+
+export async function deleteCharacterItem(userId: string, characterId: string) {
+  console.log(`Delete character ${characterId} of user ${userId} in DynamoDB`);
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/delete.js
+  const client = new DynamoDBClient({});
+  const docClient = DynamoDBDocumentClient.from(client);
+  const command = new DeleteCommand({
+    TableName: process.env.TABLE_NAME_CHARACTERS,
+    Key: {
+      userId: userId,
+      characterId: characterId,
+    },
+  });
+
+  await docClient.send(command);
+
+  console.log(`Successfully deleted character ${characterId} of user ${userId} in DynamoDB`);
 }
 
 enum CalculationPointsType {

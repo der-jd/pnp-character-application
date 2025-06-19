@@ -3,6 +3,7 @@ export {
   getCharacterItem,
   getCharacterItems,
   createCharacterItem,
+  deleteCharacterItem,
   updateAttribute,
   updateSkill,
   updateAdventurePoints,
