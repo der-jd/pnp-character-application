@@ -54,6 +54,22 @@ describe("Invalid requests", () => {
       expectedStatusCode: 401,
     },
     {
+      name: "Activating a skill without a learning method",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "nature",
+          "skill-name": "fishing",
+        },
+        queryStringParameters: null,
+        body: {
+          activated: true,
+        },
+      },
+      expectedStatusCode: 409,
+    },
+    {
       name: "Deactivating a skill is not allowed",
       request: {
         headers: fakeHeaders,
