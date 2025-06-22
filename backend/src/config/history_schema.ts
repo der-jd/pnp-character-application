@@ -77,6 +77,13 @@ export const attributeChangeSchema = z
   })
   .strict();
 
+export const calculationPointsChangeSchema = z
+  .object({
+    adventurePoints: calculationPointsSchema.optional(),
+    attributePoints: calculationPointsSchema.optional(),
+  })
+  .strict();
+
 export const skillChangeSchema = z
   .object({
     skill: skillSchema,

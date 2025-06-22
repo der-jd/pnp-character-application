@@ -18,17 +18,21 @@ import { expectHttpError } from "../utils.js";
 const testBody: HistoryBodySchema = {
   userId: fakeUserId,
   type: RecordType.CALCULATION_POINTS_CHANGED,
-  name: "Adventure Points",
+  name: "Calculation Points",
   data: {
     old: {
-      start: 0,
-      available: 0,
-      total: 100,
+      adventurePoints: {
+        start: 0,
+        available: 0,
+        total: 100,
+      },
     },
     new: {
-      start: 0,
-      available: 20,
-      total: 120,
+      adventurePoints: {
+        start: 0,
+        available: 20,
+        total: 120,
+      },
     },
   },
   learningMethod: null,
@@ -36,13 +40,13 @@ const testBody: HistoryBodySchema = {
     adventurePoints: {
       old: {
         start: 0,
-        available: 100,
-        total: 200,
+        available: 0,
+        total: 100,
       },
       new: {
         start: 0,
-        available: 120,
-        total: 220,
+        available: 20,
+        total: 120,
       },
     },
     attributePoints: null,
@@ -132,17 +136,31 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.CALCULATION_POINTS_CHANGED,
-          name: "Adventure Points",
+          name: "Calculation Points",
           data: {
             old: {
-              start: 0,
-              available: 90,
-              total: 100,
+              adventurePoints: {
+                start: 0,
+                available: 90,
+                total: 100,
+              },
+              attributePoints: {
+                start: 10,
+                available: 0,
+                total: 15,
+              },
             },
             new: {
-              start: 0,
-              available: 110,
-              total: 120,
+              adventurePoints: {
+                start: 0,
+                available: 110,
+                total: 120,
+              },
+              attributePoints: {
+                start: 10,
+                available: 10,
+                total: 25,
+              },
             },
           },
           learningMethod: null,
@@ -159,7 +177,18 @@ describe("Valid requests", () => {
                 total: 220,
               },
             },
-            attributePoints: null,
+            attributePoints: {
+              old: {
+                start: 10,
+                available: 0,
+                total: 15,
+              },
+              new: {
+                start: 10,
+                available: 10,
+                total: 25,
+              },
+            },
           },
           comment: "Epic fight against a big monster",
         },
@@ -657,17 +686,21 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.CALCULATION_POINTS_CHANGED,
-          name: "Adventure Points",
+          name: "Calculation Points",
           data: {
             old: {
-              start: 0,
-              available: 90,
-              total: 100,
+              adventurePoints: {
+                start: 0,
+                available: 90,
+                total: 100,
+              },
             },
             new: {
-              start: 0,
-              available: 110,
-              total: 120,
+              adventurePoints: {
+                start: 0,
+                available: 110,
+                total: 120,
+              },
             },
           },
           learningMethod: null,
@@ -753,17 +786,21 @@ describe("Valid requests", () => {
         body: {
           userId: fakeUserId,
           type: RecordType.CALCULATION_POINTS_CHANGED,
-          name: "Adventure Points",
+          name: "Calculation Points",
           data: {
             old: {
-              start: 0,
-              available: 90,
-              total: 100,
+              adventurePoints: {
+                start: 0,
+                available: 90,
+                total: 100,
+              },
             },
             new: {
-              start: 0,
-              available: 110,
-              total: 120,
+              adventurePoints: {
+                start: 0,
+                available: 110,
+                total: 120,
+              },
             },
           },
           learningMethod: null,
