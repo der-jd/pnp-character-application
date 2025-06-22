@@ -32,17 +32,16 @@ export async function deleteCharacter(request: Request): Promise<APIGatewayProxy
 
     console.log(`Delete character ${params.characterId} of user ${params.userId} and its history`);
 
+    // Wait for the character item to be deleted or throw an error if it does not exist.
+    await deleteCharacterItem(params.userId, params.characterId);
+
     const deleteCalls: Promise<void>[] = [];
-
-    deleteCalls.push(deleteCharacterItem(params.userId, params.characterId));
-
     const items = await getHistoryItems(params.characterId, true);
     if (!items || items.length === 0) {
       console.log(`No history found for character ${params.characterId}, skipping delete`);
     } else {
       deleteCalls.push(deleteBatchHistoryItems(items.map((item) => historyBlockSchema.parse(item))));
     }
-
     await Promise.all(deleteCalls);
 
     const response = {
