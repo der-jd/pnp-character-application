@@ -121,7 +121,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
     recordSchema.parse(record);
 
     switch (record.type) {
-      case RecordType.EVENT_CALCULATION_POINTS:
+      case RecordType.CALCULATION_POINTS_CHANGED:
         calculationPointsSchema.parse(record.data.old);
         throw new HttpError(500, "Reverting calculation points change is not implemented yet!"); // TODO
         break;

@@ -195,7 +195,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
     //await getCharacterItem(body.userId, characterId);
 
     switch (body.type) {
-      case RecordType.EVENT_CALCULATION_POINTS:
+      case RecordType.CALCULATION_POINTS_CHANGED:
         calculationPointsSchema.parse(body.data.old);
         calculationPointsSchema.parse(body.data.new);
         break;

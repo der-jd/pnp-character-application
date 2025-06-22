@@ -17,7 +17,7 @@ import { expectHttpError } from "../utils.js";
 
 const testBody: HistoryBodySchema = {
   userId: fakeUserId,
-  type: RecordType.EVENT_CALCULATION_POINTS,
+  type: RecordType.CALCULATION_POINTS_CHANGED,
   name: "Adventure Points",
   data: {
     old: {
@@ -131,7 +131,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.EVENT_CALCULATION_POINTS,
+          type: RecordType.CALCULATION_POINTS_CHANGED,
           name: "Adventure Points",
           data: {
             old: {
@@ -656,7 +656,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.EVENT_CALCULATION_POINTS,
+          type: RecordType.CALCULATION_POINTS_CHANGED,
           name: "Adventure Points",
           data: {
             old: {
@@ -752,7 +752,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.EVENT_CALCULATION_POINTS,
+          type: RecordType.CALCULATION_POINTS_CHANGED,
           name: "Adventure Points",
           data: {
             old: {
