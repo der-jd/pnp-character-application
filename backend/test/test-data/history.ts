@@ -79,8 +79,30 @@ export const calculationPointsChangedRecord: Record = {
   },
   learningMethod: null,
   calculationPoints: {
-    adventurePoints: null,
-    attributePoints: null,
+    adventurePoints: {
+      old: {
+        start: 100,
+        available: 100,
+        total: 200,
+      },
+      new: {
+        start: 100,
+        available: 150,
+        total: 250,
+      },
+    },
+    attributePoints: {
+      old: {
+        start: 15,
+        available: 0,
+        total: 20,
+      },
+      new: {
+        start: 15,
+        available: 10,
+        total: 30,
+      },
+    },
   },
   comment: null,
   timestamp: new Date().toISOString(),
