@@ -84,8 +84,6 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
     const attributePointsOld = characterSheet.calculationPoints.attributePoints;
     let adventurePoints = structuredClone(adventurePointsOld);
     let attributePoints = structuredClone(attributePointsOld);
-    let adventurePointsChanged: boolean = false;
-    let attributePointsChanged: boolean = false;
 
     if (params.body.adventurePoints) {
       console.log("Update adventure points");
@@ -96,10 +94,6 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
 
       if (params.body.adventurePoints.total) {
         adventurePoints = updateTotalValue(adventurePoints, params.body.adventurePoints.total);
-      }
-
-      if (JSON.stringify(adventurePoints) !== JSON.stringify(adventurePointsOld)) {
-        adventurePointsChanged = true;
       }
 
       await updateAdventurePoints(params.userId, params.characterId, adventurePoints);
@@ -116,10 +110,6 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
         attributePoints = updateTotalValue(attributePoints, params.body.attributePoints.total);
       }
 
-      if (JSON.stringify(attributePoints) !== JSON.stringify(attributePointsOld)) {
-        attributePointsChanged = true;
-      }
-
       await updateAttributePoints(params.userId, params.characterId, attributePoints);
     }
 
@@ -130,12 +120,12 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
         userId: params.userId,
         calculationPoints: {
           old: {
-            adventurePoints: adventurePointsChanged ? adventurePointsOld : undefined,
-            attributePoints: attributePointsChanged ? attributePointsOld : undefined,
+            adventurePoints: params.body.adventurePoints ? adventurePointsOld : undefined,
+            attributePoints: params.body.attributePoints ? attributePointsOld : undefined,
           },
           new: {
-            adventurePoints: adventurePointsChanged ? adventurePoints : undefined,
-            attributePoints: attributePointsChanged ? attributePoints : undefined,
+            adventurePoints: params.body.adventurePoints ? adventurePoints : undefined,
+            attributePoints: params.body.attributePoints ? attributePoints : undefined,
           },
         },
       }),
