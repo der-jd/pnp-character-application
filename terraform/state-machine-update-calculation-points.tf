@@ -84,8 +84,8 @@ resource "aws_sfn_state_machine" "update_calculation_points_state_machine" {
             "data"           = "{% $parse($states.input.body).calculationPoints %}",
             "learningMethod" = null,
             "calculationPoints" = {
-              "adventurePoints" = "{% $parse($states.input.body).adventurePoints %}", // TODO
-              "attributePoints" = "{% $parse($states.input.body).attributePoints %}"  // TODO
+              "adventurePoints" = "{% $parse($states.input.body).calculationPoints.old.adventurePoints ? {'old': $parse($states.input.body).calculationPoints.old.adventurePoints,'new': $parse($states.input.body).calculationPoints.new.adventurePoints} : null %}",
+              "attributePoints" = "{% $parse($states.input.body).calculationPoints.old.attributePoints ? {'old': $parse($states.input.body).calculationPoints.old.attributePoints,'new': $parse($states.input.body).calculationPoints.new.attributePoints} : null %}"
             },
             "comment" = null
           }
