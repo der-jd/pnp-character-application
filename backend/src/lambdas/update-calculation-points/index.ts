@@ -22,43 +22,29 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
+const initialNewSchema = z.object({
+  initialValue: z.number(),
+  newValue: z.number(),
+});
+
+const initialIncreasedSchema = z.object({
+  initialValue: z.number(),
+  increasedPoints: z.number(),
+});
+
 const bodySchema = z
   .object({
     adventurePoints: z
       .object({
-        start: z
-          .object({
-            initialValue: z.number(),
-            newValue: z.number(),
-          })
-          .strict()
-          .optional(),
-        total: z
-          .object({
-            initialValue: z.number(),
-            increasedPoints: z.number(),
-          })
-          .strict()
-          .optional(),
+        start: initialNewSchema.strict().optional(),
+        total: initialIncreasedSchema.strict().optional(),
       })
       .strict()
       .optional(),
     attributePoints: z
       .object({
-        start: z
-          .object({
-            initialValue: z.number(),
-            newValue: z.number(),
-          })
-          .strict()
-          .optional(),
-        total: z
-          .object({
-            initialValue: z.number(),
-            increasedPoints: z.number(),
-          })
-          .strict()
-          .optional(),
+        start: initialNewSchema.strict().optional(),
+        total: initialIncreasedSchema.strict().optional(),
       })
       .strict()
       .optional(),
@@ -168,7 +154,10 @@ function validateRequest(request: Request): Parameters {
   }
 }
 
-function updateStartValue(calculationPoints: CalculationPoints, startValue: any): CalculationPoints {
+function updateStartValue(
+  calculationPoints: CalculationPoints,
+  startValue: z.infer<typeof initialNewSchema>,
+): CalculationPoints {
   console.log(`Update start value of the calculation points from ${startValue.initialValue} to ${startValue.newValue}`);
 
   if (startValue.initialValue !== calculationPoints.start && startValue.newValue !== calculationPoints.start) {
@@ -187,7 +176,10 @@ function updateStartValue(calculationPoints: CalculationPoints, startValue: any)
   }
 }
 
-function updateTotalValue(calculationPoints: CalculationPoints, totalValue: any): CalculationPoints {
+function updateTotalValue(
+  calculationPoints: CalculationPoints,
+  totalValue: z.infer<typeof initialIncreasedSchema>,
+): CalculationPoints {
   console.log(
     `Update total calculation points from ${totalValue.initialValue} to ${totalValue.initialValue + totalValue.increasedPoints}`,
   );

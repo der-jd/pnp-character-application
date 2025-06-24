@@ -35,30 +35,22 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
+const initialNewSchema = z.object({
+  initialValue: z.number(),
+  newValue: z.number(),
+});
+
+const initialIncreasedSchema = z.object({
+  initialValue: z.number(),
+  increasedPoints: z.number(),
+});
+
 const bodySchema = z
   .object({
     activated: z.boolean().optional(),
-    start: z
-      .object({
-        initialValue: z.number(),
-        newValue: z.number(),
-      })
-      .strict()
-      .optional(),
-    current: z
-      .object({
-        initialValue: z.number(),
-        increasedPoints: z.number(),
-      })
-      .strict()
-      .optional(),
-    mod: z
-      .object({
-        initialValue: z.number(),
-        newValue: z.number(),
-      })
-      .strict()
-      .optional(),
+    start: initialNewSchema.strict().optional(),
+    current: initialIncreasedSchema.strict().optional(),
+    mod: initialNewSchema.strict().optional(),
     learningMethod: z.string().optional(),
   })
   .strict();
@@ -261,7 +253,7 @@ function activateSkill(
   }
 }
 
-function updateStartValue(skill: Skill, startValue: any): Skill {
+function updateStartValue(skill: Skill, startValue: z.infer<typeof initialNewSchema>): Skill {
   console.log(`Update start value of the skill from ${startValue.initialValue} to ${startValue.newValue}`);
 
   if (!skill.activated) {
@@ -286,7 +278,7 @@ function updateStartValue(skill: Skill, startValue: any): Skill {
 
 function updateCurrentValue(
   skill: Skill,
-  currentValue: any,
+  currentValue: z.infer<typeof initialIncreasedSchema>,
   adjustedCostCategory: CostCategory,
   adventurePoints: CalculationPoints,
 ): { skill: Skill; adventurePoints: CalculationPoints } {
@@ -338,7 +330,7 @@ function updateCurrentValue(
   }
 }
 
-function updateModValue(skill: Skill, modValue: any): Skill {
+function updateModValue(skill: Skill, modValue: z.infer<typeof initialNewSchema>): Skill {
   console.log(`Update mod value of the skill from ${modValue.initialValue} to ${modValue.newValue}`);
 
   if (!skill.activated) {
