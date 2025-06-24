@@ -70,6 +70,7 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
     const attributePointsOld = characterSheet.calculationPoints.attributePoints;
     let adventurePoints = structuredClone(adventurePointsOld);
     let attributePoints = structuredClone(attributePointsOld);
+    const updates: Promise<void>[] = [];
 
     if (params.body.adventurePoints) {
       console.log("Update adventure points");
@@ -82,7 +83,7 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
         adventurePoints = updateTotalValue(adventurePoints, params.body.adventurePoints.total);
       }
 
-      await updateAdventurePoints(params.userId, params.characterId, adventurePoints);
+      updates.push(updateAdventurePoints(params.userId, params.characterId, adventurePoints));
     }
 
     if (params.body.attributePoints) {
@@ -96,8 +97,10 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
         attributePoints = updateTotalValue(attributePoints, params.body.attributePoints.total);
       }
 
-      await updateAttributePoints(params.userId, params.characterId, attributePoints);
+      updates.push(updateAttributePoints(params.userId, params.characterId, attributePoints));
     }
+
+    await Promise.all(updates);
 
     const response = {
       statusCode: 200,
