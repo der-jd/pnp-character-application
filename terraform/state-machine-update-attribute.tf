@@ -14,7 +14,7 @@ resource "aws_sfn_state_machine" "update_attribute_state_machine" {
   }
 
   // Examples for error handling: https://docs.aws.amazon.com/step-functions/latest/dg/concepts-error-handling.html#error-handling-examples
-  // Best practiceS: https://docs.aws.amazon.com/step-functions/latest/dg/sfn-best-practices.html
+  // Best practices: https://docs.aws.amazon.com/step-functions/latest/dg/sfn-best-practices.html
   // Transforming input and output with JSONata: https://docs.aws.amazon.com/step-functions/latest/dg/transforming-data.html
   definition = jsonencode({
     StartAt = "UpdateAttribute",
