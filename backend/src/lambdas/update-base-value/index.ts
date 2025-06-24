@@ -21,29 +21,16 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
+const initialNewSchema = z.object({
+  initialValue: z.number(),
+  newValue: z.number(),
+});
+
 const bodySchema = z
   .object({
-    start: z
-      .object({
-        initialValue: z.number(),
-        newValue: z.number(),
-      })
-      .strict()
-      .optional(),
-    byLvlUp: z
-      .object({
-        initialValue: z.number(),
-        newValue: z.number(),
-      })
-      .strict()
-      .optional(),
-    mod: z
-      .object({
-        initialValue: z.number(),
-        newValue: z.number(),
-      })
-      .strict()
-      .optional(),
+    start: initialNewSchema.strict().optional(),
+    byLvlUp: initialNewSchema.strict().optional(),
+    mod: initialNewSchema.strict().optional(),
   })
   .strict();
 
@@ -132,7 +119,7 @@ function validateRequest(request: Request): Parameters {
   }
 }
 
-function updateStartValue(baseValue: BaseValue, startValue: any): BaseValue {
+function updateStartValue(baseValue: BaseValue, startValue: z.infer<typeof initialNewSchema>): BaseValue {
   console.log(`Update start value of the base value from ${startValue.initialValue} to ${startValue.newValue}`);
 
   if (startValue.initialValue !== baseValue.start && startValue.newValue !== baseValue.start) {
@@ -154,7 +141,7 @@ function updateStartValue(baseValue: BaseValue, startValue: any): BaseValue {
 function updateByLvlUpValue(
   baseValueName: keyof CharacterSheet["baseValues"] | string,
   baseValue: BaseValue,
-  byLvlUp: any,
+  byLvlUp: z.infer<typeof initialNewSchema>,
 ): BaseValue {
   console.log(`Update byLvlUp value of the base value from ${byLvlUp.initialValue} to ${byLvlUp.newValue}`);
 
@@ -182,7 +169,7 @@ function updateByLvlUpValue(
   }
 }
 
-function updateModValue(baseValue: BaseValue, modValue: any): BaseValue {
+function updateModValue(baseValue: BaseValue, modValue: z.infer<typeof initialNewSchema>): BaseValue {
   console.log(`Update mod value of the base value from ${modValue.initialValue} to ${modValue.newValue}`);
 
   if (modValue.initialValue !== baseValue.mod && modValue.newValue !== baseValue.mod) {

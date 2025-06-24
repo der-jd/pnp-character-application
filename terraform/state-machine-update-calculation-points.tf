@@ -1,14 +1,14 @@
-resource "aws_cloudwatch_log_group" "update_attribute_state_machine_log_group" {
-  name              = "/aws/vendedlogs/states/update-attribute"
+resource "aws_cloudwatch_log_group" "update_calculation_points_state_machine_log_group" {
+  name              = "/aws/vendedlogs/states/update-calculation-points"
   retention_in_days = 0
 }
 
-resource "aws_sfn_state_machine" "update_attribute_state_machine" {
-  name     = "update-attribute"
+resource "aws_sfn_state_machine" "update_calculation_points_state_machine" {
+  name     = "update-calculation-points"
   role_arn = aws_iam_role.step_function_role.arn
   type     = "EXPRESS"
   logging_configuration {
-    log_destination        = "${aws_cloudwatch_log_group.update_attribute_state_machine_log_group.arn}:*"
+    log_destination        = "${aws_cloudwatch_log_group.update_calculation_points_state_machine_log_group.arn}:*"
     include_execution_data = true
     level                  = "ALL"
   }
@@ -17,15 +17,15 @@ resource "aws_sfn_state_machine" "update_attribute_state_machine" {
   // Best practices: https://docs.aws.amazon.com/step-functions/latest/dg/sfn-best-practices.html
   // Transforming input and output with JSONata: https://docs.aws.amazon.com/step-functions/latest/dg/transforming-data.html
   definition = jsonencode({
-    StartAt = "UpdateAttribute",
+    StartAt = "UpdateCalculationPoints",
     States = {
-      UpdateAttribute = {
+      UpdateCalculationPoints = {
         Type          = "Task",
         QueryLanguage = "JSONata",
-        Resource      = module.update_attribute_lambda.lambda_function.arn,
+        Resource      = module.update_calculation_points_lambda.lambda_function.arn,
         Assign = {
-          statusCode          = "{% $states.result.statusCode %}",
-          updateAttributeBody = "{% $states.result.body %}"
+          statusCode                  = "{% $states.result.statusCode %}",
+          updateCalculationPointsBody = "{% $states.result.body %}"
         },
         TimeoutSeconds = 5 // Timeout to avoid waiting for a stuck task
         Retry = [
@@ -62,8 +62,8 @@ resource "aws_sfn_state_machine" "update_attribute_state_machine" {
         QueryLanguage = "JSONata",
         Choices = [
           {
-            // The attribute was not updated, so no history record is necessary
-            Condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}",
+            // The calculation points were not changed, so no history record is necessary
+            Condition = "{% $parse($states.input.body).calculationPoints.old = $parse($states.input.body).calculationPoints.new %}",
             Next      = "SuccessState"
           }
         ],
@@ -79,13 +79,13 @@ resource "aws_sfn_state_machine" "update_attribute_state_machine" {
           },
           "body" = {
             "userId"         = "{% $parse($states.input.body).userId %}",
-            "type"           = "8", // ATTRIBUTE_CHANGED
-            "name"           = "{% $parse($states.input.body).attributeName %}",
-            "data"           = "{% $parse($states.input.body).changes %}",
+            "type"           = "0", // CALCULATION_POINTS_CHANGED
+            "name"           = "Calculation Points",
+            "data"           = "{% $parse($states.input.body).calculationPoints %}",
             "learningMethod" = null,
             "calculationPoints" = {
-              "adventurePoints" = null,
-              "attributePoints" = "{% $parse($states.input.body).attributePoints %}"
+              "adventurePoints" = "{% $parse($states.input.body).calculationPoints.old.adventurePoints ? {'old': $parse($states.input.body).calculationPoints.old.adventurePoints,'new': $parse($states.input.body).calculationPoints.new.adventurePoints} : null %}",
+              "attributePoints" = "{% $parse($states.input.body).calculationPoints.old.attributePoints ? {'old': $parse($states.input.body).calculationPoints.old.attributePoints,'new': $parse($states.input.body).calculationPoints.new.attributePoints} : null %}"
             },
             "comment" = null
           }
@@ -143,9 +143,10 @@ resource "aws_sfn_state_machine" "update_attribute_state_machine" {
            * $parse() is used to parse the stringified JSON inside the variables temporarily back to a JSON object before the whole
            * content is stringified with $string() again.
            */
-          "body" = "{% $string({'data': $parse($updateAttributeBody),'historyRecord': $addHistoryRecordBody ? $parse($addHistoryRecordBody) : null}) %}"
+          "body" = "{% $string({'data': $parse($updateCalculationPointsBody),'historyRecord': $addHistoryRecordBody ? $parse($addHistoryRecordBody) : null}) %}"
         }
       }
     }
   })
 }
+

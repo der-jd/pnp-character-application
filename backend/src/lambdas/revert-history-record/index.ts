@@ -2,7 +2,6 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
 import {
   baseValueSchema,
-  calculationPointsSchema,
   combatValuesSchema,
   professionHobbySchema,
   RecordType,
@@ -15,6 +14,7 @@ import {
   skillChangeSchema,
   attributeChangeSchema,
   CharacterSheet,
+  calculationPointsChangeSchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -121,10 +121,12 @@ async function revertChange(userId: string, characterId: string, record: Record)
     recordSchema.parse(record);
 
     switch (record.type) {
-      case RecordType.EVENT_CALCULATION_POINTS:
-        calculationPointsSchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting calculation points change is not implemented yet!"); // TODO
+      case RecordType.CALCULATION_POINTS_CHANGED: {
+        const oldData = calculationPointsChangeSchema.parse(record.data.old);
+        await updateAdventurePointsIfExists(userId, characterId, oldData.adventurePoints);
+        await updateAttributePointsIfExists(userId, characterId, oldData.attributePoints);
         break;
+      }
       case RecordType.EVENT_LEVEL_UP:
         numberSchema.parse(record.data.old);
         throw new HttpError(500, "Reverting level up is not implemented yet!"); // TODO

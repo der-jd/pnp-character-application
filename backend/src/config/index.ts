@@ -40,6 +40,7 @@ export {
   numberSchema,
   stringSchema,
   attributeChangeSchema,
+  calculationPointsChangeSchema,
   skillChangeSchema,
 } from "./history_schema.js";
 export { calculateBaseValues } from "./formulas.js";

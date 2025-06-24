@@ -24,6 +24,7 @@
     "set-history-comment": "file:src/lambdas/set-history-comment",
     "update-attribute": "file:src/lambdas/update-attribute",
     "update-base-value": "file:src/lambdas/update-base-value",
+    "update-calculation-points": "file:src/lambdas/update-calculation-points",
     "update-combat-values": "file:src/lambdas/update-combat-values",
     "update-skill": "file:src/lambdas/update-skill",
     "utils": "file:src/utils"

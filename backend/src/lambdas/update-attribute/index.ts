@@ -22,29 +22,21 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
+const initialNewSchema = z.object({
+  initialValue: z.number(),
+  newValue: z.number(),
+});
+
+const initialIncreasedSchema = z.object({
+  initialValue: z.number(),
+  increasedPoints: z.number(),
+});
+
 const bodySchema = z
   .object({
-    start: z
-      .object({
-        initialValue: z.number(),
-        newValue: z.number(),
-      })
-      .strict()
-      .optional(),
-    current: z
-      .object({
-        initialValue: z.number(),
-        increasedPoints: z.number(),
-      })
-      .strict()
-      .optional(),
-    mod: z
-      .object({
-        initialValue: z.number(),
-        newValue: z.number(),
-      })
-      .strict()
-      .optional(),
+    start: initialNewSchema.strict().optional(),
+    current: initialIncreasedSchema.strict().optional(),
+    mod: initialNewSchema.strict().optional(),
   })
   .strict();
 
@@ -191,7 +183,7 @@ function validateRequest(request: Request): Parameters {
   }
 }
 
-function updateStartValue(attribute: Attribute, startValue: any): Attribute {
+function updateStartValue(attribute: Attribute, startValue: z.infer<typeof initialNewSchema>): Attribute {
   console.log(`Update start value of the attribute from ${startValue.initialValue} to ${startValue.newValue}`);
 
   if (startValue.initialValue !== attribute.start && startValue.newValue !== attribute.start) {
@@ -212,7 +204,7 @@ function updateStartValue(attribute: Attribute, startValue: any): Attribute {
 
 function updateCurrentValue(
   attribute: Attribute,
-  currentValue: any,
+  currentValue: z.infer<typeof initialIncreasedSchema>,
   attributePoints: CalculationPoints,
 ): { attribute: Attribute; attributePoints: CalculationPoints } {
   console.log(
@@ -257,7 +249,7 @@ function updateCurrentValue(
   }
 }
 
-function updateModValue(attribute: Attribute, modValue: any): Attribute {
+function updateModValue(attribute: Attribute, modValue: z.infer<typeof initialNewSchema>): Attribute {
   console.log(`Update mod value of the attribute from ${modValue.initialValue} to ${modValue.newValue}`);
 
   if (modValue.initialValue !== attribute.mod && modValue.newValue !== attribute.mod) {

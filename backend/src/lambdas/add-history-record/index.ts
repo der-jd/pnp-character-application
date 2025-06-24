@@ -15,6 +15,7 @@ import {
   skillChangeSchema,
   attributeChangeSchema,
   HistoryBlock,
+  calculationPointsChangeSchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -195,9 +196,9 @@ async function validateRequest(request: Request): Promise<Parameters> {
     //await getCharacterItem(body.userId, characterId);
 
     switch (body.type) {
-      case RecordType.EVENT_CALCULATION_POINTS:
-        calculationPointsSchema.parse(body.data.old);
-        calculationPointsSchema.parse(body.data.new);
+      case RecordType.CALCULATION_POINTS_CHANGED:
+        calculationPointsChangeSchema.parse(body.data.old);
+        calculationPointsChangeSchema.parse(body.data.new);
         break;
       case RecordType.EVENT_LEVEL_UP:
         numberSchema.parse(body.data.old);

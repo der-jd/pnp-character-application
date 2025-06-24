@@ -84,11 +84,19 @@ export async function deleteCharacterItem(userId: string, characterId: string) {
       userId: userId,
       characterId: characterId,
     },
+    ReturnValues: "ALL_OLD", // Return the deleted item attributes
   });
 
-  await dynamoDBDocClient.send(command);
+  const response = await dynamoDBDocClient.send(command);
 
-  console.log(`Successfully deleted character ${characterId} of user ${userId} in DynamoDB`);
+  if (!response.Attributes) {
+    throw new HttpError(404, "No character was deleted because it did not exist.", {
+      userId: userId,
+      characterId: characterId,
+    });
+  } else {
+    console.log(`Successfully deleted character ${characterId} of user ${userId} in DynamoDB`);
+  }
 }
 
 enum CalculationPointsType {

@@ -8,6 +8,7 @@ import {
   attributeAndBaseValueChangedRecord,
   attributeChangedRecord,
   baseValueChangedRecord,
+  calculationPointsChangedRecord,
   combatSkillChangedRecord,
   combatValuesChangedRecord,
   skillChangedRecord,
@@ -119,6 +120,20 @@ describe("Valid requests", () => {
     {
       name: "Revert history record for a changed base value",
       fakeRecord: baseValueChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for changed calculation points",
+      fakeRecord: calculationPointsChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {

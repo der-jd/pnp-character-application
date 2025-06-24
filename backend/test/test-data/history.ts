@@ -46,6 +46,68 @@ export const baseValueChangedRecord: Record = {
   timestamp: new Date().toISOString(),
 };
 
+export const calculationPointsChangedRecord: Record = {
+  type: RecordType.CALCULATION_POINTS_CHANGED,
+  name: "Calculation Points",
+  number: 2,
+  id: "ffdbc28b-f8ba-439d-bfc4-235f18811208",
+  data: {
+    old: {
+      adventurePoints: {
+        start: 100,
+        available: 100,
+        total: 200,
+      },
+      attributePoints: {
+        start: 15,
+        available: 0,
+        total: 20,
+      },
+    },
+    new: {
+      adventurePoints: {
+        start: 100,
+        available: 150,
+        total: 250,
+      },
+      attributePoints: {
+        start: 15,
+        available: 10,
+        total: 30,
+      },
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: {
+      old: {
+        start: 100,
+        available: 100,
+        total: 200,
+      },
+      new: {
+        start: 100,
+        available: 150,
+        total: 250,
+      },
+    },
+    attributePoints: {
+      old: {
+        start: 15,
+        available: 0,
+        total: 20,
+      },
+      new: {
+        start: 15,
+        available: 10,
+        total: 30,
+      },
+    },
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
 export const attributeAndBaseValueChangedRecord: Record = {
   type: RecordType.ATTRIBUTE_CHANGED,
   name: "strength",
