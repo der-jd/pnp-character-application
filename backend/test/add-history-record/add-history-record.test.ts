@@ -196,7 +196,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'level up' to existing block",
+      name: "Add history record for 'level changed' to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -205,7 +205,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.EVENT_LEVEL_UP,
+          type: RecordType.LEVEL_CHANGED,
           name: "Level 2",
           data: {
             old: {

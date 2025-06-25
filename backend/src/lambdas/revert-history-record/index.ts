@@ -127,9 +127,9 @@ async function revertChange(userId: string, characterId: string, record: Record)
         await updateAttributePointsIfExists(userId, characterId, oldData.attributePoints);
         break;
       }
-      case RecordType.EVENT_LEVEL_UP:
+      case RecordType.LEVEL_CHANGED:
         numberSchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting level up is not implemented yet!"); // TODO
+        throw new HttpError(500, "Reverting level change is not implemented yet!"); // TODO
         break;
       case RecordType.BASE_VALUE_CHANGED: {
         const oldBaseValue = baseValueSchema.parse(record.data.old);
