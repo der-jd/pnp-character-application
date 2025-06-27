@@ -1,5 +1,6 @@
 export { Request, parseBody } from "./request.js";
 export {
+  setSpecialAbilities,
   getCharacterItem,
   getCharacterItems,
   createCharacterItem,

@@ -16,6 +16,7 @@ import {
   attributeChangeSchema,
   HistoryBlock,
   calculationPointsChangeSchema,
+  stringSetSchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -215,9 +216,12 @@ async function validateRequest(request: Request): Promise<Parameters> {
         break;
       case RecordType.ADVANTAGE_CHANGED:
       case RecordType.DISADVANTAGE_CHANGED:
-      case RecordType.SPECIAL_ABILITY_CHANGED:
         stringSchema.parse(body.data.old);
         stringSchema.parse(body.data.new);
+        break;
+      case RecordType.SPECIAL_ABILITIES_CHANGED:
+        stringSetSchema.parse(body.data.old);
+        stringSetSchema.parse(body.data.new);
         break;
       case RecordType.ATTRIBUTE_CHANGED:
         attributeChangeSchema.parse(body.data.old);

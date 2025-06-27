@@ -386,7 +386,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'special ability changed' to existing block",
+      name: "Add history record for 'special abilities changed' to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -395,14 +395,14 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.SPECIAL_ABILITY_CHANGED,
-          name: "Special ability changed",
+          type: RecordType.SPECIAL_ABILITIES_CHANGED,
+          name: "Berserker Rage",
           data: {
             old: {
-              value: "",
+              values: "Iron Will",
             },
             new: {
-              value: "Berserker Rage",
+              values: "Iron Will, Berserker Rage",
             },
           },
           learningMethod: null,
