@@ -15,6 +15,7 @@ import {
   attributeChangeSchema,
   CharacterSheet,
   calculationPointsChangeSchema,
+  stringSetSchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -33,6 +34,7 @@ import {
   updateCombatValues,
   updateBaseValue,
   updateLevel,
+  setSpecialAbilities,
 } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -131,6 +133,8 @@ async function revertChange(userId: string, characterId: string, record: Record)
       case RecordType.LEVEL_CHANGED: {
         const oldData = numberSchema.parse(record.data.old);
         await updateLevel(userId, characterId, oldData.value);
+        await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
+        await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
       }
       case RecordType.BASE_VALUE_CHANGED: {
@@ -156,10 +160,13 @@ async function revertChange(userId: string, characterId: string, record: Record)
         stringSchema.parse(record.data.old);
         throw new HttpError(500, "Reverting disadvantage change is not implemented yet!"); // TODO
         break;
-      case RecordType.SPECIAL_ABILITY_CHANGED:
-        stringSchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting special ability change is not implemented yet!"); // TODO
+      case RecordType.SPECIAL_ABILITIES_CHANGED: {
+        const oldData = stringSetSchema.parse(record.data.old);
+        await setSpecialAbilities(userId, characterId, oldData.values);
+        await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
+        await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
+      }
       case RecordType.ATTRIBUTE_CHANGED: {
         const oldData = attributeChangeSchema.parse(record.data.old);
         const newData = attributeChangeSchema.parse(record.data.new);

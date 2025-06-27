@@ -140,7 +140,7 @@ export async function deleteBatchHistoryItems(historyItems: HistoryBlock[]): Pro
   console.log("Successfully deleted history items in DynamoDB");
 }
 
-export async function addHistoryRecord(record: Record, block: HistoryBlock) {
+export async function addHistoryRecord(record: Record, block: HistoryBlock): Promise<void> {
   console.log(
     `Add record to history block #${block.blockNumber}, id ${block.blockId} of character ${block.characterId} in DynamoDB`,
   );
@@ -167,7 +167,12 @@ export async function addHistoryRecord(record: Record, block: HistoryBlock) {
   console.log(`Successfully added record ${record.id} to history item in DynamoDB`);
 }
 
-export async function setRecordComment(characterId: string, blockNumber: number, recordIndex: number, comment: string) {
+export async function setRecordComment(
+  characterId: string,
+  blockNumber: number,
+  recordIndex: number,
+  comment: string,
+): Promise<void> {
   console.log(
     `Set comment for record (index: ${recordIndex}) in history block #${blockNumber} of character ${characterId} in DynamoDB`,
   );
@@ -194,7 +199,7 @@ export async function setRecordComment(characterId: string, blockNumber: number,
   console.log("Successfully set history comment for record in DynamoDB");
 }
 
-export async function deleteHistoryItem(block: HistoryBlock) {
+export async function deleteHistoryItem(block: HistoryBlock): Promise<void> {
   console.log(
     `Delete history item #${block.blockNumber}, id ${block.blockId} of character ${block.characterId} in DynamoDB`,
   );
@@ -213,7 +218,7 @@ export async function deleteHistoryItem(block: HistoryBlock) {
   console.log(`Successfully deleted history item #${block.blockNumber} of character ${block.characterId} in DynamoDB`);
 }
 
-export async function deleteLatestHistoryRecord(block: HistoryBlock) {
+export async function deleteLatestHistoryRecord(block: HistoryBlock): Promise<void> {
   const latestRecordIndex = block.changes.length - 1;
   const latestRecordId = block.changes[latestRecordIndex].id;
   console.log(

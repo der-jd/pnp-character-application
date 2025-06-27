@@ -360,6 +360,38 @@ module "skill_name_options" {
   resource_id = aws_api_gateway_resource.skill_name.id
 }
 
+// ================== /characters/{character-id}/special-abilities ==================
+
+resource "aws_api_gateway_resource" "special_abilities" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "special-abilities" // .../characters/{character-id}/special-abilities
+}
+
+// ================== POST /characters/{character-id}/special-abilities ==================
+
+module "special_abilities_post" {
+  source        = "./modules/apigw_stepfunction_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.special_abilities.id
+  http_method   = "POST"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  aws_region        = data.aws_region.current.name
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = aws_sfn_state_machine.add_special_ability_state_machine.arn
+}
+
+// ================== OPTIONS /characters/{character-id}/special-abilities ==================
+
+module "special_abilities_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.special_abilities.id
+}
+
 // ================== /characters/{character-id}/combat-values ==================
 
 resource "aws_api_gateway_resource" "combat_values" {
@@ -509,6 +541,8 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     module.character_id_clone_options,
     module.level_post,
     module.level_options,
+    module.special_abilities_post,
+    module.special_abilities_options,
     module.skill_name_get,
     module.skill_name_patch,
     module.skill_name_options,

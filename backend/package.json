@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "add-history-record": "file:src/lambdas/add-history-record",
+    "add-special-ability": "file:src/lambdas/add-special-ability",
     "clone-character": "file:src/lambdas/clone-character",
     "config": "file:src/config",
     "delete-character": "file:src/lambdas/delete-character",

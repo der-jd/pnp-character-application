@@ -400,6 +400,28 @@ export const combatValuesChangedRecord: Record = {
   timestamp: new Date().toISOString(),
 };
 
+export const specialAbilitiesChangedRecord: Record = {
+  type: RecordType.SPECIAL_ABILITIES_CHANGED,
+  name: "Berserker Rage",
+  number: 2,
+  id: "9f654a4d-2086-47e2-905b-ad189000b17d",
+  data: {
+    old: {
+      values: new Set(["Iron Will"]),
+    },
+    new: {
+      values: new Set(["Iron Will", "Berserker Rage"]),
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
 export const fakeHistoryBlock1: HistoryBlock = {
   characterId: fakeCharacterId,
   blockNumber: 1,

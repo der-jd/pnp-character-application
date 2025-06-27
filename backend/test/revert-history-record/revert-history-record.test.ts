@@ -13,6 +13,7 @@ import {
   combatValuesChangedRecord,
   levelChangedRecord,
   skillChangedRecord,
+  specialAbilitiesChangedRecord,
 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 import { revertRecordFromHistory } from "revert-history-record/index.js";
@@ -219,6 +220,20 @@ describe("Valid requests", () => {
     {
       name: "Revert history record for changed combat values",
       fakeRecord: combatValuesChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for changed special abilities",
+      fakeRecord: specialAbilitiesChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {
