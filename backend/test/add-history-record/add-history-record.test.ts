@@ -399,10 +399,10 @@ describe("Valid requests", () => {
           name: "Berserker Rage",
           data: {
             old: {
-              values: "Iron Will",
+              values: new Set(["Iron Will"]),
             },
             new: {
-              values: "Iron Will, Berserker Rage",
+              values: new Set(["Iron Will", "Berserker Rage"]),
             },
           },
           learningMethod: null,
