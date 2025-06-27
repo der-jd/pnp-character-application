@@ -11,6 +11,7 @@ import {
   calculationPointsChangedRecord,
   combatSkillChangedRecord,
   combatValuesChangedRecord,
+  levelChangedRecord,
   skillChangedRecord,
 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
@@ -117,6 +118,20 @@ describe("Invalid requests", () => {
 
 describe("Valid requests", () => {
   const testCasesForRevertingRecord = [
+    {
+      name: "Revert history record for changed level",
+      fakeRecord: levelChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
     {
       name: "Revert history record for a changed base value",
       fakeRecord: baseValueChangedRecord,

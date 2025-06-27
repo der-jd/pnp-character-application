@@ -261,6 +261,37 @@ module "calculation_points_options" {
   resource_id = aws_api_gateway_resource.calculation_points.id
 }
 
+// ================== /characters/{character-id}/level ==================
+
+resource "aws_api_gateway_resource" "level" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "level" // .../characters/{character-id}/level
+}
+
+// ================== POST /characters/{character-id}/level ==================
+
+module "level_post" {
+  source        = "./modules/apigw_stepfunction_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.level.id
+  http_method   = "POST"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  aws_region        = data.aws_region.current.name
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = aws_sfn_state_machine.update_level_state_machine.arn
+}
+
+// ================== OPTIONS /characters/{character-id}/level ==================
+
+module "level_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.level.id
+}
 
 // ================== /characters/{character-id}/skills ==================
 
@@ -476,6 +507,8 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     module.character_id_options,
     module.character_id_clone_post,
     module.character_id_clone_options,
+    module.level_post,
+    module.level_options,
     module.skill_name_get,
     module.skill_name_patch,
     module.skill_name_options,

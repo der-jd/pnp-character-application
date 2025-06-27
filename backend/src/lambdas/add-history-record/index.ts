@@ -200,7 +200,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
         calculationPointsChangeSchema.parse(body.data.old);
         calculationPointsChangeSchema.parse(body.data.new);
         break;
-      case RecordType.EVENT_LEVEL_UP:
+      case RecordType.LEVEL_CHANGED:
         numberSchema.parse(body.data.old);
         numberSchema.parse(body.data.new);
         break;

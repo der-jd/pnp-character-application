@@ -26,6 +26,7 @@
     "update-base-value": "file:src/lambdas/update-base-value",
     "update-calculation-points": "file:src/lambdas/update-calculation-points",
     "update-combat-values": "file:src/lambdas/update-combat-values",
+    "update-level": "file:src/lambdas/update-level",
     "update-skill": "file:src/lambdas/update-skill",
     "utils": "file:src/utils"
   },

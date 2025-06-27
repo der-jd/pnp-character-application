@@ -32,6 +32,7 @@ import {
   updateSkill,
   updateCombatValues,
   updateBaseValue,
+  updateLevel,
 } from "utils/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -127,10 +128,11 @@ async function revertChange(userId: string, characterId: string, record: Record)
         await updateAttributePointsIfExists(userId, characterId, oldData.attributePoints);
         break;
       }
-      case RecordType.EVENT_LEVEL_UP:
-        numberSchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting level up is not implemented yet!"); // TODO
+      case RecordType.LEVEL_CHANGED: {
+        const oldData = numberSchema.parse(record.data.old);
+        await updateLevel(userId, characterId, oldData.value);
         break;
+      }
       case RecordType.BASE_VALUE_CHANGED: {
         const oldBaseValue = baseValueSchema.parse(record.data.old);
         await updateBaseValue(userId, characterId, record.name, oldBaseValue);

@@ -16,6 +16,28 @@ export function addFakeHistoryRecord(
   }
 }
 
+export const levelChangedRecord: Record = {
+  type: RecordType.LEVEL_CHANGED,
+  name: "Level up",
+  number: 2,
+  id: "24f2aeb9-11a2-4b82-8307-f97fe30cfef2",
+  data: {
+    old: {
+      value: 1,
+    },
+    new: {
+      value: 2,
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: null,
+  },
+  comment: "Finished story arc",
+  timestamp: new Date().toISOString(),
+};
+
 export const baseValueChangedRecord: Record = {
   type: RecordType.BASE_VALUE_CHANGED,
   name: "healthPoints",
@@ -385,7 +407,7 @@ export const fakeHistoryBlock1: HistoryBlock = {
   previousBlockId: null,
   changes: [
     {
-      type: RecordType.EVENT_LEVEL_UP,
+      type: RecordType.LEVEL_CHANGED,
       name: "Lvl 1",
       number: 1,
       id: "5a17703e-c5fa-4fbb-bc6c-4d7f4ed50a67",

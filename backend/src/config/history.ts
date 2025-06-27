@@ -1,6 +1,6 @@
 export enum RecordType {
   CALCULATION_POINTS_CHANGED = 0,
-  EVENT_LEVEL_UP = 1, // TODO change name to LEVEL_UP?!
+  LEVEL_CHANGED = 1,
   BASE_VALUE_CHANGED = 2,
   PROFESSION_CHANGED = 3,
   HOBBY_CHANGED = 4,

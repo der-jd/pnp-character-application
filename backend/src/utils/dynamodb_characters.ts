@@ -222,6 +222,32 @@ export async function updateBaseValue(
   console.log("Successfully updated DynamoDB item");
 }
 
+export async function updateLevel(userId: string, characterId: string, level: number): Promise<void> {
+  console.log(`Update level of character ${characterId} (user ${userId}) to ${level} in DynamoDB`);
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
+  const command = new UpdateCommand({
+    TableName: process.env.TABLE_NAME_CHARACTERS,
+    Key: {
+      userId: userId,
+      characterId: characterId,
+    },
+    UpdateExpression: "SET #characterSheet.#generalInformation.#level = :level",
+    ExpressionAttributeNames: {
+      "#characterSheet": "characterSheet",
+      "#generalInformation": "generalInformation",
+      "#level": "level",
+    },
+    ExpressionAttributeValues: {
+      ":level": level,
+    },
+  });
+
+  await dynamoDBDocClient.send(command);
+
+  console.log("Successfully updated DynamoDB item");
+}
+
 export async function updateSkill(
   userId: string,
   characterId: string,
