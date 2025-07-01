@@ -41,7 +41,7 @@ export const fakeCharacter: Character = {
         total: 50,
       },
     },
-    advantages: ["Quick Reflexes", "Iron Will", "Charismatic"],
+    advantages: ["Quick Reflexes", "Charismatic"],
     disadvantages: ["Short Temper", "Fear of Heights"],
     specialAbilities: ["Berserker Rage", "Battle Cry"],
     attributes: {

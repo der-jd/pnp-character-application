@@ -342,7 +342,7 @@ describe("Valid requests", () => {
               value: "",
             },
             new: {
-              value: "Iron Will",
+              value: "Athletic",
             },
           },
           learningMethod: null,
@@ -372,7 +372,7 @@ describe("Valid requests", () => {
               value: "",
             },
             new: {
-              value: "Short Temper",
+              value: "Bad Memory",
             },
           },
           learningMethod: null,
@@ -399,10 +399,10 @@ describe("Valid requests", () => {
           name: "Berserker Rage",
           data: {
             old: {
-              values: new Set(["Iron Will"]),
+              values: new Set(["Berserker Rage", "Battle Cry"]),
             },
             new: {
-              values: new Set(["Iron Will", "Berserker Rage"]),
+              values: new Set(["Berserker Rage", "Battle Cry", "Iron Will"]),
             },
           },
           learningMethod: null,
@@ -571,8 +571,16 @@ describe("Valid requests", () => {
       expect(parsedBody.name).toBe(_case.request.body.name);
       expect(parsedBody.number).toBe(fakeHistoryBlock2.changes[fakeHistoryBlock2.changes.length - 1].number + 1);
       expect(parsedBody.id).toBeDefined();
-      expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
-      expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
+
+      // For the initial serialization of the response body, Set values are converted to arrays
+      if (_case.request.body.type === RecordType.SPECIAL_ABILITIES_CHANGED) {
+        expect(parsedBody.data.old.values).toEqual(Array.from(_case.request.body.data.old.values ?? []));
+        expect(parsedBody.data.new.values).toEqual(Array.from(_case.request.body.data.new.values ?? []));
+      } else {
+        expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
+        expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
+      }
+
       expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
       expect(parsedBody.calculationPoints).toEqual(_case.request.body.calculationPoints);
       expect(parsedBody.comment).toBe(_case.request.body.comment);

@@ -162,7 +162,13 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify(record),
+      // JSON.stringify() does not work with Set, so we need to convert it to an array
+      body: JSON.stringify(record, (key, value) => {
+        if (value instanceof Set) {
+          return Array.from(value);
+        }
+        return value;
+      }),
     };
     console.log(response);
     return response;
