@@ -89,7 +89,13 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify(latestRecord),
+      // JSON.stringify() does not work with Set, so we need to convert it to an array
+      body: JSON.stringify(latestRecord, (key, value) => {
+        if (value instanceof Set) {
+          return Array.from(value);
+        }
+        return value;
+      }),
     };
     console.log(response);
     return response;
