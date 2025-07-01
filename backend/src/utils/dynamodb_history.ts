@@ -177,6 +177,8 @@ export async function setRecordComment(
     `Set comment for record (index: ${recordIndex}) in history block #${blockNumber} of character ${characterId} in DynamoDB`,
   );
 
+  // TODO check against attack patterns like injection, XSS, etc.
+
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
   const command = new UpdateCommand({
     TableName: process.env.TABLE_NAME_HISTORY,

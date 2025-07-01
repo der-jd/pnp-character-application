@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
+import validator from "validator";
 import {
   Request,
   parseBody,
@@ -22,8 +23,15 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 const bodySchema = z
   .object({
-    specialAbility: z.string(),
+    specialAbility: z
+      .string()
+      .max(100)
+      .refine((val) => validator.isAscii(val) && val === validator.escape(val), {
+        message: "Invalid input for special ability",
+      }), // TODO check against attack patterns like injection, XSS, etc.
+    // TODO add test for special ability length and pattern
   })
+
   .strict();
 
 interface Parameters {
@@ -48,19 +56,28 @@ export async function _addSpecialAbility(request: Request): Promise<APIGatewayPr
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        characterId: params.characterId,
-        userId: params.userId,
-        specialAbilityName: params.specialAbility,
-        specialAbilities: {
-          old: {
-            values: specialAbilitiesOld,
-          },
-          new: {
-            values: specialAbilitiesNew,
+      // JSON.stringify() does not work with Set, so we need to convert it to an array
+      body: JSON.stringify(
+        {
+          characterId: params.characterId,
+          userId: params.userId,
+          specialAbilityName: params.specialAbility,
+          specialAbilities: {
+            old: {
+              values: specialAbilitiesOld,
+            },
+            new: {
+              values: specialAbilitiesNew,
+            },
           },
         },
-      }),
+        (key, value) => {
+          if (value instanceof Set) {
+            return Array.from(value);
+          }
+          return value;
+        },
+      ),
     };
     console.log(response);
     return response;
