@@ -17,6 +17,7 @@ import {
   HistoryBlock,
   calculationPointsChangeSchema,
   stringSetSchema,
+  stringArraySchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -226,8 +227,15 @@ async function validateRequest(request: Request): Promise<Parameters> {
         stringSchema.parse(body.data.new);
         break;
       case RecordType.SPECIAL_ABILITIES_CHANGED:
-        stringSetSchema.parse(body.data.old);
-        stringSetSchema.parse(body.data.new);
+        try {
+          // When called for the tests, the data is passed as a Set
+          stringSetSchema.parse(body.data.old);
+          stringSetSchema.parse(body.data.new);
+        } catch {
+          // When called via Step Functions, the data is passed as an array, because JSON.stringify() does not work with Set
+          stringArraySchema.parse(body.data.old);
+          stringArraySchema.parse(body.data.new);
+        }
         break;
       case RecordType.ATTRIBUTE_CHANGED:
         attributeChangeSchema.parse(body.data.old);
