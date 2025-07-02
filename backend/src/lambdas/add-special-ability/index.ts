@@ -42,7 +42,7 @@ export async function _addSpecialAbility(request: Request): Promise<APIGatewayPr
 
     const character = await getCharacterItem(params.userId, params.characterId);
     const specialAbilitiesOld = new Set(character.characterSheet.specialAbilities);
-    const specialAbilitiesNew = structuredClone(specialAbilitiesOld);
+    const specialAbilitiesNew = new Set(specialAbilitiesOld);
     specialAbilitiesNew.add(params.specialAbility);
     await setSpecialAbilities(params.userId, params.characterId, specialAbilitiesNew);
 
