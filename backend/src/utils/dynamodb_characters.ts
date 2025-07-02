@@ -34,7 +34,7 @@ export async function setSpecialAbilities(
       "#specialAbilities": "specialAbilities",
     },
     ExpressionAttributeValues: {
-      ":specialAbility": specialAbilities,
+      ":specialAbilities": specialAbilities,
     },
   });
 
