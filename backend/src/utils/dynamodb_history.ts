@@ -184,10 +184,9 @@ export async function setRecordComment(
       characterId: characterId,
       blockNumber: blockNumber,
     },
-    UpdateExpression: `SET #changes[#index].#comment = :comment`,
+    UpdateExpression: `SET #changes[${recordIndex}].#comment = :comment`,
     ExpressionAttributeNames: {
       "#changes": "changes",
-      "#index": `${recordIndex}`,
       "#comment": "comment",
     },
     ExpressionAttributeValues: {
