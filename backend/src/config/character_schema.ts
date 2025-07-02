@@ -93,9 +93,7 @@ export const characterSheetSchema = z
       .strict(),
     advantages: z.array(z.string()),
     disadvantages: z.array(z.string()),
-    specialAbilities: z
-      .instanceof(Set<string>)
-      .refine((set) => Array.from(set).every((v) => typeof v === "string"), { message: "All values must be strings" }),
+    specialAbilities: z.set(z.string()),
     baseValues: z
       .object({
         healthPoints: baseValueSchema,
