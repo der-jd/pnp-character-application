@@ -26,4 +26,4 @@ export {
 } from "./dynamodb_history.js";
 export { ensureHttpError, HttpError } from "./errors.js";
 export { decodeUserId } from "./token.js";
-export { validateUUID } from "./utils.js";
+export { validateUUID } from "./validation.js";
