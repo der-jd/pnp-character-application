@@ -23,8 +23,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 const bodySchema = z
   .object({
-    comment: z.string().max(1000), // TODO check against attack patterns like injection, XSS, etc.
-    // TODO add test for comment length
+    comment: z.string().max(1000),
   })
   .strict();
 
