@@ -232,10 +232,9 @@ export async function deleteLatestHistoryRecord(block: HistoryBlock): Promise<vo
       characterId: block.characterId,
       blockNumber: block.blockNumber,
     },
-    UpdateExpression: `REMOVE #changes[#index]`,
+    UpdateExpression: `REMOVE #changes[${latestRecordIndex}]`,
     ExpressionAttributeNames: {
       "#changes": "changes",
-      "#index": `${latestRecordIndex}`,
     },
   });
 
