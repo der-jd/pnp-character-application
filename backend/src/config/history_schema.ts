@@ -70,6 +70,18 @@ export const stringSchema = z
   })
   .strict();
 
+export const stringArraySchema = z
+  .object({
+    values: z.array(z.string()),
+  })
+  .strict();
+
+export const stringSetSchema = z
+  .object({
+    values: z.set(z.string()),
+  })
+  .strict();
+
 export const attributeChangeSchema = z
   .object({
     attribute: attributeSchema,

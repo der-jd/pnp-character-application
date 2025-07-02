@@ -5,6 +5,7 @@
  * Some definitions can not be generated automatically and need to be set manually:
  * - Type of 'costCategorySchema'
  * - .strict() for objects (otherwise undefined extra values are allowed for the schema)
+ * - type of 'specialAbilities' (Set<string>)
  */
 import { z } from "zod";
 import { CostCategory } from "./cost.js";
@@ -92,7 +93,7 @@ export const characterSheetSchema = z
       .strict(),
     advantages: z.array(z.string()),
     disadvantages: z.array(z.string()),
-    specialAbilities: z.array(z.string()),
+    specialAbilities: z.set(z.string()),
     baseValues: z
       .object({
         healthPoints: baseValueSchema,

@@ -41,9 +41,9 @@ export const fakeCharacter: Character = {
         total: 50,
       },
     },
-    advantages: ["Quick Reflexes", "Iron Will", "Charismatic"],
+    advantages: ["Quick Reflexes", "Charismatic"],
     disadvantages: ["Short Temper", "Fear of Heights"],
-    specialAbilities: ["Berserker Rage", "Battle Cry"],
+    specialAbilities: new Set(["Berserker Rage", "Battle Cry"]),
     attributes: {
       courage: {
         start: 12,
@@ -928,7 +928,7 @@ export const fakeCharacter2: Character = {
     },
     advantages: ["Quick Reflexes", "Iron Will", "Charismatic"],
     disadvantages: ["Short Temper", "Fear of Heights"],
-    specialAbilities: ["Berserker Rage", "Battle Cry"],
+    specialAbilities: new Set(["Berserker Rage", "Battle Cry"]),
     attributes: {
       courage: {
         start: 12,

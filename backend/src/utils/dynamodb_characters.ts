@@ -12,6 +12,37 @@ import {
 import { HttpError } from "./errors.js";
 import { dynamoDBDocClient } from "./dynamodb_client.js";
 
+export async function setSpecialAbilities(
+  userId: string,
+  characterId: string,
+  specialAbilities: Set<string>,
+): Promise<void> {
+  console.log(
+    `Set special abilities '${Array.from(specialAbilities).join(", ")}' to character ${characterId} of user ${userId} in DynamoDB`,
+  );
+
+  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
+  const command = new UpdateCommand({
+    TableName: process.env.TABLE_NAME_CHARACTERS,
+    Key: {
+      userId: userId,
+      characterId: characterId,
+    },
+    UpdateExpression: "SET #characterSheet.#specialAbilities = :specialAbilities",
+    ExpressionAttributeNames: {
+      "#characterSheet": "characterSheet",
+      "#specialAbilities": "specialAbilities",
+    },
+    ExpressionAttributeValues: {
+      ":specialAbilities": specialAbilities,
+    },
+  });
+
+  await dynamoDBDocClient.send(command);
+
+  console.log("Successfully updated DynamoDB item");
+}
+
 export async function getCharacterItem(userId: string, characterId: string): Promise<Character> {
   console.log(`Get character ${characterId} of user ${userId} from DynamoDB`);
 
@@ -74,7 +105,7 @@ export async function createCharacterItem(character: Character): Promise<void> {
   console.log("Successfully created new character item in DynamoDB", character);
 }
 
-export async function deleteCharacterItem(userId: string, characterId: string) {
+export async function deleteCharacterItem(userId: string, characterId: string): Promise<void> {
   console.log(`Delete character ${characterId} of user ${userId} in DynamoDB`);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/delete.js

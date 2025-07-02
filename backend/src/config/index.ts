@@ -39,6 +39,8 @@ export {
   HistoryBlock,
   numberSchema,
   stringSchema,
+  stringArraySchema,
+  stringSetSchema,
   attributeChangeSchema,
   calculationPointsChangeSchema,
   skillChangeSchema,

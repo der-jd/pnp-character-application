@@ -13,9 +13,11 @@ import {
   combatValuesChangedRecord,
   levelChangedRecord,
   skillChangedRecord,
+  specialAbilitiesChangedRecord,
 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 import { revertRecordFromHistory } from "revert-history-record/index.js";
+import { RecordType } from "config/index.js";
 
 const lastBlock = fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1];
 
@@ -230,6 +232,20 @@ describe("Valid requests", () => {
       },
       expectedStatusCode: 200,
     },
+    {
+      name: "Revert history record for changed special abilities",
+      fakeRecord: specialAbilitiesChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
   ];
 
   testCasesForRevertingRecord.forEach((_case) => {
@@ -243,7 +259,25 @@ describe("Valid requests", () => {
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
       const parsedBody = JSON.parse(result.body);
-      expect(parsedBody).toEqual(_case.fakeRecord);
+
+      // For the initial serialization of the response body, Set values are converted to arrays
+      if (_case.fakeRecord.type === RecordType.SPECIAL_ABILITIES_CHANGED) {
+        // Replace Set with arrays in the expected object for deep equality check
+        const expectedData = {
+          ..._case.fakeRecord,
+          data: {
+            old: {
+              values: Array.from(_case.fakeRecord.data.old.values),
+            },
+            new: {
+              values: Array.from(_case.fakeRecord.data.new.values),
+            },
+          },
+        };
+        expect(parsedBody).toEqual(expectedData);
+      } else {
+        expect(parsedBody).toEqual(_case.fakeRecord);
+      }
 
       /**
        * Check if the UpdateCommand was called at least once for the removal of the latest record from the history item.

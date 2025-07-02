@@ -121,14 +121,7 @@
         ]
       },
       "specialAbilities": {
-        "L": [
-          {
-            "S": "Berserker Rage"
-          },
-          {
-            "S": "Battle Cry"
-          }
-        ]
+        "SS": ["Berserker Rage", "Battle Cry"]
       },
       "attributes": {
         "M": {

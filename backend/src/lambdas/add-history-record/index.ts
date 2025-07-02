@@ -16,6 +16,8 @@ import {
   attributeChangeSchema,
   HistoryBlock,
   calculationPointsChangeSchema,
+  stringSetSchema,
+  stringArraySchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -161,7 +163,13 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify(record),
+      // JSON.stringify() does not work with Set, so we need to convert it to an array
+      body: JSON.stringify(record, (key, value) => {
+        if (value instanceof Set) {
+          return Array.from(value);
+        }
+        return value;
+      }),
     };
     console.log(response);
     return response;
@@ -215,9 +223,19 @@ async function validateRequest(request: Request): Promise<Parameters> {
         break;
       case RecordType.ADVANTAGE_CHANGED:
       case RecordType.DISADVANTAGE_CHANGED:
-      case RecordType.SPECIAL_ABILITY_CHANGED:
         stringSchema.parse(body.data.old);
         stringSchema.parse(body.data.new);
+        break;
+      case RecordType.SPECIAL_ABILITIES_CHANGED:
+        try {
+          // When called via the tests, the data is passed as a Set
+          stringSetSchema.parse(body.data.old);
+          stringSetSchema.parse(body.data.new);
+        } catch {
+          // When called via Step Functions, the data is passed as an array, because JSON.stringify() does not work with Set
+          stringArraySchema.parse(body.data.old);
+          stringArraySchema.parse(body.data.new);
+        }
         break;
       case RecordType.ATTRIBUTE_CHANGED:
         attributeChangeSchema.parse(body.data.old);

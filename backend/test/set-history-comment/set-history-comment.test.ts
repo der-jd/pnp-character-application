@@ -61,6 +61,21 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 404,
     },
+    {
+      name: "History comment exceeds maximum length",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "f18003ae-a678-4273-b6be-e0f9bb6b023a",
+        },
+        queryStringParameters: null,
+        body: {
+          comment: "This is a test comment".repeat(1001), // Exceeding the maximum length
+        },
+      },
+      expectedStatusCode: 400,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {
