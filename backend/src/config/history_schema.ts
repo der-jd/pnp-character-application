@@ -78,9 +78,7 @@ export const stringArraySchema = z
 
 export const stringSetSchema = z
   .object({
-    values: z
-      .instanceof(Set<string>)
-      .refine((set) => Array.from(set).every((v) => typeof v === "string"), { message: "All values must be strings" }),
+    values: z.set(z.string()),
   })
   .strict();
 
