@@ -228,7 +228,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
         break;
       case RecordType.SPECIAL_ABILITIES_CHANGED:
         try {
-          // When called for the tests, the data is passed as a Set
+          // When called via the tests, the data is passed as a Set
           stringSetSchema.parse(body.data.old);
           stringSetSchema.parse(body.data.new);
         } catch {

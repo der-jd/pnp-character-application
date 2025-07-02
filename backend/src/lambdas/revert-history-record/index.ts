@@ -16,6 +16,7 @@ import {
   CharacterSheet,
   calculationPointsChangeSchema,
   stringSetSchema,
+  stringArraySchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -167,8 +168,15 @@ async function revertChange(userId: string, characterId: string, record: Record)
         throw new HttpError(500, "Reverting disadvantage change is not implemented yet!"); // TODO
         break;
       case RecordType.SPECIAL_ABILITIES_CHANGED: {
-        const oldData = stringSetSchema.parse(record.data.old);
-        await setSpecialAbilities(userId, characterId, oldData.values);
+        let oldSpecialAbilities: Set<string>;
+        try {
+          // When called via the tests, the data is passed as a Set
+          oldSpecialAbilities = stringSetSchema.parse(record.data.old).values;
+        } catch {
+          // When called via Step Functions, the data is passed as an array, because JSON.stringify() does not work with Set
+          oldSpecialAbilities = new Set(stringArraySchema.parse(record.data.old).values);
+        }
+        await setSpecialAbilities(userId, characterId, oldSpecialAbilities);
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
