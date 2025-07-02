@@ -82,6 +82,21 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 404,
     },
+    {
+      name: "Special ability name exceeds length limit",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          specialAbility:
+            "More than 100 characters: Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will",
+        },
+      },
+      expectedStatusCode: 400,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {

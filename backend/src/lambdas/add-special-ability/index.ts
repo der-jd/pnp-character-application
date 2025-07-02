@@ -1,6 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
-import validator from "validator";
 import {
   Request,
   parseBody,
@@ -23,15 +22,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 const bodySchema = z
   .object({
-    specialAbility: z
-      .string()
-      .max(100)
-      .refine((val) => validator.isAscii(val) && val === validator.escape(val), {
-        message: "Invalid input for special ability",
-      }), // TODO check against attack patterns like injection, XSS, etc.
-    // TODO add test for special ability length and pattern
+    specialAbility: z.string().max(100),
   })
-
   .strict();
 
 interface Parameters {
@@ -98,9 +90,21 @@ function validateRequest(request: Request): Parameters {
 
   validateUUID(characterId);
 
-  return {
-    userId: userId,
-    characterId: characterId,
-    specialAbility: bodySchema.parse(request.body).specialAbility,
-  };
+  try {
+    const body = bodySchema.parse(request.body);
+
+    return {
+      userId: userId,
+      characterId: characterId,
+      specialAbility: body.specialAbility,
+    };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("Validation errors:", error.errors);
+      throw new HttpError(400, "Invalid input values!");
+    }
+
+    // Rethrow other errors
+    throw error;
+  }
 }

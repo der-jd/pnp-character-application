@@ -21,8 +21,6 @@ export async function setSpecialAbilities(
     `Set special abilities '${Array.from(specialAbilities).join(", ")}' to character ${characterId} of user ${userId} in DynamoDB`,
   );
 
-  // TODO check strings in set against attack patterns like injection, XSS, etc.
-
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
   const command = new UpdateCommand({
     TableName: process.env.TABLE_NAME_CHARACTERS,
