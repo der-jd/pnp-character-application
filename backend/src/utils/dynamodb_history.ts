@@ -11,7 +11,7 @@ import { Record, HistoryBlock, historyBlockSchema } from "config/index.js";
 import { HttpError } from "./errors.js";
 import { dynamoDBDocClient } from "./dynamodb_client.js";
 
-const DYNAMODB_BATCH_WRITE_LIMIT = 25;
+const DYNAMODB_BATCH_WRITE_LIMIT = 25; // This limit is set by DynamoDB for batch write operations
 
 /**
  * Local convenience function. It takes an array and returns
@@ -177,8 +177,6 @@ export async function setRecordComment(
     `Set comment for record (index: ${recordIndex}) in history block #${blockNumber} of character ${characterId} in DynamoDB`,
   );
 
-  // TODO check against attack patterns like injection, XSS, etc.
-
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
   const command = new UpdateCommand({
     TableName: process.env.TABLE_NAME_HISTORY,
@@ -186,9 +184,10 @@ export async function setRecordComment(
       characterId: characterId,
       blockNumber: blockNumber,
     },
-    UpdateExpression: `SET #changes[${recordIndex}].#comment = :comment`,
+    UpdateExpression: `SET #changes[#index].#comment = :comment`,
     ExpressionAttributeNames: {
       "#changes": "changes",
+      "#index": `${recordIndex}`,
       "#comment": "comment",
     },
     ExpressionAttributeValues: {
@@ -221,8 +220,8 @@ export async function deleteHistoryItem(block: HistoryBlock): Promise<void> {
 }
 
 export async function deleteLatestHistoryRecord(block: HistoryBlock): Promise<void> {
-  const latestRecordIndex = block.changes.length - 1;
-  const latestRecordId = block.changes[latestRecordIndex].id;
+  const latestRecordIndex: number = block.changes.length - 1;
+  const latestRecordId: string = block.changes[latestRecordIndex].id;
   console.log(
     `Delete latest record ${latestRecordId} from history block #${block.blockNumber}, id ${block.blockId} of character ${block.characterId} in DynamoDB`,
   );
@@ -234,9 +233,10 @@ export async function deleteLatestHistoryRecord(block: HistoryBlock): Promise<vo
       characterId: block.characterId,
       blockNumber: block.blockNumber,
     },
-    UpdateExpression: `REMOVE #changes[${latestRecordIndex}]`,
+    UpdateExpression: `REMOVE #changes[#index]`,
     ExpressionAttributeNames: {
       "#changes": "changes",
+      "#index": `${latestRecordIndex}`,
     },
   });
 

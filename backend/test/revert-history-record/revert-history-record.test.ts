@@ -291,7 +291,7 @@ describe("Valid requests", () => {
         return (
           input.Key.characterId === _case.request.pathParameters["character-id"] &&
           input.Key.blockNumber === lastBlock.blockNumber &&
-          input.UpdateExpression === `REMOVE #changes[${lastBlock.changes.length - 1}]`
+          input.ExpressionAttributeNames[`#index`] === `${lastBlock.changes.length - 1}`
         );
       });
       expect(matchingCall).toBeTruthy();
