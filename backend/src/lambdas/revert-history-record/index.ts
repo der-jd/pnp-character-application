@@ -3,13 +3,11 @@ import { z } from "zod";
 import {
   baseValueSchema,
   combatValuesSchema,
-  professionHobbySchema,
   RecordType,
   Record,
   historyBlockSchema,
   recordSchema,
   numberSchema,
-  stringSchema,
   CalculationPoints,
   skillChangeSchema,
   attributeChangeSchema,
@@ -151,22 +149,6 @@ async function revertChange(userId: string, characterId: string, record: Record)
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
       }
-      case RecordType.PROFESSION_CHANGED:
-        professionHobbySchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting profession change is not implemented yet!"); // TODO
-        break;
-      case RecordType.HOBBY_CHANGED:
-        professionHobbySchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting hobby change is not implemented yet!"); // TODO
-        break;
-      case RecordType.ADVANTAGE_CHANGED:
-        stringSchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting advantage change is not implemented yet!"); // TODO
-        break;
-      case RecordType.DISADVANTAGE_CHANGED:
-        stringSchema.parse(record.data.old);
-        throw new HttpError(500, "Reverting disadvantage change is not implemented yet!"); // TODO
-        break;
       case RecordType.SPECIAL_ABILITIES_CHANGED: {
         let oldSpecialAbilities: Set<string>;
         try {

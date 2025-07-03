@@ -6,12 +6,10 @@ import {
   baseValueSchema,
   calculationPointsSchema,
   combatValuesSchema,
-  professionHobbySchema,
   RecordType,
   Record,
   historyBlockSchema,
   numberSchema,
-  stringSchema,
   skillChangeSchema,
   attributeChangeSchema,
   HistoryBlock,
@@ -215,16 +213,6 @@ async function validateRequest(request: Request): Promise<Parameters> {
       case RecordType.BASE_VALUE_CHANGED:
         baseValueSchema.parse(body.data.old);
         baseValueSchema.parse(body.data.new);
-        break;
-      case RecordType.PROFESSION_CHANGED:
-      case RecordType.HOBBY_CHANGED:
-        professionHobbySchema.parse(body.data.old);
-        professionHobbySchema.parse(body.data.new);
-        break;
-      case RecordType.ADVANTAGE_CHANGED:
-      case RecordType.DISADVANTAGE_CHANGED:
-        stringSchema.parse(body.data.old);
-        stringSchema.parse(body.data.new);
         break;
       case RecordType.SPECIAL_ABILITIES_CHANGED:
         try {
