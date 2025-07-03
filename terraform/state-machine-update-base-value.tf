@@ -79,7 +79,7 @@ resource "aws_sfn_state_machine" "update_base_value_state_machine" {
           },
           "body" = {
             "userId"         = "{% $parse($states.input.body).userId %}",
-            "type"           = "2", // BASE_VALUE_CHANGED
+            "type"           = "3", // BASE_VALUE_CHANGED
             "name"           = "{% $parse($states.input.body).baseValueName %}",
             "data"           = "{% $parse($states.input.body).baseValue %}",
             "learningMethod" = null,
