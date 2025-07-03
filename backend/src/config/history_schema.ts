@@ -64,12 +64,6 @@ export const numberSchema = z
   })
   .strict();
 
-export const stringSchema = z
-  .object({
-    value: z.string(),
-  })
-  .strict();
-
 export const stringArraySchema = z
   .object({
     values: z.array(z.string()),

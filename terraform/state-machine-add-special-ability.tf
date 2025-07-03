@@ -79,7 +79,7 @@ resource "aws_sfn_state_machine" "add_special_ability_state_machine" {
           },
           "body" = {
             "userId"         = "{% $parse($states.input.body).userId %}",
-            "type"           = "7", // SPECIAL_ABILITIES_CHANGED
+            "type"           = "4", // SPECIAL_ABILITIES_CHANGED
             "name"           = "{% $parse($states.input.body).specialAbilityName %}",
             "data"           = "{% $parse($states.input.body).specialAbilities %}",
             "learningMethod" = null,

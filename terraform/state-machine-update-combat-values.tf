@@ -79,7 +79,7 @@ resource "aws_sfn_state_machine" "update_combat_values_state_machine" {
           },
           "body" = {
             "userId"         = "{% $parse($states.input.body).userId %}",
-            "type"           = "11", // COMBAT_VALUES_CHANGED
+            "type"           = "7", // COMBAT_VALUES_CHANGED
             "name"           = "{% $parse($states.input.body).combatCategory & '/' & $parse($states.input.body).combatSkillName %}",
             "data"           = "{% $parse($states.input.body).combatValues %}",
             "learningMethod" = null,

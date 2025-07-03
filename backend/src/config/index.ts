@@ -38,7 +38,6 @@ export {
   historyBlockSchema,
   HistoryBlock,
   numberSchema,
-  stringSchema,
   stringArraySchema,
   stringSetSchema,
   attributeChangeSchema,

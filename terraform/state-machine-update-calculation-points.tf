@@ -79,7 +79,7 @@ resource "aws_sfn_state_machine" "update_calculation_points_state_machine" {
           },
           "body" = {
             "userId"         = "{% $parse($states.input.body).userId %}",
-            "type"           = "0", // CALCULATION_POINTS_CHANGED
+            "type"           = "2", // CALCULATION_POINTS_CHANGED
             "name"           = "Calculation Points",
             "data"           = "{% $parse($states.input.body).calculationPoints %}",
             "learningMethod" = null,
