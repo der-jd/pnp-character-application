@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
-import { HistoryBlock } from "config/index.js";
+import { HistoryBlock, MAX_STRING_LENGTH_VERY_LONG } from "config/index.js";
 import {
   getHistoryItems,
   Request,
@@ -23,7 +23,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 const bodySchema = z
   .object({
-    comment: z.string().max(1000),
+    comment: z.string().max(MAX_STRING_LENGTH_VERY_LONG),
   })
   .strict();
 
