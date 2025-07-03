@@ -51,6 +51,19 @@ resource "aws_api_gateway_resource" "characters" {
   path_part   = "characters" // .../characters
 }
 
+// ================== POST /characters ==================
+
+module "characters_post" {
+  source            = "./modules/apigw_stepfunction_integration"
+  rest_api_id       = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id       = aws_api_gateway_resource.characters.id
+  http_method       = "POST"
+  authorizer_id     = aws_api_gateway_authorizer.cognito_authorizer.id
+  aws_region        = data.aws_region.current.name
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = aws_sfn_state_machine.create_character_state_machine.arn
+}
+
 // ================== GET /characters ==================
 
 module "characters_get" {
@@ -526,6 +539,7 @@ module "record_id_options" {
 // TODO there is a new stage deployment with each CircleCI run -> fix this
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
+    module.characters_post,
     module.attribute_name_patch,
     module.attribute_name_options,
     module.base_value_name_patch,

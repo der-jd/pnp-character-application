@@ -129,6 +129,8 @@ async function revertChange(userId: string, characterId: string, record: Record)
     recordSchema.parse(record);
 
     switch (record.type) {
+      case RecordType.CHARACTER_CREATED:
+        throw new HttpError(400, "Reverting character creation is not allowed! Delete the character instead.");
       case RecordType.CALCULATION_POINTS_CHANGED: {
         const oldData = calculationPointsChangeSchema.parse(record.data.old);
         await updateAdventurePointsIfExists(userId, characterId, oldData.adventurePoints);
