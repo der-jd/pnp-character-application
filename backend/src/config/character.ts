@@ -6,6 +6,23 @@ export interface Character {
   characterSheet: CharacterSheet;
 }
 
+export interface GeneralInformation {
+  name: string;
+  level: number;
+  sex: string;
+  profession: ProfessionHobby;
+  hobby: ProfessionHobby;
+  birthday: string;
+  birthplace: string;
+  size: string;
+  weight: string;
+  hairColor: string;
+  eyeColor: string;
+  residence: string;
+  appearance: string;
+  specialCharacteristics: string;
+}
+
 export interface CalculationPoints {
   start: number;
   available: number;
@@ -49,22 +66,7 @@ export interface CombatValues {
 }
 
 export interface CharacterSheet {
-  generalInformation: {
-    name: string;
-    level: number;
-    sex: string;
-    profession: ProfessionHobby;
-    hobby: ProfessionHobby;
-    birthday: string;
-    birthplace: string;
-    size: string;
-    weight: string;
-    hairColor: string;
-    eyeColor: string;
-    residence: string;
-    appearance: string;
-    specialCharacteristics: string;
-  };
+  generalInformation: GeneralInformation;
   calculationPoints: {
     adventurePoints: CalculationPoints;
     attributePoints: CalculationPoints;

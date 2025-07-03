@@ -6,9 +6,41 @@
  * - Type of 'costCategorySchema'
  * - .strict() for objects (otherwise undefined extra values are allowed for the schema)
  * - type of 'specialAbilities' (Set<string>)
+ * - Max length of strings (e.g. for advantages, disadvantages, etc.)
  */
 import { z } from "zod";
 import { CostCategory } from "./cost.js";
+
+export const MAX_STRING_LENGTH_SHORT = 30;
+export const MAX_STRING_LENGTH_DEFAULT = 120;
+export const MAX_STRING_LENGTH_LONG = 500;
+export const MAX_STRING_LENGTH_VERY_LONG = 1000;
+
+export const professionHobbySchema = z
+  .object({
+    name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    skill: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+  })
+  .strict();
+
+export const generalInformationSchema = z
+  .object({
+    name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    level: z.number(),
+    sex: z.string().max(MAX_STRING_LENGTH_SHORT),
+    profession: professionHobbySchema,
+    hobby: professionHobbySchema,
+    birthday: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    birthplace: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    size: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    weight: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    hairColor: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    eyeColor: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    residence: z.string().max(MAX_STRING_LENGTH_LONG),
+    appearance: z.string().max(MAX_STRING_LENGTH_VERY_LONG),
+    specialCharacteristics: z.string().max(MAX_STRING_LENGTH_VERY_LONG),
+  })
+  .strict();
 
 export const calculationPointsSchema = z
   .object({
@@ -18,12 +50,7 @@ export const calculationPointsSchema = z
   })
   .strict();
 
-export const professionHobbySchema = z
-  .object({
-    name: z.string(),
-    skill: z.string(),
-  })
-  .strict();
+export const dis_advantagesSchema = z.array(z.string().max(MAX_STRING_LENGTH_DEFAULT));
 
 export const attributeSchema = z
   .object({
@@ -67,33 +94,16 @@ export const skillSchema = z
 
 export const characterSheetSchema = z
   .object({
-    generalInformation: z
-      .object({
-        name: z.string(),
-        level: z.number(),
-        sex: z.string(),
-        profession: professionHobbySchema,
-        hobby: professionHobbySchema,
-        birthday: z.string(),
-        birthplace: z.string(),
-        size: z.string(),
-        weight: z.string(),
-        hairColor: z.string(),
-        eyeColor: z.string(),
-        residence: z.string(),
-        appearance: z.string(),
-        specialCharacteristics: z.string(),
-      })
-      .strict(),
+    generalInformation: generalInformationSchema,
     calculationPoints: z
       .object({
         adventurePoints: calculationPointsSchema,
         attributePoints: calculationPointsSchema,
       })
       .strict(),
-    advantages: z.array(z.string()),
-    disadvantages: z.array(z.string()),
-    specialAbilities: z.set(z.string()),
+    advantages: dis_advantagesSchema,
+    disadvantages: dis_advantagesSchema,
+    specialAbilities: z.set(z.string().max(MAX_STRING_LENGTH_DEFAULT)),
     baseValues: z
       .object({
         healthPoints: baseValueSchema,
