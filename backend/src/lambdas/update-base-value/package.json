@@ -1,5 +1,5 @@
 {
-  "name": "increase-skill",
+  "name": "update-base-value",
   "version": "1.0.0",
   "main": "index.mjs",
   "type": "module",

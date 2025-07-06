@@ -21,9 +21,11 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const bodySchema = z.object({
-  comment: z.string(),
-});
+const bodySchema = z
+  .object({
+    comment: z.string().max(1000),
+  })
+  .strict();
 
 export type BodySchema = z.infer<typeof bodySchema>;
 

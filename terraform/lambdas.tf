@@ -43,6 +43,52 @@ module "add_history_record_lambda" {
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
 }
 
+module "add_special_ability_lambda" {
+  source        = "./modules/lambda_function"
+  function_name = "add-special-ability"
+  environment_vars = {
+    TABLE_NAME_CHARACTERS = local.characters_table_name
+  }
+  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
+  role_arn        = aws_iam_role.lambda_exec_role.arn
+  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
+}
+
+module "clone_character_lambda" {
+  source        = "./modules/lambda_function"
+  function_name = "clone-character"
+  environment_vars = {
+    TABLE_NAME_CHARACTERS = local.characters_table_name
+    TABLE_NAME_HISTORY    = local.history_table_name
+  }
+  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
+  role_arn        = aws_iam_role.lambda_exec_role.arn
+  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
+}
+
+module "delete_character_lambda" {
+  source        = "./modules/lambda_function"
+  function_name = "delete-character"
+  environment_vars = {
+    TABLE_NAME_CHARACTERS = local.characters_table_name
+    TABLE_NAME_HISTORY    = local.history_table_name
+  }
+  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
+  role_arn        = aws_iam_role.lambda_exec_role.arn
+  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
+}
+
+module "update_combat_values_lambda" {
+  source        = "./modules/lambda_function"
+  function_name = "update-combat-values"
+  environment_vars = {
+    TABLE_NAME_CHARACTERS = local.characters_table_name
+  }
+  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
+  role_arn        = aws_iam_role.lambda_exec_role.arn
+  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
+}
+
 module "get_character_lambda" {
   source        = "./modules/lambda_function"
   function_name = "get-character"
@@ -87,9 +133,9 @@ module "get_skill_increase_cost_lambda" {
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
 }
 
-module "increase_attribute_lambda" {
+module "update_attribute_lambda" {
   source        = "./modules/lambda_function"
-  function_name = "increase-attribute"
+  function_name = "update-attribute"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
   }
@@ -98,9 +144,42 @@ module "increase_attribute_lambda" {
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
 }
 
-module "increase_skill_lambda" {
+module "update_base_value_lambda" {
   source        = "./modules/lambda_function"
-  function_name = "increase-skill"
+  function_name = "update-base-value"
+  environment_vars = {
+    TABLE_NAME_CHARACTERS = local.characters_table_name
+  }
+  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
+  role_arn        = aws_iam_role.lambda_exec_role.arn
+  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
+}
+
+module "update_calculation_points_lambda" {
+  source        = "./modules/lambda_function"
+  function_name = "update-calculation-points"
+  environment_vars = {
+    TABLE_NAME_CHARACTERS = local.characters_table_name
+  }
+  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
+  role_arn        = aws_iam_role.lambda_exec_role.arn
+  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
+}
+
+module "update_level_lambda" {
+  source        = "./modules/lambda_function"
+  function_name = "update-level"
+  environment_vars = {
+    TABLE_NAME_CHARACTERS = local.characters_table_name
+  }
+  layers          = [aws_lambda_layer_version.config.arn, aws_lambda_layer_version.utils.arn]
+  role_arn        = aws_iam_role.lambda_exec_role.arn
+  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
+}
+
+module "update_skill_lambda" {
+  source        = "./modules/lambda_function"
+  function_name = "update-skill"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
   }

@@ -1,16 +1,24 @@
 export { Request, parseBody } from "./request.js";
 export {
+  setSpecialAbilities,
   getCharacterItem,
   getCharacterItems,
+  createCharacterItem,
+  deleteCharacterItem,
   updateAttribute,
   updateSkill,
   updateAdventurePoints,
   updateAttributePoints,
+  updateCombatValues,
+  updateBaseValue,
+  updateLevel,
 } from "./dynamodb_characters.js";
 export {
   getHistoryItem,
   getHistoryItems,
   createHistoryItem,
+  createBatchHistoryItems,
+  deleteBatchHistoryItems,
   addHistoryRecord,
   deleteHistoryItem,
   deleteLatestHistoryRecord,
@@ -18,4 +26,4 @@ export {
 } from "./dynamodb_history.js";
 export { ensureHttpError, HttpError } from "./errors.js";
 export { decodeUserId } from "./token.js";
-export { validateUUID } from "./utils.js";
+export { validateUUID } from "./validation.js";

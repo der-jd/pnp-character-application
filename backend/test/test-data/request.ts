@@ -1,4 +1,4 @@
-// user id is used in the fake character
+// user id is used in the fake characters
 export const fakeUserId = "afab6615-c93b-4056-8741-e9484360eb0a";
 export const fakeHeaders = {
   /**
@@ -25,7 +25,8 @@ export const fakeHeaders = {
     "4MpY46-bvOpfu2Tzvs4Exg6QAyQGKJVOsXtzsoMc52WIDPbnpmWhu_WNbFvTWFQy-QniLarfe21bOCCJMgy-L4N4fTC2LMB-JbEFqNfQiSw8IatDNXkJw3EyVDmM9XkZw8hzIDe8EKooFdnS4lE62Wos4KIyIgBgIdhkFCggyQRFdT1OYl73K-SFeYuOmKnpbBmrKt6ekgXSmq3hc1l0SEIfuV2H14oH3OsAPkCe5X96-zYStyOMN52ZPHYcyMK5wrZCCc2mMQsUayTRKUtXSKpOrLk_gTFCzkLtKmANSnUMg-VTwm_X6V2N_6ozbJF9i2RaVJeQzS6QlL8Z0bbZAi8zu8bSNKii87vMekAY",
 };
 
-// user id is not used in the fake character -> invalid
+// user id is not used in the fake characters
+export const dummyUserId = "fbcc6196-6959-4a76-b647-efae2b78fdfa";
 export const dummyHeaders = {
   /**
    * Header

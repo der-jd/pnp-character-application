@@ -3,18 +3,21 @@ import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import {
-  attributeSchema,
   baseValueSchema,
   calculationPointsSchema,
-  combatSkillSchema,
+  combatValuesSchema,
   professionHobbySchema,
   RecordType,
   Record,
-  skillSchema,
   historyBlockSchema,
   numberSchema,
   stringSchema,
-  booleanSchema,
+  skillChangeSchema,
+  attributeChangeSchema,
+  HistoryBlock,
+  calculationPointsChangeSchema,
+  stringSetSchema,
+  stringArraySchema,
 } from "config/index.js";
 import {
   getHistoryItems,
@@ -38,31 +41,39 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const historyBodySchema = z.object({
-  userId: z.string(),
-  type: z.nativeEnum(RecordType),
-  name: z.string(),
-  data: z.object({
-    old: z.record(z.any()),
-    new: z.record(z.any()),
-  }),
-  learningMethod: z.string().nullable(),
-  calculationPoints: z.object({
-    adventurePoints: z
+const historyBodySchema = z
+  .object({
+    userId: z.string(),
+    type: z.nativeEnum(RecordType),
+    name: z.string(),
+    data: z
       .object({
-        old: calculationPointsSchema,
-        new: calculationPointsSchema,
+        old: z.record(z.any()),
+        new: z.record(z.any()),
       })
-      .nullable(),
-    attributePoints: z
+      .strict(),
+    learningMethod: z.string().nullable(),
+    calculationPoints: z
       .object({
-        old: calculationPointsSchema,
-        new: calculationPointsSchema,
+        adventurePoints: z
+          .object({
+            old: calculationPointsSchema,
+            new: calculationPointsSchema,
+          })
+          .strict()
+          .nullable(),
+        attributePoints: z
+          .object({
+            old: calculationPointsSchema,
+            new: calculationPointsSchema,
+          })
+          .strict()
+          .nullable(),
       })
-      .nullable(),
-  }),
-  comment: z.string().nullable(),
-});
+      .strict(),
+    comment: z.string().nullable(),
+  })
+  .strict();
 
 export type HistoryBodySchema = z.infer<typeof historyBodySchema>;
 
@@ -87,7 +98,15 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
     let record: Record;
     if (!items || items.length === 0) {
       console.log("No history found for the given character id");
-      const newBlock = await createHistoryItem(params.characterId);
+
+      const newBlock: HistoryBlock = {
+        characterId: params.characterId,
+        blockId: uuidv4(),
+        blockNumber: 1,
+        previousBlockId: null,
+        changes: [],
+      };
+      await createHistoryItem(newBlock);
 
       record = {
         number: 1,
@@ -126,7 +145,16 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
         console.log(
           `Latest block with the new record (total size ~${blockSize + recordSize} bytes) would exceed the maximum allowed size of ${MAX_ITEM_SIZE} bytes/block`,
         );
-        const newBlock = await createHistoryItem(params.characterId, latestBlock.blockNumber, latestBlock.blockId);
+
+        const newBlock: HistoryBlock = {
+          characterId: params.characterId,
+          blockId: uuidv4(),
+          blockNumber: latestBlock.blockNumber + 1,
+          previousBlockId: latestBlock.blockId,
+          changes: [],
+        };
+        await createHistoryItem(newBlock);
+
         await addHistoryRecord(record, newBlock);
       } else {
         await addHistoryRecord(record, latestBlock);
@@ -135,7 +163,13 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
 
     const response = {
       statusCode: 200,
-      body: JSON.stringify(record),
+      // JSON.stringify() does not work with Set, so we need to convert it to an array
+      body: JSON.stringify(record, (key, value) => {
+        if (value instanceof Set) {
+          return Array.from(value);
+        }
+        return value;
+      }),
     };
     console.log(response);
     return response;
@@ -166,19 +200,19 @@ async function validateRequest(request: Request): Promise<Parameters> {
     const body = historyBodySchema.parse(request.body);
 
     // Check if the character exists
-    // Note: This check is currently not necessary as the lambda is called after the increase-skill function. I.e. we can assume that the character exists.
+    // Note: This check is currently not necessary as the lambda is called after the update-skill function. I.e. we can assume that the character exists.
     //await getCharacterItem(body.userId, characterId);
 
     switch (body.type) {
-      case RecordType.EVENT_CALCULATION_POINTS:
-        calculationPointsSchema.parse(body.data.old);
-        calculationPointsSchema.parse(body.data.new);
+      case RecordType.CALCULATION_POINTS_CHANGED:
+        calculationPointsChangeSchema.parse(body.data.old);
+        calculationPointsChangeSchema.parse(body.data.new);
         break;
-      case RecordType.EVENT_LEVEL_UP:
+      case RecordType.LEVEL_CHANGED:
         numberSchema.parse(body.data.old);
         numberSchema.parse(body.data.new);
         break;
-      case RecordType.EVENT_BASE_VALUE:
+      case RecordType.BASE_VALUE_CHANGED:
         baseValueSchema.parse(body.data.old);
         baseValueSchema.parse(body.data.new);
         break;
@@ -189,25 +223,31 @@ async function validateRequest(request: Request): Promise<Parameters> {
         break;
       case RecordType.ADVANTAGE_CHANGED:
       case RecordType.DISADVANTAGE_CHANGED:
-      case RecordType.SPECIAL_ABILITY_CHANGED:
         stringSchema.parse(body.data.old);
         stringSchema.parse(body.data.new);
         break;
-      case RecordType.ATTRIBUTE_RAISED:
-        attributeSchema.parse(body.data.old);
-        attributeSchema.parse(body.data.new);
+      case RecordType.SPECIAL_ABILITIES_CHANGED:
+        try {
+          // When called via the tests, the data is passed as a Set
+          stringSetSchema.parse(body.data.old);
+          stringSetSchema.parse(body.data.new);
+        } catch {
+          // When called via Step Functions, the data is passed as an array, because JSON.stringify() does not work with Set
+          stringArraySchema.parse(body.data.old);
+          stringArraySchema.parse(body.data.new);
+        }
         break;
-      case RecordType.SKILL_ACTIVATED:
-        booleanSchema.parse(body.data.old);
-        booleanSchema.parse(body.data.new);
+      case RecordType.ATTRIBUTE_CHANGED:
+        attributeChangeSchema.parse(body.data.old);
+        attributeChangeSchema.parse(body.data.new);
         break;
-      case RecordType.SKILL_RAISED:
-        skillSchema.parse(body.data.old);
-        skillSchema.parse(body.data.new);
+      case RecordType.SKILL_CHANGED:
+        skillChangeSchema.parse(body.data.old);
+        skillChangeSchema.parse(body.data.new);
         break;
-      case RecordType.ATTACK_PARADE_DISTRIBUTED:
-        combatSkillSchema.parse(body.data.old);
-        combatSkillSchema.parse(body.data.new);
+      case RecordType.COMBAT_VALUES_CHANGED:
+        combatValuesSchema.parse(body.data.old);
+        combatValuesSchema.parse(body.data.new);
         break;
       default:
         throw new HttpError(400, "Invalid history record type!");

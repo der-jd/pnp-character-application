@@ -1,12 +1,23 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
-import { RecordType } from "config/index.js";
 import { fakeHeaders } from "../test-data/request.js";
 import { fakeHistoryBlockListResponse, mockDynamoDBQueryHistoryResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { addFakeHistoryRecord } from "../test-data/history.js";
+import {
+  addFakeHistoryRecord,
+  attributeAndBaseValueChangedRecord,
+  attributeChangedRecord,
+  baseValueChangedRecord,
+  calculationPointsChangedRecord,
+  combatSkillChangedRecord,
+  combatValuesChangedRecord,
+  levelChangedRecord,
+  skillChangedRecord,
+  specialAbilitiesChangedRecord,
+} from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 import { revertRecordFromHistory } from "revert-history-record/index.js";
+import { RecordType } from "config/index.js";
 
 const lastBlock = fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1];
 
@@ -110,8 +121,64 @@ describe("Invalid requests", () => {
 describe("Valid requests", () => {
   const testCasesForRevertingRecord = [
     {
+      name: "Revert history record for changed level",
+      fakeRecord: levelChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for a changed base value",
+      fakeRecord: baseValueChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for changed calculation points",
+      fakeRecord: calculationPointsChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
       name: "Revert history record for a changed attribute",
-      fakeRecordType: RecordType.ATTRIBUTE_RAISED,
+      fakeRecord: attributeChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for a changed attribute and base values",
+      fakeRecord: attributeAndBaseValueChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -125,7 +192,49 @@ describe("Valid requests", () => {
     },
     {
       name: "Revert history record for a changed skill",
-      fakeRecordType: RecordType.SKILL_RAISED,
+      fakeRecord: skillChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for a changed combat skill and combat values",
+      fakeRecord: combatSkillChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for changed combat values",
+      fakeRecord: combatValuesChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for changed special abilities",
+      fakeRecord: specialAbilitiesChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -141,16 +250,34 @@ describe("Valid requests", () => {
 
   testCasesForRevertingRecord.forEach((_case) => {
     test(_case.name, async () => {
-      const fakeRecord = addFakeHistoryRecord(lastBlock, _case.fakeRecordType);
+      addFakeHistoryRecord(lastBlock, _case.fakeRecord);
       mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
 
-      _case.request.pathParameters["record-id"] = fakeRecord.id;
+      _case.request.pathParameters["record-id"] = _case.fakeRecord.id;
       const result = await revertRecordFromHistory(_case.request);
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
       const parsedBody = JSON.parse(result.body);
-      expect(parsedBody).toEqual(fakeRecord);
+
+      // For the initial serialization of the response body, Set values are converted to arrays
+      if (_case.fakeRecord.type === RecordType.SPECIAL_ABILITIES_CHANGED) {
+        // Replace Set with arrays in the expected object for deep equality check
+        const expectedData = {
+          ..._case.fakeRecord,
+          data: {
+            old: {
+              values: Array.from(_case.fakeRecord.data.old.values),
+            },
+            new: {
+              values: Array.from(_case.fakeRecord.data.new.values),
+            },
+          },
+        };
+        expect(parsedBody).toEqual(expectedData);
+      } else {
+        expect(parsedBody).toEqual(_case.fakeRecord);
+      }
 
       /**
        * Check if the UpdateCommand was called at least once for the removal of the latest record from the history item.
@@ -174,7 +301,7 @@ describe("Valid requests", () => {
   const testCasesForRevertingWholeBlock = [
     {
       name: "Delete history block that contains only the reverted record",
-      fakeRecordType: RecordType.SKILL_RAISED,
+      fakeRecord: skillChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -190,16 +317,16 @@ describe("Valid requests", () => {
 
   testCasesForRevertingWholeBlock.forEach((_case) => {
     test(_case.name, async () => {
-      const fakeRecord = addFakeHistoryRecord(lastBlock, _case.fakeRecordType, true);
+      addFakeHistoryRecord(lastBlock, _case.fakeRecord, true);
       mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
 
-      _case.request.pathParameters["record-id"] = fakeRecord.id;
+      _case.request.pathParameters["record-id"] = _case.fakeRecord.id;
       const result = await revertRecordFromHistory(_case.request);
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
       const parsedBody = JSON.parse(result.body);
-      expect(parsedBody).toEqual(fakeRecord);
+      expect(parsedBody).toEqual(_case.fakeRecord);
 
       /**
        * Check if the DeleteCommand was called at least once for the removal of the latest, now empty block from the history table.

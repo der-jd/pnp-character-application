@@ -4,58 +4,9 @@ import { fakeCharacterId } from "./character.js";
 
 export function addFakeHistoryRecord(
   block: HistoryBlock,
-  type: RecordType,
+  record: Record,
   removePreviousRecords: boolean = false,
-): Record {
-  let record: Record | undefined;
-
-  switch (type) {
-    case RecordType.EVENT_CALCULATION_POINTS:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.EVENT_LEVEL_UP:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.EVENT_BASE_VALUE:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.PROFESSION_CHANGED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.HOBBY_CHANGED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.ADVANTAGE_CHANGED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.DISADVANTAGE_CHANGED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.SPECIAL_ABILITY_CHANGED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.ATTRIBUTE_RAISED: {
-      record = attributeChangedRecord;
-      break;
-    }
-    case RecordType.SKILL_ACTIVATED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    case RecordType.SKILL_RAISED: {
-      record = skillChangedRecord;
-      break;
-    }
-    case RecordType.ATTACK_PARADE_DISTRIBUTED:
-      throw new Error("Fake record not implemented yet!"); // TODO
-      break;
-    default:
-      throw new Error(`Unknown history record type ${type}!`);
-  }
-
-  if (!record) {
-    throw new Error("No record was created!");
-  }
-
+): void {
   if (removePreviousRecords) {
     record.number = block.changes[block.changes.length - 1].number;
     block.changes = [record];
@@ -63,27 +14,240 @@ export function addFakeHistoryRecord(
     record.number = block.changes[block.changes.length - 1].number + 1;
     block.changes.push(record);
   }
-
-  return record;
 }
 
-const attributeChangedRecord: Record = {
-  type: RecordType.ATTRIBUTE_RAISED,
+export const levelChangedRecord: Record = {
+  type: RecordType.LEVEL_CHANGED,
+  name: "Level up",
+  number: 2,
+  id: "24f2aeb9-11a2-4b82-8307-f97fe30cfef2",
+  data: {
+    old: {
+      value: 1,
+    },
+    new: {
+      value: 2,
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: null,
+  },
+  comment: "Finished story arc",
+  timestamp: new Date().toISOString(),
+};
+
+export const baseValueChangedRecord: Record = {
+  type: RecordType.BASE_VALUE_CHANGED,
+  name: "healthPoints",
+  number: 2,
+  id: "abc2e95b-a1f6-47e0-84da-1eca56dbb192",
+  data: {
+    old: {
+      start: 50,
+      current: 97,
+      byFormula: 77,
+      byLvlUp: 20,
+      mod: 5,
+    },
+    new: {
+      start: 40,
+      current: 100,
+      byFormula: 77,
+      byLvlUp: 23,
+      mod: 10,
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const calculationPointsChangedRecord: Record = {
+  type: RecordType.CALCULATION_POINTS_CHANGED,
+  name: "Calculation Points",
+  number: 2,
+  id: "ffdbc28b-f8ba-439d-bfc4-235f18811208",
+  data: {
+    old: {
+      adventurePoints: {
+        start: 100,
+        available: 100,
+        total: 200,
+      },
+      attributePoints: {
+        start: 15,
+        available: 0,
+        total: 20,
+      },
+    },
+    new: {
+      adventurePoints: {
+        start: 100,
+        available: 150,
+        total: 250,
+      },
+      attributePoints: {
+        start: 15,
+        available: 10,
+        total: 30,
+      },
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: {
+      old: {
+        start: 100,
+        available: 100,
+        total: 200,
+      },
+      new: {
+        start: 100,
+        available: 150,
+        total: 250,
+      },
+    },
+    attributePoints: {
+      old: {
+        start: 15,
+        available: 0,
+        total: 20,
+      },
+      new: {
+        start: 15,
+        available: 10,
+        total: 30,
+      },
+    },
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const attributeAndBaseValueChangedRecord: Record = {
+  type: RecordType.ATTRIBUTE_CHANGED,
   name: "strength",
   number: 2,
   id: "fc0a5a71-80ac-47bc-85c2-85fc4c9de99a",
   data: {
     old: {
-      start: 0,
-      current: 0,
-      mod: 0,
-      totalCost: 0,
+      attribute: {
+        start: 17,
+        current: 18,
+        mod: 1,
+        totalCost: 15,
+      },
+      baseValues: {
+        healthPoints: {
+          start: 40,
+          current: 100,
+          byFormula: 77,
+          byLvlUp: 23,
+          mod: 10,
+        },
+        attackBaseValue: {
+          start: 30,
+          current: 110,
+          byFormula: 110,
+          mod: 0,
+        },
+        paradeBaseValue: {
+          start: 30,
+          current: 112,
+          byFormula: 112,
+          mod: 0,
+        },
+        rangedAttackBaseValue: {
+          start: 25,
+          current: 108,
+          byFormula: 108,
+          mod: 0,
+        },
+      },
     },
     new: {
-      start: 0,
-      current: 1,
-      mod: 0,
-      totalCost: 1,
+      attribute: {
+        start: 17,
+        current: 20,
+        mod: 1,
+        totalCost: 17,
+      },
+      baseValues: {
+        healthPoints: {
+          start: 40,
+          current: 102,
+          byFormula: 79,
+          byLvlUp: 23,
+          mod: 10,
+        },
+        attackBaseValue: {
+          start: 30,
+          current: 114,
+          byFormula: 114,
+          mod: 0,
+        },
+        paradeBaseValue: {
+          start: 30,
+          current: 116,
+          byFormula: 116,
+          mod: 0,
+        },
+        rangedAttackBaseValue: {
+          start: 25,
+          current: 112,
+          byFormula: 112,
+          mod: 0,
+        },
+      },
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: {
+      old: {
+        start: 0,
+        available: 10,
+        total: 10,
+      },
+      new: {
+        start: 0,
+        available: 8,
+        total: 10,
+      },
+    },
+  },
+  comment: "Weight training",
+  timestamp: new Date().toISOString(),
+};
+
+export const attributeChangedRecord: Record = {
+  type: RecordType.ATTRIBUTE_CHANGED,
+  name: "intelligence",
+  number: 2,
+  id: "3d95138c-058e-445c-b366-ecdb3cb938ae",
+  data: {
+    old: {
+      attribute: {
+        start: 10,
+        current: 12,
+        mod: 2,
+        totalCost: 15,
+      },
+    },
+    new: {
+      attribute: {
+        start: 11,
+        current: 13,
+        mod: 3,
+        totalCost: 16,
+      },
     },
   },
   learningMethod: null,
@@ -102,31 +266,35 @@ const attributeChangedRecord: Record = {
       },
     },
   },
-  comment: "Weight training",
+  comment: null,
   timestamp: new Date().toISOString(),
 };
 
-const skillChangedRecord: Record = {
-  type: RecordType.SKILL_RAISED,
+export const skillChangedRecord: Record = {
+  type: RecordType.SKILL_CHANGED,
   name: "body/athletics",
   number: 3,
-  id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
+  id: "f18003ae-a678-4273-b6be-e0f9bb6b023a",
   data: {
     old: {
-      activated: true,
-      start: 0,
-      current: 0,
-      mod: 0,
-      totalCost: 0,
-      defaultCostCategory: CostCategory.CAT_2,
+      skill: {
+        activated: true,
+        start: 12,
+        current: 16,
+        mod: 4,
+        totalCost: 40,
+        defaultCostCategory: CostCategory.CAT_2,
+      },
     },
     new: {
-      activated: true,
-      start: 0,
-      current: 10,
-      mod: 0,
-      totalCost: 10,
-      defaultCostCategory: CostCategory.CAT_2,
+      skill: {
+        activated: true,
+        start: 14,
+        current: 20,
+        mod: 5,
+        totalCost: 44,
+        defaultCostCategory: CostCategory.CAT_2,
+      },
     },
   },
   learningMethod: "NORMAL",
@@ -139,10 +307,115 @@ const skillChangedRecord: Record = {
       },
       new: {
         start: 0,
-        available: 90,
+        available: 96,
         total: 200,
       },
     },
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const combatSkillChangedRecord: Record = {
+  type: RecordType.SKILL_CHANGED,
+  name: "combat/daggers (melee)",
+  number: 3,
+  id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
+  data: {
+    old: {
+      skill: {
+        activated: true,
+        start: 10,
+        current: 18,
+        mod: 8,
+        totalCost: 50,
+        defaultCostCategory: CostCategory.CAT_3,
+      },
+      combatValues: {
+        availablePoints: 26,
+        attackValue: 10,
+        paradeValue: 8,
+      },
+    },
+    new: {
+      skill: {
+        activated: true,
+        start: 11,
+        current: 22,
+        mod: 10,
+        totalCost: 58,
+        defaultCostCategory: CostCategory.CAT_3,
+      },
+      combatValues: {
+        availablePoints: 33,
+        attackValue: 10,
+        paradeValue: 8,
+      },
+    },
+  },
+  learningMethod: "NORMAL",
+  calculationPoints: {
+    adventurePoints: {
+      old: {
+        start: 0,
+        available: 100,
+        total: 200,
+      },
+      new: {
+        start: 0,
+        available: 92,
+        total: 200,
+      },
+    },
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const combatValuesChangedRecord: Record = {
+  type: RecordType.COMBAT_VALUES_CHANGED,
+  name: "melee/thrustingWeapons1h",
+  number: 3,
+  id: "0f6b98a5-33c3-416e-bf1f-fde4ef49b166",
+  data: {
+    old: {
+      availablePoints: 58,
+      attackValue: 10,
+      paradeValue: 8,
+    },
+    new: {
+      availablePoints: 55,
+      attackValue: 12,
+      paradeValue: 9,
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const specialAbilitiesChangedRecord: Record = {
+  type: RecordType.SPECIAL_ABILITIES_CHANGED,
+  name: "Berserker Rage",
+  number: 2,
+  id: "9f654a4d-2086-47e2-905b-ad189000b17d",
+  data: {
+    old: {
+      values: new Set(["Iron Will"]),
+    },
+    new: {
+      values: new Set(["Iron Will", "Berserker Rage"]),
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
     attributePoints: null,
   },
   comment: null,
@@ -156,7 +429,7 @@ export const fakeHistoryBlock1: HistoryBlock = {
   previousBlockId: null,
   changes: [
     {
-      type: RecordType.EVENT_LEVEL_UP,
+      type: RecordType.LEVEL_CHANGED,
       name: "Lvl 1",
       number: 1,
       id: "5a17703e-c5fa-4fbb-bc6c-4d7f4ed50a67",
@@ -200,26 +473,30 @@ function generateLargeChangesList(size: number): Record[] {
   const largeChanges = [];
   for (let i = 0; i < size; i++) {
     largeChanges.push({
-      type: RecordType.SKILL_RAISED,
+      type: RecordType.SKILL_CHANGED,
       name: `category/skill${i}`,
       number: i + 1,
       id: uuidv4(),
       data: {
         old: {
-          activated: true,
-          start: 0,
-          current: i,
-          mod: 0,
-          totalCost: i,
-          defaultCostCategory: CostCategory.CAT_2,
+          skill: {
+            activated: true,
+            start: 0,
+            current: i,
+            mod: 0,
+            totalCost: i,
+            defaultCostCategory: CostCategory.CAT_2,
+          },
         },
         new: {
-          activated: true,
-          start: 0,
-          current: i + 1,
-          mod: 0,
-          totalCost: i + 1,
-          defaultCostCategory: CostCategory.CAT_2,
+          skill: {
+            activated: true,
+            start: 0,
+            current: i + 1,
+            mod: 0,
+            totalCost: i + 1,
+            defaultCostCategory: CostCategory.CAT_2,
+          },
         },
       },
       learningMethod: "NORMAL",

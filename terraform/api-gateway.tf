@@ -24,8 +24,8 @@ resource "aws_iam_role_policy" "api_gateway_policy" {
         Effect = "Allow",
         Action = "states:StartSyncExecution",
         Resource = [
-          aws_sfn_state_machine.increase_skill_state_machine.arn,
-          aws_sfn_state_machine.increase_attribute_state_machine.arn
+          aws_sfn_state_machine.update_skill_state_machine.arn,
+          aws_sfn_state_machine.update_attribute_state_machine.arn
         ]
       }
     ]
@@ -95,12 +95,56 @@ module "character_id_get" {
   lambda_uri = module.get_character_lambda.lambda_function.invoke_arn
 }
 
+// ================== DELETE /characters/{character-id} ==================
+
+module "character_id_delete" {
+  source        = "./modules/apigw_lambda_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.character_id.id
+  http_method   = "DELETE"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  lambda_uri = module.delete_character_lambda.lambda_function.invoke_arn
+}
+
 // ================== OPTIONS /characters/{character-id} ==================
 
 module "character_id_options" {
   source      = "./modules/apigw_options_method"
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.character_id.id
+}
+
+// ================== /characters/{character-id}/clone ==================
+
+resource "aws_api_gateway_resource" "character_id_clone" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "clone" // .../characters/{character-id}/clone
+}
+
+// ================== POST /characters/{character-id}/clone ==================
+
+module "character_id_clone_post" {
+  source        = "./modules/apigw_lambda_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.character_id_clone.id
+  http_method   = "POST"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  lambda_uri = module.clone_character_lambda.lambda_function.invoke_arn
+}
+
+// ================== OPTIONS /characters/{character-id}/clone ==================
+
+module "character_id_clone_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.character_id_clone.id
 }
 
 // ================== /characters/{character-id}/attributes ==================
@@ -125,6 +169,7 @@ module "attribute_name_patch" {
   source        = "./modules/apigw_stepfunction_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.attribute_name.id
+  http_method   = "PATCH"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"   = true
@@ -132,7 +177,7 @@ module "attribute_name_patch" {
   }
   aws_region        = data.aws_region.current.name
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.increase_attribute_state_machine.arn
+  state_machine_arn = aws_sfn_state_machine.update_attribute_state_machine.arn
 }
 
 // ================== OPTIONS /characters/{character-id}/attributes/{attribute-name} ==================
@@ -141,6 +186,111 @@ module "attribute_name_options" {
   source      = "./modules/apigw_options_method"
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.attribute_name.id
+}
+
+// ================== /characters/{character-id}/base-values ==================
+
+resource "aws_api_gateway_resource" "base_values" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "base-values" // .../characters/{character-id}/base-values
+}
+
+// ================== /characters/{character-id}/base-values/{base-value-name} ==================
+
+resource "aws_api_gateway_resource" "base_value_name" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.base_values.id
+  path_part   = "{base-value-name}" // .../characters/{character-id}/base-values/{base-value-name}
+}
+
+// ================== PATCH /characters/{character-id}/base-values/{base-value-name} ==================
+
+module "base_value_name_patch" {
+  source        = "./modules/apigw_stepfunction_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.base_value_name.id
+  http_method   = "PATCH"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"    = true
+    "method.request.path.base-value-name" = true
+  }
+  aws_region        = data.aws_region.current.name
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = aws_sfn_state_machine.update_base_value_state_machine.arn
+}
+
+// ================== OPTIONS /characters/{character-id}/base-values/{base-value-name} ==================
+
+module "base_value_name_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.base_value_name.id
+}
+
+// ================== /characters/{character-id}/calculation-points ==================
+
+resource "aws_api_gateway_resource" "calculation_points" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "calculation-points" // .../characters/{character-id}/calculation-points
+}
+
+// ================== PATCH /characters/{character-id}/calculation-points ==================
+
+module "calculation_points_patch" {
+  source        = "./modules/apigw_stepfunction_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.calculation_points.id
+  http_method   = "PATCH"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  aws_region        = data.aws_region.current.name
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = aws_sfn_state_machine.update_calculation_points_state_machine.arn
+}
+
+// ================== OPTIONS /characters/{character-id}/calculation-points ==================
+
+module "calculation_points_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.calculation_points.id
+}
+
+// ================== /characters/{character-id}/level ==================
+
+resource "aws_api_gateway_resource" "level" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "level" // .../characters/{character-id}/level
+}
+
+// ================== POST /characters/{character-id}/level ==================
+
+module "level_post" {
+  source        = "./modules/apigw_stepfunction_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.level.id
+  http_method   = "POST"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  aws_region        = data.aws_region.current.name
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = aws_sfn_state_machine.update_level_state_machine.arn
+}
+
+// ================== OPTIONS /characters/{character-id}/level ==================
+
+module "level_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.level.id
 }
 
 // ================== /characters/{character-id}/skills ==================
@@ -190,6 +340,7 @@ module "skill_name_patch" {
   source        = "./modules/apigw_stepfunction_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id   = aws_api_gateway_resource.skill_name.id
+  http_method   = "PATCH"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"   = true
@@ -198,7 +349,7 @@ module "skill_name_patch" {
   }
   aws_region        = data.aws_region.current.name
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.increase_skill_state_machine.arn
+  state_machine_arn = aws_sfn_state_machine.update_skill_state_machine.arn
 }
 
 // ================== OPTIONS /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
@@ -207,6 +358,89 @@ module "skill_name_options" {
   source      = "./modules/apigw_options_method"
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.skill_name.id
+}
+
+// ================== /characters/{character-id}/special-abilities ==================
+
+resource "aws_api_gateway_resource" "special_abilities" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "special-abilities" // .../characters/{character-id}/special-abilities
+}
+
+// ================== POST /characters/{character-id}/special-abilities ==================
+
+module "special_abilities_post" {
+  source        = "./modules/apigw_stepfunction_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.special_abilities.id
+  http_method   = "POST"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  aws_region        = data.aws_region.current.name
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = aws_sfn_state_machine.add_special_ability_state_machine.arn
+}
+
+// ================== OPTIONS /characters/{character-id}/special-abilities ==================
+
+module "special_abilities_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.special_abilities.id
+}
+
+// ================== /characters/{character-id}/combat-values ==================
+
+resource "aws_api_gateway_resource" "combat_values" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "combat-values" // .../characters/{character-id}/combat-values
+}
+
+// ================== /characters/{character-id}/combat-values/{combat-category} ==================
+
+resource "aws_api_gateway_resource" "combat_category" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.combat_values.id
+  path_part   = "{combat-category}" // .../characters/{character-id}/combat-values/{combat-category}
+}
+
+// ================== /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
+
+resource "aws_api_gateway_resource" "combat_skill_name" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.combat_category.id
+  path_part   = "{combat-skill-name}" // .../characters/{character-id}/combat-values/{combat-category}/{combat-skill-name}
+}
+
+// ================== PATCH /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
+
+module "combat_skill_name_patch" {
+  source        = "./modules/apigw_stepfunction_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.combat_skill_name.id
+  http_method   = "PATCH"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"      = true
+    "method.request.path.combat-category"   = true
+    "method.request.path.combat-skill-name" = true
+  }
+  aws_region        = data.aws_region.current.name
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = aws_sfn_state_machine.update_combat_values_state_machine.arn
+}
+
+
+// ================== OPTIONS /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
+
+module "combat_skill_name_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.combat_skill_name.id
 }
 
 // ================== /characters/{character-id}/history ==================
@@ -294,10 +528,21 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
     module.attribute_name_patch,
     module.attribute_name_options,
+    module.base_value_name_patch,
+    module.base_value_name_options,
+    module.calculation_points_patch,
+    module.calculation_points_options,
     module.characters_get,
     module.characters_options,
     module.character_id_get,
+    module.character_id_delete,
     module.character_id_options,
+    module.character_id_clone_post,
+    module.character_id_clone_options,
+    module.level_post,
+    module.level_options,
+    module.special_abilities_post,
+    module.special_abilities_options,
     module.skill_name_get,
     module.skill_name_patch,
     module.skill_name_options,
@@ -306,6 +551,8 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     module.record_id_patch,
     module.record_id_delete,
     module.record_id_options,
+    module.combat_skill_name_patch,
+    module.combat_skill_name_options,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id

@@ -8,7 +8,7 @@
       "sex": "Male",
       "profession": {
         "name": "Warrior",
-        "skill": "greatsword"
+        "skill": "slashingWeaponsSharp2h"
       },
       "hobby": {
         "name": "Woodcarving",
@@ -93,91 +93,74 @@
       "healthPoints": {
         "start": 120,
         "current": 130,
+        "byFormula": 10,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "mentalHealth": {
         "start": 90,
         "current": 85,
-        "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "byFormula": 10,
+        "mod": 10
       },
       "armorLevel": {
         "start": 20,
         "current": 30,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "naturalArmor": {
         "start": 5,
         "current": 10,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "initiativeBaseValue": {
         "start": 13,
         "current": 15,
+        "byFormula": 10,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "attackBaseValue": {
         "start": 18,
         "current": 22,
-        "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "byFormula": 10,
+        "mod": 10
       },
       "paradeBaseValue": {
         "start": 15,
         "current": 20,
-        "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "byFormula": 10,
+        "mod": 10
       },
       "rangedAttackBaseValue": {
         "start": 12,
         "current": 14,
-        "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "byFormula": 10,
+        "mod": 10
       },
       "luckPoints": {
         "start": 3,
         "current": 4,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "bonusActionsPerCombatRound": {
         "start": 1,
         "current": 1,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       },
       "legendaryActions": {
         "start": 0,
         "current": 0,
         "byLvlUp": 10,
-        "mod": 10,
-        "totalCost": 15
+        "mod": 10
       }
     },
     "skills": {
       "combat": {
-        "greatsword": {
-          "activated": true,
-          "start": 10,
-          "current": 18,
-          "mod": 8,
-          "totalCost": 50,
-          "defaultCostCategory": 2
-        },
         "barehanded": {
           "activated": true,
           "start": 10,
@@ -202,7 +185,7 @@
           "totalCost": 50,
           "defaultCostCategory": 2
         },
-        "slashingWeapons1h": {
+        "slashingWeaponsSharp1h": {
           "activated": true,
           "start": 10,
           "current": 18,
@@ -210,7 +193,23 @@
           "totalCost": 50,
           "defaultCostCategory": 2
         },
-        "slashingWeapons2h": {
+        "slashingWeaponsBlunt1h": {
+          "activated": true,
+          "start": 10,
+          "current": 18,
+          "mod": 8,
+          "totalCost": 50,
+          "defaultCostCategory": 2
+        },
+        "slashingWeaponsSharp2h": {
+          "activated": true,
+          "start": 10,
+          "current": 18,
+          "mod": 8,
+          "totalCost": 50,
+          "defaultCostCategory": 2
+        },
+        "slashingWeaponsBlunt2h": {
           "activated": true,
           "start": 10,
           "current": 18,
@@ -227,14 +226,6 @@
           "defaultCostCategory": 2
         },
         "chainWeapons": {
-          "activated": true,
-          "start": 10,
-          "current": 18,
-          "mod": 8,
-          "totalCost": 50,
-          "defaultCostCategory": 2
-        },
-        "polearms": {
           "activated": true,
           "start": 10,
           "current": 18,
@@ -267,6 +258,14 @@
           "defaultCostCategory": 2
         },
         "firearmComplex": {
+          "activated": true,
+          "start": 6,
+          "current": 10,
+          "mod": 4,
+          "totalCost": 20,
+          "defaultCostCategory": 2
+        },
+        "heavyWeapons": {
           "activated": true,
           "start": 6,
           "current": 10,
@@ -372,14 +371,6 @@
           "totalCost": 40,
           "defaultCostCategory": 2
         },
-        "imitatingVoices": {
-          "activated": true,
-          "start": 12,
-          "current": 16,
-          "mod": 4,
-          "totalCost": 40,
-          "defaultCostCategory": 2
-        },
         "dancing": {
           "activated": true,
           "start": 12,
@@ -439,14 +430,6 @@
           "defaultCostCategory": 2
         },
         "writtenExpression": {
-          "activated": true,
-          "start": 7,
-          "current": 10,
-          "mod": 3,
-          "totalCost": 15,
-          "defaultCostCategory": 2
-        },
-        "disguising": {
           "activated": true,
           "start": 7,
           "current": 10,
@@ -748,6 +731,14 @@
           "totalCost": 15,
           "defaultCostCategory": 2
         },
+        "fineMechanics": {
+          "activated": true,
+          "start": 7,
+          "current": 10,
+          "mod": 3,
+          "totalCost": 15,
+          "defaultCostCategory": 2
+        },
         "cheating": {
           "activated": true,
           "start": 7,
@@ -806,79 +797,84 @@
         }
       }
     },
-    "combatSkills": {
+    "combatValues": {
       "melee": {
-        "greatsword": {
-          "handling": 18,
-          "attackDistributed": 10,
-          "paradeDistributed": 8
-        },
         "martialArts": {
-          "handling": 12,
-          "attackDistributed": 6,
-          "paradeDistributed": 6
+          "availablePoints": 19,
+          "attackValue": 6,
+          "paradeValue": 6
         },
         "barehanded": {
-          "handling": 18,
-          "attackDistributed": 10,
-          "paradeDistributed": 8
+          "availablePoints": 82,
+          "attackValue": 10,
+          "paradeValue": 8
         },
         "chainWeapons": {
-          "handling": 18,
-          "attackDistributed": 10,
-          "paradeDistributed": 8
+          "availablePoints": 26,
+          "attackValue": 10,
+          "paradeValue": 8
         },
         "daggers": {
-          "handling": 18,
-          "attackDistributed": 10,
-          "paradeDistributed": 8
+          "availablePoints": 26,
+          "attackValue": 10,
+          "paradeValue": 8
         },
-        "slashingWeapons1h": {
-          "handling": 18,
-          "attackDistributed": 10,
-          "paradeDistributed": 8
+        "slashingWeaponsSharp1h": {
+          "availablePoints": 10,
+          "attackValue": 10,
+          "paradeValue": 8
+        },
+        "slashingWeaponsBlunt1h": {
+          "availablePoints": 10,
+          "attackValue": 10,
+          "paradeValue": 8
         },
         "thrustingWeapons1h": {
-          "handling": 18,
-          "attackDistributed": 10,
-          "paradeDistributed": 8
+          "availablePoints": 58,
+          "attackValue": 10,
+          "paradeValue": 8
         },
-        "slashingWeapons2h": {
-          "handling": 18,
-          "attackDistributed": 10,
-          "paradeDistributed": 8
+        "slashingWeaponsSharp2h": {
+          "availablePoints": 26,
+          "attackValue": 10,
+          "paradeValue": 8
+        },
+        "slashingWeaponsBlunt2h": {
+          "availablePoints": 26,
+          "attackValue": 10,
+          "paradeValue": 8
         },
         "thrustingWeapons2h": {
-          "handling": 18,
-          "attackDistributed": 10,
-          "paradeDistributed": 8
-        },
-        "polearms": {
-          "handling": 18,
-          "attackDistributed": 10,
-          "paradeDistributed": 8
+          "availablePoints": 57,
+          "attackValue": 10,
+          "paradeValue": 8
         }
       },
       "ranged": {
         "firearmSimple": {
-          "handling": 10,
-          "attackDistributed": 6,
-          "paradeDistributed": 4
+          "availablePoints": 18,
+          "attackValue": 6,
+          "paradeValue": 0
         },
         "firearmMedium": {
-          "handling": 18,
-          "attackDistributed": 10,
-          "paradeDistributed": 8
+          "availablePoints": 22,
+          "attackValue": 10,
+          "paradeValue": 0
         },
         "firearmComplex": {
-          "handling": 18,
-          "attackDistributed": 10,
-          "paradeDistributed": 8
+          "availablePoints": 22,
+          "attackValue": 10,
+          "paradeValue": 0
+        },
+        "heavyWeapons": {
+          "availablePoints": 22,
+          "attackValue": 10,
+          "paradeValue": 0
         },
         "missile": {
-          "handling": 8,
-          "attackDistributed": 5,
-          "paradeDistributed": 3
+          "availablePoints": 15,
+          "attackValue": 5,
+          "paradeValue": 0
         }
       }
     }

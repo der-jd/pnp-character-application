@@ -34,10 +34,11 @@ export interface Attribute {
 
 export interface BaseValue {
   start: number;
-  current: number;
-  byLvlUp: number;
+  current: number; // byFormula + byLvlUp + increased (not implemented atm)
+  byFormula?: number; // Some base values are not changed by a formula
+  byLvlUp?: number; // Some base values can't be changed by level up
   mod: number;
-  totalCost: number;
+  //totalCost?: number; // No base value can be increased by points atm
 }
 
 export interface Skill {
@@ -49,10 +50,10 @@ export interface Skill {
   defaultCostCategory: CostCategory;
 }
 
-export interface CombatSkill {
-  handling: number;
-  attackDistributed: number;
-  paradeDistributed: number;
+export interface CombatValues {
+  availablePoints: number;
+  attackValue: number;
+  paradeValue: number;
 }
 
 export interface CharacterSheet {
@@ -84,7 +85,7 @@ export interface CharacterSheet {
   };
   advantages: string[];
   disadvantages: string[];
-  specialAbilities: string[];
+  specialAbilities: Set<string>;
   baseValues: {
     healthPoints: BaseValue;
     mentalHealth: BaseValue;
@@ -108,23 +109,23 @@ export interface CharacterSheet {
     endurance: Attribute;
     strength: Attribute;
   };
-  // TODO consolidate skills. Some of them are too special and probably never used
   skills: {
     combat: {
       martialArts: Skill;
       barehanded: Skill;
       chainWeapons: Skill;
       daggers: Skill;
-      slashingWeapons1h: Skill;
+      slashingWeaponsSharp1h: Skill;
+      slashingWeaponsBlunt1h: Skill;
       thrustingWeapons1h: Skill;
-      slashingWeapons2h: Skill;
+      slashingWeaponsSharp2h: Skill;
+      slashingWeaponsBlunt2h: Skill;
       thrustingWeapons2h: Skill;
-      polearms: Skill;
-      greatsword: Skill;
       missile: Skill;
       firearmSimple: Skill;
       firearmMedium: Skill;
       firearmComplex: Skill;
+      heavyWeapons: Skill;
     };
     body: {
       athletics: Skill;
@@ -138,7 +139,6 @@ export interface CharacterSheet {
       hiding: Skill;
       singing: Skill;
       sharpnessOfSenses: Skill;
-      imitatingVoices: Skill;
       dancing: Skill;
       quaffing: Skill;
       pickpocketing: Skill;
@@ -149,7 +149,6 @@ export interface CharacterSheet {
       teaching: Skill;
       acting: Skill;
       writtenExpression: Skill;
-      disguising: Skill;
       streetKnowledge: Skill;
       knowledgeOfHumanNature: Skill;
       persuading: Skill;
@@ -192,6 +191,7 @@ export interface CharacterSheet {
       fabricProcessing: Skill;
       alcoholProduction: Skill;
       steeringVehicles: Skill;
+      fineMechanics: Skill;
       cheating: Skill;
       bargaining: Skill;
       firstAid: Skill;
@@ -201,24 +201,25 @@ export interface CharacterSheet {
       lockpicking: Skill;
     };
   };
-  combatSkills: {
+  combatValues: {
     melee: {
-      martialArts: CombatSkill;
-      barehanded: CombatSkill;
-      chainWeapons: CombatSkill;
-      daggers: CombatSkill;
-      slashingWeapons1h: CombatSkill;
-      thrustingWeapons1h: CombatSkill;
-      slashingWeapons2h: CombatSkill;
-      thrustingWeapons2h: CombatSkill;
-      polearms: CombatSkill;
-      greatsword: CombatSkill;
+      martialArts: CombatValues;
+      barehanded: CombatValues;
+      chainWeapons: CombatValues;
+      daggers: CombatValues;
+      slashingWeaponsSharp1h: CombatValues;
+      slashingWeaponsBlunt1h: CombatValues;
+      thrustingWeapons1h: CombatValues;
+      slashingWeaponsSharp2h: CombatValues;
+      slashingWeaponsBlunt2h: CombatValues;
+      thrustingWeapons2h: CombatValues;
     };
     ranged: {
-      missile: CombatSkill;
-      firearmSimple: CombatSkill;
-      firearmMedium: CombatSkill;
-      firearmComplex: CombatSkill;
+      missile: CombatValues;
+      firearmSimple: CombatValues;
+      firearmMedium: CombatValues;
+      firearmComplex: CombatValues;
+      heavyWeapons: CombatValues;
     };
   };
 }

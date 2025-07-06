@@ -5,6 +5,7 @@ export {
   parseCostCategory,
   adjustCostCategory,
   getSkillIncreaseCost,
+  getSkillActivationCost,
 } from "./cost.js";
 export {
   CalculationPoints,
@@ -12,18 +13,22 @@ export {
   Attribute,
   BaseValue,
   Skill,
-  CombatSkill,
+  CombatValues,
   Character,
   CharacterSheet,
   getAttribute,
+  getBaseValue,
   getSkill,
+  getCombatValues,
+  getCombatCategory,
+  baseValuesNotUpdatableByLvlUp,
 } from "./character.js";
 export {
   attributeSchema,
   baseValueSchema,
   calculationPointsSchema,
   characterSchema,
-  combatSkillSchema,
+  combatValuesSchema,
   professionHobbySchema,
   skillSchema,
 } from "./character_schema.js";
@@ -34,6 +39,11 @@ export {
   HistoryBlock,
   numberSchema,
   stringSchema,
-  booleanSchema,
+  stringArraySchema,
+  stringSetSchema,
+  attributeChangeSchema,
+  calculationPointsChangeSchema,
+  skillChangeSchema,
 } from "./history_schema.js";
+export { calculateBaseValues } from "./formulas.js";
 export { RecordType, parseRecordType } from "./history.js";
