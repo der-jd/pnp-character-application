@@ -1,7 +1,8 @@
 import { AllCharactersReply } from "../models/allCharacters/interface";
 import { Character } from "../models/Character/character";
-import { SkillIncreaseReply, SkillIncreaseRequest } from "../models/attribute/interface";
+import { SkillIncreaseReply, SkillIncreaseRequest } from "../models/skills/interface";
 import { HistoryReply } from "../models/history/interface";
+import { AttributeIncreaseReply, AttributeIncreaseRequest } from "../models/attributes/interface";
 
 enum HttpMethod {
   GET = "GET",
@@ -119,6 +120,16 @@ export async function increaseSkill(
 ): Promise<SkillIncreaseReply> {
   const endpoint_url = `characters/${charId}/skills/${category}/${name}`;
   return await patch<SkillIncreaseReply, SkillIncreaseRequest>(idToken, endpoint_url, body);
+}
+
+export async function increaseAttribute(
+  idToken: string,
+  charId: string,
+  name: string,
+  body: AttributeIncreaseRequest,
+): Promise<AttributeIncreaseReply> {
+  const endpoint_url = `characters/${charId}/attributes/${name}`;
+  return await patch<AttributeIncreaseReply, AttributeIncreaseRequest>(idToken, endpoint_url, body);
 }
 
 /**

@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { RecordType } from "../../utils/historyEventType";
+
 export interface BodyData {
   old: Record<string, any>;
   new: Record<string, any>;
@@ -12,7 +14,7 @@ export interface CalculationPointsChange {
 }
 
 export interface Body {
-  type: string;
+  type: RecordType;
   name: string;
   data: BodyData;
   learningMethod: string;

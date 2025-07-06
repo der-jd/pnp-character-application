@@ -39,7 +39,6 @@ export default function SignUp() {
       });
 
       const response = await cognitoClient.send(command);
-      console.log(response);
 
       if (response.UserSub) {
         router.push("/auth/confirmSignup?email=" + encodeURIComponent(email));

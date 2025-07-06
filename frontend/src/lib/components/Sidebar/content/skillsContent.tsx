@@ -6,61 +6,22 @@ import React from "react";
 import { Button } from "../../ui/button";
 import { useLoadingOverlay } from "@/src/app/global/OverlayContext";
 import { useHistory } from "@/src/hooks/useHistory";
-import { useToast } from "@/src/hooks/use-toast";
-import { CharacterSheet } from "@/src/lib/api/models/Character/character";
 
 const SkillHistoryContent: React.FC = () => {
   const historyEntries = useCharacterStore((state) => state.openHistoryEntries);
   const characterSheet = useCharacterStore((state) => state.characterSheet);
-  const updateValue = useCharacterStore((state) => state.updateValue);
-  const setOpenHistoryEntries = useCharacterStore((state) => state.setOpenHistoryEntries);
   const { show, hide } = useLoadingOverlay();
-  const { revertHistoryEntry } = useHistory();
-  const toast = useToast();
+  const { revertHistoryEntry, discardUnsavedHistory } = useHistory();
 
   const revert = async () => {
     show();
-    let result = true;
-    const lastEntry = historyEntries?.pop();
-    if (lastEntry) {
-      const revertOk = await revertHistoryEntry(lastEntry.id);
-      if (revertOk) {
-        const path = ["skills", lastEntry.name.split("/")[0]] as (keyof CharacterSheet)[];
-        const name = lastEntry.name.split("/")[1] as keyof CharacterSheet;
-        updateValue(path, name, lastEntry.data.old.skill.current);
-        setOpenHistoryEntries(historyEntries ?? []);
-      } else {
-        result = false;
-      }
-    } else {
-      toast.toast({
-        title: `[History Error] No Entries!`,
-        description: `No Entries to revert for current character!`,
-        variant: "destructive",
-      });
-
-      result = false;
-    }
-
+    await revertHistoryEntry();
     hide();
-    return result;
   };
 
   const discard = async () => {
     show();
-
-    while (historyEntries && historyEntries.length > 0) {
-      await revert();
-    }
-
-    if (!historyEntries || historyEntries.length === 0) {
-      toast.toast({
-        title: `[History] All entries reverted`,
-        description: `No more entries left to revert.`,
-        variant: "success",
-      });
-    }
-
+    await discardUnsavedHistory();
     hide();
   };
 
@@ -85,19 +46,24 @@ const SkillHistoryContent: React.FC = () => {
         <h4 className="mt-4 font-semibold">Changes</h4>
 
         <div className="flex flex-col gap-4 mt-2">
-          {historyEntries?.map((entry: RecordEntry) => (
-            <div key={entry.id} className="bg-white p-4 rounded-lg shadow border">
-              <div className="text-sm text-gray-500 mb-1">
-                #{entry.number} • {new Date(entry.timestamp).toLocaleString()}
+          {historyEntries?.map((entry: RecordEntry) => {
+            const [, oldValue] = Object.entries(entry.data.old)[0] as [string, { current: number }];
+            const [, newValue] = Object.entries(entry.data.new)[0] as [string, { current: number }];
+
+            return (
+              <div key={entry.id} className="bg-white p-4 rounded-lg shadow border">
+                <div className="text-sm text-gray-500 mb-1">
+                  #{entry.number} • {new Date(entry.timestamp).toLocaleString()}
+                </div>
+                <div className="font-medium">{entry.name}</div>
+                <div className="text-sm text-gray-700">
+                  <span className="text-red-500 line-through">{oldValue.current}</span> →{" "}
+                  <span className="text-green-600">{newValue.current}</span>
+                </div>
+                {entry.comment && <div className="text-xs text-gray-500 mt-2 italic">{entry.comment}</div>}
               </div>
-              <div className="font-medium">{entry.name}</div>
-              <div className="text-sm text-gray-700">
-                <span className="text-red-500 line-through">{entry.data.old.skill.current}</span> →{" "}
-                <span className="text-green-600">{entry.data.new.skill.current}</span>
-              </div>
-              {entry.comment && <div className="text-xs text-gray-500 mt-2 italic">{entry.comment}</div>}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

@@ -26,8 +26,6 @@ export default function History() {
     else hide();
   }, [isLoading, show, hide]);
 
-  console.log(historyData);
-
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4 text-center">The Life of {characterName}</h1>
