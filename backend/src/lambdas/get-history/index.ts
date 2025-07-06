@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { HistoryBlock } from "config";
+import { HistoryBlock } from "config/index.js";
 import {
   Request,
   parseBody,

@@ -10,6 +10,7 @@ import {
   validateUUID,
   setSpecialAbilities,
 } from "utils/index.js";
+import { MAX_STRING_LENGTH_DEFAULT } from "config/index.js";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _addSpecialAbility({
@@ -22,7 +23,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 const bodySchema = z
   .object({
-    specialAbility: z.string().max(100),
+    specialAbility: z.string().max(MAX_STRING_LENGTH_DEFAULT),
   })
   .strict();
 
