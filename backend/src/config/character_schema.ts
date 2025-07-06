@@ -7,6 +7,7 @@
  * - .strict() for objects (otherwise undefined extra values are allowed for the schema)
  * - type of 'specialAbilities' (Set<string>)
  * - Max length of strings (e.g. for advantages, disadvantages, etc.)
+ * - Regex expressions
  */
 import { z } from "zod";
 import { CostCategory } from "./cost.js";
@@ -19,7 +20,9 @@ export const MAX_STRING_LENGTH_VERY_LONG = 1000;
 export const professionHobbySchema = z
   .object({
     name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
-    skill: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    skill: z.string().regex(new RegExp(`^[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}/[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}$`), {
+      message: `Skill must be in the format "skillCategory/skillName", each max ${MAX_STRING_LENGTH_DEFAULT} characters.`,
+    }),
   })
   .strict();
 
