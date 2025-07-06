@@ -9,7 +9,6 @@ import { useHistory } from "@/src/hooks/useHistory";
 import { useToast } from "@/src/hooks/use-toast";
 import { CharacterSheet } from "@/src/lib/api/models/Character/character";
 
-
 const SkillHistoryContent: React.FC = () => {
   const historyEntries = useCharacterStore((state) => state.openHistoryEntries);
   const characterSheet = useCharacterStore((state) => state.characterSheet);
@@ -18,27 +17,22 @@ const SkillHistoryContent: React.FC = () => {
   const { show, hide } = useLoadingOverlay();
   const { revertHistoryEntry } = useHistory();
   const toast = useToast();
-  
 
   const revert = async () => {
     show();
     let result = true;
     const lastEntry = historyEntries?.pop();
-    if(lastEntry) {
+    if (lastEntry) {
       const revertOk = await revertHistoryEntry(lastEntry.id);
-      if(revertOk) {
+      if (revertOk) {
         const path = ["skills", lastEntry.name.split("/")[0]] as (keyof CharacterSheet)[];
         const name = lastEntry.name.split("/")[1] as keyof CharacterSheet;
         updateValue(path, name, lastEntry.data.old.skill.current);
         setOpenHistoryEntries(historyEntries ?? []);
-      }
-
-      else {
+      } else {
         result = false;
       }
-    }
-
-    else {
+    } else {
       toast.toast({
         title: `[History Error] No Entries!`,
         description: `No Entries to revert for current character!`,
@@ -47,7 +41,7 @@ const SkillHistoryContent: React.FC = () => {
 
       result = false;
     }
-    
+
     hide();
     return result;
   };

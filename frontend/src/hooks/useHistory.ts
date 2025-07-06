@@ -19,7 +19,7 @@ export function useHistory() {
 
   const [isLoading, setLoading] = useState<boolean>(false);
 
-  function hasIdToken(idToken: string|null): idToken is string {
+  function hasIdToken(idToken: string | null): idToken is string {
     if (!idToken) {
       toast.toast({
         title: `[History Error] No Character!`,
@@ -30,8 +30,8 @@ export function useHistory() {
     }
     return true;
   }
-  
-  function hasSelectedChar(selectedChar: string|null): selectedChar is string {
+
+  function hasSelectedChar(selectedChar: string | null): selectedChar is string {
     if (!selectedChar) {
       toast.toast({
         title: `[History Error] No Character!`,
@@ -48,7 +48,7 @@ export function useHistory() {
   };
 
   const updateHistory = async (isBlocking: boolean) => {
-    if(!validateRequest()) {
+    if (!validateRequest()) {
       return;
     }
 
@@ -101,7 +101,7 @@ export function useHistory() {
   };
 
   const revertHistoryEntry = async (entryId: string): Promise<boolean> => {
-    if(entryId == undefined || entryId == "") {
+    if (entryId == undefined || entryId == "") {
       toast.toast({
         title: `[History Error] No Data!`,
         description: `Entry id missing for revert request!`,
@@ -110,7 +110,7 @@ export function useHistory() {
       return false;
     }
 
-    if(!validateRequest()) {
+    if (!validateRequest()) {
       return false;
     }
 
@@ -119,7 +119,7 @@ export function useHistory() {
 
     setLoading(true);
     try {
-      const reply = await deleteHistoryEntry(token, character, entryId);
+      await deleteHistoryEntry(token, character, entryId);
     } catch (error) {
       if (error instanceof ApiError) {
         toast.toast({
@@ -141,15 +141,11 @@ export function useHistory() {
 
     setLoading(false);
     return true;
-  }
+  };
 
   // const saveHistoryEntry = async (entryId: string): Promise<boolean> => {
-  
-  // };
 
-  const saveHistory = () => {
-    
-  }
+  // };
 
   return { updateHistory, resetHistory, revertHistoryEntry, isLoading };
 }
@@ -157,7 +153,7 @@ export function useHistory() {
 // Extract all change entries from the block response
 function flattenHistory(response: {
   items: {
-    changes: any[];
+    changes: unknown[];
   }[];
 }) {
   return response.items.flatMap((item) => item.changes);

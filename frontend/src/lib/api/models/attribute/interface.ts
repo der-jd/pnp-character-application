@@ -1,5 +1,5 @@
 import { RecordEntry } from "../history/interface";
-import { Increase, PointsAvailable } from "../common/increase"
+import { Increase, PointsAvailable } from "../common/increase";
 import { CombatValues, Skill } from "../Character/character";
 
 export interface SkillIncreaseData {
@@ -14,8 +14,8 @@ export interface SkillIncreaseData {
 export interface SkillChange {
   changes: {
     old: SkillState;
-    new: SkillState
-  }
+    new: SkillState;
+  };
 }
 
 export interface SkillState {
@@ -29,6 +29,6 @@ export interface SkillIncreaseReply {
 }
 
 export interface SkillIncreaseRequest {
-  current: Increase
+  current: Increase;
   learningMethod: string;
 }

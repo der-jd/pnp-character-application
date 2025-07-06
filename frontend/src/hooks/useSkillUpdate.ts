@@ -60,7 +60,6 @@ export function useSkillUpdater() {
           updatedCharacterSheet.calculationPoints.adventurePoints.available = data.adventurePoints.new.available;
         }
 
-
         setCharacterSheet(updatedCharacterSheet);
 
         if (!historyRecord) {

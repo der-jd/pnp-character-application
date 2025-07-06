@@ -12,12 +12,12 @@ export default function SkillsPage() {
   const editMode = useCharacterStore((state) => state.editMode);
 
   const toggleEdit = () => {
-    if(editMode) {
+    if (editMode) {
       // TODO use correct function to save history entries
       setOpenHistoryEntries([]);
     }
     changeEdit();
-  }
+  };
   const isEditMode = useCharacterStore((state) => state.editMode);
 
   return (

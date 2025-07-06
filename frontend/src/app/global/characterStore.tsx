@@ -50,8 +50,8 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
   setSelectedCharacter: (char) => set({ selectedCharacterId: char }),
   setAvailableCharacters: (chars) => set({ availableCharacters: [...chars] }),
   setHistoryEntries: (entries) => set({ historyEntries: entries }),
-  setOpenHistoryEntries: (entries) => set({openHistoryEntries: entries}),
-  
+  setOpenHistoryEntries: (entries) => set({ openHistoryEntries: entries }),
+
   /**
    * Reflects the state of the edit button
    */
