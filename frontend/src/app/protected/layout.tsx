@@ -34,7 +34,6 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
 
 const getSidebarContent = (pathname: string) => {
   if (pathname.startsWith("/protected/talente")) {
-    console.log("returned the sidebar!");
     return <SkillHistoryContent />;
   }
   return null;

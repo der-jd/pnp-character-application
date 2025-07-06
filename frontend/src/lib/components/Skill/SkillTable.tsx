@@ -14,7 +14,7 @@ import { useCharacterStore } from "@/src/app/global/characterStore";
 export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialData }) => {
   const isEditMode = useCharacterStore((state) => state.editMode);
   const { show, hide } = useLoadingOverlay();
-  const { tryIncreaseSkill } = useSkillUpdater();
+  const { tryIncrease } = useSkillUpdater();
   const [data, setData] = useState(initialData);
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
@@ -40,7 +40,7 @@ export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialD
 
   const skillButtonPushed = async (skill: ISkillProps, points_to_skill: number) => {
     show();
-    await tryIncreaseSkill(skill, points_to_skill);
+    await tryIncrease(skill, points_to_skill);
     hide();
   };
 

@@ -5,6 +5,8 @@ import { useAuth } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
 import { ApiError, deleteHistoryEntry, getHistory, getHistoryBlock } from "../lib/api/utils/api_calls";
 import { useToast } from "./use-toast";
+import { RecordType } from "../lib/api/utils/historyEventType";
+import { CharacterSheet } from "../lib/api/models/Character/character";
 
 /**
  * Update hook for the current character's history entries.
@@ -15,6 +17,9 @@ export function useHistory() {
   const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
   const setHistory = useCharacterStore((state) => state.setHistoryEntries);
   const updateHistoryEntries = useCharacterStore((state) => state.updateHistoryEntries);
+  const setOpenHistoryEntries = useCharacterStore((state) => state.setOpenHistoryEntries);
+  const updateValue = useCharacterStore((state) => state.updateValue);
+  const openHistoryEntries = useCharacterStore((state) => state.openHistoryEntries);
   const { idToken } = useAuth();
 
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -100,8 +105,9 @@ export function useHistory() {
     setHistory([]);
   };
 
-  const revertHistoryEntry = async (entryId: string): Promise<boolean> => {
-    if (entryId == undefined || entryId == "") {
+  const revertHistoryEntry = async () => {
+    const lastEntry = openHistoryEntries?.pop();
+    if (lastEntry == undefined) {
       toast.toast({
         title: `[History Error] No Data!`,
         description: `Entry id missing for revert request!`,
@@ -119,7 +125,7 @@ export function useHistory() {
 
     setLoading(true);
     try {
-      await deleteHistoryEntry(token, character, entryId);
+      await deleteHistoryEntry(token, character, lastEntry.id);
     } catch (error) {
       if (error instanceof ApiError) {
         toast.toast({
@@ -134,20 +140,51 @@ export function useHistory() {
           variant: "destructive",
         });
       }
-
       setLoading(false);
-      return false;
+      return;
     }
 
     setLoading(false);
-    return true;
+    setOpenHistoryEntries(openHistoryEntries ?? []);
+
+    switch (lastEntry.type) {
+      case RecordType.ATTRIBUTE_CHANGED:
+        {
+          const path = ["attributes"] as (keyof CharacterSheet)[];
+          const name = lastEntry.name as keyof CharacterSheet;
+          updateValue(path, name, lastEntry.data.old.attribute.current);
+        }
+        break;
+
+      case RecordType.SKILL_CHANGED:
+        {
+          const path = ["skills", lastEntry.name.split("/")[0]] as (keyof CharacterSheet)[];
+          const name = lastEntry.name.split("/")[1] as keyof CharacterSheet;
+          updateValue(path, name, lastEntry.data.old.skill.current);
+        }
+        break;
+    }
+  };
+
+  const discardUnsavedHistory = async () => {
+    while (openHistoryEntries && openHistoryEntries.length > 0) {
+      await revertHistoryEntry();
+    }
+
+    if (!openHistoryEntries || openHistoryEntries.length === 0) {
+      toast.toast({
+        title: `[History] All entries reverted`,
+        description: `No more entries left to revert.`,
+        variant: "success",
+      });
+    }
   };
 
   // const saveHistoryEntry = async (entryId: string): Promise<boolean> => {
 
   // };
 
-  return { updateHistory, resetHistory, revertHistoryEntry, isLoading };
+  return { updateHistory, resetHistory, revertHistoryEntry, discardUnsavedHistory, isLoading };
 }
 
 // Extract all change entries from the block response
