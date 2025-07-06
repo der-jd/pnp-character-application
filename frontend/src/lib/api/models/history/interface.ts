@@ -54,5 +54,7 @@ export interface Parameters {
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 export interface HistoryReply {
-  entries: Array<RecordEntry>;
+  previousBlockNumber: number;
+  previousBlockId: string;
+  items: HistoryBlock[];
 }

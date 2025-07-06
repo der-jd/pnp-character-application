@@ -1,12 +1,13 @@
 import { AllCharactersReply } from "../models/allCharacters/interface";
 import { Character } from "../models/Character/character";
-import { SkillIncreaseReply, SkillIncreaseRequest } from "../models/skillIncrease/interface";
+import { SkillIncreaseReply, SkillIncreaseRequest } from "../models/attribute/interface";
 import { HistoryReply } from "../models/history/interface";
 
 enum HttpMethod {
   GET = "GET",
   POST = "POST",
   PATCH = "PATCH",
+  DELETE = "DELETE",
 }
 
 export class ApiError extends Error {
@@ -77,10 +78,11 @@ async function makeRequest<ReturnType, BodyType>(
 const get = <ReturnType>(idToken: string, endpoint_url: string): Promise<ReturnType> =>
   makeRequest<ReturnType>(idToken, endpoint_url, HttpMethod.GET);
 
-// const post = <T>(endpoint_url: string): Promise<T> => makeRequest<T, HttpMethod.POST>(endpoint_url, HttpMethod.POST);
-
 const patch = <ReturnType, BodyType>(idToken: string, endpoint_url: string, body: BodyType): Promise<ReturnType> =>
   makeRequest<ReturnType, BodyType>(idToken, endpoint_url, HttpMethod.PATCH, body);
+
+const remove = <ReturnType>(idToken: string, endpoint_url: string): Promise<ReturnType> =>
+  makeRequest<ReturnType>(idToken, endpoint_url, HttpMethod.DELETE);
 
 /**
  * Gets a character from the api
@@ -129,3 +131,32 @@ export async function getHistory(idToken: string, id: string): Promise<HistoryRe
   const endpoint_url = `characters/${id}/history`;
   return get<HistoryReply>(idToken, endpoint_url);
 }
+
+/**
+ *
+ * @param idToken The id token of the curren user
+ * @param id The character id of the character
+ * @param blockNumber The number of the block to fetch
+ * @returns A History reply containing the requested block
+ */
+export async function getHistoryBlock(idToken: string, id: string, blockNumber: number): Promise<HistoryReply> {
+  const endpoint_url = `characters/${id}/history?${blockNumber}`;
+  return get<HistoryReply>(idToken, endpoint_url);
+}
+
+/**
+ *
+ * @param idToken The id token of the curren user
+ * @param id The character id of the character
+ * @param entryId The id of the skilling entry to delete
+ * @returns
+ */
+export async function deleteHistoryEntry(idToken: string, id: string, entryId: string): Promise<HistoryReply> {
+  const endpoint_url = `characters/${id}/history/${entryId}`;
+  return remove<HistoryReply>(idToken, endpoint_url);
+}
+
+// export async function saveHistoryEntry(idToken: string, id: string, entryId: string): Promise<HistoryReply> {
+//   const endpoint_url = `characters/${id}/history/${entryId}`;
+//   return patch<HistoryReply>(idToken, endpoint_url);
+// }

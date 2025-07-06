@@ -8,6 +8,7 @@ import { increaseSkill } from "../lib/api/utils/api_calls";
 import { ISkillProps } from "../lib/components/Skill/SkillDefinitions";
 import { ApiError } from "@lib/api/utils/api_calls";
 import { useToast } from "./use-toast";
+import { SkillIncreaseRequest } from "../lib/api/models/attribute/interface";
 
 /**
  * Hook that provides functionallity to update a skill via api call, handles and shows errors and
@@ -20,7 +21,7 @@ export function useSkillUpdater() {
   const { idToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const updateValue = useCharacterStore((state) => state.updateValue);
-  const updateReversibleHistory = useCharacterStore((state) => state.updateHistoryEntries);
+  const updateReversibleHistory = useCharacterStore((state) => state.updateOpenHistoryEntries);
   const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
   const setCharacterSheet = useCharacterStore((state) => state.setCharacterSheet);
   const characterSheet = useCharacterStore((state) => state.characterSheet);
@@ -29,9 +30,11 @@ export function useSkillUpdater() {
     const path = ["skills", skill.category] as (keyof CharacterSheet)[];
     const name = skill.name as keyof CharacterSheet;
 
-    const increaseSkillRequest = {
-      initialValue: skill.current_level,
-      increasedPoints: pointsToSkill,
+    const increaseSkillRequest: SkillIncreaseRequest = {
+      current: {
+        initialValue: skill.current_level,
+        increasedPoints: pointsToSkill,
+      },
       learningMethod: LearningMethod[skill.learning_method],
     };
 
@@ -53,13 +56,10 @@ export function useSkillUpdater() {
 
         const updatedCharacterSheet = { ...characterSheet };
 
-        if (data.availableAdventurePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
-          updatedCharacterSheet.calculationPoints.adventurePoints.available = data.availableAdventurePoints;
+        if (data.adventurePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
+          updatedCharacterSheet.calculationPoints.adventurePoints.available = data.adventurePoints.new.available;
         }
 
-        if (data.availableAttributePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
-          updatedCharacterSheet.calculationPoints.attributePoints.available = data.availableAttributePoints;
-        }
 
         setCharacterSheet(updatedCharacterSheet);
 

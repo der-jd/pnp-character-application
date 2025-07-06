@@ -201,25 +201,24 @@ export interface CharacterSheet {
       lockpicking: Skill;
     };
   };
-  combatValues: {
+  CombatValues: {
     melee: {
       martialArts: CombatValues;
       barehanded: CombatValues;
       chainWeapons: CombatValues;
       daggers: CombatValues;
-      slashingWeaponsSharp1h: CombatValues;
-      slashingWeaponsBlunt1h: CombatValues;
+      slashingWeapons1h: CombatValues;
       thrustingWeapons1h: CombatValues;
-      slashingWeaponsSharp2h: CombatValues;
-      slashingWeaponsBlunt2h: CombatValues;
+      slashingWeapons2h: CombatValues;
       thrustingWeapons2h: CombatValues;
+      polearms: CombatValues;
+      greatsword: CombatValues;
     };
     ranged: {
       missile: CombatValues;
       firearmSimple: CombatValues;
       firearmMedium: CombatValues;
       firearmComplex: CombatValues;
-      heavyWeapons: CombatValues;
     };
   };
 }
