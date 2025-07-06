@@ -212,6 +212,35 @@ export interface CharacterSheet {
   };
 }
 
+export const combatSkills: string[] = [
+  "martialArts",
+  "barehanded",
+  "chainWeapons",
+  "daggers",
+  "slashingWeaponsSharp1h",
+  "slashingWeaponsBlunt1h",
+  "thrustingWeapons1h",
+  "slashingWeaponsSharp2h",
+  "slashingWeaponsBlunt2h",
+  "thrustingWeapons2h",
+  "missile",
+  "firearmSimple",
+  "firearmMedium",
+  "firearmComplex",
+  "heavyWeapons",
+];
+
+export const attributes: (keyof CharacterSheet["attributes"])[] = [
+  "courage",
+  "intelligence",
+  "concentration",
+  "charisma",
+  "mentalResilience",
+  "dexterity",
+  "endurance",
+  "strength",
+];
+
 export function getAttribute(attributes: CharacterSheet["attributes"], name: string): Attribute {
   const attribute = (attributes as Record<string, Attribute>)[name];
   if (!attribute) {
