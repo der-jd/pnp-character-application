@@ -12,12 +12,14 @@ export interface CharacterStore {
   editMode: boolean;
   characterSheet: CharacterSheet | null;
   historyEntries: Array<RecordEntry> | null;
+  openHistoryEntries: Array<RecordEntry> | null;
 
   setCharacterSheet: (data: CharacterSheet) => void;
   setEditable: (isEditable: boolean) => void;
   setSelectedCharacter: (char: string) => void;
   setAvailableCharacters: (chars: Array<AllCharactersCharacter>) => void;
   setHistoryEntries: (entries: Array<RecordEntry>) => void;
+  setOpenHistoryEntries: (entries: Array<RecordEntry>) => void;
 
   updateValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: number) => void;
 
@@ -26,6 +28,7 @@ export interface CharacterStore {
   updateAvailableCharacters: (idToken: string) => void;
   updateCharacter: (idToken: string, charId: string) => void;
   updateHistoryEntries: (newEntries: RecordEntry[]) => void;
+  updateOpenHistoryEntries: (newEntries: RecordEntry[]) => void;
 }
 
 /**
@@ -40,12 +43,15 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
   characterSheet: null,
   editMode: false,
   historyEntries: null,
+  openHistoryEntries: null,
 
   setCharacterSheet: (sheet) => set({ characterSheet: { ...sheet } }),
   setEditable: (isEditable) => set({ isEditable }),
   setSelectedCharacter: (char) => set({ selectedCharacterId: char }),
   setAvailableCharacters: (chars) => set({ availableCharacters: [...chars] }),
   setHistoryEntries: (entries) => set({ historyEntries: entries }),
+  setOpenHistoryEntries: (entries) => set({ openHistoryEntries: entries }),
+
   /**
    * Reflects the state of the edit button
    */
@@ -110,6 +116,12 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
   updateHistoryEntries: (newEntries: RecordEntry[]) => {
     set((state) => ({
       historyEntries: [...(state.historyEntries ?? []), ...newEntries],
+    }));
+  },
+
+  updateOpenHistoryEntries: (newEntries: RecordEntry[]) => {
+    set((state) => ({
+      openHistoryEntries: [...(state.openHistoryEntries ?? []), ...newEntries],
     }));
   },
 

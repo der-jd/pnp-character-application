@@ -3,8 +3,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { RecordEntry } from "../../../api/models/history/interface";
 import { ArrowUpDown } from "lucide-react";
-import { Button } from "@components/ui/button"; // update path if needed
+import { Button } from "@components/ui/button";
 import { format } from "date-fns";
+import { RecordType } from "@/src/lib/api/utils/historyEventType";
 
 export const columns: ColumnDef<RecordEntry>[] = [
   {
@@ -30,6 +31,7 @@ export const columns: ColumnDef<RecordEntry>[] = [
   },
   {
     accessorKey: "type",
+    accessorFn: (row) => RecordType[row.type as unknown as number],
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         Type <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -54,7 +56,7 @@ export const columns: ColumnDef<RecordEntry>[] = [
   },
   {
     id: "spent",
-    accessorFn: (row) => row.calculationPointsChange?.adjustment ?? 0,
+    accessorFn: (row) => row.data?.new.skill.totalCost - row.data?.old.skill.totalCost,
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         Points spent <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -64,7 +66,7 @@ export const columns: ColumnDef<RecordEntry>[] = [
   },
   {
     id: "old",
-    accessorFn: (row) => row.calculationPointsChange?.old ?? 0,
+    accessorFn: (row) => row.data?.old.skill.current ?? 0,
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         Old Value <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -74,10 +76,20 @@ export const columns: ColumnDef<RecordEntry>[] = [
   },
   {
     id: "new",
-    accessorFn: (row) => row.calculationPointsChange?.new ?? 0,
+    accessorFn: (row) => row.data?.new.skill.current ?? 0,
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         New Value <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    sortingFn: "basic",
+  },
+  {
+    id: "spent total",
+    accessorFn: (row) => row.data?.new.skill.totalCost ?? 0,
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Spent Total <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     sortingFn: "basic",

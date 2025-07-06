@@ -8,6 +8,7 @@ import { increaseSkill } from "../lib/api/utils/api_calls";
 import { ISkillProps } from "../lib/components/Skill/SkillDefinitions";
 import { ApiError } from "@lib/api/utils/api_calls";
 import { useToast } from "./use-toast";
+import { SkillIncreaseRequest } from "../lib/api/models/attribute/interface";
 
 /**
  * Hook that provides functionallity to update a skill via api call, handles and shows errors and
@@ -20,7 +21,7 @@ export function useSkillUpdater() {
   const { idToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const updateValue = useCharacterStore((state) => state.updateValue);
-  const updateReversibleHistory = useCharacterStore((state) => state.updateHistoryEntries);
+  const updateReversibleHistory = useCharacterStore((state) => state.updateOpenHistoryEntries);
   const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
   const setCharacterSheet = useCharacterStore((state) => state.setCharacterSheet);
   const characterSheet = useCharacterStore((state) => state.characterSheet);
@@ -29,9 +30,11 @@ export function useSkillUpdater() {
     const path = ["skills", skill.category] as (keyof CharacterSheet)[];
     const name = skill.name as keyof CharacterSheet;
 
-    const increaseSkillRequest = {
-      initialValue: skill.current_level,
-      increasedPoints: pointsToSkill,
+    const increaseSkillRequest: SkillIncreaseRequest = {
+      current: {
+        initialValue: skill.current_level,
+        increasedPoints: pointsToSkill,
+      },
       learningMethod: LearningMethod[skill.learning_method],
     };
 
@@ -39,7 +42,8 @@ export function useSkillUpdater() {
       try {
         setLoading(true);
         const response = await increaseSkill(idToken, selectedChar, skill.name, skill.category, increaseSkillRequest);
-        const { availableAdventurePoints, availableAttributePoints, historyRecord } = response;
+        console.log(response);
+        const { data, historyRecord } = response;
 
         if (!characterSheet) {
           toast.toast({
@@ -52,12 +56,8 @@ export function useSkillUpdater() {
 
         const updatedCharacterSheet = { ...characterSheet };
 
-        if (availableAdventurePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
-          updatedCharacterSheet.calculationPoints.adventurePoints.available = availableAdventurePoints;
-        }
-
-        if (availableAttributePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
-          updatedCharacterSheet.calculationPoints.attributePoints.available = availableAttributePoints;
+        if (data.adventurePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
+          updatedCharacterSheet.calculationPoints.adventurePoints.available = data.adventurePoints.new.available;
         }
 
         setCharacterSheet(updatedCharacterSheet);
@@ -71,7 +71,7 @@ export function useSkillUpdater() {
           return;
         }
 
-        updateReversibleHistory(selectedChar ?? "", historyRecord);
+        updateReversibleHistory([historyRecord]);
       } catch (error) {
         if (error instanceof ApiError) {
           toast.toast({
