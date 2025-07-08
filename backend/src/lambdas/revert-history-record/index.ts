@@ -7,7 +7,7 @@ import {
   Record,
   historyBlockSchema,
   recordSchema,
-  numberSchema,
+  integerSchema,
   CalculationPoints,
   skillChangeSchema,
   attributeChangeSchema,
@@ -138,7 +138,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
         break;
       }
       case RecordType.LEVEL_CHANGED: {
-        const oldData = numberSchema.parse(record.data.old);
+        const oldData = integerSchema.parse(record.data.old);
         await updateLevel(userId, characterId, oldData.value);
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);

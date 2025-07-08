@@ -36,7 +36,7 @@ const attributeSchema = z.object(
   Object.fromEntries(
     attributes.map((attr) => [
       attr,
-      z.number().min(MIN_ATTRIBUTE_VALUE_FOR_CREATION).max(MAX_ATTRIBUTE_VALUE_FOR_CREATION),
+      z.number().int().min(MIN_ATTRIBUTE_VALUE_FOR_CREATION).max(MAX_ATTRIBUTE_VALUE_FOR_CREATION),
     ]),
   ),
 );

@@ -11,6 +11,7 @@
  */
 import { z } from "zod";
 import { CostCategory } from "./cost.js";
+import { START_LEVEL } from "./rules.js";
 
 export const MAX_STRING_LENGTH_SHORT = 30;
 export const MAX_STRING_LENGTH_DEFAULT = 120;
@@ -29,7 +30,7 @@ export const professionHobbySchema = z
 export const generalInformationSchema = z
   .object({
     name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
-    level: z.number(),
+    level: z.number().int().min(START_LEVEL),
     sex: z.string().max(MAX_STRING_LENGTH_SHORT),
     profession: professionHobbySchema,
     hobby: professionHobbySchema,
@@ -57,28 +58,28 @@ export const dis_advantagesSchema = z.array(z.string().max(MAX_STRING_LENGTH_DEF
 
 export const attributeSchema = z
   .object({
-    start: z.number(),
-    current: z.number(),
-    mod: z.number(),
-    totalCost: z.number(),
+    start: z.number().int(),
+    current: z.number().int(),
+    mod: z.number().int(),
+    totalCost: z.number().int(),
   })
   .strict();
 
 export const baseValueSchema = z
   .object({
-    start: z.number(),
-    current: z.number(),
-    byFormula: z.number().optional(),
-    byLvlUp: z.number().optional(),
-    mod: z.number(),
+    start: z.number().int(),
+    current: z.number().int(),
+    byFormula: z.number().int().optional(),
+    byLvlUp: z.number().int().optional(),
+    mod: z.number().int(),
   })
   .strict();
 
 export const combatValuesSchema = z
   .object({
-    availablePoints: z.number(),
-    attackValue: z.number(),
-    paradeValue: z.number(),
+    availablePoints: z.number().int(),
+    attackValue: z.number().int(),
+    paradeValue: z.number().int(),
   })
   .strict();
 
@@ -87,9 +88,9 @@ const costCategorySchema = z.nativeEnum(CostCategory);
 export const skillSchema = z
   .object({
     activated: z.boolean(),
-    start: z.number(),
-    current: z.number(),
-    mod: z.number(),
+    start: z.number().int(),
+    current: z.number().int(),
+    mod: z.number().int(),
     totalCost: z.number(),
     defaultCostCategory: costCategorySchema,
   })

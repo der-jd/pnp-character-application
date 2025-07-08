@@ -23,13 +23,13 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 };
 
 const initialNewSchema = z.object({
-  initialValue: z.number(),
-  newValue: z.number(),
+  initialValue: z.number().int(),
+  newValue: z.number().int(),
 });
 
 const initialIncreasedSchema = z.object({
-  initialValue: z.number(),
-  increasedPoints: z.number(),
+  initialValue: z.number().int(),
+  increasedPoints: z.number().int(),
 });
 
 const bodySchema = z
