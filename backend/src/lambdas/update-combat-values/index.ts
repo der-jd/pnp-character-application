@@ -25,14 +25,14 @@ const bodySchema = z
   .object({
     attackValue: z
       .object({
-        initialValue: z.number(),
-        increasedPoints: z.number(),
+        initialValue: z.number().int(),
+        increasedPoints: z.number().int(),
       })
       .strict(),
     paradeValue: z
       .object({
-        initialValue: z.number(),
-        increasedPoints: z.number(),
+        initialValue: z.number().int(),
+        increasedPoints: z.number().int(),
       })
       .strict(),
   })

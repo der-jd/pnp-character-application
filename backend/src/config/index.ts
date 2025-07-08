@@ -45,7 +45,7 @@ export {
   Record,
   historyBlockSchema,
   HistoryBlock,
-  numberSchema,
+  integerSchema,
   stringArraySchema,
   stringSetSchema,
   attributeChangeSchema,

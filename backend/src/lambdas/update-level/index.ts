@@ -22,7 +22,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 const bodySchema = z
   .object({
-    initialLevel: z.number(),
+    initialLevel: z.number().int(),
   })
   .strict();
 
