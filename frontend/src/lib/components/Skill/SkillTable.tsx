@@ -93,7 +93,7 @@ export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialD
     },
     {
       accessorKey: "skilling",
-      header: () => <div className="text-center">Increase Skill</div>,
+      header: () => <div className="text-center">Increase</div>,
       cell: ({ row }) => (
         <div className="flex justify-evenly items-right w-full space-x-4">
           {[1, 5, 10].map((points) => (
