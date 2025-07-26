@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { RecordEntry } from "../../../api/models/history/interface";
+import { RecordEntry } from "@/src/lib/api/models/history/interface";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@components/ui/button";
 import { format } from "date-fns";
@@ -30,7 +30,7 @@ export const columns: ColumnDef<RecordEntry>[] = [
     },
   },
   {
-    accessorKey: "type",
+    id: "type",
     accessorFn: (row) => RecordType[row.type as unknown as number],
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>

@@ -30,7 +30,7 @@ export default function History() {
     <div>
       <h1 className="text-3xl font-bold mb-4 text-center">The Life of {characterName}</h1>
       {(historyData?.length ?? 0) > 0 ? (
-        <DataTable columns={columns} data={historyData} />
+        <DataTable columns={columns} data={historyData ?? []} />
       ) : (
         <p>No history data available.</p>
       )}
