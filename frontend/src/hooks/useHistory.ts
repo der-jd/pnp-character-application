@@ -7,6 +7,7 @@ import { ApiError, deleteHistoryEntry, getHistory, getHistoryBlock } from "../li
 import { useToast } from "./use-toast";
 import { RecordType } from "../lib/api/utils/historyEventType";
 import { CharacterSheet } from "../lib/api/models/Character/character";
+import { RecordEntry } from "../lib/api/models/history/interface";
 
 /**
  * Update hook for the current character's history entries.
@@ -63,7 +64,7 @@ export function useHistory() {
     const fetchHistory = async () => {
       try {
         let response = await getHistory(token, character);
-        let allChanges = flattenHistory(response);
+        let allChanges: RecordEntry[] = flattenHistory(response) as RecordEntry[];
 
         while (
           response.previousBlockNumber !== null &&
@@ -190,8 +191,8 @@ export function useHistory() {
 // Extract all change entries from the block response
 function flattenHistory(response: {
   items: {
-    changes: unknown[];
+    changes: RecordEntry[];
   }[];
-}) {
+}): RecordEntry[] {
   return response.items.flatMap((item) => item.changes);
 }

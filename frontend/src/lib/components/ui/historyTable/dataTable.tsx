@@ -23,13 +23,14 @@ import {
 
 import React from "react";
 import { Button } from "@components/ui/button";
+import { RecordEntry } from "@/src/lib/api/models/history/interface";
 
-interface DataTableProps<TData extends { type: string }, TValue> {
+interface DataTableProps<TData extends RecordEntry, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData extends { type: string }, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData extends RecordEntry, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -55,7 +56,7 @@ export function DataTable<TData extends { type: string }, TValue>({ columns, dat
   const typeOptions = React.useMemo(() => {
     const values = new Set<string>();
     data.forEach((row) => {
-      if (row.type) values.add(row.type);
+      if (row.type) values.add(String(row.type));
     });
     return Array.from(values).sort();
   }, [data]);

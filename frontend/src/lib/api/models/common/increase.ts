@@ -5,6 +5,11 @@ export interface Increase {
   increasedPoints: number;
 }
 
+export interface IncreaseBaseValue {
+  initialValue: number;
+  newValue: number;
+}
+
 export interface PointsAvailable {
   old: CalculationPoints;
   new: CalculationPoints;

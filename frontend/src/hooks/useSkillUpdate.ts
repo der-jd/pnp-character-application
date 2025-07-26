@@ -4,12 +4,13 @@ import { useState } from "react";
 import { useAuth } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
 import { CharacterSheet, LearningMethod } from "../lib/api/models/Character/character";
-import { increaseAttribute, increaseSkill } from "../lib/api/utils/api_calls";
+import { increaseAttribute, increaseBaseValue, increaseSkill } from "../lib/api/utils/api_calls";
 import { ISkillProps } from "../lib/components/Skill/SkillDefinitions";
 import { ApiError } from "@lib/api/utils/api_calls";
 import { useToast } from "./use-toast";
 import { SkillIncreaseRequest } from "../lib/api/models/skills/interface";
 import { AttributeIncreaseRequest } from "../lib/api/models/attributes/interface";
+import { BaseValueIncreaseRequest } from "../lib/api/models/baseValues/interface";
 
 /**
  * Hook that provides functionallity to update a skill via api call, handles and shows errors and
@@ -148,11 +149,50 @@ export function useSkillUpdater() {
     updateValue(path, name, skill.current_level + pointsToSkill);
   };
 
+  const tryIncreaseBaseValue = async (value: ISkillProps, pointsToSkill: number) => {
+    const path = ["baseValues"] as (keyof CharacterSheet)[];
+    const name = value.name as keyof CharacterSheet;
+    const increaseBaseValueRequest: BaseValueIncreaseRequest = {
+      byLvlUp: {
+        initialValue: value.current_level,
+        newValue: pointsToSkill,
+      },
+    };
+
+    if (selectedChar && idToken) {
+      try {
+        setLoading(true);
+        await increaseBaseValue(idToken, selectedChar, value.name, increaseBaseValueRequest);
+        if (!characterSheet) {
+          toast.toast({
+            title: `Error increasing ${value.name} character sheet not defined!`,
+            description: `The character sheet is missing in the store. Please reload the character and try again!`,
+            variant: "destructive",
+          });
+          return;
+        }
+      } catch (error) {
+        if (error instanceof ApiError) {
+          toast.toast({
+            title: `Error ${error.statusCode}`,
+            description: `${error.body}`,
+            variant: "destructive",
+          });
+        }
+        setLoading(false);
+        return;
+      }
+
+      updateValue(path, name, value.current_level + pointsToSkill);
+      setLoading(false);
+    }
+  };
+
   const tryIncrease = async (value: ISkillProps, pointsToSkill: number) => {
     if (value.category == "Attributes") {
       await tryIncreaseAttribute(value, pointsToSkill);
     } else if (value.category == "BaseValues") {
-      // TODO
+      await tryIncreaseBaseValue(value, pointsToSkill);
     } else {
       await tryIncreaseSkill(value, pointsToSkill);
     }

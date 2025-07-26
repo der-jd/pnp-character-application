@@ -3,6 +3,7 @@ import { Character } from "../models/Character/character";
 import { SkillIncreaseReply, SkillIncreaseRequest } from "../models/skills/interface";
 import { HistoryReply } from "../models/history/interface";
 import { AttributeIncreaseReply, AttributeIncreaseRequest } from "../models/attributes/interface";
+import { BaseValueIncreaseReply, BaseValueIncreaseRequest } from "../models/baseValues/interface";
 
 enum HttpMethod {
   GET = "GET",
@@ -105,7 +106,7 @@ export async function getAllCharacters(idToken: string): Promise<AllCharactersRe
 }
 
 /**
- *
+ * Send an increase skill request to the backend
  * @param charId The uuid of the character
  * @param name The name of the skill
  * @param category The category of the skill
@@ -122,6 +123,13 @@ export async function increaseSkill(
   return await patch<SkillIncreaseReply, SkillIncreaseRequest>(idToken, endpoint_url, body);
 }
 
+/**
+ * Send an increase attribute request to the backend
+ * @param charId The uuid of the current character
+ * @param name The name of the attribute
+ * @param body The data for the backend
+ * @returns A Promise reflecting the new state of the character and the history
+ */
 export async function increaseAttribute(
   idToken: string,
   charId: string,
@@ -130,6 +138,23 @@ export async function increaseAttribute(
 ): Promise<AttributeIncreaseReply> {
   const endpoint_url = `characters/${charId}/attributes/${name}`;
   return await patch<AttributeIncreaseReply, AttributeIncreaseRequest>(idToken, endpoint_url, body);
+}
+
+/**
+ * Send an increase base value request to the backend
+ * @param charId The uuid of the current character
+ * @param name The name of the attribute
+ * @param body The data for the backend
+ * @returns A Promise reflecting the new state of the character and the history
+ */
+export async function increaseBaseValue(
+  idToken: string,
+  charId: string,
+  name: string,
+  body: BaseValueIncreaseRequest,
+): Promise<BaseValueIncreaseReply> {
+  const endpoint_url = `characters/${charId}/base-values/${name}`;
+  return patch<BaseValueIncreaseReply, BaseValueIncreaseRequest>(idToken, endpoint_url, body);
 }
 
 /**
