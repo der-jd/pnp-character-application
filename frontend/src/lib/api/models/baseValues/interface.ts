@@ -6,19 +6,11 @@ export interface BaseValueIncreaseData {
   characterId: string;
   userId: string;
   baseValueName: string;
-  changes: BaseValueChange;
-  baseValuePoints: PointsAvailable;
-}
-
-export interface BaseValueChange {
-  changes: {
-    old: BaseValueState;
-    new: BaseValueState;
+  baseValue: {
+    old: BaseValue;
+    new: BaseValue;
   };
-}
-
-export interface BaseValueState {
-  baseValue: BaseValue;
+  baseValuePoints: PointsAvailable;
 }
 
 export interface BaseValueIncreaseReply {

@@ -7,15 +7,11 @@ export interface SkillIncreaseData {
   userId: string;
   skillCategory: string;
   skillName: string;
-  changes: SkillChange;
-  adventurePoints: PointsAvailable;
-}
-
-export interface SkillChange {
   changes: {
     old: SkillState;
     new: SkillState;
   };
+  adventurePoints: PointsAvailable;
 }
 
 export interface SkillState {

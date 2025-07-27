@@ -8,10 +8,12 @@ import SidebarLeft from "@/src/lib/components/Sidebar/SidebarLeft";
 import { usePathname } from "next/navigation";
 
 import SkillHistoryContent from "@/src/lib/components/Sidebar/content/skillsContent";
+import CharacterInfoContent from "@/src/lib/components/Sidebar/content/charInfoContent";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const sidebarContent = getSidebarContent(pathname);
+  const sidebarLeftContent = getSidebarLeftContent(pathname);
+  const sidebarRightContent = getSidebarRightContent(pathname);
 
   return (
     <LoadingOverlayProvider>
@@ -19,11 +21,11 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
         <Header />
         <div className="flex">
           <div className="flex-1">
-            <SidebarRight />
+            <SidebarRight content={sidebarRightContent} />
           </div>
           <main className="flex-2 p-6">{children}</main>
           <div className="flex-1">
-            <SidebarLeft content={sidebarContent} />
+            <SidebarLeft content={sidebarLeftContent} />
           </div>
         </div>
       </div>
@@ -32,9 +34,14 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   );
 }
 
-const getSidebarContent = (pathname: string) => {
+const getSidebarLeftContent = (pathname: string) => {
   if (pathname.startsWith("/protected/talente")) {
     return <SkillHistoryContent />;
   }
-  return null;
+};
+
+const getSidebarRightContent = (pathname: string) => {
+  if (pathname.startsWith("/protected/talente")) {
+    return <CharacterInfoContent />;
+  }
 };

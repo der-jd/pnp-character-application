@@ -164,6 +164,19 @@ export function useHistory() {
           updateValue(path, name, lastEntry.data.old.skill.current);
         }
         break;
+
+      case RecordType.EVENT_BASE_VALUE: {
+        const path = ["baseValues"] as (keyof CharacterSheet)[];
+        const name = lastEntry.name as keyof CharacterSheet;
+        updateValue(path, name, lastEntry.data.old.current);
+      }
+
+      case RecordType.EVENT_LEVEL_UP: {
+        const path = ["generalInformation"] as (keyof CharacterSheet)[];
+        const name = "level" as keyof CharacterSheet;
+        console.log(lastEntry.data.old);
+        updateValue(path, name, lastEntry.data.old.value);
+      }
     }
   };
 
