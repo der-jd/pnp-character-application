@@ -4,13 +4,15 @@ import { useState } from "react";
 import { useAuth } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
 import { CharacterSheet, LearningMethod } from "../lib/api/models/Character/character";
-import { increaseAttribute, increaseBaseValue, increaseSkill } from "../lib/api/utils/api_calls";
+import { increaseAttribute, increaseBaseValue, increaseSkill, levelUp } from "../lib/api/utils/api_calls";
 import { ISkillProps } from "../lib/components/Skill/SkillDefinitions";
 import { ApiError } from "@lib/api/utils/api_calls";
 import { useToast } from "./use-toast";
 import { SkillIncreaseRequest } from "../lib/api/models/skills/interface";
 import { AttributeIncreaseRequest } from "../lib/api/models/attributes/interface";
 import { BaseValueIncreaseRequest } from "../lib/api/models/baseValues/interface";
+import { LevelupRequest } from "../lib/api/models/lvlUp/interface";
+import { RecordEntry } from "../lib/api/models/history/interface";
 
 /**
  * Hook that provides functionallity to update a skill via api call, handles and shows errors and
@@ -28,7 +30,60 @@ export function useSkillUpdater() {
   const setCharacterSheet = useCharacterStore((state) => state.setCharacterSheet);
   const characterSheet = useCharacterStore((state) => state.characterSheet);
 
+  function applyUpdate({
+    keyPath,
+    name,
+    newValue,
+    historyRecord,
+    updatedAdventurePoints,
+    updatedAttributePoints,
+  }: {
+    keyPath: (keyof CharacterSheet)[];
+    name: keyof CharacterSheet;
+    newValue: number;
+    historyRecord?: RecordEntry;
+    updatedAdventurePoints?: number;
+    updatedAttributePoints?: number;
+  }) {
+    console.log("applyUpdate called with newValue:", newValue);
+    if (!characterSheet) {
+      toast.toast({
+        title: `Error updating ${name}, character sheet not defined!`,
+        description: `The character sheet is missing in the store. Please reload the character and try again!`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const updatedCharacterSheet = { ...characterSheet };
+
+    if (updatedCharacterSheet.calculationPoints) {
+      if (updatedAdventurePoints !== undefined) {
+        updatedCharacterSheet.calculationPoints.adventurePoints.available = updatedAdventurePoints;
+      }
+      if (updatedAttributePoints !== undefined) {
+        updatedCharacterSheet.calculationPoints.attributePoints.available = updatedAttributePoints;
+      }
+    }
+
+    setCharacterSheet(updatedCharacterSheet);
+    updateValue(keyPath, name, newValue);
+
+    if (!historyRecord) {
+      toast.toast({
+        title: `Error updating ${name}`,
+        description: `History Entry is missing from backend reply!`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updateReversibleHistory([historyRecord]);
+  }
+
   const tryIncreaseAttribute = async (skill: ISkillProps, pointsToSkill: number) => {
+    const path = ["attributes"] as (keyof CharacterSheet)[];
+    const name = skill.name as keyof CharacterSheet;
     const increaseAttributeRequest: AttributeIncreaseRequest = {
       current: {
         initialValue: skill.current_level,
@@ -39,36 +94,21 @@ export function useSkillUpdater() {
     if (selectedChar && idToken) {
       try {
         setLoading(true);
-        const response = await increaseAttribute(idToken, selectedChar, skill.name, increaseAttributeRequest);
-        const { data, historyRecord } = response;
 
-        if (!characterSheet) {
-          toast.toast({
-            title: `Error increasing ${skill.name} character sheet not defined!`,
-            description: `The character sheet is missing in the store. Please reload the character and try again!`,
-            variant: "destructive",
-          });
-          return;
-        }
+        const { data, historyRecord } = await increaseAttribute(
+          idToken,
+          selectedChar,
+          skill.name,
+          increaseAttributeRequest,
+        );
 
-        const updatedCharacterSheet = { ...characterSheet };
-
-        if (data.attributePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
-          updatedCharacterSheet.calculationPoints.attributePoints.available = data.attributePoints.new.available;
-        }
-
-        setCharacterSheet(updatedCharacterSheet);
-
-        if (!historyRecord) {
-          toast.toast({
-            title: `Error increasing ${skill.name}!`,
-            description: `History Entry from the missing from the backend reply!`,
-            variant: "destructive",
-          });
-          return;
-        }
-
-        updateReversibleHistory([historyRecord]);
+        applyUpdate({
+          keyPath: path,
+          name: name,
+          newValue: data.changes.new.attribute.current,
+          historyRecord: historyRecord,
+          updatedAttributePoints: data.attributePoints?.new.available,
+        });
       } catch (error) {
         if (error instanceof ApiError) {
           toast.toast({
@@ -77,13 +117,10 @@ export function useSkillUpdater() {
             variant: "destructive",
           });
         }
-        setLoading(false);
         return;
+      } finally {
+        setLoading(false);
       }
-
-      const path = ["attributes"] as (keyof CharacterSheet)[];
-      const name = skill.name as keyof CharacterSheet;
-      updateValue(path, name, skill.current_level + pointsToSkill);
     }
   };
 
@@ -102,36 +139,21 @@ export function useSkillUpdater() {
     if (selectedChar && idToken) {
       try {
         setLoading(true);
-        const response = await increaseSkill(idToken, selectedChar, skill.name, skill.category, increaseSkillRequest);
-        const { data, historyRecord } = response;
+        const { data, historyRecord } = await increaseSkill(
+          idToken,
+          selectedChar,
+          skill.name,
+          skill.category,
+          increaseSkillRequest,
+        );
 
-        if (!characterSheet) {
-          toast.toast({
-            title: `Error increasing ${skill.name} character sheet not defined!`,
-            description: `The character sheet is missing in the store. Please reload the character and try again!`,
-            variant: "destructive",
-          });
-          return;
-        }
-
-        const updatedCharacterSheet = { ...characterSheet };
-
-        if (data.adventurePoints != undefined && updatedCharacterSheet.calculationPoints != undefined) {
-          updatedCharacterSheet.calculationPoints.adventurePoints.available = data.adventurePoints.new.available;
-        }
-
-        setCharacterSheet(updatedCharacterSheet);
-
-        if (!historyRecord) {
-          toast.toast({
-            title: `Error increasing ${skill.name}!`,
-            description: `History Entry from the missing from the backend reply!`,
-            variant: "destructive",
-          });
-          return;
-        }
-
-        updateReversibleHistory([historyRecord]);
+        applyUpdate({
+          keyPath: path,
+          name: name,
+          newValue: data.changes.new.skill.current,
+          historyRecord: historyRecord,
+          updatedAdventurePoints: data.adventurePoints?.new.available,
+        });
       } catch (error) {
         if (error instanceof ApiError) {
           toast.toast({
@@ -140,13 +162,11 @@ export function useSkillUpdater() {
             variant: "destructive",
           });
         }
-        setLoading(false);
         return;
+      } finally {
+        setLoading(false);
       }
     }
-
-    setLoading(false);
-    updateValue(path, name, skill.current_level + pointsToSkill);
   };
 
   const tryIncreaseBaseValue = async (value: ISkillProps, pointsToSkill: number) => {
@@ -162,15 +182,19 @@ export function useSkillUpdater() {
     if (selectedChar && idToken) {
       try {
         setLoading(true);
-        await increaseBaseValue(idToken, selectedChar, value.name, increaseBaseValueRequest);
-        if (!characterSheet) {
-          toast.toast({
-            title: `Error increasing ${value.name} character sheet not defined!`,
-            description: `The character sheet is missing in the store. Please reload the character and try again!`,
-            variant: "destructive",
-          });
-          return;
-        }
+        const { data, historyRecord } = await increaseBaseValue(
+          idToken,
+          selectedChar,
+          value.name,
+          increaseBaseValueRequest,
+        );
+
+        applyUpdate({
+          keyPath: path,
+          name: name,
+          newValue: data.baseValue.new.current,
+          historyRecord: historyRecord,
+        });
       } catch (error) {
         if (error instanceof ApiError) {
           toast.toast({
@@ -182,8 +206,6 @@ export function useSkillUpdater() {
         setLoading(false);
         return;
       }
-
-      updateValue(path, name, value.current_level + pointsToSkill);
       setLoading(false);
     }
   };
@@ -198,5 +220,41 @@ export function useSkillUpdater() {
     }
   };
 
-  return { tryIncrease, loading };
+  const lvlUp = async (currentLevel: number) => {
+    const path = ["generalInformation"] as (keyof CharacterSheet)[];
+    const name = "level" as keyof CharacterSheet;
+    const lvlUpRequest: LevelupRequest = {
+      initialLevel: currentLevel,
+    };
+
+    if (selectedChar && idToken) {
+      try {
+        setLoading(true);
+        const { data, historyRecord } = await levelUp(idToken, selectedChar, lvlUpRequest);
+        try {
+          applyUpdate({
+            keyPath: path,
+            name: name,
+            newValue: data.level.new.value,
+            historyRecord: historyRecord,
+          });
+        } catch (e) {
+          console.log(e);
+        }
+      } catch (error) {
+        if (error instanceof ApiError) {
+          toast.toast({
+            title: `Error ${error.statusCode}`,
+            description: `${error.body}`,
+            variant: "destructive",
+          });
+        }
+        setLoading(false);
+        return;
+      }
+      setLoading(false);
+    }
+  };
+
+  return { tryIncrease, lvlUp, loading };
 }

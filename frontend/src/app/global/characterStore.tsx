@@ -5,6 +5,10 @@ import { create } from "zustand";
 import * as R from "ramda";
 import { RecordEntry } from "@/src/lib/api/models/history/interface";
 
+function asPath(path: (string | number | symbol)[]): (string | number)[] {
+  return path.map((key) => key.toString()); // or key as string
+}
+
 export interface CharacterStore {
   availableCharacters: Array<AllCharactersCharacter>;
   selectedCharacterId: string | null;
@@ -72,10 +76,19 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
   updateValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: number) => {
     set((state) => {
       if (!state.characterSheet) {
-        throw new Error(`No character sheet has been loaded yet, updating value ${name} failed`);
+        throw new Error(`No character sheet has been loaded yet, updating value ${String(name)} failed`);
       }
 
-      return { characterSheet: R.modifyPath([...path, name, "current"], () => newValue, state.characterSheet) };
+      const target = R.path([...path, name] as (string | number)[], state.characterSheet);
+
+      const fullPath =
+        typeof target === "object" && target !== null && "current" in target
+          ? [...path, name, "current"]
+          : [...path, name];
+
+      return {
+        characterSheet: R.modifyPath(asPath(fullPath), () => newValue, state.characterSheet),
+      };
     });
   },
 

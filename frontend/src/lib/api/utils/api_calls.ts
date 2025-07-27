@@ -4,6 +4,7 @@ import { SkillIncreaseReply, SkillIncreaseRequest } from "../models/skills/inter
 import { HistoryReply } from "../models/history/interface";
 import { AttributeIncreaseReply, AttributeIncreaseRequest } from "../models/attributes/interface";
 import { BaseValueIncreaseReply, BaseValueIncreaseRequest } from "../models/baseValues/interface";
+import { LevelUpReply, LevelupRequest } from "../models/lvlUp/interface";
 
 enum HttpMethod {
   GET = "GET",
@@ -83,6 +84,9 @@ const get = <ReturnType>(idToken: string, endpoint_url: string): Promise<ReturnT
 const patch = <ReturnType, BodyType>(idToken: string, endpoint_url: string, body: BodyType): Promise<ReturnType> =>
   makeRequest<ReturnType, BodyType>(idToken, endpoint_url, HttpMethod.PATCH, body);
 
+const post = <ReturnType, BodyType>(idToken: string, endpoint_url: string, body: BodyType): Promise<ReturnType> =>
+  makeRequest<ReturnType, BodyType>(idToken, endpoint_url, HttpMethod.POST, body);
+
 const remove = <ReturnType>(idToken: string, endpoint_url: string): Promise<ReturnType> =>
   makeRequest<ReturnType>(idToken, endpoint_url, HttpMethod.DELETE);
 
@@ -155,6 +159,11 @@ export async function increaseBaseValue(
 ): Promise<BaseValueIncreaseReply> {
   const endpoint_url = `characters/${charId}/base-values/${name}`;
   return patch<BaseValueIncreaseReply, BaseValueIncreaseRequest>(idToken, endpoint_url, body);
+}
+
+export async function levelUp(idToken: string, charId: string, body: LevelupRequest): Promise<LevelUpReply> {
+  const endpoint_url = `characters/${charId}/level`;
+  return post<LevelUpReply, LevelupRequest>(idToken, endpoint_url, body);
 }
 
 /**

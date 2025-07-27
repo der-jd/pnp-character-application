@@ -6,15 +6,11 @@ export interface AttributeIncreaseData {
   characterId: string;
   userId: string;
   attributeName: string;
-  changes: AttributeChange;
-  attributePoints: PointsAvailable;
-}
-
-export interface AttributeChange {
   changes: {
     old: AttributeState;
     new: AttributeState;
   };
+  attributePoints: PointsAvailable;
 }
 
 export interface AttributeState {
