@@ -1,0 +1,87 @@
+openapi: 3.0.3
+info:
+  title: Update Character API
+  version: 1.0.0
+paths:
+  /characters/{character-id}/level:
+    post:
+      summary: Increase the level of a character by 1
+      description: |
+        Increases the character's level by 1.
+        This operation is idempotent: if the level has already been increased,
+        repeating the request will not change the state further.
+      parameters:
+        - name: character-id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The UUID of the character to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - initialLevel
+              properties:
+                initialLevel:
+                  type: integer
+                  description: The current level of the character as known by the client
+      responses:
+        "200":
+          description: Level updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  characterId:
+                    type: string
+                  userId:
+                    type: string
+                  level:
+                    type: object
+                    properties:
+                      old:
+                        type: object
+                        properties:
+                          value:
+                            type: integer
+                      new:
+                        type: object
+                        properties:
+                          value:
+                            type: integer
+        "400":
+          description: Invalid input values
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "409":
+          description: The passed initial level doesn't match the backend value
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  passedLevel:
+                    type: integer
+                  backendLevel:
+                    type: integer
+        "404":
+          description: Character not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string

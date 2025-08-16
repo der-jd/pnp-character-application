@@ -6,6 +6,23 @@ export interface Character {
   characterSheet: CharacterSheet;
 }
 
+export interface GeneralInformation {
+  name: string;
+  level: number;
+  sex: string;
+  profession: ProfessionHobby;
+  hobby: ProfessionHobby;
+  birthday: string;
+  birthplace: string;
+  size: string;
+  weight: string;
+  hairColor: string;
+  eyeColor: string;
+  residence: string;
+  appearance: string;
+  specialCharacteristics: string;
+}
+
 export interface CalculationPoints {
   start: number;
   available: number;
@@ -49,22 +66,7 @@ export interface CombatValues {
 }
 
 export interface CharacterSheet {
-  generalInformation: {
-    name: string;
-    level: number;
-    sex: string;
-    profession: ProfessionHobby;
-    hobby: ProfessionHobby;
-    birthday: string;
-    birthplace: string;
-    size: string;
-    weight: string;
-    hairColor: string;
-    eyeColor: string;
-    residence: string;
-    appearance: string;
-    specialCharacteristics: string;
-  };
+  generalInformation: GeneralInformation;
   calculationPoints: {
     adventurePoints: CalculationPoints;
     attributePoints: CalculationPoints;
@@ -209,6 +211,35 @@ export interface CharacterSheet {
     };
   };
 }
+
+export const combatSkills: string[] = [
+  "martialArts",
+  "barehanded",
+  "chainWeapons",
+  "daggers",
+  "slashingWeaponsSharp1h",
+  "slashingWeaponsBlunt1h",
+  "thrustingWeapons1h",
+  "slashingWeaponsSharp2h",
+  "slashingWeaponsBlunt2h",
+  "thrustingWeapons2h",
+  "missile",
+  "firearmSimple",
+  "firearmMedium",
+  "firearmComplex",
+  "heavyWeapons",
+];
+
+export const attributes: (keyof CharacterSheet["attributes"])[] = [
+  "courage",
+  "intelligence",
+  "concentration",
+  "charisma",
+  "mentalResilience",
+  "dexterity",
+  "endurance",
+  "strength",
+];
 
 export function getAttribute(attributes: CharacterSheet["attributes"], name: string): Attribute {
   const attribute = (attributes as Record<string, Attribute>)[name];
