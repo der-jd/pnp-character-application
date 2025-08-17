@@ -1,4 +1,4 @@
-import { CharacterSheet } from "@/src/lib/api/models/Character/character";
+import { CharacterSheet, CombatValues } from "@/src/lib/api/models/Character/character";
 import { AllCharactersCharacter } from "@/src/lib/api/models/allCharacters/interface";
 import { getAllCharacters, getCharacter } from "@/src/lib/api/utils/api_calls";
 import { create } from "zustand";
@@ -26,6 +26,7 @@ export interface CharacterStore {
   setOpenHistoryEntries: (entries: Array<RecordEntry>) => void;
 
   updateValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: number) => void;
+  updateCombatValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, combatValue: CombatValues) => void;
 
   toggleEdit: () => void;
 
@@ -88,6 +89,28 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
 
       return {
         characterSheet: R.modifyPath(asPath(fullPath), () => newValue, state.characterSheet),
+      };
+    });
+  },
+
+  /**
+   * Updates a specified combat value in the character sheet and updates the value in the character store
+   * Note: Updating the character sheet in the store triggers a rerender of components using the sheet
+   *
+   * @param path The keys to the value in order(!) of key traversal through the object
+   * @param name The name of the value to update
+   * @param newValue The new value of the value to update
+   */
+  updateCombatValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: CombatValues) => {
+    set((state) => {
+      if (!state.characterSheet) {
+        throw new Error(`No character sheet has been loaded yet, updating value ${String(name)} failed`);
+      }
+
+      const fullPath = [...path, name].map(String);
+      console.log(fullPath);
+      return {
+        characterSheet: R.modifyPath(fullPath, () => newValue, state.characterSheet),
       };
     });
   },

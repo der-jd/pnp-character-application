@@ -201,7 +201,7 @@ export interface CharacterSheet {
       lockpicking: Skill;
     };
   };
-  CombatValues: {
+  combatValues: {
     melee: {
       martialArts: CombatValues;
       barehanded: CombatValues;

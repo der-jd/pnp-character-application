@@ -4,7 +4,13 @@ import { useState } from "react";
 import { useAuth } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
 import { CharacterSheet, LearningMethod } from "../lib/api/models/Character/character";
-import { increaseAttribute, increaseBaseValue, increaseSkill, levelUp } from "../lib/api/utils/api_calls";
+import {
+  increaseAttribute,
+  increaseBaseValue,
+  increaseCombatValue,
+  increaseSkill,
+  levelUp,
+} from "../lib/api/utils/api_calls";
 import { ISkillProps } from "../lib/components/Skill/SkillDefinitions";
 import { ApiError } from "@lib/api/utils/api_calls";
 import { useToast } from "./use-toast";
@@ -12,7 +18,8 @@ import { SkillIncreaseRequest } from "../lib/api/models/skills/interface";
 import { AttributeIncreaseRequest } from "../lib/api/models/attributes/interface";
 import { BaseValueIncreaseRequest } from "../lib/api/models/baseValues/interface";
 import { LevelupRequest } from "../lib/api/models/lvlUp/interface";
-import { RecordEntry } from "../lib/api/models/history/interface";
+import { CombatValueIncreaseRequest } from "../lib/api/models/combatValues/interface";
+import { ICombatValue } from "../lib/components/ui/combatTable/definitions";
 
 /**
  * Hook that provides functionallity to update a skill via api call, handles and shows errors and
@@ -25,6 +32,7 @@ export function useSkillUpdater() {
   const { idToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const updateValue = useCharacterStore((state) => state.updateValue);
+  const updateCombatValue = useCharacterStore((state) => state.updateCombatValue);
   const updateReversibleHistory = useCharacterStore((state) => state.updateOpenHistoryEntries);
   const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
   const setCharacterSheet = useCharacterStore((state) => state.setCharacterSheet);
@@ -41,7 +49,8 @@ export function useSkillUpdater() {
     keyPath: (keyof CharacterSheet)[];
     name: keyof CharacterSheet;
     newValue: number;
-    historyRecord?: RecordEntry;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    historyRecord?: any;
     updatedAdventurePoints?: number;
     updatedAttributePoints?: number;
   }) {
@@ -256,5 +265,49 @@ export function useSkillUpdater() {
     }
   };
 
-  return { tryIncrease, lvlUp, loading };
+  const tryIncreaseCombatValue = async (value: ICombatValue, subtype: string, pointsToSkill: number) => {
+    console.log(subtype);
+    const path = ["combatValues", value.type] as (keyof CharacterSheet)[];
+    const name = value.name as keyof CharacterSheet;
+    const increaseCombatValueRequest: CombatValueIncreaseRequest = {
+      attackValue: {
+        initialValue: value.attack,
+        increasedPoints: subtype === "attack" ? pointsToSkill : 0,
+      },
+      paradeValue: {
+        initialValue: value.parry,
+        increasedPoints: subtype === "parry" ? pointsToSkill : 0,
+      },
+    };
+
+    if (selectedChar && idToken) {
+      try {
+        setLoading(true);
+        const { data, historyRecord } = await increaseCombatValue(
+          idToken,
+          selectedChar,
+          value.name,
+          value.type,
+          increaseCombatValueRequest,
+        );
+
+        updateCombatValue(path, name, data.combatValues.new);
+
+        if (historyRecord) updateReversibleHistory([historyRecord]);
+      } catch (error) {
+        if (error instanceof ApiError) {
+          toast.toast({
+            title: `Error ${error.statusCode}`,
+            description: `${error.body}`,
+            variant: "destructive",
+          });
+        }
+        setLoading(false);
+        return;
+      }
+      setLoading(false);
+    }
+  };
+
+  return { tryIncrease, lvlUp, tryIncreaseCombatValue, loading };
 }

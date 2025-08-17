@@ -56,7 +56,12 @@ export const columns: ColumnDef<RecordEntry>[] = [
   },
   {
     id: "spent",
-    accessorFn: (row) => row.data?.new.skill.totalCost - row.data?.old.skill.totalCost,
+    accessorFn: (row) => {
+      if ("skill" in row.data?.new && "skill" in row.data?.old) {
+        return row.data.new.skill.totalCost - row.data.old.skill.totalCost;
+      }
+      return 0;
+    },
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         Points spent <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -66,7 +71,12 @@ export const columns: ColumnDef<RecordEntry>[] = [
   },
   {
     id: "old",
-    accessorFn: (row) => row.data?.old.skill.current ?? 0,
+    accessorFn: (row) => {
+      if ("skill" in row.data?.new && "skill" in row.data?.old) {
+        return row.data?.old.skill.current ?? 0;
+      }
+      return 0;
+    },
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         Old Value <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -76,7 +86,12 @@ export const columns: ColumnDef<RecordEntry>[] = [
   },
   {
     id: "new",
-    accessorFn: (row) => row.data?.new.skill.current ?? 0,
+    accessorFn: (row) => {
+      if ("skill" in row.data?.new && "skill" in row.data?.old) {
+        return row.data?.new.skill.current ?? 0;
+      }
+      return 0;
+    },
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         New Value <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -86,7 +101,12 @@ export const columns: ColumnDef<RecordEntry>[] = [
   },
   {
     id: "spent total",
-    accessorFn: (row) => row.data?.new.skill.totalCost ?? 0,
+    accessorFn: (row) => {
+      if ("skill" in row.data?.new && "skill" in row.data?.old) {
+        return row.data?.new.skill.totalCost ?? 0;
+      }
+      return 0;
+    },
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         Spent Total <ArrowUpDown className="ml-2 h-4 w-4" />
