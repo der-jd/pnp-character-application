@@ -95,8 +95,7 @@ const CharacterInfoContent: React.FC = () => {
 
   const handleBenefitChange = (option: LevelUpOption | null) => {
     if (option) {
-      setSelectedBenefit(option.value);
-      // Optionally update store or local state
+      //setSelectedBenefit(option.Werner1234W!
     }
   };
 

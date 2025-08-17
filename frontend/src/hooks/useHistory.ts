@@ -6,7 +6,7 @@ import { useCharacterStore } from "../app/global/characterStore";
 import { ApiError, deleteHistoryEntry, getHistory, getHistoryBlock } from "../lib/api/utils/api_calls";
 import { useToast } from "./use-toast";
 import { RecordType } from "../lib/api/utils/historyEventType";
-import { CharacterSheet } from "../lib/api/models/Character/character";
+import { CharacterSheet, CombatValues } from "../lib/api/models/Character/character";
 import { RecordEntry } from "../lib/api/models/history/interface";
 
 /**
@@ -20,6 +20,7 @@ export function useHistory() {
   const updateHistoryEntries = useCharacterStore((state) => state.updateHistoryEntries);
   const setOpenHistoryEntries = useCharacterStore((state) => state.setOpenHistoryEntries);
   const updateValue = useCharacterStore((state) => state.updateValue);
+  const updateCombatValue = useCharacterStore((state) => state.updateCombatValue);
   const openHistoryEntries = useCharacterStore((state) => state.openHistoryEntries);
   const { idToken } = useAuth();
 
@@ -165,17 +166,30 @@ export function useHistory() {
         }
         break;
 
-      case RecordType.EVENT_BASE_VALUE: {
-        const path = ["baseValues"] as (keyof CharacterSheet)[];
-        const name = lastEntry.name as keyof CharacterSheet;
-        updateValue(path, name, lastEntry.data.old.current);
-      }
+      case RecordType.EVENT_BASE_VALUE:
+        {
+          const path = ["baseValues"] as (keyof CharacterSheet)[];
+          const name = lastEntry.name as keyof CharacterSheet;
+          updateValue(path, name, lastEntry.data.old.current);
+        }
+        break;
 
-      case RecordType.EVENT_LEVEL_UP: {
-        const path = ["generalInformation"] as (keyof CharacterSheet)[];
-        const name = "level" as keyof CharacterSheet;
-        console.log(lastEntry.data.old);
-        updateValue(path, name, lastEntry.data.old.value);
+      case RecordType.EVENT_LEVEL_UP:
+        {
+          const path = ["generalInformation"] as (keyof CharacterSheet)[];
+          const name = "level" as keyof CharacterSheet;
+          console.log(lastEntry.data.old);
+          updateValue(path, name, lastEntry.data.old.value);
+        }
+        break;
+
+      case RecordType.COMBAT_VALUES_CHANGED: {
+        const path = [
+          "combatValues",
+          lastEntry.name.toLowerCase().includes("melee") ? "melee" : "ranged",
+        ] as (keyof CharacterSheet)[];
+        const name = lastEntry.name.split("/")[1] as keyof CharacterSheet;
+        updateCombatValue(path, name, lastEntry.data.old as CombatValues);
       }
     }
   };

@@ -5,6 +5,7 @@ import { HistoryReply } from "../models/history/interface";
 import { AttributeIncreaseReply, AttributeIncreaseRequest } from "../models/attributes/interface";
 import { BaseValueIncreaseReply, BaseValueIncreaseRequest } from "../models/baseValues/interface";
 import { LevelUpReply, LevelupRequest } from "../models/lvlUp/interface";
+import { CombatValueIncreaseReply, CombatValueIncreaseRequest } from "../models/combatValues/interface";
 
 enum HttpMethod {
   GET = "GET",
@@ -159,6 +160,17 @@ export async function increaseBaseValue(
 ): Promise<BaseValueIncreaseReply> {
   const endpoint_url = `characters/${charId}/base-values/${name}`;
   return patch<BaseValueIncreaseReply, BaseValueIncreaseRequest>(idToken, endpoint_url, body);
+}
+
+export async function increaseCombatValue(
+  idToken: string,
+  charId: string,
+  name: string,
+  category: string,
+  body: CombatValueIncreaseRequest,
+): Promise<CombatValueIncreaseReply> {
+  const endpoint_url = `characters/${charId}/combat-values/${category}/${name}`;
+  return patch<CombatValueIncreaseReply, CombatValueIncreaseRequest>(idToken, endpoint_url, body);
 }
 
 export async function levelUp(idToken: string, charId: string, body: LevelupRequest): Promise<LevelUpReply> {
