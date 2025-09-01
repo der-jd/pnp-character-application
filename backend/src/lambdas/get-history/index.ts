@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { HistoryBlock } from "config";
+import { HistoryBlock } from "config/index.js";
 import {
   Request,
   parseBody,
@@ -42,7 +42,6 @@ export async function getHistory(request: Request): Promise<APIGatewayProxyResul
     }
 
     if (items.length === 0) {
-      console.error("No history found for the given character id");
       throw new HttpError(404, "No history found for the given character id");
     }
 

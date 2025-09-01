@@ -13,5 +13,16 @@ done
 echo "Renaming complete!"
 
 echo "Replacing all '.js' imports in the JavaScript files to '.mjs' imports..."
-find "$build_dir" -type f -name "*.mjs" -exec sed --in-place --regexp-extended 's/from[[:space:]]+"([a-zA-Z0-9_/.-]+)\.js"/from "\1.mjs"/g' {} +
+
+# Detect OS for portable sed usage
+if [[ "$(uname)" == "Darwin" ]]; then
+  # macOS BSD sed
+  sed_inplace_option=(-i '')
+else
+  # GNU sed (Linux)
+  sed_inplace_option=(-i)
+fi
+
+# Use -E for extended regex (portable)
+find "$build_dir" -type f -name "*.mjs" -exec sed "${sed_inplace_option[@]}" -E 's/from[[:space:]]+"([a-zA-Z0-9_/.-]+)\.js"/from "\1.mjs"/g' {} +
 echo "Replaced all imports!"

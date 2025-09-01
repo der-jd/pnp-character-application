@@ -12,7 +12,7 @@ export const recordSchema = z
   .object({
     type: z.nativeEnum(RecordType),
     name: z.string(),
-    number: z.number(),
+    number: z.number().int(),
     id: z.string(),
     data: z
       .object({
@@ -49,7 +49,7 @@ export type Record = z.infer<typeof recordSchema>;
 export const historyBlockSchema = z
   .object({
     characterId: z.string(),
-    blockNumber: z.number(),
+    blockNumber: z.number().int(),
     blockId: z.string(),
     previousBlockId: z.string().nullable(),
     changes: z.array(recordSchema),
@@ -58,15 +58,9 @@ export const historyBlockSchema = z
 
 export type HistoryBlock = z.infer<typeof historyBlockSchema>;
 
-export const numberSchema = z
+export const integerSchema = z
   .object({
-    value: z.number(),
-  })
-  .strict();
-
-export const stringSchema = z
-  .object({
-    value: z.string(),
+    value: z.number().int(),
   })
   .strict();
 

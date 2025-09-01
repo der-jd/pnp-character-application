@@ -13,11 +13,11 @@ export const fakeCharacter: Character = {
       sex: "Male",
       profession: {
         name: "Warrior",
-        skill: "slashingWeaponsSharp1h",
+        skill: "combat/slashingWeaponsSharp1h",
       },
       hobby: {
         name: "Woodcarving",
-        skill: "woodwork",
+        skill: "crafting/woodwork",
       },
       birthday: "2002-05-15",
       birthplace: "Stormhold",
@@ -898,11 +898,11 @@ export const fakeCharacter2: Character = {
       sex: "Female",
       profession: {
         name: "Warrior",
-        skill: "slashingWeaponsSharp1h",
+        skill: "combat/slashingWeaponsSharp1h",
       },
       hobby: {
         name: "Woodcarving",
-        skill: "woodwork",
+        skill: "crafting/woodwork",
       },
       birthday: "2000-05-15",
       birthplace: "Stormhold",

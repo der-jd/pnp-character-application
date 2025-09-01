@@ -8,14 +8,14 @@
     "test": "vitest --run",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
-    "coverage": "vitest run --coverage",
-    "generate-zod-schemas": "npx ts-to-zod src/config/character.ts src/config/character_schema.ts"
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "add-history-record": "file:src/lambdas/add-history-record",
     "add-special-ability": "file:src/lambdas/add-special-ability",
     "clone-character": "file:src/lambdas/clone-character",
     "config": "file:src/config",
+    "create-character": "file:src/lambdas/create-character",
     "delete-character": "file:src/lambdas/delete-character",
     "get-character": "file:src/lambdas/get-character",
     "get-characters": "file:src/lambdas/get-characters",
@@ -23,6 +23,7 @@
     "get-skill-increase-cost": "file:src/lambdas/get-skill-increase-cost",
     "revert-history-record": "file:src/lambdas/revert-history-record",
     "set-history-comment": "file:src/lambdas/set-history-comment",
+    "shared": "file:../shared",
     "update-attribute": "file:src/lambdas/update-attribute",
     "update-base-value": "file:src/lambdas/update-base-value",
     "update-calculation-points": "file:src/lambdas/update-calculation-points",
