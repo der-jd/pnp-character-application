@@ -82,11 +82,9 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: |
-            cd backend
-            npm ci
+          command: npm run setup-backend
       - run:
-          name: Compile code
+          name: Build backend
           command: |
             cd backend
             npm run build
@@ -103,9 +101,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: |
-            cd backend
-            npm ci
+          command: npm run setup-backend
       - run:
           name: Run tests
           command: |
