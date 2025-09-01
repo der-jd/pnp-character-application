@@ -20,7 +20,7 @@ for lambda in "${lambdas[@]}"
 do
   echo "Copying package*.json files..."
   lambda_dest_dir="$lambdas_build_dir/$lambda"
-  cp --verbose $src_dir/lambdas/$lambda/package*.json $lambda_dest_dir
+  cp -v $src_dir/lambdas/$lambda/package*.json $lambda_dest_dir
 
   echo "Installing prod dependencies in $lambda_dest_dir..."
   cd $lambda_dest_dir
@@ -45,10 +45,10 @@ for layer in "${lambda_layers[@]}"
 do
   echo "Copying package*.json files..."
   layer_dest_dir="$lambda_layers_build_dir/$layer"
-  mkdir --parent $layer_dest_dir
-  cp --verbose $lambda_layers_src_dir/$layer/package*.json $layer_dest_dir
+  mkdir -p $layer_dest_dir
+  cp -v $lambda_layers_src_dir/$layer/package*.json $layer_dest_dir
   layer_packages_dest_dir="$build_dir/$layer"
-  cp --verbose $src_dir/$layer/package*.json $layer_packages_dest_dir
+  cp -v $src_dir/$layer/package*.json $layer_packages_dest_dir
 
   echo "Installing prod dependencies in $layer_dest_dir..."
   cd $layer_dest_dir
@@ -58,8 +58,8 @@ do
 
   echo "Moving dependencies into required sub folder for Lambda Layer..."
   mkdir nodejs
-  cp --verbose --recursive --dereference node_modules nodejs
-  rm --recursive node_modules
+  cp -v -R -L node_modules nodejs
+  rm -r node_modules
 
   cd $start_dir
 done
