@@ -30,6 +30,7 @@ async function buildLambdas() {
 
       console.log(`📦 Building ${lambdaName}...`);
 
+      // https://esbuild.github.io/api/
       await build({
         entryPoints: [entryPoint],
         bundle: true,
@@ -41,6 +42,21 @@ async function buildLambdas() {
           // AWS SDK is provided by Lambda runtime
           "@aws-sdk/*",
           "aws-sdk",
+          // Node.js built-ins - explicitly externalized since platform: "node"
+          // doesn't seem to work reliably with ESM format
+          "buffer",
+          "crypto",
+          "events",
+          "fs",
+          "path",
+          "stream",
+          "util",
+          "os",
+          "url",
+          "querystring",
+          "http",
+          "https",
+          "zlib",
         ],
         minify: true,
         sourcemap: false, // Can enable for debugging
