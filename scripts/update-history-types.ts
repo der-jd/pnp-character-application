@@ -92,7 +92,4 @@ function main(): void {
   console.log("=".repeat(60));
 }
 
-// Run the script if executed directly
-if (require.main === module) {
-  main();
-}
+main();
