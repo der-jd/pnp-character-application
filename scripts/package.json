@@ -2,7 +2,8 @@
   "name": "scripts",
   "version": "1.0.0",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "update-history-types": "npx ts-node update-history-types.ts"
   },
   "devDependencies": {
     "@aws-sdk/util-dynamodb": "^3.758.0",
