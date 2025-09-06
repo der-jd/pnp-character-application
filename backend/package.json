@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "build": "tsc && bash ./rename-build-files-and-imports.sh && bash ./include-dependencies.sh",
+    "type-check": "tsc --noEmit",
+    "build": "npm run type-check && node build-lambdas.mjs && bash ./include-dependencies.sh",
+    "build:legacy": "tsc && bash ./rename-build-files-and-imports.sh && bash ./include-dependencies.sh",
     "test": "vitest --run",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
@@ -38,6 +40,7 @@
     "@vitest/ui": "^3.1.1",
     "aws-sdk-client-mock": "^4.1.0",
     "aws-sdk-client-mock-jest": "^4.1.0",
+    "esbuild": "^0.25.9",
     "eslint": "^9.13.0",
     "globals": "^15.11.0",
     "ts-to-zod": "^3.15.0",
