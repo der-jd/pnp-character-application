@@ -15,7 +15,7 @@ import {
   getCharacterItem,
   decodeUserId,
   HttpError,
-  ensureHttpError,
+  logAndEnsureHttpError,
   logZodError,
   isZodError,
 } from "utils";
@@ -75,7 +75,7 @@ export async function getSkillCost(request: Request): Promise<APIGatewayProxyRes
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 

@@ -17,7 +17,7 @@ import {
   getCharacterItem,
   decodeUserId,
   HttpError,
-  ensureHttpError,
+  logAndEnsureHttpError,
   updateBaseValue,
   isZodError,
   logZodError,
@@ -87,7 +87,7 @@ export async function _updateBaseValue(request: Request): Promise<APIGatewayProx
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 

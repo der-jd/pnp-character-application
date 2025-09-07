@@ -16,7 +16,7 @@ import {
   getCharacterItem,
   decodeUserId,
   HttpError,
-  ensureHttpError,
+  logAndEnsureHttpError,
   updateCombatValues,
   isZodError,
   logZodError,
@@ -150,7 +150,7 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 

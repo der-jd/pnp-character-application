@@ -5,7 +5,7 @@ import {
   getCharacterItem,
   decodeUserId,
   HttpError,
-  ensureHttpError,
+  logAndEnsureHttpError,
   updateLevel,
   logZodError,
   isZodError,
@@ -57,7 +57,7 @@ export async function _updateLevel(request: Request): Promise<APIGatewayProxyRes
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 

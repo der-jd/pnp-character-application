@@ -20,7 +20,7 @@ import {
   updateAttribute,
   decodeUserId,
   HttpError,
-  ensureHttpError,
+  logAndEnsureHttpError,
   updateBaseValue,
   isZodError,
   logZodError,
@@ -150,7 +150,7 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 
