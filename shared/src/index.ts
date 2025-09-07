@@ -57,3 +57,9 @@ export {
   addHistoryRecordResponseSchema,
   AddHistoryRecordResponse,
 } from "./add-history-record.js";
+export {
+  getCharacterPathParamsSchema,
+  GetCharacterPathParams,
+  getCharacterResponseSchema,
+  GetCharacterResponse,
+} from "./get-character.js";
