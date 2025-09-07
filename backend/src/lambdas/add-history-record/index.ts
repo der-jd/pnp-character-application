@@ -27,7 +27,6 @@ import {
   parseBody,
   HttpError,
   ensureHttpError,
-  validateUUID,
   isZodError,
   logZodError,
 } from "utils";
