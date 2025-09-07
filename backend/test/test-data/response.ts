@@ -78,7 +78,7 @@ export function mockDynamoDBGetHistoryResponse(response: FakeHistoryBlockRespons
 
 export function mockDynamoDBGetBothCharacterAndHistoryResponse(
   characterResponse: FakeCharacterResponse,
-  historyResponse: FakeHistoryBlockResponse
+  historyResponse: FakeHistoryBlockResponse,
 ) {
   (globalThis as any).dynamoDBMock.on(GetCommand).callsFake((command: { Key: any }) => {
     const key = command.Key;
@@ -94,7 +94,10 @@ export function mockDynamoDBGetBothCharacterAndHistoryResponse(
 
     // Check if this is a history request (has blockNumber in key)
     if (key.blockNumber !== undefined) {
-      if (key.characterId === historyResponse.Item.characterId && key.blockNumber === historyResponse.Item.blockNumber) {
+      if (
+        key.characterId === historyResponse.Item.characterId &&
+        key.blockNumber === historyResponse.Item.blockNumber
+      ) {
         return Promise.resolve(historyResponse);
       } else {
         return Promise.resolve({ Item: undefined });
