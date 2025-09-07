@@ -1,5 +1,21 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { Request, parseBody, getCharacterItems, ensureHttpError, HttpError, decodeUserId } from "utils";
+import {
+  Request,
+  parseBody,
+  getCharacterItems,
+  ensureHttpError,
+  HttpError,
+  decodeUserId,
+  isZodError,
+  logZodError,
+} from "utils";
+import {
+  getCharactersQueryParamsSchema,
+  GetCharactersQueryParams,
+  GetCharactersResponse,
+  CharacterShort,
+  headersSchema,
+} from "shared";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getCharacters({
@@ -12,7 +28,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  characterShort: boolean;
+  queryParams: GetCharactersQueryParams;
 }
 
 export async function getCharacters(request: Request): Promise<APIGatewayProxyResult> {
@@ -22,24 +38,26 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
     const items = await getCharacterItems(params.userId);
 
     let characters = [];
-    if (params.characterShort) {
+    if (params.queryParams["character-short"]) {
       for (const item of items) {
-        characters.push({
+        const characterShort: CharacterShort = {
           userId: item.userId,
           characterId: item.characterId,
           name: item.characterSheet.generalInformation.name,
           level: item.characterSheet.generalInformation.level,
-        });
+        };
+        characters.push(characterShort);
       }
     } else {
       characters = items;
     }
 
+    const responseBody: GetCharactersResponse = {
+      characters: characters,
+    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        characters: characters,
-      }),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
@@ -49,21 +67,20 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
 }
 
 function validateRequest(request: Request): Parameters {
-  console.log("Validate request");
+  try {
+    console.log("Validate request");
 
-  const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
+    return {
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      queryParams: getCharactersQueryParamsSchema.parse(request.queryStringParameters || {}),
+    };
+  } catch (error) {
+    if (isZodError(error)) {
+      logZodError(error);
+      throw new HttpError(400, "Invalid input values!");
+    }
 
-  if (
-    request.queryStringParameters?.["character-short"] &&
-    typeof request.queryStringParameters?.["character-short"] !== "string"
-  ) {
-    throw new HttpError(400, "Invalid input values!");
+    // Rethrow other errors
+    throw error;
   }
-
-  const params: Parameters = {
-    userId: userId,
-    characterShort: request.queryStringParameters?.["character-short"] === "true",
-  };
-
-  return params;
 }

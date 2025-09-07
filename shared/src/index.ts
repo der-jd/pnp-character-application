@@ -63,3 +63,11 @@ export {
   getCharacterResponseSchema,
   GetCharacterResponse,
 } from "./get-character.js";
+export {
+  getCharactersQueryParamsSchema,
+  GetCharactersQueryParams,
+  characterShortSchema,
+  CharacterShort,
+  getCharactersResponseSchema,
+  GetCharactersResponse,
+} from "./get-characters.js";
