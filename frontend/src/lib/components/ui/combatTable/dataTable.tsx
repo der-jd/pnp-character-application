@@ -41,15 +41,11 @@ export const CombatValueTable = ({ data, callback }: CombatValueTableProps) => {
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="bg-gray-200 h-10">
+              <TableRow key={headerGroup.id} className="group rounded-md h-10 bg-black">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className={
-                      header.column.id === "name"
-                        ? "text-left px-2 w-80" // or w-[160px] if you prefer pixels
-                        : "text-left px-2"
-                    }
+                    className={`text-left px-2 w-80 !text-white group-hover:bg-gray-200 group-hover:!text-black`}
                   >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
