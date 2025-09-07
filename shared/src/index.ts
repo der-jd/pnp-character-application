@@ -77,3 +77,11 @@ export {
   deleteCharacterResponseSchema,
   DeleteCharacterResponse,
 } from "./delete-character.js";
+export {
+  cloneCharacterPathParamsSchema,
+  CloneCharacterPathParams,
+  cloneCharacterRequestSchema,
+  CloneCharacterRequest,
+  cloneCharacterResponseSchema,
+  CloneCharacterResponse,
+} from "./clone-character.js";
