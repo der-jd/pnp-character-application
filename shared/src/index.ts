@@ -55,6 +55,16 @@ export {
   RevertHistoryRecordResponse,
 } from "./revert-history-record.js";
 export {
+  setHistoryCommentPathParamsSchema,
+  SetHistoryCommentPathParams,
+  setHistoryCommentQueryParamsSchema,
+  SetHistoryCommentQueryParams,
+  setHistoryCommentRequestSchema,
+  SetHistoryCommentRequest,
+  setHistoryCommentResponseSchema,
+  SetHistoryCommentResponse,
+} from "./set-history-comment.js";
+export {
   updateLevelPathParamsSchema,
   UpdateLevelPathParams,
   updateLevelRequestSchema,

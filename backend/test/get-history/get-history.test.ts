@@ -5,7 +5,7 @@ import {
   fakeCharacterResponse,
   mockDynamoDBQueryHistoryResponse,
   mockDynamoDBGetCharacterResponse,
-  mockDynamoDBGetBothCharacterAndHistoryResponse,
+  mockDynamoDBGetCharacterAndHistoryResponse,
 } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
@@ -123,7 +123,7 @@ describe("Valid requests", () => {
 
   validTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetBothCharacterAndHistoryResponse(fakeCharacterResponse, fakeHistoryBlockResponse);
+      mockDynamoDBGetCharacterAndHistoryResponse(fakeCharacterResponse, fakeHistoryBlockResponse);
       mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
 
       const result = await getHistory(_case.request);

@@ -24,7 +24,7 @@ export type GetHistoryQueryParams = z.infer<typeof getHistoryQueryParamsSchema>;
 
 export const getHistoryResponseSchema = z
   .object({
-    previousBlockNumber: z.number().int().nullable(),
+    previousBlockNumber: z.number().int().positive().nullable(),
     previousBlockId: z.string().uuid().nullable(),
     items: z.array(historyBlockSchema),
   })

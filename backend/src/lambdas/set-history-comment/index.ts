@@ -1,15 +1,27 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { z } from "zod";
-import { HistoryBlock, MAX_STRING_LENGTH_VERY_LONG } from "config";
+import {
+  HistoryBlock,
+  setHistoryCommentPathParamsSchema,
+  SetHistoryCommentPathParams,
+  setHistoryCommentQueryParamsSchema,
+  SetHistoryCommentQueryParams,
+  setHistoryCommentRequestSchema,
+  SetHistoryCommentRequest,
+  SetHistoryCommentResponse,
+  headersSchema,
+} from "shared";
 import {
   getHistoryItems,
   Request,
   parseBody,
   HttpError,
   ensureHttpError,
-  validateUUID,
   getHistoryItem,
   setRecordComment,
+  decodeUserId,
+  logZodError,
+  isZodError,
+  getCharacterItem,
 } from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -21,34 +33,31 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const bodySchema = z
-  .object({
-    comment: z.string().max(MAX_STRING_LENGTH_VERY_LONG),
-  })
-  .strict();
-
-export type BodySchema = z.infer<typeof bodySchema>;
-
 interface Parameters {
-  characterId: string;
-  recordId: string;
-  blockNumber?: number;
-  body: BodySchema;
+  userId: string;
+  pathParams: SetHistoryCommentPathParams;
+  queryParams?: SetHistoryCommentQueryParams;
+  body: SetHistoryCommentRequest;
 }
 
 export async function setHistoryComment(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = await validateRequest(request);
 
-    console.log(`Set comment for history record ${params.recordId} of character ${params.characterId}`);
+    // First verify that the user owns the character and is therefore allowed to access the history
+    await getCharacterItem(params.userId, params.pathParams["character-id"]);
+
+    console.log(
+      `Set comment for history record ${params.pathParams["record-id"]} of character ${params.pathParams["character-id"]}`,
+    );
     console.log(`Comment: ${params.body.comment}`);
 
     let items: HistoryBlock[] = [];
-    if (params.blockNumber) {
-      items.push(await getHistoryItem(params.characterId, params.blockNumber));
+    if (params.queryParams?.["block-number"]) {
+      items.push(await getHistoryItem(params.pathParams["character-id"], params.queryParams?.["block-number"]));
     } else {
       items = await getHistoryItems(
-        params.characterId,
+        params.pathParams["character-id"],
         false, // Sort descending to get highest block number (latest item) first
         1, // Only get the last item
       );
@@ -57,7 +66,7 @@ export async function setHistoryComment(request: Request): Promise<APIGatewayPro
     let foundBlockNumber: number | undefined = undefined;
     let foundRecordIndex: number | undefined = undefined;
     for (const item of items) {
-      const index = item.changes.findIndex((change) => change.id === params.recordId);
+      const index = item.changes.findIndex((change) => change.id === params.pathParams["record-id"]);
       if (index !== -1) {
         foundBlockNumber = item.blockNumber;
         foundRecordIndex = index;
@@ -65,19 +74,20 @@ export async function setHistoryComment(request: Request): Promise<APIGatewayPro
       }
     }
     if (foundBlockNumber === undefined || foundRecordIndex === undefined) {
-      throw new HttpError(404, `Record with id ${params.recordId} not found in history block`);
+      throw new HttpError(404, `Record with id ${params.pathParams["record-id"]} not found in history block`);
     }
 
-    await setRecordComment(params.characterId, foundBlockNumber, foundRecordIndex, params.body.comment);
+    await setRecordComment(params.pathParams["character-id"], foundBlockNumber, foundRecordIndex, params.body.comment);
 
+    const responseBody: SetHistoryCommentResponse = {
+      characterId: params.pathParams["character-id"],
+      blockNumber: foundBlockNumber,
+      recordId: params.pathParams["record-id"],
+      comment: params.body.comment,
+    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        characterId: params.characterId,
-        blockNumber: foundBlockNumber,
-        recordId: params.recordId,
-        comment: params.body.comment,
-      }),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
@@ -87,34 +97,17 @@ export async function setHistoryComment(request: Request): Promise<APIGatewayPro
 }
 
 async function validateRequest(request: Request): Promise<Parameters> {
-  console.log("Validate request");
-
-  const characterId = request.pathParameters?.["character-id"];
-  const recordId = request.pathParameters?.["record-id"];
-  const blockNumber = request.queryStringParameters?.["block-number"];
-  if (
-    typeof characterId !== "string" ||
-    typeof recordId !== "string" ||
-    (blockNumber && typeof blockNumber !== "string")
-  ) {
-    throw new HttpError(400, "Invalid input values!");
-  }
-
-  validateUUID(characterId);
-  validateUUID(recordId);
-
   try {
-    const body = bodySchema.parse(request.body);
-
+    console.log("Validate request");
     return {
-      characterId: characterId,
-      recordId: recordId,
-      blockNumber: blockNumber ? parseInt(blockNumber) : undefined,
-      body: body,
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      pathParams: setHistoryCommentPathParamsSchema.parse(request.pathParameters),
+      queryParams: setHistoryCommentQueryParamsSchema.parse(request.queryStringParameters) || undefined,
+      body: setHistoryCommentRequestSchema.parse(request.body),
     };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
+    if (isZodError(error)) {
+      logZodError(error);
       throw new HttpError(400, "Invalid input values!");
     }
 

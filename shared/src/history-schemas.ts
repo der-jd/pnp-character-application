@@ -4,6 +4,7 @@ import {
   calculationPointsSchema,
   characterSheetSchema,
   combatValuesSchema,
+  MAX_STRING_LENGTH_VERY_LONG,
   skillSchema,
 } from "./character-schemas.js";
 
@@ -26,7 +27,7 @@ export const recordSchema = z
   .object({
     type: z.nativeEnum(RecordType),
     name: z.string(),
-    number: z.number().int(),
+    number: z.number().int().positive(),
     id: z.string().uuid(),
     data: z
       .object({
@@ -53,7 +54,7 @@ export const recordSchema = z
           .nullable(),
       })
       .strict(),
-    comment: z.string().nullable(),
+    comment: z.string().max(MAX_STRING_LENGTH_VERY_LONG).nullable(),
     timestamp: z.string().datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2023-03-15T16:00:00Z (UTC) or 2023-03-15T16:00:00-07:00 (PDT)
   })
   .strict();
@@ -63,7 +64,7 @@ export type Record = z.infer<typeof recordSchema>;
 export const historyBlockSchema = z
   .object({
     characterId: z.string().uuid(),
-    blockNumber: z.number().int(),
+    blockNumber: z.number().int().positive(),
     blockId: z.string().uuid(),
     previousBlockId: z.string().uuid().nullable(),
     changes: z.array(recordSchema),

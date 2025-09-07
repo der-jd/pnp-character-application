@@ -76,7 +76,7 @@ export function mockDynamoDBGetHistoryResponse(response: FakeHistoryBlockRespons
   });
 }
 
-export function mockDynamoDBGetBothCharacterAndHistoryResponse(
+export function mockDynamoDBGetCharacterAndHistoryResponse(
   characterResponse: FakeCharacterResponse,
   historyResponse: FakeHistoryBlockResponse,
 ) {
