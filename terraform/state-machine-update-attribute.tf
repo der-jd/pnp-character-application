@@ -79,7 +79,7 @@ resource "aws_sfn_state_machine" "update_attribute_state_machine" {
           },
           "body" = {
             "userId"         = "{% $parse($states.input.body).userId %}",
-            "type"           = "8", // ATTRIBUTE_CHANGED
+            "type"           = "5", // ATTRIBUTE_CHANGED
             "name"           = "{% $parse($states.input.body).attributeName %}",
             "data"           = "{% $parse($states.input.body).changes %}",
             "learningMethod" = null,

@@ -115,7 +115,7 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
           },
           "body" = {
             "userId" = "{% $parse($states.input.body).userId %}",
-            "type"   = "10", // SKILL_CHANGED
+            "type"   = "6", // SKILL_CHANGED
             // name pattern combat skill: "skillCategory/skillName (combatCategory)"
             // e.g. "combat/sword1h (melee)"
             // name pattern other skills: "skillCategory/skillName"

@@ -1,6 +1,7 @@
 import { validate } from "uuid";
 import { HttpError } from "./errors.js";
 
+// TODO not needed anymore after zod schema?
 export function validateUUID(id: string): void {
   if (!id) {
     throw new HttpError(400, "Id is missing!");

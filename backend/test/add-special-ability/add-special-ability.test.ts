@@ -5,6 +5,7 @@ import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test
 import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { _addSpecialAbility } from "add-special-ability/index.js";
 import { expectHttpError } from "../utils.js";
+import { MAX_STRING_LENGTH_DEFAULT } from "config/index.js";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [
@@ -83,7 +84,7 @@ describe("Invalid requests", () => {
       expectedStatusCode: 404,
     },
     {
-      name: "Special ability name exceeds length limit",
+      name: "Special ability name exceeds max length",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -91,8 +92,7 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          specialAbility:
-            "More than 100 characters: Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will Iron Will",
+          specialAbility: "Iron Will".repeat(MAX_STRING_LENGTH_DEFAULT + 1), // Exceeding the maximum length
         },
       },
       expectedStatusCode: 400,

@@ -1,5 +1,4 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { z } from "zod";
 import {
   Request,
   parseBody,
@@ -7,9 +6,11 @@ import {
   decodeUserId,
   HttpError,
   ensureHttpError,
-  validateUUID,
   updateLevel,
+  logZodError,
+  isZodError,
 } from "utils/index.js";
+import { headersSchema, updateLevelRequestSchema, updateLevelPathParamsSchema, UpdateLevelResponse } from "shared";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _updateLevel({
@@ -19,12 +20,6 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     body: parseBody(event.body),
   });
 };
-
-const bodySchema = z
-  .object({
-    initialLevel: z.number(),
-  })
-  .strict();
 
 interface Parameters {
   userId: string;
@@ -43,20 +38,21 @@ export async function _updateLevel(request: Request): Promise<APIGatewayProxyRes
     const levelNew = increaseLevel(levelOld, params.initialLevel);
     await updateLevel(params.userId, params.characterId, levelNew);
 
+    const responseBody: UpdateLevelResponse = {
+      characterId: params.characterId,
+      userId: params.userId,
+      level: {
+        old: {
+          value: levelOld,
+        },
+        new: {
+          value: levelNew,
+        },
+      },
+    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        characterId: params.characterId,
-        userId: params.userId,
-        level: {
-          old: {
-            value: levelOld,
-          },
-          new: {
-            value: levelNew,
-          },
-        },
-      }),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
@@ -66,22 +62,22 @@ export async function _updateLevel(request: Request): Promise<APIGatewayProxyRes
 }
 
 function validateRequest(request: Request): Parameters {
-  console.log("Validate request");
+  try {
+    console.log("Validate request");
+    return {
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      characterId: updateLevelPathParamsSchema.parse(request.pathParameters)["character-id"],
+      initialLevel: updateLevelRequestSchema.parse(request.body).initialLevel,
+    };
+  } catch (error) {
+    if (isZodError(error)) {
+      logZodError(error);
+      throw new HttpError(400, "Invalid input values!");
+    }
 
-  const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
-
-  const characterId = request.pathParameters?.["character-id"];
-  if (typeof characterId !== "string") {
-    throw new HttpError(400, "Invalid input values!");
+    // Rethrow other errors
+    throw error;
   }
-
-  validateUUID(characterId);
-
-  return {
-    userId: userId,
-    characterId: characterId,
-    initialLevel: bodySchema.parse(request.body).initialLevel,
-  };
 }
 
 function increaseLevel(level: number, passedInitialLevel: number): number {

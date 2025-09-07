@@ -1,5 +1,7 @@
+// TODO rename to logAndEnsureHttpError
 export function ensureHttpError(value: unknown): HttpError {
   if (value instanceof HttpError) {
+    console.error(value);
     return value;
   }
 
@@ -27,5 +29,21 @@ export class HttpError extends Error {
     this.statusCode = httpStatusCode;
     this.name = "HttpError";
     this.context = context;
+  }
+}
+
+export function isZodError(error: unknown): boolean {
+  // Support multiple Zod instances by checking error name
+  return error !== null && typeof error === "object" && (error as any).name === "ZodError";
+}
+
+export function logZodError(error: unknown): void {
+  const issues = (error as any).issues ?? (error as any).errors;
+  if (Array.isArray(issues)) {
+    issues.forEach((issue: any) => {
+      console.error("Zod validation error:", issue);
+    });
+  } else {
+    console.error("Zod validation errors:", issues);
   }
 }
