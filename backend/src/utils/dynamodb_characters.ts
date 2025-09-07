@@ -1,6 +1,6 @@
 import { DeleteCommand, GetCommand, PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { Attribute, Character, characterSchema, CalculationPoints, Skill, CombatValues, BaseValue } from "config";
+import { Attribute, Character, CalculationPoints, CombatValues, BaseValue, Skill, characterSchema } from "shared";
 import { HttpError } from "./errors.js";
 import { dynamoDBDocClient } from "./dynamodb_client.js";
 

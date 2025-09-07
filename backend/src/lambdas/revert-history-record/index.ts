@@ -15,7 +15,7 @@ import {
   calculationPointsChangeSchema,
   stringSetSchema,
   stringArraySchema,
-} from "config";
+} from "shared";
 import {
   getHistoryItems,
   deleteHistoryItem,

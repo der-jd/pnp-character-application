@@ -1,4 +1,4 @@
-import { Character, CostCategory } from "config";
+import { Character, CostCategory } from "shared";
 import { fakeUserId } from "./request.js";
 
 export const fakeCharacterId = "9862f3c9-a065-4e0e-80b2-5bf085535cbe";

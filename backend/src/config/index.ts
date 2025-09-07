@@ -26,33 +26,6 @@ export {
   baseValuesNotUpdatableByLvlUp,
 } from "./character.js";
 export {
-  generalInformationSchema,
-  attributeSchema,
-  baseValueSchema,
-  calculationPointsSchema,
-  dis_advantagesSchema,
-  characterSchema,
-  combatValuesSchema,
-  professionHobbySchema,
-  skillSchema,
-  MAX_STRING_LENGTH_SHORT,
-  MAX_STRING_LENGTH_DEFAULT,
-  MAX_STRING_LENGTH_LONG,
-  MAX_STRING_LENGTH_VERY_LONG,
-} from "./character_schema.js";
-export {
-  recordSchema,
-  Record,
-  historyBlockSchema,
-  HistoryBlock,
-  integerSchema,
-  stringArraySchema,
-  stringSetSchema,
-  attributeChangeSchema,
-  calculationPointsChangeSchema,
-  skillChangeSchema,
-} from "./history_schema.js";
-export {
   ATTRIBUTE_POINTS_FOR_CREATION,
   PROFESSION_SKILL_BONUS,
   HOBBY_SKILL_BONUS,
@@ -63,4 +36,3 @@ export {
 } from "./rules.js";
 export { createEmptyCharacterSheet } from "./character_factory.js";
 export { calculateBaseValues } from "./formulas.js";
-export { RecordType, parseRecordType } from "./history.js";

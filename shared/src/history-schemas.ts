@@ -1,12 +1,26 @@
 import { z } from "zod";
-import { RecordType } from "./history.js";
 import {
   attributeSchema,
   calculationPointsSchema,
   characterSheetSchema,
   combatValuesSchema,
   skillSchema,
-} from "./character_schema.js";
+} from "./character-schemas.js";
+
+export enum RecordType {
+  CHARACTER_CREATED = 0,
+  LEVEL_CHANGED = 1,
+  CALCULATION_POINTS_CHANGED = 2,
+  BASE_VALUE_CHANGED = 3,
+  SPECIAL_ABILITIES_CHANGED = 4,
+  ATTRIBUTE_CHANGED = 5,
+  SKILL_CHANGED = 6,
+  COMBAT_VALUES_CHANGED = 7,
+}
+
+export function parseRecordType(method: string): RecordType {
+  return RecordType[method.toUpperCase() as keyof typeof RecordType];
+}
 
 export const recordSchema = z
   .object({
@@ -16,8 +30,8 @@ export const recordSchema = z
     id: z.string(),
     data: z
       .object({
-        old: z.record(z.any()),
-        new: z.record(z.any()),
+        old: z.record(z.string(), z.unknown()),
+        new: z.record(z.string(), z.unknown()),
       })
       .strict(),
     learningMethod: z.string().nullable(),
@@ -40,7 +54,7 @@ export const recordSchema = z
       })
       .strict(),
     comment: z.string().nullable(),
-    timestamp: z.string().datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2025-03-24T16:34:56Z (UTC) or 2025-03-24T16:34:56+02:00
+    timestamp: z.string().datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2023-03-15T16:00:00Z (UTC) or 2023-03-15T16:00:00-07:00 (PDT)
   })
   .strict();
 
