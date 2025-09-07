@@ -1,6 +1,18 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { z } from "zod";
-import { getAttribute, Attribute, CalculationPoints, CharacterSheet, calculateBaseValues } from "config";
+import { getAttribute, calculateBaseValues } from "config";
+import {
+  updateAttributePathParamsSchema,
+  UpdateAttributePathParams,
+  updateAttributeRequestSchema,
+  UpdateAttributeRequest,
+  UpdateAttributeResponse,
+  headersSchema,
+  Attribute,
+  CalculationPoints,
+  CharacterSheet,
+  InitialNew,
+  InitialIncreased,
+} from "shared";
 import {
   Request,
   parseBody,
@@ -9,8 +21,9 @@ import {
   decodeUserId,
   HttpError,
   ensureHttpError,
-  validateUUID,
   updateBaseValue,
+  isZodError,
+  logZodError,
 } from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -22,43 +35,24 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const initialNewSchema = z.object({
-  initialValue: z.number().int(),
-  newValue: z.number().int(),
-});
-
-const initialIncreasedSchema = z.object({
-  initialValue: z.number().int(),
-  increasedPoints: z.number().int(),
-});
-
-const bodySchema = z
-  .object({
-    start: initialNewSchema.strict().optional(),
-    current: initialIncreasedSchema.strict().optional(),
-    mod: initialNewSchema.strict().optional(),
-  })
-  .strict();
-
 interface Parameters {
   userId: string;
-  characterId: string;
-  attributeName: string;
-  body: z.infer<typeof bodySchema>;
+  pathParams: UpdateAttributePathParams;
+  body: UpdateAttributeRequest;
 }
 
 export async function _updateAttribute(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
 
-    console.log(`Update character ${params.characterId} of user ${params.userId}`);
-    console.log(`Update attribute '${params.attributeName}'`);
+    console.log(`Update character ${params.pathParams["character-id"]} of user ${params.userId}`);
+    console.log(`Update attribute '${params.pathParams["attribute-name"]}'`);
 
-    const character = await getCharacterItem(params.userId, params.characterId);
+    const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
     const characterSheet = character.characterSheet;
     const attributePointsOld = characterSheet.calculationPoints.attributePoints;
     let attributePoints = structuredClone(attributePointsOld);
-    const attributeOld = getAttribute(characterSheet.attributes, params.attributeName);
+    const attributeOld = getAttribute(characterSheet.attributes, params.pathParams["attribute-name"]);
     let attribute = structuredClone(attributeOld);
 
     if (params.body.start) {
@@ -75,13 +69,19 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
       attribute = updateModValue(attribute, params.body.mod);
     }
 
-    await updateAttribute(params.userId, params.characterId, params.attributeName, attribute, attributePoints);
+    await updateAttribute(
+      params.userId,
+      params.pathParams["character-id"],
+      params.pathParams["attribute-name"],
+      attribute,
+      attributePoints,
+    );
 
     console.log("Calculate base values");
     const baseValuesOld = characterSheet.baseValues;
     let baseValuesNew: CharacterSheet["baseValues"] | undefined;
     const attributesNew = structuredClone(characterSheet.attributes);
-    attributesNew[params.attributeName as keyof CharacterSheet["attributes"]] = attribute;
+    attributesNew[params.pathParams["attribute-name"] as keyof CharacterSheet["attributes"]] = attribute;
     const newBaseValuesByFormula = calculateBaseValues(attributesNew);
     const updates: Promise<void>[] = [];
     const changedBaseValues: Partial<CharacterSheet["baseValues"]> = {};
@@ -102,7 +102,14 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
         console.log(`Update base value '${baseValueName}'`);
         console.log("Old base value:", oldBaseValue);
         console.log("New base value:", changedBaseValues[baseValueName]);
-        updates.push(updateBaseValue(params.userId, params.characterId, baseValueName, baseValuesNew[baseValueName]));
+        updates.push(
+          updateBaseValue(
+            params.userId,
+            params.pathParams["character-id"],
+            baseValueName,
+            baseValuesNew[baseValueName],
+          ),
+        );
       }
     }
 
@@ -112,29 +119,32 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
       console.log("No base values changed, nothing to update.");
     }
 
+    const responseBody: UpdateAttributeResponse = {
+      characterId: params.pathParams["character-id"],
+      userId: params.userId,
+      attributeName: params.pathParams["attribute-name"],
+      changes: {
+        old: {
+          attribute: attributeOld,
+          baseValues:
+            Object.keys(changedBaseValues).length > 0
+              ? Object.fromEntries(Object.entries(baseValuesOld).filter(([k]) => k in changedBaseValues))
+              : undefined,
+        },
+        new: {
+          attribute: attribute,
+          baseValues: Object.keys(changedBaseValues).length > 0 ? changedBaseValues : undefined,
+        },
+      },
+      attributePoints: {
+        old: attributePointsOld,
+        new: attributePoints,
+      },
+    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        characterId: params.characterId,
-        userId: params.userId,
-        attributeName: params.attributeName,
-        changes: {
-          old: {
-            attribute: attributeOld,
-            baseValues:
-              Object.keys(changedBaseValues).length > 0
-                ? Object.fromEntries(Object.entries(baseValuesOld).filter(([k]) => k in changedBaseValues))
-                : undefined,
-          },
-          new: {
-            attribute: attribute,
-            baseValues: Object.keys(changedBaseValues).length > 0 ? changedBaseValues : undefined,
-          },
-        },
-        attributePoints: {
-          old: attributePointsOld,
-          new: attributePoints,
-        },
+      body: JSON.stringify(responseBody, (key, value) => {
+        return typeof value === "bigint" ? value.toString() : value;
       }),
     };
     console.log(response);
@@ -148,33 +158,14 @@ function validateRequest(request: Request): Parameters {
   try {
     console.log("Validate request");
 
-    const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
-
-    const characterId = request.pathParameters?.["character-id"];
-    const attributeName = request.pathParameters?.["attribute-name"];
-    if (typeof characterId !== "string" || typeof attributeName !== "string") {
-      throw new HttpError(400, "Invalid input values!");
-    }
-
-    validateUUID(characterId);
-
-    const body = bodySchema.parse(request.body);
-
-    if (body.current && body.current.increasedPoints <= 0) {
-      throw new HttpError(400, "Points to increase are negative or null! The value must be greater than or equal 1.", {
-        increasedPoints: body.current.increasedPoints,
-      });
-    }
-
     return {
-      userId: userId,
-      characterId: characterId,
-      attributeName: attributeName,
-      body: body,
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      pathParams: updateAttributePathParamsSchema.parse(request.pathParameters),
+      body: updateAttributeRequestSchema.parse(request.body),
     };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
+    if (isZodError(error)) {
+      logZodError(error);
       throw new HttpError(400, "Invalid input values!");
     }
 
@@ -183,7 +174,7 @@ function validateRequest(request: Request): Parameters {
   }
 }
 
-function updateStartValue(attribute: Attribute, startValue: z.infer<typeof initialNewSchema>): Attribute {
+function updateStartValue(attribute: Attribute, startValue: InitialNew): Attribute {
   console.log(`Update start value of the attribute from ${startValue.initialValue} to ${startValue.newValue}`);
 
   if (startValue.initialValue !== attribute.start && startValue.newValue !== attribute.start) {
@@ -204,12 +195,18 @@ function updateStartValue(attribute: Attribute, startValue: z.infer<typeof initi
 
 function updateCurrentValue(
   attribute: Attribute,
-  currentValue: z.infer<typeof initialIncreasedSchema>,
+  currentValue: InitialIncreased,
   attributePoints: CalculationPoints,
 ): { attribute: Attribute; attributePoints: CalculationPoints } {
   console.log(
     `Update current value of the attribute from ${currentValue.initialValue} to ${currentValue.initialValue + currentValue.increasedPoints}`,
   );
+
+  if (currentValue.increasedPoints <= 0) {
+    throw new HttpError(400, "Points to increase are negative or null! The value must be greater than or equal 1.", {
+      increasedPoints: currentValue.increasedPoints,
+    });
+  }
 
   if (
     currentValue.initialValue !== attribute.current &&
@@ -249,7 +246,7 @@ function updateCurrentValue(
   }
 }
 
-function updateModValue(attribute: Attribute, modValue: z.infer<typeof initialNewSchema>): Attribute {
+function updateModValue(attribute: Attribute, modValue: InitialNew): Attribute {
   console.log(`Update mod value of the attribute from ${modValue.initialValue} to ${modValue.newValue}`);
 
   if (modValue.initialValue !== attribute.mod && modValue.newValue !== attribute.mod) {

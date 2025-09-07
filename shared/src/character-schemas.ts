@@ -73,6 +73,24 @@ export const baseValueSchema = z
 
 export type BaseValue = z.infer<typeof baseValueSchema>;
 
+export const baseValuesSchema = z
+  .object({
+    healthPoints: baseValueSchema,
+    mentalHealth: baseValueSchema,
+    armorLevel: baseValueSchema,
+    naturalArmor: baseValueSchema,
+    initiativeBaseValue: baseValueSchema,
+    attackBaseValue: baseValueSchema,
+    paradeBaseValue: baseValueSchema,
+    rangedAttackBaseValue: baseValueSchema,
+    luckPoints: baseValueSchema,
+    bonusActionsPerCombatRound: baseValueSchema,
+    legendaryActions: baseValueSchema,
+  })
+  .strict();
+
+export type BaseValues = z.infer<typeof baseValuesSchema>;
+
 export const combatValuesSchema = z
   .object({
     availablePoints: z.number().int(),
@@ -128,21 +146,7 @@ export const characterSheetSchema = z
     advantages: dis_advantagesSchema,
     disadvantages: dis_advantagesSchema,
     specialAbilities: z.set(z.string().max(MAX_STRING_LENGTH_DEFAULT)),
-    baseValues: z
-      .object({
-        healthPoints: baseValueSchema,
-        mentalHealth: baseValueSchema,
-        armorLevel: baseValueSchema,
-        naturalArmor: baseValueSchema,
-        initiativeBaseValue: baseValueSchema,
-        attackBaseValue: baseValueSchema,
-        paradeBaseValue: baseValueSchema,
-        rangedAttackBaseValue: baseValueSchema,
-        luckPoints: baseValueSchema,
-        bonusActionsPerCombatRound: baseValueSchema,
-        legendaryActions: baseValueSchema,
-      })
-      .strict(),
+    baseValues: baseValuesSchema,
     attributes: z
       .object({
         courage: attributeSchema,

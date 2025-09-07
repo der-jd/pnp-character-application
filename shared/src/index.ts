@@ -15,6 +15,7 @@ export {
   skillSchema,
   characterSheetSchema,
   characterSchema,
+  baseValuesSchema,
   CalculationPoints,
   CharacterSheet,
   Skill,
@@ -23,6 +24,7 @@ export {
   ProfessionHobby,
   Attribute,
   BaseValue,
+  BaseValues,
   CombatValues,
   CostCategory,
   LearningMethod,
@@ -85,3 +87,13 @@ export {
   cloneCharacterResponseSchema,
   CloneCharacterResponse,
 } from "./clone-character.js";
+export {
+  updateAttributePathParamsSchema,
+  UpdateAttributePathParams,
+  updateAttributeRequestSchema,
+  UpdateAttributeRequest,
+  updateAttributeResponseSchema,
+  UpdateAttributeResponse,
+  InitialNew,
+  InitialIncreased,
+} from "./update-attribute.js";
