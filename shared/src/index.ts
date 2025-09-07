@@ -17,6 +17,7 @@ export {
   characterSheetSchema,
   characterSchema,
   baseValuesSchema,
+  learningMethodSchema,
   CalculationPoints,
   CharacterSheet,
   Skill,
@@ -29,6 +30,7 @@ export {
   CombatValues,
   CostCategory,
   LearningMethod,
+  LearningMethodString,
   Level,
 } from "./character-schemas.js";
 export {
@@ -122,3 +124,11 @@ export {
   updateCombatValuesResponseSchema,
   UpdateCombatValuesResponse,
 } from "./update-combat-values.js";
+export {
+  updateSkillPathParamsSchema,
+  UpdateSkillPathParams,
+  updateSkillRequestSchema,
+  UpdateSkillRequest,
+  updateSkillResponseSchema,
+  UpdateSkillResponse,
+} from "./update-skill.js";

@@ -105,6 +105,10 @@ export const combatValuesSchema = z
 
 export type CombatValues = z.infer<typeof combatValuesSchema>;
 
+export const learningMethodSchema = z.enum(["FREE", "LOW_PRICED", "NORMAL", "EXPENSIVE"]);
+
+export type LearningMethodString = z.infer<typeof learningMethodSchema>;
+
 export enum LearningMethod {
   FREE = 99, // Cost Category 0
   LOW_PRICED = -1, // Cost Category -1
