@@ -49,6 +49,12 @@ export {
 } from "./history-schemas.js";
 export { initialNewSchema, InitialNew, initialIncreasedSchema, InitialIncreased } from "./general-schemas.js";
 export {
+  revertHistoryRecordPathParamsSchema,
+  RevertHistoryRecordPathParams,
+  revertHistoryRecordResponseSchema,
+  RevertHistoryRecordResponse,
+} from "./revert-history-record.js";
+export {
   updateLevelPathParamsSchema,
   UpdateLevelPathParams,
   updateLevelRequestSchema,

@@ -14,6 +14,9 @@ import {
   calculationPointsChangeSchema,
   stringSetSchema,
   stringArraySchema,
+  revertHistoryRecordPathParamsSchema,
+  RevertHistoryRecordResponse,
+  headersSchema,
 } from "shared";
 import {
   getHistoryItems,
@@ -23,7 +26,6 @@ import {
   parseBody,
   HttpError,
   ensureHttpError,
-  validateUUID,
   updateAdventurePoints,
   decodeUserId,
   updateAttributePoints,
@@ -87,10 +89,11 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
       await deleteLatestHistoryRecord(latestBlock);
     }
 
+    const responseBody: RevertHistoryRecordResponse = latestRecord;
     const response = {
       statusCode: 200,
       // JSON.stringify() does not work with Set, so we need to convert it to an array
-      body: JSON.stringify(latestRecord, (key, value) => {
+      body: JSON.stringify(responseBody, (key, value) => {
         if (value instanceof Set) {
           return Array.from(value);
         }
@@ -105,22 +108,23 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
 }
 
 async function validateRequest(request: Request): Promise<Parameters> {
-  console.log("Validate request");
+  try {
+    console.log("Validate request");
 
-  const characterId = request.pathParameters?.["character-id"];
-  const recordId = request.pathParameters?.["record-id"];
-  if (typeof characterId !== "string" || typeof recordId !== "string") {
-    throw new HttpError(400, "Invalid input values!");
+    const pathParams = revertHistoryRecordPathParamsSchema.parse(request.pathParameters);
+
+    return {
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      characterId: pathParams["character-id"],
+      recordId: pathParams["record-id"],
+    };
+  } catch (error) {
+    if (isZodError(error)) {
+      logZodError(error);
+      throw new HttpError(400, "Invalid input values!");
+    }
+    throw error;
   }
-
-  validateUUID(characterId);
-  validateUUID(recordId);
-
-  return {
-    userId: decodeUserId(request.headers.authorization ?? request.headers.Authorization),
-    characterId: characterId,
-    recordId: recordId,
-  };
 }
 
 async function revertChange(userId: string, characterId: string, record: Record): Promise<void> {
