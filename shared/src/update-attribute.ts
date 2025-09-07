@@ -10,17 +10,21 @@ export const updateAttributePathParamsSchema = z
 
 export type UpdateAttributePathParams = z.infer<typeof updateAttributePathParamsSchema>;
 
-const initialNewSchema = z.object({
-  initialValue: z.number().int(),
-  newValue: z.number().int(),
-}).strict();
+const initialNewSchema = z
+  .object({
+    initialValue: z.number().int(),
+    newValue: z.number().int(),
+  })
+  .strict();
 
 export type InitialNew = z.infer<typeof initialNewSchema>;
 
-const initialIncreasedSchema = z.object({
-  initialValue: z.number().int(),
-  increasedPoints: z.number().int(),
-}).strict();
+const initialIncreasedSchema = z
+  .object({
+    initialValue: z.number().int(),
+    increasedPoints: z.number().int(),
+  })
+  .strict();
 
 export type InitialIncreased = z.infer<typeof initialIncreasedSchema>;
 
@@ -38,20 +42,28 @@ export const updateAttributeResponseSchema = z.object({
   characterId: z.string().uuid(),
   userId: z.string(),
   attributeName: z.string(),
-  changes: z.object({
-    old: z.object({
-      attribute: attributeSchema,
-      baseValues: baseValuesSchema.partial().optional(),
-    }).strict(),
-    new: z.object({
-      attribute: attributeSchema,
-      baseValues: baseValuesSchema.partial().optional(),
-    }).strict(),
-  }).strict(),
-  attributePoints: z.object({
-    old: calculationPointsSchema,
-    new: calculationPointsSchema,
-  }).strict(),
+  changes: z
+    .object({
+      old: z
+        .object({
+          attribute: attributeSchema,
+          baseValues: baseValuesSchema.partial().optional(),
+        })
+        .strict(),
+      new: z
+        .object({
+          attribute: attributeSchema,
+          baseValues: baseValuesSchema.partial().optional(),
+        })
+        .strict(),
+    })
+    .strict(),
+  attributePoints: z
+    .object({
+      old: calculationPointsSchema,
+      new: calculationPointsSchema,
+    })
+    .strict(),
 });
 
 export type UpdateAttributeResponse = z.infer<typeof updateAttributeResponseSchema>;
