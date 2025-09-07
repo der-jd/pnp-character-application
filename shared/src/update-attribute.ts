@@ -13,22 +13,22 @@ export type UpdateAttributePathParams = z.infer<typeof updateAttributePathParams
 const initialNewSchema = z.object({
   initialValue: z.number().int(),
   newValue: z.number().int(),
-});
+}).strict();
 
 export type InitialNew = z.infer<typeof initialNewSchema>;
 
 const initialIncreasedSchema = z.object({
   initialValue: z.number().int(),
   increasedPoints: z.number().int(),
-});
+}).strict();
 
 export type InitialIncreased = z.infer<typeof initialIncreasedSchema>;
 
 export const updateAttributeRequestSchema = z
   .object({
-    start: initialNewSchema.strict().optional(),
-    current: initialIncreasedSchema.strict().optional(),
-    mod: initialNewSchema.strict().optional(),
+    start: initialNewSchema.optional(),
+    current: initialIncreasedSchema.optional(),
+    mod: initialNewSchema.optional(),
   })
   .strict();
 
@@ -42,16 +42,16 @@ export const updateAttributeResponseSchema = z.object({
     old: z.object({
       attribute: attributeSchema,
       baseValues: baseValuesSchema.partial().optional(),
-    }),
+    }).strict(),
     new: z.object({
       attribute: attributeSchema,
       baseValues: baseValuesSchema.partial().optional(),
-    }),
-  }),
+    }).strict(),
+  }).strict(),
   attributePoints: z.object({
     old: calculationPointsSchema,
     new: calculationPointsSchema,
-  }),
+  }).strict(),
 });
 
 export type UpdateAttributeResponse = z.infer<typeof updateAttributeResponseSchema>;
