@@ -98,7 +98,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm run setup-backend
+          command: npm ci
       - run:
           name: Run tests
           command: |
