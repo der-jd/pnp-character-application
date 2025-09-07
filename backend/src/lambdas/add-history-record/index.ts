@@ -16,7 +16,7 @@ import {
   calculationPointsChangeSchema,
   stringSetSchema,
   stringArraySchema,
-} from "config";
+} from "shared";
 import {
   getHistoryItems,
   createHistoryItem,
@@ -26,6 +26,8 @@ import {
   HttpError,
   ensureHttpError,
   validateUUID,
+  isZodError,
+  logZodError,
 } from "utils";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
@@ -246,8 +248,8 @@ async function validateRequest(request: Request): Promise<Parameters> {
       body: body,
     };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
+    if (isZodError(error)) {
+      logZodError(error);
       throw new HttpError(400, "Invalid input values!");
     }
 
