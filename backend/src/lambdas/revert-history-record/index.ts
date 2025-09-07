@@ -1,5 +1,4 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { z } from "zod";
 import {
   baseValueSchema,
   combatValuesSchema,
@@ -34,6 +33,8 @@ import {
   updateBaseValue,
   updateLevel,
   setSpecialAbilities,
+  logZodError,
+  isZodError,
 } from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -243,8 +244,8 @@ async function revertChange(userId: string, characterId: string, record: Record)
         throw new HttpError(500, "Unknown history record type!");
     }
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
+    if (isZodError(error)) {
+      logZodError(error);
       throw new HttpError(500, "Invalid history record values!");
     }
 
