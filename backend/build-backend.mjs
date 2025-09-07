@@ -4,15 +4,53 @@ import { build } from "esbuild";
 import { readdir, mkdir } from "fs/promises";
 import { join } from "path";
 
-const srcDir = "src";
-const buildDir = "build";
+const SRC_DIR = "src";
+const BUILD_DIR = "build";
+
+async function buildCommonPackages() {
+  console.log("🔧 Building common packages...");
+
+  // Build config package
+  const configSrcDir = join(SRC_DIR, "config");
+  const configBuildDir = join(BUILD_DIR, "src", "config");
+
+  await mkdir(configBuildDir, { recursive: true });
+
+  await build({
+    entryPoints: [join(configSrcDir, "index.ts")],
+    bundle: false, // Keep individual files for common packages
+    platform: "node",
+    target: "node20",
+    format: "esm",
+    outdir: configBuildDir,
+    outExtension: { ".js": ".mjs" },
+  });
+
+  // Build utils package
+  const utilsSrcDir = join(SRC_DIR, "utils");
+  const utilsBuildDir = join(BUILD_DIR, "src", "utils");
+
+  await mkdir(utilsBuildDir, { recursive: true });
+
+  await build({
+    entryPoints: [join(utilsSrcDir, "index.ts")],
+    bundle: false, // Keep individual files for common packages
+    platform: "node",
+    target: "node20",
+    format: "esm",
+    outdir: utilsBuildDir,
+    outExtension: { ".js": ".mjs" },
+  });
+
+  console.log("✅ Common packages built successfully!");
+}
 
 async function buildLambdas() {
   console.log("🚀 Building Lambda functions with esbuild...");
 
   // Get all Lambda function directories
-  const lambdasSrcDir = join(srcDir, "lambdas");
-  const lambdasBuildDir = join(buildDir, "src", "lambdas");
+  const lambdasSrcDir = join(SRC_DIR, "lambdas");
+  const lambdasBuildDir = join(BUILD_DIR, "src", "lambdas");
 
   try {
     const lambdaDirs = await readdir(lambdasSrcDir, { withFileTypes: true });
@@ -68,49 +106,11 @@ async function buildLambdas() {
   }
 }
 
-async function buildLambdaLayers() {
-  console.log("🔧 Building Lambda layers...");
-
-  // Build config package
-  const configSrcDir = join(srcDir, "config");
-  const configBuildDir = join(buildDir, "src", "config");
-
-  await mkdir(configBuildDir, { recursive: true });
-
-  await build({
-    entryPoints: [join(configSrcDir, "index.ts")],
-    bundle: false, // Keep individual files for layers
-    platform: "node",
-    target: "node20",
-    format: "esm",
-    outdir: configBuildDir,
-    outExtension: { ".js": ".mjs" },
-  });
-
-  // Build utils package
-  const utilsSrcDir = join(srcDir, "utils");
-  const utilsBuildDir = join(buildDir, "src", "utils");
-
-  await mkdir(utilsBuildDir, { recursive: true });
-
-  await build({
-    entryPoints: [join(utilsSrcDir, "index.ts")],
-    bundle: false, // Keep individual files for layers
-    platform: "node",
-    target: "node20",
-    format: "esm",
-    outdir: utilsBuildDir,
-    outExtension: { ".js": ".mjs" },
-  });
-
-  console.log("✅ Lambda layers built successfully!");
-}
-
 // Main build process
 async function main() {
   try {
+    await buildCommonPackages();
     await buildLambdas();
-    await buildLambdaLayers();
     console.log("🎉 All builds completed successfully!");
   } catch (error) {
     console.error("❌ Build process failed:", error);
