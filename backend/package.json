@@ -6,7 +6,6 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "build": "npm run type-check && node build-backend.mjs",
-    "build:legacy": "tsc && bash ./rename-build-files-and-imports.sh && bash ./include-dependencies.sh",
     "test": "vitest --run",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
