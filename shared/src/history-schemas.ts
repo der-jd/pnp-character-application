@@ -27,7 +27,7 @@ export const recordSchema = z
     type: z.nativeEnum(RecordType),
     name: z.string(),
     number: z.number().int(),
-    id: z.string(),
+    id: z.string().uuid(),
     data: z
       .object({
         old: z.record(z.string(), z.unknown()),
@@ -62,10 +62,10 @@ export type Record = z.infer<typeof recordSchema>;
 
 export const historyBlockSchema = z
   .object({
-    characterId: z.string(),
+    characterId: z.string().uuid(),
     blockNumber: z.number().int(),
-    blockId: z.string(),
-    previousBlockId: z.string().nullable(),
+    blockId: z.string().uuid(),
+    previousBlockId: z.string().uuid().nullable(),
     changes: z.array(recordSchema),
   })
   .strict();

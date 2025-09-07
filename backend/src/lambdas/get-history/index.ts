@@ -1,6 +1,25 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { HistoryBlock } from "config";
-import { Request, parseBody, getHistoryItem, getHistoryItems, ensureHttpError, HttpError, validateUUID } from "utils";
+import {
+  HistoryBlock,
+  headersSchema,
+  GetHistoryPathParams,
+  GetHistoryQueryParams,
+  GetHistoryResponse,
+  getHistoryPathParamsSchema,
+  getHistoryQueryParamsSchema,
+} from "shared";
+import {
+  Request,
+  parseBody,
+  getHistoryItem,
+  getHistoryItems,
+  getCharacterItem,
+  ensureHttpError,
+  HttpError,
+  decodeUserId,
+  isZodError,
+  logZodError,
+} from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getHistory({
@@ -12,22 +31,26 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 };
 
 interface Parameters {
-  characterId: string;
-  blockNumber?: number;
+  userId: string;
+  pathParams: GetHistoryPathParams;
+  queryParams?: GetHistoryQueryParams;
 }
 
 export async function getHistory(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
 
-    console.log(`Get history of character ${params.characterId}`);
+    // First verify that the user owns the character and is therefore allowed to access the history
+    await getCharacterItem(params.userId, params.pathParams["character-id"]);
+
+    console.log(`Get history of character ${params.pathParams["character-id"]} for user ${params.userId}`);
 
     let items: HistoryBlock[] = [];
-    if (params.blockNumber) {
-      items.push(await getHistoryItem(params.characterId, params.blockNumber));
+    if (params.queryParams?.["block-number"]) {
+      items.push(await getHistoryItem(params.pathParams["character-id"], params.queryParams["block-number"]));
     } else {
       items = await getHistoryItems(
-        params.characterId,
+        params.pathParams["character-id"],
         false, // Sort descending to get highest block number (latest item) first
         1, // Only get the last item
       );
@@ -37,13 +60,14 @@ export async function getHistory(request: Request): Promise<APIGatewayProxyResul
       throw new HttpError(404, "No history found for the given character id");
     }
 
+    const responseBody: GetHistoryResponse = {
+      previousBlockNumber: items[items.length - 1].blockNumber === 1 ? null : items[items.length - 1].blockNumber - 1,
+      previousBlockId: items[items.length - 1].previousBlockId,
+      items: items,
+    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        previousBlockNumber: items[items.length - 1].blockNumber === 1 ? null : items[items.length - 1].blockNumber - 1,
-        previousBlockId: items[items.length - 1].previousBlockId,
-        items: items,
-      }),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
@@ -53,23 +77,23 @@ export async function getHistory(request: Request): Promise<APIGatewayProxyResul
 }
 
 function validateRequest(request: Request): Parameters {
-  console.log("Validate request");
+  try {
+    console.log("Validate request");
 
-  if (
-    typeof request.pathParameters?.["character-id"] !== "string" ||
-    (request.queryStringParameters?.["block-number"] &&
-      typeof request.queryStringParameters?.["block-number"] !== "string")
-  ) {
-    throw new HttpError(400, "Invalid input values!");
+    return {
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      pathParams: getHistoryPathParamsSchema.parse(request.pathParameters),
+      queryParams: request.queryStringParameters
+        ? getHistoryQueryParamsSchema.parse(request.queryStringParameters)
+        : undefined,
+    };
+  } catch (error) {
+    if (isZodError(error)) {
+      logZodError(error);
+      throw new HttpError(400, "Invalid input values!");
+    }
+
+    // Rethrow other errors
+    throw error;
   }
-
-  const characterId = request.pathParameters?.["character-id"];
-  validateUUID(characterId);
-
-  return {
-    characterId: characterId,
-    blockNumber: request.queryStringParameters?.["block-number"]
-      ? parseInt(request.queryStringParameters["block-number"])
-      : undefined,
-  };
 }

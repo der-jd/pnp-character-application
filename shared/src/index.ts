@@ -132,3 +132,11 @@ export {
   updateSkillResponseSchema,
   UpdateSkillResponse,
 } from "./update-skill.js";
+export {
+  getHistoryPathParamsSchema,
+  GetHistoryPathParams,
+  getHistoryQueryParamsSchema,
+  GetHistoryQueryParams,
+  getHistoryResponseSchema,
+  GetHistoryResponse,
+} from "./get-history.js";

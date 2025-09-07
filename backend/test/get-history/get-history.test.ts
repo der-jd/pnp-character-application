@@ -2,20 +2,51 @@ import { describe, expect, test } from "vitest";
 import {
   fakeHistoryBlockResponse,
   fakeHistoryBlockListResponse,
-  mockDynamoDBGetHistoryResponse,
+  fakeCharacterResponse,
   mockDynamoDBQueryHistoryResponse,
+  mockDynamoDBGetCharacterResponse,
+  mockDynamoDBGetBothCharacterAndHistoryResponse,
 } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
+import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
 import { getHistory } from "get-history";
-import { HistoryBlock } from "config";
+import { HistoryBlock } from "shared";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [
     {
+      name: "Authorization header is malformed",
+      request: {
+        headers: {
+          authorization: "dummyValue",
+        },
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 401,
+    },
+    {
+      name: "Authorization token is invalid",
+      request: {
+        headers: {
+          authorization: "Bearer 1234567890",
+        },
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 401,
+    },
+    {
       name: "Character id is not an UUID",
       request: {
-        headers: {},
+        headers: fakeHeaders,
         pathParameters: {
           "character-id": "1234567890",
         },
@@ -27,9 +58,21 @@ describe("Invalid requests", () => {
     {
       name: "No history found for a non existing character id",
       request: {
-        headers: {},
+        headers: fakeHeaders,
         pathParameters: {
           "character-id": "26c5d41d-cef1-455f-a341-b15d8a5b3967",
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 404,
+    },
+    {
+      name: "No character found for a non existing user id or user is not allowed to access the character",
+      request: {
+        headers: dummyHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
         body: null,
@@ -40,6 +83,7 @@ describe("Invalid requests", () => {
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
+      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
       mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
 
       await expectHttpError(() => getHistory(_case.request), _case.expectedStatusCode);
@@ -52,7 +96,7 @@ describe("Valid requests", () => {
     {
       name: "Successfully get history",
       request: {
-        headers: {},
+        headers: fakeHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
         },
@@ -64,7 +108,7 @@ describe("Valid requests", () => {
     {
       name: "Successfully get a specific history item",
       request: {
-        headers: {},
+        headers: fakeHeaders,
         pathParameters: {
           "character-id": fakeCharacterId,
         },
@@ -79,7 +123,7 @@ describe("Valid requests", () => {
 
   validTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetHistoryResponse(fakeHistoryBlockResponse);
+      mockDynamoDBGetBothCharacterAndHistoryResponse(fakeCharacterResponse, fakeHistoryBlockResponse);
       mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
 
       const result = await getHistory(_case.request);
