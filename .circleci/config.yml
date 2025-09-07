@@ -187,9 +187,7 @@ jobs:
           role_arn: "$AWS_ROLE_ARN"
       - run:
           name: Install dependencies
-          command: |
-            cd frontend
-            npm ci
+          command: npm ci
       - run:
           name: Prepare cache restoring
           command: |
