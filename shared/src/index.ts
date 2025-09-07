@@ -49,3 +49,11 @@ export {
   updateLevelResponseSchema,
   UpdateLevelResponse,
 } from "./update-level.js";
+export {
+  addHistoryRecordPathParamsSchema,
+  AddHistoryRecordPathParams,
+  addHistoryRecordRequestSchema,
+  AddHistoryRecordRequest,
+  addHistoryRecordResponseSchema,
+  AddHistoryRecordResponse,
+} from "./add-history-record.js";

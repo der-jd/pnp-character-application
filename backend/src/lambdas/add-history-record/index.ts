@@ -1,10 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
 import {
   baseValueSchema,
-  calculationPointsSchema,
   combatValuesSchema,
   RecordType,
   Record,
@@ -16,6 +14,10 @@ import {
   calculationPointsChangeSchema,
   stringSetSchema,
   stringArraySchema,
+  AddHistoryRecordRequest,
+  AddHistoryRecordResponse,
+  addHistoryRecordPathParamsSchema,
+  addHistoryRecordRequestSchema,
 } from "shared";
 import {
   getHistoryItems,
@@ -41,45 +43,9 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const historyBodySchema = z
-  .object({
-    userId: z.string(),
-    type: z.nativeEnum(RecordType),
-    name: z.string(),
-    data: z
-      .object({
-        old: z.record(z.any()),
-        new: z.record(z.any()),
-      })
-      .strict(),
-    learningMethod: z.string().nullable(),
-    calculationPoints: z
-      .object({
-        adventurePoints: z
-          .object({
-            old: calculationPointsSchema,
-            new: calculationPointsSchema,
-          })
-          .strict()
-          .nullable(),
-        attributePoints: z
-          .object({
-            old: calculationPointsSchema,
-            new: calculationPointsSchema,
-          })
-          .strict()
-          .nullable(),
-      })
-      .strict(),
-    comment: z.string().nullable(),
-  })
-  .strict();
-
-export type HistoryBodySchema = z.infer<typeof historyBodySchema>;
-
 interface Parameters {
   characterId: string;
-  body: HistoryBodySchema;
+  body: AddHistoryRecordRequest;
 }
 
 export async function addRecordToHistory(request: Request): Promise<APIGatewayProxyResult> {
@@ -161,10 +127,11 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       }
     }
 
+    const responseBody: AddHistoryRecordResponse = record;
     const response = {
       statusCode: 200,
       // JSON.stringify() does not work with Set, so we need to convert it to an array
-      body: JSON.stringify(record, (key, value) => {
+      body: JSON.stringify(responseBody, (key, value) => {
         if (value instanceof Set) {
           return Array.from(value);
         }
@@ -181,13 +148,6 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
 async function validateRequest(request: Request): Promise<Parameters> {
   console.log("Validate request");
 
-  if (typeof request.pathParameters?.["character-id"] !== "string") {
-    throw new HttpError(400, "Invalid input values!");
-  }
-
-  const characterId = request.pathParameters?.["character-id"];
-  validateUUID(characterId);
-
   try {
     /**
      * This conversion is necessary if the Lambda is called via AWS Step Functions.
@@ -196,8 +156,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
     if (typeof request.body?.type === "string") {
       request.body.type = Number(request.body.type);
     }
-    // TODO use parse function and request object for all lambdas
-    const body = historyBodySchema.parse(request.body);
+    const body = addHistoryRecordRequestSchema.parse(request.body);
 
     // Check if the character exists
     // Note: This check is currently not necessary as the lambda is called after the update-skill function. I.e. we can assume that the character exists.
@@ -244,7 +203,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
     }
 
     return {
-      characterId: characterId,
+      characterId: addHistoryRecordPathParamsSchema.parse(request.pathParameters)["character-id"],
       body: body,
     };
   } catch (error) {

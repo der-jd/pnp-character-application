@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { CostCategory, RecordType } from "config";
-import { addRecordToHistory, HistoryBodySchema } from "add-history-record";
+import { CostCategory, RecordType, AddHistoryRecordRequest } from "shared";
+import { addRecordToHistory } from "add-history-record";
 import { fakeUserId } from "../test-data/request.js";
 import {
   fakeHistoryBlockListResponse,
@@ -15,7 +15,7 @@ import { fakeCharacterId } from "../test-data/character.js";
 import { fakeBigHistoryBlock, fakeHistoryBlock2 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 
-const testBody: HistoryBodySchema = {
+const testBody: AddHistoryRecordRequest = {
   userId: fakeUserId,
   type: RecordType.CALCULATION_POINTS_CHANGED,
   name: "Calculation Points",
