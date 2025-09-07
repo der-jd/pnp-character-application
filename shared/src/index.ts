@@ -114,3 +114,11 @@ export {
   updateCalculationPointsResponseSchema,
   UpdateCalculationPointsResponse,
 } from "./update-calculation-points.js";
+export {
+  updateCombatValuesPathParamsSchema,
+  UpdateCombatValuesPathParams,
+  updateCombatValuesRequestSchema,
+  UpdateCombatValuesRequest,
+  updateCombatValuesResponseSchema,
+  UpdateCombatValuesResponse,
+} from "./update-combat-values.js";
