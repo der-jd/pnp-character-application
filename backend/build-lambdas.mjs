@@ -42,21 +42,6 @@ async function buildLambdas() {
           // AWS SDK is provided by Lambda runtime
           "@aws-sdk/*",
           "aws-sdk",
-          // Node.js built-ins - explicitly externalized since platform: "node"
-          // doesn't seem to work reliably with ESM format
-          "buffer",
-          "crypto",
-          "events",
-          "fs",
-          "path",
-          "stream",
-          "util",
-          "os",
-          "url",
-          "querystring",
-          "http",
-          "https",
-          "zlib",
         ],
         minify: true,
         sourcemap: false, // Can enable for debugging
@@ -65,6 +50,10 @@ async function buildLambdas() {
         // Handle your current import paths
         conditions: ["import", "node"],
         mainFields: ["module", "main"],
+        // Fix for dynamic require issue in ESM
+        banner: {
+          js: 'import { createRequire } from "module"; const require = createRequire(import.meta.url);',
+        },
       });
 
       console.log(`✅ Built ${lambdaName}`);
