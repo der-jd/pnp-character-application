@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { attributeSchema, calculationPointsSchema, baseValuesSchema } from "./character-schemas.js";
+import { initialIncreasedSchema, initialNewSchema } from "./general-schemas.js";
 
 export const updateAttributePathParamsSchema = z
   .object({
@@ -9,24 +10,6 @@ export const updateAttributePathParamsSchema = z
   .strict();
 
 export type UpdateAttributePathParams = z.infer<typeof updateAttributePathParamsSchema>;
-
-const initialNewSchema = z
-  .object({
-    initialValue: z.number().int(),
-    newValue: z.number().int(),
-  })
-  .strict();
-
-export type InitialNew = z.infer<typeof initialNewSchema>;
-
-const initialIncreasedSchema = z
-  .object({
-    initialValue: z.number().int(),
-    increasedPoints: z.number().int(),
-  })
-  .strict();
-
-export type InitialIncreased = z.infer<typeof initialIncreasedSchema>;
 
 export const updateAttributeRequestSchema = z
   .object({

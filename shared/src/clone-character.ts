@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAX_STRING_LENGTH_DEFAULT, START_LEVEL } from "./character-schemas.js";
+import { levelSchema } from "./character-schemas.js";
 
 export const cloneCharacterPathParamsSchema = z
   .object({
@@ -21,8 +21,8 @@ export const cloneCharacterResponseSchema = z
   .object({
     userId: z.string(),
     characterId: z.string().uuid(),
-    name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
-    level: z.number().int().min(START_LEVEL),
+    name: z.string(),
+    level: levelSchema,
   })
   .strict();
 

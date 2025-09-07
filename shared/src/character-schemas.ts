@@ -17,10 +17,14 @@ export const professionHobbySchema = z
 
 export type ProfessionHobby = z.infer<typeof professionHobbySchema>;
 
+export const levelSchema = z.number().int().min(START_LEVEL);
+
+export type Level = z.infer<typeof levelSchema>;
+
 export const generalInformationSchema = z
   .object({
     name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
-    level: z.number().int().min(START_LEVEL),
+    level: levelSchema,
     sex: z.string().max(MAX_STRING_LENGTH_SHORT),
     profession: professionHobbySchema,
     hobby: professionHobbySchema,

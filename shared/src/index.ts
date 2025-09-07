@@ -5,6 +5,7 @@ export {
   MAX_STRING_LENGTH_DEFAULT,
   MAX_STRING_LENGTH_LONG,
   MAX_STRING_LENGTH_VERY_LONG,
+  levelSchema,
   professionHobbySchema,
   generalInformationSchema,
   calculationPointsSchema,
@@ -28,6 +29,7 @@ export {
   CombatValues,
   CostCategory,
   LearningMethod,
+  Level,
 } from "./character-schemas.js";
 export {
   recordSchema,
@@ -43,6 +45,7 @@ export {
   calculationPointsChangeSchema,
   skillChangeSchema,
 } from "./history-schemas.js";
+export { initialNewSchema, InitialNew, initialIncreasedSchema, InitialIncreased } from "./general-schemas.js";
 export {
   updateLevelPathParamsSchema,
   UpdateLevelPathParams,
@@ -94,6 +97,12 @@ export {
   UpdateAttributeRequest,
   updateAttributeResponseSchema,
   UpdateAttributeResponse,
-  InitialNew,
-  InitialIncreased,
 } from "./update-attribute.js";
+export {
+  updateBaseValuePathParamsSchema,
+  UpdateBaseValuePathParams,
+  updateBaseValueRequestSchema,
+  UpdateBaseValueRequest,
+  updateBaseValueResponseSchema,
+  UpdateBaseValueResponse,
+} from "./update-base-value.js";

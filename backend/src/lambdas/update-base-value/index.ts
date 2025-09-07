@@ -1,6 +1,16 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { z } from "zod";
-import { CharacterSheet, BaseValue, baseValuesNotUpdatableByLvlUp, getBaseValue } from "config";
+import { baseValuesNotUpdatableByLvlUp, getBaseValue } from "config";
+import {
+  updateBaseValuePathParamsSchema,
+  UpdateBaseValuePathParams,
+  updateBaseValueRequestSchema,
+  UpdateBaseValueRequest,
+  UpdateBaseValueResponse,
+  headersSchema,
+  BaseValue,
+  CharacterSheet,
+  InitialNew,
+} from "shared";
 import {
   Request,
   parseBody,
@@ -8,8 +18,9 @@ import {
   decodeUserId,
   HttpError,
   ensureHttpError,
-  validateUUID,
   updateBaseValue,
+  isZodError,
+  logZodError,
 } from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -21,36 +32,22 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const initialNewSchema = z.object({
-  initialValue: z.number().int(),
-  newValue: z.number().int(),
-});
-
-const bodySchema = z
-  .object({
-    start: initialNewSchema.strict().optional(),
-    byLvlUp: initialNewSchema.strict().optional(),
-    mod: initialNewSchema.strict().optional(),
-  })
-  .strict();
-
 interface Parameters {
   userId: string;
-  characterId: string;
-  baseValueName: string;
-  body: z.infer<typeof bodySchema>;
+  pathParams: UpdateBaseValuePathParams;
+  body: UpdateBaseValueRequest;
 }
 
 export async function _updateBaseValue(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
 
-    console.log(`Update character ${params.characterId} of user ${params.userId}`);
-    console.log(`Update base value '${params.baseValueName}'`);
+    console.log(`Update character ${params.pathParams["character-id"]} of user ${params.userId}`);
+    console.log(`Update base value '${params.pathParams["base-value-name"]}'`);
 
-    const character = await getCharacterItem(params.userId, params.characterId);
+    const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
     const characterSheet = character.characterSheet;
-    const baseValueOld = getBaseValue(characterSheet.baseValues, params.baseValueName);
+    const baseValueOld = getBaseValue(characterSheet.baseValues, params.pathParams["base-value-name"]);
     let baseValue = structuredClone(baseValueOld);
 
     if (params.body.start) {
@@ -58,25 +55,33 @@ export async function _updateBaseValue(request: Request): Promise<APIGatewayProx
     }
 
     if (params.body.byLvlUp) {
-      baseValue = updateByLvlUpValue(params.baseValueName, baseValue, params.body.byLvlUp);
+      baseValue = updateByLvlUpValue(params.pathParams["base-value-name"], baseValue, params.body.byLvlUp);
     }
 
     if (params.body.mod) {
       baseValue = updateModValue(baseValue, params.body.mod);
     }
 
-    await updateBaseValue(params.userId, params.characterId, params.baseValueName, baseValue);
+    await updateBaseValue(
+      params.userId,
+      params.pathParams["character-id"],
+      params.pathParams["base-value-name"],
+      baseValue,
+    );
 
+    const responseBody: UpdateBaseValueResponse = {
+      characterId: params.pathParams["character-id"],
+      userId: params.userId,
+      baseValueName: params.pathParams["base-value-name"],
+      baseValue: {
+        old: baseValueOld,
+        new: baseValue,
+      },
+    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        characterId: params.characterId,
-        userId: params.userId,
-        baseValueName: params.baseValueName,
-        baseValue: {
-          old: baseValueOld,
-          new: baseValue,
-        },
+      body: JSON.stringify(responseBody, (key, value) => {
+        return typeof value === "bigint" ? value.toString() : value;
       }),
     };
     console.log(response);
@@ -90,27 +95,14 @@ function validateRequest(request: Request): Parameters {
   try {
     console.log("Validate request");
 
-    const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
-
-    const characterId = request.pathParameters?.["character-id"];
-    const baseValueName = request.pathParameters?.["base-value-name"];
-    if (typeof characterId !== "string" || typeof baseValueName !== "string") {
-      throw new HttpError(400, "Invalid input values!");
-    }
-
-    validateUUID(characterId);
-
-    const body = bodySchema.parse(request.body);
-
     return {
-      userId: userId,
-      characterId: characterId,
-      baseValueName: baseValueName,
-      body: body,
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      pathParams: updateBaseValuePathParamsSchema.parse(request.pathParameters),
+      body: updateBaseValueRequestSchema.parse(request.body),
     };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
+    if (isZodError(error)) {
+      logZodError(error);
       throw new HttpError(400, "Invalid input values!");
     }
 
@@ -119,7 +111,7 @@ function validateRequest(request: Request): Parameters {
   }
 }
 
-function updateStartValue(baseValue: BaseValue, startValue: z.infer<typeof initialNewSchema>): BaseValue {
+function updateStartValue(baseValue: BaseValue, startValue: InitialNew): BaseValue {
   console.log(`Update start value of the base value from ${startValue.initialValue} to ${startValue.newValue}`);
 
   if (startValue.initialValue !== baseValue.start && startValue.newValue !== baseValue.start) {
@@ -141,7 +133,7 @@ function updateStartValue(baseValue: BaseValue, startValue: z.infer<typeof initi
 function updateByLvlUpValue(
   baseValueName: keyof CharacterSheet["baseValues"] | string,
   baseValue: BaseValue,
-  byLvlUp: z.infer<typeof initialNewSchema>,
+  byLvlUp: InitialNew,
 ): BaseValue {
   console.log(`Update byLvlUp value of the base value from ${byLvlUp.initialValue} to ${byLvlUp.newValue}`);
 
@@ -169,7 +161,7 @@ function updateByLvlUpValue(
   }
 }
 
-function updateModValue(baseValue: BaseValue, modValue: z.infer<typeof initialNewSchema>): BaseValue {
+function updateModValue(baseValue: BaseValue, modValue: InitialNew): BaseValue {
   console.log(`Update mod value of the base value from ${modValue.initialValue} to ${modValue.newValue}`);
 
   if (modValue.initialValue !== baseValue.mod && modValue.newValue !== baseValue.mod) {
