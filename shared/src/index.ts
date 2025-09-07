@@ -71,3 +71,9 @@ export {
   getCharactersResponseSchema,
   GetCharactersResponse,
 } from "./get-characters.js";
+export {
+  deleteCharacterPathParamsSchema,
+  DeleteCharacterPathParams,
+  deleteCharacterResponseSchema,
+  DeleteCharacterResponse,
+} from "./delete-character.js";
