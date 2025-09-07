@@ -4,6 +4,11 @@
   "main": "index.mjs",
   "type": "module",
   "dependencies": {
-    "@aws-sdk/util-dynamodb": "^3.787.0"
+    "@aws-sdk/util-dynamodb": "^3.787.0",
+    "config": "*",
+    "utils": "*"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.0"
   }
 }

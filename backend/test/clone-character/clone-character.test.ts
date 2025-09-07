@@ -7,7 +7,7 @@ import {
   mockDynamoDBQueryHistoryResponse,
 } from "../test-data/response.js";
 import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
-import { cloneCharacter } from "clone-character/index.js";
+import { cloneCharacter } from "clone-character";
 import { expectHttpError } from "../utils.js";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 

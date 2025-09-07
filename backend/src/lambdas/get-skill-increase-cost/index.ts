@@ -1,14 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { adjustCostCategory, Character, getSkillIncreaseCost, getSkill, parseLearningMethod } from "config/index.js";
-import {
-  Request,
-  parseBody,
-  getCharacterItem,
-  decodeUserId,
-  HttpError,
-  ensureHttpError,
-  validateUUID,
-} from "utils/index.js";
+import { adjustCostCategory, Character, getSkillIncreaseCost, getSkill, parseLearningMethod } from "config";
+import { Request, parseBody, getCharacterItem, decodeUserId, HttpError, ensureHttpError, validateUUID } from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getSkillCost({

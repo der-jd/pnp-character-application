@@ -3,7 +3,7 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { _updateLevel } from "update-level/index.js";
+import { _updateLevel } from "update-level";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {

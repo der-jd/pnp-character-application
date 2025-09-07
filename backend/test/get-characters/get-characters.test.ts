@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterListResponse, mockDynamoDBQueryCharactersResponse } from "../test-data/response.js";
-import { getCharacters } from "get-characters/index.js";
-import { Character } from "config/index.js";
+import { getCharacters } from "get-characters";
+import { Character } from "config";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {

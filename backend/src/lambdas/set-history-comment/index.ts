@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
-import { HistoryBlock, MAX_STRING_LENGTH_VERY_LONG } from "config/index.js";
+import { HistoryBlock, MAX_STRING_LENGTH_VERY_LONG } from "config";
 import {
   getHistoryItems,
   Request,
@@ -10,7 +10,7 @@ import {
   validateUUID,
   getHistoryItem,
   setRecordComment,
-} from "utils/index.js";
+} from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return setHistoryComment({

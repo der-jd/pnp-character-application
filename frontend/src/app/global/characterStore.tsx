@@ -126,7 +126,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       set(() => ({
         availableCharacters: [...characters.characters],
       }));
-    } catch (error) {
+    } catch {
       console.log(`[Character store] Error while fetching available characters!`);
     }
   },
@@ -144,7 +144,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       set(() => ({
         characterSheet: { ...character.characterSheet },
       }));
-    } catch (error) {
+    } catch {
       console.log(`[Character store] Error while fetching character data for ${charId}!`);
     }
   },

@@ -13,7 +13,8 @@ variable "environment_vars" {
   type = map(string)
 }
 variable "layers" {
-  type = list(string)
+  type    = list(string)
+  default = []
 }
 variable "role_arn" {
   type = string

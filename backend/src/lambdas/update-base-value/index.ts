@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
-import { CharacterSheet, BaseValue, baseValuesNotUpdatableByLvlUp, getBaseValue } from "config/index.js";
+import { CharacterSheet, BaseValue, baseValuesNotUpdatableByLvlUp, getBaseValue } from "config";
 import {
   Request,
   parseBody,
@@ -10,7 +10,7 @@ import {
   ensureHttpError,
   validateUUID,
   updateBaseValue,
-} from "utils/index.js";
+} from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _updateBaseValue({
