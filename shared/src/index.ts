@@ -81,6 +81,14 @@ export {
   AddHistoryRecordResponse,
 } from "./add-history-record.js";
 export {
+  addSpecialAbilityPathParamsSchema,
+  AddSpecialAbilityPathParams,
+  addSpecialAbilityRequestSchema,
+  AddSpecialAbilityRequest,
+  addSpecialAbilityResponseSchema,
+  AddSpecialAbilityResponse,
+} from "./add-special-ability.js";
+export {
   getCharacterPathParamsSchema,
   GetCharacterPathParams,
   getCharacterResponseSchema,

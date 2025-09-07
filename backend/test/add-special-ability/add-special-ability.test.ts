@@ -5,7 +5,7 @@ import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test
 import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { _addSpecialAbility } from "add-special-ability";
 import { expectHttpError } from "../utils.js";
-import { MAX_STRING_LENGTH_DEFAULT } from "config";
+import { MAX_STRING_LENGTH_DEFAULT } from "shared";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [
