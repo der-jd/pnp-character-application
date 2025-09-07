@@ -16,7 +16,7 @@ import {
   calculationPointsChangeSchema,
   stringSetSchema,
   stringArraySchema,
-} from "config/index.js";
+} from "config";
 import {
   getHistoryItems,
   createHistoryItem,
@@ -26,7 +26,7 @@ import {
   HttpError,
   ensureHttpError,
   validateUUID,
-} from "utils/index.js";
+} from "utils";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
 

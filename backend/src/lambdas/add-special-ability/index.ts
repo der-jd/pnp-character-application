@@ -9,8 +9,8 @@ import {
   ensureHttpError,
   validateUUID,
   setSpecialAbilities,
-} from "utils/index.js";
-import { MAX_STRING_LENGTH_DEFAULT } from "config/index.js";
+} from "utils";
+import { MAX_STRING_LENGTH_DEFAULT } from "config";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _addSpecialAbility({

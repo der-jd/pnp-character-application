@@ -9,7 +9,7 @@ import {
   updateLevel,
   logZodError,
   isZodError,
-} from "utils/index.js";
+} from "utils";
 import { headersSchema, updateLevelRequestSchema, updateLevelPathParamsSchema, UpdateLevelResponse } from "shared";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {

@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
-import { Request, parseBody, decodeUserId, HttpError, ensureHttpError, createCharacterItem } from "utils/index.js";
+import { Request, parseBody, decodeUserId, HttpError, ensureHttpError, createCharacterItem } from "utils";
 import {
   dis_advantagesSchema,
   generalInformationSchema,
@@ -19,7 +19,7 @@ import {
   PROFESSION_SKILL_BONUS,
   HOBBY_SKILL_BONUS,
   Character,
-} from "config/index.js";
+} from "config";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _createCharacter({

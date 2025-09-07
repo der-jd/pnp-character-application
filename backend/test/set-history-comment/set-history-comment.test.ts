@@ -9,8 +9,8 @@ import {
 } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { expectHttpError } from "../utils.js";
-import { setHistoryComment } from "set-history-comment/index.js";
-import { MAX_STRING_LENGTH_VERY_LONG } from "config/index.js";
+import { setHistoryComment } from "set-history-comment";
+import { MAX_STRING_LENGTH_VERY_LONG } from "config";
 
 const lastBlock = fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1];
 const fakeRecordId = lastBlock.changes[lastBlock.changes.length - 1].id;

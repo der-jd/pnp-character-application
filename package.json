@@ -1,6 +1,16 @@
 {
   "name": "pnp-application",
   "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "scripts",
+    "shared",
+    "backend/src/config",
+    "backend/src/utils",
+    "backend/src/lambdas/*"
+  ],
   "scripts": {
     "prepare": "husky",
     "format": "prettier . --write",
@@ -8,7 +18,9 @@
     "check-format": "prettier . --check",
     "check-format:terraform": "terraform fmt -check -recursive terraform && echo \"SUCCESS: Format is correct!\"",
     "lint:terraform": "tflint --chdir=terraform && echo \"SUCCESS: No lint errors found!\"",
-    "setup-backend": "cd shared && npm ci && npm run build && cd ../backend && npm ci"
+    "lint": "npm run lint --workspaces --if-present",
+    "build": "cd shared && npm run build && cd .. && npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   },
   "devDependencies": {
     "husky": "^9.1.7",

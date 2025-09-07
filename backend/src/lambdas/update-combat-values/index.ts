@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
-import { Character, getSkill, Skill, getCombatValues, CombatValues } from "config/index.js";
+import { Character, getSkill, Skill, getCombatValues, CombatValues } from "config";
 import {
   Request,
   parseBody,
@@ -10,7 +10,7 @@ import {
   ensureHttpError,
   validateUUID,
   updateCombatValues,
-} from "utils/index.js";
+} from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _updateCombatValues({

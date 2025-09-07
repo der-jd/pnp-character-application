@@ -2,5 +2,12 @@
   "name": "get-character",
   "version": "1.0.0",
   "main": "index.mjs",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "config": "*",
+    "utils": "*"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.0"
+  }
 }

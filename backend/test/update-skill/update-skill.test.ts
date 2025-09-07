@@ -3,7 +3,7 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { Character, getCombatCategory, getCombatValues, getSkill } from "config/index.js";
+import { Character, getCombatCategory, getCombatValues, getSkill } from "config";
 import { _updateSkill, availableCombatPointsChanged } from "../../src/lambdas/update-skill/index.js";
 import { expectHttpError } from "../utils.js";
 

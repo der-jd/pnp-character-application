@@ -12,7 +12,7 @@ import {
   getHistoryItems,
   createBatchHistoryItems,
   createCharacterItem,
-} from "utils/index.js";
+} from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return cloneCharacter({

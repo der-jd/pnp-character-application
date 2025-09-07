@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { CostCategory, HistoryBlock, RecordType, Record } from "config/index.js";
+import { CostCategory, HistoryBlock, RecordType, Record } from "config";
 import { fakeCharacterId } from "./character.js";
 
 export function addFakeHistoryRecord(
