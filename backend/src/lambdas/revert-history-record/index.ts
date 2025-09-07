@@ -15,6 +15,7 @@ import {
   stringSetSchema,
   stringArraySchema,
   revertHistoryRecordPathParamsSchema,
+  RevertHistoryRecordPathParams,
   RevertHistoryRecordResponse,
   headersSchema,
 } from "shared";
@@ -50,18 +51,19 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  characterId: string;
-  recordId: string;
+  pathParams: RevertHistoryRecordPathParams;
 }
 
 export async function revertRecordFromHistory(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = await validateRequest(request);
 
-    console.log(`Delete record ${params.recordId} from history of character ${params.characterId}`);
+    console.log(
+      `Delete record ${params.pathParams["record-id"]} from history of character ${params.pathParams["character-id"]}`,
+    );
 
     const items = await getHistoryItems(
-      params.characterId,
+      params.pathParams["character-id"],
       false, // Sort descending to get highest block number (latest item) first
       1, // Only need the top result
     );
@@ -76,11 +78,11 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
     console.log("Latest history block:", { ...latestBlock, changes: ["..."] }); // Don't log changes as this can be a very long list
     const latestRecord = latestBlock.changes[latestBlock.changes.length - 1];
 
-    if (latestRecord.id !== params.recordId) {
+    if (latestRecord.id !== params.pathParams["record-id"]) {
       throw new HttpError(404, "The latest record does not match the given id");
     }
 
-    await revertChange(params.userId, params.characterId, latestRecord);
+    await revertChange(params.userId, params.pathParams["character-id"], latestRecord);
 
     if (latestBlock.changes.length === 1) {
       console.log("Deleting the complete history block as it only contains the record that should be deleted");
@@ -110,13 +112,9 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
 async function validateRequest(request: Request): Promise<Parameters> {
   try {
     console.log("Validate request");
-
-    const pathParams = revertHistoryRecordPathParamsSchema.parse(request.pathParameters);
-
     return {
       userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
-      characterId: pathParams["character-id"],
-      recordId: pathParams["record-id"],
+      pathParams: revertHistoryRecordPathParamsSchema.parse(request.pathParameters),
     };
   } catch (error) {
     if (isZodError(error)) {
