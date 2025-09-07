@@ -6,8 +6,8 @@ import {
   mockDynamoDBQueryHistoryResponse,
 } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { getHistory } from "get-history/index.js";
-import { HistoryBlock } from "config/index.js";
+import { getHistory } from "get-history";
+import { HistoryBlock } from "config";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {

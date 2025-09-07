@@ -9,8 +9,8 @@ import {
   getHistoryItems,
   deleteCharacterItem,
   deleteBatchHistoryItems,
-} from "utils/index.js";
-import { historyBlockSchema } from "config/index.js";
+} from "utils";
+import { historyBlockSchema } from "config";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return deleteCharacter({

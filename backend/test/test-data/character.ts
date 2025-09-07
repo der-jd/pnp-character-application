@@ -1,4 +1,4 @@
-import { Character, CostCategory } from "config/index.js";
+import { Character, CostCategory } from "config";
 import { fakeUserId } from "./request.js";
 
 export const fakeCharacterId = "9862f3c9-a065-4e0e-80b2-5bf085535cbe";

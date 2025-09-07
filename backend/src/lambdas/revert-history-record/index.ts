@@ -15,7 +15,7 @@ import {
   calculationPointsChangeSchema,
   stringSetSchema,
   stringArraySchema,
-} from "config/index.js";
+} from "config";
 import {
   getHistoryItems,
   deleteHistoryItem,
@@ -34,7 +34,7 @@ import {
   updateBaseValue,
   updateLevel,
   setSpecialAbilities,
-} from "utils/index.js";
+} from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return revertRecordFromHistory({

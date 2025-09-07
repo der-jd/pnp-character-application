@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { CostCategory, RecordType } from "config/index.js";
-import { addRecordToHistory, HistoryBodySchema } from "add-history-record/index.js";
+import { CostCategory, RecordType } from "config";
+import { addRecordToHistory, HistoryBodySchema } from "add-history-record";
 import { fakeUserId } from "../test-data/request.js";
 import {
   fakeHistoryBlockListResponse,

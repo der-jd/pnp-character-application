@@ -61,18 +61,10 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: |
-            cd backend
-            npm ci
-            cd ../frontend
-            npm ci
+          command: npm ci
       - run:
           name: Lint TypeScript code
-          command: |
-            cd backend
-            npm run lint
-            cd ../frontend
-            npm run lint
+          command: npm run lint
 
   build-backend:
     docker:
@@ -82,7 +74,12 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm run setup-backend
+          command: npm ci
+      - run:
+          name: Build shared package
+          command: |
+            cd shared
+            npm run build
       - run:
           name: Build backend
           command: |

@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { z } from "zod";
-import { CalculationPoints } from "config/index.js";
+import { CalculationPoints } from "config";
 import {
   Request,
   parseBody,
@@ -11,7 +11,7 @@ import {
   validateUUID,
   updateAdventurePoints,
   updateAttributePoints,
-} from "utils/index.js";
+} from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _updateCalculationPoints({

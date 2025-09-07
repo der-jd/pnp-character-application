@@ -13,7 +13,7 @@ import {
   getCombatCategory,
   CombatValues,
   getSkillActivationCost,
-} from "config/index.js";
+} from "config";
 import {
   Request,
   parseBody,
@@ -24,7 +24,7 @@ import {
   ensureHttpError,
   validateUUID,
   updateCombatValues,
-} from "utils/index.js";
+} from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _updateSkill({

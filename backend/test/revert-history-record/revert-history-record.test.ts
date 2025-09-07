@@ -16,8 +16,8 @@ import {
   specialAbilitiesChangedRecord,
 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
-import { revertRecordFromHistory } from "revert-history-record/index.js";
-import { RecordType } from "config/index.js";
+import { revertRecordFromHistory } from "revert-history-record";
+import { RecordType } from "config";
 
 const lastBlock = fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1];
 

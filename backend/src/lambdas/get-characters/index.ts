@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { Request, parseBody, getCharacterItems, ensureHttpError, HttpError, decodeUserId } from "utils/index.js";
+import { Request, parseBody, getCharacterItems, ensureHttpError, HttpError, decodeUserId } from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getCharacters({

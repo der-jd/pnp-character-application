@@ -1,14 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { HistoryBlock } from "config/index.js";
-import {
-  Request,
-  parseBody,
-  getHistoryItem,
-  getHistoryItems,
-  ensureHttpError,
-  HttpError,
-  validateUUID,
-} from "utils/index.js";
+import { HistoryBlock } from "config";
+import { Request, parseBody, getHistoryItem, getHistoryItems, ensureHttpError, HttpError, validateUUID } from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getHistory({
