@@ -11,7 +11,7 @@ const Sidebar: React.FC<SidebarProps> = ({ content }) => {
   return (
     <div className="flex-1 bg-grey-500">
       <nav className="sidebar-nav">
-        <ul>{content}</ul> {/* Render dynamic content */}
+        <ul>{content}</ul>
       </nav>
     </div>
   );

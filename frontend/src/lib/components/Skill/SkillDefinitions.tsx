@@ -162,7 +162,7 @@ function mapNodeToISkillProps(
 
 type NodeExtractor = {
   key: keyof CharacterSheet;
-  type: "Skill" | "Attribute" | "BaseValue";
+  type: "Skill" | "Attribute" | "BaseValue" | "CombatValue";
   category?: string;
 };
 
@@ -170,29 +170,38 @@ export const nodeExtractors: NodeExtractor[] = [
   { key: "skills", type: "Skill" },
   { key: "attributes", type: "Attribute", category: "Attributes" },
   { key: "baseValues", type: "BaseValue", category: "BaseValues" },
+  { key: "combatValues", type: "CombatValue" },
 ];
 
 export function extract_properties_data(characterSheet: CharacterSheet | null): ISkillProps[] {
-  if (!characterSheet) {
-    return [];
-  }
+  if (!characterSheet) return [];
 
   const result: ISkillProps[] = [];
 
   for (const extractor of nodeExtractors) {
-    const node = characterSheet[extractor.key];
-    const category = extractor.category || extractor.key;
+    const key = extractor.key;
 
-    // Check if the node has nested structures
-    if (category === "skills") {
+    // Skip baseValues and combatValues completely
+    if (key === "combatValues" || key === "baseValues") continue;
+
+    const node = characterSheet[key];
+    const category = extractor.category || key;
+
+    if (!node) continue;
+
+    if (key === "skills") {
       Object.entries(node).forEach(([subCategory, subNode]) => {
         Object.entries(subNode).forEach(([name, data]) => {
-          result.push(mapNodeToISkillProps(name, subCategory, data, extractor.type));
+          if (extractor.type === "Skill") {
+            result.push(mapNodeToISkillProps(name, subCategory, data, extractor.type));
+          }
         });
       });
-    } else {
+    } else if (key === "attributes") {
       Object.entries(node).forEach(([name, data]) => {
-        result.push(mapNodeToISkillProps(name, category, data, extractor.type));
+        if (extractor.type === "Attribute") {
+          result.push(mapNodeToISkillProps(name, category, data, extractor.type));
+        }
       });
     }
   }

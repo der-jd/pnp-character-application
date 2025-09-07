@@ -31,8 +31,10 @@ const CharacterInfoContent: React.FC = () => {
   const editMode = useCharacterStore((state) => state.editMode);
   const { lvlUp } = useSkillUpdater();
   const { show, hide } = useLoadingOverlay();
-
+  const [apInput, setApInput] = useState(0);
+  const [epInput, setEpInput] = useState(0);
   const idToken = useAuth().idToken;
+  const [modifiedTile, setModifiedTile] = useState<{ key: string; value: number } | null>(null);
 
   const loadCharacterOptions = async (idToken: string) => {
     await updateAvailableCharacters(idToken);
@@ -56,35 +58,13 @@ const CharacterInfoContent: React.FC = () => {
       }, 0);
     });
 
-  const loadLevelUpOptions = async (): Promise<LevelUpOption[]> => {
-    if (!idToken || !selectedValue) return [];
-
-    // TODO: Replace this with a real backend call
-    return [
-      { value: "hp", label: "Increase Health Points" },
-      { value: "armorLvl", label: "Improve Armor Level" },
-      { value: "ini", label: "Improve Initiative" },
-      { value: "luck", label: "Add Luckpoint" },
-      { value: "action", label: "Add Bonus Action" },
-      { value: "legend", label: "Add Legendary Action" },
-      { value: "reroll", label: "Add Reroll Action" },
-    ];
-  };
-
   const handleLvlUp = async () => {
     show();
     const currentLevel = characterSheet?.generalInformation.level ?? 0;
     await lvlUp(currentLevel);
+    handleBenefitChange(null); // TODO implement benefit change
     hide();
   };
-
-  const promiseLevelUpOptions = () =>
-    new Promise<LevelUpOption[]>((resolve) => {
-      setTimeout(async () => {
-        const options = await loadLevelUpOptions();
-        resolve(options);
-      }, 0);
-    });
 
   const handleChange = (value: CharacterOptions | null) => {
     if (value) {
@@ -94,9 +74,7 @@ const CharacterInfoContent: React.FC = () => {
   };
 
   const handleBenefitChange = (option: LevelUpOption | null) => {
-    if (option) {
-      //setSelectedBenefit(option.Werner1234W!
-    }
+    return option;
   };
 
   const loadCharacter = async () => {
@@ -105,9 +83,13 @@ const CharacterInfoContent: React.FC = () => {
     }
   };
 
+  const updateCharacterPoints = (type: "adventurePoints" | "attributePoints", amount: number) => {
+    console.log(`Updating ${type} by ${amount}`);
+  };
+
   return (
-    <div className="flex flex-col gap-4 p-4 bg-grey-500 h-full">
-      <div className="font-bold bg-black text-white p-4 rounded sticky top-0">
+    <div className="flex flex-col gap-4 p-4 bg-gray-100 h-full overflow-y-auto">
+      <div className="font-bold bg-black text-white p-4 rounded sticky top-0 z-10">
         <h2>Current Character State</h2>
       </div>
 
@@ -130,78 +112,135 @@ const CharacterInfoContent: React.FC = () => {
             Load Character
           </Button>
         </div>
-
         {editMode && (
-          <div className="flex gap-2 items-center">
-            <AsyncSelect
-              cacheOptions
-              defaultOptions
-              loadOptions={promiseLevelUpOptions}
-              onChange={handleBenefitChange}
-              placeholder="Choose Level-Up Benefit"
-              className="w-full"
-            />
-            <Button onClick={handleLvlUp} className="w-1/2">
-              Level up
-            </Button>
-          </div>
-        )}
-        {characterSheet?.generalInformation?.name && (
-          <div className="flex flex-col text-black bg-white p-4 rounded-lg">
-            <div className="text-md font-semibold space-y-1">
-              <div className="text-md font-semibold space-y-1 ml-auto">
-                <div className="grid grid-cols-[150px_1fr] gap-2">
-                  <span>
-                    <strong>Name:</strong>
-                  </span>
-                  <span>{characterSheet.generalInformation.name}</span>
+          <>
+            <div className="border rounded-lg p-4 bg-white shadow flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  {
+                    label: "Legendary Actions",
+                    key: "legendaryActions",
+                    value: characterSheet?.baseValues.legendaryActions.current ?? 0,
+                  },
+                  {
+                    label: "Bonus Actions",
+                    key: "bonusActionsPerCombatRound",
+                    value: characterSheet?.baseValues.bonusActionsPerCombatRound.current ?? 0,
+                  },
+                  {
+                    label: "Health Points",
+                    key: "healthPoints",
+                    value: characterSheet?.baseValues.healthPoints.current ?? 0,
+                  },
+                  {
+                    label: "Initiative",
+                    key: "initiativeBaseValue",
+                    value: characterSheet?.baseValues.initiativeBaseValue.current ?? 0,
+                  },
+                  {
+                    label: "Armor Level",
+                    key: "armorLevel",
+                    value: characterSheet?.baseValues.armorLevel.current ?? 0,
+                  },
+                  {
+                    label: "Luck Points",
+                    key: "luckPoints",
+                    value: characterSheet?.baseValues.luckPoints.current ?? 0,
+                  },
+                ].map(({ label, key, value }) => {
+                  const currentValue = modifiedTile?.key === key ? modifiedTile.value : value;
+                  const locked = !!modifiedTile && modifiedTile.key !== key;
 
-                  <span>
-                    <strong>Level:</strong>
-                  </span>
-                  <span>{characterSheet.generalInformation.level}</span>
-
-                  <span>
-                    <strong>Owner:</strong>
-                  </span>
-                  <span>Philipp</span>
-
-                  <span>
-                    <strong>Editable:</strong>
-                  </span>
-                  <span>Yes</span>
-                </div>
+                  return (
+                    <div
+                      key={key}
+                      className="border rounded-lg p-3 bg-gray-100 shadow flex flex-col items-center justify-center text-center"
+                    >
+                      <span className="font-semibold text-sm">{label}</span>
+                      <span className="text-lg font-bold">
+                        {modifiedTile?.key === key ? `${value} → ${modifiedTile.value}` : value}
+                      </span>
+                      <div className="flex gap-2 mt-2">
+                        <Button
+                          disabled={locked}
+                          className="bg-black text-white text-xs"
+                          size="sm"
+                          onClick={() => setModifiedTile({ key, value: currentValue + 1 })}
+                        >
+                          +1
+                        </Button>
+                        <Button
+                          disabled={locked}
+                          className="bg-black text-white text-xs"
+                          size="sm"
+                          onClick={() => {
+                            const newValue = currentValue - 1;
+                            if (newValue === value) {
+                              setModifiedTile(null);
+                            } else {
+                              setModifiedTile({ key, value: newValue });
+                            }
+                          }}
+                        >
+                          -1
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
-              <div className="pt-4 grid gap-2">
-                {[
-                  { label: "Legendary Actions", value: characterSheet.baseValues.legendaryActions.current },
-                  { label: "Bonus Actions", value: characterSheet.baseValues.bonusActionsPerCombatRound.current },
-                  { label: "Health Points", value: characterSheet.baseValues.healthPoints.current },
-                  { label: "Mental Health", value: characterSheet.baseValues.mentalHealth.current },
-                  { label: "AP", value: characterSheet.calculationPoints.adventurePoints.available },
-                  { label: "EP", value: characterSheet.calculationPoints.attributePoints.available },
-                ].map(({ label, value }) => (
-                  <div key={label} className="grid grid-cols-[150px_60px_repeat(4,40px)] items-center gap-2">
-                    <span>{label}:</span>
-                    <span className="text-right">{value}</span>
-                    <Button className="bg-black text-white" size="sm">
-                      +1
-                    </Button>
-                    <Button className="bg-black text-white" size="sm">
-                      +10
-                    </Button>
-                    <Button className="bg-black text-white" size="sm">
-                      -1
-                    </Button>
-                    <Button className="bg-black text-white" size="sm">
-                      -10
-                    </Button>
-                  </div>
-                ))}
+              <Button className="bg-black text-white font-bold py-2 mt-4 w-full" onClick={handleLvlUp}>
+                Level Up
+              </Button>
+            </div>
+
+            <div className="pt-4 grid grid-rows-2 gap-4">
+              <div className="border rounded-lg p-4 flex flex-col items-center bg-white shadow">
+                <Button
+                  className="bg-black text-white w-full mb-3"
+                  onClick={() => {
+                    if (apInput > 0) {
+                      updateCharacterPoints("adventurePoints", apInput);
+                      setApInput(0);
+                    }
+                  }}
+                >
+                  Increase AP
+                </Button>
+                <input
+                  type="number"
+                  min={0}
+                  className="border rounded px-2 py-1 w-full text-center"
+                  value={apInput}
+                  onChange={(e) => setApInput(Number(e.target.value))}
+                  placeholder="Enter AP"
+                />
+              </div>
+
+              <div className="border rounded-lg p-4 flex flex-col items-center bg-white shadow">
+                <Button
+                  className="bg-black text-white w-full mb-3"
+                  onClick={() => {
+                    if (epInput > 0) {
+                      updateCharacterPoints("attributePoints", epInput);
+                      setEpInput(0);
+                    }
+                  }}
+                >
+                  Increase EP
+                </Button>
+                <input
+                  type="number"
+                  min={0}
+                  className="border rounded px-2 py-1 w-full text-center"
+                  value={epInput}
+                  onChange={(e) => setEpInput(Number(e.target.value))}
+                  placeholder="Enter EP"
+                />
               </div>
             </div>
-          </div>
+          </>
         )}
       </nav>
     </div>

@@ -26,15 +26,14 @@ const SkillHistoryContent: React.FC = () => {
   };
 
   return (
-    <div className="p-4 bg-grey-300 shadow-md rounded-lg">
-      <div className="p-4">
-        <div className="mt-4 font-semibold">
-          AdventurePoints: {characterSheet?.calculationPoints?.adventurePoints.available ?? "N/A"} Attribute Points:{" "}
+    <div className="p-4 bg-grey-300 shadow-md rounded-lg h-full flex flex-col">
+      {/* Sticky header */}
+      <div className="sticky top-0 bg-grey-300 p-4 z-10 shadow-md">
+        <div className="font-semibold mb-2">
+          Adventure Points: {characterSheet?.calculationPoints?.adventurePoints.available ?? "N/A"} | Attribute Points:{" "}
           {characterSheet?.calculationPoints?.attributePoints.available ?? "N/A"}
         </div>
-      </div>
 
-      <div className="p-4">
         <div className="flex gap-4">
           <Button onClick={revert} className="bg-black text-white hover:bg-gray-300 hover:text-black px-4 py-2">
             Revert
@@ -43,8 +42,11 @@ const SkillHistoryContent: React.FC = () => {
             Revert all
           </Button>
         </div>
-        <h4 className="mt-4 font-semibold">Changes</h4>
+      </div>
 
+      {/* Scrollable content with padding to avoid overlap */}
+      <div className="flex-1 overflow-y-auto pt-4">
+        <h4 className="font-semibold mb-2">Changes</h4>
         <div className="flex flex-col gap-4 mt-2">
           {historyEntries?.map((entry: RecordEntry) => {
             const oldObj = entry.data.old;
