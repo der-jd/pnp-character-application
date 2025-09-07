@@ -106,3 +106,11 @@ export {
   updateBaseValueResponseSchema,
   UpdateBaseValueResponse,
 } from "./update-base-value.js";
+export {
+  updateCalculationPointsPathParamsSchema,
+  UpdateCalculationPointsPathParams,
+  updateCalculationPointsRequestSchema,
+  UpdateCalculationPointsRequest,
+  updateCalculationPointsResponseSchema,
+  UpdateCalculationPointsResponse,
+} from "./update-calculation-points.js";
