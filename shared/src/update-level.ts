@@ -19,7 +19,7 @@ export type UpdateLevelRequest = z.infer<typeof updateLevelRequestSchema>;
 export const updateLevelResponseSchema = z
   .object({
     characterId: z.string().uuid(),
-    userId: z.string().uuid(),
+    userId: z.string(),
     level: z
       .object({
         old: z.object({ value: z.number().int() }).strict(),
