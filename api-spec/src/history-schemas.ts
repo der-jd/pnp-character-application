@@ -55,7 +55,7 @@ export const recordSchema = z
       })
       .strict(),
     comment: z.string().max(MAX_STRING_LENGTH_VERY_LONG).nullable(),
-    timestamp: z.string().datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2023-03-15T16:00:00Z (UTC) or 2023-03-15T16:00:00-07:00 (PDT)
+    timestamp: z.iso.datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2023-03-15T16:00:00Z (UTC) or 2023-03-15T16:00:00-07:00 (PDT)
   })
   .strict();
 
