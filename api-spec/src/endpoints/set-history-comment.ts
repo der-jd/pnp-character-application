@@ -22,6 +22,7 @@ export const setHistoryCommentQueryParamsSchema = z
       .optional(),
   })
   .strict()
+  .nullable()
   .optional();
 
 export type SetHistoryCommentQueryParams = z.infer<typeof setHistoryCommentQueryParamsSchema>;
