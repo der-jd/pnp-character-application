@@ -3,7 +3,7 @@ import { historyBlockSchema } from "../history-schemas.js";
 
 export const getHistoryPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
   })
   .strict();
 
@@ -25,7 +25,7 @@ export type GetHistoryQueryParams = z.infer<typeof getHistoryQueryParamsSchema>;
 export const getHistoryResponseSchema = z
   .object({
     previousBlockNumber: z.number().int().positive().nullable(),
-    previousBlockId: z.string().uuid().nullable(),
+    previousBlockId: z.uuid().nullable(),
     items: z.array(historyBlockSchema),
   })
   .strict();

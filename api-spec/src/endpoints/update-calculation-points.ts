@@ -4,7 +4,7 @@ import { calculationPointsSchema } from "../character-schemas.js";
 
 export const updateCalculationPointsPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
   })
   .strict();
 
@@ -33,7 +33,7 @@ export type UpdateCalculationPointsRequest = z.infer<typeof updateCalculationPoi
 
 export const updateCalculationPointsResponseSchema = z
   .object({
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
     userId: userIdSchema,
     calculationPoints: z
       .object({

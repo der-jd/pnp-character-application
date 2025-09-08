@@ -4,7 +4,7 @@ import { combatValuesSchema } from "../character-schemas.js";
 
 export const updateCombatValuesPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
     "combat-category": z.string(),
     "combat-skill-name": z.string(),
   })
@@ -23,7 +23,7 @@ export type UpdateCombatValuesRequest = z.infer<typeof updateCombatValuesRequest
 
 export const updateCombatValuesResponseSchema = z
   .object({
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
     userId: userIdSchema,
     combatCategory: z.string(),
     combatSkillName: z.string(),

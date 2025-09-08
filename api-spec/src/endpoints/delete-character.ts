@@ -3,7 +3,7 @@ import { userIdSchema } from "../general-schemas.js";
 
 export const deleteCharacterPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
   })
   .strict();
 
@@ -12,7 +12,7 @@ export type DeleteCharacterPathParams = z.infer<typeof deleteCharacterPathParams
 export const deleteCharacterResponseSchema = z
   .object({
     userId: userIdSchema,
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
   })
   .strict();
 

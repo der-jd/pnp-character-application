@@ -3,8 +3,8 @@ import { MAX_STRING_LENGTH_VERY_LONG } from "../character-schemas.js";
 
 export const setHistoryCommentPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
-    "record-id": z.string().uuid(),
+    "character-id": z.uuid(),
+    "record-id": z.uuid(),
   })
   .strict();
 
@@ -34,9 +34,9 @@ export type SetHistoryCommentRequest = z.infer<typeof setHistoryCommentRequestSc
 
 export const setHistoryCommentResponseSchema = z
   .object({
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
     blockNumber: z.number().int().positive(),
-    recordId: z.string().uuid(),
+    recordId: z.uuid(),
     comment: z.string(),
   })
   .strict();

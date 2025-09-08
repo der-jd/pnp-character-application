@@ -4,7 +4,7 @@ import { userIdSchema } from "../general-schemas.js";
 
 export const cloneCharacterPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
   })
   .strict();
 
@@ -12,7 +12,7 @@ export type CloneCharacterPathParams = z.infer<typeof cloneCharacterPathParamsSc
 
 export const cloneCharacterRequestSchema = z
   .object({
-    userIdOfCharacter: z.string().uuid(),
+    userIdOfCharacter: z.uuid(),
   })
   .strict();
 
@@ -21,7 +21,7 @@ export type CloneCharacterRequest = z.infer<typeof cloneCharacterRequestSchema>;
 export const cloneCharacterResponseSchema = z
   .object({
     userId: userIdSchema,
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
     name: z.string(),
     level: levelSchema,
   })

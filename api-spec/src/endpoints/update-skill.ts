@@ -9,7 +9,7 @@ import {
 
 export const updateSkillPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
     "skill-category": z.string(),
     "skill-name": z.string(),
   })
@@ -31,7 +31,7 @@ export type UpdateSkillRequest = z.infer<typeof updateSkillRequestSchema>;
 
 export const updateSkillResponseSchema = z
   .object({
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
     userId: userIdSchema,
     skillCategory: z.string(),
     skillName: z.string(),

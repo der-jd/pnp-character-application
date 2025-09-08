@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const getSkillIncreaseCostPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
     "skill-category": z.string(),
     "skill-name": z.string(),
   })
@@ -20,7 +20,7 @@ export type GetSkillIncreaseCostQueryParams = z.infer<typeof getSkillIncreaseCos
 
 export const getSkillIncreaseCostResponseSchema = z
   .object({
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
     skillName: z.string(),
     increaseCost: z.number(),
   })

@@ -4,7 +4,7 @@ import { initialNewSchema, userIdSchema } from "../general-schemas.js";
 
 export const updateBaseValuePathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
     "base-value-name": z.string(),
   })
   .strict();
@@ -23,7 +23,7 @@ export type UpdateBaseValueRequest = z.infer<typeof updateBaseValueRequestSchema
 
 export const updateBaseValueResponseSchema = z
   .object({
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
     userId: userIdSchema,
     baseValueName: z.string(),
     baseValue: z

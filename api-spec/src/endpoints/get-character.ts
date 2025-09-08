@@ -3,7 +3,7 @@ import { characterSchema } from "../character-schemas.js";
 
 export const getCharacterPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
   })
   .strict();
 

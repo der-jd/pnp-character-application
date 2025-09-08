@@ -318,7 +318,7 @@ export type CharacterSheet = z.infer<typeof characterSheetSchema>;
 export const characterSchema = z
   .object({
     userId: userIdSchema,
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
     characterSheet: characterSheetSchema,
   })
   .strict();

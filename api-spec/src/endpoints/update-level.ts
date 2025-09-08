@@ -4,7 +4,7 @@ import { userIdSchema } from "../general-schemas.js";
 
 export const updateLevelPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
   })
   .strict();
 
@@ -20,7 +20,7 @@ export type UpdateLevelRequest = z.infer<typeof updateLevelRequestSchema>;
 
 export const updateLevelResponseSchema = z
   .object({
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
     userId: userIdSchema,
     level: z
       .object({

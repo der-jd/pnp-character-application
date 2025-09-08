@@ -4,7 +4,7 @@ import { initialIncreasedSchema, initialNewSchema, userIdSchema } from "../gener
 
 export const updateAttributePathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
     "attribute-name": z.string(),
   })
   .strict();
@@ -23,7 +23,7 @@ export type UpdateAttributeRequest = z.infer<typeof updateAttributeRequestSchema
 
 export const updateAttributeResponseSchema = z
   .object({
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
     userId: userIdSchema,
     attributeName: z.string(),
     changes: z

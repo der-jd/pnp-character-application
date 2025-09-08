@@ -16,7 +16,7 @@ export type GetCharactersQueryParams = z.infer<typeof getCharactersQueryParamsSc
 export const characterShortSchema = z
   .object({
     userId: userIdSchema,
-    characterId: z.string().uuid(),
+    characterId: z.uuid(),
     name: z.string(),
     level: z.number().int().min(START_LEVEL),
   })

@@ -3,8 +3,8 @@ import { recordSchema } from "../history-schemas.js";
 
 export const revertHistoryRecordPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
-    "record-id": z.string().uuid(),
+    "character-id": z.uuid(),
+    "record-id": z.uuid(),
   })
   .strict();
 

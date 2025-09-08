@@ -5,7 +5,7 @@ import { userIdSchema } from "../general-schemas.js";
 
 export const addHistoryRecordPathParamsSchema = z
   .object({
-    "character-id": z.string().uuid(),
+    "character-id": z.uuid(),
   })
   .strict();
 
