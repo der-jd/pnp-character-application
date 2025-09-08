@@ -1,10 +1,6 @@
 export { headersSchema, Headers } from "./headers.js";
 export {
   START_LEVEL,
-  MAX_STRING_LENGTH_SHORT,
-  MAX_STRING_LENGTH_DEFAULT,
-  MAX_STRING_LENGTH_LONG,
-  MAX_STRING_LENGTH_VERY_LONG,
   levelSchema,
   professionHobbySchema,
   generalInformationSchema,
@@ -51,7 +47,16 @@ export {
   calculationPointsChangeSchema,
   skillChangeSchema,
 } from "./history-schemas.js";
-export { initialNewSchema, InitialNew, initialIncreasedSchema, InitialIncreased } from "./general-schemas.js";
+export {
+  initialNewSchema,
+  InitialNew,
+  initialIncreasedSchema,
+  InitialIncreased,
+  MAX_STRING_LENGTH_SHORT,
+  MAX_STRING_LENGTH_DEFAULT,
+  MAX_STRING_LENGTH_LONG,
+  MAX_STRING_LENGTH_VERY_LONG,
+} from "./general-schemas.js";
 export {
   revertHistoryRecordPathParamsSchema,
   RevertHistoryRecordPathParams,

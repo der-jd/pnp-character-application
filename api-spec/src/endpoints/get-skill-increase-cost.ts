@@ -1,10 +1,12 @@
 import { z } from "zod";
+import { MAX_STRING_LENGTH_DEFAULT } from "../general-schemas.js";
+import { learningMethodSchema } from "../character-schemas.js";
 
 export const getSkillIncreaseCostPathParamsSchema = z
   .object({
     "character-id": z.uuid(),
-    "skill-category": z.string(),
-    "skill-name": z.string(),
+    "skill-category": z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    "skill-name": z.string().max(MAX_STRING_LENGTH_DEFAULT),
   })
   .strict();
 
@@ -12,7 +14,7 @@ export type GetSkillIncreaseCostPathParams = z.infer<typeof getSkillIncreaseCost
 
 export const getSkillIncreaseCostQueryParamsSchema = z
   .object({
-    "learning-method": z.string(),
+    "learning-method": learningMethodSchema,
   })
   .strict();
 
@@ -21,7 +23,7 @@ export type GetSkillIncreaseCostQueryParams = z.infer<typeof getSkillIncreaseCos
 export const getSkillIncreaseCostResponseSchema = z
   .object({
     characterId: z.uuid(),
-    skillName: z.string(),
+    skillName: z.string().max(MAX_STRING_LENGTH_DEFAULT),
     increaseCost: z.number(),
   })
   .strict();

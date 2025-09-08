@@ -4,9 +4,10 @@ import {
   calculationPointsSchema,
   characterSheetSchema,
   combatValuesSchema,
-  MAX_STRING_LENGTH_VERY_LONG,
+  learningMethodSchema,
   skillSchema,
 } from "./character-schemas.js";
+import { MAX_STRING_LENGTH_DEFAULT, MAX_STRING_LENGTH_LONG, MAX_STRING_LENGTH_VERY_LONG } from "./general-schemas.js";
 
 export enum RecordType {
   CHARACTER_CREATED = 0,
@@ -25,17 +26,17 @@ export function parseRecordType(method: string): RecordType {
 
 export const recordSchema = z
   .object({
-    type: z.nativeEnum(RecordType),
-    name: z.string(),
+    type: z.enum(RecordType),
+    name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
     number: z.number().int().positive(),
     id: z.uuid(),
     data: z
       .object({
-        old: z.record(z.string(), z.unknown()),
-        new: z.record(z.string(), z.unknown()),
+        old: z.record(z.string().max(MAX_STRING_LENGTH_DEFAULT), z.unknown()),
+        new: z.record(z.string().max(MAX_STRING_LENGTH_DEFAULT), z.unknown()),
       })
       .strict(),
-    learningMethod: z.string().nullable(),
+    learningMethod: learningMethodSchema.nullable(),
     calculationPoints: z
       .object({
         adventurePoints: z
@@ -81,13 +82,13 @@ export const integerSchema = z
 
 export const stringArraySchema = z
   .object({
-    values: z.array(z.string()),
+    values: z.array(z.string().max(MAX_STRING_LENGTH_LONG)),
   })
   .strict();
 
 export const stringSetSchema = z
   .object({
-    values: z.set(z.string()),
+    values: z.set(z.string().max(MAX_STRING_LENGTH_LONG)),
   })
   .strict();
 

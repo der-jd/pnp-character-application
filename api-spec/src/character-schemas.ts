@@ -1,11 +1,13 @@
 import { z } from "zod";
-import { userIdSchema } from "./general-schemas.js";
+import {
+  MAX_STRING_LENGTH_DEFAULT,
+  MAX_STRING_LENGTH_LONG,
+  MAX_STRING_LENGTH_SHORT,
+  MAX_STRING_LENGTH_VERY_LONG,
+  userIdSchema,
+} from "./general-schemas.js";
 
 export const START_LEVEL = 1;
-export const MAX_STRING_LENGTH_SHORT = 30;
-export const MAX_STRING_LENGTH_DEFAULT = 120;
-export const MAX_STRING_LENGTH_LONG = 500;
-export const MAX_STRING_LENGTH_VERY_LONG = 1000;
 
 export const professionHobbySchema = z
   .object({
@@ -22,9 +24,11 @@ export const levelSchema = z.number().int().min(START_LEVEL);
 
 export type Level = z.infer<typeof levelSchema>;
 
+export const characterNameSchema = z.string().max(MAX_STRING_LENGTH_DEFAULT);
+
 export const generalInformationSchema = z
   .object({
-    name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    name: characterNameSchema,
     level: levelSchema,
     sex: z.string().max(MAX_STRING_LENGTH_SHORT),
     profession: professionHobbySchema,
@@ -153,7 +157,7 @@ export const skillSchema = z
     current: z.number().int(),
     mod: z.number().int(),
     totalCost: z.number(),
-    defaultCostCategory: z.nativeEnum(CostCategory),
+    defaultCostCategory: z.enum(CostCategory),
   })
   .strict();
 
@@ -181,6 +185,8 @@ export const combatSkillsSchema = z
 
 export type CombatSkills = z.infer<typeof combatSkillsSchema>;
 
+export const specialAbilitySchema = z.string().max(MAX_STRING_LENGTH_DEFAULT);
+
 export const characterSheetSchema = z
   .object({
     generalInformation: generalInformationSchema,
@@ -192,7 +198,7 @@ export const characterSheetSchema = z
       .strict(),
     advantages: dis_advantagesSchema,
     disadvantages: dis_advantagesSchema,
-    specialAbilities: z.set(z.string().max(MAX_STRING_LENGTH_DEFAULT)),
+    specialAbilities: z.set(specialAbilitySchema),
     baseValues: baseValuesSchema,
     attributes: attributesSchema,
     skills: z

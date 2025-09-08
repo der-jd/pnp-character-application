@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export const MAX_STRING_LENGTH_SHORT = 30;
+export const MAX_STRING_LENGTH_DEFAULT = 120;
+export const MAX_STRING_LENGTH_LONG = 500;
+export const MAX_STRING_LENGTH_VERY_LONG = 1000;
+
 export const initialNewSchema = z
   .object({
     initialValue: z.number().int(),

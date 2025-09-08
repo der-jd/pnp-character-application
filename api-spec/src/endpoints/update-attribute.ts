@@ -1,11 +1,16 @@
 import { z } from "zod";
 import { attributeSchema, calculationPointsSchema, baseValuesSchema } from "../character-schemas.js";
-import { initialIncreasedSchema, initialNewSchema, userIdSchema } from "../general-schemas.js";
+import {
+  initialIncreasedSchema,
+  initialNewSchema,
+  MAX_STRING_LENGTH_DEFAULT,
+  userIdSchema,
+} from "../general-schemas.js";
 
 export const updateAttributePathParamsSchema = z
   .object({
     "character-id": z.uuid(),
-    "attribute-name": z.string(),
+    "attribute-name": z.string().max(MAX_STRING_LENGTH_DEFAULT),
   })
   .strict();
 
@@ -25,7 +30,7 @@ export const updateAttributeResponseSchema = z
   .object({
     characterId: z.uuid(),
     userId: userIdSchema,
-    attributeName: z.string(),
+    attributeName: z.string().max(MAX_STRING_LENGTH_DEFAULT),
     changes: z
       .object({
         old: z

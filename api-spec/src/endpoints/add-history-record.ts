@@ -1,6 +1,5 @@
-import { record, z } from "zod";
-import { recordSchema, RecordType } from "../history-schemas.js";
-import { calculationPointsSchema } from "../character-schemas.js";
+import { z } from "zod";
+import { recordSchema } from "../history-schemas.js";
 import { userIdSchema } from "../general-schemas.js";
 
 export const addHistoryRecordPathParamsSchema = z
@@ -11,37 +10,14 @@ export const addHistoryRecordPathParamsSchema = z
 
 export type AddHistoryRecordPathParams = z.infer<typeof addHistoryRecordPathParamsSchema>;
 
-export const addHistoryRecordRequestSchema = z
-  .object({
+export const addHistoryRecordRequestSchema = recordSchema
+  .omit({
+    number: true,
+    id: true,
+    timestamp: true,
+  })
+  .extend({
     userId: userIdSchema,
-    type: z.nativeEnum(RecordType),
-    name: z.string(),
-    data: z
-      .object({
-        old: z.record(z.string(), z.unknown()),
-        new: z.record(z.string(), z.unknown()),
-      })
-      .strict(),
-    learningMethod: z.string().nullable(),
-    calculationPoints: z
-      .object({
-        adventurePoints: z
-          .object({
-            old: calculationPointsSchema,
-            new: calculationPointsSchema,
-          })
-          .strict()
-          .nullable(),
-        attributePoints: z
-          .object({
-            old: calculationPointsSchema,
-            new: calculationPointsSchema,
-          })
-          .strict()
-          .nullable(),
-      })
-      .strict(),
-    comment: z.string().nullable(),
   })
   .strict();
 

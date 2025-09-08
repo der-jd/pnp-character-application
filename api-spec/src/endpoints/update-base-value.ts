@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { BaseValues, baseValueSchema } from "../character-schemas.js";
-import { initialNewSchema, userIdSchema } from "../general-schemas.js";
+import { initialNewSchema, MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
 
 export const updateBaseValuePathParamsSchema = z
   .object({
     "character-id": z.uuid(),
-    "base-value-name": z.string(),
+    "base-value-name": z.string().max(MAX_STRING_LENGTH_DEFAULT),
   })
   .strict();
 
@@ -25,7 +25,7 @@ export const updateBaseValueResponseSchema = z
   .object({
     characterId: z.uuid(),
     userId: userIdSchema,
-    baseValueName: z.string(),
+    baseValueName: z.string().max(MAX_STRING_LENGTH_DEFAULT),
     baseValue: z
       .object({
         old: baseValueSchema,

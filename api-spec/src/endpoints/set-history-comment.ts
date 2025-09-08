@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAX_STRING_LENGTH_VERY_LONG } from "../character-schemas.js";
+import { MAX_STRING_LENGTH_VERY_LONG } from "../general-schemas.js";
 
 export const setHistoryCommentPathParamsSchema = z
   .object({
@@ -37,7 +37,7 @@ export const setHistoryCommentResponseSchema = z
     characterId: z.uuid(),
     blockNumber: z.number().int().positive(),
     recordId: z.uuid(),
-    comment: z.string(),
+    comment: z.string().max(MAX_STRING_LENGTH_VERY_LONG),
   })
   .strict();
 

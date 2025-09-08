@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { levelSchema } from "../character-schemas.js";
+import { characterNameSchema, levelSchema } from "../character-schemas.js";
 import { userIdSchema } from "../general-schemas.js";
 
 export const cloneCharacterPathParamsSchema = z
@@ -22,7 +22,7 @@ export const cloneCharacterResponseSchema = z
   .object({
     userId: userIdSchema,
     characterId: z.uuid(),
-    name: z.string(),
+    name: characterNameSchema,
     level: levelSchema,
   })
   .strict();

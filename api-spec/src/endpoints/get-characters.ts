@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { characterSchema, START_LEVEL } from "../character-schemas.js";
+import { characterNameSchema, characterSchema, levelSchema } from "../character-schemas.js";
 import { userIdSchema } from "../general-schemas.js";
 
 export const getCharactersQueryParamsSchema = z
@@ -17,8 +17,8 @@ export const characterShortSchema = z
   .object({
     userId: userIdSchema,
     characterId: z.uuid(),
-    name: z.string(),
-    level: z.number().int().min(START_LEVEL),
+    name: characterNameSchema,
+    level: levelSchema,
   })
   .strict();
 

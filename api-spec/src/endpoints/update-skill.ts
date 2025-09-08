@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { initialNewSchema, initialIncreasedSchema, userIdSchema } from "../general-schemas.js";
+import {
+  initialNewSchema,
+  initialIncreasedSchema,
+  userIdSchema,
+  MAX_STRING_LENGTH_DEFAULT,
+} from "../general-schemas.js";
 import {
   skillSchema,
   combatValuesSchema,
@@ -10,8 +15,8 @@ import {
 export const updateSkillPathParamsSchema = z
   .object({
     "character-id": z.uuid(),
-    "skill-category": z.string(),
-    "skill-name": z.string(),
+    "skill-category": z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    "skill-name": z.string().max(MAX_STRING_LENGTH_DEFAULT),
   })
   .strict();
 
@@ -33,9 +38,9 @@ export const updateSkillResponseSchema = z
   .object({
     characterId: z.uuid(),
     userId: userIdSchema,
-    skillCategory: z.string(),
-    skillName: z.string(),
-    combatCategory: z.string().optional(),
+    skillCategory: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    skillName: z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    combatCategory: z.string().max(MAX_STRING_LENGTH_DEFAULT).optional(),
     changes: z
       .object({
         old: z
