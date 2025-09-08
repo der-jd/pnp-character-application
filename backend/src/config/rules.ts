@@ -10,8 +10,6 @@ export const HOBBY_SKILL_BONUS = 25;
 
 export const NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION = 5;
 
-export const START_LEVEL = 1;
-
 export const COST_CATEGORY_DEFAULT = CostCategory.CAT_2;
 export const COST_CATEGORY_COMBAT_SKILLS = CostCategory.CAT_3;
 

@@ -12,6 +12,11 @@ import {
   MAX_STRING_LENGTH_LONG,
   MAX_STRING_LENGTH_VERY_LONG,
   MAX_ARRAY_SIZE,
+  MAX_POINTS,
+  MIN_POINTS,
+  MAX_HISTORY_RECORDS,
+  MAX_HISTORY_BLOCK_NUMBER,
+  MIN_HISTORY_BLOCK_NUMBER,
 } from "./general-schemas.js";
 
 export enum RecordType {
@@ -33,7 +38,7 @@ export const recordSchema = z
   .object({
     type: z.enum(RecordType),
     name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
-    number: z.number().int().positive(),
+    number: z.number().int().min(1).max(MAX_HISTORY_RECORDS),
     id: z.uuid(),
     data: z
       .object({
@@ -70,7 +75,7 @@ export type Record = z.infer<typeof recordSchema>;
 export const historyBlockSchema = z
   .object({
     characterId: z.uuid(),
-    blockNumber: z.number().int().positive(),
+    blockNumber: z.number().int().min(MIN_HISTORY_BLOCK_NUMBER).max(MAX_HISTORY_BLOCK_NUMBER),
     blockId: z.uuid(),
     previousBlockId: z.uuid().nullable(),
     /**
@@ -86,7 +91,7 @@ export type HistoryBlock = z.infer<typeof historyBlockSchema>;
 
 export const integerSchema = z
   .object({
-    value: z.number().int(),
+    value: z.number().int().min(MIN_POINTS).max(MAX_POINTS),
   })
   .strict();
 

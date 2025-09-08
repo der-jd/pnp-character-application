@@ -1,6 +1,5 @@
 export { headersSchema, Headers } from "./headers.js";
 export {
-  START_LEVEL,
   levelSchema,
   professionHobbySchema,
   generalInformationSchema,
@@ -56,6 +55,7 @@ export {
   MAX_STRING_LENGTH_DEFAULT,
   MAX_STRING_LENGTH_LONG,
   MAX_STRING_LENGTH_VERY_LONG,
+  MIN_LEVEL,
 } from "./general-schemas.js";
 export {
   revertHistoryRecordPathParamsSchema,

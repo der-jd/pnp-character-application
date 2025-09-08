@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { historyBlockSchema } from "../history-schemas.js";
-import { MAX_ARRAY_SIZE } from "../general-schemas.js";
+import { MAX_ARRAY_SIZE, MAX_HISTORY_BLOCK_NUMBER, MIN_HISTORY_BLOCK_NUMBER } from "../general-schemas.js";
 
 export const getHistoryPathParamsSchema = z
   .object({
@@ -16,6 +16,9 @@ export const getHistoryQueryParamsSchema = z
       .string()
       .regex(/^\d+$/)
       .transform((val) => parseInt(val, 10))
+      .refine((val) => val >= MIN_HISTORY_BLOCK_NUMBER && val <= MAX_HISTORY_BLOCK_NUMBER, {
+        message: `Block number must be between ${MIN_HISTORY_BLOCK_NUMBER} and ${MAX_HISTORY_BLOCK_NUMBER}`,
+      })
       .optional(),
   })
   .strict()
@@ -25,7 +28,12 @@ export type GetHistoryQueryParams = z.infer<typeof getHistoryQueryParamsSchema>;
 
 export const getHistoryResponseSchema = z
   .object({
-    previousBlockNumber: z.number().int().positive().nullable(),
+    previousBlockNumber: z
+      .number()
+      .int()
+      .min(MIN_HISTORY_BLOCK_NUMBER)
+      .max(MAX_HISTORY_BLOCK_NUMBER - 1)
+      .nullable(),
     previousBlockId: z.uuid().nullable(),
     items: z.array(historyBlockSchema).max(MAX_ARRAY_SIZE),
   })

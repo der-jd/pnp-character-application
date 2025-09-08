@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAX_STRING_LENGTH_VERY_LONG } from "../general-schemas.js";
+import { MAX_HISTORY_BLOCK_NUMBER, MAX_STRING_LENGTH_VERY_LONG, MIN_HISTORY_BLOCK_NUMBER } from "../general-schemas.js";
 
 export const setHistoryCommentPathParamsSchema = z
   .object({
@@ -16,11 +16,13 @@ export const setHistoryCommentQueryParamsSchema = z
       .string()
       .regex(/^\d+$/)
       .transform((val) => parseInt(val, 10))
+      .refine((val) => val >= MIN_HISTORY_BLOCK_NUMBER && val <= MAX_HISTORY_BLOCK_NUMBER, {
+        message: `Block number must be between ${MIN_HISTORY_BLOCK_NUMBER} and ${MAX_HISTORY_BLOCK_NUMBER}`,
+      })
       .optional(),
   })
   .strict()
-  .optional()
-  .nullable();
+  .optional();
 
 export type SetHistoryCommentQueryParams = z.infer<typeof setHistoryCommentQueryParamsSchema>;
 
@@ -35,7 +37,7 @@ export type SetHistoryCommentRequest = z.infer<typeof setHistoryCommentRequestSc
 export const setHistoryCommentResponseSchema = z
   .object({
     characterId: z.uuid(),
-    blockNumber: z.number().int().positive(),
+    blockNumber: z.number().int().min(MIN_HISTORY_BLOCK_NUMBER).max(MAX_HISTORY_BLOCK_NUMBER),
     recordId: z.uuid(),
     comment: z.string().max(MAX_STRING_LENGTH_VERY_LONG),
   })

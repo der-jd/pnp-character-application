@@ -7,10 +7,15 @@ import {
   MAX_POINTS,
   MAX_COST,
   MAX_ARRAY_SIZE,
+  MIN_LEVEL,
+  MAX_LEVEL,
+  MAX_ATTRIBUTE_VALUE,
+  MIN_ATTRIBUTE_VALUE,
   userIdSchema,
+  MIN_BASE_VALUE,
+  MIN_COMBAT_VALUE,
+  MIN_POINTS,
 } from "./general-schemas.js";
-
-export const START_LEVEL = 1;
 
 export const professionHobbySchema = z
   .object({
@@ -23,7 +28,7 @@ export const professionHobbySchema = z
 
 export type ProfessionHobby = z.infer<typeof professionHobbySchema>;
 
-export const levelSchema = z.number().int().min(START_LEVEL);
+export const levelSchema = z.number().int().min(MIN_LEVEL).max(MAX_LEVEL);
 
 export type Level = z.infer<typeof levelSchema>;
 
@@ -64,10 +69,10 @@ export const dis_advantagesSchema = z.array(z.string().max(MAX_STRING_LENGTH_DEF
 
 export const attributeSchema = z
   .object({
-    start: z.number().int(),
-    current: z.number().int(),
-    mod: z.number().int(),
-    totalCost: z.number().int(),
+    start: z.number().int().min(MIN_ATTRIBUTE_VALUE).max(MAX_ATTRIBUTE_VALUE),
+    current: z.number().int().min(MIN_ATTRIBUTE_VALUE).max(MAX_ATTRIBUTE_VALUE),
+    mod: z.number().int().min(MIN_ATTRIBUTE_VALUE).max(MAX_ATTRIBUTE_VALUE),
+    totalCost: z.number().int().min(0).max(MAX_COST),
   })
   .strict();
 
@@ -90,12 +95,12 @@ export type Attributes = z.infer<typeof attributesSchema>;
 
 export const baseValueSchema = z
   .object({
-    start: z.number().int(),
-    current: z.number().int(), // byFormula + byLvlUp + increased (not implemented atm)
-    byFormula: z.number().int().optional(), // Some base values are not changed by a formula
-    byLvlUp: z.number().int().optional(), // Some base values can't be changed by level up
-    mod: z.number().int(),
-    //totalCost: z.number().optional(); // No base value can be increased by points atm
+    start: z.number().int().min(MIN_BASE_VALUE).max(MAX_POINTS),
+    current: z.number().int().min(MIN_BASE_VALUE).max(MAX_POINTS), // byFormula + byLvlUp + increased (not implemented atm)
+    byFormula: z.number().int().min(0).max(MAX_POINTS).optional(), // Some base values are not changed by a formula
+    byLvlUp: z.number().int().min(0).max(MAX_POINTS).optional(), // Some base values can't be changed by level up
+    mod: z.number().int().min(MIN_BASE_VALUE).max(MAX_POINTS),
+    //totalCost: z.number()...optional(); // No base value can be increased by points atm
   })
   .strict();
 
@@ -121,9 +126,9 @@ export type BaseValues = z.infer<typeof baseValuesSchema>;
 
 export const combatValuesSchema = z
   .object({
-    availablePoints: z.number().int(),
-    attackValue: z.number().int(),
-    paradeValue: z.number().int(),
+    availablePoints: z.number().int().min(0).max(MAX_POINTS),
+    attackValue: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
+    paradeValue: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
   })
   .strict();
 
@@ -156,9 +161,9 @@ export enum CostCategory {
 export const skillSchema = z
   .object({
     activated: z.boolean(),
-    start: z.number().int(),
-    current: z.number().int(),
-    mod: z.number().int(),
+    start: z.number().int().min(MIN_POINTS).max(MAX_POINTS),
+    current: z.number().int().min(MIN_POINTS).max(MAX_POINTS),
+    mod: z.number().int().min(MIN_POINTS).max(MAX_POINTS),
     totalCost: z.number().min(0).max(MAX_COST),
     defaultCostCategory: z.enum(CostCategory),
   })

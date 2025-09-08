@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { START_LEVEL } from "../character-schemas.js";
 import { userIdSchema } from "../general-schemas.js";
+import { levelSchema } from "../character-schemas.js";
 
 export const updateLevelPathParamsSchema = z
   .object({
@@ -12,7 +12,7 @@ export type UpdateLevelPathParams = z.infer<typeof updateLevelPathParamsSchema>;
 
 export const updateLevelRequestSchema = z
   .object({
-    initialLevel: z.number().int().min(START_LEVEL),
+    initialLevel: levelSchema,
   })
   .strict();
 
@@ -24,8 +24,8 @@ export const updateLevelResponseSchema = z
     userId: userIdSchema,
     level: z
       .object({
-        old: z.object({ value: z.number().int().min(START_LEVEL) }).strict(),
-        new: z.object({ value: z.number().int().positive() }).strict(),
+        old: z.object({ value: levelSchema }).strict(),
+        new: z.object({ value: levelSchema }).strict(),
       })
       .strict(),
   })
