@@ -4,6 +4,7 @@ import {
   initialIncreasedSchema,
   userIdSchema,
   MAX_STRING_LENGTH_DEFAULT,
+  MAX_COST,
 } from "../general-schemas.js";
 import {
   skillSchema,
@@ -58,7 +59,7 @@ export const updateSkillResponseSchema = z
       })
       .strict(),
     learningMethod: learningMethodSchema.optional(),
-    increaseCost: z.number().optional(),
+    increaseCost: z.number().min(0).max(MAX_COST).optional(),
     adventurePoints: z
       .object({
         old: calculationPointsSchema,

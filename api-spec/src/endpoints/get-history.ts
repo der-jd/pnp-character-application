@@ -1,5 +1,6 @@
-import { uuid, z } from "zod";
+import { z } from "zod";
 import { historyBlockSchema } from "../history-schemas.js";
+import { MAX_ARRAY_SIZE } from "../general-schemas.js";
 
 export const getHistoryPathParamsSchema = z
   .object({
@@ -26,7 +27,7 @@ export const getHistoryResponseSchema = z
   .object({
     previousBlockNumber: z.number().int().positive().nullable(),
     previousBlockId: z.uuid().nullable(),
-    items: z.array(historyBlockSchema),
+    items: z.array(historyBlockSchema).max(MAX_ARRAY_SIZE),
   })
   .strict();
 

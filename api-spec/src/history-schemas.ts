@@ -7,7 +7,12 @@ import {
   learningMethodSchema,
   skillSchema,
 } from "./character-schemas.js";
-import { MAX_STRING_LENGTH_DEFAULT, MAX_STRING_LENGTH_LONG, MAX_STRING_LENGTH_VERY_LONG } from "./general-schemas.js";
+import {
+  MAX_STRING_LENGTH_DEFAULT,
+  MAX_STRING_LENGTH_LONG,
+  MAX_STRING_LENGTH_VERY_LONG,
+  MAX_ARRAY_SIZE,
+} from "./general-schemas.js";
 
 export enum RecordType {
   CHARACTER_CREATED = 0,
@@ -68,7 +73,12 @@ export const historyBlockSchema = z
     blockNumber: z.number().int().positive(),
     blockId: z.uuid(),
     previousBlockId: z.uuid().nullable(),
-    changes: z.array(recordSchema),
+    /**
+     * No max array size is actually needed as the Lambda function to
+     * add history records already limits the maximum size of a history block.
+     * Nevertheless, the max array size is an additional safety measure here.
+     */
+    changes: z.array(recordSchema).max(MAX_ARRAY_SIZE),
   })
   .strict();
 
@@ -82,13 +92,13 @@ export const integerSchema = z
 
 export const stringArraySchema = z
   .object({
-    values: z.array(z.string().max(MAX_STRING_LENGTH_LONG)),
+    values: z.array(z.string().max(MAX_STRING_LENGTH_LONG)).max(MAX_ARRAY_SIZE),
   })
   .strict();
 
 export const stringSetSchema = z
   .object({
-    values: z.set(z.string().max(MAX_STRING_LENGTH_LONG)),
+    values: z.set(z.string().max(MAX_STRING_LENGTH_LONG)).max(MAX_ARRAY_SIZE),
   })
   .strict();
 

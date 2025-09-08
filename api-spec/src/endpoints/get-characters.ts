@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { characterNameSchema, characterSchema, levelSchema } from "../character-schemas.js";
-import { userIdSchema } from "../general-schemas.js";
+import { userIdSchema, MAX_ARRAY_SIZE } from "../general-schemas.js";
 
 export const getCharactersQueryParamsSchema = z
   .object({
@@ -26,7 +26,7 @@ export type CharacterShort = z.infer<typeof characterShortSchema>;
 
 export const getCharactersResponseSchema = z
   .object({
-    characters: z.array(z.union([characterSchema, characterShortSchema])),
+    characters: z.array(z.union([characterSchema, characterShortSchema])).max(MAX_ARRAY_SIZE),
   })
   .strict();
 

@@ -5,6 +5,10 @@ export const MAX_STRING_LENGTH_DEFAULT = 120;
 export const MAX_STRING_LENGTH_LONG = 500;
 export const MAX_STRING_LENGTH_VERY_LONG = 1000;
 
+export const MAX_POINTS = 1000000; // 1 million
+export const MAX_COST = 100000; // 100k cost max
+export const MAX_ARRAY_SIZE = 1000; // 1000 items
+
 export const initialNewSchema = z
   .object({
     initialValue: z.number().int(),

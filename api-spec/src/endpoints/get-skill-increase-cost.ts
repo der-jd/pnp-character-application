@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAX_STRING_LENGTH_DEFAULT } from "../general-schemas.js";
+import { MAX_STRING_LENGTH_DEFAULT, MAX_COST } from "../general-schemas.js";
 import { learningMethodSchema } from "../character-schemas.js";
 
 export const getSkillIncreaseCostPathParamsSchema = z
@@ -24,7 +24,7 @@ export const getSkillIncreaseCostResponseSchema = z
   .object({
     characterId: z.uuid(),
     skillName: z.string().max(MAX_STRING_LENGTH_DEFAULT),
-    increaseCost: z.number(),
+    increaseCost: z.number().min(0).max(MAX_COST),
   })
   .strict();
 

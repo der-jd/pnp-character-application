@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { userIdSchema } from "../general-schemas.js";
+import { userIdSchema, MAX_ARRAY_SIZE } from "../general-schemas.js";
 import { specialAbilitySchema } from "../character-schemas.js";
 
 export const addSpecialAbilityPathParamsSchema = z
@@ -27,12 +27,12 @@ export const addSpecialAbilityResponseSchema = z
       .object({
         old: z
           .object({
-            values: z.array(specialAbilitySchema),
+            values: z.array(specialAbilitySchema).max(MAX_ARRAY_SIZE),
           })
           .strict(),
         new: z
           .object({
-            values: z.array(specialAbilitySchema),
+            values: z.array(specialAbilitySchema).max(MAX_ARRAY_SIZE),
           })
           .strict(),
       })

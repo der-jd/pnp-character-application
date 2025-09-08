@@ -4,6 +4,9 @@ import {
   MAX_STRING_LENGTH_LONG,
   MAX_STRING_LENGTH_SHORT,
   MAX_STRING_LENGTH_VERY_LONG,
+  MAX_POINTS,
+  MAX_COST,
+  MAX_ARRAY_SIZE,
   userIdSchema,
 } from "./general-schemas.js";
 
@@ -49,15 +52,15 @@ export type GeneralInformation = z.infer<typeof generalInformationSchema>;
 
 export const calculationPointsSchema = z
   .object({
-    start: z.number(),
-    available: z.number(),
-    total: z.number(),
+    start: z.number().min(0).max(MAX_POINTS),
+    available: z.number().min(0).max(MAX_POINTS),
+    total: z.number().min(0).max(MAX_POINTS),
   })
   .strict();
 
 export type CalculationPoints = z.infer<typeof calculationPointsSchema>;
 
-export const dis_advantagesSchema = z.array(z.string().max(MAX_STRING_LENGTH_DEFAULT));
+export const dis_advantagesSchema = z.array(z.string().max(MAX_STRING_LENGTH_DEFAULT)).max(MAX_ARRAY_SIZE);
 
 export const attributeSchema = z
   .object({
@@ -156,7 +159,7 @@ export const skillSchema = z
     start: z.number().int(),
     current: z.number().int(),
     mod: z.number().int(),
-    totalCost: z.number(),
+    totalCost: z.number().min(0).max(MAX_COST),
     defaultCostCategory: z.enum(CostCategory),
   })
   .strict();
@@ -198,7 +201,7 @@ export const characterSheetSchema = z
       .strict(),
     advantages: dis_advantagesSchema,
     disadvantages: dis_advantagesSchema,
-    specialAbilities: z.set(specialAbilitySchema),
+    specialAbilities: z.set(specialAbilitySchema).max(MAX_ARRAY_SIZE),
     baseValues: baseValuesSchema,
     attributes: attributesSchema,
     skills: z
