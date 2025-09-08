@@ -21,32 +21,34 @@ export const updateAttributeRequestSchema = z
 
 export type UpdateAttributeRequest = z.infer<typeof updateAttributeRequestSchema>;
 
-export const updateAttributeResponseSchema = z.object({
-  characterId: z.string().uuid(),
-  userId: z.string(),
-  attributeName: z.string(),
-  changes: z
-    .object({
-      old: z
-        .object({
-          attribute: attributeSchema,
-          baseValues: baseValuesSchema.partial().optional(),
-        })
-        .strict(),
-      new: z
-        .object({
-          attribute: attributeSchema,
-          baseValues: baseValuesSchema.partial().optional(),
-        })
-        .strict(),
-    })
-    .strict(),
-  attributePoints: z
-    .object({
-      old: calculationPointsSchema,
-      new: calculationPointsSchema,
-    })
-    .strict(),
-});
+export const updateAttributeResponseSchema = z
+  .object({
+    characterId: z.string().uuid(),
+    userId: z.string(),
+    attributeName: z.string(),
+    changes: z
+      .object({
+        old: z
+          .object({
+            attribute: attributeSchema,
+            baseValues: baseValuesSchema.partial().optional(),
+          })
+          .strict(),
+        new: z
+          .object({
+            attribute: attributeSchema,
+            baseValues: baseValuesSchema.partial().optional(),
+          })
+          .strict(),
+      })
+      .strict(),
+    attributePoints: z
+      .object({
+        old: calculationPointsSchema,
+        new: calculationPointsSchema,
+      })
+      .strict(),
+  })
+  .strict();
 
 export type UpdateAttributeResponse = z.infer<typeof updateAttributeResponseSchema>;

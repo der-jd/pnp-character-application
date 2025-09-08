@@ -22,14 +22,20 @@ export const addSpecialAbilityResponseSchema = z
     characterId: z.string().uuid(),
     userId: z.string(),
     specialAbilityName: z.string().max(MAX_STRING_LENGTH_DEFAULT),
-    specialAbilities: z.object({
-      old: z.object({
-        values: z.array(z.string()),
-      }),
-      new: z.object({
-        values: z.array(z.string()),
-      }),
-    }),
+    specialAbilities: z
+      .object({
+        old: z
+          .object({
+            values: z.array(z.string()),
+          })
+          .strict(),
+        new: z
+          .object({
+            values: z.array(z.string()),
+          })
+          .strict(),
+      })
+      .strict(),
   })
   .strict();
 
