@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { initialNewSchema, initialIncreasedSchema } from "../general-schemas.js";
-import { skillSchema, combatValuesSchema, calculationPointsSchema, learningMethodSchema } from "../character-schemas.js";
+import {
+  skillSchema,
+  combatValuesSchema,
+  calculationPointsSchema,
+  learningMethodSchema,
+} from "../character-schemas.js";
 
 export const updateSkillPathParamsSchema = z
   .object({
