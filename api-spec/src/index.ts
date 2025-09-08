@@ -57,7 +57,7 @@ export {
   RevertHistoryRecordPathParams,
   revertHistoryRecordResponseSchema,
   RevertHistoryRecordResponse,
-} from "./revert-history-record.js";
+} from "./endpoints/revert-history-record.js";
 export {
   setHistoryCommentPathParamsSchema,
   SetHistoryCommentPathParams,
@@ -67,7 +67,7 @@ export {
   SetHistoryCommentRequest,
   setHistoryCommentResponseSchema,
   SetHistoryCommentResponse,
-} from "./set-history-comment.js";
+} from "./endpoints/set-history-comment.js";
 export {
   updateLevelPathParamsSchema,
   UpdateLevelPathParams,
@@ -75,7 +75,7 @@ export {
   UpdateLevelRequest,
   updateLevelResponseSchema,
   UpdateLevelResponse,
-} from "./update-level.js";
+} from "./endpoints/update-level.js";
 export {
   addHistoryRecordPathParamsSchema,
   AddHistoryRecordPathParams,
@@ -83,7 +83,7 @@ export {
   AddHistoryRecordRequest,
   addHistoryRecordResponseSchema,
   AddHistoryRecordResponse,
-} from "./add-history-record.js";
+} from "./endpoints/add-history-record.js";
 export {
   addSpecialAbilityPathParamsSchema,
   AddSpecialAbilityPathParams,
@@ -91,13 +91,13 @@ export {
   AddSpecialAbilityRequest,
   addSpecialAbilityResponseSchema,
   AddSpecialAbilityResponse,
-} from "./add-special-ability.js";
+} from "./endpoints/add-special-ability.js";
 export {
   getCharacterPathParamsSchema,
   GetCharacterPathParams,
   getCharacterResponseSchema,
   GetCharacterResponse,
-} from "./get-character.js";
+} from "./endpoints/get-character.js";
 export {
   getCharactersQueryParamsSchema,
   GetCharactersQueryParams,
@@ -105,7 +105,7 @@ export {
   CharacterShort,
   getCharactersResponseSchema,
   GetCharactersResponse,
-} from "./get-characters.js";
+} from "./endpoints/get-characters.js";
 export {
   getSkillIncreaseCostPathParamsSchema,
   GetSkillIncreaseCostPathParams,
@@ -113,13 +113,13 @@ export {
   GetSkillIncreaseCostQueryParams,
   getSkillIncreaseCostResponseSchema,
   GetSkillIncreaseCostResponse,
-} from "./get-skill-increase-cost.js";
+} from "./endpoints/get-skill-increase-cost.js";
 export {
   deleteCharacterPathParamsSchema,
   DeleteCharacterPathParams,
   deleteCharacterResponseSchema,
   DeleteCharacterResponse,
-} from "./delete-character.js";
+} from "./endpoints/delete-character.js";
 export {
   cloneCharacterPathParamsSchema,
   CloneCharacterPathParams,
@@ -127,7 +127,7 @@ export {
   CloneCharacterRequest,
   cloneCharacterResponseSchema,
   CloneCharacterResponse,
-} from "./clone-character.js";
+} from "./endpoints/clone-character.js";
 export {
   updateAttributePathParamsSchema,
   UpdateAttributePathParams,
@@ -135,7 +135,7 @@ export {
   UpdateAttributeRequest,
   updateAttributeResponseSchema,
   UpdateAttributeResponse,
-} from "./update-attribute.js";
+} from "./endpoints/update-attribute.js";
 export {
   updateBaseValuePathParamsSchema,
   UpdateBaseValuePathParams,
@@ -144,7 +144,7 @@ export {
   updateBaseValueResponseSchema,
   UpdateBaseValueResponse,
   baseValuesUpdatableByLvlUp,
-} from "./update-base-value.js";
+} from "./endpoints/update-base-value.js";
 export {
   updateCalculationPointsPathParamsSchema,
   UpdateCalculationPointsPathParams,
@@ -152,7 +152,7 @@ export {
   UpdateCalculationPointsRequest,
   updateCalculationPointsResponseSchema,
   UpdateCalculationPointsResponse,
-} from "./update-calculation-points.js";
+} from "./endpoints/update-calculation-points.js";
 export {
   updateCombatValuesPathParamsSchema,
   UpdateCombatValuesPathParams,
@@ -160,7 +160,7 @@ export {
   UpdateCombatValuesRequest,
   updateCombatValuesResponseSchema,
   UpdateCombatValuesResponse,
-} from "./update-combat-values.js";
+} from "./endpoints/update-combat-values.js";
 export {
   updateSkillPathParamsSchema,
   UpdateSkillPathParams,
@@ -168,7 +168,7 @@ export {
   UpdateSkillRequest,
   updateSkillResponseSchema,
   UpdateSkillResponse,
-} from "./update-skill.js";
+} from "./endpoints/update-skill.js";
 export {
   getHistoryPathParamsSchema,
   GetHistoryPathParams,
@@ -176,4 +176,4 @@ export {
   GetHistoryQueryParams,
   getHistoryResponseSchema,
   GetHistoryResponse,
-} from "./get-history.js";
+} from "./endpoints/get-history.js";

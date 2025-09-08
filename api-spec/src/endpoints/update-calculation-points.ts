@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { initialNewSchema, initialIncreasedSchema } from "./general-schemas.js";
-import { calculationPointsSchema } from "./character-schemas.js";
+import { initialNewSchema, initialIncreasedSchema } from "../general-schemas.js";
+import { calculationPointsSchema } from "../character-schemas.js";
 
 export const updateCalculationPointsPathParamsSchema = z
   .object({

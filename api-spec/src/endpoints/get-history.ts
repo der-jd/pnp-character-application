@@ -1,5 +1,5 @@
 import { uuid, z } from "zod";
-import { historyBlockSchema } from "./history-schemas.js";
+import { historyBlockSchema } from "../history-schemas.js";
 
 export const getHistoryPathParamsSchema = z
   .object({

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAX_STRING_LENGTH_DEFAULT } from "./character-schemas.js";
+import { MAX_STRING_LENGTH_DEFAULT } from "../character-schemas.js";
 
 export const addSpecialAbilityPathParamsSchema = z
   .object({

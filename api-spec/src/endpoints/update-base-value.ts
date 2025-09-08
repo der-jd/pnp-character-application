@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { BaseValues, baseValueSchema } from "./character-schemas.js";
-import { initialNewSchema } from "./general-schemas.js";
+import { BaseValues, baseValueSchema } from "../character-schemas.js";
+import { initialNewSchema } from "../general-schemas.js";
 
 export const updateBaseValuePathParamsSchema = z
   .object({

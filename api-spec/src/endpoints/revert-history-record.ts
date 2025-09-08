@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { recordSchema } from "./history-schemas.js";
+import { recordSchema } from "../history-schemas.js";
 
 export const revertHistoryRecordPathParamsSchema = z
   .object({

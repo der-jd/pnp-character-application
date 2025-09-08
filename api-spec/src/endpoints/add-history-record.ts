@@ -1,6 +1,6 @@
 import { record, z } from "zod";
-import { recordSchema, RecordType } from "./history-schemas.js";
-import { calculationPointsSchema } from "./character-schemas.js";
+import { recordSchema, RecordType } from "../history-schemas.js";
+import { calculationPointsSchema } from "../character-schemas.js";
 
 export const addHistoryRecordPathParamsSchema = z
   .object({

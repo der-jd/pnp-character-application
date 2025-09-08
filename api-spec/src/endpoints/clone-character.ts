@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { levelSchema } from "./character-schemas.js";
+import { levelSchema } from "../character-schemas.js";
 
 export const cloneCharacterPathParamsSchema = z
   .object({

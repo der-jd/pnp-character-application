@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { initialIncreasedSchema } from "./general-schemas.js";
-import { combatValuesSchema } from "./character-schemas.js";
+import { initialIncreasedSchema } from "../general-schemas.js";
+import { combatValuesSchema } from "../character-schemas.js";
 
 export const updateCombatValuesPathParamsSchema = z
   .object({

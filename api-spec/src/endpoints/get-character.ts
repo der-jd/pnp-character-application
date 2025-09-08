@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { characterSchema } from "./character-schemas.js";
+import { characterSchema } from "../character-schemas.js";
 
 export const getCharacterPathParamsSchema = z
   .object({

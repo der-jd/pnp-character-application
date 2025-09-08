@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAX_STRING_LENGTH_VERY_LONG } from "./character-schemas.js";
+import { MAX_STRING_LENGTH_VERY_LONG } from "../character-schemas.js";
 
 export const setHistoryCommentPathParamsSchema = z
   .object({
