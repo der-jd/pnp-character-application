@@ -1,4 +1,4 @@
-import { Attribute, BaseValue, CharacterSheet, CombatValues, Skill } from "shared";
+import { Attribute, BaseValue, CharacterSheet, CombatValues, Skill } from "api-spec";
 import {
   ATTRIBUTE_POINTS_FOR_CREATION,
   COST_CATEGORY_COMBAT_SKILLS,

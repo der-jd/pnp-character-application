@@ -12,7 +12,7 @@ import {
 import { fakeCharacterId } from "../test-data/character.js";
 import { expectHttpError } from "../utils.js";
 import { setHistoryComment } from "set-history-comment";
-import { MAX_STRING_LENGTH_VERY_LONG } from "shared";
+import { MAX_STRING_LENGTH_VERY_LONG } from "api-spec";
 
 const lastBlock = fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1];
 const fakeRecordId = lastBlock.changes[lastBlock.changes.length - 1].id;

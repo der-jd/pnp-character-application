@@ -4,7 +4,7 @@
   "main": "index.mjs",
   "type": "module",
   "dependencies": {
-    "shared": "*",
+    "api-spec": "*",
     "utils": "*"
   },
   "devDependencies": {

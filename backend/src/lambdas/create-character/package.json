@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "config": "*",
-    "shared": "*",
+    "api-spec": "*",
     "utils": "*"
   },
   "devDependencies": {

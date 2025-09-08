@@ -11,7 +11,7 @@ import {
   CharacterSheet,
   InitialNew,
   baseValuesUpdatableByLvlUp,
-} from "shared";
+} from "api-spec";
 import {
   Request,
   parseBody,

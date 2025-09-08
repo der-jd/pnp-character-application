@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { CostCategory, RecordType, AddHistoryRecordRequest } from "shared";
+import { CostCategory, RecordType, AddHistoryRecordRequest } from "api-spec";
 import { addRecordToHistory } from "add-history-record";
 import { fakeUserId } from "../test-data/request.js";
 import {

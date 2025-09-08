@@ -9,7 +9,7 @@ import {
   isZodError,
   logZodError,
 } from "utils";
-import { getCharacterPathParamsSchema, GetCharacterResponse, GetCharacterPathParams, headersSchema } from "shared";
+import { getCharacterPathParamsSchema, GetCharacterResponse, GetCharacterPathParams, headersSchema } from "api-spec";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getCharacter({

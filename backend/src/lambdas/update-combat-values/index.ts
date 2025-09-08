@@ -9,7 +9,7 @@ import {
   updateCombatValuesRequestSchema,
   Character,
   CombatValues,
-} from "shared";
+} from "api-spec";
 import {
   Request,
   parseBody,

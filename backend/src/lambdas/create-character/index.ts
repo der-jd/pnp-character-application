@@ -26,7 +26,7 @@
 //   PROFESSION_SKILL_BONUS,
 //   HOBBY_SKILL_BONUS,
 //   Character,
-// } from "shared";
+// } from "api-spec";
 // import { getSkill, getAttribute } from "config";
 
 // export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {

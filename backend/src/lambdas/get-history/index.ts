@@ -7,7 +7,7 @@ import {
   GetHistoryResponse,
   getHistoryPathParamsSchema,
   getHistoryQueryParamsSchema,
-} from "shared";
+} from "api-spec";
 import {
   Request,
   parseBody,

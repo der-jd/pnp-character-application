@@ -10,7 +10,7 @@ import {
 import { fakeCharacterId } from "../test-data/character.js";
 import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
 import { getHistory } from "get-history";
-import { HistoryBlock } from "shared";
+import { HistoryBlock } from "api-spec";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {

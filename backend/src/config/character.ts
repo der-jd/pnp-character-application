@@ -1,4 +1,4 @@
-import { CharacterSheet, Attribute, BaseValue, Skill, CombatValues } from "shared";
+import { CharacterSheet, Attribute, BaseValue, Skill, CombatValues } from "api-spec";
 
 export function getAttribute(attributes: CharacterSheet["attributes"], name: string): Attribute {
   const attribute = (attributes as Record<string, Attribute>)[name];

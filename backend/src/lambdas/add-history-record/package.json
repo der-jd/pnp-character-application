@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@aws-sdk/util-dynamodb": "^3.787.0",
-    "shared": "*",
+    "api-spec": "*",
     "utils": "*"
   },
   "devDependencies": {

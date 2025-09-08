@@ -7,7 +7,7 @@ import {
   BatchWriteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { Record, HistoryBlock, historyBlockSchema } from "shared";
+import { Record, HistoryBlock, historyBlockSchema } from "api-spec";
 import { HttpError } from "./errors.js";
 import { dynamoDBDocClient } from "./dynamodb_client.js";
 

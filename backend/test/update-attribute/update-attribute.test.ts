@@ -3,7 +3,7 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { CharacterSheet } from "shared";
+import { CharacterSheet } from "api-spec";
 import { getAttribute } from "config";
 import { _updateAttribute } from "update-attribute";
 import { expectHttpError } from "../utils.js";

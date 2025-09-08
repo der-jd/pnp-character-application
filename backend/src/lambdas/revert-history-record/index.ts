@@ -18,7 +18,7 @@ import {
   RevertHistoryRecordPathParams,
   RevertHistoryRecordResponse,
   headersSchema,
-} from "shared";
+} from "api-spec";
 import {
   getHistoryItems,
   deleteHistoryItem,

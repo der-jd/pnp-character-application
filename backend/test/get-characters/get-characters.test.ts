@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterListResponse, mockDynamoDBQueryCharactersResponse } from "../test-data/response.js";
 import { getCharacters } from "get-characters";
-import { Character } from "shared";
+import { Character } from "api-spec";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {

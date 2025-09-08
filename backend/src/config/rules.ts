@@ -1,4 +1,4 @@
-import { CostCategory, combatSkillsSchema } from "shared";
+import { CostCategory, combatSkillsSchema } from "api-spec";
 
 export const ATTRIBUTE_POINTS_FOR_CREATION = 40;
 

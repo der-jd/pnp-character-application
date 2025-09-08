@@ -4,7 +4,7 @@ import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { getCombatValues } from "config";
-import { Character } from "shared";
+import { Character } from "api-spec";
 import { expectHttpError } from "../utils.js";
 import { _updateCombatValues } from "update-combat-values";
 

@@ -20,7 +20,7 @@ import {
   CloneCharacterRequest,
   CloneCharacterResponse,
   headersSchema,
-} from "shared";
+} from "api-spec";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return cloneCharacter({

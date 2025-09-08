@@ -1,4 +1,4 @@
-import { CostCategory, LearningMethod } from "shared";
+import { CostCategory, LearningMethod } from "api-spec";
 
 export function parseLearningMethod(method: string): LearningMethod {
   return LearningMethod[method.toUpperCase() as keyof typeof LearningMethod];

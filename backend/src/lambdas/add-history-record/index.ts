@@ -18,7 +18,7 @@ import {
   AddHistoryRecordResponse,
   addHistoryRecordPathParamsSchema,
   addHistoryRecordRequestSchema,
-} from "shared";
+} from "api-spec";
 import {
   getHistoryItems,
   createHistoryItem,

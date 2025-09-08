@@ -17,7 +17,7 @@ import {
 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 import { revertRecordFromHistory } from "revert-history-record";
-import { RecordType } from "shared";
+import { RecordType } from "api-spec";
 
 const lastBlock = fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1];
 

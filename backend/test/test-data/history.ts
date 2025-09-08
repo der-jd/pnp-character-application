@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { CostCategory, HistoryBlock, RecordType, Record } from "shared";
+import { CostCategory, HistoryBlock, RecordType, Record } from "api-spec";
 import { fakeCharacterId } from "./character.js";
 
 export function addFakeHistoryRecord(

@@ -22,7 +22,7 @@ import {
   updateSkillRequestSchema,
   InitialNew,
   InitialIncreased,
-} from "shared";
+} from "api-spec";
 import {
   Request,
   parseBody,

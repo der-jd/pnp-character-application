@@ -9,7 +9,7 @@ import {
   SetHistoryCommentRequest,
   SetHistoryCommentResponse,
   headersSchema,
-} from "shared";
+} from "api-spec";
 import {
   getHistoryItems,
   Request,
