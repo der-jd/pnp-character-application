@@ -18,6 +18,8 @@ export {
   characterSchema,
   baseValuesSchema,
   learningMethodSchema,
+  attributesSchema,
+  combatSkillsSchema,
   CalculationPoints,
   CharacterSheet,
   Skill,
@@ -32,6 +34,8 @@ export {
   LearningMethod,
   LearningMethodString,
   Level,
+  Attributes,
+  CombatSkills,
 } from "./character-schemas.js";
 export {
   recordSchema,
@@ -139,6 +143,7 @@ export {
   UpdateBaseValueRequest,
   updateBaseValueResponseSchema,
   UpdateBaseValueResponse,
+  baseValuesUpdatableByLvlUp,
 } from "./update-base-value.js";
 export {
   updateCalculationPointsPathParamsSchema,

@@ -1,5 +1,4 @@
-import { combatSkills } from "./character.js";
-import { CostCategory } from "./cost.js";
+import { CostCategory, combatSkillsSchema } from "shared";
 
 export const ATTRIBUTE_POINTS_FOR_CREATION = 40;
 
@@ -15,6 +14,8 @@ export const START_LEVEL = 1;
 
 export const COST_CATEGORY_DEFAULT = CostCategory.CAT_2;
 export const COST_CATEGORY_COMBAT_SKILLS = CostCategory.CAT_3;
+
+export const combatSkills = Object.keys(combatSkillsSchema.shape) as Array<keyof typeof combatSkillsSchema.shape>;
 
 export const startSkills: string[] = [
   // body skills

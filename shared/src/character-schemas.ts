@@ -65,13 +65,29 @@ export const attributeSchema = z
 
 export type Attribute = z.infer<typeof attributeSchema>;
 
+export const attributesSchema = z
+  .object({
+    courage: attributeSchema,
+    intelligence: attributeSchema,
+    concentration: attributeSchema,
+    charisma: attributeSchema,
+    mentalResilience: attributeSchema,
+    dexterity: attributeSchema,
+    endurance: attributeSchema,
+    strength: attributeSchema,
+  })
+  .strict();
+
+export type Attributes = z.infer<typeof attributesSchema>;
+
 export const baseValueSchema = z
   .object({
     start: z.number().int(),
-    current: z.number().int(),
-    byFormula: z.number().int().optional(),
-    byLvlUp: z.number().int().optional(),
+    current: z.number().int(), // byFormula + byLvlUp + increased (not implemented atm)
+    byFormula: z.number().int().optional(), // Some base values are not changed by a formula
+    byLvlUp: z.number().int().optional(), // Some base values can't be changed by level up
     mod: z.number().int(),
+    //totalCost: z.number().optional(); // No base value can be increased by points atm
   })
   .strict();
 
@@ -142,6 +158,28 @@ export const skillSchema = z
 
 export type Skill = z.infer<typeof skillSchema>;
 
+export const combatSkillsSchema = z
+  .object({
+    martialArts: skillSchema,
+    barehanded: skillSchema,
+    chainWeapons: skillSchema,
+    daggers: skillSchema,
+    slashingWeaponsSharp1h: skillSchema,
+    slashingWeaponsBlunt1h: skillSchema,
+    thrustingWeapons1h: skillSchema,
+    slashingWeaponsSharp2h: skillSchema,
+    slashingWeaponsBlunt2h: skillSchema,
+    thrustingWeapons2h: skillSchema,
+    missile: skillSchema,
+    firearmSimple: skillSchema,
+    firearmMedium: skillSchema,
+    firearmComplex: skillSchema,
+    heavyWeapons: skillSchema,
+  })
+  .strict();
+
+export type CombatSkills = z.infer<typeof combatSkillsSchema>;
+
 export const characterSheetSchema = z
   .object({
     generalInformation: generalInformationSchema,
@@ -155,39 +193,10 @@ export const characterSheetSchema = z
     disadvantages: dis_advantagesSchema,
     specialAbilities: z.set(z.string().max(MAX_STRING_LENGTH_DEFAULT)),
     baseValues: baseValuesSchema,
-    attributes: z
-      .object({
-        courage: attributeSchema,
-        intelligence: attributeSchema,
-        concentration: attributeSchema,
-        charisma: attributeSchema,
-        mentalResilience: attributeSchema,
-        dexterity: attributeSchema,
-        endurance: attributeSchema,
-        strength: attributeSchema,
-      })
-      .strict(),
+    attributes: attributesSchema,
     skills: z
       .object({
-        combat: z
-          .object({
-            martialArts: skillSchema,
-            barehanded: skillSchema,
-            chainWeapons: skillSchema,
-            daggers: skillSchema,
-            slashingWeaponsSharp1h: skillSchema,
-            slashingWeaponsBlunt1h: skillSchema,
-            thrustingWeapons1h: skillSchema,
-            slashingWeaponsSharp2h: skillSchema,
-            slashingWeaponsBlunt2h: skillSchema,
-            thrustingWeapons2h: skillSchema,
-            missile: skillSchema,
-            firearmSimple: skillSchema,
-            firearmMedium: skillSchema,
-            firearmComplex: skillSchema,
-            heavyWeapons: skillSchema,
-          })
-          .strict(),
+        combat: combatSkillsSchema,
         body: z
           .object({
             athletics: skillSchema,

@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { baseValuesNotUpdatableByLvlUp, getBaseValue } from "config";
+import { getBaseValue } from "config";
 import {
   updateBaseValuePathParamsSchema,
   UpdateBaseValuePathParams,
@@ -10,6 +10,7 @@ import {
   BaseValue,
   CharacterSheet,
   InitialNew,
+  baseValuesUpdatableByLvlUp,
 } from "shared";
 import {
   Request,
@@ -137,7 +138,7 @@ function updateByLvlUpValue(
 ): BaseValue {
   console.log(`Update byLvlUp value of the base value from ${byLvlUp.initialValue} to ${byLvlUp.newValue}`);
 
-  if (baseValuesNotUpdatableByLvlUp.includes(baseValueName as keyof CharacterSheet["baseValues"])) {
+  if (!baseValuesUpdatableByLvlUp.includes(baseValueName as keyof CharacterSheet["baseValues"])) {
     throw new HttpError(409, "'By level up' changes are not allowed for this base value!", {
       baseValueName: baseValueName,
     });

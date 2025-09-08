@@ -1,30 +1,11 @@
 export {
-  LearningMethod,
   parseLearningMethod,
-  CostCategory,
   parseCostCategory,
   adjustCostCategory,
   getSkillIncreaseCost,
   getSkillActivationCost,
 } from "./cost.js";
-export {
-  CalculationPoints,
-  ProfessionHobby,
-  Attribute,
-  BaseValue,
-  Skill,
-  CombatValues,
-  attributes,
-  combatSkills,
-  Character,
-  CharacterSheet,
-  getAttribute,
-  getBaseValue,
-  getSkill,
-  getCombatValues,
-  getCombatCategory,
-  baseValuesNotUpdatableByLvlUp,
-} from "./character.js";
+export { getAttribute, getBaseValue, getSkill, getCombatValues, getCombatCategory } from "./character.js";
 export {
   ATTRIBUTE_POINTS_FOR_CREATION,
   PROFESSION_SKILL_BONUS,
