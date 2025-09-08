@@ -267,10 +267,10 @@ describe("Valid requests", () => {
           ..._case.fakeRecord,
           data: {
             old: {
-              values: Array.from(_case.fakeRecord.data.old.values),
+              values: Array.from(_case.fakeRecord.data.old.values as Set<string>),
             },
             new: {
-              values: Array.from(_case.fakeRecord.data.new.values),
+              values: Array.from(_case.fakeRecord.data.new.values as Set<string>),
             },
           },
         };
