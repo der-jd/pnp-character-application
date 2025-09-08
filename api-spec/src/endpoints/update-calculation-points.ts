@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { initialNewSchema, initialIncreasedSchema } from "../general-schemas.js";
+import { initialNewSchema, initialIncreasedSchema, userIdSchema } from "../general-schemas.js";
 import { calculationPointsSchema } from "../character-schemas.js";
 
 export const updateCalculationPointsPathParamsSchema = z
@@ -34,7 +34,7 @@ export type UpdateCalculationPointsRequest = z.infer<typeof updateCalculationPoi
 export const updateCalculationPointsResponseSchema = z
   .object({
     characterId: z.string().uuid(),
-    userId: z.string(),
+    userId: userIdSchema,
     calculationPoints: z
       .object({
         old: z

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { initialIncreasedSchema } from "../general-schemas.js";
+import { initialIncreasedSchema, userIdSchema } from "../general-schemas.js";
 import { combatValuesSchema } from "../character-schemas.js";
 
 export const updateCombatValuesPathParamsSchema = z
@@ -24,7 +24,7 @@ export type UpdateCombatValuesRequest = z.infer<typeof updateCombatValuesRequest
 export const updateCombatValuesResponseSchema = z
   .object({
     characterId: z.string().uuid(),
-    userId: z.string(),
+    userId: userIdSchema,
     combatCategory: z.string(),
     combatSkillName: z.string(),
     combatValues: z

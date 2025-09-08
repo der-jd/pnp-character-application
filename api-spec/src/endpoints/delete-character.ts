@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { userIdSchema } from "../general-schemas.js";
 
 export const deleteCharacterPathParamsSchema = z
   .object({
@@ -10,7 +11,7 @@ export type DeleteCharacterPathParams = z.infer<typeof deleteCharacterPathParams
 
 export const deleteCharacterResponseSchema = z
   .object({
-    userId: z.string(),
+    userId: userIdSchema,
     characterId: z.string().uuid(),
   })
   .strict();

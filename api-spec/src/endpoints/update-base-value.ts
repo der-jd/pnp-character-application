@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { BaseValues, baseValueSchema } from "../character-schemas.js";
-import { initialNewSchema } from "../general-schemas.js";
+import { initialNewSchema, userIdSchema } from "../general-schemas.js";
 
 export const updateBaseValuePathParamsSchema = z
   .object({
@@ -24,7 +24,7 @@ export type UpdateBaseValueRequest = z.infer<typeof updateBaseValueRequestSchema
 export const updateBaseValueResponseSchema = z
   .object({
     characterId: z.string().uuid(),
-    userId: z.string(),
+    userId: userIdSchema,
     baseValueName: z.string(),
     baseValue: z
       .object({

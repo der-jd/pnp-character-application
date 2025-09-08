@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MAX_STRING_LENGTH_DEFAULT } from "../character-schemas.js";
+import { userIdSchema } from "../general-schemas.js";
 
 export const addSpecialAbilityPathParamsSchema = z
   .object({
@@ -20,7 +21,7 @@ export type AddSpecialAbilityRequest = z.infer<typeof addSpecialAbilityRequestSc
 export const addSpecialAbilityResponseSchema = z
   .object({
     characterId: z.string().uuid(),
-    userId: z.string(),
+    userId: userIdSchema,
     specialAbilityName: z.string().max(MAX_STRING_LENGTH_DEFAULT),
     specialAbilities: z
       .object({

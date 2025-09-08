@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { attributeSchema, calculationPointsSchema, baseValuesSchema } from "../character-schemas.js";
-import { initialIncreasedSchema, initialNewSchema } from "../general-schemas.js";
+import { initialIncreasedSchema, initialNewSchema, userIdSchema } from "../general-schemas.js";
 
 export const updateAttributePathParamsSchema = z
   .object({
@@ -24,7 +24,7 @@ export type UpdateAttributeRequest = z.infer<typeof updateAttributeRequestSchema
 export const updateAttributeResponseSchema = z
   .object({
     characterId: z.string().uuid(),
-    userId: z.string(),
+    userId: userIdSchema,
     attributeName: z.string(),
     changes: z
       .object({

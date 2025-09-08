@@ -17,3 +17,8 @@ export const initialIncreasedSchema = z
   .strict();
 
 export type InitialIncreased = z.infer<typeof initialIncreasedSchema>;
+
+/**
+ * An user ID is not necessarily an UUID (36 characters), but a string with a certain length.
+ */
+export const userIdSchema = z.string().min(30).max(50);

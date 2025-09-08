@@ -1,6 +1,7 @@
 import { record, z } from "zod";
 import { recordSchema, RecordType } from "../history-schemas.js";
 import { calculationPointsSchema } from "../character-schemas.js";
+import { userIdSchema } from "../general-schemas.js";
 
 export const addHistoryRecordPathParamsSchema = z
   .object({
@@ -12,7 +13,7 @@ export type AddHistoryRecordPathParams = z.infer<typeof addHistoryRecordPathPara
 
 export const addHistoryRecordRequestSchema = z
   .object({
-    userId: z.string(),
+    userId: userIdSchema,
     type: z.nativeEnum(RecordType),
     name: z.string(),
     data: z

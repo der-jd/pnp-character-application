@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { userIdSchema } from "./general-schemas.js";
 
 export const START_LEVEL = 1;
 export const MAX_STRING_LENGTH_SHORT = 30;
@@ -316,8 +317,8 @@ export type CharacterSheet = z.infer<typeof characterSheetSchema>;
 
 export const characterSchema = z
   .object({
-    userId: z.string(),
-    characterId: z.string(),
+    userId: userIdSchema,
+    characterId: z.string().uuid(),
     characterSheet: characterSheetSchema,
   })
   .strict();

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { initialNewSchema, initialIncreasedSchema } from "../general-schemas.js";
+import { initialNewSchema, initialIncreasedSchema, userIdSchema } from "../general-schemas.js";
 import {
   skillSchema,
   combatValuesSchema,
@@ -32,7 +32,7 @@ export type UpdateSkillRequest = z.infer<typeof updateSkillRequestSchema>;
 export const updateSkillResponseSchema = z
   .object({
     characterId: z.string().uuid(),
-    userId: z.string(),
+    userId: userIdSchema,
     skillCategory: z.string(),
     skillName: z.string(),
     combatCategory: z.string().optional(),
