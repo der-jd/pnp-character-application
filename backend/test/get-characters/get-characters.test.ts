@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterListResponse, mockDynamoDBQueryCharactersResponse } from "../test-data/response.js";
 import { getCharacters } from "get-characters";
-import { Character } from "config";
+import { Character, getCharactersResponseSchema } from "api-spec";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
@@ -86,16 +86,16 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = getCharactersResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characters.length).toBe(fakeCharacterListResponse.Items.length);
 
       // Check that all characters have the same userId as the input
-      parsedBody.characters.forEach((character: Character) => {
+      parsedBody.characters.forEach((character) => {
         expect(character.userId).toBe(fakeUserId);
       });
 
       // Check that all characterIds from the fake response are included in the result
-      const resultCharacterIds = parsedBody.characters.map((character: Character) => character.characterId);
+      const resultCharacterIds = parsedBody.characters.map((character) => character.characterId);
       const fakeCharacterIds = fakeCharacterListResponse.Items.map((item: Character) => item.characterId);
       expect(resultCharacterIds).toEqual(expect.arrayContaining(fakeCharacterIds));
     });

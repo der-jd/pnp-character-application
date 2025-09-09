@@ -1,5 +1,4 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import {
   Request,
@@ -7,12 +6,21 @@ import {
   getCharacterItem,
   decodeUserId,
   HttpError,
-  ensureHttpError,
-  validateUUID,
+  logAndEnsureHttpError,
   getHistoryItems,
   createBatchHistoryItems,
   createCharacterItem,
+  isZodError,
+  logZodError,
 } from "utils";
+import {
+  postCharacterClonePathParamsSchema,
+  PostCharacterClonePathParams,
+  postCharacterCloneRequestSchema,
+  PostCharacterCloneRequest,
+  PostCharacterCloneResponse,
+  headersSchema,
+} from "api-spec";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return cloneCharacter({
@@ -23,25 +31,21 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const bodySchema = z
-  .object({
-    userIdOfCharacter: z.string().uuid(),
-  })
-  .strict();
-
 interface Parameters {
   currentUserId: string;
-  characterId: string;
-  userIdOfCharacter: string;
+  pathParams: PostCharacterClonePathParams;
+  body: PostCharacterCloneRequest;
 }
 
 export async function cloneCharacter(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
+    const characterId = params.pathParams["character-id"];
+    const userIdOfCharacter = params.body.userIdOfCharacter;
 
-    console.log(`Clone character ${params.characterId} of user ${params.userIdOfCharacter}`);
+    console.log(`Clone character ${characterId} of user ${userIdOfCharacter}`);
 
-    const character = await getCharacterItem(params.userIdOfCharacter, params.characterId);
+    const character = await getCharacterItem(userIdOfCharacter, characterId);
 
     character.userId = params.currentUserId;
     character.characterId = uuidv4();
@@ -50,11 +54,11 @@ export async function cloneCharacter(request: Request): Promise<APIGatewayProxyR
     const putCalls: Promise<void>[] = [];
     putCalls.push(createCharacterItem(character));
 
-    console.log(`Clone history of character ${params.characterId} for new character ${character.characterId}`);
+    console.log(`Clone history of character ${characterId} for new character ${character.characterId}`);
 
-    const items = await getHistoryItems(params.characterId, true);
+    const items = await getHistoryItems(characterId, true);
     if (!items || items.length === 0) {
-      console.log(`No history found for character ${params.characterId}, skipping clone`);
+      console.log(`No history found for character ${characterId}, skipping clone`);
     } else {
       for (const item of items) {
         item.characterId = character.characterId;
@@ -65,19 +69,20 @@ export async function cloneCharacter(request: Request): Promise<APIGatewayProxyR
     console.log("Save new character and history items to DynamoDB");
     await Promise.all(putCalls);
 
+    const responseBody: PostCharacterCloneResponse = {
+      userId: character.userId,
+      characterId: character.characterId,
+      name: character.characterSheet.generalInformation.name,
+      level: character.characterSheet.generalInformation.level,
+    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        userId: character.userId,
-        characterId: character.characterId,
-        name: character.characterSheet.generalInformation.name,
-        level: character.characterSheet.generalInformation.level,
-      }),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 
@@ -85,25 +90,14 @@ function validateRequest(request: Request): Parameters {
   try {
     console.log("Validate request");
 
-    const currentUserId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
-
-    const characterId = request.pathParameters?.["character-id"];
-    if (typeof characterId !== "string") {
-      throw new HttpError(400, "Invalid input values!");
-    }
-
-    validateUUID(characterId);
-
-    const body = bodySchema.parse(request.body);
-
     return {
-      currentUserId: currentUserId,
-      characterId: characterId,
-      userIdOfCharacter: body.userIdOfCharacter,
+      currentUserId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      pathParams: postCharacterClonePathParamsSchema.parse(request.pathParameters),
+      body: postCharacterCloneRequestSchema.parse(request.body),
     };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
+    if (isZodError(error)) {
+      logZodError(error);
       throw new HttpError(400, "Invalid input values!");
     }
 

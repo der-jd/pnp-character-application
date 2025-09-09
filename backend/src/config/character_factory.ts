@@ -1,8 +1,9 @@
-import { Attribute, BaseValue, CharacterSheet, combatSkills, CombatValues, Skill } from "./character.js";
+import { Attribute, BaseValue, CharacterSheet, CombatValues, Skill } from "api-spec";
 import {
   ATTRIBUTE_POINTS_FOR_CREATION,
   COST_CATEGORY_COMBAT_SKILLS,
   COST_CATEGORY_DEFAULT,
+  combatSkills,
   startSkills,
 } from "./rules.js";
 
@@ -17,7 +18,9 @@ export function createEmptyCharacterSheet(): CharacterSheet {
       current: 0,
       mod: 0,
       totalCost: 0,
-      defaultCostCategory: combatSkills.includes(skillName) ? COST_CATEGORY_COMBAT_SKILLS : COST_CATEGORY_DEFAULT,
+      defaultCostCategory: (combatSkills as string[]).includes(skillName)
+        ? COST_CATEGORY_COMBAT_SKILLS
+        : COST_CATEGORY_DEFAULT,
     } as Skill;
   };
 
@@ -50,7 +53,7 @@ export function createEmptyCharacterSheet(): CharacterSheet {
     },
     advantages: [],
     disadvantages: [],
-    specialAbilities: new Set<string>(),
+    specialAbilities: [],
     baseValues: {
       healthPoints: zeroBaseValue(),
       mentalHealth: zeroBaseValue(),

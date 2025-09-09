@@ -1,25 +1,12 @@
-export enum LearningMethod {
-  FREE = 99, // Cost Category 0
-  LOW_PRICED = -1, // Cost Category -1
-  NORMAL = 0, // Default Cost Category
-  EXPENSIVE = 1, // Cost Category +1
+import { CostCategory, LearningMethod, RecordType } from "api-spec";
+
+// TODO move this function and similar ones to utils package?!
+export function parseRecordType(method: string): RecordType {
+  return RecordType[method.toUpperCase() as keyof typeof RecordType];
 }
 
 export function parseLearningMethod(method: string): LearningMethod {
   return LearningMethod[method.toUpperCase() as keyof typeof LearningMethod];
-}
-
-/**
- * The number values of CostCategory are used for the character sheet, not the string values "CAT_X".
- * Using the string values leads to multiple cumbersome problems and workarounds when trying to use
- * schemas with zod.
- */
-export enum CostCategory {
-  CAT_0 = 0,
-  CAT_1 = 1,
-  CAT_2 = 2,
-  CAT_3 = 3,
-  CAT_4 = 4,
 }
 
 const MAX_COST_CATEGORY = CostCategory.CAT_4;

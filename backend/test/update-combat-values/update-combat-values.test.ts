@@ -3,7 +3,8 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { Character, getCombatValues } from "config";
+import { getCombatValues } from "config";
+import { Character, updateCombatValuesResponseSchema } from "api-spec";
 import { expectHttpError } from "../utils.js";
 import { _updateCombatValues } from "update-combat-values";
 
@@ -335,7 +336,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateCombatValuesResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.userId).toBe(fakeUserId);
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       expect(parsedBody.combatCategory).toBe(_case.request.pathParameters["combat-category"]);

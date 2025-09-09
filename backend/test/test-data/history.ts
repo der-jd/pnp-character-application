@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { CostCategory, HistoryBlock, RecordType, Record } from "config";
+import { CostCategory, HistoryBlock, RecordType, Record, LearningMethodString } from "api-spec";
 import { fakeCharacterId } from "./character.js";
 
 export function addFakeHistoryRecord(
@@ -297,7 +297,7 @@ export const skillChangedRecord: Record = {
       },
     },
   },
-  learningMethod: "NORMAL",
+  learningMethod: "NORMAL" as LearningMethodString,
   calculationPoints: {
     adventurePoints: {
       old: {
@@ -354,7 +354,7 @@ export const combatSkillChangedRecord: Record = {
       },
     },
   },
-  learningMethod: "NORMAL",
+  learningMethod: "NORMAL" as LearningMethodString,
   calculationPoints: {
     adventurePoints: {
       old: {
@@ -407,10 +407,10 @@ export const specialAbilitiesChangedRecord: Record = {
   id: "9f654a4d-2086-47e2-905b-ad189000b17d",
   data: {
     old: {
-      values: new Set(["Iron Will"]),
+      values: ["Iron Will"],
     },
     new: {
-      values: new Set(["Iron Will", "Berserker Rage"]),
+      values: ["Iron Will", "Berserker Rage"],
     },
   },
   learningMethod: null,
@@ -499,7 +499,7 @@ function generateLargeChangesList(size: number): Record[] {
           },
         },
       },
-      learningMethod: "NORMAL",
+      learningMethod: "NORMAL" as LearningMethodString,
       calculationPoints: {
         adventurePoints: {
           old: {

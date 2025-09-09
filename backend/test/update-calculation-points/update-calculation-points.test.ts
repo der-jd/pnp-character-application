@@ -3,6 +3,7 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
+import { updateCalculationPointsResponseSchema } from "api-spec";
 import { _updateCalculationPoints } from "update-calculation-points";
 import { expectHttpError } from "../utils.js";
 
@@ -282,7 +283,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateCalculationPointsResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       expect(parsedBody.userId).toBe(fakeUserId);
 
@@ -294,20 +295,20 @@ describe("Valid requests", () => {
         );
 
         if (_case.request.body.adventurePoints.start) {
-          expect(parsedBody.calculationPoints.new.adventurePoints.start).toBe(
+          expect(parsedBody.calculationPoints.new.adventurePoints?.start).toBe(
             _case.request.body.adventurePoints.start.newValue,
           );
         }
 
         if (_case.request.body.adventurePoints.total) {
           const diffAvailable =
-            parsedBody.calculationPoints.new.adventurePoints.available -
-            parsedBody.calculationPoints.old.adventurePoints.available;
+            parsedBody.calculationPoints.new.adventurePoints!.available -
+            parsedBody.calculationPoints.old.adventurePoints!.available;
           const diffTotal =
-            parsedBody.calculationPoints.new.adventurePoints.total -
-            parsedBody.calculationPoints.old.adventurePoints.total;
+            parsedBody.calculationPoints.new.adventurePoints!.total -
+            parsedBody.calculationPoints.old.adventurePoints!.total;
           expect(diffAvailable).toBe(diffTotal);
-          expect(parsedBody.calculationPoints.new.adventurePoints.total).toBe(
+          expect(parsedBody.calculationPoints.new.adventurePoints?.total).toBe(
             _case.request.body.adventurePoints.total.initialValue +
               _case.request.body.adventurePoints.total.increasedPoints,
           );
@@ -320,20 +321,20 @@ describe("Valid requests", () => {
         );
 
         if (_case.request.body.attributePoints.start) {
-          expect(parsedBody.calculationPoints.new.attributePoints.start).toBe(
+          expect(parsedBody.calculationPoints.new.attributePoints?.start).toBe(
             _case.request.body.attributePoints.start.newValue,
           );
         }
 
         if (_case.request.body.attributePoints.total) {
           const diffAvailable =
-            parsedBody.calculationPoints.new.attributePoints.available -
-            parsedBody.calculationPoints.old.attributePoints.available;
+            parsedBody.calculationPoints.new.attributePoints!.available -
+            parsedBody.calculationPoints.old.attributePoints!.available;
           const diffTotal =
-            parsedBody.calculationPoints.new.attributePoints.total -
-            parsedBody.calculationPoints.old.attributePoints.total;
+            parsedBody.calculationPoints.new.attributePoints!.total -
+            parsedBody.calculationPoints.old.attributePoints!.total;
           expect(diffAvailable).toBe(diffTotal);
-          expect(parsedBody.calculationPoints.new.attributePoints.total).toBe(
+          expect(parsedBody.calculationPoints.new.attributePoints?.total).toBe(
             _case.request.body.attributePoints.total.initialValue +
               _case.request.body.attributePoints.total.increasedPoints,
           );
@@ -462,7 +463,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateCalculationPointsResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       expect(parsedBody.userId).toBe(fakeUserId);
 
@@ -472,20 +473,20 @@ describe("Valid requests", () => {
         );
 
         if (_case.request.body.adventurePoints.start) {
-          expect(parsedBody.calculationPoints.new.adventurePoints.start).toBe(
+          expect(parsedBody.calculationPoints.new.adventurePoints?.start).toBe(
             _case.request.body.adventurePoints.start.newValue,
           );
         }
 
         if (_case.request.body.adventurePoints.total) {
           const diffAvailable =
-            parsedBody.calculationPoints.new.adventurePoints.available -
-            parsedBody.calculationPoints.old.adventurePoints.available;
+            parsedBody.calculationPoints.new.adventurePoints!.available -
+            parsedBody.calculationPoints.old.adventurePoints!.available;
           const diffTotal =
-            parsedBody.calculationPoints.new.adventurePoints.total -
-            parsedBody.calculationPoints.old.adventurePoints.total;
+            parsedBody.calculationPoints.new.adventurePoints!.total -
+            parsedBody.calculationPoints.old.adventurePoints!.total;
           expect(diffAvailable).toBe(diffTotal);
-          expect(parsedBody.calculationPoints.new.adventurePoints.total).toBe(
+          expect(parsedBody.calculationPoints.new.adventurePoints?.total).toBe(
             _case.request.body.adventurePoints.total.initialValue +
               _case.request.body.adventurePoints.total.increasedPoints,
           );
@@ -498,20 +499,20 @@ describe("Valid requests", () => {
         );
 
         if (_case.request.body.attributePoints.start) {
-          expect(parsedBody.calculationPoints.new.attributePoints.start).toBe(
+          expect(parsedBody.calculationPoints.new.attributePoints?.start).toBe(
             _case.request.body.attributePoints.start.newValue,
           );
         }
 
         if (_case.request.body.attributePoints.total) {
           const diffAvailable =
-            parsedBody.calculationPoints.new.attributePoints.available -
-            parsedBody.calculationPoints.old.attributePoints.available;
+            parsedBody.calculationPoints.new.attributePoints!.available -
+            parsedBody.calculationPoints.old.attributePoints!.available;
           const diffTotal =
-            parsedBody.calculationPoints.new.attributePoints.total -
-            parsedBody.calculationPoints.old.attributePoints.total;
+            parsedBody.calculationPoints.new.attributePoints!.total -
+            parsedBody.calculationPoints.old.attributePoints!.total;
           expect(diffAvailable).toBe(diffTotal);
-          expect(parsedBody.calculationPoints.new.attributePoints.total).toBe(
+          expect(parsedBody.calculationPoints.new.attributePoints?.total).toBe(
             _case.request.body.attributePoints.total.initialValue +
               _case.request.body.attributePoints.total.increasedPoints,
           );

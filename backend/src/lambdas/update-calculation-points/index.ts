@@ -1,16 +1,26 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { z } from "zod";
-import { CalculationPoints } from "config";
+import {
+  CalculationPoints,
+  headersSchema,
+  PatchCalculationPointsPathParams,
+  PatchCalculationPointsRequest,
+  UpdateCalculationPointsResponse,
+  patchCalculationPointsPathParamsSchema,
+  patchCalculationPointsRequestSchema,
+  InitialNew,
+  InitialIncreased,
+} from "api-spec";
 import {
   Request,
   parseBody,
   getCharacterItem,
   decodeUserId,
   HttpError,
-  ensureHttpError,
-  validateUUID,
+  logAndEnsureHttpError,
   updateAdventurePoints,
   updateAttributePoints,
+  isZodError,
+  logZodError,
 } from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -22,49 +32,20 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const initialNewSchema = z.object({
-  initialValue: z.number(),
-  newValue: z.number(),
-});
-
-const initialIncreasedSchema = z.object({
-  initialValue: z.number(),
-  increasedPoints: z.number(),
-});
-
-const bodySchema = z
-  .object({
-    adventurePoints: z
-      .object({
-        start: initialNewSchema.strict().optional(),
-        total: initialIncreasedSchema.strict().optional(),
-      })
-      .strict()
-      .optional(),
-    attributePoints: z
-      .object({
-        start: initialNewSchema.strict().optional(),
-        total: initialIncreasedSchema.strict().optional(),
-      })
-      .strict()
-      .optional(),
-  })
-  .strict();
-
 interface Parameters {
   userId: string;
-  characterId: string;
-  body: z.infer<typeof bodySchema>;
+  pathParams: PatchCalculationPointsPathParams;
+  body: PatchCalculationPointsRequest;
 }
 
 export async function _updateCalculationPoints(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
 
-    console.log(`Update character ${params.characterId} of user ${params.userId}`);
+    console.log(`Update character ${params.pathParams["character-id"]} of user ${params.userId}`);
     console.log("Update calculation points");
 
-    const character = await getCharacterItem(params.userId, params.characterId);
+    const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
     const characterSheet = character.characterSheet;
     const adventurePointsOld = characterSheet.calculationPoints.adventurePoints;
     const attributePointsOld = characterSheet.calculationPoints.attributePoints;
@@ -83,7 +64,7 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
         adventurePoints = updateTotalValue(adventurePoints, params.body.adventurePoints.total);
       }
 
-      updates.push(updateAdventurePoints(params.userId, params.characterId, adventurePoints));
+      updates.push(updateAdventurePoints(params.userId, params.pathParams["character-id"], adventurePoints));
     }
 
     if (params.body.attributePoints) {
@@ -97,32 +78,33 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
         attributePoints = updateTotalValue(attributePoints, params.body.attributePoints.total);
       }
 
-      updates.push(updateAttributePoints(params.userId, params.characterId, attributePoints));
+      updates.push(updateAttributePoints(params.userId, params.pathParams["character-id"], attributePoints));
     }
 
     await Promise.all(updates);
 
+    const responseBody: UpdateCalculationPointsResponse = {
+      characterId: params.pathParams["character-id"],
+      userId: params.userId,
+      calculationPoints: {
+        old: {
+          adventurePoints: params.body.adventurePoints ? adventurePointsOld : undefined,
+          attributePoints: params.body.attributePoints ? attributePointsOld : undefined,
+        },
+        new: {
+          adventurePoints: params.body.adventurePoints ? adventurePoints : undefined,
+          attributePoints: params.body.attributePoints ? attributePoints : undefined,
+        },
+      },
+    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        characterId: params.characterId,
-        userId: params.userId,
-        calculationPoints: {
-          old: {
-            adventurePoints: params.body.adventurePoints ? adventurePointsOld : undefined,
-            attributePoints: params.body.attributePoints ? attributePointsOld : undefined,
-          },
-          new: {
-            adventurePoints: params.body.adventurePoints ? adventurePoints : undefined,
-            attributePoints: params.body.attributePoints ? attributePoints : undefined,
-          },
-        },
-      }),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 
@@ -130,25 +112,14 @@ function validateRequest(request: Request): Parameters {
   try {
     console.log("Validate request");
 
-    const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
-
-    const characterId = request.pathParameters?.["character-id"];
-    if (typeof characterId !== "string") {
-      throw new HttpError(400, "Invalid input values!");
-    }
-
-    validateUUID(characterId);
-
-    const body = bodySchema.parse(request.body);
-
     return {
-      userId: userId,
-      characterId: characterId,
-      body: body,
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      pathParams: patchCalculationPointsPathParamsSchema.parse(request.pathParameters),
+      body: patchCalculationPointsRequestSchema.parse(request.body),
     };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
+    if (isZodError(error)) {
+      logZodError(error);
       throw new HttpError(400, "Invalid input values!");
     }
 
@@ -157,10 +128,7 @@ function validateRequest(request: Request): Parameters {
   }
 }
 
-function updateStartValue(
-  calculationPoints: CalculationPoints,
-  startValue: z.infer<typeof initialNewSchema>,
-): CalculationPoints {
+function updateStartValue(calculationPoints: CalculationPoints, startValue: InitialNew): CalculationPoints {
   console.log(`Update start value of the calculation points from ${startValue.initialValue} to ${startValue.newValue}`);
 
   if (startValue.initialValue !== calculationPoints.start && startValue.newValue !== calculationPoints.start) {
@@ -179,10 +147,7 @@ function updateStartValue(
   }
 }
 
-function updateTotalValue(
-  calculationPoints: CalculationPoints,
-  totalValue: z.infer<typeof initialIncreasedSchema>,
-): CalculationPoints {
+function updateTotalValue(calculationPoints: CalculationPoints, totalValue: InitialIncreased): CalculationPoints {
   console.log(
     `Update total calculation points from ${totalValue.initialValue} to ${totalValue.initialValue + totalValue.increasedPoints}`,
   );

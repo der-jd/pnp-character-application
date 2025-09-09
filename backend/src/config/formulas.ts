@@ -1,4 +1,4 @@
-import { Attribute, CharacterSheet } from "./character.js";
+import { Attribute, CharacterSheet } from "api-spec";
 
 type AttributeName = keyof CharacterSheet["attributes"];
 type BaseValueName = keyof CharacterSheet["baseValues"];

@@ -1,19 +1,28 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { z } from "zod";
 import {
   parseLearningMethod,
   adjustCostCategory,
-  Character,
   getSkillIncreaseCost,
   getSkill,
+  getCombatValues,
+  getCombatCategory,
+  getSkillActivationCost,
+} from "config";
+import {
+  Character,
   Skill,
   CalculationPoints,
   CostCategory,
-  getCombatValues,
-  getCombatCategory,
   CombatValues,
-  getSkillActivationCost,
-} from "config";
+  headersSchema,
+  PatchSkillPathParams,
+  PatchSkillRequest,
+  UpdateSkillResponse,
+  patchSkillPathParamsSchema,
+  patchSkillRequestSchema,
+  InitialNew,
+  InitialIncreased,
+} from "api-spec";
 import {
   Request,
   parseBody,
@@ -21,9 +30,10 @@ import {
   updateSkill,
   decodeUserId,
   HttpError,
-  ensureHttpError,
-  validateUUID,
+  logAndEnsureHttpError,
   updateCombatValues,
+  isZodError,
+  logZodError,
 } from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -35,45 +45,23 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const initialNewSchema = z.object({
-  initialValue: z.number().int(),
-  newValue: z.number().int(),
-});
-
-const initialIncreasedSchema = z.object({
-  initialValue: z.number().int(),
-  increasedPoints: z.number().int(),
-});
-
-const bodySchema = z
-  .object({
-    activated: z.boolean().optional(),
-    start: initialNewSchema.strict().optional(),
-    current: initialIncreasedSchema.strict().optional(),
-    mod: initialNewSchema.strict().optional(),
-    learningMethod: z.string().optional(),
-  })
-  .strict();
-
 interface Parameters {
   userId: string;
-  characterId: string;
-  skillCategory: string;
-  skillName: string;
-  body: z.infer<typeof bodySchema>;
+  pathParams: PatchSkillPathParams;
+  body: PatchSkillRequest;
 }
 
 export async function _updateSkill(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
 
-    console.log(`Update character ${params.characterId} of user ${params.userId}`);
-    console.log(`Update skill '${params.skillCategory}/${params.skillName}'`);
+    console.log(`Update character ${params.pathParams["character-id"]} of user ${params.userId}`);
+    console.log(`Update skill '${params.pathParams["skill-category"]}/${params.pathParams["skill-name"]}'`);
 
-    const character = await getCharacterItem(params.userId, params.characterId);
+    const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
     const characterSheet = character.characterSheet;
-    const skillCategory = params.skillCategory as keyof Character["characterSheet"]["skills"];
-    const skillOld = getSkill(characterSheet.skills, skillCategory, params.skillName);
+    const skillCategory = params.pathParams["skill-category"] as keyof Character["characterSheet"]["skills"];
+    const skillOld = getSkill(characterSheet.skills, skillCategory, params.pathParams["skill-name"]);
     let skill = structuredClone(skillOld);
     const adventurePointsOld = characterSheet.calculationPoints.adventurePoints;
     let adventurePoints = structuredClone(adventurePointsOld);
@@ -108,7 +96,14 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
       skill = updateModValue(skill, params.body.mod);
     }
 
-    await updateSkill(params.userId, params.characterId, skillCategory, params.skillName, skill, adventurePoints);
+    await updateSkill(
+      params.userId,
+      params.pathParams["character-id"],
+      skillCategory,
+      params.pathParams["skill-name"],
+      skill,
+      adventurePoints,
+    );
 
     let combatValues:
       | {
@@ -116,10 +111,14 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
           new: CombatValues;
         }
       | undefined;
-    if (availableCombatPointsChanged(skillOld, skill, params.skillCategory)) {
+    if (availableCombatPointsChanged(skillOld, skill, params.pathParams["skill-category"])) {
       console.log("Available combat points changed. Update combat values.");
-      const combatCategory = getCombatCategory(characterSheet.combatValues, params.skillName);
-      const skillCombatValuesOld = getCombatValues(characterSheet.combatValues, combatCategory, params.skillName);
+      const combatCategory = getCombatCategory(characterSheet.combatValues, params.pathParams["skill-name"]);
+      const skillCombatValuesOld = getCombatValues(
+        characterSheet.combatValues,
+        combatCategory,
+        params.pathParams["skill-name"],
+      );
       const skillCombatValues = structuredClone(skillCombatValuesOld);
       skillCombatValues.availablePoints += skill.current - skillOld.current + (skill.mod - skillOld.mod);
       combatValues = {
@@ -127,42 +126,49 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
         new: skillCombatValues,
       };
 
-      await updateCombatValues(params.userId, params.characterId, combatCategory, params.skillName, skillCombatValues);
+      await updateCombatValues(
+        params.userId,
+        params.pathParams["character-id"],
+        combatCategory,
+        params.pathParams["skill-name"],
+        skillCombatValues,
+      );
     }
 
+    const responseBody: UpdateSkillResponse = {
+      characterId: params.pathParams["character-id"],
+      userId: params.userId,
+      skillCategory: params.pathParams["skill-category"],
+      skillName: params.pathParams["skill-name"],
+      combatCategory:
+        params.pathParams["skill-category"] === "combat"
+          ? getCombatCategory(characterSheet.combatValues, params.pathParams["skill-name"])
+          : undefined,
+      changes: {
+        old: {
+          skill: skillOld,
+          combatValues: combatValues?.old,
+        },
+        new: {
+          skill: skill,
+          combatValues: combatValues?.new,
+        },
+      },
+      learningMethod: params.body.learningMethod,
+      increaseCost: increaseCost,
+      adventurePoints: {
+        old: adventurePointsOld,
+        new: adventurePoints,
+      },
+    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        characterId: params.characterId,
-        userId: params.userId,
-        skillCategory: params.skillCategory,
-        skillName: params.skillName,
-        combatCategory:
-          params.skillCategory === "combat"
-            ? getCombatCategory(characterSheet.combatValues, params.skillName)
-            : undefined,
-        changes: {
-          old: {
-            skill: skillOld,
-            combatValues: combatValues?.old,
-          },
-          new: {
-            skill: skill,
-            combatValues: combatValues?.new,
-          },
-        },
-        learningMethod: params.body.learningMethod,
-        increaseCost: increaseCost,
-        adventurePoints: {
-          old: adventurePointsOld,
-          new: adventurePoints,
-        },
-      }),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 
@@ -170,18 +176,8 @@ function validateRequest(request: Request): Parameters {
   try {
     console.log("Validate request");
 
-    const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
-
-    const characterId = request.pathParameters?.["character-id"];
-    const skillCategory = request.pathParameters?.["skill-category"];
-    const skillName = request.pathParameters?.["skill-name"];
-    if (typeof characterId !== "string" || typeof skillCategory !== "string" || typeof skillName !== "string") {
-      throw new HttpError(400, "Invalid input values!");
-    }
-
-    validateUUID(characterId);
-
-    const body = bodySchema.parse(request.body);
+    const pathParams = patchSkillPathParamsSchema.parse(request.pathParameters);
+    const body = patchSkillRequestSchema.parse(request.body);
 
     if ((body.activated || body.current) && !body.learningMethod) {
       throw new HttpError(
@@ -205,15 +201,13 @@ function validateRequest(request: Request): Parameters {
     }
 
     return {
-      userId: userId,
-      characterId: characterId,
-      skillCategory: skillCategory,
-      skillName: skillName,
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      pathParams: pathParams,
       body: body,
     };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
+    if (isZodError(error)) {
+      logZodError(error);
       throw new HttpError(400, "Invalid input values!");
     }
 
@@ -253,7 +247,7 @@ function activateSkill(
   }
 }
 
-function updateStartValue(skill: Skill, startValue: z.infer<typeof initialNewSchema>): Skill {
+function updateStartValue(skill: Skill, startValue: InitialNew): Skill {
   console.log(`Update start value of the skill from ${startValue.initialValue} to ${startValue.newValue}`);
 
   if (!skill.activated) {
@@ -278,7 +272,7 @@ function updateStartValue(skill: Skill, startValue: z.infer<typeof initialNewSch
 
 function updateCurrentValue(
   skill: Skill,
-  currentValue: z.infer<typeof initialIncreasedSchema>,
+  currentValue: InitialIncreased,
   adjustedCostCategory: CostCategory,
   adventurePoints: CalculationPoints,
 ): { skill: Skill; adventurePoints: CalculationPoints } {
@@ -330,7 +324,7 @@ function updateCurrentValue(
   }
 }
 
-function updateModValue(skill: Skill, modValue: z.infer<typeof initialNewSchema>): Skill {
+function updateModValue(skill: Skill, modValue: InitialNew): Skill {
   console.log(`Update mod value of the skill from ${modValue.initialValue} to ${modValue.newValue}`);
 
   if (!skill.activated) {

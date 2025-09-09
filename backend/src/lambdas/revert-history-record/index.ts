@@ -1,5 +1,4 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { z } from "zod";
 import {
   baseValueSchema,
   combatValuesSchema,
@@ -13,9 +12,12 @@ import {
   attributeChangeSchema,
   CharacterSheet,
   calculationPointsChangeSchema,
-  stringSetSchema,
   stringArraySchema,
-} from "config";
+  deleteHistoryRecordPathParamsSchema,
+  DeleteHistoryRecordPathParams,
+  DeleteHistoryRecordResponse,
+  headersSchema,
+} from "api-spec";
 import {
   getHistoryItems,
   deleteHistoryItem,
@@ -23,8 +25,7 @@ import {
   Request,
   parseBody,
   HttpError,
-  ensureHttpError,
-  validateUUID,
+  logAndEnsureHttpError,
   updateAdventurePoints,
   decodeUserId,
   updateAttributePoints,
@@ -34,6 +35,8 @@ import {
   updateBaseValue,
   updateLevel,
   setSpecialAbilities,
+  logZodError,
+  isZodError,
 } from "utils";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -47,18 +50,19 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  characterId: string;
-  recordId: string;
+  pathParams: DeleteHistoryRecordPathParams;
 }
 
 export async function revertRecordFromHistory(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = await validateRequest(request);
 
-    console.log(`Delete record ${params.recordId} from history of character ${params.characterId}`);
+    console.log(
+      `Delete record ${params.pathParams["record-id"]} from history of character ${params.pathParams["character-id"]}`,
+    );
 
     const items = await getHistoryItems(
-      params.characterId,
+      params.pathParams["character-id"],
       false, // Sort descending to get highest block number (latest item) first
       1, // Only need the top result
     );
@@ -73,11 +77,11 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
     console.log("Latest history block:", { ...latestBlock, changes: ["..."] }); // Don't log changes as this can be a very long list
     const latestRecord = latestBlock.changes[latestBlock.changes.length - 1];
 
-    if (latestRecord.id !== params.recordId) {
+    if (latestRecord.id !== params.pathParams["record-id"]) {
       throw new HttpError(404, "The latest record does not match the given id");
     }
 
-    await revertChange(params.userId, params.characterId, latestRecord);
+    await revertChange(params.userId, params.pathParams["character-id"], latestRecord);
 
     if (latestBlock.changes.length === 1) {
       console.log("Deleting the complete history block as it only contains the record that should be deleted");
@@ -88,38 +92,29 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
 
     const response = {
       statusCode: 200,
-      // JSON.stringify() does not work with Set, so we need to convert it to an array
-      body: JSON.stringify(latestRecord, (key, value) => {
-        if (value instanceof Set) {
-          return Array.from(value);
-        }
-        return value;
-      }),
+      body: JSON.stringify(latestRecord as DeleteHistoryRecordResponse),
     };
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 
 async function validateRequest(request: Request): Promise<Parameters> {
-  console.log("Validate request");
-
-  const characterId = request.pathParameters?.["character-id"];
-  const recordId = request.pathParameters?.["record-id"];
-  if (typeof characterId !== "string" || typeof recordId !== "string") {
-    throw new HttpError(400, "Invalid input values!");
+  try {
+    console.log("Validate request");
+    return {
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      pathParams: deleteHistoryRecordPathParamsSchema.parse(request.pathParameters),
+    };
+  } catch (error) {
+    if (isZodError(error)) {
+      logZodError(error);
+      throw new HttpError(400, "Invalid input values!");
+    }
+    throw error;
   }
-
-  validateUUID(characterId);
-  validateUUID(recordId);
-
-  return {
-    userId: decodeUserId(request.headers.authorization ?? request.headers.Authorization),
-    characterId: characterId,
-    recordId: recordId,
-  };
 }
 
 async function revertChange(userId: string, characterId: string, record: Record): Promise<void> {
@@ -152,14 +147,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
         break;
       }
       case RecordType.SPECIAL_ABILITIES_CHANGED: {
-        let oldSpecialAbilities: Set<string>;
-        try {
-          // When called via the tests, the data is passed as a Set
-          oldSpecialAbilities = stringSetSchema.parse(record.data.old).values;
-        } catch {
-          // When called via Step Functions, the data is passed as an array, because JSON.stringify() does not work with Set
-          oldSpecialAbilities = new Set(stringArraySchema.parse(record.data.old).values);
-        }
+        const oldSpecialAbilities = stringArraySchema.parse(record.data.old).values;
         await setSpecialAbilities(userId, characterId, oldSpecialAbilities);
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
@@ -243,8 +231,8 @@ async function revertChange(userId: string, characterId: string, record: Record)
         throw new HttpError(500, "Unknown history record type!");
     }
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
+    if (isZodError(error)) {
+      logZodError(error);
       throw new HttpError(500, "Invalid history record values!");
     }
 

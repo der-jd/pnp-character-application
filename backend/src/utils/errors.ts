@@ -1,5 +1,4 @@
-// TODO rename to logAndEnsureHttpError
-export function ensureHttpError(value: unknown): HttpError {
+export function logAndEnsureHttpError(value: unknown): HttpError {
   if (value instanceof HttpError) {
     console.error(value);
     return value;

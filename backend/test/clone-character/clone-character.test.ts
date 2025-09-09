@@ -7,6 +7,7 @@ import {
   mockDynamoDBQueryHistoryResponse,
 } from "../test-data/response.js";
 import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
+import { postCharacterCloneResponseSchema } from "api-spec";
 import { cloneCharacter } from "clone-character";
 import { expectHttpError } from "../utils.js";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
@@ -142,7 +143,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = postCharacterCloneResponseSchema.parse(JSON.parse(result.body));
 
       switch (_case.type) {
         case "own":

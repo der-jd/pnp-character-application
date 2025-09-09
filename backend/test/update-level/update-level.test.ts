@@ -3,6 +3,7 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
+import { updateLevelResponseSchema } from "api-spec";
 import { _updateLevel } from "update-level";
 import { expectHttpError } from "../utils.js";
 
@@ -133,7 +134,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateLevelResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       expect(parsedBody.userId).toBe(fakeUserId);
 
@@ -167,7 +168,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateLevelResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       expect(parsedBody.userId).toBe(fakeUserId);
 

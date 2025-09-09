@@ -5,8 +5,9 @@
   "type": "module",
   "dependencies": {
     "@aws-sdk/util-dynamodb": "^3.787.0",
-    "config": "*",
-    "utils": "*"
+    "api-spec": "*",
+    "utils": "*",
+    "config": "*"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.0"

@@ -76,6 +76,39 @@ export function mockDynamoDBGetHistoryResponse(response: FakeHistoryBlockRespons
   });
 }
 
+export function mockDynamoDBGetCharacterAndHistoryResponse(
+  characterResponse: FakeCharacterResponse,
+  historyResponse: FakeHistoryBlockResponse,
+) {
+  (globalThis as any).dynamoDBMock.on(GetCommand).callsFake((command: { Key: any }) => {
+    const key = command.Key;
+
+    // Check if this is a character request (has userId in key)
+    if (key.userId !== undefined) {
+      if (key.characterId === characterResponse.Item.characterId && key.userId === characterResponse.Item.userId) {
+        return Promise.resolve(characterResponse);
+      } else {
+        return Promise.resolve({ Item: undefined });
+      }
+    }
+
+    // Check if this is a history request (has blockNumber in key)
+    if (key.blockNumber !== undefined) {
+      if (
+        key.characterId === historyResponse.Item.characterId &&
+        key.blockNumber === historyResponse.Item.blockNumber
+      ) {
+        return Promise.resolve(historyResponse);
+      } else {
+        return Promise.resolve({ Item: undefined });
+      }
+    }
+
+    // Default case
+    return Promise.resolve({ Item: undefined });
+  });
+}
+
 export function mockDynamoDBQueryHistoryResponse(response: FakeHistoryBlockListResponse) {
   (globalThis as any).dynamoDBMock
     .on(QueryCommand)

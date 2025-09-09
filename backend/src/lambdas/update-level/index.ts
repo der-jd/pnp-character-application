@@ -5,12 +5,12 @@ import {
   getCharacterItem,
   decodeUserId,
   HttpError,
-  ensureHttpError,
+  logAndEnsureHttpError,
   updateLevel,
   logZodError,
   isZodError,
 } from "utils";
-import { headersSchema, updateLevelRequestSchema, updateLevelPathParamsSchema, UpdateLevelResponse } from "shared";
+import { headersSchema, postLevelRequestSchema, postLevelPathParamsSchema, UpdateLevelResponse } from "api-spec";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _updateLevel({
@@ -57,7 +57,7 @@ export async function _updateLevel(request: Request): Promise<APIGatewayProxyRes
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 
@@ -66,8 +66,8 @@ function validateRequest(request: Request): Parameters {
     console.log("Validate request");
     return {
       userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
-      characterId: updateLevelPathParamsSchema.parse(request.pathParameters)["character-id"],
-      initialLevel: updateLevelRequestSchema.parse(request.body).initialLevel,
+      characterId: postLevelPathParamsSchema.parse(request.pathParameters)["character-id"],
+      initialLevel: postLevelRequestSchema.parse(request.body).initialLevel,
     };
   } catch (error) {
     if (isZodError(error)) {

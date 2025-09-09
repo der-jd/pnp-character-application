@@ -1,16 +1,23 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { z } from "zod";
+import {
+  PostSpecialAbilitiesPathParams,
+  PostSpecialAbilitiesRequest,
+  AddSpecialAbilityResponse,
+  postSpecialAbilitiesPathParamsSchema,
+  postSpecialAbilitiesRequestSchema,
+  headersSchema,
+} from "api-spec";
 import {
   Request,
   parseBody,
   getCharacterItem,
   decodeUserId,
   HttpError,
-  ensureHttpError,
-  validateUUID,
+  logAndEnsureHttpError,
   setSpecialAbilities,
+  logZodError,
+  isZodError,
 } from "utils";
-import { MAX_STRING_LENGTH_DEFAULT } from "config";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _addSpecialAbility({
@@ -21,16 +28,10 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const bodySchema = z
-  .object({
-    specialAbility: z.string().max(MAX_STRING_LENGTH_DEFAULT),
-  })
-  .strict();
-
 interface Parameters {
   userId: string;
-  characterId: string;
-  specialAbility: string;
+  pathParams: PostSpecialAbilitiesPathParams;
+  body: PostSpecialAbilitiesRequest;
 }
 
 export async function _addSpecialAbility(request: Request): Promise<APIGatewayProxyResult> {
@@ -38,70 +39,52 @@ export async function _addSpecialAbility(request: Request): Promise<APIGatewayPr
     const params = validateRequest(request);
 
     console.log(
-      `Add special ability '${params.specialAbility}' to character ${params.characterId} of user ${params.userId}`,
+      `Add special ability '${params.body.specialAbility}' to character ${params.pathParams["character-id"]} of user ${params.userId}`,
     );
 
-    const character = await getCharacterItem(params.userId, params.characterId);
-    const specialAbilitiesOld = new Set(character.characterSheet.specialAbilities);
-    const specialAbilitiesNew = new Set(specialAbilitiesOld);
-    specialAbilitiesNew.add(params.specialAbility);
-    await setSpecialAbilities(params.userId, params.characterId, specialAbilitiesNew);
+    const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
+    const specialAbilitiesOld = character.characterSheet.specialAbilities;
+    const specialAbilitiesNew = [...specialAbilitiesOld];
+    if (!specialAbilitiesNew.includes(params.body.specialAbility)) {
+      specialAbilitiesNew.push(params.body.specialAbility);
+    }
+    await setSpecialAbilities(params.userId, params.pathParams["character-id"], specialAbilitiesNew);
 
+    const responseBody: AddSpecialAbilityResponse = {
+      characterId: params.pathParams["character-id"],
+      userId: params.userId,
+      specialAbilityName: params.body.specialAbility,
+      specialAbilities: {
+        old: {
+          values: specialAbilitiesOld,
+        },
+        new: {
+          values: specialAbilitiesNew,
+        },
+      },
+    };
     const response = {
       statusCode: 200,
-      // JSON.stringify() does not work with Set, so we need to convert it to an array
-      body: JSON.stringify(
-        {
-          characterId: params.characterId,
-          userId: params.userId,
-          specialAbilityName: params.specialAbility,
-          specialAbilities: {
-            old: {
-              values: specialAbilitiesOld,
-            },
-            new: {
-              values: specialAbilitiesNew,
-            },
-          },
-        },
-        (key, value) => {
-          if (value instanceof Set) {
-            return Array.from(value);
-          }
-          return value;
-        },
-      ),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 
 function validateRequest(request: Request): Parameters {
-  console.log("Validate request");
-
-  const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
-
-  const characterId = request.pathParameters?.["character-id"];
-  if (typeof characterId !== "string") {
-    throw new HttpError(400, "Invalid input values!");
-  }
-
-  validateUUID(characterId);
-
   try {
-    const body = bodySchema.parse(request.body);
-
+    console.log("Validate request");
     return {
-      userId: userId,
-      characterId: characterId,
-      specialAbility: body.specialAbility,
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      pathParams: postSpecialAbilitiesPathParamsSchema.parse(request.pathParameters),
+      body: postSpecialAbilitiesRequestSchema.parse(request.body),
     };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
+    if (isZodError(error)) {
+      logZodError(error);
       throw new HttpError(400, "Invalid input values!");
     }
 

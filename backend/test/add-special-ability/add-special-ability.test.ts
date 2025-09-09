@@ -3,9 +3,10 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
+import { addSpecialAbilityResponseSchema } from "api-spec";
 import { _addSpecialAbility } from "add-special-ability";
 import { expectHttpError } from "../utils.js";
-import { MAX_STRING_LENGTH_DEFAULT } from "config";
+import { MAX_STRING_LENGTH_DEFAULT } from "api-spec";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [
@@ -134,14 +135,13 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = addSpecialAbilityResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       expect(parsedBody.userId).toBe(fakeUserId);
 
       expect(parsedBody.specialAbilityName).toBe(_case.request.body.specialAbility);
 
-      // For the initial serialization of the response body, Set values are converted to arrays
-      expect(parsedBody.specialAbilities.old.values).toEqual(Array.from(fakeCharacter.characterSheet.specialAbilities));
+      expect(parsedBody.specialAbilities.old.values).toEqual(fakeCharacter.characterSheet.specialAbilities);
       expect(parsedBody.specialAbilities.new).toStrictEqual(parsedBody.specialAbilities.old);
       expect(parsedBody.specialAbilities.new.values).toContain(parsedBody.specialAbilityName);
     });
@@ -172,14 +172,13 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = addSpecialAbilityResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       expect(parsedBody.userId).toBe(fakeUserId);
 
       expect(parsedBody.specialAbilityName).toBe(_case.request.body.specialAbility);
 
-      // For the initial serialization of the response body, Set values are converted to arrays
-      expect(parsedBody.specialAbilities.old.values).toEqual(Array.from(fakeCharacter.characterSheet.specialAbilities));
+      expect(parsedBody.specialAbilities.old.values).toEqual(fakeCharacter.characterSheet.specialAbilities);
       expect(parsedBody.specialAbilities.old.values).not.toContain(parsedBody.specialAbilityName);
       const newSpecialAbilities = [...parsedBody.specialAbilities.old.values, parsedBody.specialAbilityName];
       expect(parsedBody.specialAbilities.new.values).toStrictEqual(newSpecialAbilities);

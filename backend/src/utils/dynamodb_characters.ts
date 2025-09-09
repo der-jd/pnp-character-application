@@ -1,16 +1,16 @@
 import { DeleteCommand, GetCommand, PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { Attribute, Character, characterSchema, CalculationPoints, Skill, CombatValues, BaseValue } from "config";
+import { Attribute, Character, CalculationPoints, CombatValues, BaseValue, Skill, characterSchema } from "api-spec";
 import { HttpError } from "./errors.js";
 import { dynamoDBDocClient } from "./dynamodb_client.js";
 
 export async function setSpecialAbilities(
   userId: string,
   characterId: string,
-  specialAbilities: Set<string>,
+  specialAbilities: string[],
 ): Promise<void> {
   console.log(
-    `Set special abilities '${Array.from(specialAbilities).join(", ")}' to character ${characterId} of user ${userId} in DynamoDB`,
+    `Set special abilities '${specialAbilities.join(", ")}' to character ${characterId} of user ${userId} in DynamoDB`,
   );
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
@@ -26,7 +26,7 @@ export async function setSpecialAbilities(
       "#specialAbilities": "specialAbilities",
     },
     ExpressionAttributeValues: {
-      ":specialAbilities": specialAbilities,
+      ":specialAbilities": new Set(specialAbilities),
     },
   });
 
@@ -56,7 +56,13 @@ export async function getCharacterItem(userId: string, characterId: string): Pro
 
   console.log("Successfully got DynamoDB item");
 
-  return characterSchema.parse(response.Item);
+  // Convert Sets to arrays before parsing since the schema expects arrays
+  const item = response.Item;
+  if (item?.characterSheet?.specialAbilities) {
+    item.characterSheet.specialAbilities = Array.from(item.characterSheet.specialAbilities);
+  }
+
+  return characterSchema.parse(item);
 }
 
 export async function getCharacterItems(userId: string): Promise<Character[]> {
@@ -80,7 +86,15 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
 
   console.log("Successfully got DynamoDB items");
 
-  return z.array(characterSchema).parse(response.Items);
+  // Convert Sets to arrays before parsing since the schema expects arrays
+  const items = response.Items.map((item) => {
+    if (item?.characterSheet?.specialAbilities) {
+      item.characterSheet.specialAbilities = Array.from(item.characterSheet.specialAbilities);
+    }
+    return item;
+  });
+
+  return z.array(characterSchema).parse(items);
 }
 
 export async function createCharacterItem(character: Character): Promise<void> {

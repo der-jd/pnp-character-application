@@ -76,9 +76,9 @@ jobs:
           name: Install dependencies
           command: npm ci
       - run:
-          name: Build shared package
+          name: Build api-spec package
           command: |
-            cd shared
+            cd api-spec
             npm run build
       - run:
           name: Build backend
@@ -100,9 +100,9 @@ jobs:
           name: Install dependencies
           command: npm ci
       - run:
-          name: Build shared package
+          name: Build api-spec package
           command: |
-            cd shared
+            cd api-spec
             npm run build
       - run:
           name: Run tests

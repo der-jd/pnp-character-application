@@ -1,0 +1,44 @@
+import { z } from "zod";
+import { userIdSchema } from "../general-schemas.js";
+import { levelSchema } from "../character-schemas.js";
+import { recordSchema } from "../history-schemas.js";
+
+export const postLevelPathParamsSchema = z
+  .object({
+    "character-id": z.uuid(),
+  })
+  .strict();
+
+export type PostLevelPathParams = z.infer<typeof postLevelPathParamsSchema>;
+
+export const postLevelRequestSchema = z
+  .object({
+    initialLevel: levelSchema,
+  })
+  .strict();
+
+export type PostLevelRequest = z.infer<typeof postLevelRequestSchema>;
+
+export const updateLevelResponseSchema = z
+  .object({
+    characterId: z.uuid(),
+    userId: userIdSchema,
+    level: z
+      .object({
+        old: z.object({ value: levelSchema }).strict(),
+        new: z.object({ value: levelSchema }).strict(),
+      })
+      .strict(),
+  })
+  .strict();
+
+export type UpdateLevelResponse = z.infer<typeof updateLevelResponseSchema>;
+
+export const postLevelResponseSchema = z
+  .object({
+    data: updateLevelResponseSchema,
+    historyRecord: recordSchema,
+  })
+  .strict();
+
+export type PostLevelResponse = z.infer<typeof postLevelResponseSchema>;

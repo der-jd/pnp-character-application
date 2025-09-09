@@ -3,7 +3,8 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { CharacterSheet, getAttribute } from "config";
+import { CharacterSheet, updateAttributeResponseSchema } from "api-spec";
+import { getAttribute } from "config";
 import { _updateAttribute } from "update-attribute";
 import { expectHttpError } from "../utils.js";
 
@@ -288,7 +289,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateAttributeResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       const attributeName = _case.request.pathParameters["attribute-name"];
       expect(parsedBody.attributeName).toBe(attributeName);
@@ -434,7 +435,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateAttributeResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       const attributeName = _case.request.pathParameters["attribute-name"];
       expect(parsedBody.attributeName).toBe(attributeName);
@@ -578,7 +579,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateAttributeResponseSchema.parse(JSON.parse(result.body));
       const attributeName = _case.request.pathParameters["attribute-name"];
       expect(parsedBody.attributeName).toBe(attributeName);
 
@@ -592,52 +593,56 @@ describe("Valid requests", () => {
         expect(parsedBody.changes.old.baseValues).toBeDefined();
         expect(parsedBody.changes.new.baseValues).toBeDefined();
 
-        for (const baseValueName of Object.keys(
-          parsedBody.changes.old.baseValues,
-        ) as (keyof CharacterSheet["baseValues"])[]) {
-          const oldVal = parsedBody.changes.old.baseValues[baseValueName];
-          const newVal = parsedBody.changes.new.baseValues[baseValueName];
+        if (parsedBody.changes.old.baseValues && parsedBody.changes.new.baseValues) {
+          for (const baseValueName of Object.keys(
+            parsedBody.changes.old.baseValues,
+          ) as (keyof CharacterSheet["baseValues"])[]) {
+            const oldVal = parsedBody.changes.old.baseValues[baseValueName];
+            const newVal = parsedBody.changes.new.baseValues[baseValueName];
 
-          // Only byFormula and current should differ
-          for (const key of Object.keys(oldVal) as (keyof typeof oldVal)[]) {
-            if (key === "byFormula" || key === "current") continue;
-            expect(newVal[key]).toStrictEqual(oldVal[key]);
-          }
-
-          const diffCurrent = newVal.current - oldVal.current;
-          const diffByFormula = newVal.byFormula - oldVal.byFormula;
-          expect(diffCurrent).toBe(diffByFormula);
-
-          switch (baseValueName) {
-            case "healthPoints":
-              expect(newVal.current).toBe(102);
-              expect(newVal.byFormula).toBe(79);
-              break;
-            case "mentalHealth":
-              expect(newVal.current).toBe(57);
-              expect(newVal.byFormula).toBe(57);
-              break;
-            case "initiativeBaseValue":
-              expect(newVal.current).toBe(27);
-              expect(newVal.byFormula).toBe(17);
-              break;
-            case "attackBaseValue":
-              if (attributeName === "strength") {
-                expect(newVal.current).toBe(114);
-                expect(newVal.byFormula).toBe(114);
-              } else if (attributeName === "courage") {
-                expect(newVal.current).toBe(124);
-                expect(newVal.byFormula).toBe(124);
+            if (oldVal && newVal) {
+              // Only byFormula and current should differ
+              for (const key of Object.keys(oldVal) as (keyof typeof oldVal)[]) {
+                if (key === "byFormula" || key === "current") continue;
+                expect(newVal[key]).toStrictEqual(oldVal[key]);
               }
-              break;
-            case "paradeBaseValue":
-              expect(newVal.current).toBe(116);
-              expect(newVal.byFormula).toBe(116);
-              break;
-            case "rangedAttackBaseValue":
-              expect(newVal.current).toBe(112);
-              expect(newVal.byFormula).toBe(112);
-              break;
+
+              const diffCurrent = newVal.current - oldVal.current;
+              const diffByFormula = (newVal.byFormula ?? 0) - (oldVal.byFormula ?? 0);
+              expect(diffCurrent).toBe(diffByFormula);
+
+              switch (baseValueName) {
+                case "healthPoints":
+                  expect(newVal.current).toBe(102);
+                  expect(newVal.byFormula).toBe(79);
+                  break;
+                case "mentalHealth":
+                  expect(newVal.current).toBe(57);
+                  expect(newVal.byFormula).toBe(57);
+                  break;
+                case "initiativeBaseValue":
+                  expect(newVal.current).toBe(27);
+                  expect(newVal.byFormula).toBe(17);
+                  break;
+                case "attackBaseValue":
+                  if (attributeName === "strength") {
+                    expect(newVal.current).toBe(114);
+                    expect(newVal.byFormula).toBe(114);
+                  } else if (attributeName === "courage") {
+                    expect(newVal.current).toBe(124);
+                    expect(newVal.byFormula).toBe(124);
+                  }
+                  break;
+                case "paradeBaseValue":
+                  expect(newVal.current).toBe(116);
+                  expect(newVal.byFormula).toBe(116);
+                  break;
+                case "rangedAttackBaseValue":
+                  expect(newVal.current).toBe(112);
+                  expect(newVal.byFormula).toBe(112);
+                  break;
+              }
+            }
           }
         }
       }

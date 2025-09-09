@@ -1,5 +1,4 @@
-import { combatSkills } from "./character.js";
-import { CostCategory } from "./cost.js";
+import { CostCategory, combatSkillsSchema } from "api-spec";
 
 export const ATTRIBUTE_POINTS_FOR_CREATION = 40;
 
@@ -11,10 +10,10 @@ export const HOBBY_SKILL_BONUS = 25;
 
 export const NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION = 5;
 
-export const START_LEVEL = 1;
-
 export const COST_CATEGORY_DEFAULT = CostCategory.CAT_2;
 export const COST_CATEGORY_COMBAT_SKILLS = CostCategory.CAT_3;
+
+export const combatSkills = Object.keys(combatSkillsSchema.shape) as Array<keyof typeof combatSkillsSchema.shape>;
 
 export const startSkills: string[] = [
   // body skills

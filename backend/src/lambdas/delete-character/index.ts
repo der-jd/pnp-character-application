@@ -4,13 +4,20 @@ import {
   parseBody,
   decodeUserId,
   HttpError,
-  ensureHttpError,
-  validateUUID,
+  logAndEnsureHttpError,
   getHistoryItems,
   deleteCharacterItem,
   deleteBatchHistoryItems,
+  isZodError,
+  logZodError,
 } from "utils";
-import { historyBlockSchema } from "config";
+import {
+  deleteCharacterPathParamsSchema,
+  DeleteCharacterPathParams,
+  DeleteCharacterResponse,
+  historyBlockSchema,
+  headersSchema,
+} from "api-spec";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return deleteCharacter({
@@ -23,55 +30,58 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  characterId: string;
+  pathParams: DeleteCharacterPathParams;
 }
 
 export async function deleteCharacter(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
+    const characterId = params.pathParams["character-id"];
 
-    console.log(`Delete character ${params.characterId} of user ${params.userId} and its history`);
+    console.log(`Delete character ${characterId} of user ${params.userId} and its history`);
 
     // Wait for the character item to be deleted or throw an error if it does not exist.
-    await deleteCharacterItem(params.userId, params.characterId);
+    await deleteCharacterItem(params.userId, characterId);
 
     const deleteCalls: Promise<void>[] = [];
-    const items = await getHistoryItems(params.characterId, true);
+    const items = await getHistoryItems(characterId, true);
     if (!items || items.length === 0) {
-      console.log(`No history found for character ${params.characterId}, skipping delete`);
+      console.log(`No history found for character ${characterId}, skipping delete`);
     } else {
       deleteCalls.push(deleteBatchHistoryItems(items.map((item) => historyBlockSchema.parse(item))));
     }
     await Promise.all(deleteCalls);
 
+    const responseBody: DeleteCharacterResponse = {
+      userId: params.userId,
+      characterId: characterId,
+    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        userId: params.userId,
-        characterId: params.characterId,
-      }),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 
 function validateRequest(request: Request): Parameters {
-  console.log("Validate request");
+  try {
+    console.log("Validate request");
 
-  const currentUserId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
+    return {
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      pathParams: deleteCharacterPathParamsSchema.parse(request.pathParameters),
+    };
+  } catch (error) {
+    if (isZodError(error)) {
+      logZodError(error);
+      throw new HttpError(400, "Invalid input values!");
+    }
 
-  const characterId = request.pathParameters?.["character-id"];
-  if (typeof characterId !== "string") {
-    throw new HttpError(400, "Invalid input values!");
+    // Rethrow other errors
+    throw error;
   }
-
-  validateUUID(characterId);
-
-  return {
-    userId: currentUserId,
-    characterId: characterId,
-  };
 }

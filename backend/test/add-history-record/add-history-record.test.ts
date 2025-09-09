@@ -1,7 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { CostCategory, RecordType } from "config";
-import { addRecordToHistory, HistoryBodySchema } from "add-history-record";
+import { CostCategory, RecordType } from "api-spec";
+import { AddHistoryRecordRequest, addHistoryRecordResponseSchema } from "config";
+import { addRecordToHistory } from "add-history-record";
 import { fakeUserId } from "../test-data/request.js";
 import {
   fakeHistoryBlockListResponse,
@@ -15,7 +16,7 @@ import { fakeCharacterId } from "../test-data/character.js";
 import { fakeBigHistoryBlock, fakeHistoryBlock2 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 
-const testBody: HistoryBodySchema = {
+const testBody: AddHistoryRecordRequest = {
   userId: fakeUserId,
   type: RecordType.CALCULATION_POINTS_CHANGED,
   name: "Calculation Points",
@@ -275,10 +276,10 @@ describe("Valid requests", () => {
           name: "Berserker Rage",
           data: {
             old: {
-              values: new Set(["Berserker Rage", "Battle Cry"]),
+              values: ["Berserker Rage", "Battle Cry"],
             },
             new: {
-              values: new Set(["Berserker Rage", "Battle Cry", "Iron Will"]),
+              values: ["Berserker Rage", "Battle Cry", "Iron Will"],
             },
           },
           learningMethod: null,
@@ -442,21 +443,13 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = addHistoryRecordResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.type).toBe(_case.request.body.type);
       expect(parsedBody.name).toBe(_case.request.body.name);
       expect(parsedBody.number).toBe(fakeHistoryBlock2.changes[fakeHistoryBlock2.changes.length - 1].number + 1);
       expect(parsedBody.id).toBeDefined();
-
-      // For the initial serialization of the response body, Set values are converted to arrays
-      if (_case.request.body.type === RecordType.SPECIAL_ABILITIES_CHANGED) {
-        expect(parsedBody.data.old.values).toEqual(Array.from(_case.request.body.data.old.values ?? []));
-        expect(parsedBody.data.new.values).toEqual(Array.from(_case.request.body.data.new.values ?? []));
-      } else {
-        expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
-        expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
-      }
-
+      expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
+      expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
       expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
       expect(parsedBody.calculationPoints).toEqual(_case.request.body.calculationPoints);
       expect(parsedBody.comment).toBe(_case.request.body.comment);
@@ -544,7 +537,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = addHistoryRecordResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.type).toBe(_case.request.body.type);
       expect(parsedBody.name).toBe(_case.request.body.name);
       expect(parsedBody.number).toBe(fakeHistoryBlock2.changes[fakeHistoryBlock2.changes.length - 1].number);
@@ -619,7 +612,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = addHistoryRecordResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.type).toBe(_case.request.body.type);
       expect(parsedBody.name).toBe(_case.request.body.name);
       expect(parsedBody.number).toBe(1); // first record in a newly created history
@@ -719,7 +712,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = addHistoryRecordResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.type).toBe(_case.request.body.type);
       expect(parsedBody.name).toBe(_case.request.body.name);
       expect(parsedBody.number).toBe(fakeBigHistoryBlock.changes[fakeBigHistoryBlock.changes.length - 1].number + 1);

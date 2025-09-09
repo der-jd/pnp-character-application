@@ -85,7 +85,7 @@ export interface CharacterSheet {
   };
   advantages: string[];
   disadvantages: string[];
-  specialAbilities: Set<string>;
+  specialAbilities: string[];
   baseValues: {
     healthPoints: BaseValue;
     mentalHealth: BaseValue;

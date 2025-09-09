@@ -1,10 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
 import {
   baseValueSchema,
-  calculationPointsSchema,
   combatValuesSchema,
   RecordType,
   Record,
@@ -14,9 +12,8 @@ import {
   attributeChangeSchema,
   HistoryBlock,
   calculationPointsChangeSchema,
-  stringSetSchema,
   stringArraySchema,
-} from "config";
+} from "api-spec";
 import {
   getHistoryItems,
   createHistoryItem,
@@ -24,9 +21,16 @@ import {
   Request,
   parseBody,
   HttpError,
-  ensureHttpError,
-  validateUUID,
+  logAndEnsureHttpError,
+  isZodError,
+  logZodError,
 } from "utils";
+import {
+  AddHistoryRecordRequest,
+  AddHistoryRecordResponse,
+  addHistoryRecordPathParamsSchema,
+  addHistoryRecordRequestSchema,
+} from "config";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
 
@@ -39,45 +43,9 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
   });
 };
 
-const historyBodySchema = z
-  .object({
-    userId: z.string(),
-    type: z.nativeEnum(RecordType),
-    name: z.string(),
-    data: z
-      .object({
-        old: z.record(z.any()),
-        new: z.record(z.any()),
-      })
-      .strict(),
-    learningMethod: z.string().nullable(),
-    calculationPoints: z
-      .object({
-        adventurePoints: z
-          .object({
-            old: calculationPointsSchema,
-            new: calculationPointsSchema,
-          })
-          .strict()
-          .nullable(),
-        attributePoints: z
-          .object({
-            old: calculationPointsSchema,
-            new: calculationPointsSchema,
-          })
-          .strict()
-          .nullable(),
-      })
-      .strict(),
-    comment: z.string().nullable(),
-  })
-  .strict();
-
-export type HistoryBodySchema = z.infer<typeof historyBodySchema>;
-
 interface Parameters {
   characterId: string;
-  body: HistoryBodySchema;
+  body: AddHistoryRecordRequest;
 }
 
 export async function addRecordToHistory(request: Request): Promise<APIGatewayProxyResult> {
@@ -161,30 +129,17 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
 
     const response = {
       statusCode: 200,
-      // JSON.stringify() does not work with Set, so we need to convert it to an array
-      body: JSON.stringify(record, (key, value) => {
-        if (value instanceof Set) {
-          return Array.from(value);
-        }
-        return value;
-      }),
+      body: JSON.stringify(record as AddHistoryRecordResponse),
     };
     console.log(response);
     return response;
   } catch (error) {
-    throw ensureHttpError(error);
+    throw logAndEnsureHttpError(error);
   }
 }
 
 async function validateRequest(request: Request): Promise<Parameters> {
   console.log("Validate request");
-
-  if (typeof request.pathParameters?.["character-id"] !== "string") {
-    throw new HttpError(400, "Invalid input values!");
-  }
-
-  const characterId = request.pathParameters?.["character-id"];
-  validateUUID(characterId);
 
   try {
     /**
@@ -194,8 +149,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
     if (typeof request.body?.type === "string") {
       request.body.type = Number(request.body.type);
     }
-    // TODO use parse function and request object for all lambdas
-    const body = historyBodySchema.parse(request.body);
+    const body = addHistoryRecordRequestSchema.parse(request.body);
 
     // Check if the character exists
     // Note: This check is currently not necessary as the lambda is called after the update-skill function. I.e. we can assume that the character exists.
@@ -215,15 +169,8 @@ async function validateRequest(request: Request): Promise<Parameters> {
         baseValueSchema.parse(body.data.new);
         break;
       case RecordType.SPECIAL_ABILITIES_CHANGED:
-        try {
-          // When called via the tests, the data is passed as a Set
-          stringSetSchema.parse(body.data.old);
-          stringSetSchema.parse(body.data.new);
-        } catch {
-          // When called via Step Functions, the data is passed as an array, because JSON.stringify() does not work with Set
-          stringArraySchema.parse(body.data.old);
-          stringArraySchema.parse(body.data.new);
-        }
+        stringArraySchema.parse(body.data.old);
+        stringArraySchema.parse(body.data.new);
         break;
       case RecordType.ATTRIBUTE_CHANGED:
         attributeChangeSchema.parse(body.data.old);
@@ -242,12 +189,12 @@ async function validateRequest(request: Request): Promise<Parameters> {
     }
 
     return {
-      characterId: characterId,
+      characterId: addHistoryRecordPathParamsSchema.parse(request.pathParameters)["character-id"],
       body: body,
     };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
+    if (isZodError(error)) {
+      logZodError(error);
       throw new HttpError(400, "Invalid input values!");
     }
 
