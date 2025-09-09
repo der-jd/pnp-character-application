@@ -1,22 +1,23 @@
 import { z } from "zod";
 import { userIdSchema, MAX_ARRAY_SIZE } from "../general-schemas.js";
 import { specialAbilitySchema } from "../character-schemas.js";
+import { recordSchema } from "../history-schemas.js";
 
-export const addSpecialAbilityPathParamsSchema = z
+export const postSpecialAbilitiesPathParamsSchema = z
   .object({
     "character-id": z.uuid(),
   })
   .strict();
 
-export type AddSpecialAbilityPathParams = z.infer<typeof addSpecialAbilityPathParamsSchema>;
+export type PostSpecialAbilitiesPathParams = z.infer<typeof postSpecialAbilitiesPathParamsSchema>;
 
-export const addSpecialAbilityRequestSchema = z
+export const postSpecialAbilitiesRequestSchema = z
   .object({
     specialAbility: specialAbilitySchema,
   })
   .strict();
 
-export type AddSpecialAbilityRequest = z.infer<typeof addSpecialAbilityRequestSchema>;
+export type PostSpecialAbilitiesRequest = z.infer<typeof postSpecialAbilitiesRequestSchema>;
 
 export const addSpecialAbilityResponseSchema = z
   .object({
@@ -41,3 +42,12 @@ export const addSpecialAbilityResponseSchema = z
   .strict();
 
 export type AddSpecialAbilityResponse = z.infer<typeof addSpecialAbilityResponseSchema>;
+
+export const postSpecialAbilitiesResponseSchema = z
+  .object({
+    data: addSpecialAbilityResponseSchema,
+    historyRecord: recordSchema,
+  })
+  .strict();
+
+export type PostSpecialAbilitiesResponse = z.infer<typeof postSpecialAbilitiesResponseSchema>;

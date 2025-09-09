@@ -2,23 +2,23 @@ import { z } from "zod";
 import { characterNameSchema, levelSchema } from "../character-schemas.js";
 import { userIdSchema } from "../general-schemas.js";
 
-export const cloneCharacterPathParamsSchema = z
+export const postCharacterClonePathParamsSchema = z
   .object({
     "character-id": z.uuid(),
   })
   .strict();
 
-export type CloneCharacterPathParams = z.infer<typeof cloneCharacterPathParamsSchema>;
+export type PostCharacterClonePathParams = z.infer<typeof postCharacterClonePathParamsSchema>;
 
-export const cloneCharacterRequestSchema = z
+export const postCharacterCloneRequestSchema = z
   .object({
     userIdOfCharacter: z.uuid(),
   })
   .strict();
 
-export type CloneCharacterRequest = z.infer<typeof cloneCharacterRequestSchema>;
+export type PostCharacterCloneRequest = z.infer<typeof postCharacterCloneRequestSchema>;
 
-export const cloneCharacterResponseSchema = z
+export const postCharacterCloneResponseSchema = z
   .object({
     userId: userIdSchema,
     characterId: z.uuid(),
@@ -27,4 +27,4 @@ export const cloneCharacterResponseSchema = z
   })
   .strict();
 
-export type CloneCharacterResponse = z.infer<typeof cloneCharacterResponseSchema>;
+export type PostCharacterCloneResponse = z.infer<typeof postCharacterCloneResponseSchema>;

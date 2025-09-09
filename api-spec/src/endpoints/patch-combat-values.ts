@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { initialIncreasedSchema, MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
 import { combatValuesSchema } from "../character-schemas.js";
+import { recordSchema } from "../history-schemas.js";
 
-export const updateCombatValuesPathParamsSchema = z
+export const patchCombatValuesPathParamsSchema = z
   .object({
     "character-id": z.uuid(),
     "combat-category": z.string().max(MAX_STRING_LENGTH_DEFAULT),
@@ -10,16 +11,16 @@ export const updateCombatValuesPathParamsSchema = z
   })
   .strict();
 
-export type UpdateCombatValuesPathParams = z.infer<typeof updateCombatValuesPathParamsSchema>;
+export type PatchCombatValuesPathParams = z.infer<typeof patchCombatValuesPathParamsSchema>;
 
-export const updateCombatValuesRequestSchema = z
+export const patchCombatValuesRequestSchema = z
   .object({
     attackValue: initialIncreasedSchema,
     paradeValue: initialIncreasedSchema,
   })
   .strict();
 
-export type UpdateCombatValuesRequest = z.infer<typeof updateCombatValuesRequestSchema>;
+export type PatchCombatValuesRequest = z.infer<typeof patchCombatValuesRequestSchema>;
 
 export const updateCombatValuesResponseSchema = z
   .object({
@@ -37,3 +38,12 @@ export const updateCombatValuesResponseSchema = z
   .strict();
 
 export type UpdateCombatValuesResponse = z.infer<typeof updateCombatValuesResponseSchema>;
+
+export const patchCombatValuesResponseSchema = z
+  .object({
+    data: updateCombatValuesResponseSchema,
+    historyRecord: recordSchema,
+  })
+  .strict();
+
+export type PatchCombatValuesResponse = z.infer<typeof patchCombatValuesResponseSchema>;

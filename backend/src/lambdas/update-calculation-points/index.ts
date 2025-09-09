@@ -2,11 +2,11 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import {
   CalculationPoints,
   headersSchema,
-  UpdateCalculationPointsPathParams,
-  UpdateCalculationPointsRequest,
+  PatchCalculationPointsPathParams,
+  PatchCalculationPointsRequest,
   UpdateCalculationPointsResponse,
-  updateCalculationPointsPathParamsSchema,
-  updateCalculationPointsRequestSchema,
+  patchCalculationPointsPathParamsSchema,
+  patchCalculationPointsRequestSchema,
   InitialNew,
   InitialIncreased,
 } from "api-spec";
@@ -34,8 +34,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  pathParams: UpdateCalculationPointsPathParams;
-  body: UpdateCalculationPointsRequest;
+  pathParams: PatchCalculationPointsPathParams;
+  body: PatchCalculationPointsRequest;
 }
 
 export async function _updateCalculationPoints(request: Request): Promise<APIGatewayProxyResult> {
@@ -114,8 +114,8 @@ function validateRequest(request: Request): Parameters {
 
     return {
       userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
-      pathParams: updateCalculationPointsPathParamsSchema.parse(request.pathParameters),
-      body: updateCalculationPointsRequestSchema.parse(request.body),
+      pathParams: patchCalculationPointsPathParamsSchema.parse(request.pathParameters),
+      body: patchCalculationPointsRequestSchema.parse(request.body),
     };
   } catch (error) {
     if (isZodError(error)) {

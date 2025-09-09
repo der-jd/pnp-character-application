@@ -1,11 +1,11 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { adjustCostCategory, getSkillIncreaseCost, getSkill, parseLearningMethod } from "config";
 import {
-  GetSkillIncreaseCostPathParams,
-  GetSkillIncreaseCostQueryParams,
-  GetSkillIncreaseCostResponse,
-  getSkillIncreaseCostPathParamsSchema,
-  getSkillIncreaseCostQueryParamsSchema,
+  GetSkillPathParams,
+  GetSkillQueryParams,
+  GetSkillResponse,
+  getSkillPathParamsSchema,
+  getSkillQueryParamsSchema,
   headersSchema,
   Character,
 } from "api-spec";
@@ -31,8 +31,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  pathParams: GetSkillIncreaseCostPathParams;
-  queryParams: GetSkillIncreaseCostQueryParams;
+  pathParams: GetSkillPathParams;
+  queryParams: GetSkillQueryParams;
 }
 
 export async function getSkillCost(request: Request): Promise<APIGatewayProxyResult> {
@@ -63,7 +63,7 @@ export async function getSkillCost(request: Request): Promise<APIGatewayProxyRes
 
     const increaseCost = getSkillIncreaseCost(skillValue, adjustedCostCategory);
 
-    const responseBody: GetSkillIncreaseCostResponse = {
+    const responseBody: GetSkillResponse = {
       characterId: params.pathParams["character-id"],
       skillName: params.pathParams["skill-name"],
       increaseCost: increaseCost,
@@ -84,8 +84,8 @@ function validateRequest(request: Request): Parameters {
     console.log("Validate request");
     return {
       userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
-      pathParams: getSkillIncreaseCostPathParamsSchema.parse(request.pathParameters),
-      queryParams: getSkillIncreaseCostQueryParamsSchema.parse(request.queryStringParameters),
+      pathParams: getSkillPathParamsSchema.parse(request.pathParameters),
+      queryParams: getSkillQueryParamsSchema.parse(request.queryStringParameters),
     };
   } catch (error) {
     if (isZodError(error)) {

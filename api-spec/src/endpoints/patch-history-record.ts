@@ -1,16 +1,16 @@
 import { z } from "zod";
 import { MAX_HISTORY_BLOCK_NUMBER, MAX_STRING_LENGTH_VERY_LONG, MIN_HISTORY_BLOCK_NUMBER } from "../general-schemas.js";
 
-export const setHistoryCommentPathParamsSchema = z
+export const patchHistoryRecordPathParamsSchema = z
   .object({
     "character-id": z.uuid(),
     "record-id": z.uuid(),
   })
   .strict();
 
-export type SetHistoryCommentPathParams = z.infer<typeof setHistoryCommentPathParamsSchema>;
+export type PatchHistoryRecordPathParams = z.infer<typeof patchHistoryRecordPathParamsSchema>;
 
-export const setHistoryCommentQueryParamsSchema = z
+export const patchHistoryRecordQueryParamsSchema = z
   .object({
     "block-number": z
       .string()
@@ -25,17 +25,17 @@ export const setHistoryCommentQueryParamsSchema = z
   .nullable()
   .optional();
 
-export type SetHistoryCommentQueryParams = z.infer<typeof setHistoryCommentQueryParamsSchema>;
+export type PatchHistoryRecordQueryParams = z.infer<typeof patchHistoryRecordQueryParamsSchema>;
 
-export const setHistoryCommentRequestSchema = z
+export const patchHistoryRecordRequestSchema = z
   .object({
     comment: z.string().max(MAX_STRING_LENGTH_VERY_LONG),
   })
   .strict();
 
-export type SetHistoryCommentRequest = z.infer<typeof setHistoryCommentRequestSchema>;
+export type PatchHistoryRecordRequest = z.infer<typeof patchHistoryRecordRequestSchema>;
 
-export const setHistoryCommentResponseSchema = z
+export const patchHistoryRecordResponseSchema = z
   .object({
     characterId: z.uuid(),
     blockNumber: z.number().int().min(MIN_HISTORY_BLOCK_NUMBER).max(MAX_HISTORY_BLOCK_NUMBER),
@@ -44,4 +44,4 @@ export const setHistoryCommentResponseSchema = z
   })
   .strict();
 
-export type SetHistoryCommentResponse = z.infer<typeof setHistoryCommentResponseSchema>;
+export type PatchHistoryRecordResponse = z.infer<typeof patchHistoryRecordResponseSchema>;

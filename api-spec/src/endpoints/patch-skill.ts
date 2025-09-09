@@ -12,8 +12,9 @@ import {
   calculationPointsSchema,
   learningMethodSchema,
 } from "../character-schemas.js";
+import { recordSchema } from "../history-schemas.js";
 
-export const updateSkillPathParamsSchema = z
+export const patchSkillPathParamsSchema = z
   .object({
     "character-id": z.uuid(),
     "skill-category": z.string().max(MAX_STRING_LENGTH_DEFAULT),
@@ -21,9 +22,9 @@ export const updateSkillPathParamsSchema = z
   })
   .strict();
 
-export type UpdateSkillPathParams = z.infer<typeof updateSkillPathParamsSchema>;
+export type PatchSkillPathParams = z.infer<typeof patchSkillPathParamsSchema>;
 
-export const updateSkillRequestSchema = z
+export const patchSkillRequestSchema = z
   .object({
     activated: z.boolean().optional(),
     start: initialNewSchema.optional(),
@@ -33,7 +34,7 @@ export const updateSkillRequestSchema = z
   })
   .strict();
 
-export type UpdateSkillRequest = z.infer<typeof updateSkillRequestSchema>;
+export type PatchSkillRequest = z.infer<typeof patchSkillRequestSchema>;
 
 export const updateSkillResponseSchema = z
   .object({
@@ -70,3 +71,12 @@ export const updateSkillResponseSchema = z
   .strict();
 
 export type UpdateSkillResponse = z.infer<typeof updateSkillResponseSchema>;
+
+export const patchSkillResponseSchema = z
+  .object({
+    data: updateSkillResponseSchema,
+    historyRecord: recordSchema,
+  })
+  .strict();
+
+export type PatchSkillResponse = z.infer<typeof patchSkillResponseSchema>;

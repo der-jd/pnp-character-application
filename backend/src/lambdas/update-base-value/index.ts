@@ -1,10 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { getBaseValue } from "config";
 import {
-  updateBaseValuePathParamsSchema,
-  UpdateBaseValuePathParams,
-  updateBaseValueRequestSchema,
-  UpdateBaseValueRequest,
+  patchBaseValuePathParamsSchema,
+  PatchBaseValuePathParams,
+  patchBaseValueRequestSchema,
+  PatchBaseValueRequest,
   UpdateBaseValueResponse,
   headersSchema,
   BaseValue,
@@ -35,8 +35,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  pathParams: UpdateBaseValuePathParams;
-  body: UpdateBaseValueRequest;
+  pathParams: PatchBaseValuePathParams;
+  body: PatchBaseValueRequest;
 }
 
 export async function _updateBaseValue(request: Request): Promise<APIGatewayProxyResult> {
@@ -98,8 +98,8 @@ function validateRequest(request: Request): Parameters {
 
     return {
       userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
-      pathParams: updateBaseValuePathParamsSchema.parse(request.pathParameters),
-      body: updateBaseValueRequestSchema.parse(request.body),
+      pathParams: patchBaseValuePathParamsSchema.parse(request.pathParameters),
+      body: patchBaseValueRequestSchema.parse(request.body),
     };
   } catch (error) {
     if (isZodError(error)) {

@@ -14,9 +14,9 @@ import {
   calculationPointsChangeSchema,
   stringSetSchema,
   stringArraySchema,
-  revertHistoryRecordPathParamsSchema,
-  RevertHistoryRecordPathParams,
-  RevertHistoryRecordResponse,
+  deleteHistoryRecordPathParamsSchema,
+  DeleteHistoryRecordPathParams,
+  DeleteHistoryRecordResponse,
   headersSchema,
 } from "api-spec";
 import {
@@ -51,7 +51,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  pathParams: RevertHistoryRecordPathParams;
+  pathParams: DeleteHistoryRecordPathParams;
 }
 
 export async function revertRecordFromHistory(request: Request): Promise<APIGatewayProxyResult> {
@@ -91,7 +91,7 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
       await deleteLatestHistoryRecord(latestBlock);
     }
 
-    const responseBody: RevertHistoryRecordResponse = latestRecord;
+    const responseBody: DeleteHistoryRecordResponse = latestRecord;
     const response = {
       statusCode: 200,
       // JSON.stringify() does not work with Set, so we need to convert it to an array
@@ -114,7 +114,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
     console.log("Validate request");
     return {
       userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
-      pathParams: revertHistoryRecordPathParamsSchema.parse(request.pathParameters),
+      pathParams: deleteHistoryRecordPathParamsSchema.parse(request.pathParameters),
     };
   } catch (error) {
     if (isZodError(error)) {

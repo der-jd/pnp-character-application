@@ -15,11 +15,11 @@ import {
   CostCategory,
   CombatValues,
   headersSchema,
-  UpdateSkillPathParams,
-  UpdateSkillRequest,
+  PatchSkillPathParams,
+  PatchSkillRequest,
   UpdateSkillResponse,
-  updateSkillPathParamsSchema,
-  updateSkillRequestSchema,
+  patchSkillPathParamsSchema,
+  patchSkillRequestSchema,
   InitialNew,
   InitialIncreased,
 } from "api-spec";
@@ -47,8 +47,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  pathParams: UpdateSkillPathParams;
-  body: UpdateSkillRequest;
+  pathParams: PatchSkillPathParams;
+  body: PatchSkillRequest;
 }
 
 export async function _updateSkill(request: Request): Promise<APIGatewayProxyResult> {
@@ -176,8 +176,8 @@ function validateRequest(request: Request): Parameters {
   try {
     console.log("Validate request");
 
-    const pathParams = updateSkillPathParamsSchema.parse(request.pathParameters);
-    const body = updateSkillRequestSchema.parse(request.body);
+    const pathParams = patchSkillPathParamsSchema.parse(request.pathParameters);
+    const body = patchSkillRequestSchema.parse(request.body);
 
     if ((body.activated || body.current) && !body.learningMethod) {
       throw new HttpError(

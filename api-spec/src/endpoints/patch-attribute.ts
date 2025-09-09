@@ -6,17 +6,18 @@ import {
   MAX_STRING_LENGTH_DEFAULT,
   userIdSchema,
 } from "../general-schemas.js";
+import { recordSchema } from "../history-schemas.js";
 
-export const updateAttributePathParamsSchema = z
+export const patchAttributePathParamsSchema = z
   .object({
     "character-id": z.uuid(),
     "attribute-name": z.string().max(MAX_STRING_LENGTH_DEFAULT),
   })
   .strict();
 
-export type UpdateAttributePathParams = z.infer<typeof updateAttributePathParamsSchema>;
+export type PatchAttributePathParams = z.infer<typeof patchAttributePathParamsSchema>;
 
-export const updateAttributeRequestSchema = z
+export const patchAttributeRequestSchema = z
   .object({
     start: initialNewSchema.optional(),
     current: initialIncreasedSchema.optional(),
@@ -24,7 +25,7 @@ export const updateAttributeRequestSchema = z
   })
   .strict();
 
-export type UpdateAttributeRequest = z.infer<typeof updateAttributeRequestSchema>;
+export type PatchAttributeRequest = z.infer<typeof patchAttributeRequestSchema>;
 
 export const updateAttributeResponseSchema = z
   .object({
@@ -57,3 +58,12 @@ export const updateAttributeResponseSchema = z
   .strict();
 
 export type UpdateAttributeResponse = z.infer<typeof updateAttributeResponseSchema>;
+
+export const patchAttributeResponseSchema = z
+  .object({
+    data: updateAttributeResponseSchema,
+    historyRecord: recordSchema,
+  })
+  .strict();
+
+export type PatchAttributeResponse = z.infer<typeof patchAttributeResponseSchema>;

@@ -1,10 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { getAttribute, calculateBaseValues } from "config";
 import {
-  updateAttributePathParamsSchema,
-  UpdateAttributePathParams,
-  updateAttributeRequestSchema,
-  UpdateAttributeRequest,
+  patchAttributePathParamsSchema,
+  PatchAttributePathParams,
+  patchAttributeRequestSchema,
+  PatchAttributeRequest,
   UpdateAttributeResponse,
   headersSchema,
   Attribute,
@@ -37,8 +37,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  pathParams: UpdateAttributePathParams;
-  body: UpdateAttributeRequest;
+  pathParams: PatchAttributePathParams;
+  body: PatchAttributeRequest;
 }
 
 export async function _updateAttribute(request: Request): Promise<APIGatewayProxyResult> {
@@ -160,8 +160,8 @@ function validateRequest(request: Request): Parameters {
 
     return {
       userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
-      pathParams: updateAttributePathParamsSchema.parse(request.pathParameters),
-      body: updateAttributeRequestSchema.parse(request.body),
+      pathParams: patchAttributePathParamsSchema.parse(request.pathParameters),
+      body: patchAttributeRequestSchema.parse(request.body),
     };
   } catch (error) {
     if (isZodError(error)) {

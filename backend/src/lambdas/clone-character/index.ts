@@ -14,11 +14,11 @@ import {
   logZodError,
 } from "utils";
 import {
-  cloneCharacterPathParamsSchema,
-  CloneCharacterPathParams,
-  cloneCharacterRequestSchema,
-  CloneCharacterRequest,
-  CloneCharacterResponse,
+  postCharacterClonePathParamsSchema,
+  PostCharacterClonePathParams,
+  postCharacterCloneRequestSchema,
+  PostCharacterCloneRequest,
+  PostCharacterCloneResponse,
   headersSchema,
 } from "api-spec";
 
@@ -33,8 +33,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   currentUserId: string;
-  pathParams: CloneCharacterPathParams;
-  body: CloneCharacterRequest;
+  pathParams: PostCharacterClonePathParams;
+  body: PostCharacterCloneRequest;
 }
 
 export async function cloneCharacter(request: Request): Promise<APIGatewayProxyResult> {
@@ -69,7 +69,7 @@ export async function cloneCharacter(request: Request): Promise<APIGatewayProxyR
     console.log("Save new character and history items to DynamoDB");
     await Promise.all(putCalls);
 
-    const responseBody: CloneCharacterResponse = {
+    const responseBody: PostCharacterCloneResponse = {
       userId: character.userId,
       characterId: character.characterId,
       name: character.characterSheet.generalInformation.name,
@@ -92,8 +92,8 @@ function validateRequest(request: Request): Parameters {
 
     return {
       currentUserId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
-      pathParams: cloneCharacterPathParamsSchema.parse(request.pathParameters),
-      body: cloneCharacterRequestSchema.parse(request.body),
+      pathParams: postCharacterClonePathParamsSchema.parse(request.pathParameters),
+      body: postCharacterCloneRequestSchema.parse(request.body),
     };
   } catch (error) {
     if (isZodError(error)) {

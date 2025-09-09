@@ -2,11 +2,11 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { getCombatValues } from "config";
 import {
   headersSchema,
-  UpdateCombatValuesPathParams,
-  UpdateCombatValuesRequest,
+  PatchCombatValuesPathParams,
+  PatchCombatValuesRequest,
   UpdateCombatValuesResponse,
-  updateCombatValuesPathParamsSchema,
-  updateCombatValuesRequestSchema,
+  patchCombatValuesPathParamsSchema,
+  patchCombatValuesRequestSchema,
   Character,
   CombatValues,
 } from "api-spec";
@@ -33,8 +33,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  pathParams: UpdateCombatValuesPathParams;
-  body: UpdateCombatValuesRequest;
+  pathParams: PatchCombatValuesPathParams;
+  body: PatchCombatValuesRequest;
 }
 
 export async function _updateCombatValues(request: Request): Promise<APIGatewayProxyResult> {
@@ -158,8 +158,8 @@ function validateRequest(request: Request): Parameters {
   try {
     console.log("Validate request");
 
-    const pathParams = updateCombatValuesPathParamsSchema.parse(request.pathParameters);
-    const body = updateCombatValuesRequestSchema.parse(request.body);
+    const pathParams = patchCombatValuesPathParamsSchema.parse(request.pathParameters);
+    const body = patchCombatValuesRequestSchema.parse(request.body);
 
     if (pathParams["combat-category"] === "ranged" && body.paradeValue.increasedPoints != 0) {
       throw new HttpError(400, "Parade value for a ranged combat skill must be 0!");

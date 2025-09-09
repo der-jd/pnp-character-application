@@ -1,15 +1,15 @@
 import { z } from "zod";
 import { recordSchema } from "../history-schemas.js";
 
-export const revertHistoryRecordPathParamsSchema = z
+export const deleteHistoryRecordPathParamsSchema = z
   .object({
     "character-id": z.uuid(),
     "record-id": z.uuid(),
   })
   .strict();
 
-export type RevertHistoryRecordPathParams = z.infer<typeof revertHistoryRecordPathParamsSchema>;
+export type DeleteHistoryRecordPathParams = z.infer<typeof deleteHistoryRecordPathParamsSchema>;
 
-export const revertHistoryRecordResponseSchema = recordSchema;
+export const deleteHistoryRecordResponseSchema = recordSchema;
 
-export type RevertHistoryRecordResponse = z.infer<typeof revertHistoryRecordResponseSchema>;
+export type DeleteHistoryRecordResponse = z.infer<typeof deleteHistoryRecordResponseSchema>;

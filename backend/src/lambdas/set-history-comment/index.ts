@@ -1,13 +1,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import {
   HistoryBlock,
-  setHistoryCommentPathParamsSchema,
-  SetHistoryCommentPathParams,
-  setHistoryCommentQueryParamsSchema,
-  SetHistoryCommentQueryParams,
-  setHistoryCommentRequestSchema,
-  SetHistoryCommentRequest,
-  SetHistoryCommentResponse,
+  patchHistoryRecordPathParamsSchema,
+  PatchHistoryRecordPathParams,
+  patchHistoryRecordQueryParamsSchema,
+  PatchHistoryRecordQueryParams,
+  patchHistoryRecordRequestSchema,
+  PatchHistoryRecordRequest,
+  PatchHistoryRecordResponse,
   headersSchema,
 } from "api-spec";
 import {
@@ -35,9 +35,9 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  pathParams: SetHistoryCommentPathParams;
-  queryParams?: SetHistoryCommentQueryParams;
-  body: SetHistoryCommentRequest;
+  pathParams: PatchHistoryRecordPathParams;
+  queryParams?: PatchHistoryRecordQueryParams;
+  body: PatchHistoryRecordRequest;
 }
 
 export async function setHistoryComment(request: Request): Promise<APIGatewayProxyResult> {
@@ -79,7 +79,7 @@ export async function setHistoryComment(request: Request): Promise<APIGatewayPro
 
     await setRecordComment(params.pathParams["character-id"], foundBlockNumber, foundRecordIndex, params.body.comment);
 
-    const responseBody: SetHistoryCommentResponse = {
+    const responseBody: PatchHistoryRecordResponse = {
       characterId: params.pathParams["character-id"],
       blockNumber: foundBlockNumber,
       recordId: params.pathParams["record-id"],
@@ -101,9 +101,9 @@ async function validateRequest(request: Request): Promise<Parameters> {
     console.log("Validate request");
     return {
       userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
-      pathParams: setHistoryCommentPathParamsSchema.parse(request.pathParameters),
-      queryParams: setHistoryCommentQueryParamsSchema.parse(request.queryStringParameters) || undefined,
-      body: setHistoryCommentRequestSchema.parse(request.body),
+      pathParams: patchHistoryRecordPathParamsSchema.parse(request.pathParameters),
+      queryParams: patchHistoryRecordQueryParamsSchema.parse(request.queryStringParameters) || undefined,
+      body: patchHistoryRecordRequestSchema.parse(request.body),
     };
   } catch (error) {
     if (isZodError(error)) {

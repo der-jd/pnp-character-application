@@ -1,10 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import {
-  AddSpecialAbilityPathParams,
-  AddSpecialAbilityRequest,
+  PostSpecialAbilitiesPathParams,
+  PostSpecialAbilitiesRequest,
   AddSpecialAbilityResponse,
-  addSpecialAbilityPathParamsSchema,
-  addSpecialAbilityRequestSchema,
+  postSpecialAbilitiesPathParamsSchema,
+  postSpecialAbilitiesRequestSchema,
   headersSchema,
 } from "api-spec";
 import {
@@ -30,8 +30,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
 interface Parameters {
   userId: string;
-  pathParams: AddSpecialAbilityPathParams;
-  body: AddSpecialAbilityRequest;
+  pathParams: PostSpecialAbilitiesPathParams;
+  body: PostSpecialAbilitiesRequest;
 }
 
 export async function _addSpecialAbility(request: Request): Promise<APIGatewayProxyResult> {
@@ -78,8 +78,8 @@ function validateRequest(request: Request): Parameters {
     console.log("Validate request");
     return {
       userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
-      pathParams: addSpecialAbilityPathParamsSchema.parse(request.pathParameters),
-      body: addSpecialAbilityRequestSchema.parse(request.body),
+      pathParams: postSpecialAbilitiesPathParamsSchema.parse(request.pathParameters),
+      body: postSpecialAbilitiesRequestSchema.parse(request.body),
     };
   } catch (error) {
     if (isZodError(error)) {
