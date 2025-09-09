@@ -43,9 +43,11 @@ export async function _addSpecialAbility(request: Request): Promise<APIGatewayPr
     );
 
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
-    const specialAbilitiesOld = new Set(character.characterSheet.specialAbilities);
-    const specialAbilitiesNew = new Set(specialAbilitiesOld);
-    specialAbilitiesNew.add(params.body.specialAbility);
+    const specialAbilitiesOld = character.characterSheet.specialAbilities;
+    const specialAbilitiesNew = [...specialAbilitiesOld];
+    if (!specialAbilitiesNew.includes(params.body.specialAbility)) {
+      specialAbilitiesNew.push(params.body.specialAbility);
+    }
     await setSpecialAbilities(params.userId, params.pathParams["character-id"], specialAbilitiesNew);
 
     const responseBody: AddSpecialAbilityResponse = {
@@ -53,12 +55,11 @@ export async function _addSpecialAbility(request: Request): Promise<APIGatewayPr
       userId: params.userId,
       specialAbilityName: params.body.specialAbility,
       specialAbilities: {
-        // JSON.stringify() does not work with Set, so we need to convert it to an array
         old: {
-          values: Array.from(specialAbilitiesOld),
+          values: specialAbilitiesOld,
         },
         new: {
-          values: Array.from(specialAbilitiesNew),
+          values: specialAbilitiesNew,
         },
       },
     };

@@ -31,10 +31,9 @@ export async function getCharacter(request: Request): Promise<APIGatewayProxyRes
 
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
 
-    const responseBody: GetCharacterResponse = character;
     const response = {
       statusCode: 200,
-      body: JSON.stringify(responseBody),
+      body: JSON.stringify(character as GetCharacterResponse),
     };
     console.log(response);
     return response;

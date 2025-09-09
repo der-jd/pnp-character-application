@@ -12,7 +12,6 @@ import {
   attributeChangeSchema,
   CharacterSheet,
   calculationPointsChangeSchema,
-  stringSetSchema,
   stringArraySchema,
   deleteHistoryRecordPathParamsSchema,
   DeleteHistoryRecordPathParams,
@@ -91,16 +90,9 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
       await deleteLatestHistoryRecord(latestBlock);
     }
 
-    const responseBody: DeleteHistoryRecordResponse = latestRecord;
     const response = {
       statusCode: 200,
-      // JSON.stringify() does not work with Set, so we need to convert it to an array
-      body: JSON.stringify(responseBody, (key, value) => {
-        if (value instanceof Set) {
-          return Array.from(value);
-        }
-        return value;
-      }),
+      body: JSON.stringify(latestRecord as DeleteHistoryRecordResponse),
     };
     console.log(response);
     return response;
@@ -155,14 +147,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
         break;
       }
       case RecordType.SPECIAL_ABILITIES_CHANGED: {
-        let oldSpecialAbilities: Set<string>;
-        try {
-          // When called via the tests, the data is passed as a Set
-          oldSpecialAbilities = stringSetSchema.parse(record.data.old).values;
-        } catch {
-          // When called via Step Functions, the data is passed as an array, because JSON.stringify() does not work with Set
-          oldSpecialAbilities = new Set(stringArraySchema.parse(record.data.old).values);
-        }
+        const oldSpecialAbilities = stringArraySchema.parse(record.data.old).values;
         await setSpecialAbilities(userId, characterId, oldSpecialAbilities);
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);

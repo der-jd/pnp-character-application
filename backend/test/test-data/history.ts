@@ -407,10 +407,10 @@ export const specialAbilitiesChangedRecord: Record = {
   id: "9f654a4d-2086-47e2-905b-ad189000b17d",
   data: {
     old: {
-      values: new Set(["Iron Will"]),
+      values: ["Iron Will"],
     },
     new: {
-      values: new Set(["Iron Will", "Berserker Rage"]),
+      values: ["Iron Will", "Berserker Rage"],
     },
   },
   learningMethod: null,

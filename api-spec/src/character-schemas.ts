@@ -206,7 +206,13 @@ export const characterSheetSchema = z
       .strict(),
     advantages: dis_advantagesSchema,
     disadvantages: dis_advantagesSchema,
-    specialAbilities: z.set(specialAbilitySchema).max(MAX_ARRAY_SIZE),
+    /**
+     * Duplicated special abilities are not allowed although
+     * the type is an array instead of a Set.
+     * Using a Set (unique values) leads to diverse complications
+     * because JSON.stringify() can't handle Sets.
+     */
+    specialAbilities: z.array(specialAbilitySchema).max(MAX_ARRAY_SIZE),
     baseValues: baseValuesSchema,
     attributes: attributesSchema,
     skills: z

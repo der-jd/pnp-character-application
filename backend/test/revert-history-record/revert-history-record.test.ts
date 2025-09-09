@@ -18,7 +18,6 @@ import {
 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 import { revertRecordFromHistory } from "revert-history-record";
-import { RecordType } from "api-spec";
 
 const lastBlock = fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1];
 
@@ -261,24 +260,7 @@ describe("Valid requests", () => {
 
       const parsedBody = deleteHistoryRecordResponseSchema.parse(JSON.parse(result.body));
 
-      // For the initial serialization of the response body, Set values are converted to arrays
-      if (_case.fakeRecord.type === RecordType.SPECIAL_ABILITIES_CHANGED) {
-        // Replace Set with arrays in the expected object for deep equality check
-        const expectedData = {
-          ..._case.fakeRecord,
-          data: {
-            old: {
-              values: Array.from(_case.fakeRecord.data.old.values as Set<string>),
-            },
-            new: {
-              values: Array.from(_case.fakeRecord.data.new.values as Set<string>),
-            },
-          },
-        };
-        expect(parsedBody).toEqual(expectedData);
-      } else {
-        expect(parsedBody).toEqual(_case.fakeRecord);
-      }
+      expect(parsedBody).toEqual(_case.fakeRecord);
 
       /**
        * Check if the UpdateCommand was called at least once for the removal of the latest record from the history item.

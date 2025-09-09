@@ -97,12 +97,6 @@ export const stringArraySchema = z
   })
   .strict();
 
-export const stringSetSchema = z
-  .object({
-    values: z.set(z.string().max(MAX_STRING_LENGTH_LONG)).max(MAX_ARRAY_SIZE),
-  })
-  .strict();
-
 export const attributeChangeSchema = z
   .object({
     attribute: attributeSchema,

@@ -101,7 +101,6 @@
 
 //     const response = {
 //       statusCode: 200,
-//       // JSON.stringify() does not work with Set, so we need to convert it to an array
 //       body: JSON.stringify(
 //         {
 //           characterId: character.characterId,
@@ -111,12 +110,6 @@
 //             old: {},
 //             new: character,
 //           },
-//         },
-//         (key, value) => {
-//           if (value instanceof Set) {
-//             return Array.from(value);
-//           }
-//           return value;
 //         },
 //       ),
 //     };

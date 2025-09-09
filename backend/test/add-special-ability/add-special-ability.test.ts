@@ -141,8 +141,7 @@ describe("Valid requests", () => {
 
       expect(parsedBody.specialAbilityName).toBe(_case.request.body.specialAbility);
 
-      // For the initial serialization of the response body, Set values are converted to arrays
-      expect(parsedBody.specialAbilities.old.values).toEqual(Array.from(fakeCharacter.characterSheet.specialAbilities));
+      expect(parsedBody.specialAbilities.old.values).toEqual(fakeCharacter.characterSheet.specialAbilities);
       expect(parsedBody.specialAbilities.new).toStrictEqual(parsedBody.specialAbilities.old);
       expect(parsedBody.specialAbilities.new.values).toContain(parsedBody.specialAbilityName);
     });
@@ -179,8 +178,7 @@ describe("Valid requests", () => {
 
       expect(parsedBody.specialAbilityName).toBe(_case.request.body.specialAbility);
 
-      // For the initial serialization of the response body, Set values are converted to arrays
-      expect(parsedBody.specialAbilities.old.values).toEqual(Array.from(fakeCharacter.characterSheet.specialAbilities));
+      expect(parsedBody.specialAbilities.old.values).toEqual(fakeCharacter.characterSheet.specialAbilities);
       expect(parsedBody.specialAbilities.old.values).not.toContain(parsedBody.specialAbilityName);
       const newSpecialAbilities = [...parsedBody.specialAbilities.old.values, parsedBody.specialAbilityName];
       expect(parsedBody.specialAbilities.new.values).toStrictEqual(newSpecialAbilities);

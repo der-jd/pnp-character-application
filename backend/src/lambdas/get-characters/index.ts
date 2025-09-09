@@ -15,6 +15,7 @@ import {
   GetCharactersResponse,
   CharacterShort,
   headersSchema,
+  Character,
 } from "api-spec";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -37,7 +38,7 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
 
     const items = await getCharacterItems(params.userId);
 
-    let characters = [];
+    let characters: (CharacterShort | Character)[] = [];
     if (params.queryParams["character-short"]) {
       for (const item of items) {
         const characterShort: CharacterShort = {
@@ -52,12 +53,9 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
       characters = items;
     }
 
-    const responseBody: GetCharactersResponse = {
-      characters: characters,
-    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify(responseBody),
+      body: JSON.stringify({ characters: characters } as GetCharactersResponse),
     };
     console.log(response);
     return response;

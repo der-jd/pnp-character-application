@@ -53,7 +53,7 @@ export function createEmptyCharacterSheet(): CharacterSheet {
     },
     advantages: [],
     disadvantages: [],
-    specialAbilities: new Set<string>(),
+    specialAbilities: [],
     baseValues: {
       healthPoints: zeroBaseValue(),
       mentalHealth: zeroBaseValue(),
