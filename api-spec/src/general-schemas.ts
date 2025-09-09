@@ -4,6 +4,7 @@ export const MAX_STRING_LENGTH_SHORT = 30;
 export const MAX_STRING_LENGTH_DEFAULT = 120;
 export const MAX_STRING_LENGTH_LONG = 500;
 export const MAX_STRING_LENGTH_VERY_LONG = 1000;
+export const MAX_HEADER_LENGTH = 2000;
 
 export const MIN_POINTS = -10000;
 export const MAX_POINTS = 1000000;
