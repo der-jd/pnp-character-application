@@ -36,7 +36,6 @@ export {
   recordSchema,
   RecordType,
   Record,
-  parseRecordType,
   historyBlockSchema,
   HistoryBlock,
   integerSchema,

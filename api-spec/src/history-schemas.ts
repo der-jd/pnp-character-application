@@ -30,10 +30,6 @@ export enum RecordType {
   COMBAT_VALUES_CHANGED = 7,
 }
 
-export function parseRecordType(method: string): RecordType {
-  return RecordType[method.toUpperCase() as keyof typeof RecordType];
-}
-
 export const recordSchema = z
   .object({
     type: z.enum(RecordType),

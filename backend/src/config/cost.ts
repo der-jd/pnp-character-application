@@ -1,4 +1,9 @@
-import { CostCategory, LearningMethod } from "api-spec";
+import { CostCategory, LearningMethod, RecordType } from "api-spec";
+
+// TODO move this function and similar ones to utils package?!
+export function parseRecordType(method: string): RecordType {
+  return RecordType[method.toUpperCase() as keyof typeof RecordType];
+}
 
 export function parseLearningMethod(method: string): LearningMethod {
   return LearningMethod[method.toUpperCase() as keyof typeof LearningMethod];
