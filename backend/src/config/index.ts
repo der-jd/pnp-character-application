@@ -16,3 +16,11 @@ export {
 } from "./rules.js";
 export { createEmptyCharacterSheet } from "./character_factory.js";
 export { calculateBaseValues } from "./formulas.js";
+export {
+  addHistoryRecordPathParamsSchema,
+  AddHistoryRecordPathParams,
+  addHistoryRecordRequestSchema,
+  AddHistoryRecordRequest,
+  addHistoryRecordResponseSchema,
+  AddHistoryRecordResponse,
+} from "./add-history-record.js";

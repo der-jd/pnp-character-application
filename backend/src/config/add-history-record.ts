@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { recordSchema } from "../history-schemas.js";
-import { userIdSchema } from "../general-schemas.js";
+import { recordSchema } from "api-spec/src/history-schemas.js";
+import { userIdSchema } from "api-spec/src/general-schemas.js";
 
 export const addHistoryRecordPathParamsSchema = z
   .object({

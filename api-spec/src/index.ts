@@ -62,7 +62,7 @@ export {
   RevertHistoryRecordPathParams,
   revertHistoryRecordResponseSchema,
   RevertHistoryRecordResponse,
-} from "./endpoints/revert-history-record.js";
+} from "./endpoints/delete-history-record.js";
 export {
   setHistoryCommentPathParamsSchema,
   SetHistoryCommentPathParams,
@@ -72,7 +72,7 @@ export {
   SetHistoryCommentRequest,
   setHistoryCommentResponseSchema,
   SetHistoryCommentResponse,
-} from "./endpoints/set-history-comment.js";
+} from "./endpoints/patch-history-record.js";
 export {
   updateLevelPathParamsSchema,
   UpdateLevelPathParams,
@@ -80,15 +80,7 @@ export {
   UpdateLevelRequest,
   updateLevelResponseSchema,
   UpdateLevelResponse,
-} from "./endpoints/update-level.js";
-export {
-  addHistoryRecordPathParamsSchema,
-  AddHistoryRecordPathParams,
-  addHistoryRecordRequestSchema,
-  AddHistoryRecordRequest,
-  addHistoryRecordResponseSchema,
-  AddHistoryRecordResponse,
-} from "./endpoints/add-history-record.js";
+} from "./endpoints/post-level.js";
 export {
   addSpecialAbilityPathParamsSchema,
   AddSpecialAbilityPathParams,
@@ -96,7 +88,7 @@ export {
   AddSpecialAbilityRequest,
   addSpecialAbilityResponseSchema,
   AddSpecialAbilityResponse,
-} from "./endpoints/add-special-ability.js";
+} from "./endpoints/post-special-abilities.js";
 export {
   getCharacterPathParamsSchema,
   GetCharacterPathParams,
@@ -118,7 +110,7 @@ export {
   GetSkillIncreaseCostQueryParams,
   getSkillIncreaseCostResponseSchema,
   GetSkillIncreaseCostResponse,
-} from "./endpoints/get-skill-increase-cost.js";
+} from "./endpoints/get-skill.js";
 export {
   deleteCharacterPathParamsSchema,
   DeleteCharacterPathParams,
@@ -132,7 +124,7 @@ export {
   CloneCharacterRequest,
   cloneCharacterResponseSchema,
   CloneCharacterResponse,
-} from "./endpoints/clone-character.js";
+} from "./endpoints/post-character-clone.js";
 export {
   updateAttributePathParamsSchema,
   UpdateAttributePathParams,
@@ -140,7 +132,7 @@ export {
   UpdateAttributeRequest,
   updateAttributeResponseSchema,
   UpdateAttributeResponse,
-} from "./endpoints/update-attribute.js";
+} from "./endpoints/patch-attribute.js";
 export {
   updateBaseValuePathParamsSchema,
   UpdateBaseValuePathParams,
@@ -149,7 +141,7 @@ export {
   updateBaseValueResponseSchema,
   UpdateBaseValueResponse,
   baseValuesUpdatableByLvlUp,
-} from "./endpoints/update-base-value.js";
+} from "./endpoints/patch-base-value.js";
 export {
   updateCalculationPointsPathParamsSchema,
   UpdateCalculationPointsPathParams,
@@ -157,7 +149,7 @@ export {
   UpdateCalculationPointsRequest,
   updateCalculationPointsResponseSchema,
   UpdateCalculationPointsResponse,
-} from "./endpoints/update-calculation-points.js";
+} from "./endpoints/patch-calculation-points.js";
 export {
   updateCombatValuesPathParamsSchema,
   UpdateCombatValuesPathParams,
@@ -165,7 +157,7 @@ export {
   UpdateCombatValuesRequest,
   updateCombatValuesResponseSchema,
   UpdateCombatValuesResponse,
-} from "./endpoints/update-combat-values.js";
+} from "./endpoints/patch-combat-values.js";
 export {
   updateSkillPathParamsSchema,
   UpdateSkillPathParams,
@@ -173,7 +165,7 @@ export {
   UpdateSkillRequest,
   updateSkillResponseSchema,
   UpdateSkillResponse,
-} from "./endpoints/update-skill.js";
+} from "./endpoints/patch-skill.js";
 export {
   getHistoryPathParamsSchema,
   GetHistoryPathParams,
