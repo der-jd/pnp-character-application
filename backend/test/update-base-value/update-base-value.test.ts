@@ -3,6 +3,7 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
+import { updateBaseValueResponseSchema } from "api-spec";
 import { getBaseValue } from "config";
 import { _updateBaseValue } from "update-base-value";
 import { expectHttpError } from "../utils.js";
@@ -306,7 +307,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateBaseValueResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       const baseValueName = _case.request.pathParameters["base-value-name"];
       expect(parsedBody.baseValueName).toBe(baseValueName);
@@ -420,7 +421,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateBaseValueResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       const baseValueName = _case.request.pathParameters["base-value-name"];
       expect(parsedBody.baseValueName).toBe(baseValueName);
@@ -434,7 +435,7 @@ describe("Valid requests", () => {
 
       if (_case.request.body.byLvlUp) {
         expect(parsedBody.baseValue.new.byLvlUp).toBe(_case.request.body.byLvlUp.newValue);
-        const diffByLvlUp = parsedBody.baseValue.new.byLvlUp - parsedBody.baseValue.old.byLvlUp;
+        const diffByLvlUp = (parsedBody.baseValue.new.byLvlUp ?? 0) - (parsedBody.baseValue.old.byLvlUp ?? 0);
         const diffCurrent = parsedBody.baseValue.new.current - parsedBody.baseValue.old.current;
         expect(diffByLvlUp).toBe(diffCurrent);
         expect(parsedBody.baseValue.new.current).toBe(parsedBody.baseValue.old.current + diffByLvlUp);

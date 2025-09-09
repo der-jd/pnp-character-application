@@ -10,7 +10,7 @@ import {
 import { fakeCharacterId } from "../test-data/character.js";
 import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
 import { getHistory } from "get-history";
-import { HistoryBlock } from "api-spec";
+import { HistoryBlock, getHistoryResponseSchema } from "api-spec";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
@@ -130,7 +130,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = getHistoryResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.items.length).toBe(1); // The Lambda function currently only returns one item with each call
 
       // Check that all history items have the same character id as the input

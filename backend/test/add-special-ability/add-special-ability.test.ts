@@ -3,6 +3,7 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
+import { addSpecialAbilityResponseSchema } from "api-spec";
 import { _addSpecialAbility } from "add-special-ability";
 import { expectHttpError } from "../utils.js";
 import { MAX_STRING_LENGTH_DEFAULT } from "api-spec";
@@ -134,7 +135,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = addSpecialAbilityResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       expect(parsedBody.userId).toBe(fakeUserId);
 
@@ -172,7 +173,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = addSpecialAbilityResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       expect(parsedBody.userId).toBe(fakeUserId);
 

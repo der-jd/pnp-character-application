@@ -4,8 +4,8 @@ import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { getCombatCategory, getCombatValues, getSkill } from "config";
-import { Character } from "api-spec";
-import { _updateSkill, availableCombatPointsChanged } from "../../src/lambdas/update-skill/index.js";
+import { Character, updateSkillResponseSchema } from "api-spec";
+import { _updateSkill, availableCombatPointsChanged } from "update-skill";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
@@ -420,7 +420,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateSkillResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       const skillCategory = _case.request.pathParameters[
         "skill-category"
@@ -718,7 +718,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = updateSkillResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       const skillCategory = _case.request.pathParameters[
         "skill-category"
@@ -816,14 +816,14 @@ describe("Valid requests", () => {
           skillName,
         );
         expect(parsedBody.changes.old.combatValues).toStrictEqual(skillCombatValuesOld);
-        expect(parsedBody.changes.new.combatValues.attackValue).toBe(skillCombatValuesOld.attackValue);
-        expect(parsedBody.changes.new.combatValues.paradeValue).toBe(skillCombatValuesOld.paradeValue);
+        expect(parsedBody.changes.new.combatValues?.attackValue).toBe(skillCombatValuesOld.attackValue);
+        expect(parsedBody.changes.new.combatValues?.paradeValue).toBe(skillCombatValuesOld.paradeValue);
 
         const availableCombatPointsNew =
           skillCombatValuesOld.availablePoints +
           (parsedBody.changes.new.skill.current - parsedBody.changes.old.skill.current) +
           (parsedBody.changes.new.skill.mod - parsedBody.changes.old.skill.mod);
-        expect(parsedBody.changes.new.combatValues.availablePoints).toBe(availableCombatPointsNew);
+        expect(parsedBody.changes.new.combatValues?.availablePoints).toBe(availableCombatPointsNew);
       }
       // Only skill is updated
       else {
@@ -837,11 +837,6 @@ describe("Valid requests", () => {
         );
       });
       expect(matchingCall).toBeTruthy();
-
-      /**
-       * TODO add a check for all tests across all Lambdas to validate the response body against the corresponding API schema (zod)
-       * Or better add integration tests against the API in API Gateway?! The response body of the Lambda is not the same as the response body of the API Gateway.
-       */
     });
   });
 });

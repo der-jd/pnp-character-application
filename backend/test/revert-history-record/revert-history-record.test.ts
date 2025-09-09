@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { deleteHistoryRecordResponseSchema } from "api-spec";
 import { fakeHeaders } from "../test-data/request.js";
 import { fakeHistoryBlockListResponse, mockDynamoDBQueryHistoryResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
@@ -258,7 +259,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = deleteHistoryRecordResponseSchema.parse(JSON.parse(result.body));
 
       // For the initial serialization of the response body, Set values are converted to arrays
       if (_case.fakeRecord.type === RecordType.SPECIAL_ABILITIES_CHANGED) {
@@ -325,7 +326,7 @@ describe("Valid requests", () => {
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-      const parsedBody = JSON.parse(result.body);
+      const parsedBody = deleteHistoryRecordResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody).toEqual(_case.fakeRecord);
 
       /**

@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
+import { getSkillResponseSchema } from "api-spec";
 import { getSkillCost } from "get-skill-increase-cost";
 import { expectHttpError } from "../utils.js";
 
@@ -376,7 +377,7 @@ describe("Valid requests", () => {
 
         expect(result.statusCode).toBe(_case.expectedStatusCode);
 
-        const parsedBody = JSON.parse(result.body);
+        const parsedBody = getSkillResponseSchema.parse(JSON.parse(result.body));
         expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
         expect(parsedBody.skillName).toBe(_case.request.pathParameters["skill-name"]);
         expect(parsedBody.increaseCost).toBeCloseTo(r.increaseCost);
