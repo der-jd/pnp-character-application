@@ -14,10 +14,6 @@ import {
   calculationPointsChangeSchema,
   stringSetSchema,
   stringArraySchema,
-  AddHistoryRecordRequest,
-  AddHistoryRecordResponse,
-  addHistoryRecordPathParamsSchema,
-  addHistoryRecordRequestSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -30,6 +26,12 @@ import {
   isZodError,
   logZodError,
 } from "utils";
+import {
+  AddHistoryRecordRequest,
+  AddHistoryRecordResponse,
+  addHistoryRecordPathParamsSchema,
+  addHistoryRecordRequestSchema,
+} from "config";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
 
