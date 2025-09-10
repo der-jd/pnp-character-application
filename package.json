@@ -7,7 +7,6 @@
     "frontend",
     "scripts",
     "api-spec",
-    "backend/src/config",
     "backend/src/core",
     "backend/src/lambdas/*"
   ],

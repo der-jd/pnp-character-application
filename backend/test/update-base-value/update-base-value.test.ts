@@ -4,7 +4,7 @@ import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { updateBaseValueResponseSchema } from "api-spec";
-import { getBaseValue } from "config";
+import { getBaseValue } from "core";
 import { _updateBaseValue } from "update-base-value";
 import { expectHttpError } from "../utils.js";
 

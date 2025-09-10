@@ -1,4 +1,11 @@
-import { CharacterSheet, Attribute, BaseValue, Skill, CombatValues } from "api-spec";
+import { CostCategory, LearningMethod, CharacterSheet, Attribute, BaseValue, Skill, CombatValues } from "api-spec";
+import {
+  SKILL_ACTIVATION_COSTS,
+  COST_MATRIX,
+  MAX_COST_CATEGORY,
+  MIN_COST_CATEGORY,
+  SKILL_THRESHOLDS,
+} from "./rules/constants.js";
 
 export function getAttribute(attributes: CharacterSheet["attributes"], name: string): Attribute {
   const attribute = (attributes as Record<string, Attribute>)[name];
@@ -53,4 +60,37 @@ export function getCombatCategory(
     }
   }
   throw new Error(`Combat category for skill ${combatSkillName} not found!`);
+}
+
+export function parseLearningMethod(method: string): LearningMethod {
+  return LearningMethod[method.toUpperCase() as keyof typeof LearningMethod];
+}
+
+export function parseCostCategory(category: string): CostCategory {
+  return CostCategory[category.toUpperCase() as keyof typeof CostCategory];
+}
+
+export function adjustCostCategory(defaultCostCategory: CostCategory, learningMethod: LearningMethod): CostCategory {
+  if (learningMethod === LearningMethod.FREE) {
+    return CostCategory.CAT_0;
+  }
+
+  const adjustedCategory = Number(defaultCostCategory) + Number(learningMethod);
+
+  if (adjustedCategory > MAX_COST_CATEGORY) {
+    return MAX_COST_CATEGORY;
+  } else if (adjustedCategory < MIN_COST_CATEGORY) {
+    return MIN_COST_CATEGORY;
+  }
+
+  return adjustedCategory as CostCategory;
+}
+
+export function getSkillIncreaseCost(skillValue: number, costCategory: CostCategory): number {
+  const columnIndex = SKILL_THRESHOLDS.findIndex((threshold) => skillValue < threshold);
+  return COST_MATRIX[costCategory][columnIndex];
+}
+
+export function getSkillActivationCost(costCategory: CostCategory): number {
+  return SKILL_ACTIVATION_COSTS[costCategory];
 }
