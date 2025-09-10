@@ -31,6 +31,13 @@ import {
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
 
+/**
+ * This Lambda is only called internally as part of step functions,
+ * it is not exposed via API Gateway.
+ * Therefore, the API schemas and types are not in the api-spec package,
+ * but directly in this package.
+ */
+
 export const addHistoryRecordPathParamsSchema = z
   .object({
     "character-id": z.uuid(),
