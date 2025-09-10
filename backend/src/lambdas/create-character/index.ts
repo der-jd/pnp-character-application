@@ -12,8 +12,6 @@ import {
   getSkill,
   getAttribute,
   createEmptyCharacterSheet,
-  PROFESSION_SKILL_BONUS,
-  HOBBY_SKILL_BONUS,
 } from "core";
 import {
   CharacterSheet,
@@ -26,6 +24,8 @@ import {
   Skill,
   PostCharactersResponse,
   ATTRIBUTE_POINTS_FOR_CREATION,
+  PROFESSION_SKILL_BONUS,
+  HOBBY_SKILL_BONUS,
 } from "api-spec";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {

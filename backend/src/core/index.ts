@@ -39,6 +39,5 @@ export {
   getCombatCategory,
 } from "./character-utils.js";
 export { parseRecordType } from "./history-utils.js";
-export { PROFESSION_SKILL_BONUS, HOBBY_SKILL_BONUS } from "./rules/constants.js";
 export { createEmptyCharacterSheet } from "./rules/character-factory.js";
 export { calculateBaseValues } from "./rules/base-value-formulas.js";

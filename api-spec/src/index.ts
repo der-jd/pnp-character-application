@@ -60,6 +60,8 @@ export {
   MIN_ATTRIBUTE_VALUE_FOR_CREATION,
   MAX_ATTRIBUTE_VALUE_FOR_CREATION,
   ATTRIBUTE_POINTS_FOR_CREATION,
+  PROFESSION_SKILL_BONUS,
+  HOBBY_SKILL_BONUS,
 } from "./general-schemas.js";
 export {
   deleteHistoryRecordPathParamsSchema,

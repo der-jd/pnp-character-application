@@ -1,8 +1,5 @@
 import { CostCategory, combatSkillsSchema } from "api-spec";
 
-export const PROFESSION_SKILL_BONUS = 50;
-export const HOBBY_SKILL_BONUS = 25;
-
 export const COST_CATEGORY_DEFAULT = CostCategory.CAT_2;
 export const COST_CATEGORY_COMBAT_SKILLS = CostCategory.CAT_3;
 
@@ -46,6 +43,7 @@ export const COST_MATRIX: number[][] = [
 export const SKILL_ACTIVATION_COSTS: number[] = [0, 40, 50, 60, 70];
 
 export const START_SKILLS: string[] = [
+  // TODO must only contain valid skill names
   // body skills
   "athletics",
   "climbing",

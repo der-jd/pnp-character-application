@@ -26,6 +26,9 @@ export const MIN_ATTRIBUTE_VALUE_FOR_CREATION = 4;
 export const MAX_ATTRIBUTE_VALUE_FOR_CREATION = 7;
 export const ATTRIBUTE_POINTS_FOR_CREATION = 40;
 
+export const PROFESSION_SKILL_BONUS = 50;
+export const HOBBY_SKILL_BONUS = 25;
+
 export const initialNewSchema = z
   .object({
     initialValue: z.number().int().min(MIN_POINTS).max(MAX_POINTS),
