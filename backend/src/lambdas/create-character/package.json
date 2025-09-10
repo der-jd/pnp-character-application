@@ -4,9 +4,8 @@
   "main": "index.mjs",
   "type": "module",
   "dependencies": {
-    "config": "*",
     "api-spec": "*",
-    "utils": "*"
+    "core": "*"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.145",

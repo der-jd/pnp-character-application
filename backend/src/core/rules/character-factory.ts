@@ -3,9 +3,9 @@ import {
   ATTRIBUTE_POINTS_FOR_CREATION,
   COST_CATEGORY_COMBAT_SKILLS,
   COST_CATEGORY_DEFAULT,
+  START_SKILLS,
   combatSkills,
-  startSkills,
-} from "./rules.js";
+} from "./constants.js";
 
 export function createEmptyCharacterSheet(): CharacterSheet {
   const zeroAttribute = (): Attribute => ({ start: 0, current: 0, mod: 0, totalCost: 0 });
@@ -13,7 +13,7 @@ export function createEmptyCharacterSheet(): CharacterSheet {
 
   const zeroSkill = (skillName: string): Skill => {
     return {
-      activated: startSkills.includes(skillName) ? true : false,
+      activated: START_SKILLS.includes(skillName) ? true : false,
       start: 0,
       current: 0,
       mod: 0,

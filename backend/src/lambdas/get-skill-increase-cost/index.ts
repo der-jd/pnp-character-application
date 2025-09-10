@@ -1,5 +1,4 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { adjustCostCategory, getSkillIncreaseCost, getSkill, parseLearningMethod } from "config";
 import {
   GetSkillPathParams,
   GetSkillQueryParams,
@@ -10,6 +9,10 @@ import {
   Character,
 } from "api-spec";
 import {
+  adjustCostCategory,
+  getSkillIncreaseCost,
+  getSkill,
+  parseLearningMethod,
   Request,
   parseBody,
   getCharacterItem,
@@ -18,7 +21,7 @@ import {
   logAndEnsureHttpError,
   logZodError,
   isZodError,
-} from "utils";
+} from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return getSkillCost({

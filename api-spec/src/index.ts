@@ -49,6 +49,7 @@ export {
   InitialNew,
   initialIncreasedSchema,
   InitialIncreased,
+  userIdSchema,
   MAX_STRING_LENGTH_SHORT,
   MAX_STRING_LENGTH_DEFAULT,
   MAX_STRING_LENGTH_LONG,

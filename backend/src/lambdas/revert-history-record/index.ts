@@ -37,7 +37,7 @@ import {
   setSpecialAbilities,
   logZodError,
   isZodError,
-} from "utils";
+} from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return revertRecordFromHistory({

@@ -1,4 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { z } from "zod";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -13,6 +14,8 @@ import {
   HistoryBlock,
   calculationPointsChangeSchema,
   stringArraySchema,
+  recordSchema,
+  userIdSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -24,15 +27,34 @@ import {
   logAndEnsureHttpError,
   isZodError,
   logZodError,
-} from "utils";
-import {
-  AddHistoryRecordRequest,
-  AddHistoryRecordResponse,
-  addHistoryRecordPathParamsSchema,
-  addHistoryRecordRequestSchema,
-} from "config";
+} from "core";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
+
+export const addHistoryRecordPathParamsSchema = z
+  .object({
+    "character-id": z.uuid(),
+  })
+  .strict();
+
+export type AddHistoryRecordPathParams = z.infer<typeof addHistoryRecordPathParamsSchema>;
+
+export const addHistoryRecordRequestSchema = recordSchema
+  .omit({
+    number: true,
+    id: true,
+    timestamp: true,
+  })
+  .extend({
+    userId: userIdSchema,
+  })
+  .strict();
+
+export type AddHistoryRecordRequest = z.infer<typeof addHistoryRecordRequestSchema>;
+
+export const addHistoryRecordResponseSchema = recordSchema;
+
+export type AddHistoryRecordResponse = z.infer<typeof addHistoryRecordResponseSchema>;
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return addRecordToHistory({

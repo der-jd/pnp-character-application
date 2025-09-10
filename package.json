@@ -7,8 +7,7 @@
     "frontend",
     "scripts",
     "api-spec",
-    "backend/src/config",
-    "backend/src/utils",
+    "backend/src/core",
     "backend/src/lambdas/*"
   ],
   "scripts": {

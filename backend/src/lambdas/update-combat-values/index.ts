@@ -1,5 +1,4 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { getCombatValues } from "config";
 import {
   headersSchema,
   PatchCombatValuesPathParams,
@@ -20,7 +19,8 @@ import {
   updateCombatValues,
   isZodError,
   logZodError,
-} from "utils";
+  getCombatValues,
+} from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _updateCombatValues({

@@ -10,7 +10,7 @@
 //   createCharacterItem,
 //   isZodError,
 //   logZodError,
-// } from "utils";
+// } from "core";
 // import {
 //   dis_advantagesSchema,
 //   generalInformationSchema,
@@ -27,7 +27,7 @@
 //   HOBBY_SKILL_BONUS,
 //   Character,
 // } from "api-spec";
-// import { getSkill, getAttribute } from "config";
+// import { getSkill, getAttribute } from "core";
 
 // export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 //   return _createCharacter({

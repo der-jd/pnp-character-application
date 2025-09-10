@@ -1,5 +1,4 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { getAttribute, calculateBaseValues } from "config";
 import {
   patchAttributePathParamsSchema,
   PatchAttributePathParams,
@@ -24,7 +23,9 @@ import {
   updateBaseValue,
   isZodError,
   logZodError,
-} from "utils";
+  getAttribute,
+  calculateBaseValues,
+} from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _updateAttribute({
