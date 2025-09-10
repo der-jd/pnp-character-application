@@ -12,7 +12,7 @@ import {
   createCharacterItem,
   isZodError,
   logZodError,
-} from "utils";
+} from "core";
 import {
   postCharacterClonePathParamsSchema,
   PostCharacterClonePathParams,

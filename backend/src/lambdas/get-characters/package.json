@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "api-spec": "*",
-    "utils": "*"
+    "core": "*"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.0"

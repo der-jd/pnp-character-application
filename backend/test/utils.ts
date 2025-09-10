@@ -1,5 +1,5 @@
 import { expect } from "vitest";
-import { HttpError } from "utils";
+import { HttpError } from "core";
 
 export async function expectHttpError(fn: () => Promise<unknown>, statusCode: number) {
   try {

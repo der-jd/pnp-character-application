@@ -8,7 +8,7 @@ import {
   decodeUserId,
   isZodError,
   logZodError,
-} from "utils";
+} from "core";
 import { getCharacterPathParamsSchema, GetCharacterResponse, GetCharacterPathParams, headersSchema } from "api-spec";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {

@@ -34,7 +34,7 @@ import {
   updateCombatValues,
   isZodError,
   logZodError,
-} from "utils";
+} from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _updateSkill({

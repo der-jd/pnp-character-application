@@ -10,7 +10,7 @@ import {
   deleteBatchHistoryItems,
   isZodError,
   logZodError,
-} from "utils";
+} from "core";
 import {
   deleteCharacterPathParamsSchema,
   DeleteCharacterPathParams,

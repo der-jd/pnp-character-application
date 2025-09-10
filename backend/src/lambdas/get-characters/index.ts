@@ -8,7 +8,7 @@ import {
   decodeUserId,
   isZodError,
   logZodError,
-} from "utils";
+} from "core";
 import {
   getCharactersQueryParamsSchema,
   GetCharactersQueryParams,

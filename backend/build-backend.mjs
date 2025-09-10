@@ -10,35 +10,19 @@ const BUILD_DIR = "build";
 async function buildCommonPackages() {
   console.log("🔧 Building common packages...");
 
-  // Build config package
-  const configSrcDir = join(SRC_DIR, "config");
-  const configBuildDir = join(BUILD_DIR, "src", "config");
+  // Build core package
+  const coreSrcDir = join(SRC_DIR, "core");
+  const coreBuildDir = join(BUILD_DIR, "src", "core");
 
-  await mkdir(configBuildDir, { recursive: true });
+  await mkdir(coreBuildDir, { recursive: true });
 
   await build({
-    entryPoints: [join(configSrcDir, "index.ts")],
+    entryPoints: [join(coreSrcDir, "index.ts")],
     bundle: false, // Keep individual files for common packages
     platform: "node",
     target: "node20",
     format: "esm",
-    outdir: configBuildDir,
-    outExtension: { ".js": ".mjs" },
-  });
-
-  // Build utils package
-  const utilsSrcDir = join(SRC_DIR, "utils");
-  const utilsBuildDir = join(BUILD_DIR, "src", "utils");
-
-  await mkdir(utilsBuildDir, { recursive: true });
-
-  await build({
-    entryPoints: [join(utilsSrcDir, "index.ts")],
-    bundle: false, // Keep individual files for common packages
-    platform: "node",
-    target: "node20",
-    format: "esm",
-    outdir: utilsBuildDir,
+    outdir: coreBuildDir,
     outExtension: { ".js": ".mjs" },
   });
 

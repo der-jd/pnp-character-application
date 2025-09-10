@@ -24,7 +24,7 @@ import {
   logAndEnsureHttpError,
   isZodError,
   logZodError,
-} from "utils";
+} from "core";
 import {
   AddHistoryRecordRequest,
   AddHistoryRecordResponse,
