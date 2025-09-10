@@ -20,6 +20,12 @@ export const MAX_ATTRIBUTE_VALUE = 1000;
 export const MIN_BASE_VALUE = -200; // Min base value (for negative mods)
 export const MIN_COMBAT_VALUE = -10000; // Min combat value (for negative mods)
 
+export const NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION = 5;
+
+export const MIN_ATTRIBUTE_VALUE_FOR_CREATION = 4;
+export const MAX_ATTRIBUTE_VALUE_FOR_CREATION = 7;
+export const ATTRIBUTE_POINTS_FOR_CREATION = 40;
+
 export const initialNewSchema = z
   .object({
     initialValue: z.number().int().min(MIN_POINTS).max(MAX_POINTS),

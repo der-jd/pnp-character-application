@@ -17,12 +17,16 @@ import {
   MIN_POINTS,
 } from "./general-schemas.js";
 
+export const combinedSkillCategoryAndNameSchema = z
+  .string()
+  .regex(new RegExp(`^[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}/[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}$`), {
+    message: `Skill must be in the format "skillCategory/skillName", each max ${MAX_STRING_LENGTH_DEFAULT} characters.`,
+  });
+
 export const professionHobbySchema = z
   .object({
     name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
-    skill: z.string().regex(new RegExp(`^[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}/[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}$`), {
-      message: `Skill must be in the format "skillCategory/skillName", each max ${MAX_STRING_LENGTH_DEFAULT} characters.`,
-    }),
+    skill: combinedSkillCategoryAndNameSchema,
   })
   .strict();
 

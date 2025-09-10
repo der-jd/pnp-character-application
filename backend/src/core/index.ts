@@ -39,13 +39,6 @@ export {
   getCombatCategory,
 } from "./character-utils.js";
 export { parseRecordType } from "./history-utils.js";
-export {
-  ATTRIBUTE_POINTS_FOR_CREATION,
-  PROFESSION_SKILL_BONUS,
-  HOBBY_SKILL_BONUS,
-  MIN_ATTRIBUTE_VALUE_FOR_CREATION,
-  MAX_ATTRIBUTE_VALUE_FOR_CREATION,
-  NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
-} from "./rules/constants.js";
+export { PROFESSION_SKILL_BONUS, HOBBY_SKILL_BONUS } from "./rules/constants.js";
 export { createEmptyCharacterSheet } from "./rules/character-factory.js";
 export { calculateBaseValues } from "./rules/base-value-formulas.js";

@@ -1,217 +1,183 @@
-// import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-// import { z } from "zod";
-// import { v4 as uuidv4 } from "uuid";
-// import {
-//   Request,
-//   parseBody,
-//   decodeUserId,
-//   HttpError,
-//   logAndEnsureHttpError,
-//   createCharacterItem,
-//   isZodError,
-//   logZodError,
-// } from "core";
-// import {
-//   dis_advantagesSchema,
-//   generalInformationSchema,
-//   MAX_STRING_LENGTH_DEFAULT,
-//   NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
-//   MAX_ATTRIBUTE_VALUE_FOR_CREATION,
-//   MIN_ATTRIBUTE_VALUE_FOR_CREATION,
-//   createEmptyCharacterSheet,
-//   CharacterSheet,
-//   START_LEVEL,
-//   attributes,
-//   ATTRIBUTE_POINTS_FOR_CREATION,
-//   PROFESSION_SKILL_BONUS,
-//   HOBBY_SKILL_BONUS,
-//   Character,
-// } from "api-spec";
-// import { getSkill, getAttribute } from "core";
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { v4 as uuidv4 } from "uuid";
+import {
+  Request,
+  parseBody,
+  decodeUserId,
+  HttpError,
+  logAndEnsureHttpError,
+  createCharacterItem,
+  isZodError,
+  logZodError,
+  getSkill,
+  getAttribute,
+  createEmptyCharacterSheet,
+  PROFESSION_SKILL_BONUS,
+  HOBBY_SKILL_BONUS,
+} from "core";
+import {
+  CharacterSheet,
+  Character,
+  headersSchema,
+  PostCharactersRequest,
+  postCharactersRequestSchema,
+  AttributesForCreation,
+  GeneralInformation,
+  Skill,
+  PostCharactersResponse,
+  ATTRIBUTE_POINTS_FOR_CREATION,
+} from "api-spec";
 
-// export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-//   return _createCharacter({
-//     headers: event.headers,
-//     pathParameters: event.pathParameters,
-//     queryStringParameters: event.queryStringParameters,
-//     body: parseBody(event.body),
-//   });
-// };
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  return _createCharacter({
+    headers: event.headers,
+    pathParameters: event.pathParameters,
+    queryStringParameters: event.queryStringParameters,
+    body: parseBody(event.body),
+  });
+};
 
-// const generalInformationSchemaWithoutLevel = generalInformationSchema.omit({ level: true });
+interface Parameters {
+  userId: string;
+  body: PostCharactersRequest;
+}
 
-// const attributeSchema = z.object(
-//   Object.fromEntries(
-//     attributes.map((attr) => [
-//       attr,
-//       z.number().int().min(MIN_ATTRIBUTE_VALUE_FOR_CREATION).max(MAX_ATTRIBUTE_VALUE_FOR_CREATION),
-//     ]),
-//   ),
-// );
+export async function _createCharacter(request: Request): Promise<APIGatewayProxyResult> {
+  try {
+    const params = validateRequest(request);
 
-// const activatableSkillsForFreeSchema = z
-//   .array(
-//     z.string().regex(new RegExp(`^[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}/[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}$`), {
-//       message: `Skill must be in the format "skillCategory/skillName", each max ${MAX_STRING_LENGTH_DEFAULT} characters.`,
-//     }),
-//   )
-//   .length(NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION);
+    const characterId = uuidv4();
 
-// const bodySchema = z
-//   .object({
-//     generalInformationWithoutLevel: generalInformationSchemaWithoutLevel,
-//     attributes: attributeSchema,
-//     advantages: dis_advantagesSchema,
-//     disadvantages: dis_advantagesSchema,
-//     activatableSkillsForFree: activatableSkillsForFreeSchema,
-//   })
-//   .strict();
+    console.log(`Create new character with id '${characterId}' for user ${params.userId}`);
 
-// interface Parameters {
-//   userId: string;
-//   body: z.infer<typeof bodySchema>;
-// }
+    let characterSheet = createEmptyCharacterSheet();
 
-// export async function _createCharacter(request: Request): Promise<APIGatewayProxyResult> {
-//   try {
-//     const params = validateRequest(request);
+    characterSheet = setAttributes(characterSheet, params.body.attributes);
 
-//     const characterId = uuidv4();
+    characterSheet = setGeneralInformation(characterSheet, params.body.generalInformation);
 
-//     console.log(`Create new character with id '${characterId}' for user ${params.userId}`);
+    // TODO check if advantages and disadvantages are valid -> does the names exist and are the cost points correct?
+    // TODO advantages and disadvantages: set benefits and costs
 
-//     let characterSheet = createEmptyCharacterSheet();
+    characterSheet = activateSkills(characterSheet, params.body.activatableSkillsForFree);
 
-//     characterSheet = setAttributes(characterSheet, params.body.attributes);
+    const character: Character = {
+      characterId: characterId,
+      userId: params.userId,
+      characterSheet: characterSheet,
+    };
 
-//     characterSheet = setGeneralInformation(characterSheet, params.body.generalInformationWithoutLevel);
+    await createCharacterItem(character);
 
-//     // TODO check if advantages and disadvantages are valid -> does the names exist and are the cost points correct?
-//     // TODO advanteges and disadvantages: set benefits and costs
+    const response = {
+      statusCode: 200,
+      body: JSON.stringify({
+        characterId: character.characterId,
+        userId: character.userId,
+        characterName: character.characterSheet.generalInformation.name,
+        character: {
+          old: {},
+          new: character,
+        },
+      } as PostCharactersResponse),
+    };
+    console.log(response);
+    return response;
+  } catch (error) {
+    throw logAndEnsureHttpError(error);
+  }
+}
 
-//     characterSheet = activateSkills(characterSheet, params.body.activatableSkillsForFree);
+function validateRequest(request: Request): Parameters {
+  try {
+    console.log("Validate request");
+    return {
+      userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
+      body: postCharactersRequestSchema.parse(request.body),
+    };
+  } catch (error) {
+    if (isZodError(error)) {
+      logZodError(error);
+      throw new HttpError(400, "Invalid input values!");
+    }
 
-//     const character: Character = {
-//       characterId: characterId,
-//       userId: params.userId,
-//       characterSheet: characterSheet,
-//     };
+    // Rethrow other errors
+    throw error;
+  }
+}
 
-//     await createCharacterItem(character);
+function setAttributes(characterSheet: CharacterSheet, passedAttributes: AttributesForCreation): CharacterSheet {
+  console.log("Set attributes");
 
-//     const response = {
-//       statusCode: 200,
-//       body: JSON.stringify(
-//         {
-//           characterId: character.characterId,
-//           userId: character.userId,
-//           characterName: character.characterSheet.generalInformation.name,
-//           character: {
-//             old: {},
-//             new: character,
-//           },
-//         },
-//       ),
-//     };
-//     console.log(response);
-//     return response;
-//   } catch (error) {
-//     throw logAndEnsureHttpError(error);
-//   }
-// }
+  let spentAttributePoints = 0;
+  for (const [attr, value] of Object.entries(passedAttributes)) {
+    const attribute = getAttribute(characterSheet.attributes, attr);
+    attribute.start = value.current;
+    attribute.current = value.current;
+    attribute.mod = value.mod;
+    attribute.totalCost = value.current;
+    spentAttributePoints += attribute.totalCost;
+  }
 
-// function validateRequest(request: Request): Parameters {
-//   console.log("Validate request");
+  if (spentAttributePoints !== ATTRIBUTE_POINTS_FOR_CREATION) {
+    throw new HttpError(
+      400,
+      `Expected ${ATTRIBUTE_POINTS_FOR_CREATION} distributed attribute points, but got ${spentAttributePoints} points.`,
+    );
+  }
 
-//   const userId = decodeUserId(request.headers.authorization ?? request.headers.Authorization);
+  characterSheet.calculationPoints.attributePoints.start = ATTRIBUTE_POINTS_FOR_CREATION;
+  characterSheet.calculationPoints.attributePoints.total = ATTRIBUTE_POINTS_FOR_CREATION;
 
-//   try {
-//     const body = bodySchema.parse(request.body);
+  return characterSheet;
+}
 
-//     return {
-//       userId: userId,
-//       body: body,
-//     };
-//   } catch (error) {
-//     if (isZodError(error)) {
-//       logZodError(error);
-//       throw new HttpError(400, "Invalid input values!");
-//     }
+function setGeneralInformation(characterSheet: CharacterSheet, generalInformation: GeneralInformation): CharacterSheet {
+  const setupSkill = (skillString: string, bonus: number, type: string) => {
+    console.log(`Set up ${type} with skill '${skillString}' and bonus ${bonus}`);
 
-//     // Rethrow other errors
-//     throw error;
-//   }
-// }
+    const [skillCategory, skillName] = skillString.split("/");
+    try {
+      const skill = getSkill(characterSheet.skills, skillCategory as keyof CharacterSheet["skills"], skillName);
+      skill.activated = true;
+      skill.start = bonus;
+      skill.current = bonus;
+    } catch (error) {
+      throw logAndEnsureHttpError(error);
+    }
+  };
 
-// function setAttributes(
-//   characterSheet: CharacterSheet,
-//   passedAttributes: z.infer<typeof attributeSchema>,
-// ): CharacterSheet {
-//   let spentAttributePoints = 0;
-//   for (const [attr, value] of Object.entries(passedAttributes)) {
-//     const attribute = getAttribute(characterSheet.attributes, attr);
-//     attribute.start = value;
-//     attribute.current = value;
+  setupSkill(generalInformation.profession.skill, PROFESSION_SKILL_BONUS, "profession");
+  setupSkill(generalInformation.hobby.skill, HOBBY_SKILL_BONUS, "hobby");
 
-//     spentAttributePoints += value;
-//   }
+  console.log("Set general information");
+  characterSheet.generalInformation = { ...generalInformation };
 
-//   if (spentAttributePoints !== ATTRIBUTE_POINTS_FOR_CREATION) {
-//     throw new HttpError(
-//       400,
-//       `Expected ${ATTRIBUTE_POINTS_FOR_CREATION} distributed attribute points, but only got ${spentAttributePoints} points.`,
-//     );
-//   }
+  return characterSheet;
+}
 
-//   characterSheet.calculationPoints.attributePoints.start = ATTRIBUTE_POINTS_FOR_CREATION;
-//   characterSheet.calculationPoints.attributePoints.total = ATTRIBUTE_POINTS_FOR_CREATION;
+function activateSkills(
+  characterSheet: CharacterSheet,
+  activatableSkillsForFree: PostCharactersRequest["activatableSkillsForFree"],
+): CharacterSheet {
+  console.log("Activate skills for free");
 
-//   return characterSheet;
-// }
+  for (const skill of activatableSkillsForFree) {
+    const [category, name] = skill.split("/");
 
-// function setGeneralInformation(
-//   characterSheet: CharacterSheet,
-//   generalInformationWithoutLevel: z.infer<typeof generalInformationSchemaWithoutLevel>,
-// ): CharacterSheet {
-//   const [professionSkillCategory, professionSkillName] = generalInformationWithoutLevel.profession.skill.split("/");
-//   const professionSkill = getSkill(
-//     characterSheet.skills,
-//     professionSkillCategory as keyof CharacterSheet["skills"],
-//     professionSkillName,
-//   );
-//   professionSkill.activated = true;
-//   professionSkill.start = PROFESSION_SKILL_BONUS;
-//   professionSkill.current = PROFESSION_SKILL_BONUS;
+    let characterSkill: Skill;
+    try {
+      characterSkill = getSkill(characterSheet.skills, category as keyof CharacterSheet["skills"], name);
+    } catch (error) {
+      throw logAndEnsureHttpError(error);
+    }
 
-//   const [hobbySkillCategory, hobbySkillName] = generalInformationWithoutLevel.hobby.skill.split("/");
-//   const hobbySkill = getSkill(
-//     characterSheet.skills,
-//     hobbySkillCategory as keyof CharacterSheet["skills"],
-//     hobbySkillName,
-//   );
-//   hobbySkill.activated = true;
-//   hobbySkill.start = HOBBY_SKILL_BONUS;
-//   hobbySkill.current = HOBBY_SKILL_BONUS;
+    if (characterSkill.activated) {
+      throw new HttpError(400, `Skill '${skill}' is already activated.`);
+    }
 
-//   characterSheet.generalInformation = { ...generalInformationWithoutLevel, level: START_LEVEL };
+    characterSkill.activated = true;
+  }
 
-//   return characterSheet;
-// }
-
-// function activateSkills(
-//   characterSheet: CharacterSheet,
-//   activatableSkillsForFree: z.infer<typeof activatableSkillsForFreeSchema>,
-// ): CharacterSheet {
-//   for (const skill of activatableSkillsForFree) {
-//     const [category, name] = skill.split("/");
-//     const characterSkill = getSkill(characterSheet.skills, category as keyof CharacterSheet["skills"], name);
-
-//     if (characterSkill.activated) {
-//       throw new HttpError(400, `Skill '${skill}' is already activated.`);
-//     }
-
-//     characterSkill.activated = true;
-//   }
-
-//   return characterSheet;
-// }
+  return characterSheet;
+}

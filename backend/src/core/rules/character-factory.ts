@@ -1,13 +1,17 @@
-import { Attribute, BaseValue, CharacterSheet, CombatValues, Skill } from "api-spec";
 import {
+  Attribute,
+  BaseValue,
+  CharacterSheet,
+  CombatValues,
+  Skill,
   ATTRIBUTE_POINTS_FOR_CREATION,
-  COST_CATEGORY_COMBAT_SKILLS,
-  COST_CATEGORY_DEFAULT,
-  START_SKILLS,
-  combatSkills,
-} from "./constants.js";
+  MIN_LEVEL,
+} from "api-spec";
+import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT, START_SKILLS, combatSkills } from "./constants.js";
 
 export function createEmptyCharacterSheet(): CharacterSheet {
+  console.log("Create empty character sheet");
+
   const zeroAttribute = (): Attribute => ({ start: 0, current: 0, mod: 0, totalCost: 0 });
   const zeroBaseValue = (): BaseValue => ({ start: 0, current: 0, mod: 0 }); // TODO by formula and byLvlUp. See baseValueFormulas and baseValuesNotUpdatableByLvlUp
 
@@ -33,7 +37,7 @@ export function createEmptyCharacterSheet(): CharacterSheet {
   return {
     generalInformation: {
       name: "",
-      level: 0,
+      level: MIN_LEVEL,
       sex: "",
       profession: { name: "", skill: "" },
       hobby: { name: "", skill: "" },
@@ -48,8 +52,12 @@ export function createEmptyCharacterSheet(): CharacterSheet {
       specialCharacteristics: "",
     },
     calculationPoints: {
-      adventurePoints: { start: ATTRIBUTE_POINTS_FOR_CREATION, available: 0, total: ATTRIBUTE_POINTS_FOR_CREATION },
-      attributePoints: { start: 0, available: 0, total: 0 },
+      adventurePoints: { start: 0, available: 0, total: 0 },
+      attributePoints: {
+        start: ATTRIBUTE_POINTS_FOR_CREATION,
+        available: ATTRIBUTE_POINTS_FOR_CREATION,
+        total: ATTRIBUTE_POINTS_FOR_CREATION,
+      },
     },
     advantages: [],
     disadvantages: [],
