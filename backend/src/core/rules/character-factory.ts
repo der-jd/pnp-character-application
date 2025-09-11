@@ -6,8 +6,16 @@ import {
   Skill,
   ATTRIBUTE_POINTS_FOR_CREATION,
   MIN_LEVEL,
+  START_SKILLS,
+  SkillName,
+  combatSkills,
+  BodySkillName,
+  SocialSkillName,
+  NatureSkillName,
+  KnowledgeSkillName,
+  HandcraftSkillName,
 } from "api-spec";
-import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT, START_SKILLS, combatSkills } from "./constants.js";
+import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "./constants.js";
 
 export function createEmptyCharacterSheet(): CharacterSheet {
   console.log("Create empty character sheet");
@@ -15,17 +23,15 @@ export function createEmptyCharacterSheet(): CharacterSheet {
   const zeroAttribute = (): Attribute => ({ start: 0, current: 0, mod: 0, totalCost: 0 });
   const zeroBaseValue = (): BaseValue => ({ start: 0, current: 0, mod: 0 }); // TODO by formula and byLvlUp. See baseValueFormulas and baseValuesNotUpdatableByLvlUp
 
-  const zeroSkill = (skillName: string): Skill => {
+  const zeroSkill = (skillName: SkillName): Skill => {
     return {
       activated: START_SKILLS.includes(skillName) ? true : false,
       start: 0,
       current: 0,
       mod: 0,
       totalCost: 0,
-      defaultCostCategory: (combatSkills as string[]).includes(skillName)
-        ? COST_CATEGORY_COMBAT_SKILLS
-        : COST_CATEGORY_DEFAULT,
-    } as Skill;
+      defaultCostCategory: combatSkills.includes(skillName) ? COST_CATEGORY_COMBAT_SKILLS : COST_CATEGORY_DEFAULT,
+    };
   };
 
   const zeroCombatValues = (): CombatValues => ({
@@ -34,13 +40,22 @@ export function createEmptyCharacterSheet(): CharacterSheet {
     paradeValue: 0,
   });
 
+  const createSkillObjectsFromSkillNamesArray = (skillNames: readonly SkillName[]) =>
+    Object.fromEntries(skillNames.map((name) => [name, zeroSkill(name)]));
+
+  const bodySkillNames = Object.keys({} as CharacterSheet["skills"]["body"]) as BodySkillName[];
+  const socialSkillNames = Object.keys({} as CharacterSheet["skills"]["social"]) as SocialSkillName[];
+  const natureSkillNames = Object.keys({} as CharacterSheet["skills"]["nature"]) as NatureSkillName[];
+  const knowledgeSkillNames = Object.keys({} as CharacterSheet["skills"]["knowledge"]) as KnowledgeSkillName[];
+  const handcraftSkillNames = Object.keys({} as CharacterSheet["skills"]["handcraft"]) as HandcraftSkillName[];
+
   return {
     generalInformation: {
       name: "",
       level: MIN_LEVEL,
       sex: "",
-      profession: { name: "", skill: "" },
-      hobby: { name: "", skill: "" },
+      profession: { name: "", skill: "{skillCategory}/{skillName}" },
+      hobby: { name: "", skill: "<skillCategory/{skillName}" },
       birthday: "",
       birthplace: "",
       size: "",
@@ -86,96 +101,12 @@ export function createEmptyCharacterSheet(): CharacterSheet {
       strength: zeroAttribute(),
     },
     skills: {
-      combat: {
-        martialArts: zeroSkill("martialArts"),
-        barehanded: zeroSkill("barehanded"),
-        chainWeapons: zeroSkill("chainWeapons"),
-        daggers: zeroSkill("daggers"),
-        slashingWeaponsSharp1h: zeroSkill("slashingWeaponsSharp1h"),
-        slashingWeaponsBlunt1h: zeroSkill("slashingWeaponsBlunt1h"),
-        thrustingWeapons1h: zeroSkill("thrustingWeapons1h"),
-        slashingWeaponsSharp2h: zeroSkill("slashingWeaponsSharp2h"),
-        slashingWeaponsBlunt2h: zeroSkill("slashingWeaponsBlunt2h"),
-        thrustingWeapons2h: zeroSkill("thrustingWeapons2h"),
-        missile: zeroSkill("missile"),
-        firearmSimple: zeroSkill("firearmSimple"),
-        firearmMedium: zeroSkill("firearmMedium"),
-        firearmComplex: zeroSkill("firearmComplex"),
-        heavyWeapons: zeroSkill("heavyWeapons"),
-      },
-      body: {
-        athletics: zeroSkill("athletics"),
-        juggleries: zeroSkill("juggleries"),
-        climbing: zeroSkill("climbing"),
-        bodyControl: zeroSkill("bodyControl"),
-        riding: zeroSkill("riding"),
-        sneaking: zeroSkill("sneaking"),
-        swimming: zeroSkill("swimming"),
-        selfControl: zeroSkill("selfControl"),
-        hiding: zeroSkill("hiding"),
-        singing: zeroSkill("singing"),
-        sharpnessOfSenses: zeroSkill("sharpnessOfSenses"),
-        dancing: zeroSkill("dancing"),
-        quaffing: zeroSkill("quaffing"),
-        pickpocketing: zeroSkill("pickpocketing"),
-      },
-      social: {
-        seduction: zeroSkill("seduction"),
-        etiquette: zeroSkill("etiquette"),
-        teaching: zeroSkill("teaching"),
-        acting: zeroSkill("acting"),
-        writtenExpression: zeroSkill("writtenExpression"),
-        streetKnowledge: zeroSkill("streetKnowledge"),
-        knowledgeOfHumanNature: zeroSkill("knowledgeOfHumanNature"),
-        persuading: zeroSkill("persuading"),
-        convincing: zeroSkill("convincing"),
-      },
-      nature: {
-        tracking: zeroSkill("tracking"),
-        knottingSkills: zeroSkill("knottingSkills"),
-        trapping: zeroSkill("trapping"),
-        fishing: zeroSkill("fishing"),
-        orientation: zeroSkill("orientation"),
-        wildernessLife: zeroSkill("wildernessLife"),
-      },
-      knowledge: {
-        anatomy: zeroSkill("anatomy"),
-        architecture: zeroSkill("architecture"),
-        geography: zeroSkill("geography"),
-        history: zeroSkill("history"),
-        petrology: zeroSkill("petrology"),
-        botany: zeroSkill("botany"),
-        philosophy: zeroSkill("philosophy"),
-        astronomy: zeroSkill("astronomy"),
-        mathematics: zeroSkill("mathematics"),
-        knowledgeOfTheLaw: zeroSkill("knowledgeOfTheLaw"),
-        estimating: zeroSkill("estimating"),
-        zoology: zeroSkill("zoology"),
-        technology: zeroSkill("technology"),
-        chemistry: zeroSkill("chemistry"),
-        warfare: zeroSkill("warfare"),
-        itSkills: zeroSkill("itSkills"),
-        mechanics: zeroSkill("mechanics"),
-      },
-      handcraft: {
-        training: zeroSkill("training"),
-        woodwork: zeroSkill("woodwork"),
-        foodProcessing: zeroSkill("foodProcessing"),
-        leatherProcessing: zeroSkill("leatherProcessing"),
-        metalwork: zeroSkill("metalwork"),
-        stonework: zeroSkill("stonework"),
-        fabricProcessing: zeroSkill("fabricProcessing"),
-        alcoholProduction: zeroSkill("alcoholProduction"),
-        steeringVehicles: zeroSkill("steeringVehicles"),
-        fineMechanics: zeroSkill("fineMechanics"),
-        cheating: zeroSkill("cheating"),
-        bargaining: zeroSkill("bargaining"),
-        firstAid: zeroSkill("firstAid"),
-        calmingSbDown: zeroSkill("calmingSbDown"),
-        drawingAndPainting: zeroSkill("drawingAndPainting"),
-        makingMusic: zeroSkill("makingMusic"),
-        lockpicking: zeroSkill("lockpicking"),
-      },
+      combat: createSkillObjectsFromSkillNamesArray(combatSkills) as CharacterSheet["skills"]["combat"],
+      body: createSkillObjectsFromSkillNamesArray(bodySkillNames) as CharacterSheet["skills"]["body"],
+      social: createSkillObjectsFromSkillNamesArray(socialSkillNames) as CharacterSheet["skills"]["social"],
+      nature: createSkillObjectsFromSkillNamesArray(natureSkillNames) as CharacterSheet["skills"]["nature"],
+      knowledge: createSkillObjectsFromSkillNamesArray(knowledgeSkillNames) as CharacterSheet["skills"]["knowledge"],
+      handcraft: createSkillObjectsFromSkillNamesArray(handcraftSkillNames) as CharacterSheet["skills"]["handcraft"],
     },
     combatValues: {
       melee: {

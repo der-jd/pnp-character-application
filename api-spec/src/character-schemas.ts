@@ -197,6 +197,56 @@ export const combatSkillsSchema = z
 
 export type CombatSkills = z.infer<typeof combatSkillsSchema>;
 
+export type CombatSkillName = keyof CombatSkills;
+export type BodySkillName = keyof CharacterSheet["skills"]["body"];
+export type SocialSkillName = keyof CharacterSheet["skills"]["social"];
+export type NatureSkillName = keyof CharacterSheet["skills"]["nature"];
+export type KnowledgeSkillName = keyof CharacterSheet["skills"]["knowledge"];
+export type HandcraftSkillName = keyof CharacterSheet["skills"]["handcraft"];
+
+export type SkillName =
+  | CombatSkillName
+  | BodySkillName
+  | SocialSkillName
+  | NatureSkillName
+  | KnowledgeSkillName
+  | HandcraftSkillName;
+
+export const combatSkills = Object.keys(combatSkillsSchema) as SkillName[];
+
+export const START_SKILLS: SkillName[] = [
+  // body skills
+  "athletics",
+  "climbing",
+  "bodyControl",
+  "sneaking",
+  "swimming",
+  "selfControl",
+  "hiding",
+  "singing",
+  "sharpnessOfSenses",
+  "quaffing",
+  // social skills
+  "etiquette",
+  "knowledgeOfHumanNature",
+  "persuading",
+  // nature skills
+  "knottingSkills",
+  // knowledge skills
+  "mathematics",
+  "zoology",
+  // handcraft skills
+  "woodwork",
+  "foodProcessing",
+  "fabricProcessing",
+  "steeringVehicles",
+  "bargaining",
+  "firstAid",
+  "calmingSbDown",
+  "drawingAndPainting",
+  ...combatSkills,
+];
+
 export const specialAbilitySchema = z.string().max(MAX_STRING_LENGTH_DEFAULT);
 
 export const characterSheetSchema = z

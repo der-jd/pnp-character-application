@@ -1,9 +1,7 @@
-import { CostCategory, combatSkillsSchema } from "api-spec";
+import { CostCategory } from "api-spec";
 
 export const COST_CATEGORY_DEFAULT = CostCategory.CAT_2;
 export const COST_CATEGORY_COMBAT_SKILLS = CostCategory.CAT_3;
-
-export const combatSkills = Object.keys(combatSkillsSchema.shape) as Array<keyof typeof combatSkillsSchema.shape>;
 
 export const MAX_COST_CATEGORY = CostCategory.CAT_4;
 export const MIN_COST_CATEGORY = CostCategory.CAT_0;
@@ -41,37 +39,3 @@ export const COST_MATRIX: number[][] = [
  * +------------+-------------+
  */
 export const SKILL_ACTIVATION_COSTS: number[] = [0, 40, 50, 60, 70];
-
-export const START_SKILLS: string[] = [
-  // TODO must only contain valid skill names
-  // body skills
-  "athletics",
-  "climbing",
-  "bodyControl",
-  "sneaking",
-  "swimming",
-  "selfControl",
-  "hiding",
-  "singing",
-  "sharpnessOfSenses",
-  "quaffing",
-  // social skills
-  "etiquette",
-  "knowledgeOfHumanNature",
-  "persuading",
-  // nature skills
-  "knottingSkills",
-  // knowledge skills
-  "mathematics",
-  "zoology",
-  // handcraft skills
-  "woodwork",
-  "foodProcessing",
-  "fabricProcessing",
-  "steeringVehicles",
-  "bargaining",
-  "firstAid",
-  "calmingSbDown",
-  "drawingAndPainting",
-  ...combatSkills,
-];

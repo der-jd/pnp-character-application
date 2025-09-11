@@ -32,6 +32,15 @@ export {
   Level,
   Attributes,
   CombatSkills,
+  CombatSkillName,
+  BodySkillName,
+  SocialSkillName,
+  NatureSkillName,
+  KnowledgeSkillName,
+  HandcraftSkillName,
+  SkillName,
+  combatSkills,
+  START_SKILLS,
 } from "./character-schemas.js";
 export {
   recordSchema,
