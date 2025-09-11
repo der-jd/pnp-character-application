@@ -90,9 +90,10 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
       await deleteLatestHistoryRecord(latestBlock);
     }
 
+    const responseBody: DeleteHistoryRecordResponse = latestRecord;
     const response = {
       statusCode: 200,
-      body: JSON.stringify(latestRecord as DeleteHistoryRecordResponse),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;

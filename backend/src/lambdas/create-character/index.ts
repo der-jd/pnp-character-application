@@ -69,17 +69,18 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
 
     await createCharacterItem(character);
 
+    const responseBody: PostCharactersResponse = {
+      characterId: character.characterId,
+      userId: character.userId,
+      characterName: character.characterSheet.generalInformation.name,
+      character: {
+        old: {},
+        new: character,
+      },
+    };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({
-        characterId: character.characterId,
-        userId: character.userId,
-        characterName: character.characterSheet.generalInformation.name,
-        character: {
-          old: {},
-          new: character,
-        },
-      } as PostCharactersResponse),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;

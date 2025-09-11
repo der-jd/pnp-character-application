@@ -156,9 +156,10 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       }
     }
 
+    const responseBody: AddHistoryRecordResponse = record;
     const response = {
       statusCode: 200,
-      body: JSON.stringify(record as AddHistoryRecordResponse),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
