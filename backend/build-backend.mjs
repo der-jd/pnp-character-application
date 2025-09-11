@@ -66,10 +66,9 @@ async function buildLambdas() {
           "aws-sdk",
         ],
         minify: true,
-        sourcemap: false, // Can enable for debugging
-        // Keep the same import behavior as your current setup
+        sourcemap: false, // needed for debugging
         resolveExtensions: [".ts", ".js", ".mjs"],
-        // Handle your current import paths
+        // Handle the current import paths
         conditions: ["import", "node"],
         mainFields: ["module", "main"],
         // Fix for dynamic require issue in ESM
