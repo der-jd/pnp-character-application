@@ -27,6 +27,7 @@ export const COST_MATRIX: number[][] = [
   [3, 4, 5],
 ];
 
+// TODO move to api-spec because needed in the frontend?!
 /**
  * +------------+-------------+
  * |  Category  |    Cost     |

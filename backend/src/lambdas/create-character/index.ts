@@ -32,13 +32,14 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
 
     console.log(`Create new character for user ${params.userId}`);
 
-    // TODO check if attributes are valid -> do not exceed max points and min points    // TODO check if advantages and disadvantages are valid -> does the names exist and are the cost points correct?
-    // TODO advantages and disadvantages: set benefits and costs
+    // TODO advantages and disadvantages: set benefits / drawbacks in character builder
 
     const character = new CharacterBuilder()
       .setUserId(params.userId)
-      .setAttributes(params.body.attributes)
       .setGeneralInformation(params.body.generalInformation)
+      .setAdvantages(params.body.advantages)
+      .setDisAdvantages(params.body.disadvantages)
+      .setAttributes(params.body.attributes)
       .activateSkills(params.body.activatableSkillsForFree)
       .build();
 

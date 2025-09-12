@@ -21,6 +21,9 @@ import {
   AttributesForCreation,
   PostCharactersRequest,
   Character,
+  DisAdvantages,
+  ADVANTAGES,
+  DISADVANTAGES,
 } from "api-spec";
 import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "./constants.js";
 import { getAttribute, getSkill } from "../character-utils.js";
@@ -30,6 +33,8 @@ export class CharacterBuilder {
   private characterSheet: CharacterSheet;
   private attributesSet = false;
   private generalInfoSet = false;
+  private advantagesSet = false;
+  private disadvantagesSet = false;
   private skillsActivated = false;
   private userId?: string;
 
@@ -217,6 +222,38 @@ export class CharacterBuilder {
     return this;
   }
 
+  setAdvantages(advantages: DisAdvantages): this {
+    console.log("Set advantages");
+
+    for (const advantage of advantages) {
+      const [name, value] = advantage;
+      const isInvalid = !ADVANTAGES.some(([advName, advValue]) => advName === name && advValue === value);
+      if (isInvalid) {
+        throw new HttpError(400, `Invalid advantage: [${name}, ${value}]`);
+      }
+    }
+
+    this.characterSheet.advantages = advantages;
+    this.advantagesSet = true;
+    return this;
+  }
+
+  setDisAdvantages(disadvantages: DisAdvantages): this {
+    console.log("Set disadvantages");
+
+    for (const disadvantage of disadvantages) {
+      const [name, value] = disadvantage;
+      const isInvalid = !DISADVANTAGES.some(([advName, advValue]) => advName === name && advValue === value);
+      if (isInvalid) {
+        throw new HttpError(400, `Invalid disadvantage: [${name}, ${value}]`);
+      }
+    }
+
+    this.characterSheet.disadvantages = disadvantages;
+    this.disadvantagesSet = true;
+    return this;
+  }
+
   activateSkills(activatableSkills: PostCharactersRequest["activatableSkillsForFree"]): this {
     console.log("Activate skills for free");
 
@@ -243,7 +280,14 @@ export class CharacterBuilder {
   }
 
   build(): Character {
-    if (!this.attributesSet || !this.generalInfoSet || !this.skillsActivated || !this.userId) {
+    if (
+      !this.attributesSet ||
+      !this.generalInfoSet ||
+      !this.advantagesSet ||
+      !this.disadvantagesSet ||
+      !this.skillsActivated ||
+      !this.userId
+    ) {
       throw new HttpError(400, "All steps must be completed before building the character.");
     }
     return {
