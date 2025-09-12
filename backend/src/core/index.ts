@@ -39,5 +39,5 @@ export {
   getCombatCategory,
 } from "./character-utils.js";
 export { parseRecordType } from "./history-utils.js";
-export { createEmptyCharacterSheet } from "./rules/character-factory.js";
+export { CharacterBuilder } from "./rules/character-builder.js";
 export { calculateBaseValues } from "./rules/base-value-formulas.js";
