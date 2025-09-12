@@ -70,9 +70,9 @@ export const calculationPointsSchema = z
 export type CalculationPoints = z.infer<typeof calculationPointsSchema>;
 
 export const dis_advantageSchema = z.tuple([
-    z.string().max(MAX_STRING_LENGTH_DEFAULT),
-    z.number().int().min(-99).max(99),
-  ]);
+  z.string().max(MAX_STRING_LENGTH_DEFAULT),
+  z.number().int().min(-99).max(99),
+]);
 
 export type DisAdvantage = z.infer<typeof dis_advantageSchema>;
 
