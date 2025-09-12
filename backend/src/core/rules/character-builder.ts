@@ -25,6 +25,7 @@ import {
   ADVANTAGES,
   DISADVANTAGES,
   MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES,
+  GENERATION_POINTS,
 } from "api-spec";
 import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "./constants.js";
 import { getAttribute, getSkill } from "../character-utils.js";
@@ -34,8 +35,7 @@ export class CharacterBuilder {
   private characterSheet: CharacterSheet;
   private attributesSet = false;
   private generalInfoSet = false;
-  private advantagesSet = false;
-  private disadvantagesSet = false;
+  private dis_advantagesSet = false;
   private skillsActivated = false;
   private userId?: string;
 
@@ -178,6 +178,50 @@ export class CharacterBuilder {
     return Object.keys({} as CharacterSheet["skills"]["handcraft"]) as HandcraftSkillName[];
   }
 
+  private setAdvantages(advantages: DisAdvantages): number {
+    console.log(`Set advantages ${advantages}`);
+
+    for (const advantage of advantages) {
+      const [name, value] = advantage;
+      const isInvalid = !ADVANTAGES.some(([advName, advValue]) => advName === name && advValue === value);
+      if (isInvalid) {
+        throw new HttpError(400, `Invalid advantage: [${name}, ${value}]`);
+      }
+    }
+
+    this.characterSheet.advantages = advantages;
+
+    const spentGenerationPoints = advantages.reduce((sum, [, value]) => sum + value, 0);
+    console.log("Generation points spent on advantages: ", spentGenerationPoints);
+
+    return spentGenerationPoints;
+  }
+
+  private setDisadvantages(disadvantages: DisAdvantages): number {
+    console.log(`Set disadvantages ${disadvantages}`);
+
+    for (const disadvantage of disadvantages) {
+      const [name, value] = disadvantage;
+      const isInvalid = !DISADVANTAGES.some(([advName, advValue]) => advName === name && advValue === value);
+      if (isInvalid) {
+        throw new HttpError(400, `Invalid disadvantage: [${name}, ${value}]`);
+      }
+    }
+
+    const receivedGenerationPoints = disadvantages.reduce((sum, [, value]) => sum + value, 0);
+    console.log("Generation points through disadvantages:", receivedGenerationPoints);
+    if (receivedGenerationPoints > MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES) {
+      throw new HttpError(
+        400,
+        `Generation points through disadvantages exceed maximum allowed: ${MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES}`,
+      );
+    }
+
+    this.characterSheet.disadvantages = disadvantages;
+
+    return receivedGenerationPoints;
+  }
+
   setAttributes(attributes: AttributesForCreation): this {
     console.log("Set attributes");
 
@@ -223,43 +267,23 @@ export class CharacterBuilder {
     return this;
   }
 
-  setAdvantages(advantages: DisAdvantages): this {
-    console.log("Set advantages");
+  setDisAdvantages(advantages: DisAdvantages, disadvantages: DisAdvantages): this {
+    const receivedGenerationPoints = this.setDisadvantages(disadvantages);
 
-    for (const advantage of advantages) {
-      const [name, value] = advantage;
-      const isInvalid = !ADVANTAGES.some(([advName, advValue]) => advName === name && advValue === value);
-      if (isInvalid) {
-        throw new HttpError(400, `Invalid advantage: [${name}, ${value}]`);
-      }
-    }
+    const totalGenerationPoints = GENERATION_POINTS + receivedGenerationPoints;
+    console.log("Available generation points:", totalGenerationPoints);
 
-    this.characterSheet.advantages = advantages;
-    this.advantagesSet = true;
-    return this;
-  }
+    const spentGenerationPoints = this.setAdvantages(advantages);
 
-  setDisAdvantages(disadvantages: DisAdvantages): this {
-    console.log("Set disadvantages");
-
-    for (const disadvantage of disadvantages) {
-      const [name, value] = disadvantage;
-      const isInvalid = !DISADVANTAGES.some(([advName, advValue]) => advName === name && advValue === value);
-      if (isInvalid) {
-        throw new HttpError(400, `Invalid disadvantage: [${name}, ${value}]`);
-      }
-    }
-
-    const totalDisadvantageBonuses = disadvantages.reduce((sum, [, value]) => sum + value, 0);
-    if (totalDisadvantageBonuses > MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES) {
+    if (spentGenerationPoints > totalGenerationPoints) {
       throw new HttpError(
         400,
-        `Total disadvantage bonuses exceed maximum allowed: ${MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES}`,
+        `Generation points spent on advantages (${spentGenerationPoints}) exceed available generation points (${totalGenerationPoints}).`,
       );
     }
 
-    this.characterSheet.disadvantages = disadvantages;
-    this.disadvantagesSet = true;
+    this.dis_advantagesSet = true;
+
     return this;
   }
 
@@ -292,8 +316,7 @@ export class CharacterBuilder {
     if (
       !this.attributesSet ||
       !this.generalInfoSet ||
-      !this.advantagesSet ||
-      !this.disadvantagesSet ||
+      !this.dis_advantagesSet ||
       !this.skillsActivated ||
       !this.userId
     ) {
