@@ -24,6 +24,7 @@ import {
   DisAdvantages,
   ADVANTAGES,
   DISADVANTAGES,
+  MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES,
 } from "api-spec";
 import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "./constants.js";
 import { getAttribute, getSkill } from "../character-utils.js";
@@ -247,6 +248,14 @@ export class CharacterBuilder {
       if (isInvalid) {
         throw new HttpError(400, `Invalid disadvantage: [${name}, ${value}]`);
       }
+    }
+
+    const totalDisadvantageBonuses = disadvantages.reduce((sum, [, value]) => sum + value, 0);
+    if (totalDisadvantageBonuses > MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES) {
+      throw new HttpError(
+        400,
+        `Total disadvantage bonuses exceed maximum allowed: ${MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES}`,
+      );
     }
 
     this.characterSheet.disadvantages = disadvantages;
