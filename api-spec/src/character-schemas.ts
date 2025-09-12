@@ -69,7 +69,72 @@ export const calculationPointsSchema = z
 
 export type CalculationPoints = z.infer<typeof calculationPointsSchema>;
 
-export const dis_advantagesSchema = z.array(z.string().max(MAX_STRING_LENGTH_DEFAULT)).max(MAX_ARRAY_SIZE);
+export const dis_advantageSchema = z.tuple([
+    z.string().max(MAX_STRING_LENGTH_DEFAULT),
+    z.number().int().min(-99).max(99),
+  ]);
+
+export type DisAdvantage = z.infer<typeof dis_advantageSchema>;
+
+export const dis_advantagesSchema = z.array(dis_advantageSchema).max(MAX_ARRAY_SIZE);
+
+export type DisAdvantages = z.infer<typeof dis_advantagesSchema>;
+
+export const ADVANTAGES: DisAdvantages = [
+  ["High School Degree", 3],
+  ["Charmer", 5],
+  ["Dark Vision", 2],
+  ["Lucky", 3],
+  ["Good-Looking", 2],
+  ["Good Memory", 3],
+  ["Outstanding Sense [Sight/Hearing]", 3],
+  ["Master of the Situation", 7],
+  ["High General Knowledge", 6],
+  ["Master of Improvisation", 5],
+  ["Military Training", 8],
+  ["Brave", 2],
+  ["Athletic", 4],
+  ["College Education", 5],
+  ["Daring", 4],
+  ["Melodious Voice", 2],
+];
+
+export const DISADVANTAGES: DisAdvantages = [
+  ["Superstition", 4],
+  ["Coward", 4],
+  ["Low General Knowledge", 6],
+  ["Socially Inept", 5],
+  ["No Degree", 3],
+  ["Pacifist", 6],
+  ["Unlucky", 3],
+  ["Early School Dropout", 7],
+  ["Fear of ...", 2],
+  ["Fear of ...", 3],
+  ["Fear of ...", 4],
+  ["Fear of ...", 5],
+  ["Miser", 3],
+  ["Sense of Justice", 5],
+  ["Impulsive", 3],
+  ["Hot-Tempered", 4],
+  ["Lethargic", 3],
+  ["Vengeful", 2],
+  ["Quarrelsome", 5],
+  ["Speech Impediment", 1],
+  ["Sleep Disorder", 3],
+  ["Spendthrift", 3],
+  ["Night Blind", 2],
+  ["Bad Habit", 2],
+  ["Bad Trait", 4],
+  ["Addiction (Caffeine)", 2],
+  ["Addiction (Nicotine)", 3],
+  ["Addiction (Gambling)", 3],
+  ["Addiction (Alcohol)", 10],
+  ["Addiction (Drugs)", 10],
+  ["Impaired Sense", 4],
+  ["Unattractive", 2],
+  ["Unpleasant Voice", 2],
+  ["Poor Memory", 3],
+];
 
 export const attributeSchema = z
   .object({
