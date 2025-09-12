@@ -26,53 +26,6 @@ import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "./constants.
 import { getAttribute, getSkill } from "../character-utils.js";
 import { HttpError, logAndEnsureHttpError } from "../errors.js";
 
-function zeroAttribute(): Attribute {
-  return { start: 0, current: 0, mod: 0, totalCost: 0 };
-}
-
-function zeroBaseValue(): BaseValue {
-  return { start: 0, current: 0, mod: 0 }; // TODO by formula and byLvlUp. See baseValueFormulas and baseValuesNotUpdatableByLvlUp
-}
-
-function zeroSkill(skillName: SkillName): Skill {
-  return {
-    activated: START_SKILLS.includes(skillName) ? true : false,
-    start: 0,
-    current: 0,
-    mod: 0,
-    totalCost: 0,
-    defaultCostCategory: combatSkills.includes(skillName) ? COST_CATEGORY_COMBAT_SKILLS : COST_CATEGORY_DEFAULT,
-  };
-}
-
-function zeroCombatValues(): CombatValues {
-  return {
-    availablePoints: 0,
-    attackValue: 0,
-    paradeValue: 0,
-  };
-}
-
-function createSkillObjectsFromSkillNamesArray(skillNames: readonly SkillName[]) {
-  return Object.fromEntries(skillNames.map((name) => [name, zeroSkill(name)]));
-}
-
-function getBodySkillNames(): BodySkillName[] {
-  return Object.keys({} as CharacterSheet["skills"]["body"]) as BodySkillName[];
-}
-function getSocialSkillNames(): SocialSkillName[] {
-  return Object.keys({} as CharacterSheet["skills"]["social"]) as SocialSkillName[];
-}
-function getNatureSkillNames(): NatureSkillName[] {
-  return Object.keys({} as CharacterSheet["skills"]["nature"]) as NatureSkillName[];
-}
-function getKnowledgeSkillNames(): KnowledgeSkillName[] {
-  return Object.keys({} as CharacterSheet["skills"]["knowledge"]) as KnowledgeSkillName[];
-}
-function getHandcraftSkillNames(): HandcraftSkillName[] {
-  return Object.keys({} as CharacterSheet["skills"]["handcraft"]) as HandcraftSkillName[];
-}
-
 export class CharacterBuilder {
   private characterSheet: CharacterSheet;
   private attributesSet = false;
@@ -110,62 +63,113 @@ export class CharacterBuilder {
       disadvantages: [],
       specialAbilities: [],
       baseValues: {
-        healthPoints: zeroBaseValue(),
-        mentalHealth: zeroBaseValue(),
-        armorLevel: zeroBaseValue(),
-        naturalArmor: zeroBaseValue(),
-        initiativeBaseValue: zeroBaseValue(),
-        attackBaseValue: zeroBaseValue(),
-        paradeBaseValue: zeroBaseValue(),
-        rangedAttackBaseValue: zeroBaseValue(),
-        luckPoints: zeroBaseValue(),
-        bonusActionsPerCombatRound: zeroBaseValue(),
-        legendaryActions: zeroBaseValue(),
+        healthPoints: this.zeroBaseValue(),
+        mentalHealth: this.zeroBaseValue(),
+        armorLevel: this.zeroBaseValue(),
+        naturalArmor: this.zeroBaseValue(),
+        initiativeBaseValue: this.zeroBaseValue(),
+        attackBaseValue: this.zeroBaseValue(),
+        paradeBaseValue: this.zeroBaseValue(),
+        rangedAttackBaseValue: this.zeroBaseValue(),
+        luckPoints: this.zeroBaseValue(),
+        bonusActionsPerCombatRound: this.zeroBaseValue(),
+        legendaryActions: this.zeroBaseValue(),
       },
       attributes: {
-        courage: zeroAttribute(),
-        intelligence: zeroAttribute(),
-        concentration: zeroAttribute(),
-        charisma: zeroAttribute(),
-        mentalResilience: zeroAttribute(),
-        dexterity: zeroAttribute(),
-        endurance: zeroAttribute(),
-        strength: zeroAttribute(),
+        courage: this.zeroAttribute(),
+        intelligence: this.zeroAttribute(),
+        concentration: this.zeroAttribute(),
+        charisma: this.zeroAttribute(),
+        mentalResilience: this.zeroAttribute(),
+        dexterity: this.zeroAttribute(),
+        endurance: this.zeroAttribute(),
+        strength: this.zeroAttribute(),
       },
       skills: {
-        combat: createSkillObjectsFromSkillNamesArray(combatSkills) as CharacterSheet["skills"]["combat"],
-        body: createSkillObjectsFromSkillNamesArray(getBodySkillNames()) as CharacterSheet["skills"]["body"],
-        social: createSkillObjectsFromSkillNamesArray(getSocialSkillNames()) as CharacterSheet["skills"]["social"],
-        nature: createSkillObjectsFromSkillNamesArray(getNatureSkillNames()) as CharacterSheet["skills"]["nature"],
-        knowledge: createSkillObjectsFromSkillNamesArray(
-          getKnowledgeSkillNames(),
+        combat: this.createSkillObjectsFromSkillNamesArray(combatSkills) as CharacterSheet["skills"]["combat"],
+        body: this.createSkillObjectsFromSkillNamesArray(this.getBodySkillNames()) as CharacterSheet["skills"]["body"],
+        social: this.createSkillObjectsFromSkillNamesArray(
+          this.getSocialSkillNames(),
+        ) as CharacterSheet["skills"]["social"],
+        nature: this.createSkillObjectsFromSkillNamesArray(
+          this.getNatureSkillNames(),
+        ) as CharacterSheet["skills"]["nature"],
+        knowledge: this.createSkillObjectsFromSkillNamesArray(
+          this.getKnowledgeSkillNames(),
         ) as CharacterSheet["skills"]["knowledge"],
-        handcraft: createSkillObjectsFromSkillNamesArray(
-          getHandcraftSkillNames(),
+        handcraft: this.createSkillObjectsFromSkillNamesArray(
+          this.getHandcraftSkillNames(),
         ) as CharacterSheet["skills"]["handcraft"],
       },
       combatValues: {
         melee: {
-          martialArts: zeroCombatValues(),
-          barehanded: zeroCombatValues(),
-          chainWeapons: zeroCombatValues(),
-          daggers: zeroCombatValues(),
-          slashingWeaponsSharp1h: zeroCombatValues(),
-          slashingWeaponsBlunt1h: zeroCombatValues(),
-          thrustingWeapons1h: zeroCombatValues(),
-          slashingWeaponsSharp2h: zeroCombatValues(),
-          slashingWeaponsBlunt2h: zeroCombatValues(),
-          thrustingWeapons2h: zeroCombatValues(),
+          martialArts: this.zeroCombatValues(),
+          barehanded: this.zeroCombatValues(),
+          chainWeapons: this.zeroCombatValues(),
+          daggers: this.zeroCombatValues(),
+          slashingWeaponsSharp1h: this.zeroCombatValues(),
+          slashingWeaponsBlunt1h: this.zeroCombatValues(),
+          thrustingWeapons1h: this.zeroCombatValues(),
+          slashingWeaponsSharp2h: this.zeroCombatValues(),
+          slashingWeaponsBlunt2h: this.zeroCombatValues(),
+          thrustingWeapons2h: this.zeroCombatValues(),
         },
         ranged: {
-          missile: zeroCombatValues(),
-          firearmSimple: zeroCombatValues(),
-          firearmMedium: zeroCombatValues(),
-          firearmComplex: zeroCombatValues(),
-          heavyWeapons: zeroCombatValues(),
+          missile: this.zeroCombatValues(),
+          firearmSimple: this.zeroCombatValues(),
+          firearmMedium: this.zeroCombatValues(),
+          firearmComplex: this.zeroCombatValues(),
+          heavyWeapons: this.zeroCombatValues(),
         },
       },
     };
+  }
+
+  private zeroAttribute(): Attribute {
+    return { start: 0, current: 0, mod: 0, totalCost: 0 };
+  }
+
+  private zeroBaseValue(): BaseValue {
+    return { start: 0, current: 0, mod: 0 }; // TODO by formula and byLvlUp. See baseValueFormulas and baseValuesNotUpdatableByLvlUp
+  }
+
+  private zeroSkill(skillName: SkillName): Skill {
+    return {
+      activated: START_SKILLS.includes(skillName) ? true : false,
+      start: 0,
+      current: 0,
+      mod: 0,
+      totalCost: 0,
+      defaultCostCategory: combatSkills.includes(skillName) ? COST_CATEGORY_COMBAT_SKILLS : COST_CATEGORY_DEFAULT,
+    };
+  }
+
+  private zeroCombatValues(): CombatValues {
+    return {
+      availablePoints: 0,
+      attackValue: 0,
+      paradeValue: 0,
+    };
+  }
+
+  private createSkillObjectsFromSkillNamesArray(skillNames: readonly SkillName[]) {
+    return Object.fromEntries(skillNames.map((name) => [name, this.zeroSkill(name)]));
+  }
+
+  private getBodySkillNames(): BodySkillName[] {
+    return Object.keys({} as CharacterSheet["skills"]["body"]) as BodySkillName[];
+  }
+  private getSocialSkillNames(): SocialSkillName[] {
+    return Object.keys({} as CharacterSheet["skills"]["social"]) as SocialSkillName[];
+  }
+  private getNatureSkillNames(): NatureSkillName[] {
+    return Object.keys({} as CharacterSheet["skills"]["nature"]) as NatureSkillName[];
+  }
+  private getKnowledgeSkillNames(): KnowledgeSkillName[] {
+    return Object.keys({} as CharacterSheet["skills"]["knowledge"]) as KnowledgeSkillName[];
+  }
+  private getHandcraftSkillNames(): HandcraftSkillName[] {
+    return Object.keys({} as CharacterSheet["skills"]["handcraft"]) as HandcraftSkillName[];
   }
 
   setAttributes(attributes: AttributesForCreation): this {
