@@ -6,7 +6,7 @@ import { ColumnDef, flexRender, getCoreRowModel, useReactTable, VisibilityState 
 import { Button } from "@lib/components/ui/button";
 import { Checkbox } from "@lib/components/ui/checkbox";
 import { ISkillProps, render_skill_icon } from "./SkillDefinitions";
-import { LearningMethod } from "@/src/lib/api/models/Character/character";
+import { LearningMethod } from "api-spec";
 import { useSkillUpdater } from "@/src/hooks/useSkillUpdate";
 import { useLoadingOverlay } from "@/src/app/global/OverlayContext";
 import { useCharacterStore } from "@/src/app/global/characterStore";

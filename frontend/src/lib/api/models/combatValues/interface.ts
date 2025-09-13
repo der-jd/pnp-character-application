@@ -1,5 +1,5 @@
 import { RecordEntry } from "../history/interface";
-import { CombatValues } from "../Character/character";
+import type { CombatValues } from "api-spec";
 
 export interface CombatValueIncreaseData {
   characterId: string;

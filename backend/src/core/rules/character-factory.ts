@@ -35,8 +35,8 @@ export function createEmptyCharacterSheet(): CharacterSheet {
       name: "",
       level: 0,
       sex: "",
-      profession: { name: "", skill: "" },
-      hobby: { name: "", skill: "" },
+      profession: { name: "", skill: "combat/barehanded" }, // Default to valid format
+      hobby: { name: "", skill: "body/athletics" }, // Default to valid format
       birthday: "",
       birthplace: "",
       size: "",

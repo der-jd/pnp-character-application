@@ -1,6 +1,27 @@
+// Import types from api-spec instead of defining our own
+import {
+  PatchSkillRequest as SkillIncreaseRequest,
+  PatchSkillPathParams,
+  UpdateSkillResponse,
+  LearningMethodString,
+  InitialNew,
+  InitialIncreased,
+  CombatValues,
+  Skill,
+} from "api-spec";
+
 import { RecordEntry } from "../history/interface";
-import { Increase, PointsAvailable } from "../common/increase";
-import { CombatValues, Skill } from "../Character/character";
+import { PointsAvailable } from "../common/increase";
+
+// Re-export api-spec types for convenience
+export type {
+  SkillIncreaseRequest,
+  PatchSkillPathParams,
+  UpdateSkillResponse,
+  LearningMethodString,
+  InitialNew,
+  InitialIncreased,
+};
 
 export interface SkillIncreaseData {
   characterId: string;
@@ -22,9 +43,4 @@ export interface SkillState {
 export interface SkillIncreaseReply {
   data: SkillIncreaseData;
   historyRecord?: RecordEntry;
-}
-
-export interface SkillIncreaseRequest {
-  current: Increase;
-  learningMethod: string;
 }
