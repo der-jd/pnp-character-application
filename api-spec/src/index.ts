@@ -96,6 +96,8 @@ export {
   UpdateLevelResponse,
   postLevelResponseSchema,
   PostLevelResponse,
+  postLevelHistoryRecordSchema,
+  PostLevelHistoryRecord,
 } from "./endpoints/post-level.js";
 export {
   postSpecialAbilitiesPathParamsSchema,
@@ -106,6 +108,8 @@ export {
   AddSpecialAbilityResponse,
   postSpecialAbilitiesResponseSchema,
   PostSpecialAbilitiesResponse,
+  postSpecialAbilitiesHistoryRecordSchema,
+  PostSpecialAbilitiesHistoryRecord,
 } from "./endpoints/post-special-abilities.js";
 export {
   getCharacterPathParamsSchema,
@@ -152,6 +156,8 @@ export {
   UpdateAttributeResponse,
   patchAttributeResponseSchema,
   PatchAttributeResponse,
+  patchAttributeHistoryRecordSchema,
+  PatchAttributeHistoryRecord,
 } from "./endpoints/patch-attribute.js";
 export {
   patchBaseValuePathParamsSchema,
@@ -163,6 +169,8 @@ export {
   patchBaseValueResponseSchema,
   PatchBaseValueResponse,
   baseValuesUpdatableByLvlUp,
+  patchBaseValueHistoryRecordSchema,
+  PatchBaseValueHistoryRecord,
 } from "./endpoints/patch-base-value.js";
 export {
   patchCalculationPointsPathParamsSchema,
@@ -173,6 +181,8 @@ export {
   UpdateCalculationPointsResponse,
   patchCalculationPointsResponseSchema,
   PatchCalculationPointsResponse,
+  patchCalculationPointsHistoryRecordSchema,
+  PatchCalculationPointsHistoryRecord,
 } from "./endpoints/patch-calculation-points.js";
 export {
   patchCombatValuesPathParamsSchema,
@@ -183,6 +193,8 @@ export {
   UpdateCombatValuesResponse,
   patchCombatValuesResponseSchema,
   PatchCombatValuesResponse,
+  patchCombatValuesHistoryRecordSchema,
+  PatchCombatValuesHistoryRecord,
 } from "./endpoints/patch-combat-values.js";
 export {
   patchSkillPathParamsSchema,
@@ -193,6 +205,8 @@ export {
   UpdateSkillResponse,
   patchSkillResponseSchema,
   PatchSkillResponse,
+  patchSkillsHistoryRecordSchema,
+  PatchSkillsHistoryRecord,
 } from "./endpoints/patch-skill.js";
 export {
   getHistoryPathParamsSchema,

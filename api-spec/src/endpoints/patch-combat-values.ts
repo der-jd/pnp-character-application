@@ -39,10 +39,21 @@ export const updateCombatValuesResponseSchema = z
 
 export type UpdateCombatValuesResponse = z.infer<typeof updateCombatValuesResponseSchema>;
 
+export const patchCombatValuesHistoryRecordSchema = recordSchema.extend({
+  data: z
+    .object({
+      old: combatValuesSchema,
+      new: combatValuesSchema,
+    })
+    .strict(),
+});
+
+export type PatchCombatValuesHistoryRecord = z.infer<typeof patchCombatValuesHistoryRecordSchema>;
+
 export const patchCombatValuesResponseSchema = z
   .object({
     data: updateCombatValuesResponseSchema,
-    historyRecord: recordSchema.nullable(),
+    historyRecord: patchCombatValuesHistoryRecordSchema.nullable(),
   })
   .strict();
 
