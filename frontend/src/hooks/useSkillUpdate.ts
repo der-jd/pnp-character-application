@@ -3,7 +3,23 @@
 import { useState } from "react";
 import { useAuth } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
-import { CharacterSheet, LearningMethod } from "../lib/api/models/Character/character";
+import { CharacterSheet, LearningMethod, LearningMethodString } from "api-spec";
+
+// Helper function to convert from numeric LearningMethod to string
+const convertLearningMethodToString = (numericMethod: LearningMethod): LearningMethodString => {
+  switch (numericMethod) {
+    case LearningMethod.FREE:
+      return "FREE";
+    case LearningMethod.LOW_PRICED:
+      return "LOW_PRICED";
+    case LearningMethod.NORMAL:
+      return "NORMAL";
+    case LearningMethod.EXPENSIVE:
+      return "EXPENSIVE";
+    default:
+      return "NORMAL";
+  }
+};
 import {
   increaseAttribute,
   increaseBaseValue,
@@ -142,7 +158,7 @@ export function useSkillUpdater() {
         initialValue: skill.current_level,
         increasedPoints: pointsToSkill,
       },
-      learningMethod: LearningMethod[skill.learning_method],
+      learningMethod: convertLearningMethodToString(skill.learning_method),
     };
 
     if (selectedChar && idToken) {
