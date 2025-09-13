@@ -26,6 +26,8 @@ import {
   GENERATION_POINTS,
   CharacterCreation,
   ActivatedSkills,
+  BaseValues,
+  baseValuesUpdatableByLvlUp,
 } from "api-spec";
 import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "./constants.js";
 import { getAttribute, getSkill } from "../character-utils.js";
@@ -74,17 +76,17 @@ export class CharacterBuilder {
       disadvantages: [],
       specialAbilities: [],
       baseValues: {
-        healthPoints: this.zeroBaseValue(),
-        mentalHealth: this.zeroBaseValue(),
-        armorLevel: this.zeroBaseValue(),
-        naturalArmor: this.zeroBaseValue(),
-        initiativeBaseValue: this.zeroBaseValue(),
-        attackBaseValue: this.zeroBaseValue(),
-        paradeBaseValue: this.zeroBaseValue(),
-        rangedAttackBaseValue: this.zeroBaseValue(),
-        luckPoints: this.zeroBaseValue(),
-        bonusActionsPerCombatRound: this.zeroBaseValue(),
-        legendaryActions: this.zeroBaseValue(),
+        healthPoints: this.zeroBaseValue("healthPoints"),
+        mentalHealth: this.zeroBaseValue("mentalHealth"),
+        armorLevel: this.zeroBaseValue("armorLevel"),
+        naturalArmor: this.zeroBaseValue("naturalArmor"),
+        initiativeBaseValue: this.zeroBaseValue("initiativeBaseValue"),
+        attackBaseValue: this.zeroBaseValue("attackBaseValue"),
+        paradeBaseValue: this.zeroBaseValue("paradeBaseValue"),
+        rangedAttackBaseValue: this.zeroBaseValue("rangedAttackBaseValue"),
+        luckPoints: this.zeroBaseValue("luckPoints"),
+        bonusActionsPerCombatRound: this.zeroBaseValue("bonusActionsPerCombatRound"),
+        legendaryActions: this.zeroBaseValue("legendaryActions"),
       },
       attributes: {
         courage: this.zeroAttribute(),
@@ -140,8 +142,14 @@ export class CharacterBuilder {
     return { start: 0, current: 0, mod: 0, totalCost: 0 };
   }
 
-  private zeroBaseValue(): BaseValue {
-    return { start: 0, current: 0, mod: 0 }; // TODO by formula and byLvlUp. See baseValueFormulas and baseValuesNotUpdatableByLvlUp
+  private zeroBaseValue(baseValueName: keyof BaseValues): BaseValue {
+    return {
+      start: 0,
+      current: 0,
+      mod: 0,
+      byLvlUp: baseValuesUpdatableByLvlUp.includes(baseValueName) ? 0 : undefined,
+    }; // The value via formula is set later
+    // TODO by formula. See baseValueFormulas
   }
 
   private zeroSkill(skillName: SkillName): Skill {
