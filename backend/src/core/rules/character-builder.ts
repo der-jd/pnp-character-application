@@ -28,10 +28,12 @@ import {
   ActivatedSkills,
   BaseValues,
   baseValuesUpdatableByLvlUp,
+  baseValuesSchema,
 } from "api-spec";
 import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "./constants.js";
 import { getAttribute, getSkill } from "../character-utils.js";
 import { HttpError, logAndEnsureHttpError } from "../errors.js";
+import { calculateBaseValues } from "./base-value-formulas.js";
 
 export class CharacterBuilder {
   private attributesSet = false;
@@ -146,10 +148,20 @@ export class CharacterBuilder {
     return {
       start: 0,
       current: 0,
-      mod: 0,
       byLvlUp: baseValuesUpdatableByLvlUp.includes(baseValueName) ? 0 : undefined,
-    }; // The value via formula is set later
-    // TODO by formula. See baseValueFormulas
+      mod: 0,
+      // The value for 'byFormula' is set later
+    };
+  }
+
+  private setBaseValuesByFormula(): void {
+    console.log("Set byFormula values for base values");
+
+    const calculatedBaseValues = calculateBaseValues(this.characterSheet.attributes);
+
+    for (const baseValueName of Object.keys(baseValuesSchema.shape) as (keyof BaseValues)[]) {
+      this.characterSheet.baseValues[baseValueName].byFormula = calculatedBaseValues[baseValueName];
+    }
   }
 
   private zeroSkill(skillName: SkillName): Skill {
@@ -249,7 +261,11 @@ export class CharacterBuilder {
         `Expected ${ATTRIBUTE_POINTS_FOR_CREATION} distributed attribute points, but got ${spentAttributePoints} points.`,
       );
     }
+
+    this.setBaseValuesByFormula();
+
     this.attributesSet = true;
+
     return this;
   }
 
