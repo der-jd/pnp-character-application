@@ -46,7 +46,7 @@ export type AddSpecialAbilityResponse = z.infer<typeof addSpecialAbilityResponse
 export const postSpecialAbilitiesResponseSchema = z
   .object({
     data: addSpecialAbilityResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: recordSchema.nullable(),
   })
   .strict();
 

@@ -37,7 +37,7 @@ export type UpdateLevelResponse = z.infer<typeof updateLevelResponseSchema>;
 export const postLevelResponseSchema = z
   .object({
     data: updateLevelResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: recordSchema.nullable(),
   })
   .strict();
 

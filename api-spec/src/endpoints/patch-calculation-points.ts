@@ -60,7 +60,7 @@ export type UpdateCalculationPointsResponse = z.infer<typeof updateCalculationPo
 export const patchCalculationPointsResponseSchema = z
   .object({
     data: updateCalculationPointsResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: recordSchema.nullable(),
   })
   .strict();
 

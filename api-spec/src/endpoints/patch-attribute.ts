@@ -62,7 +62,7 @@ export type UpdateAttributeResponse = z.infer<typeof updateAttributeResponseSche
 export const patchAttributeResponseSchema = z
   .object({
     data: updateAttributeResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: recordSchema.nullable(),
   })
   .strict();
 

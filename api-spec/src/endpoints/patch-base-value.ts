@@ -41,7 +41,7 @@ export type UpdateBaseValueResponse = z.infer<typeof updateBaseValueResponseSche
 export const patchBaseValueResponseSchema = z
   .object({
     data: updateBaseValueResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: recordSchema.nullable(),
   })
   .strict();
 

@@ -42,7 +42,7 @@ export type UpdateCombatValuesResponse = z.infer<typeof updateCombatValuesRespon
 export const patchCombatValuesResponseSchema = z
   .object({
     data: updateCombatValuesResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: recordSchema.nullable(),
   })
   .strict();
 

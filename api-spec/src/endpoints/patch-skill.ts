@@ -75,7 +75,7 @@ export type UpdateSkillResponse = z.infer<typeof updateSkillResponseSchema>;
 export const patchSkillResponseSchema = z
   .object({
     data: updateSkillResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: recordSchema.nullable(),
   })
   .strict();
 
