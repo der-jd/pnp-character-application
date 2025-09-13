@@ -1,6 +1,20 @@
 import { v4 as uuidv4 } from "uuid";
-import { CostCategory, HistoryBlock, RecordType, Record, LearningMethodString } from "api-spec";
-import { fakeCharacterId } from "./character.js";
+import {
+  CostCategory,
+  HistoryBlock,
+  RecordType,
+  Record,
+  LearningMethodString,
+  PostCharactersHistoryRecord,
+  PostLevelHistoryRecord,
+  PatchBaseValueHistoryRecord,
+  PatchCalculationPointsHistoryRecord,
+  PatchAttributeHistoryRecord,
+  PatchSkillHistoryRecord,
+  PatchCombatValuesHistoryRecord,
+  PostSpecialAbilitiesHistoryRecord,
+} from "api-spec";
+import { fakeCharacter, fakeCharacterId } from "./character.js";
 
 export function addFakeHistoryRecord(
   block: HistoryBlock,
@@ -16,7 +30,38 @@ export function addFakeHistoryRecord(
   }
 }
 
-export const levelChangedRecord: Record = {
+export const characterCreatedChangedRecord: PostCharactersHistoryRecord = {
+  type: RecordType.CHARACTER_CREATED,
+  name: "New Character",
+  number: 3,
+  id: "df6daaa8-d13c-47c0-b633-69c6396df4fd",
+  data: {
+    new: {
+      character: fakeCharacter,
+      generationPoints: {
+        throughDisadvantages: 15,
+        spent: 20,
+        total: 20,
+      },
+      activatedSkills: [
+        "body/pickpocketing",
+        "body/bodyControl",
+        "social/convincing",
+        "nature/fishing",
+        "handcraft/stonework",
+      ],
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const levelChangedRecord: PostLevelHistoryRecord = {
   type: RecordType.LEVEL_CHANGED,
   name: "Level up",
   number: 2,
@@ -38,7 +83,7 @@ export const levelChangedRecord: Record = {
   timestamp: new Date().toISOString(),
 };
 
-export const baseValueChangedRecord: Record = {
+export const baseValueChangedRecord: PatchBaseValueHistoryRecord = {
   type: RecordType.BASE_VALUE_CHANGED,
   name: "healthPoints",
   number: 2,
@@ -68,7 +113,7 @@ export const baseValueChangedRecord: Record = {
   timestamp: new Date().toISOString(),
 };
 
-export const calculationPointsChangedRecord: Record = {
+export const calculationPointsChangedRecord: PatchCalculationPointsHistoryRecord = {
   type: RecordType.CALCULATION_POINTS_CHANGED,
   name: "Calculation Points",
   number: 2,
@@ -130,7 +175,7 @@ export const calculationPointsChangedRecord: Record = {
   timestamp: new Date().toISOString(),
 };
 
-export const attributeAndBaseValueChangedRecord: Record = {
+export const attributeAndBaseValueChangedRecord: PatchAttributeHistoryRecord = {
   type: RecordType.ATTRIBUTE_CHANGED,
   name: "strength",
   number: 2,
@@ -227,7 +272,7 @@ export const attributeAndBaseValueChangedRecord: Record = {
   timestamp: new Date().toISOString(),
 };
 
-export const attributeChangedRecord: Record = {
+export const attributeChangedRecord: PatchAttributeHistoryRecord = {
   type: RecordType.ATTRIBUTE_CHANGED,
   name: "intelligence",
   number: 2,
@@ -270,7 +315,7 @@ export const attributeChangedRecord: Record = {
   timestamp: new Date().toISOString(),
 };
 
-export const skillChangedRecord: Record = {
+export const skillChangedRecord: PatchSkillHistoryRecord = {
   type: RecordType.SKILL_CHANGED,
   name: "body/athletics",
   number: 3,
@@ -317,7 +362,7 @@ export const skillChangedRecord: Record = {
   timestamp: new Date().toISOString(),
 };
 
-export const combatSkillChangedRecord: Record = {
+export const combatSkillChangedRecord: PatchSkillHistoryRecord = {
   type: RecordType.SKILL_CHANGED,
   name: "combat/daggers (melee)",
   number: 3,
@@ -374,7 +419,7 @@ export const combatSkillChangedRecord: Record = {
   timestamp: new Date().toISOString(),
 };
 
-export const combatValuesChangedRecord: Record = {
+export const combatValuesChangedRecord: PatchCombatValuesHistoryRecord = {
   type: RecordType.COMBAT_VALUES_CHANGED,
   name: "melee/thrustingWeapons1h",
   number: 3,
@@ -400,7 +445,7 @@ export const combatValuesChangedRecord: Record = {
   timestamp: new Date().toISOString(),
 };
 
-export const specialAbilitiesChangedRecord: Record = {
+export const specialAbilitiesChangedRecord: PostSpecialAbilitiesHistoryRecord = {
   type: RecordType.SPECIAL_ABILITIES_CHANGED,
   name: "Berserker Rage",
   number: 2,

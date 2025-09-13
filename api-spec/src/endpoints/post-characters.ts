@@ -3,17 +3,14 @@ import {
   attributeSchema,
   attributesSchema,
   characterNameSchema,
-  characterSchema,
-  combinedSkillCategoryAndNameSchema,
   dis_advantagesSchema,
   generalInformationSchema,
 } from "../character-schemas.js";
 import { userIdSchema, MIN_LEVEL } from "../general-schemas.js";
+import { activatedSkillsSchema, characterCreationSchema, recordSchema } from "../history-schemas.js";
 
 export const GENERATION_POINTS = 5;
 export const MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES = 15;
-
-export const NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION = 5;
 
 export const MIN_ATTRIBUTE_VALUE_FOR_CREATION = 4;
 export const MAX_ATTRIBUTE_VALUE_FOR_CREATION = 7;
@@ -46,23 +43,41 @@ export const postCharactersRequestSchema = z
     attributes: attributesForCreationSchema,
     advantages: dis_advantagesSchema,
     disadvantages: dis_advantagesSchema,
-    activatableSkillsForFree: z
-      .array(combinedSkillCategoryAndNameSchema)
-      .length(NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION),
+    activatedSkills: activatedSkillsSchema,
   })
   .strict();
 
 export type PostCharactersRequest = z.infer<typeof postCharactersRequestSchema>;
 
-export const postCharactersResponseSchema = z
+export const createCharacterResponseSchema = z
   .object({
     characterId: z.uuid(),
     userId: userIdSchema,
     characterName: characterNameSchema,
-    character: {
-      old: {},
-      new: characterSchema,
-    },
+    changes: z
+      .object({
+        new: characterCreationSchema,
+      })
+      .strict(),
+  })
+  .strict();
+
+export type CreateCharacterResponse = z.infer<typeof createCharacterResponseSchema>;
+
+export const postCharactersHistoryRecordSchema = recordSchema.extend({
+  data: z
+    .object({
+      new: characterCreationSchema,
+    })
+    .strict(),
+});
+
+export type PostCharactersHistoryRecord = z.infer<typeof postCharactersHistoryRecordSchema>;
+
+export const postCharactersResponseSchema = z
+  .object({
+    data: createCharacterResponseSchema,
+    historyRecord: postCharactersHistoryRecordSchema,
   })
   .strict();
 

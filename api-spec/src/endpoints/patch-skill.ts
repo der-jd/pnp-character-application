@@ -72,7 +72,7 @@ export const updateSkillResponseSchema = z
 
 export type UpdateSkillResponse = z.infer<typeof updateSkillResponseSchema>;
 
-export const patchSkillsHistoryRecordSchema = recordSchema.extend({
+export const patchSkillHistoryRecordSchema = recordSchema.extend({
   data: z
     .object({
       old: skillChangeSchema,
@@ -81,12 +81,12 @@ export const patchSkillsHistoryRecordSchema = recordSchema.extend({
     .strict(),
 });
 
-export type PatchSkillsHistoryRecord = z.infer<typeof patchSkillsHistoryRecordSchema>;
+export type PatchSkillHistoryRecord = z.infer<typeof patchSkillHistoryRecordSchema>;
 
 export const patchSkillResponseSchema = z
   .object({
     data: updateSkillResponseSchema,
-    historyRecord: patchSkillsHistoryRecordSchema.nullable(),
+    historyRecord: patchSkillHistoryRecordSchema.nullable(),
   })
   .strict();
 

@@ -16,6 +16,7 @@ import {
   stringArraySchema,
   recordSchema,
   userIdSchema,
+  characterCreationSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -186,13 +187,17 @@ async function validateRequest(request: Request): Promise<Parameters> {
     //await getCharacterItem(body.userId, characterId);
 
     switch (body.type) {
-      case RecordType.CALCULATION_POINTS_CHANGED:
-        calculationPointsChangeSchema.parse(body.data.old);
-        calculationPointsChangeSchema.parse(body.data.new);
+      case RecordType.CHARACTER_CREATED:
+        // There is no "old" data for character creation
+        characterCreationSchema.parse(body.data.new);
         break;
       case RecordType.LEVEL_CHANGED:
         integerSchema.parse(body.data.old);
         integerSchema.parse(body.data.new);
+        break;
+      case RecordType.CALCULATION_POINTS_CHANGED:
+        calculationPointsChangeSchema.parse(body.data.old);
+        calculationPointsChangeSchema.parse(body.data.new);
         break;
       case RecordType.BASE_VALUE_CHANGED:
         baseValueSchema.parse(body.data.old);

@@ -58,6 +58,11 @@ export {
   attributeChangeSchema,
   calculationPointsChangeSchema,
   skillChangeSchema,
+  characterCreationSchema,
+  CharacterCreation,
+  NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
+  activatedSkillsSchema,
+  ActivatedSkills,
 } from "./history-schemas.js";
 export {
   initialNewSchema,
@@ -205,8 +210,8 @@ export {
   UpdateSkillResponse,
   patchSkillResponseSchema,
   PatchSkillResponse,
-  patchSkillsHistoryRecordSchema,
-  PatchSkillsHistoryRecord,
+  patchSkillHistoryRecordSchema,
+  PatchSkillHistoryRecord,
 } from "./endpoints/patch-skill.js";
 export {
   getHistoryPathParamsSchema,
@@ -217,7 +222,6 @@ export {
   GetHistoryResponse,
 } from "./endpoints/get-history.js";
 export {
-  NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
   MIN_ATTRIBUTE_VALUE_FOR_CREATION,
   MAX_ATTRIBUTE_VALUE_FOR_CREATION,
   ATTRIBUTE_POINTS_FOR_CREATION,
@@ -235,4 +239,8 @@ export {
   AttributesForCreation,
   generalInformationForCreationSchema,
   GeneralInformationForCreation,
+  createCharacterResponseSchema,
+  CreateCharacterResponse,
+  postCharactersHistoryRecordSchema,
+  PostCharactersHistoryRecord,
 } from "./endpoints/post-characters.js";

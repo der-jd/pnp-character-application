@@ -19,25 +19,30 @@ import {
   PROFESSION_SKILL_BONUS,
   HOBBY_SKILL_BONUS,
   AttributesForCreation,
-  PostCharactersRequest,
-  Character,
   DisAdvantages,
   ADVANTAGES,
   DISADVANTAGES,
   MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES,
   GENERATION_POINTS,
+  CharacterCreation,
+  ActivatedSkills,
 } from "api-spec";
 import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "./constants.js";
 import { getAttribute, getSkill } from "../character-utils.js";
 import { HttpError, logAndEnsureHttpError } from "../errors.js";
 
 export class CharacterBuilder {
-  private characterSheet: CharacterSheet;
   private attributesSet = false;
   private generalInfoSet = false;
   private dis_advantagesSet = false;
   private skillsActivated = false;
+
+  private characterSheet: CharacterSheet;
   private userId?: string;
+  private generationPointsThroughDisadvantages: number = 0;
+  private spentGenerationPoints: number = 0;
+  private totalGenerationPoints: number = 0;
+  private activatedSkills: ActivatedSkills = [];
 
   constructor() {
     this.characterSheet = {
@@ -178,7 +183,7 @@ export class CharacterBuilder {
     return Object.keys({} as CharacterSheet["skills"]["handcraft"]) as HandcraftSkillName[];
   }
 
-  private setAdvantages(advantages: DisAdvantages): number {
+  private setAdvantages(advantages: DisAdvantages): void {
     console.log(`Set advantages ${advantages}`);
 
     for (const advantage of advantages) {
@@ -191,13 +196,11 @@ export class CharacterBuilder {
 
     this.characterSheet.advantages = advantages;
 
-    const spentGenerationPoints = advantages.reduce((sum, [, value]) => sum + value, 0);
-    console.log("Generation points spent on advantages: ", spentGenerationPoints);
-
-    return spentGenerationPoints;
+    this.spentGenerationPoints = advantages.reduce((sum, [, value]) => sum + value, 0);
+    console.log("Generation points spent on advantages: ", this.spentGenerationPoints);
   }
 
-  private setDisadvantages(disadvantages: DisAdvantages): number {
+  private setDisadvantages(disadvantages: DisAdvantages): void {
     console.log(`Set disadvantages ${disadvantages}`);
 
     for (const disadvantage of disadvantages) {
@@ -208,9 +211,9 @@ export class CharacterBuilder {
       }
     }
 
-    const receivedGenerationPoints = disadvantages.reduce((sum, [, value]) => sum + value, 0);
-    console.log("Generation points through disadvantages:", receivedGenerationPoints);
-    if (receivedGenerationPoints > MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES) {
+    this.generationPointsThroughDisadvantages = disadvantages.reduce((sum, [, value]) => sum + value, 0);
+    console.log("Generation points through disadvantages:", this.generationPointsThroughDisadvantages);
+    if (this.generationPointsThroughDisadvantages > MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES) {
       throw new HttpError(
         400,
         `Generation points through disadvantages exceed maximum allowed: ${MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES}`,
@@ -218,8 +221,6 @@ export class CharacterBuilder {
     }
 
     this.characterSheet.disadvantages = disadvantages;
-
-    return receivedGenerationPoints;
   }
 
   setAttributes(attributes: AttributesForCreation): this {
@@ -268,17 +269,17 @@ export class CharacterBuilder {
   }
 
   setDisAdvantages(advantages: DisAdvantages, disadvantages: DisAdvantages): this {
-    const receivedGenerationPoints = this.setDisadvantages(disadvantages);
+    this.setDisadvantages(disadvantages);
 
-    const totalGenerationPoints = GENERATION_POINTS + receivedGenerationPoints;
-    console.log("Available generation points:", totalGenerationPoints);
+    this.totalGenerationPoints = GENERATION_POINTS + this.generationPointsThroughDisadvantages;
+    console.log("Available generation points:", this.totalGenerationPoints);
 
-    const spentGenerationPoints = this.setAdvantages(advantages);
+    this.setAdvantages(advantages);
 
-    if (spentGenerationPoints > totalGenerationPoints) {
+    if (this.spentGenerationPoints > this.totalGenerationPoints) {
       throw new HttpError(
         400,
-        `Generation points spent on advantages (${spentGenerationPoints}) exceed available generation points (${totalGenerationPoints}).`,
+        `Generation points spent on advantages (${this.spentGenerationPoints}) exceed available generation points (${this.totalGenerationPoints}).`,
       );
     }
 
@@ -287,10 +288,10 @@ export class CharacterBuilder {
     return this;
   }
 
-  activateSkills(activatableSkills: PostCharactersRequest["activatableSkillsForFree"]): this {
+  activateSkills(activatedSkills: ActivatedSkills): this {
     console.log("Activate skills for free");
 
-    for (const skill of activatableSkills) {
+    for (const skill of activatedSkills) {
       try {
         const [category, name] = skill.split("/");
         const characterSkill = getSkill(this.characterSheet.skills, category as keyof CharacterSheet["skills"], name);
@@ -302,6 +303,7 @@ export class CharacterBuilder {
         throw logAndEnsureHttpError(error);
       }
     }
+    this.activatedSkills = activatedSkills;
     this.skillsActivated = true;
     return this;
   }
@@ -312,7 +314,7 @@ export class CharacterBuilder {
     return this;
   }
 
-  build(): Character {
+  build(): CharacterCreation {
     if (
       !this.attributesSet ||
       !this.generalInfoSet ||
@@ -323,9 +325,17 @@ export class CharacterBuilder {
       throw new HttpError(400, "All steps must be completed before building the character.");
     }
     return {
-      characterId: uuidv4(),
-      userId: this.userId,
-      characterSheet: this.characterSheet,
+      character: {
+        userId: this.userId,
+        characterId: uuidv4(),
+        characterSheet: this.characterSheet,
+      },
+      generationPoints: {
+        throughDisadvantages: this.generationPointsThroughDisadvantages,
+        spent: this.spentGenerationPoints,
+        total: this.totalGenerationPoints,
+      },
+      activatedSkills: this.activatedSkills,
     };
   }
 }

@@ -10,7 +10,7 @@ import {
   logZodError,
 } from "core";
 import { CharacterBuilder } from "core";
-import { headersSchema, PostCharactersRequest, postCharactersRequestSchema, PostCharactersResponse } from "api-spec";
+import { CreateCharacterResponse, headersSchema, PostCharactersRequest, postCharactersRequestSchema } from "api-spec";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   return _createCharacter({
@@ -34,23 +34,26 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
 
     // TODO advantages and disadvantages: set benefits / drawbacks in character builder
 
-    const character = new CharacterBuilder()
+    const characterCreation = new CharacterBuilder()
       .setUserId(params.userId)
       .setGeneralInformation(params.body.generalInformation)
       .setDisAdvantages(params.body.advantages, params.body.disadvantages)
       .setAttributes(params.body.attributes)
-      .activateSkills(params.body.activatableSkillsForFree)
+      .activateSkills(params.body.activatedSkills)
       .build();
 
-    await createCharacterItem(character);
+    await createCharacterItem(characterCreation.character);
 
-    const responseBody: PostCharactersResponse = {
-      characterId: character.characterId,
-      userId: character.userId,
-      characterName: character.characterSheet.generalInformation.name,
-      character: {
-        old: {},
-        new: character,
+    const responseBody: CreateCharacterResponse = {
+      characterId: characterCreation.character.characterId,
+      userId: characterCreation.character.userId,
+      characterName: characterCreation.character.characterSheet.generalInformation.name,
+      changes: {
+        new: {
+          character: characterCreation.character,
+          generationPoints: characterCreation.generationPoints,
+          activatedSkills: characterCreation.activatedSkills,
+        },
       },
     };
     const response = {
