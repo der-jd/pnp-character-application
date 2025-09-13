@@ -1,4 +1,4 @@
-import { Character, CostCategory } from "api-spec";
+import { AdvantagesNames, Character, CostCategory, DisadvantagesNames } from "api-spec";
 import { fakeUserId } from "./request.js";
 
 export const fakeCharacterId = "9862f3c9-a065-4e0e-80b2-5bf085535cbe";
@@ -41,8 +41,14 @@ export const fakeCharacter: Character = {
         total: 50,
       },
     },
-    advantages: ["Quick Reflexes", "Charismatic"],
-    disadvantages: ["Short Temper", "Fear of Heights"],
+    advantages: [
+      [AdvantagesNames.BRAVE, "", 2],
+      [AdvantagesNames.ATHLETIC, "", 4],
+    ],
+    disadvantages: [
+      [DisadvantagesNames.VENGEFUL, "", 2],
+      [DisadvantagesNames.FEAR_OF, "Heights", 2],
+    ],
     specialAbilities: ["Berserker Rage", "Battle Cry"],
     attributes: {
       courage: {
@@ -474,6 +480,14 @@ export const fakeCharacter: Character = {
           totalCost: 20,
           defaultCostCategory: CostCategory.CAT_2,
         },
+        bargaining: {
+          activated: true,
+          start: 7,
+          current: 10,
+          mod: 3,
+          totalCost: 15,
+          defaultCostCategory: CostCategory.CAT_2,
+        },
       },
       nature: {
         tracking: {
@@ -745,14 +759,6 @@ export const fakeCharacter: Character = {
           defaultCostCategory: CostCategory.CAT_2,
         },
         cheating: {
-          activated: true,
-          start: 7,
-          current: 10,
-          mod: 3,
-          totalCost: 15,
-          defaultCostCategory: CostCategory.CAT_2,
-        },
-        bargaining: {
           activated: true,
           start: 7,
           current: 10,
@@ -926,8 +932,15 @@ export const fakeCharacter2: Character = {
         total: 50,
       },
     },
-    advantages: ["Quick Reflexes", "Iron Will", "Charismatic"],
-    disadvantages: ["Short Temper", "Fear of Heights"],
+    advantages: [
+      [AdvantagesNames.BRAVE, "", 2],
+      [AdvantagesNames.ATHLETIC, "", 4],
+      [AdvantagesNames.CHARMER, "", 5],
+    ],
+    disadvantages: [
+      [DisadvantagesNames.VENGEFUL, "", 2],
+      [DisadvantagesNames.FEAR_OF, "Heights", 2],
+    ],
     specialAbilities: ["Berserker Rage", "Battle Cry"],
     attributes: {
       courage: {
@@ -1359,6 +1372,14 @@ export const fakeCharacter2: Character = {
           totalCost: 20,
           defaultCostCategory: CostCategory.CAT_2,
         },
+        bargaining: {
+          activated: true,
+          start: 7,
+          current: 10,
+          mod: 3,
+          totalCost: 15,
+          defaultCostCategory: CostCategory.CAT_2,
+        },
       },
       nature: {
         tracking: {
@@ -1630,14 +1651,6 @@ export const fakeCharacter2: Character = {
           defaultCostCategory: CostCategory.CAT_2,
         },
         cheating: {
-          activated: true,
-          start: 7,
-          current: 10,
-          mod: 3,
-          totalCost: 15,
-          defaultCostCategory: CostCategory.CAT_2,
-        },
-        bargaining: {
           activated: true,
           start: 7,
           current: 10,

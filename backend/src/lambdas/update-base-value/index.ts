@@ -139,7 +139,7 @@ function updateByLvlUpValue(
   console.log(`Update byLvlUp value of the base value from ${byLvlUp.initialValue} to ${byLvlUp.newValue}`);
 
   if (!baseValuesUpdatableByLvlUp.includes(baseValueName as keyof CharacterSheet["baseValues"])) {
-    throw new HttpError(409, "'By level up' changes are not allowed for this base value!", {
+    throw new HttpError(400, "'By level up' changes are not allowed for this base value!", {
       baseValueName: baseValueName,
     });
   }

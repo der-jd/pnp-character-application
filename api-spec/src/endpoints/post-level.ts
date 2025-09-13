@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { userIdSchema } from "../general-schemas.js";
 import { levelSchema } from "../character-schemas.js";
-import { recordSchema } from "../history-schemas.js";
+import { integerSchema, recordSchema } from "../history-schemas.js";
 
 export const postLevelPathParamsSchema = z
   .object({
@@ -34,10 +34,21 @@ export const updateLevelResponseSchema = z
 
 export type UpdateLevelResponse = z.infer<typeof updateLevelResponseSchema>;
 
+export const postLevelHistoryRecordSchema = recordSchema.extend({
+  data: z
+    .object({
+      old: integerSchema,
+      new: integerSchema,
+    })
+    .strict(),
+});
+
+export type PostLevelHistoryRecord = z.infer<typeof postLevelHistoryRecordSchema>;
+
 export const postLevelResponseSchema = z
   .object({
     data: updateLevelResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: postLevelHistoryRecordSchema.nullable(),
   })
   .strict();
 

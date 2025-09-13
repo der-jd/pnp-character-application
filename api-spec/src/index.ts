@@ -4,7 +4,18 @@ export {
   professionHobbySchema,
   generalInformationSchema,
   calculationPointsSchema,
-  dis_advantagesSchema,
+  DisadvantagesNames,
+  disadvantageSchema,
+  Disadvantage,
+  disadvantagesSchema,
+  Disadvantages,
+  DISADVANTAGES,
+  AdvantagesNames,
+  advantageSchema,
+  Advantage,
+  advantagesSchema,
+  Advantages,
+  ADVANTAGES,
   attributeSchema,
   baseValueSchema,
   combatValuesSchema,
@@ -15,6 +26,7 @@ export {
   learningMethodSchema,
   attributesSchema,
   combatSkillsSchema,
+  combinedSkillCategoryAndNameSchema,
   CalculationPoints,
   CharacterSheet,
   Skill,
@@ -31,6 +43,15 @@ export {
   Level,
   Attributes,
   CombatSkills,
+  CombatSkillName,
+  BodySkillName,
+  SocialSkillName,
+  NatureSkillName,
+  KnowledgeSkillName,
+  HandcraftSkillName,
+  SkillName,
+  combatSkills,
+  START_SKILLS,
 } from "./character-schemas.js";
 export {
   recordSchema,
@@ -43,6 +64,11 @@ export {
   attributeChangeSchema,
   calculationPointsChangeSchema,
   skillChangeSchema,
+  characterCreationSchema,
+  CharacterCreation,
+  NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
+  activatedSkillsSchema,
+  ActivatedSkills,
 } from "./history-schemas.js";
 export {
   initialNewSchema,
@@ -81,6 +107,8 @@ export {
   UpdateLevelResponse,
   postLevelResponseSchema,
   PostLevelResponse,
+  postLevelHistoryRecordSchema,
+  PostLevelHistoryRecord,
 } from "./endpoints/post-level.js";
 export {
   postSpecialAbilitiesPathParamsSchema,
@@ -91,6 +119,8 @@ export {
   AddSpecialAbilityResponse,
   postSpecialAbilitiesResponseSchema,
   PostSpecialAbilitiesResponse,
+  postSpecialAbilitiesHistoryRecordSchema,
+  PostSpecialAbilitiesHistoryRecord,
 } from "./endpoints/post-special-abilities.js";
 export {
   getCharacterPathParamsSchema,
@@ -137,6 +167,8 @@ export {
   UpdateAttributeResponse,
   patchAttributeResponseSchema,
   PatchAttributeResponse,
+  patchAttributeHistoryRecordSchema,
+  PatchAttributeHistoryRecord,
 } from "./endpoints/patch-attribute.js";
 export {
   patchBaseValuePathParamsSchema,
@@ -148,6 +180,8 @@ export {
   patchBaseValueResponseSchema,
   PatchBaseValueResponse,
   baseValuesUpdatableByLvlUp,
+  patchBaseValueHistoryRecordSchema,
+  PatchBaseValueHistoryRecord,
 } from "./endpoints/patch-base-value.js";
 export {
   patchCalculationPointsPathParamsSchema,
@@ -158,6 +192,8 @@ export {
   UpdateCalculationPointsResponse,
   patchCalculationPointsResponseSchema,
   PatchCalculationPointsResponse,
+  patchCalculationPointsHistoryRecordSchema,
+  PatchCalculationPointsHistoryRecord,
 } from "./endpoints/patch-calculation-points.js";
 export {
   patchCombatValuesPathParamsSchema,
@@ -168,6 +204,8 @@ export {
   UpdateCombatValuesResponse,
   patchCombatValuesResponseSchema,
   PatchCombatValuesResponse,
+  patchCombatValuesHistoryRecordSchema,
+  PatchCombatValuesHistoryRecord,
 } from "./endpoints/patch-combat-values.js";
 export {
   patchSkillPathParamsSchema,
@@ -178,6 +216,8 @@ export {
   UpdateSkillResponse,
   patchSkillResponseSchema,
   PatchSkillResponse,
+  patchSkillHistoryRecordSchema,
+  PatchSkillHistoryRecord,
 } from "./endpoints/patch-skill.js";
 export {
   getHistoryPathParamsSchema,
@@ -187,3 +227,26 @@ export {
   getHistoryResponseSchema,
   GetHistoryResponse,
 } from "./endpoints/get-history.js";
+export {
+  MIN_ATTRIBUTE_VALUE_FOR_CREATION,
+  MAX_ATTRIBUTE_VALUE_FOR_CREATION,
+  ATTRIBUTE_POINTS_FOR_CREATION,
+  PROFESSION_SKILL_BONUS,
+  HOBBY_SKILL_BONUS,
+  GENERATION_POINTS,
+  MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES,
+  postCharactersRequestSchema,
+  PostCharactersRequest,
+  postCharactersResponseSchema,
+  PostCharactersResponse,
+  attributeForCreationSchema,
+  attributesForCreationSchema,
+  AttributeForCreation,
+  AttributesForCreation,
+  generalInformationForCreationSchema,
+  GeneralInformationForCreation,
+  createCharacterResponseSchema,
+  CreateCharacterResponse,
+  postCharactersHistoryRecordSchema,
+  PostCharactersHistoryRecord,
+} from "./endpoints/post-characters.js";

@@ -11,7 +11,7 @@ import {
   mockDynamoDBGetCharacterResponse,
   mockDynamoDBQueryHistoryResponse,
 } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { fakeBigHistoryBlock, fakeHistoryBlock2 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 
@@ -125,6 +125,45 @@ describe("Invalid requests", () => {
 
 describe("Valid requests", () => {
   const testCasesForExistingHistoryBlock = [
+    {
+      name: "Add history record for 'character created' to existing block",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          userId: fakeUserId,
+          type: RecordType.CHARACTER_CREATED,
+          name: "New Character",
+          data: {
+            new: {
+              character: fakeCharacter,
+              generationPoints: {
+                throughDisadvantages: 15,
+                spent: 20,
+                total: 20,
+              },
+              activatedSkills: [
+                "body/pickpocketing",
+                "body/bodyControl",
+                "social/convincing",
+                "nature/fishing",
+                "handcraft/stonework",
+              ],
+            },
+          },
+          learningMethod: null,
+          calculationPoints: {
+            adventurePoints: null,
+            attributePoints: null,
+          },
+          comment: null,
+        },
+      },
+      expectedStatusCode: 200,
+    },
     {
       name: "Add history record for 'calculation points changed' to existing block",
       request: {

@@ -2,8 +2,10 @@ import { z } from "zod";
 import {
   attributeSchema,
   calculationPointsSchema,
+  characterSchema,
   characterSheetSchema,
   combatValuesSchema,
+  combinedSkillCategoryAndNameSchema,
   learningMethodSchema,
   skillSchema,
 } from "./character-schemas.js";
@@ -38,7 +40,7 @@ export const recordSchema = z
     id: z.uuid(),
     data: z
       .object({
-        old: z.record(z.string().max(MAX_STRING_LENGTH_DEFAULT), z.unknown()),
+        old: z.record(z.string().max(MAX_STRING_LENGTH_DEFAULT), z.unknown()).optional(),
         new: z.record(z.string().max(MAX_STRING_LENGTH_DEFAULT), z.unknown()),
       })
       .strict(),
@@ -84,6 +86,30 @@ export const historyBlockSchema = z
   .strict();
 
 export type HistoryBlock = z.infer<typeof historyBlockSchema>;
+
+export const NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION = 5;
+
+export const activatedSkillsSchema = z
+  .array(combinedSkillCategoryAndNameSchema)
+  .length(NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION);
+
+export type ActivatedSkills = z.infer<typeof activatedSkillsSchema>;
+
+export const characterCreationSchema = z
+  .object({
+    character: characterSchema,
+    generationPoints: z
+      .object({
+        throughDisadvantages: z.number().int().min(0).max(MAX_POINTS),
+        spent: z.number().int().min(0).max(MAX_POINTS),
+        total: z.number().int().min(0).max(MAX_POINTS),
+      })
+      .strict(),
+    activatedSkills: activatedSkillsSchema,
+  })
+  .strict();
+
+export type CharacterCreation = z.infer<typeof characterCreationSchema>;
 
 export const integerSchema = z
   .object({
