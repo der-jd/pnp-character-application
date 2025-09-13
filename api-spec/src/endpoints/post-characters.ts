@@ -3,7 +3,8 @@ import {
   attributeSchema,
   attributesSchema,
   characterNameSchema,
-  dis_advantagesSchema,
+  advantagesSchema,
+  disadvantagesSchema,
   generalInformationSchema,
 } from "../character-schemas.js";
 import { userIdSchema, MIN_LEVEL } from "../general-schemas.js";
@@ -41,8 +42,8 @@ export const postCharactersRequestSchema = z
   .object({
     generalInformation: generalInformationForCreationSchema,
     attributes: attributesForCreationSchema,
-    advantages: dis_advantagesSchema,
-    disadvantages: dis_advantagesSchema,
+    advantages: advantagesSchema,
+    disadvantages: disadvantagesSchema,
     activatedSkills: activatedSkillsSchema,
   })
   .strict();

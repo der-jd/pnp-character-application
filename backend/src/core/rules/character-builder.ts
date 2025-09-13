@@ -19,7 +19,8 @@ import {
   PROFESSION_SKILL_BONUS,
   HOBBY_SKILL_BONUS,
   AttributesForCreation,
-  DisAdvantages,
+  Advantages,
+  Disadvantages,
   ADVANTAGES,
   DISADVANTAGES,
   MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES,
@@ -29,8 +30,9 @@ import {
   BaseValues,
   baseValuesUpdatableByLvlUp,
   baseValuesSchema,
+  DisadvantagesNames,
 } from "api-spec";
-import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "./constants.js";
+import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT, MAX_COST_CATEGORY } from "./constants.js";
 import { getAttribute, getSkill } from "../character-utils.js";
 import { HttpError, logAndEnsureHttpError } from "../errors.js";
 import { calculateBaseValues } from "./base-value-formulas.js";
@@ -203,12 +205,12 @@ export class CharacterBuilder {
     return Object.keys({} as CharacterSheet["skills"]["handcraft"]) as HandcraftSkillName[];
   }
 
-  private setAdvantages(advantages: DisAdvantages): void {
+  private setAdvantages(advantages: Advantages): void {
     console.log(`Set advantages ${advantages}`);
 
     for (const advantage of advantages) {
-      const [name, value] = advantage;
-      const isInvalid = !ADVANTAGES.some(([advName, advValue]) => advName === name && advValue === value);
+      const [name, , value] = advantage;
+      const isInvalid = !ADVANTAGES.some(([advName, , advValue]) => advName === name && advValue === value);
       if (isInvalid) {
         throw new HttpError(400, `Invalid advantage: [${name}, ${value}]`);
       }
@@ -216,22 +218,24 @@ export class CharacterBuilder {
 
     this.characterSheet.advantages = advantages;
 
-    this.spentGenerationPoints = advantages.reduce((sum, [, value]) => sum + value, 0);
+    this.spentGenerationPoints = advantages.reduce((sum, [, , value]) => sum + value, 0);
     console.log("Generation points spent on advantages: ", this.spentGenerationPoints);
   }
 
-  private setDisadvantages(disadvantages: DisAdvantages): void {
+  private setDisadvantages(disadvantages: Disadvantages): void {
     console.log(`Set disadvantages ${disadvantages}`);
 
     for (const disadvantage of disadvantages) {
-      const [name, value] = disadvantage;
-      const isInvalid = !DISADVANTAGES.some(([advName, advValue]) => advName === name && advValue === value);
+      const [name, , value] = disadvantage;
+      const isInvalid = !DISADVANTAGES.some(
+        ([disadvName, , disadvValue]) => disadvName === name && disadvValue === value,
+      );
       if (isInvalid) {
         throw new HttpError(400, `Invalid disadvantage: [${name}, ${value}]`);
       }
     }
 
-    this.generationPointsThroughDisadvantages = disadvantages.reduce((sum, [, value]) => sum + value, 0);
+    this.generationPointsThroughDisadvantages = disadvantages.reduce((sum, [, , value]) => sum + value, 0);
     console.log("Generation points through disadvantages:", this.generationPointsThroughDisadvantages);
     if (this.generationPointsThroughDisadvantages > MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES) {
       throw new HttpError(
@@ -241,6 +245,53 @@ export class CharacterBuilder {
     }
 
     this.characterSheet.disadvantages = disadvantages;
+
+    this.setDisadvantagesEffects(disadvantages);
+  }
+
+  private setDisadvantagesEffects(disadvantages: Disadvantages): void {
+    console.log("Apply effects of disadvantages on character stats");
+
+    for (const disadvantage of disadvantages) {
+      console.log("Apply effect of disadvantage:", disadvantage[0]);
+      switch (disadvantage[0]) {
+        case DisadvantagesNames.SOCIALLY_INEPT:
+          this.characterSheet.skills.social.seduction.mod -= 10;
+          this.characterSheet.skills.social.etiquette.mod -= 10;
+          this.characterSheet.skills.social.knowledgeOfHumanNature.mod -= 10;
+          this.characterSheet.skills.social.convincing.mod -= 10;
+          this.characterSheet.skills.social.persuading.mod -= 10;
+          this.characterSheet.skills.social.bargaining.mod -= 10;
+          break;
+        case DisadvantagesNames.NO_DEGREE:
+          this.characterSheet.skills.knowledge.anatomy.mod -= 10;
+          this.characterSheet.skills.knowledge.chemistry.mod -= 10;
+          this.characterSheet.skills.knowledge.geography.mod -= 10;
+          this.characterSheet.skills.knowledge.history.mod -= 10;
+          this.characterSheet.skills.knowledge.botany.mod -= 10;
+          this.characterSheet.skills.knowledge.zoology.mod -= 10;
+          this.characterSheet.skills.knowledge.mathematics.mod -= 10;
+          break;
+        case DisadvantagesNames.PACIFIST:
+          this.characterSheet.skills.knowledge.warfare.mod -= 20;
+          break;
+        case DisadvantagesNames.EARLY_SCHOOL_DROPOUT:
+          for (const skillName of Object.keys(this.characterSheet.skills.knowledge) as KnowledgeSkillName[]) {
+            this.characterSheet.skills.knowledge[skillName].defaultCostCategory += 1;
+
+            if (this.characterSheet.skills.knowledge[skillName].defaultCostCategory > MAX_COST_CATEGORY) {
+              throw new HttpError(
+                500,
+                `Cost category for knowledge skill '${skillName}' exceeds maximum allowed: ${MAX_COST_CATEGORY}`,
+              );
+            }
+          }
+          break;
+        default:
+          console.log("No direct effect on character stats for disadvantage:", disadvantage[0]);
+          break;
+      }
+    }
   }
 
   setAttributes(attributes: AttributesForCreation): this {
@@ -292,7 +343,7 @@ export class CharacterBuilder {
     return this;
   }
 
-  setDisAdvantages(advantages: DisAdvantages, disadvantages: DisAdvantages): this {
+  setDisAdvantages(advantages: Advantages, disadvantages: Disadvantages): this {
     this.setDisadvantages(disadvantages);
 
     this.totalGenerationPoints = GENERATION_POINTS + this.generationPointsThroughDisadvantages;
