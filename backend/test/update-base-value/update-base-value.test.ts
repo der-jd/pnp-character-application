@@ -174,7 +174,7 @@ describe("Invalid requests", () => {
           },
         },
       },
-      expectedStatusCode: 409,
+      expectedStatusCode: 400,
     },
     {
       name: "No byLvlUp change allowed for base value 'attackBaseValue'",
@@ -192,7 +192,7 @@ describe("Invalid requests", () => {
           },
         },
       },
-      expectedStatusCode: 409,
+      expectedStatusCode: 400,
     },
     {
       name: "No byLvlUp change allowed for base value 'paradeBaseValue'",
@@ -210,7 +210,7 @@ describe("Invalid requests", () => {
           },
         },
       },
-      expectedStatusCode: 409,
+      expectedStatusCode: 400,
     },
     {
       name: "No byLvlUp change allowed for base value 'rangedAttackBaseValue'",
@@ -228,7 +228,7 @@ describe("Invalid requests", () => {
           },
         },
       },
-      expectedStatusCode: 409,
+      expectedStatusCode: 400,
     },
   ];
 
