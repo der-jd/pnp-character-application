@@ -68,21 +68,6 @@ export async function getCharacterItem(userId: string, characterId: string): Pro
     item.characterSheet.disadvantages = Array.from(item.characterSheet.disadvantages);
   }
 
-  // Fix invalid profession/hobby skill formats for legacy data
-  if (item?.characterSheet?.generalInformation?.profession?.skill) {
-    const professionSkill = item.characterSheet.generalInformation.profession.skill;
-    if (typeof professionSkill === "string" && !professionSkill.includes("/")) {
-      item.characterSheet.generalInformation.profession.skill = `Unknown/${professionSkill}`;
-    }
-  }
-
-  if (item?.characterSheet?.generalInformation?.hobby?.skill) {
-    const hobbySkill = item.characterSheet.generalInformation.hobby.skill;
-    if (typeof hobbySkill === "string" && !hobbySkill.includes("/")) {
-      item.characterSheet.generalInformation.hobby.skill = `Unknown/${hobbySkill}`;
-    }
-  }
-
   return characterSchema.parse(item);
 }
 
@@ -117,21 +102,6 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
     }
     if (item?.characterSheet?.disadvantages) {
       item.characterSheet.disadvantages = Array.from(item.characterSheet.disadvantages);
-    }
-
-    // Fix invalid profession/hobby skill formats for legacy data
-    if (item?.characterSheet?.generalInformation?.profession?.skill) {
-      const professionSkill = item.characterSheet.generalInformation.profession.skill;
-      if (typeof professionSkill === "string" && !professionSkill.includes("/")) {
-        item.characterSheet.generalInformation.profession.skill = `Unknown/${professionSkill}`;
-      }
-    }
-
-    if (item?.characterSheet?.generalInformation?.hobby?.skill) {
-      const hobbySkill = item.characterSheet.generalInformation.hobby.skill;
-      if (typeof hobbySkill === "string" && !hobbySkill.includes("/")) {
-        item.characterSheet.generalInformation.hobby.skill = `Unknown/${hobbySkill}`;
-      }
     }
 
     return item;
