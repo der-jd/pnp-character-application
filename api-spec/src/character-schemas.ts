@@ -341,7 +341,7 @@ export type SkillName =
   | KnowledgeSkillName
   | HandcraftSkillName;
 
-export const combatSkills = Object.keys(combatSkillsSchema) as SkillName[];
+export const combatSkills = Object.keys(combatSkillsSchema.shape) as SkillName[];
 
 export const START_SKILLS: SkillName[] = [
   // body skills
