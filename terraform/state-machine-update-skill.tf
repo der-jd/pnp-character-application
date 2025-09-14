@@ -174,7 +174,8 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
         Type          = "Succeed",
         QueryLanguage = "JSONata",
         Output = {
-          "statusCode" = "{% $statusCode %}",
+          "statusCode"   = "{% $statusCode %}",
+          "errorMessage" = "",
           /**
            * The content of "body" should be a stringified JSON to be consistent with output coming directly from a Lambda function.
            * The body of a Lambda function is always a stringified JSON object.
