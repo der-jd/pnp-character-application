@@ -28,7 +28,7 @@ export type AttributeForCreation = z.infer<typeof attributeForCreationSchema>;
 
 export const attributesForCreationSchema = z.object(
   Object.fromEntries(Object.keys(attributesSchema.shape).map((attr) => [attr, attributeForCreationSchema])),
-);
+).strict();
 
 export type AttributesForCreation = z.infer<typeof attributesForCreationSchema>;
 
