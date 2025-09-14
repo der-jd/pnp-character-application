@@ -20,6 +20,21 @@ const fakeRecordId = lastBlock.changes[lastBlock.changes.length - 1].id;
 describe("Invalid requests", () => {
   const invalidTestCases = [
     {
+      name: "Authorization header is missing",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": fakeRecordId,
+        },
+        queryStringParameters: null,
+        body: {
+          comment: "This is a test comment",
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
       name: "Authorization header is malformed",
       request: {
         headers: {

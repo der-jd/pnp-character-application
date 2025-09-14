@@ -27,6 +27,19 @@ describe("Invalid requests", () => {
 
   const invalidTestCases = [
     {
+      name: "Authorization header is missing",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": fakeRecordId,
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
+    {
       name: "Authorization header is malformed",
       request: {
         headers: {

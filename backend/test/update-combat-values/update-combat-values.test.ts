@@ -11,6 +11,29 @@ import { _updateCombatValues } from "update-combat-values";
 describe("Invalid requests", () => {
   const invalidTestCases = [
     {
+      name: "Authorization header is missing",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "combat-category": "melee",
+          "combat-skill-name": "thrustingWeapons1h",
+        },
+        queryStringParameters: null,
+        body: {
+          attackValue: {
+            initialValue: 10,
+            increasedPoints: 3,
+          },
+          paradeValue: {
+            initialValue: 8,
+            increasedPoints: 2,
+          },
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
       name: "Authorization header is malformed",
       request: {
         headers: {
