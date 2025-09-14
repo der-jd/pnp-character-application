@@ -345,6 +345,25 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 400,
     },
+    {
+      name: "Activated skill is already activated",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          activatedSkills: [
+            "handcraft/makingMusic",
+            "handcraft/alcoholProduction",
+            "handcraft/fineMechanics",
+            "social/convincing",
+            "combat/daggers",
+          ],
+        },
+      },
+      expectedStatusCode: 400,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {
