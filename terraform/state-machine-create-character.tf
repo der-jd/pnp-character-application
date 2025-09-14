@@ -69,13 +69,13 @@ resource "aws_sfn_state_machine" "create_character_state_machine" {
             "userId"         = "{% $parse($states.input.body).userId %}",
             "type"           = "0", // CHARACTER_CREATED
             "name"           = "{% $parse($states.input.body).characterName %}",
-            "data"           = "{% $parse($states.input.body).character %}",
+            "data"           = "{% $parse($states.input.body).changes %}",
             "learningMethod" = null,
             "calculationPoints" = {
               "adventurePoints" = null,
               "attributePoints" = null
             },
-            "comment" = null
+            "comment" = "{% $parse($states.input.body).characterName %}"
           }
         },
         Assign = {
