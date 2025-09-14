@@ -6,7 +6,15 @@ import {
   mockDynamoDBGetCharacterResponse,
   mockDynamoDBQueryHistoryResponse,
 } from "../test-data/response.js";
-import { AdvantagesNames, createCharacterResponseSchema, DisadvantagesNames, PostCharactersRequest } from "api-spec";
+import {
+  AdvantagesNames,
+  createCharacterResponseSchema,
+  DisadvantagesNames,
+  MAX_ATTRIBUTE_VALUE_FOR_CREATION,
+  MIN_ATTRIBUTE_VALUE_FOR_CREATION,
+  NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
+  PostCharactersRequest,
+} from "api-spec";
 import { _createCharacter } from "create-character";
 import { expectHttpError } from "../utils.js";
 
@@ -128,13 +136,219 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 400,
     },
+    {
+      name: "Profession skill has the wrong format",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          generalInformation: {
+            ...characterCreationRequest.generalInformation,
+            profession: {
+              ...characterCreationRequest.generalInformation.profession,
+              skill: "slashingWeaponsBlunt2h",
+            },
+          },
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Hobby skill has the wrong format",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          generalInformation: {
+            ...characterCreationRequest.generalInformation,
+            hobby: {
+              ...characterCreationRequest.generalInformation.hobby,
+              skill: "fishing",
+            },
+          },
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Attribute value below the min value for new characters",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          attributes: {
+            ...characterCreationRequest.attributes,
+            courage: {
+              current: MIN_ATTRIBUTE_VALUE_FOR_CREATION - 1,
+            },
+          },
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Attribute value above the max value for new characters",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          attributes: {
+            ...characterCreationRequest.attributes,
+            courage: {
+              current: MAX_ATTRIBUTE_VALUE_FOR_CREATION + 1,
+            },
+          },
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Invalid advantage enum value (string instead of number)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          advantages: [["BRAVE", "", 2]],
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Invalid disadvantage enum value (string instead of number)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          disadvantages: [["VENGEFUL", "", 2]],
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Invalid advantage enum value (number above max enum value)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          advantages: [
+            // Add a value above the max enum value for demonstration
+            [999, "", 2],
+          ],
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Invalid disadvantage enum value (number above max enum value)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          disadvantages: [
+            // Add a value above the max enum value for demonstration
+            [999, "", 2],
+          ],
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Invalid cost for an advantage",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          advantages: [[AdvantagesNames.BRAVE, "", 5]],
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Invalid cost for a disadvantage",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          disadvantages: [[DisadvantagesNames.VENGEFUL, "", 5]],
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Activated skills have the wrong format",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          activatedSkills: ["makingMusic", "alcoholProduction", "fineMechanics", "convincing", "trapping"],
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: `Number of activated skills are above the required number of ${NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION}`,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          activatedSkills: [
+            "handcraft/makingMusic",
+            "handcraft/alcoholProduction",
+            "handcraft/fineMechanics",
+            "social/convincing",
+            "nature/trapping",
+            "handcraft/stonework",
+          ],
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: `Number of activated skills are below the required number of ${NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION}`,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          activatedSkills: [
+            "handcraft/makingMusic",
+            "handcraft/alcoholProduction",
+            "handcraft/fineMechanics",
+            "social/convincing",
+          ],
+        },
+      },
+      expectedStatusCode: 400,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
-      mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
-
       await expectHttpError(() => _createCharacter(_case.request), _case.expectedStatusCode);
     });
   });
