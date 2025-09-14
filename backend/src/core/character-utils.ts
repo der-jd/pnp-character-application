@@ -1,4 +1,14 @@
-import { CostCategory, LearningMethod, CharacterSheet, Attribute, BaseValue, Skill, CombatValues } from "api-spec";
+import {
+  CostCategory,
+  LearningMethod,
+  CharacterSheet,
+  Attribute,
+  BaseValue,
+  Skill,
+  CombatValues,
+  AdvantagesNames,
+  DisadvantagesNames,
+} from "api-spec";
 import {
   SKILL_ACTIVATION_COSTS,
   COST_MATRIX,
@@ -28,6 +38,10 @@ export function getSkill(
   category: keyof CharacterSheet["skills"],
   name: string,
 ): Skill {
+  if (!(category in skills)) {
+    throw new Error(`Category ${category} is not a valid skill category!`);
+  }
+
   const skillCategory = skills[category] as Record<string, Skill>;
   const skill = skillCategory[name];
   if (!skill) {
@@ -41,6 +55,10 @@ export function getCombatValues(
   category: keyof CharacterSheet["combatValues"],
   combatSkillName: string,
 ): CombatValues {
+  if (!(category in combatValues)) {
+    throw new Error(`Category ${category} is not a valid combat category!`);
+  }
+
   const combatCategory = combatValues[category] as Record<string, CombatValues>;
   const skillCombatValues = combatCategory[combatSkillName];
   if (!skillCombatValues) {
@@ -93,4 +111,14 @@ export function getSkillIncreaseCost(skillValue: number, costCategory: CostCateg
 
 export function getSkillActivationCost(costCategory: CostCategory): number {
   return SKILL_ACTIVATION_COSTS[costCategory];
+}
+
+export function advantagesEnumToString(enumValue: AdvantagesNames): string | undefined {
+  return Object.keys(AdvantagesNames).find((key) => AdvantagesNames[key as keyof typeof AdvantagesNames] === enumValue);
+}
+
+export function disadvantagesEnumToString(enumValue: DisadvantagesNames): string | undefined {
+  return Object.keys(DisadvantagesNames).find(
+    (key) => DisadvantagesNames[key as keyof typeof DisadvantagesNames] === enumValue,
+  );
 }
