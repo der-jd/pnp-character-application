@@ -211,6 +211,42 @@ describe("Invalid requests", () => {
       expectedStatusCode: 400,
     },
     {
+      name: "Spent more attribute points than available for new characters",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          attributes: {
+            ...characterCreationRequest.attributes,
+            courage: {
+              current: 6,
+            },
+          },
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Spent less attribute points than available for new characters",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          attributes: {
+            ...characterCreationRequest.attributes,
+            courage: {
+              current: 4,
+            },
+          },
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
       name: "Invalid advantage enum value (string instead of number)",
       request: {
         headers: fakeHeaders,
@@ -290,6 +326,42 @@ describe("Invalid requests", () => {
         body: {
           ...characterCreationRequest,
           disadvantages: [[DisadvantagesNames.VENGEFUL, "", 5]],
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Spent more generation points than available",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          advantages: [
+            [AdvantagesNames.BRAVE, "", 2],
+            [AdvantagesNames.ATHLETIC, "", 4],
+            [AdvantagesNames.CHARMER, "", 5],
+          ],
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Generation points through disadvantages exceed maximum allowed",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          disadvantages: [
+            [DisadvantagesNames.VENGEFUL, "", 2],
+            [DisadvantagesNames.FEAR_OF, "Heights", 2],
+            [DisadvantagesNames.FEAR_OF, "crowd of people", 5],
+            [DisadvantagesNames.QUARRELSOME, "", 5],
+            [DisadvantagesNames.IMPULSIVE, "", 3],
+          ],
         },
       },
       expectedStatusCode: 400,
