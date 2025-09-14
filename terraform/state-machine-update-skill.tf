@@ -99,7 +99,7 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
         Choices = [
           {
             // The skill was not updated, so no history record is necessary
-            Condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}",
+            Condition = "{% $parse($updateSkillBody).changes.old = $parse($updateSkillBody).changes.new %}",
             Next      = "SuccessState"
           }
         ],
@@ -111,20 +111,20 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
         Resource      = module.add_history_record_lambda.lambda_function.arn,
         Arguments = {
           "pathParameters" = {
-            "character-id" = "{% $parse($states.input.body).characterId %}"
+            "character-id" = "{% $parse($updateSkillBody).characterId %}"
           },
           "body" = {
-            "userId" = "{% $parse($states.input.body).userId %}",
+            "userId" = "{% $parse($updateSkillBody).userId %}",
             "type"   = "6", // SKILL_CHANGED
             // name pattern combat skill: "skillCategory/skillName (combatCategory)"
             // e.g. "combat/sword1h (melee)"
             // name pattern other skills: "skillCategory/skillName"
             // e.g. "knowledge/history"
-            "name"           = "{% $parse($states.input.body).skillCategory & '/' & $parse($states.input.body).skillName & ($parse($states.input.body).combatCategory ? ' (' & $parse($states.input.body).combatCategory & ')' : '') %}",
-            "data"           = "{% $parse($states.input.body).changes %}",
-            "learningMethod" = "{% $parse($states.input.body).learningMethod ? $parse($states.input.body).learningMethod : null %}",
+            "name"           = "{% $parse($updateSkillBody).skillCategory & '/' & $parse($updateSkillBody).skillName & ($parse($updateSkillBody).combatCategory ? ' (' & $parse($updateSkillBody).combatCategory & ')' : '') %}",
+            "data"           = "{% $parse($updateSkillBody).changes %}",
+            "learningMethod" = "{% $parse($updateSkillBody).learningMethod ? $parse($updateSkillBody).learningMethod : null %}",
             "calculationPoints" = {
-              "adventurePoints" = "{% $parse($states.input.body).adventurePoints %}",
+              "adventurePoints" = "{% $parse($updateSkillBody).adventurePoints %}",
               "attributePoints" = null
             },
             "comment" = null
