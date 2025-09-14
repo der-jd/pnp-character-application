@@ -31,6 +31,7 @@ import {
   baseValuesUpdatableByLvlUp,
   baseValuesSchema,
   DisadvantagesNames,
+  AdvantagesNames,
 } from "api-spec";
 import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT, MAX_COST_CATEGORY } from "./constants.js";
 import { getAttribute, getSkill } from "../character-utils.js";
@@ -218,8 +219,108 @@ export class CharacterBuilder {
 
     this.characterSheet.advantages = advantages;
 
+    this.setAdvantagesEffects(advantages);
+
     this.spentGenerationPoints = advantages.reduce((sum, [, , value]) => sum + value, 0);
     console.log("Generation points spent on advantages: ", this.spentGenerationPoints);
+  }
+
+  private setAdvantagesEffects(advantages: Advantages): void {
+    console.log("Apply effects of advantages on character stats");
+
+    for (const advantage of advantages) {
+      const [name, info] = advantage;
+      console.log("Apply effect of advantage:", name);
+      switch (name) {
+        case AdvantagesNames.HIGH_SCHOOL_DEGREE:
+          this.characterSheet.skills.knowledge.anatomy.activated = true;
+          this.characterSheet.skills.knowledge.anatomy.mod += 10;
+          this.characterSheet.skills.knowledge.chemistry.activated = true;
+          this.characterSheet.skills.knowledge.chemistry.mod += 10;
+          this.characterSheet.skills.knowledge.geography.activated = true;
+          this.characterSheet.skills.knowledge.geography.mod += 10;
+          this.characterSheet.skills.knowledge.history.activated = true;
+          this.characterSheet.skills.knowledge.history.mod += 10;
+          this.characterSheet.skills.knowledge.botany.activated = true;
+          this.characterSheet.skills.knowledge.botany.mod += 10;
+          break;
+        case AdvantagesNames.CHARMER:
+          this.characterSheet.skills.social.seduction.mod += 10;
+          this.characterSheet.skills.social.etiquette.mod += 10;
+          this.characterSheet.skills.social.persuading.mod += 10;
+          this.characterSheet.skills.social.convincing.mod += 10;
+          this.characterSheet.attributes.charisma.mod += 1;
+          break;
+        case AdvantagesNames.GOOD_LOOKING:
+          this.characterSheet.skills.social.seduction.mod += 20;
+          this.characterSheet.skills.social.persuading.mod += 10;
+          this.characterSheet.skills.social.convincing.mod += 10;
+          break;
+        case AdvantagesNames.GOOD_MEMORY:
+          for (const skillName of Object.keys(this.characterSheet.skills.knowledge) as KnowledgeSkillName[]) {
+            this.characterSheet.skills.knowledge[skillName].mod += 10;
+          }
+          this.characterSheet.attributes.intelligence.mod += 1;
+          break;
+        case AdvantagesNames.OUTSTANDING_SENSE_SIGHT_HEARING:
+          this.characterSheet.skills.body.sharpnessOfSenses.mod += 10;
+          break;
+        case AdvantagesNames.MILITARY_TRAINING:
+          this.characterSheet.skills.body.athletics.mod += 10;
+          this.characterSheet.skills.body.bodyControl.mod += 10;
+          this.characterSheet.skills.body.selfControl.mod += 10;
+          this.characterSheet.skills.knowledge.warfare.mod += 10;
+          break;
+        case AdvantagesNames.DARING:
+          this.characterSheet.attributes.courage.mod += 1;
+          break;
+        case AdvantagesNames.ATHLETIC:
+          this.characterSheet.skills.body.athletics.mod += 10;
+          this.characterSheet.skills.body.climbing.mod += 10;
+          this.characterSheet.skills.body.bodyControl.mod += 10;
+          this.characterSheet.skills.body.swimming.mod += 10;
+          this.characterSheet.skills.body.dancing.mod += 10;
+          break;
+        case AdvantagesNames.COLLEGE_EDUCATION: {
+          // Same effect as HIGH_SCHOOL_DEGREE
+          this.characterSheet.skills.knowledge.anatomy.activated = true;
+          this.characterSheet.skills.knowledge.anatomy.mod += 10;
+          this.characterSheet.skills.knowledge.chemistry.activated = true;
+          this.characterSheet.skills.knowledge.chemistry.mod += 10;
+          this.characterSheet.skills.knowledge.geography.activated = true;
+          this.characterSheet.skills.knowledge.geography.mod += 10;
+          this.characterSheet.skills.knowledge.history.activated = true;
+          this.characterSheet.skills.knowledge.history.mod += 10;
+          this.characterSheet.skills.knowledge.botany.activated = true;
+          this.characterSheet.skills.knowledge.botany.mod += 10;
+
+          // Additional effect
+          const knowledgeSkillName: KnowledgeSkillName = info as KnowledgeSkillName;
+          if (!(knowledgeSkillName in this.characterSheet.skills.knowledge)) {
+            throw new HttpError(400, `Invalid skill name: ${knowledgeSkillName}. It must be a valid knowledge skill.`);
+          }
+
+          const forbiddenSkills: KnowledgeSkillName[] = ["warfare", "estimating"];
+          if (forbiddenSkills.includes(knowledgeSkillName)) {
+            throw new HttpError(
+              400,
+              `Skills ${forbiddenSkills.join(", ")} cannot be selected as a bonus for advantage 'COLLEGE_EDUCATION'. Passed skill name: ${knowledgeSkillName}`,
+            );
+          }
+
+          this.characterSheet.skills.knowledge[knowledgeSkillName].mod += 20;
+          break;
+        }
+        case AdvantagesNames.MELODIOUS_VOICE:
+          this.characterSheet.skills.social.persuading.mod += 10;
+          this.characterSheet.skills.social.convincing.mod += 10;
+          this.characterSheet.skills.social.bargaining.mod += 10;
+          break;
+        default:
+          console.log("No direct effect on character stats for advantage:", name);
+          break;
+      }
+    }
   }
 
   private setDisadvantages(disadvantages: Disadvantages): void {
@@ -253,8 +354,9 @@ export class CharacterBuilder {
     console.log("Apply effects of disadvantages on character stats");
 
     for (const disadvantage of disadvantages) {
-      console.log("Apply effect of disadvantage:", disadvantage[0]);
-      switch (disadvantage[0]) {
+      const [name, ,] = disadvantage;
+      console.log("Apply effect of disadvantage:", name);
+      switch (name) {
         case DisadvantagesNames.SOCIALLY_INEPT:
           this.characterSheet.skills.social.seduction.mod -= 10;
           this.characterSheet.skills.social.etiquette.mod -= 10;
@@ -288,7 +390,7 @@ export class CharacterBuilder {
           }
           break;
         default:
-          console.log("No direct effect on character stats for disadvantage:", disadvantage[0]);
+          console.log("No direct effect on character stats for disadvantage:", name);
           break;
       }
     }
