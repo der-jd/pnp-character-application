@@ -32,9 +32,10 @@ import {
   baseValuesSchema,
   DisadvantagesNames,
   AdvantagesNames,
+  characterSheetSchema,
 } from "api-spec";
 import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT, MAX_COST_CATEGORY } from "./constants.js";
-import { getAttribute, getSkill } from "../character-utils.js";
+import { advantagesEnumToString, disadvantagesEnumToString, getAttribute, getSkill } from "../character-utils.js";
 import { HttpError, logAndEnsureHttpError } from "../errors.js";
 import { calculateBaseValues } from "./base-value-formulas.js";
 
@@ -191,23 +192,29 @@ export class CharacterBuilder {
   }
 
   private getBodySkillNames(): BodySkillName[] {
-    return Object.keys({} as CharacterSheet["skills"]["body"]) as BodySkillName[];
+    return Object.keys(characterSheetSchema.shape.skills.shape.body.shape) as BodySkillName[];
   }
+
   private getSocialSkillNames(): SocialSkillName[] {
-    return Object.keys({} as CharacterSheet["skills"]["social"]) as SocialSkillName[];
+    return Object.keys(characterSheetSchema.shape.skills.shape.social.shape) as SocialSkillName[];
   }
+
   private getNatureSkillNames(): NatureSkillName[] {
-    return Object.keys({} as CharacterSheet["skills"]["nature"]) as NatureSkillName[];
+    return Object.keys(characterSheetSchema.shape.skills.shape.nature.shape) as NatureSkillName[];
   }
+
   private getKnowledgeSkillNames(): KnowledgeSkillName[] {
-    return Object.keys({} as CharacterSheet["skills"]["knowledge"]) as KnowledgeSkillName[];
+    return Object.keys(characterSheetSchema.shape.skills.shape.knowledge.shape) as KnowledgeSkillName[];
   }
+
   private getHandcraftSkillNames(): HandcraftSkillName[] {
-    return Object.keys({} as CharacterSheet["skills"]["handcraft"]) as HandcraftSkillName[];
+    return Object.keys(characterSheetSchema.shape.skills.shape.handcraft.shape) as HandcraftSkillName[];
   }
 
   private setAdvantages(advantages: Advantages): void {
-    console.log(`Set advantages ${advantages}`);
+    console.log(
+      `Set advantages ${advantages.map(([name, info, value]) => `[${advantagesEnumToString(name)}, ${info}, ${value}]`).join(", ")}`,
+    );
 
     for (const advantage of advantages) {
       const [name, , value] = advantage;
@@ -222,16 +229,17 @@ export class CharacterBuilder {
     this.setAdvantagesEffects(advantages);
 
     this.spentGenerationPoints = advantages.reduce((sum, [, , value]) => sum + value, 0);
-    console.log("Generation points spent on advantages: ", this.spentGenerationPoints);
+    console.log("Generation points spent on advantages:", this.spentGenerationPoints);
   }
 
   private setAdvantagesEffects(advantages: Advantages): void {
     console.log("Apply effects of advantages on character stats");
 
     for (const advantage of advantages) {
-      const [name, info] = advantage;
+      const [enumValue, info] = advantage;
+      const name = advantagesEnumToString(enumValue);
       console.log("Apply effect of advantage:", name);
-      switch (name) {
+      switch (enumValue) {
         case AdvantagesNames.HIGH_SCHOOL_DEGREE:
           this.characterSheet.skills.knowledge.anatomy.activated = true;
           this.characterSheet.skills.knowledge.anatomy.mod += 10;
@@ -324,7 +332,9 @@ export class CharacterBuilder {
   }
 
   private setDisadvantages(disadvantages: Disadvantages): void {
-    console.log(`Set disadvantages ${disadvantages}`);
+    console.log(
+      `Set disadvantages ${disadvantages.map(([name, info, value]) => `[${disadvantagesEnumToString(name)}, ${info}, ${value}]`).join(", ")}`,
+    );
 
     for (const disadvantage of disadvantages) {
       const [name, , value] = disadvantage;
@@ -354,9 +364,10 @@ export class CharacterBuilder {
     console.log("Apply effects of disadvantages on character stats");
 
     for (const disadvantage of disadvantages) {
-      const [name, ,] = disadvantage;
+      const [enumValue, ,] = disadvantage;
+      const name = disadvantagesEnumToString(enumValue);
       console.log("Apply effect of disadvantage:", name);
-      switch (name) {
+      switch (enumValue) {
         case DisadvantagesNames.SOCIALLY_INEPT:
           this.characterSheet.skills.social.seduction.mod -= 10;
           this.characterSheet.skills.social.etiquette.mod -= 10;
@@ -465,7 +476,7 @@ export class CharacterBuilder {
   }
 
   activateSkills(activatedSkills: ActivatedSkills): this {
-    console.log("Activate skills for free");
+    console.log("Activate skills for free:", activatedSkills);
 
     for (const skill of activatedSkills) {
       try {
