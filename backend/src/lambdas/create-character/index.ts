@@ -32,8 +32,6 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
 
     console.log(`Create new character for user ${params.userId}`);
 
-    // TODO advantages and disadvantages: set benefits / drawbacks in character builder
-
     const characterCreation = new CharacterBuilder()
       .setUserId(params.userId)
       .setGeneralInformation(params.body.generalInformation)
