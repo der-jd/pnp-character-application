@@ -507,7 +507,7 @@ export const fakeCharacter: Character = {
           defaultCostCategory: CostCategory.CAT_2,
         },
         trapping: {
-          activated: true,
+          activated: false,
           start: 7,
           current: 10,
           mod: 3,
@@ -735,7 +735,7 @@ export const fakeCharacter: Character = {
           defaultCostCategory: CostCategory.CAT_2,
         },
         alcoholProduction: {
-          activated: true,
+          activated: false,
           start: 7,
           current: 10,
           mod: 3,
@@ -751,7 +751,7 @@ export const fakeCharacter: Character = {
           defaultCostCategory: CostCategory.CAT_2,
         },
         fineMechanics: {
-          activated: true,
+          activated: false,
           start: 7,
           current: 10,
           mod: 3,
@@ -791,7 +791,7 @@ export const fakeCharacter: Character = {
           defaultCostCategory: CostCategory.CAT_2,
         },
         makingMusic: {
-          activated: true,
+          activated: false,
           start: 7,
           current: 10,
           mod: 3,
