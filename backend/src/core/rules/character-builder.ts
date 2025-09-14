@@ -404,7 +404,6 @@ export class CharacterBuilder {
       const attribute = getAttribute(this.characterSheet.attributes, attr);
       attribute.start = value.current;
       attribute.current = value.current;
-      attribute.mod = value.mod;
       attribute.totalCost = value.current;
       spentAttributePoints += attribute.totalCost;
     }
@@ -424,7 +423,7 @@ export class CharacterBuilder {
 
   setGeneralInformation(generalInformation: GeneralInformation): this {
     const setupSkill = (skillString: string, bonus: number, type: string) => {
-      console.log(`Set up ${type} with skill '${skillString}' and bonus ${bonus}`);
+      console.log(`Set ${type} with skill '${skillString}' and bonus ${bonus}`);
 
       const [skillCategory, skillName] = skillString.split("/");
       try {

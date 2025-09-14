@@ -20,7 +20,7 @@ export const ATTRIBUTE_POINTS_FOR_CREATION = 40;
 export const PROFESSION_SKILL_BONUS = 50;
 export const HOBBY_SKILL_BONUS = 25;
 
-export const attributeForCreationSchema = attributeSchema.omit({ totalCost: true }).extend({
+export const attributeForCreationSchema = attributeSchema.omit({ start: true, mod: true, totalCost: true }).extend({
   current: z.number().int().min(MIN_ATTRIBUTE_VALUE_FOR_CREATION).max(MAX_ATTRIBUTE_VALUE_FOR_CREATION),
 });
 
