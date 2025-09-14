@@ -66,6 +66,7 @@ export async function getSkillCost(request: Request): Promise<APIGatewayProxyRes
 
     const increaseCost = getSkillIncreaseCost(skillValue, adjustedCostCategory);
 
+    // TODO update get-skill-increase-cost endpoint to include skill activation costs. Rename endpoint?
     const responseBody: GetSkillResponse = {
       characterId: params.pathParams["character-id"],
       skillName: params.pathParams["skill-name"],
