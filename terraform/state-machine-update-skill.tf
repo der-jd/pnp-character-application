@@ -63,7 +63,7 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
           statusCode      = "{% $states.result.statusCode %}",
           updateSkillBody = "{% $states.result.body %}"
         },
-        TimeoutSeconds = 5 // Timeout to avoid waiting for a stuck task
+        TimeoutSeconds = 15 // Timeout to avoid waiting for a stuck task
         Retry = [
           {
             // Retry in case of Lambda service exceptions
