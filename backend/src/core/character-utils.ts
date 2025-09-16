@@ -126,7 +126,8 @@ export function disadvantagesEnumToString(enumValue: DisadvantagesNames): string
 export function getSkillCategoryAndName(categoryAndName: string): { category: string; name: string } {
   const skillCategory = categoryAndName.split("/")[0];
   let skillName: string;
-  if (skillCategory === "combat") {
+  const combatCategory: keyof CharacterSheet["skills"] = "combat";
+  if (skillCategory === combatCategory) {
     // name pattern is "skillCategory/skillName (combatCategory)"
     skillName = categoryAndName.split(" (")[0].split("/")[1];
   } else {
