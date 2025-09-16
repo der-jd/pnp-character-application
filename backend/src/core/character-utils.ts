@@ -122,3 +122,16 @@ export function disadvantagesEnumToString(enumValue: DisadvantagesNames): string
     (key) => DisadvantagesNames[key as keyof typeof DisadvantagesNames] === enumValue,
   );
 }
+
+export function getSkillCategoryAndName(categoryAndName: string): { category: string; name: string } {
+  const skillCategory = categoryAndName.split("/")[0];
+  let skillName: string;
+  if (skillCategory === "combat") {
+    // name pattern is "skillCategory/skillName (combatCategory)"
+    skillName = categoryAndName.split(" (")[0].split("/")[1];
+  } else {
+    // name pattern is "skillCategory/skillName"
+    skillName = categoryAndName.split("/")[1];
+  }
+  return { category: skillCategory, name: skillName };
+}

@@ -35,7 +35,13 @@ import {
   characterSheetSchema,
 } from "api-spec";
 import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT, MAX_COST_CATEGORY } from "./constants.js";
-import { advantagesEnumToString, disadvantagesEnumToString, getAttribute, getSkill } from "../character-utils.js";
+import {
+  advantagesEnumToString,
+  disadvantagesEnumToString,
+  getAttribute,
+  getSkill,
+  getSkillCategoryAndName,
+} from "../character-utils.js";
 import { HttpError, logAndEnsureHttpError } from "../errors.js";
 import { calculateBaseValues } from "./base-value-formulas.js";
 
@@ -410,6 +416,8 @@ export class CharacterBuilder {
   setAttributes(attributes: AttributesForCreation): this {
     console.log("Set attributes");
 
+    // TODO extract logic for change attributes (update attribute endpoint, character creation) to separate function so that effect on attribute and base values is in one place?!
+
     let spentAttributePoints = 0;
     for (const [attr, value] of Object.entries(attributes)) {
       const attribute = getAttribute(this.characterSheet.attributes, attr);
@@ -425,6 +433,12 @@ export class CharacterBuilder {
       );
     }
 
+    /**
+     * TODO
+     * - extract function to calculate base values from update-attribute lambda
+     * - use that function here and in update-attribute lambda
+     * - currently, the setBaseValuesByFormula() functions is also wrong because it ignores the current value
+     */
     this.setBaseValuesByFormula();
 
     this.attributesSet = true;
@@ -436,7 +450,7 @@ export class CharacterBuilder {
     const setupSkill = (skillString: string, bonus: number, type: string) => {
       console.log(`Set ${type} with skill '${skillString}' and bonus ${bonus}`);
 
-      const [skillCategory, skillName] = skillString.split("/");
+      const { category: skillCategory, name: skillName } = getSkillCategoryAndName(skillString);
       try {
         const skill = getSkill(this.characterSheet.skills, skillCategory as keyof CharacterSheet["skills"], skillName);
         skill.activated = true;
@@ -480,7 +494,7 @@ export class CharacterBuilder {
 
     for (const skill of activatedSkills) {
       try {
-        const [category, name] = skill.split("/");
+        const { category, name } = getSkillCategoryAndName(skill);
         const characterSkill = getSkill(this.characterSheet.skills, category as keyof CharacterSheet["skills"], name);
         if (characterSkill.activated) {
           throw new HttpError(400, `Skill '${skill}' is already activated.`);

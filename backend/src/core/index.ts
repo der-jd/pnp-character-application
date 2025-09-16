@@ -37,6 +37,7 @@ export {
   getSkill,
   getCombatValues,
   getCombatCategory,
+  getSkillCategoryAndName,
 } from "./character-utils.js";
 export { parseRecordType } from "./history-utils.js";
 export { CharacterBuilder } from "./rules/character-builder.js";

@@ -37,6 +37,7 @@ import {
   setSpecialAbilities,
   logZodError,
   isZodError,
+  getSkillCategoryAndName,
 } from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -193,15 +194,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
       case RecordType.SKILL_CHANGED: {
         const oldData = skillChangeSchema.parse(record.data.old);
 
-        const skillCategory = record.name.split("/")[0];
-        let skillName: string;
-        if (skillCategory === "combat") {
-          // name pattern is "skillCategory/skillName (combatCategory)"
-          skillName = record.name.split(" (")[0].split("/")[1];
-        } else {
-          // name pattern is "skillCategory/skillName"
-          skillName = record.name.split("/")[1];
-        }
+        const { category: skillCategory, name: skillName } = getSkillCategoryAndName(record.name);
 
         if (oldData.combatValues) {
           // name pattern is "skillCategory/skillName (combatCategory)"
