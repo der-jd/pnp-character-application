@@ -69,15 +69,8 @@ import { GiBestialFangs } from "react-icons/gi";
 import { GiTinker } from "react-icons/gi";
 import { GiDespair } from "react-icons/gi";
 
-import {
-  Skill,
-  LearningMethod,
-  CostCategory,
-  Character,
-  Attribute,
-  BaseValue,
-  CharacterSheet,
-} from "@api/models/Character/character";
+import { LearningMethod, CostCategory } from "api-spec";
+import type { Skill, Character, Attribute, BaseValue, CharacterSheet } from "api-spec";
 
 export interface ISkillProps {
   name: string;

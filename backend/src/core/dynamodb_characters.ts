@@ -91,6 +91,7 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
     if (item?.characterSheet?.specialAbilities) {
       item.characterSheet.specialAbilities = Array.from(item.characterSheet.specialAbilities);
     }
+
     return item;
   });
 
