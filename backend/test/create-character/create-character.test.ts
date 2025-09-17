@@ -1,22 +1,22 @@
 import { describe, expect, test } from "vitest";
-import { fakeHeaders } from "../test-data/request.js";
-import {
-  fakeCharacterResponse,
-  fakeHistoryBlockListResponse,
-  mockDynamoDBGetCharacterResponse,
-  mockDynamoDBQueryHistoryResponse,
-} from "../test-data/response.js";
+import { fakeHeaders, fakeUserId } from "../test-data/request.js";
 import {
   AdvantagesNames,
+  Attributes,
   createCharacterResponseSchema,
   DisadvantagesNames,
   MAX_ATTRIBUTE_VALUE_FOR_CREATION,
   MIN_ATTRIBUTE_VALUE_FOR_CREATION,
   NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
   PostCharactersRequest,
+  PROFESSION_SKILL_BONUS,
+  HOBBY_SKILL_BONUS,
+  START_SKILLS,
+  GENERATION_POINTS,
 } from "api-spec";
 import { _createCharacter } from "create-character";
 import { expectHttpError } from "../utils.js";
+import { getSkill, getSkillCategoryAndName } from "core";
 
 const characterCreationRequest: PostCharactersRequest = {
   generalInformation: {
@@ -448,17 +448,7 @@ describe("Invalid requests", () => {
 describe("Valid requests", () => {
   const validTestCases = [
     {
-      name: "Copy an own character",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: null,
-        queryStringParameters: null,
-        body: characterCreationRequest,
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Copy another character",
+      name: "Create a new character",
       request: {
         headers: fakeHeaders,
         pathParameters: null,
@@ -471,15 +461,96 @@ describe("Valid requests", () => {
 
   validTestCases.forEach((_case) => {
     test(_case.name, async () => {
-      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
-      mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
-
       const result = await _createCharacter(_case.request);
 
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
       const parsedBody = createCharacterResponseSchema.parse(JSON.parse(result.body));
-      expect(parsedBody.changes.new.character.characterId).toBeDefined();
+      expect(parsedBody.characterId).toBeDefined();
+      expect(parsedBody.userId).toBe(fakeUserId);
+      expect(parsedBody.characterName).toBe(_case.request.body.generalInformation.name);
+
+      expect(parsedBody.changes.new.character).toBeDefined();
+      expect(parsedBody.changes.new.character.userId).toBe(fakeUserId);
+
+      expect(parsedBody.changes.new.character.characterSheet.generalInformation).toStrictEqual(
+        _case.request.body.generalInformation,
+      );
+
+      // Attributes should be set according to the request
+      for (const attributeName in _case.request.body.attributes) {
+        const attribute = parsedBody.changes.new.character.characterSheet.attributes[attributeName as keyof Attributes];
+        const requestAttribute = (_case.request.body.attributes as Record<string, any>)[attributeName];
+
+        expect(attribute.start).toBe(requestAttribute.current);
+        expect(attribute.current).toBe(requestAttribute.current);
+        expect(attribute.totalCost).toBe(requestAttribute.current);
+      }
+
+      // Advantages and Disadvantages should be copied
+      expect(parsedBody.changes.new.character.characterSheet.advantages).toStrictEqual(_case.request.body.advantages);
+      expect(parsedBody.changes.new.character.characterSheet.disadvantages).toStrictEqual(
+        _case.request.body.disadvantages,
+      );
+
+      // Profession and Hobby skills should be modified
+      const professionSkill = _case.request.body.generalInformation.profession.skill;
+      const hobbySkill = _case.request.body.generalInformation.hobby.skill;
+      expect(parsedBody.changes.new.character.characterSheet.generalInformation.profession.skill).toStrictEqual(
+        professionSkill,
+      );
+      expect(parsedBody.changes.new.character.characterSheet.generalInformation.hobby.skill).toStrictEqual(hobbySkill);
+
+      const { category: professionCategory, name: professionSkillName } = getSkillCategoryAndName(professionSkill);
+      const { category: hobbyCategory, name: hobbyNameSkillName } = getSkillCategoryAndName(hobbySkill);
+      const returnedProfessionSkill = getSkill(
+        parsedBody.changes.new.character.characterSheet.skills,
+        professionCategory,
+        professionSkillName,
+      );
+      const returnedHobbySkill = getSkill(
+        parsedBody.changes.new.character.characterSheet.skills,
+        hobbyCategory,
+        hobbyNameSkillName,
+      );
+      expect(returnedProfessionSkill.activated).toBe(true);
+      expect(returnedHobbySkill.activated).toBe(true);
+      expect(returnedProfessionSkill.start).toBe(PROFESSION_SKILL_BONUS);
+      expect(returnedHobbySkill.start).toBe(HOBBY_SKILL_BONUS);
+      expect(returnedProfessionSkill.current).toBe(PROFESSION_SKILL_BONUS);
+      expect(returnedHobbySkill.current).toBe(HOBBY_SKILL_BONUS);
+
+      // Activated skills should be marked as activated
+      const activatedSkills = _case.request.body.activatedSkills;
+      activatedSkills.forEach((skill) => {
+        const { category, name } = getSkillCategoryAndName(skill);
+        const skillDetails = getSkill(parsedBody.changes.new.character.characterSheet.skills, category, name);
+        expect(skillDetails.activated).toBe(true);
+      });
+
+      // All start skills should be activated
+      START_SKILLS.forEach((skill) => {
+        const { category, name } = getSkillCategoryAndName(skill);
+        const skillDetails = getSkill(parsedBody.changes.new.character.characterSheet.skills, category, name);
+        expect(skillDetails.activated).toBe(true);
+      });
+
+      // TODO check that other skills, attributes, base values, combat values, etc. are zero or set correctly?!
+      // TODO check effects of advantages and disadvantages?!
+
+      // Generation points should be calculated according to the input advantages and disadvantages
+      const generationPointsThroughDisadvantages = _case.request.body.disadvantages.reduce(
+        (sum, [, , value]) => sum + value,
+        0,
+      );
+      expect(parsedBody.changes.new.generationPoints.throughDisadvantages).toBe(generationPointsThroughDisadvantages);
+      const spentGenerationPoints = _case.request.body.advantages.reduce((sum, [, , value]) => sum + value, 0);
+      expect(parsedBody.changes.new.generationPoints.spent).toBe(spentGenerationPoints);
+      expect(parsedBody.changes.new.generationPoints.total).toBe(
+        GENERATION_POINTS + generationPointsThroughDisadvantages,
+      );
+
+      expect(parsedBody.changes.new.activatedSkills).toStrictEqual(_case.request.body.activatedSkills);
     });
   });
 });
