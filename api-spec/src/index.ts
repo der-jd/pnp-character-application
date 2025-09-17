@@ -49,9 +49,13 @@ export {
   NatureSkillName,
   KnowledgeSkillName,
   HandcraftSkillName,
+  SkillCategory,
+  SkillNameWithCategory,
   SkillName,
   combatSkills,
   START_SKILLS,
+  skillCategories,
+  skillNames,
 } from "./character-schemas.js";
 export {
   recordSchema,

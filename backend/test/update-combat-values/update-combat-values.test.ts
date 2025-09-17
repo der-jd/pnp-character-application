@@ -4,7 +4,7 @@ import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { getCombatValues } from "core";
-import { Character, updateCombatValuesResponseSchema } from "api-spec";
+import { Character, SkillName, updateCombatValuesResponseSchema } from "api-spec";
 import { expectHttpError } from "../utils.js";
 import { _updateCombatValues } from "update-combat-values";
 
@@ -363,7 +363,7 @@ describe("Valid requests", () => {
       expect(parsedBody.userId).toBe(fakeUserId);
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
       expect(parsedBody.combatCategory).toBe(_case.request.pathParameters["combat-category"]);
-      const skillName = _case.request.pathParameters["combat-skill-name"];
+      const skillName = _case.request.pathParameters["combat-skill-name"] as SkillName;
       expect(parsedBody.combatSkillName).toBe(skillName);
 
       const combatCategory = _case.request.pathParameters[

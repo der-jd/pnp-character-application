@@ -341,39 +341,50 @@ export type SkillName =
   | KnowledgeSkillName
   | HandcraftSkillName;
 
-export const combatSkills = Object.keys(combatSkillsSchema.shape) as SkillName[];
+export type SkillCategory = keyof CharacterSheet["skills"];
 
-export const START_SKILLS: SkillName[] = [
-  // body skills
-  "athletics",
-  "climbing",
-  "bodyControl",
-  "sneaking",
-  "swimming",
-  "selfControl",
-  "hiding",
-  "singing",
-  "sharpnessOfSenses",
-  "quaffing",
-  // social skills
-  "etiquette",
-  "knowledgeOfHumanNature",
-  "persuading",
-  // nature skills
-  "knottingSkills",
-  // knowledge skills
-  "mathematics",
-  "zoology",
-  // handcraft skills
-  "woodwork",
-  "foodProcessing",
-  "fabricProcessing",
-  "steeringVehicles",
-  "bargaining",
-  "firstAid",
-  "calmingSbDown",
-  "drawingAndPainting",
-  ...combatSkills,
+type Join<K extends string, V extends string> = `${K}/${V}`;
+export type SkillNameWithCategory = {
+  [Category in keyof CharacterSheet["skills"]]: Join<
+    Category & string,
+    keyof CharacterSheet["skills"][Category] & string
+  >;
+}[keyof CharacterSheet["skills"]];
+
+const combatSkillCategory: SkillCategory = "combat";
+
+export const combatSkills = Object.keys(combatSkillsSchema.shape).map(
+  (skill) => `${combatSkillCategory}/${skill}` as SkillNameWithCategory,
+);
+
+export const START_SKILLS: SkillNameWithCategory[] = [
+  "body/athletics",
+  "body/climbing",
+  "body/bodyControl",
+  "body/sneaking",
+  "body/swimming",
+  "body/selfControl",
+  "body/hiding",
+  "body/singing",
+  "body/sharpnessOfSenses",
+  "body/quaffing",
+  "social/etiquette",
+  "social/knowledgeOfHumanNature",
+  "social/persuading",
+  "social/bargaining",
+  "nature/knottingSkills",
+  "knowledge/mathematics",
+  "knowledge/zoology",
+  "handcraft/woodwork",
+  "handcraft/foodProcessing",
+  "handcraft/fabricProcessing",
+  "handcraft/steeringVehicles",
+  "handcraft/firstAid",
+  "handcraft/calmingSbDown",
+  "handcraft/drawingAndPainting",
+  ...(Object.keys(combatSkillsSchema.shape) as Array<keyof CharacterSheet["skills"]["combat"]>).map(
+    (skill) => `${combatSkillCategory}/${skill}` as SkillNameWithCategory,
+  ),
 ];
 
 export const specialAbilitySchema = z.string().max(MAX_STRING_LENGTH_DEFAULT);
@@ -527,3 +538,8 @@ export const characterSchema = z
   .strict();
 
 export type Character = z.infer<typeof characterSchema>;
+
+export const skillCategories = Object.keys(characterSheetSchema.shape.skills.shape) as SkillCategory[];
+export const skillNames = Object.values(characterSheetSchema.shape.skills.shape).flatMap(
+  (category) => category.keyof().options,
+);

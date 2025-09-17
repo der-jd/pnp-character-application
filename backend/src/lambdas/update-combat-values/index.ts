@@ -6,8 +6,9 @@ import {
   UpdateCombatValuesResponse,
   patchCombatValuesPathParamsSchema,
   patchCombatValuesRequestSchema,
-  Character,
   CombatValues,
+  SkillName,
+  CharacterSheet,
 } from "api-spec";
 import {
   Request,
@@ -40,10 +41,12 @@ interface Parameters {
 export async function _updateCombatValues(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
+    const combatCategory = params.pathParams["combat-category"] as keyof CharacterSheet["combatValues"];
+    const combatSkillName = params.pathParams["combat-skill-name"] as SkillName;
 
     console.log(`Update character ${params.pathParams["character-id"]} of user ${params.userId}`);
     console.log(
-      `Update attack/parade value of combat skill '${params.pathParams["combat-category"]}/${params.pathParams["combat-skill-name"]}' from ` +
+      `Update attack/parade value of combat skill '${combatCategory}/${combatSkillName}' from ` +
         `${params.body.attackValue.initialValue}/${params.body.paradeValue.initialValue} to ` +
         `${params.body.attackValue.initialValue + params.body.attackValue.increasedPoints}/${params.body.paradeValue.initialValue + params.body.paradeValue.increasedPoints}`,
     );
@@ -51,12 +54,7 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
 
     const characterSheet = character.characterSheet;
-    const combatCategory = params.pathParams["combat-category"] as keyof Character["characterSheet"]["combatValues"];
-    const skillCombatValuesOld = getCombatValues(
-      characterSheet.combatValues,
-      combatCategory,
-      params.pathParams["combat-skill-name"],
-    );
+    const skillCombatValuesOld = getCombatValues(characterSheet.combatValues, combatCategory, combatSkillName);
     const skillCombatValues = structuredClone(skillCombatValuesOld);
 
     if (
@@ -69,8 +67,8 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
       const responseBody: UpdateCombatValuesResponse = {
         characterId: params.pathParams["character-id"],
         userId: params.userId,
-        combatCategory: params.pathParams["combat-category"],
-        combatSkillName: params.pathParams["combat-skill-name"],
+        combatCategory: combatCategory,
+        combatSkillName: combatSkillName,
         combatValues: {
           old: skillCombatValuesOld,
           new: skillCombatValues,
@@ -129,15 +127,15 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
       params.userId,
       params.pathParams["character-id"],
       combatCategory,
-      params.pathParams["combat-skill-name"],
+      combatSkillName,
       skillCombatValues,
     );
 
     const responseBody: UpdateCombatValuesResponse = {
       characterId: params.pathParams["character-id"],
       userId: params.userId,
-      combatCategory: params.pathParams["combat-category"],
-      combatSkillName: params.pathParams["combat-skill-name"],
+      combatCategory: combatCategory,
+      combatSkillName: combatSkillName,
       combatValues: {
         old: skillCombatValuesOld,
         new: skillCombatValues,

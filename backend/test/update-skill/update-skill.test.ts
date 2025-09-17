@@ -4,7 +4,7 @@ import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
 import { getCombatCategory, getCombatValues, getSkill } from "core";
-import { Character, updateSkillResponseSchema } from "api-spec";
+import { Character, SkillName, updateSkillResponseSchema } from "api-spec";
 import { _updateSkill, availableCombatPointsChanged } from "update-skill";
 import { expectHttpError } from "../utils.js";
 
@@ -446,7 +446,7 @@ describe("Valid requests", () => {
         "skill-category"
       ] as keyof Character["characterSheet"]["skills"];
       expect(parsedBody.skillCategory).toBe(skillCategory);
-      const skillName = _case.request.pathParameters["skill-name"];
+      const skillName = _case.request.pathParameters["skill-name"] as SkillName;
       expect(parsedBody.skillName).toBe(skillName);
 
       if (_case.request.body.activated) {
@@ -744,7 +744,7 @@ describe("Valid requests", () => {
         "skill-category"
       ] as keyof Character["characterSheet"]["skills"];
       expect(parsedBody.skillCategory).toBe(skillCategory);
-      const skillName = _case.request.pathParameters["skill-name"];
+      const skillName = _case.request.pathParameters["skill-name"] as SkillName;
       expect(parsedBody.skillName).toBe(skillName);
 
       const oldAvailableAdventurePoints =

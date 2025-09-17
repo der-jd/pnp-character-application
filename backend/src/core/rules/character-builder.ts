@@ -8,7 +8,6 @@ import {
   ATTRIBUTE_POINTS_FOR_CREATION,
   MIN_LEVEL,
   START_SKILLS,
-  SkillName,
   combatSkills,
   BodySkillName,
   SocialSkillName,
@@ -33,6 +32,9 @@ import {
   DisadvantagesNames,
   AdvantagesNames,
   characterSheetSchema,
+  SkillNameWithCategory,
+  SkillName,
+  SkillCategory,
 } from "api-spec";
 import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT, MAX_COST_CATEGORY } from "./constants.js";
 import {
@@ -111,18 +113,28 @@ export class CharacterBuilder {
         strength: this.zeroAttribute(),
       },
       skills: {
-        combat: this.createSkillObjectsFromSkillNamesArray(combatSkills) as CharacterSheet["skills"]["combat"],
-        body: this.createSkillObjectsFromSkillNamesArray(this.getBodySkillNames()) as CharacterSheet["skills"]["body"],
-        social: this.createSkillObjectsFromSkillNamesArray(
+        combat: this.createSkillObjectsFromSkillNames(
+          "combat",
+          combatSkills.map((skill) => getSkillCategoryAndName(skill).name),
+        ) as CharacterSheet["skills"]["combat"],
+        body: this.createSkillObjectsFromSkillNames(
+          "body",
+          this.getBodySkillNames(),
+        ) as CharacterSheet["skills"]["body"],
+        social: this.createSkillObjectsFromSkillNames(
+          "social",
           this.getSocialSkillNames(),
         ) as CharacterSheet["skills"]["social"],
-        nature: this.createSkillObjectsFromSkillNamesArray(
+        nature: this.createSkillObjectsFromSkillNames(
+          "nature",
           this.getNatureSkillNames(),
         ) as CharacterSheet["skills"]["nature"],
-        knowledge: this.createSkillObjectsFromSkillNamesArray(
+        knowledge: this.createSkillObjectsFromSkillNames(
+          "knowledge",
           this.getKnowledgeSkillNames(),
         ) as CharacterSheet["skills"]["knowledge"],
-        handcraft: this.createSkillObjectsFromSkillNamesArray(
+        handcraft: this.createSkillObjectsFromSkillNames(
+          "handcraft",
           this.getHandcraftSkillNames(),
         ) as CharacterSheet["skills"]["handcraft"],
       },
@@ -174,14 +186,14 @@ export class CharacterBuilder {
     }
   }
 
-  private zeroSkill(skillName: SkillName): Skill {
+  private zeroSkill(skill: SkillNameWithCategory): Skill {
     return {
-      activated: START_SKILLS.includes(skillName) ? true : false,
+      activated: START_SKILLS.includes(skill) ? true : false,
       start: 0,
       current: 0,
       mod: 0,
       totalCost: 0,
-      defaultCostCategory: combatSkills.includes(skillName) ? COST_CATEGORY_COMBAT_SKILLS : COST_CATEGORY_DEFAULT,
+      defaultCostCategory: combatSkills.includes(skill) ? COST_CATEGORY_COMBAT_SKILLS : COST_CATEGORY_DEFAULT,
     };
   }
 
@@ -193,8 +205,12 @@ export class CharacterBuilder {
     };
   }
 
-  private createSkillObjectsFromSkillNamesArray(skillNames: readonly SkillName[]) {
-    return Object.fromEntries(skillNames.map((name) => [name, this.zeroSkill(name)]));
+  private createSkillObjectsFromSkillNames(skillCategory: SkillCategory, skillNames: SkillName[]) {
+    return Object.fromEntries(
+      skillNames.map((skillName) => {
+        return [skillName, this.zeroSkill(`${skillCategory}/${skillName}` as SkillNameWithCategory)];
+      }),
+    );
   }
 
   private getBodySkillNames(): BodySkillName[] {
@@ -452,7 +468,7 @@ export class CharacterBuilder {
 
       try {
         const { category: skillCategory, name: skillName } = getSkillCategoryAndName(skillString);
-        const skill = getSkill(this.characterSheet.skills, skillCategory as keyof CharacterSheet["skills"], skillName);
+        const skill = getSkill(this.characterSheet.skills, skillCategory, skillName);
         skill.activated = true;
         skill.start = bonus;
         skill.current = bonus;
@@ -496,7 +512,7 @@ export class CharacterBuilder {
     for (const skill of activatedSkills) {
       try {
         const { category, name } = getSkillCategoryAndName(skill);
-        const characterSkill = getSkill(this.characterSheet.skills, category as keyof CharacterSheet["skills"], name);
+        const characterSkill = getSkill(this.characterSheet.skills, category, name);
         if (characterSkill.activated) {
           throw new HttpError(400, `Skill '${skill}' is already activated.`);
         }
@@ -530,7 +546,7 @@ export class CharacterBuilder {
       character: {
         userId: this.userId,
         characterId: uuidv4(),
-        characterSheet: this.characterSheet,
+        characterSheet: characterSheetSchema.parse(this.characterSheet),
       },
       generationPoints: {
         throughDisadvantages: this.generationPointsThroughDisadvantages,

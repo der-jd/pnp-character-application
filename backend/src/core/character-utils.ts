@@ -9,6 +9,10 @@ import {
   AdvantagesNames,
   DisadvantagesNames,
   characterSheetSchema,
+  SkillCategory,
+  SkillName,
+  skillCategories,
+  skillNames,
 } from "api-spec";
 import {
   SKILL_ACTIVATION_COSTS,
@@ -34,11 +38,7 @@ export function getBaseValue(baseValues: CharacterSheet["baseValues"], name: str
   return baseValue;
 }
 
-export function getSkill(
-  skills: CharacterSheet["skills"],
-  category: keyof CharacterSheet["skills"],
-  name: string,
-): Skill {
+export function getSkill(skills: CharacterSheet["skills"], category: SkillCategory, name: SkillName): Skill {
   if (!(category in skills)) {
     throw new Error(`Category ${category} is not a valid skill category!`);
   }
@@ -54,7 +54,7 @@ export function getSkill(
 export function getCombatValues(
   combatValues: CharacterSheet["combatValues"],
   category: keyof CharacterSheet["combatValues"],
-  combatSkillName: string,
+  combatSkillName: SkillName,
 ): CombatValues {
   if (!(category in combatValues)) {
     throw new Error(`Category ${category} is not a valid combat category!`);
@@ -68,7 +68,7 @@ export function getCombatValues(
   return skillCombatValues;
 }
 
-export function getCombatCategory(combatSkillName: string): keyof CharacterSheet["combatValues"] {
+export function getCombatCategory(combatSkillName: SkillName): keyof CharacterSheet["combatValues"] {
   const meleeSkills = Object.keys(characterSheetSchema.shape.combatValues.shape.melee.shape);
   const rangedSkills = Object.keys(characterSheetSchema.shape.combatValues.shape.ranged.shape);
 
@@ -126,9 +126,18 @@ export function disadvantagesEnumToString(enumValue: DisadvantagesNames): string
   );
 }
 
-export function getSkillCategoryAndName(categoryAndName: string): { category: string; name: string } {
+export function getSkillCategoryAndName(categoryAndName: string): { category: SkillCategory; name: SkillName } {
   // Pattern is "skillCategory/skillName"
-  const skillCategory = categoryAndName.split("/")[0];
-  const skillName = categoryAndName.split("/")[1];
+  const skillCategory = categoryAndName.split("/")[0] as SkillCategory;
+  const skillName = categoryAndName.split("/")[1] as SkillName;
+
+  if (!skillCategories.includes(skillCategory)) {
+    throw new Error(`Skill category ${skillCategory} is not valid!`);
+  }
+
+  if (!skillNames.includes(skillName)) {
+    throw new Error(`Skill name ${skillName} is not valid!`);
+  }
+
   return { category: skillCategory, name: skillName };
 }
