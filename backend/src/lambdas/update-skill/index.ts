@@ -13,6 +13,7 @@ import {
   patchSkillRequestSchema,
   InitialNew,
   InitialIncreased,
+  CharacterSheet,
 } from "api-spec";
 import {
   Request,
@@ -133,13 +134,14 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
       );
     }
 
+    const combatSkillCategory: keyof CharacterSheet["skills"] = "combat";
     const responseBody: UpdateSkillResponse = {
       characterId: params.pathParams["character-id"],
       userId: params.userId,
       skillCategory: params.pathParams["skill-category"],
       skillName: params.pathParams["skill-name"],
       combatCategory:
-        params.pathParams["skill-category"] === "combat"
+        params.pathParams["skill-category"] === combatSkillCategory
           ? getCombatCategory(characterSheet.combatValues, params.pathParams["skill-name"])
           : undefined,
       changes: {
