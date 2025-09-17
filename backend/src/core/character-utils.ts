@@ -8,6 +8,7 @@ import {
   CombatValues,
   AdvantagesNames,
   DisadvantagesNames,
+  characterSheetSchema,
 } from "api-spec";
 import {
   SKILL_ACTIVATION_COSTS,
@@ -67,17 +68,19 @@ export function getCombatValues(
   return skillCombatValues;
 }
 
-export function getCombatCategory(
-  combatValues: CharacterSheet["combatValues"],
-  combatSkillName: string,
-): keyof CharacterSheet["combatValues"] {
-  for (const category in combatValues) {
-    const combatCategory = combatValues[category as keyof CharacterSheet["combatValues"]] as Record<string, any>;
-    if (combatCategory[combatSkillName]) {
-      return category as keyof CharacterSheet["combatValues"];
-    }
+export function getCombatCategory(combatSkillName: string): keyof CharacterSheet["combatValues"] {
+  const meleeSkills = Object.keys(characterSheetSchema.shape.combatValues.shape.melee.shape);
+  const rangedSkills = Object.keys(characterSheetSchema.shape.combatValues.shape.ranged.shape);
+
+  if (meleeSkills.includes(combatSkillName)) {
+    const meleeCategory: keyof CharacterSheet["combatValues"] = "melee";
+    return meleeCategory;
+  } else if (rangedSkills.includes(combatSkillName)) {
+    const rangedCategory: keyof CharacterSheet["combatValues"] = "ranged";
+    return rangedCategory;
+  } else {
+    throw new Error(`Combat category for skill ${combatSkillName} not found!`);
   }
-  throw new Error(`Combat category for skill ${combatSkillName} not found!`);
 }
 
 export function parseLearningMethod(method: string): LearningMethod {
@@ -124,15 +127,8 @@ export function disadvantagesEnumToString(enumValue: DisadvantagesNames): string
 }
 
 export function getSkillCategoryAndName(categoryAndName: string): { category: string; name: string } {
+  // Pattern is "skillCategory/skillName"
   const skillCategory = categoryAndName.split("/")[0];
-  let skillName: string;
-  const combatCategory: keyof CharacterSheet["skills"] = "combat";
-  if (skillCategory === combatCategory) {
-    // name pattern is "skillCategory/skillName (combatCategory)"
-    skillName = categoryAndName.split(" (")[0].split("/")[1];
-  } else {
-    // name pattern is "skillCategory/skillName"
-    skillName = categoryAndName.split("/")[1];
-  }
+  const skillName = categoryAndName.split("/")[1];
   return { category: skillCategory, name: skillName };
 }

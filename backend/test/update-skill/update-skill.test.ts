@@ -827,7 +827,7 @@ describe("Valid requests", () => {
         expect(parsedBody.changes.old.combatValues).toBeDefined();
         expect(parsedBody.changes.new.combatValues).toBeDefined();
 
-        const combatCategory = getCombatCategory(fakeCharacterResponse.Item.characterSheet.combatValues, skillName);
+        const combatCategory = getCombatCategory(skillName);
         expect(parsedBody.combatCategory).toBe(combatCategory);
 
         const skillCombatValuesOld = getCombatValues(

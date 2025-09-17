@@ -364,7 +364,7 @@ export const skillChangedRecord: PatchSkillHistoryRecord = {
 
 export const combatSkillChangedRecord: PatchSkillHistoryRecord = {
   type: RecordType.SKILL_CHANGED,
-  name: "combat/daggers (melee)",
+  name: "combat/daggers",
   number: 3,
   id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
   data: {

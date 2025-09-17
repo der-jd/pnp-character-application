@@ -450,8 +450,8 @@ export class CharacterBuilder {
     const setupSkill = (skillString: string, bonus: number, type: string) => {
       console.log(`Set ${type} with skill '${skillString}' and bonus ${bonus}`);
 
-      const { category: skillCategory, name: skillName } = getSkillCategoryAndName(skillString);
       try {
+        const { category: skillCategory, name: skillName } = getSkillCategoryAndName(skillString);
         const skill = getSkill(this.characterSheet.skills, skillCategory as keyof CharacterSheet["skills"], skillName);
         skill.activated = true;
         skill.start = bonus;
@@ -460,6 +460,7 @@ export class CharacterBuilder {
         throw logAndEnsureHttpError(error);
       }
     };
+
     setupSkill(generalInformation.profession.skill, PROFESSION_SKILL_BONUS, "profession");
     setupSkill(generalInformation.hobby.skill, HOBBY_SKILL_BONUS, "hobby");
 

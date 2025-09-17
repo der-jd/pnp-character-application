@@ -38,6 +38,7 @@ import {
   logZodError,
   isZodError,
   getSkillCategoryAndName,
+  getCombatCategory,
 } from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -197,8 +198,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
         const { category: skillCategory, name: skillName } = getSkillCategoryAndName(record.name);
 
         if (oldData.combatValues) {
-          // name pattern is "skillCategory/skillName (combatCategory)"
-          const combatCategory = record.name.split(" (")[1].slice(0, -1); // Remove the trailing ")"
+          const combatCategory = getCombatCategory(skillName);
           await updateCombatValues(userId, characterId, combatCategory, skillName, oldData.combatValues);
         }
 

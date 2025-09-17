@@ -112,7 +112,7 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
       | undefined;
     if (availableCombatPointsChanged(skillOld, skill, params.pathParams["skill-category"])) {
       console.log("Available combat points changed. Update combat values.");
-      const combatCategory = getCombatCategory(characterSheet.combatValues, params.pathParams["skill-name"]);
+      const combatCategory = getCombatCategory(params.pathParams["skill-name"]);
       const skillCombatValuesOld = getCombatValues(
         characterSheet.combatValues,
         combatCategory,
@@ -142,7 +142,7 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
       skillName: params.pathParams["skill-name"],
       combatCategory:
         params.pathParams["skill-category"] === combatSkillCategory
-          ? getCombatCategory(characterSheet.combatValues, params.pathParams["skill-name"])
+          ? getCombatCategory(params.pathParams["skill-name"])
           : undefined,
       changes: {
         old: {
