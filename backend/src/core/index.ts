@@ -42,3 +42,4 @@ export {
 export { parseRecordType } from "./history-utils.js";
 export { CharacterBuilder } from "./rules/character-builder.js";
 export { calculateBaseValues } from "./rules/base-value-formulas.js";
+export { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT, MAX_COST_CATEGORY } from "./rules/constants.js";

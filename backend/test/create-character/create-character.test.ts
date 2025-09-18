@@ -14,6 +14,9 @@ import {
   START_SKILLS,
   GENERATION_POINTS,
   SkillCategory,
+  baseValuesUpdatableByLvlUp,
+  BaseValues,
+  ATTRIBUTE_POINTS_FOR_CREATION,
 } from "api-spec";
 import { _createCharacter } from "create-character";
 import { expectHttpError } from "../utils.js";
@@ -494,7 +497,7 @@ describe("Valid requests", () => {
         _case.request.body.disadvantages,
       );
 
-      // Profession and Hobby skills should be modified
+      // Check profession and Hobby
       const profession = _case.request.body.generalInformation.profession;
       const hobby = _case.request.body.generalInformation.hobby;
       expect(parsedBody.changes.new.character.characterSheet.generalInformation.profession.name).toBe(profession.name);
@@ -521,13 +524,14 @@ describe("Valid requests", () => {
       expect(returnedProfessionSkill.mod).toBe(PROFESSION_SKILL_BONUS);
       expect(returnedHobbySkill.mod).toBe(HOBBY_SKILL_BONUS);
 
-      // Activated skills should be marked as activated
+      // Check activated skills
       const activatedSkills = _case.request.body.activatedSkills;
       activatedSkills.forEach((skill) => {
         const { category, name } = getSkillCategoryAndName(skill);
         const skillDetails = getSkill(parsedBody.changes.new.character.characterSheet.skills, category, name);
         expect(skillDetails.activated).toBe(true);
       });
+      expect(parsedBody.changes.new.activatedSkills).toStrictEqual(_case.request.body.activatedSkills);
 
       // All start skills should be activated
       START_SKILLS.forEach((skill) => {
@@ -551,14 +555,46 @@ describe("Valid requests", () => {
         });
       });
 
-      /**
-       * TODO
-       * - check base values: byFormula === current === start
-       * - check combat values: attackValue === paradeValue === 0; availablePoints === combatSkill value
-       * - check attribute points
-       * - check adventure points (all 0)
-       * - check special abilities (empty)
-       */
+      // Check combat values
+      Object.entries(parsedBody.changes.new.character.characterSheet.combatValues).forEach(
+        ([, combatValuesInCategory]) => {
+          Object.entries(combatValuesInCategory).forEach(([, details]) => {
+            expect(details.availablePoints).toBe(0); // TODO must be handling + initial skill (to be rolled) + corresponding-skill.current + corresponding-skill.mod
+            expect(details.attackValue).toBe(0);
+            expect(details.paradeValue).toBe(0);
+          });
+        },
+      );
+
+      // Check attribute points
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.attributePoints.start).toBe(
+        ATTRIBUTE_POINTS_FOR_CREATION,
+      );
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.attributePoints.available).toBe(0);
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.attributePoints.total).toBe(
+        ATTRIBUTE_POINTS_FOR_CREATION,
+      );
+
+      // Check adventure points
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.start).toBe(0);
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.available).toBe(0);
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.total).toBe(0);
+
+      // Check special abilities
+      expect(parsedBody.changes.new.character.characterSheet.specialAbilities).toStrictEqual([]);
+
+      // Check that base values are initialized correctly
+      Object.entries(parsedBody.changes.new.character.characterSheet.baseValues).forEach(
+        ([baseValueName, baseValue]) => {
+          expect(baseValue.byFormula).toBe(baseValue.current);
+          expect(baseValue.current).toBe(baseValue.start);
+          if (baseValuesUpdatableByLvlUp.includes(baseValueName as keyof BaseValues)) {
+            expect(baseValue.byLvlUp).toBe(0);
+          } else {
+            expect(baseValue.byLvlUp).toBeUndefined();
+          }
+        },
+      );
 
       // Generation points should be calculated according to the input advantages and disadvantages
       const generationPointsThroughDisadvantages = _case.request.body.disadvantages.reduce(
@@ -571,8 +607,6 @@ describe("Valid requests", () => {
       expect(parsedBody.changes.new.generationPoints.total).toBe(
         GENERATION_POINTS + generationPointsThroughDisadvantages,
       );
-
-      expect(parsedBody.changes.new.activatedSkills).toStrictEqual(_case.request.body.activatedSkills);
     });
   });
 });
