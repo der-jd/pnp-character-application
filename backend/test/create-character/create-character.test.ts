@@ -13,10 +13,11 @@ import {
   HOBBY_SKILL_BONUS,
   START_SKILLS,
   GENERATION_POINTS,
+  SkillCategory,
 } from "api-spec";
 import { _createCharacter } from "create-character";
 import { expectHttpError } from "../utils.js";
-import { getSkill, getSkillCategoryAndName } from "core";
+import { getSkill, getSkillCategoryAndName, COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "core";
 
 const characterCreationRequest: PostCharactersRequest = {
   generalInformation: {
@@ -517,12 +518,8 @@ describe("Valid requests", () => {
       );
       expect(returnedProfessionSkill.activated).toBe(true);
       expect(returnedHobbySkill.activated).toBe(true);
-      expect(returnedProfessionSkill.start).toBe(PROFESSION_SKILL_BONUS);
-      expect(returnedHobbySkill.start).toBe(HOBBY_SKILL_BONUS);
-      expect(returnedProfessionSkill.current).toBe(PROFESSION_SKILL_BONUS);
-      expect(returnedHobbySkill.current).toBe(HOBBY_SKILL_BONUS);
-      expect(returnedProfessionSkill.totalCost).toBe(0);
-      expect(returnedHobbySkill.totalCost).toBe(0);
+      expect(returnedProfessionSkill.mod).toBe(PROFESSION_SKILL_BONUS);
+      expect(returnedHobbySkill.mod).toBe(HOBBY_SKILL_BONUS);
 
       // Activated skills should be marked as activated
       const activatedSkills = _case.request.body.activatedSkills;
@@ -539,22 +536,23 @@ describe("Valid requests", () => {
         expect(skillDetails.activated).toBe(true);
       });
 
-      // Check that skills (except profession and hobby) are initialized correctly
+      // Check that skills are initialized correctly
+      const combatSkillCategory: SkillCategory = "combat";
       Object.entries(parsedBody.changes.new.character.characterSheet.skills).forEach(([category, skillsInCategory]) => {
-        Object.entries(skillsInCategory).forEach(([skillName, skillDetails]) => {
-          const skill = `${category}/${skillName}`;
-          if (skill !== profession.skill && skill !== hobby.skill) {
-            expect(skillDetails.start).toBe(0);
-            expect(skillDetails.current).toBe(0);
-            expect(skillDetails.totalCost).toBe(0);
+        Object.entries(skillsInCategory).forEach(([, skillDetails]) => {
+          expect(skillDetails.start).toBe(0);
+          expect(skillDetails.current).toBe(0);
+          expect(skillDetails.totalCost).toBe(0);
+          if (category === combatSkillCategory) {
+            expect(skillDetails.defaultCostCategory).toBe(COST_CATEGORY_COMBAT_SKILLS);
+          } else {
+            expect(skillDetails.defaultCostCategory).toBe(COST_CATEGORY_DEFAULT);
           }
         });
       });
 
       /**
        * TODO
-       * - check that default cost category for combat skill is CAT 3
-       * - check that default cost category for non combat skills is CAT 2
        * - check base values: byFormula === current === start
        * - check combat values: attackValue === paradeValue === 0; availablePoints === combatSkill value
        * - check attribute points

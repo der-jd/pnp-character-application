@@ -168,7 +168,7 @@ export class CharacterBuilder {
 
   private zeroBaseValue(baseValueName: keyof BaseValues): BaseValue {
     return {
-      start: 0,
+      start: 0, // TODO set correct start value based on current
       current: 0,
       byLvlUp: baseValuesUpdatableByLvlUp.includes(baseValueName) ? 0 : undefined,
       mod: 0,
@@ -470,8 +470,7 @@ export class CharacterBuilder {
         const { category: skillCategory, name: skillName } = getSkillCategoryAndName(skillString);
         const skill = getSkill(this.characterSheet.skills, skillCategory, skillName);
         skill.activated = true;
-        skill.start = bonus;
-        skill.current = bonus;
+        skill.mod += bonus;
       } catch (error) {
         throw logAndEnsureHttpError(error);
       }
