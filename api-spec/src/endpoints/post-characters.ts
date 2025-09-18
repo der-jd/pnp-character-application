@@ -6,6 +6,7 @@ import {
   advantagesSchema,
   disadvantagesSchema,
   generalInformationSchema,
+  combatSkillsSchema,
 } from "../character-schemas.js";
 import { userIdSchema, MIN_LEVEL } from "../general-schemas.js";
 import { activatedSkillsSchema, characterCreationSchema, recordSchema } from "../history-schemas.js";
@@ -19,6 +20,9 @@ export const ATTRIBUTE_POINTS_FOR_CREATION = 40;
 
 export const PROFESSION_SKILL_BONUS = 50;
 export const HOBBY_SKILL_BONUS = 25;
+
+export const MIN_INITIAL_COMBAT_SKILL_VALUE = 1;
+export const MAX_INITIAL_COMBAT_SKILL_VALUE = 30;
 
 export const attributeForCreationSchema = attributeSchema.omit({ start: true, mod: true, totalCost: true }).extend({
   current: z.number().int().min(MIN_ATTRIBUTE_VALUE_FOR_CREATION).max(MAX_ATTRIBUTE_VALUE_FOR_CREATION),
@@ -38,6 +42,19 @@ export const generalInformationForCreationSchema = generalInformationSchema.exte
 
 export type GeneralInformationForCreation = z.infer<typeof generalInformationForCreationSchema>;
 
+export const combatSkillsStartValuesSchema = z
+  .object(
+    Object.fromEntries(
+      Object.keys(combatSkillsSchema.shape).map((skill) => [
+        skill,
+        z.number().int().min(MIN_INITIAL_COMBAT_SKILL_VALUE).max(MAX_INITIAL_COMBAT_SKILL_VALUE),
+      ]),
+    ),
+  )
+  .strict();
+
+export type CombatSkillsStartValues = z.infer<typeof combatSkillsStartValuesSchema>;
+
 export const postCharactersRequestSchema = z
   .object({
     generalInformation: generalInformationForCreationSchema,
@@ -45,6 +62,7 @@ export const postCharactersRequestSchema = z
     advantages: advantagesSchema,
     disadvantages: disadvantagesSchema,
     activatedSkills: activatedSkillsSchema,
+    combatSkillsStartValues: combatSkillsStartValuesSchema,
   })
   .strict();
 

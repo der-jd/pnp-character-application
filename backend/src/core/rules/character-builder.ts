@@ -36,6 +36,7 @@ import {
   SkillName,
   SkillCategory,
   CombatSkillName,
+  CombatSkillsStartValues,
 } from "api-spec";
 import {
   COST_CATEGORY_COMBAT_SKILLS,
@@ -530,6 +531,15 @@ export class CharacterBuilder {
     }
     this.activatedSkills = activatedSkills;
     this.skillsActivated = true;
+    return this;
+  }
+
+  setCombatSkillsStartValues(combatSkills: CombatSkillsStartValues): this {
+    console.log("Set combat skills start values");
+    for (const [skillName, start] of Object.entries(combatSkills)) {
+      this.characterSheet.skills.combat[skillName as CombatSkillName].start += start;
+      this.characterSheet.skills.combat[skillName as CombatSkillName].current += start;
+    }
     return this;
   }
 

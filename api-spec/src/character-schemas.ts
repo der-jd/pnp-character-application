@@ -259,10 +259,10 @@ export type BaseValues = z.infer<typeof baseValuesSchema>;
 
 export const combatValuesSchema = z
   .object({
-    // TODO remove initial skill?!
     // availablePoints = handling + initial skill (to be rolled) + corresponding-skill.current + corresponding-skill.mod
     availablePoints: z.number().int().min(0).max(MAX_POINTS),
     handling: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
+    // TODO store effective attack and parade value
     // Effective total attack value = attackValue + (ranged)attackBaseValue.current + (ranged)attackBaseValue.mod
     attackValue: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
     // Effective total parade value (only for melee combat) = paradeValue + paradeBaseValue.current + paradeBaseValue.mod

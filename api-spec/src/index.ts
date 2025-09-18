@@ -253,4 +253,8 @@ export {
   CreateCharacterResponse,
   postCharactersHistoryRecordSchema,
   PostCharactersHistoryRecord,
+  combatSkillsStartValuesSchema,
+  CombatSkillsStartValues,
+  MIN_INITIAL_COMBAT_SKILL_VALUE,
+  MAX_INITIAL_COMBAT_SKILL_VALUE,
 } from "./endpoints/post-characters.js";

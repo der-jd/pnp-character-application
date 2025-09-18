@@ -18,6 +18,8 @@ import {
   BaseValues,
   ATTRIBUTE_POINTS_FOR_CREATION,
   CombatSkillName,
+  MAX_INITIAL_COMBAT_SKILL_VALUE,
+  MIN_INITIAL_COMBAT_SKILL_VALUE,
 } from "api-spec";
 import { _createCharacter } from "create-character";
 import { expectHttpError } from "../utils.js";
@@ -93,6 +95,23 @@ const characterCreationRequest: PostCharactersRequest = {
     "social/convincing",
     "nature/trapping",
   ],
+  combatSkillsStartValues: {
+    martialArts: 1,
+    barehanded: 1,
+    chainWeapons: 1,
+    daggers: 1,
+    slashingWeaponsSharp1h: 1,
+    slashingWeaponsBlunt1h: 1,
+    thrustingWeapons1h: 1,
+    slashingWeaponsSharp2h: 1,
+    slashingWeaponsBlunt2h: 1,
+    thrustingWeapons2h: 1,
+    missile: 1,
+    firearmSimple: 1,
+    firearmMedium: 1,
+    firearmComplex: 1,
+    heavyWeapons: 1,
+  },
 };
 
 describe("Invalid requests", () => {
@@ -447,6 +466,38 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 400,
     },
+    {
+      name: "Start value of combat skill is above maximum allowed",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          combatSkillsStartValues: {
+            ...characterCreationRequest.combatSkillsStartValues,
+            daggers: MAX_INITIAL_COMBAT_SKILL_VALUE + 1,
+          },
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Start value of combat skill is below minimum allowed",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          combatSkillsStartValues: {
+            ...characterCreationRequest.combatSkillsStartValues,
+            daggers: MIN_INITIAL_COMBAT_SKILL_VALUE - 1,
+          },
+        },
+      },
+      expectedStatusCode: 400,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {
@@ -550,13 +601,15 @@ describe("Valid requests", () => {
       // Check that skills are initialized correctly
       const combatSkillCategory: SkillCategory = "combat";
       Object.entries(parsedBody.changes.new.character.characterSheet.skills).forEach(([category, skillsInCategory]) => {
-        Object.entries(skillsInCategory).forEach(([, skillDetails]) => {
-          expect(skillDetails.start).toBe(0);
-          expect(skillDetails.current).toBe(0);
+        Object.entries(skillsInCategory).forEach(([name, skillDetails]) => {
           expect(skillDetails.totalCost).toBe(0);
           if (category === combatSkillCategory) {
+            expect(skillDetails.start).toBe(_case.request.body.combatSkillsStartValues[name]);
+            expect(skillDetails.current).toBe(_case.request.body.combatSkillsStartValues[name]);
             expect(skillDetails.defaultCostCategory).toBe(COST_CATEGORY_COMBAT_SKILLS);
           } else {
+            expect(skillDetails.start).toBe(0);
+            expect(skillDetails.current).toBe(0);
             expect(skillDetails.defaultCostCategory).toBe(COST_CATEGORY_DEFAULT);
           }
         });
