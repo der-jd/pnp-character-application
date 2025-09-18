@@ -188,8 +188,8 @@ export class CharacterBuilder {
     const calculatedBaseValues = calculateBaseValues(this.characterSheet.attributes);
 
     for (const baseValueName of Object.keys(baseValuesSchema.shape) as (keyof BaseValues)[]) {
-      this.characterSheet.baseValues[baseValueName].start = calculatedBaseValues[baseValueName];
-      this.characterSheet.baseValues[baseValueName].current = calculatedBaseValues[baseValueName];
+      this.characterSheet.baseValues[baseValueName].start += calculatedBaseValues[baseValueName];
+      this.characterSheet.baseValues[baseValueName].current += calculatedBaseValues[baseValueName];
       this.characterSheet.baseValues[baseValueName].byFormula = calculatedBaseValues[baseValueName];
     }
   }
@@ -446,9 +446,9 @@ export class CharacterBuilder {
     let spentAttributePoints = 0;
     for (const [attr, value] of Object.entries(attributes)) {
       const attribute = getAttribute(this.characterSheet.attributes, attr);
-      attribute.start = value.current;
-      attribute.current = value.current;
-      attribute.totalCost = value.current;
+      attribute.start += value.current;
+      attribute.current += value.current;
+      attribute.totalCost += value.current;
       spentAttributePoints += attribute.totalCost;
     }
     if (spentAttributePoints !== ATTRIBUTE_POINTS_FOR_CREATION) {
