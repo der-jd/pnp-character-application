@@ -3,8 +3,8 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { getCombatValues } from "core";
-import { Character, SkillName, updateCombatValuesResponseSchema } from "api-spec";
+import { getCombatSkillHandling, getCombatValues } from "core";
+import { Character, CombatSkillName, SkillName, updateCombatValuesResponseSchema } from "api-spec";
 import { expectHttpError } from "../utils.js";
 import { _updateCombatValues } from "update-combat-values";
 
@@ -390,6 +390,9 @@ describe("Valid requests", () => {
         oldSkillCombatValues.attackValue +
         (parsedBody.combatValues.new.paradeValue - oldSkillCombatValues.paradeValue);
       expect(diffAvailablePoints).toBe(diffCombatValues);
+
+      expect(parsedBody.combatValues.new.handling).toBe(getCombatSkillHandling(skillName as CombatSkillName));
+      expect(parsedBody.combatValues.new.handling).toBe(parsedBody.combatValues.old.handling);
 
       // Skill was not already at the target value
       if (JSON.stringify(parsedBody.combatValues.new) !== JSON.stringify(parsedBody.combatValues.old)) {

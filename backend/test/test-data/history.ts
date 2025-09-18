@@ -379,6 +379,7 @@ export const combatSkillChangedRecord: PatchSkillHistoryRecord = {
       },
       combatValues: {
         availablePoints: 26,
+        handling: 25,
         attackValue: 10,
         paradeValue: 8,
       },
@@ -394,6 +395,7 @@ export const combatSkillChangedRecord: PatchSkillHistoryRecord = {
       },
       combatValues: {
         availablePoints: 33,
+        handling: 25,
         attackValue: 10,
         paradeValue: 8,
       },
@@ -427,11 +429,13 @@ export const combatValuesChangedRecord: PatchCombatValuesHistoryRecord = {
   data: {
     old: {
       availablePoints: 58,
+      handling: 20,
       attackValue: 10,
       paradeValue: 8,
     },
     new: {
       availablePoints: 55,
+      handling: 20,
       attackValue: 12,
       paradeValue: 9,
     },

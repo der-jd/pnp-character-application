@@ -451,11 +451,13 @@ describe("Valid requests", () => {
           data: {
             old: {
               availablePoints: 10,
+              handling: 25,
               attackValue: 108,
               paradeValue: 78,
             },
             new: {
               availablePoints: 2,
+              handling: 25,
               attackValue: 110,
               paradeValue: 84,
             },

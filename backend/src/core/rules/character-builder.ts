@@ -35,8 +35,14 @@ import {
   SkillNameWithCategory,
   SkillName,
   SkillCategory,
+  CombatSkillName,
 } from "api-spec";
-import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT, MAX_COST_CATEGORY } from "./constants.js";
+import {
+  COST_CATEGORY_COMBAT_SKILLS,
+  COST_CATEGORY_DEFAULT,
+  MAX_COST_CATEGORY,
+  getCombatSkillHandling,
+} from "./constants.js";
 import {
   advantagesEnumToString,
   disadvantagesEnumToString,
@@ -140,23 +146,23 @@ export class CharacterBuilder {
       },
       combatValues: {
         melee: {
-          martialArts: this.zeroCombatValues(),
-          barehanded: this.zeroCombatValues(),
-          chainWeapons: this.zeroCombatValues(),
-          daggers: this.zeroCombatValues(),
-          slashingWeaponsSharp1h: this.zeroCombatValues(),
-          slashingWeaponsBlunt1h: this.zeroCombatValues(),
-          thrustingWeapons1h: this.zeroCombatValues(),
-          slashingWeaponsSharp2h: this.zeroCombatValues(),
-          slashingWeaponsBlunt2h: this.zeroCombatValues(),
-          thrustingWeapons2h: this.zeroCombatValues(),
+          martialArts: this.zeroCombatValues("martialArts"),
+          barehanded: this.zeroCombatValues("barehanded"),
+          chainWeapons: this.zeroCombatValues("chainWeapons"),
+          daggers: this.zeroCombatValues("daggers"),
+          slashingWeaponsSharp1h: this.zeroCombatValues("slashingWeaponsSharp1h"),
+          slashingWeaponsBlunt1h: this.zeroCombatValues("slashingWeaponsBlunt1h"),
+          thrustingWeapons1h: this.zeroCombatValues("thrustingWeapons1h"),
+          slashingWeaponsSharp2h: this.zeroCombatValues("slashingWeaponsSharp2h"),
+          slashingWeaponsBlunt2h: this.zeroCombatValues("slashingWeaponsBlunt2h"),
+          thrustingWeapons2h: this.zeroCombatValues("thrustingWeapons2h"),
         },
         ranged: {
-          missile: this.zeroCombatValues(),
-          firearmSimple: this.zeroCombatValues(),
-          firearmMedium: this.zeroCombatValues(),
-          firearmComplex: this.zeroCombatValues(),
-          heavyWeapons: this.zeroCombatValues(),
+          missile: this.zeroCombatValues("missile"),
+          firearmSimple: this.zeroCombatValues("firearmSimple"),
+          firearmMedium: this.zeroCombatValues("firearmMedium"),
+          firearmComplex: this.zeroCombatValues("firearmComplex"),
+          heavyWeapons: this.zeroCombatValues("heavyWeapons"),
         },
       },
     };
@@ -197,9 +203,10 @@ export class CharacterBuilder {
     };
   }
 
-  private zeroCombatValues(): CombatValues {
+  private zeroCombatValues(name: CombatSkillName): CombatValues {
     return {
-      availablePoints: 0,
+      availablePoints: getCombatSkillHandling(name),
+      handling: getCombatSkillHandling(name),
       attackValue: 0,
       paradeValue: 0,
     };

@@ -812,51 +812,61 @@ export const fakeCharacter: Character = {
       melee: {
         martialArts: {
           availablePoints: 19,
+          handling: 25,
           attackValue: 6,
           paradeValue: 6,
         },
         barehanded: {
           availablePoints: 82,
+          handling: 25,
           attackValue: 10,
           paradeValue: 8,
         },
         chainWeapons: {
           availablePoints: 26,
+          handling: 15,
           attackValue: 10,
           paradeValue: 8,
         },
         daggers: {
           availablePoints: 26,
+          handling: 25,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeaponsSharp1h: {
           availablePoints: 10,
+          handling: 25,
           attackValue: 108,
           paradeValue: 78,
         },
         slashingWeaponsBlunt1h: {
           availablePoints: 10,
+          handling: 25,
           attackValue: 108,
           paradeValue: 78,
         },
         thrustingWeapons1h: {
           availablePoints: 58,
+          handling: 20,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeaponsSharp2h: {
           availablePoints: 83,
+          handling: 15,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeaponsBlunt2h: {
           availablePoints: 26,
+          handling: 15,
           attackValue: 10,
           paradeValue: 8,
         },
         thrustingWeapons2h: {
           availablePoints: 57,
+          handling: 15,
           attackValue: 10,
           paradeValue: 8,
         },
@@ -864,26 +874,31 @@ export const fakeCharacter: Character = {
       ranged: {
         firearmSimple: {
           availablePoints: 18,
+          handling: 30,
           attackValue: 6,
           paradeValue: 0,
         },
         firearmMedium: {
           availablePoints: 22,
+          handling: 20,
           attackValue: 10,
           paradeValue: 0,
         },
         firearmComplex: {
           availablePoints: 22,
+          handling: 10,
           attackValue: 10,
           paradeValue: 0,
         },
         heavyWeapons: {
           availablePoints: 22,
+          handling: 5,
           attackValue: 10,
           paradeValue: 0,
         },
         missile: {
           availablePoints: 15,
+          handling: 15,
           attackValue: 5,
           paradeValue: 0,
         },
@@ -1704,51 +1719,61 @@ export const fakeCharacter2: Character = {
       melee: {
         martialArts: {
           availablePoints: 19,
+          handling: 25,
           attackValue: 6,
           paradeValue: 6,
         },
         barehanded: {
           availablePoints: 26,
+          handling: 25,
           attackValue: 10,
           paradeValue: 8,
         },
         chainWeapons: {
           availablePoints: 26,
+          handling: 15,
           attackValue: 10,
           paradeValue: 8,
         },
         daggers: {
           availablePoints: 26,
+          handling: 25,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeaponsSharp1h: {
           availablePoints: 0,
+          handling: 25,
           attackValue: 108,
           paradeValue: 78,
         },
         slashingWeaponsBlunt1h: {
           availablePoints: 0,
+          handling: 25,
           attackValue: 108,
           paradeValue: 78,
         },
         thrustingWeapons1h: {
           availablePoints: 26,
+          handling: 20,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeaponsSharp2h: {
           availablePoints: 26,
+          handling: 15,
           attackValue: 10,
           paradeValue: 8,
         },
         slashingWeaponsBlunt2h: {
           availablePoints: 26,
+          handling: 15,
           attackValue: 10,
           paradeValue: 8,
         },
         thrustingWeapons2h: {
           availablePoints: 26,
+          handling: 15,
           attackValue: 10,
           paradeValue: 8,
         },
@@ -1756,26 +1781,31 @@ export const fakeCharacter2: Character = {
       ranged: {
         firearmSimple: {
           availablePoints: 18,
+          handling: 30,
           attackValue: 6,
           paradeValue: 0,
         },
         firearmMedium: {
           availablePoints: 22,
+          handling: 20,
           attackValue: 10,
           paradeValue: 0,
         },
         firearmComplex: {
           availablePoints: 22,
+          handling: 10,
           attackValue: 10,
           paradeValue: 0,
         },
         heavyWeapons: {
           availablePoints: 22,
+          handling: 5,
           attackValue: 10,
           paradeValue: 0,
         },
         missile: {
           availablePoints: 15,
+          handling: 15,
           attackValue: 5,
           paradeValue: 0,
         },

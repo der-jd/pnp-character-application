@@ -17,10 +17,17 @@ import {
   baseValuesUpdatableByLvlUp,
   BaseValues,
   ATTRIBUTE_POINTS_FOR_CREATION,
+  CombatSkillName,
 } from "api-spec";
 import { _createCharacter } from "create-character";
 import { expectHttpError } from "../utils.js";
-import { getSkill, getSkillCategoryAndName, COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "core";
+import {
+  getSkill,
+  getSkillCategoryAndName,
+  COST_CATEGORY_COMBAT_SKILLS,
+  COST_CATEGORY_DEFAULT,
+  getCombatSkillHandling,
+} from "core";
 
 const characterCreationRequest: PostCharactersRequest = {
   generalInformation: {
@@ -558,8 +565,9 @@ describe("Valid requests", () => {
       // Check combat values
       Object.entries(parsedBody.changes.new.character.characterSheet.combatValues).forEach(
         ([, combatValuesInCategory]) => {
-          Object.entries(combatValuesInCategory).forEach(([, details]) => {
-            expect(details.availablePoints).toBe(0); // TODO must be handling + initial skill (to be rolled) + corresponding-skill.current + corresponding-skill.mod
+          Object.entries(combatValuesInCategory).forEach(([name, details]) => {
+            expect(details.availablePoints).toBe(getCombatSkillHandling(name as CombatSkillName)); // TODO must be handling + initial skill (to be rolled) + corresponding-skill.current + corresponding-skill.mod
+            expect(details.handling).toBe(getCombatSkillHandling(name as CombatSkillName));
             expect(details.attackValue).toBe(0);
             expect(details.paradeValue).toBe(0);
           });
