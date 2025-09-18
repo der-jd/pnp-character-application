@@ -494,15 +494,17 @@ describe("Valid requests", () => {
       );
 
       // Profession and Hobby skills should be modified
-      const professionSkill = _case.request.body.generalInformation.profession.skill;
-      const hobbySkill = _case.request.body.generalInformation.hobby.skill;
+      const profession = _case.request.body.generalInformation.profession;
+      const hobby = _case.request.body.generalInformation.hobby;
+      expect(parsedBody.changes.new.character.characterSheet.generalInformation.profession.name).toBe(profession.name);
+      expect(parsedBody.changes.new.character.characterSheet.generalInformation.hobby.name).toBe(hobby.name);
       expect(parsedBody.changes.new.character.characterSheet.generalInformation.profession.skill).toStrictEqual(
-        professionSkill,
+        profession.skill,
       );
-      expect(parsedBody.changes.new.character.characterSheet.generalInformation.hobby.skill).toStrictEqual(hobbySkill);
+      expect(parsedBody.changes.new.character.characterSheet.generalInformation.hobby.skill).toStrictEqual(hobby.skill);
 
-      const { category: professionCategory, name: professionSkillName } = getSkillCategoryAndName(professionSkill);
-      const { category: hobbyCategory, name: hobbyNameSkillName } = getSkillCategoryAndName(hobbySkill);
+      const { category: professionCategory, name: professionSkillName } = getSkillCategoryAndName(profession.skill);
+      const { category: hobbyCategory, name: hobbySkillName } = getSkillCategoryAndName(hobby.skill);
       const returnedProfessionSkill = getSkill(
         parsedBody.changes.new.character.characterSheet.skills,
         professionCategory,
@@ -511,7 +513,7 @@ describe("Valid requests", () => {
       const returnedHobbySkill = getSkill(
         parsedBody.changes.new.character.characterSheet.skills,
         hobbyCategory,
-        hobbyNameSkillName,
+        hobbySkillName,
       );
       expect(returnedProfessionSkill.activated).toBe(true);
       expect(returnedHobbySkill.activated).toBe(true);
@@ -519,6 +521,8 @@ describe("Valid requests", () => {
       expect(returnedHobbySkill.start).toBe(HOBBY_SKILL_BONUS);
       expect(returnedProfessionSkill.current).toBe(PROFESSION_SKILL_BONUS);
       expect(returnedHobbySkill.current).toBe(HOBBY_SKILL_BONUS);
+      expect(returnedProfessionSkill.totalCost).toBe(0);
+      expect(returnedHobbySkill.totalCost).toBe(0);
 
       // Activated skills should be marked as activated
       const activatedSkills = _case.request.body.activatedSkills;
@@ -535,8 +539,28 @@ describe("Valid requests", () => {
         expect(skillDetails.activated).toBe(true);
       });
 
-      // TODO check that other skills, attributes, base values, combat values, etc. are zero or set correctly?!
-      // TODO check effects of advantages and disadvantages?!
+      // Check that skills (except profession and hobby) are initialized correctly
+      Object.entries(parsedBody.changes.new.character.characterSheet.skills).forEach(([category, skillsInCategory]) => {
+        Object.entries(skillsInCategory).forEach(([skillName, skillDetails]) => {
+          const skill = `${category}/${skillName}`;
+          if (skill !== profession.skill && skill !== hobby.skill) {
+            expect(skillDetails.start).toBe(0);
+            expect(skillDetails.current).toBe(0);
+            expect(skillDetails.totalCost).toBe(0);
+          }
+        });
+      });
+
+      /**
+       * TODO
+       * - check that default cost category for combat skill is CAT 3
+       * - check that default cost category for non combat skills is CAT 2
+       * - check base values: byFormula === current === start
+       * - check combat values: attackValue === paradeValue === 0; availablePoints === combatSkill value
+       * - check attribute points
+       * - check adventure points (all 0)
+       * - check special abilities (empty)
+       */
 
       // Generation points should be calculated according to the input advantages and disadvantages
       const generationPointsThroughDisadvantages = _case.request.body.disadvantages.reduce(
