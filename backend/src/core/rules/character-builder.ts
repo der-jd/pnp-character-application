@@ -174,11 +174,11 @@ export class CharacterBuilder {
 
   private zeroBaseValue(baseValueName: keyof BaseValues): BaseValue {
     return {
-      start: 0, // TODO set correct start value based on current
+      // The values are updated again later when 'byFormula' is set
+      start: 0,
       current: 0,
       byLvlUp: baseValuesUpdatableByLvlUp.includes(baseValueName) ? 0 : undefined,
       mod: 0,
-      // The value for 'byFormula' is set later
     };
   }
 
@@ -188,6 +188,8 @@ export class CharacterBuilder {
     const calculatedBaseValues = calculateBaseValues(this.characterSheet.attributes);
 
     for (const baseValueName of Object.keys(baseValuesSchema.shape) as (keyof BaseValues)[]) {
+      this.characterSheet.baseValues[baseValueName].start = calculatedBaseValues[baseValueName];
+      this.characterSheet.baseValues[baseValueName].current = calculatedBaseValues[baseValueName];
       this.characterSheet.baseValues[baseValueName].byFormula = calculatedBaseValues[baseValueName];
     }
   }
@@ -460,7 +462,6 @@ export class CharacterBuilder {
      * TODO
      * - extract function to calculate base values from update-attribute lambda
      * - use that function here and in update-attribute lambda
-     * - currently, the setBaseValuesByFormula() functions is also wrong because it ignores the current value
      */
     this.setBaseValuesByFormula();
 
