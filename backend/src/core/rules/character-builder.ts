@@ -484,8 +484,6 @@ export class CharacterBuilder {
   setAttributes(attributes: AttributesForCreation): this {
     console.log("Set attributes");
 
-    // TODO extract logic for change attributes (update attribute endpoint, character creation) to separate function so that effect on attribute and base values is in one place?!
-
     let spentAttributePoints = 0;
     for (const [attr, value] of Object.entries(attributes)) {
       const attribute = getAttribute(this.characterSheet.attributes, attr);
@@ -504,7 +502,7 @@ export class CharacterBuilder {
     /**
      * TODO
      * - extract function to calculate base values from update-attribute lambda
-     * - use that function here and in update-attribute lambda
+     * - use that function here, in update-attribute lambda and update base values lambda
      */
     this.setBaseValuesByFormula();
 
