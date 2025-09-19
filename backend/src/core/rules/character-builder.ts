@@ -59,6 +59,7 @@ export class CharacterBuilder {
   private generalInfoSet = false;
   private dis_advantagesSet = false;
   private skillsActivated = false;
+  private combatSkillsStartValuesSet = false;
 
   private characterSheet: CharacterSheet;
   private userId?: string;
@@ -536,10 +537,12 @@ export class CharacterBuilder {
 
   setCombatSkillsStartValues(combatSkills: CombatSkillsStartValues): this {
     console.log("Set combat skills start values");
+
     for (const [skillName, start] of Object.entries(combatSkills)) {
       this.characterSheet.skills.combat[skillName as CombatSkillName].start += start;
       this.characterSheet.skills.combat[skillName as CombatSkillName].current += start;
     }
+    this.combatSkillsStartValuesSet = true;
     return this;
   }
 
@@ -555,7 +558,8 @@ export class CharacterBuilder {
       !this.generalInfoSet ||
       !this.dis_advantagesSet ||
       !this.skillsActivated ||
-      !this.userId
+      !this.userId ||
+      !this.combatSkillsStartValuesSet
     ) {
       throw new HttpError(400, "All steps must be completed before building the character.");
     }
