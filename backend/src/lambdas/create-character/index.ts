@@ -35,7 +35,7 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
     const characterCreation = new CharacterBuilder()
       .setUserId(params.userId)
       .setGeneralInformation(params.body.generalInformation)
-      .setDisAdvantages(params.body.advantages, params.body.disadvantages)
+      .setAdvantagesAndDisadvantages(params.body.advantages, params.body.disadvantages)
       .setAttributes(params.body.attributes)
       .activateSkills(params.body.activatedSkills)
       .setCombatSkillsStartValues(params.body.combatSkillsStartValues)

@@ -59,7 +59,7 @@ import { calculateCombatValues } from "./combat-values.js";
 export class CharacterBuilder {
   private attributesSet = false;
   private generalInfoSet = false;
-  private dis_advantagesSet = false;
+  private advantagesAndDisadvantagesSet = false;
   private skillsActivated = false;
   private combatSkillsStartValuesSet = false;
 
@@ -534,7 +534,7 @@ export class CharacterBuilder {
     return this;
   }
 
-  setDisAdvantages(advantages: Advantages, disadvantages: Disadvantages): this {
+  setAdvantagesAndDisadvantages(advantages: Advantages, disadvantages: Disadvantages): this {
     this.setDisadvantages(disadvantages);
 
     this.totalGenerationPoints = GENERATION_POINTS + this.generationPointsThroughDisadvantages;
@@ -549,7 +549,7 @@ export class CharacterBuilder {
       );
     }
 
-    this.dis_advantagesSet = true;
+    this.advantagesAndDisadvantagesSet = true;
 
     return this;
   }
@@ -596,7 +596,7 @@ export class CharacterBuilder {
     if (
       !this.attributesSet ||
       !this.generalInfoSet ||
-      !this.dis_advantagesSet ||
+      !this.advantagesAndDisadvantagesSet ||
       !this.skillsActivated ||
       !this.userId ||
       !this.combatSkillsStartValuesSet
