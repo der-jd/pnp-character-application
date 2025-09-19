@@ -200,7 +200,7 @@ export class CharacterBuilder {
 
   private zeroSkill(skill: SkillNameWithCategory): Skill {
     return {
-      activated: START_SKILLS.includes(skill) ? true : false,
+      activated: START_SKILLS.includes(skill),
       start: 0,
       current: 0,
       mod: 0,
