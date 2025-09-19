@@ -38,6 +38,7 @@ export {
   getCombatValues,
   getCombatCategory,
   getSkillCategoryAndName,
+  isCombatSkill,
 } from "./character-utils.js";
 export { parseRecordType } from "./history-utils.js";
 export { CharacterBuilder } from "./rules/character-builder.js";
@@ -48,3 +49,4 @@ export {
   MAX_COST_CATEGORY,
   getCombatSkillHandling,
 } from "./rules/constants.js";
+export { calculateCombatValues, combatValuesChanged } from "./rules/combat-values.js";

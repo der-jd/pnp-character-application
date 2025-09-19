@@ -15,8 +15,8 @@ export type PatchCombatValuesPathParams = z.infer<typeof patchCombatValuesPathPa
 
 export const patchCombatValuesRequestSchema = z
   .object({
-    attackValue: initialIncreasedSchema,
-    paradeValue: initialIncreasedSchema,
+    skilledAttackValue: initialIncreasedSchema,
+    skilledParadeValue: initialIncreasedSchema,
   })
   .strict();
 

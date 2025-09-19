@@ -21,11 +21,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 3,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 8,
             increasedPoints: 2,
           },
@@ -46,11 +46,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 3,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 8,
             increasedPoints: 2,
           },
@@ -71,11 +71,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 3,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 8,
             increasedPoints: 2,
           },
@@ -94,11 +94,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 3,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 8,
             increasedPoints: 2,
           },
@@ -117,11 +117,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 5,
             increasedPoints: 2,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 3,
             increasedPoints: 1,
           },
@@ -140,11 +140,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 50,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 8,
             increasedPoints: 50,
           },
@@ -163,11 +163,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 0,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 0,
             increasedPoints: 2,
           },
@@ -186,11 +186,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 3,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 8,
             increasedPoints: 2,
           },
@@ -209,11 +209,11 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 3,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 8,
             increasedPoints: 2,
           },
@@ -245,12 +245,12 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
-            initialValue: 7,
+          skilledAttackValue: {
+            initialValue: 10,
             increasedPoints: 3,
           },
-          paradeValue: {
-            initialValue: 6,
+          skilledParadeValue: {
+            initialValue: 8,
             increasedPoints: 2,
           },
         },
@@ -268,11 +268,11 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 5,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 8,
             increasedPoints: 0,
           },
@@ -291,11 +291,11 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 0,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 8,
             increasedPoints: 4,
           },
@@ -314,11 +314,11 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 5,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 8,
             increasedPoints: 5,
           },
@@ -337,11 +337,11 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          attackValue: {
+          skilledAttackValue: {
             initialValue: 10,
             increasedPoints: 10,
           },
-          paradeValue: {
+          skilledParadeValue: {
             initialValue: 0,
             increasedPoints: 0,
           },
@@ -376,12 +376,39 @@ describe("Valid requests", () => {
       );
       expect(parsedBody.combatValues.old).toStrictEqual(oldSkillCombatValues);
 
-      expect(parsedBody.combatValues.new.attackValue).toBe(
-        _case.request.body.attackValue.initialValue + _case.request.body.attackValue.increasedPoints,
+      expect(parsedBody.combatValues.new.skilledAttackValue).toBe(
+        _case.request.body.skilledAttackValue.initialValue + _case.request.body.skilledAttackValue.increasedPoints,
       );
-      expect(parsedBody.combatValues.new.paradeValue).toBe(
-        _case.request.body.paradeValue.initialValue + _case.request.body.paradeValue.increasedPoints,
-      );
+
+      const rangedCombatCategory: keyof Character["characterSheet"]["combatValues"] = "ranged";
+      if (combatCategory === rangedCombatCategory) {
+        const rangedAttackBaseValue =
+          fakeCharacterResponse.Item.characterSheet.baseValues.rangedAttackBaseValue.current +
+          fakeCharacterResponse.Item.characterSheet.baseValues.rangedAttackBaseValue.mod;
+        expect(parsedBody.combatValues.new.attackValue).toBe(
+          parsedBody.combatValues.new.skilledAttackValue + rangedAttackBaseValue,
+        );
+
+        expect(parsedBody.combatValues.new.skilledParadeValue).toBe(0);
+        expect(parsedBody.combatValues.new.paradeValue).toBe(0);
+      } else {
+        const attackBaseValue =
+          fakeCharacterResponse.Item.characterSheet.baseValues.attackBaseValue.current +
+          fakeCharacterResponse.Item.characterSheet.baseValues.attackBaseValue.mod;
+        expect(parsedBody.combatValues.new.attackValue).toBe(
+          parsedBody.combatValues.new.skilledAttackValue + attackBaseValue,
+        );
+
+        expect(parsedBody.combatValues.new.skilledParadeValue).toBe(
+          _case.request.body.skilledParadeValue.initialValue + _case.request.body.skilledParadeValue.increasedPoints,
+        );
+        const paradeBaseValue =
+          fakeCharacterResponse.Item.characterSheet.baseValues.paradeBaseValue.current +
+          fakeCharacterResponse.Item.characterSheet.baseValues.paradeBaseValue.mod;
+        expect(parsedBody.combatValues.new.paradeValue).toBe(
+          parsedBody.combatValues.new.skilledParadeValue + paradeBaseValue,
+        );
+      }
 
       const oldAvailablePoints = oldSkillCombatValues.availablePoints;
       const diffAvailablePoints = oldAvailablePoints - parsedBody.combatValues.new.availablePoints;

@@ -48,11 +48,13 @@ import {
   advantagesEnumToString,
   disadvantagesEnumToString,
   getAttribute,
+  getCombatCategory,
   getSkill,
   getSkillCategoryAndName,
 } from "../character-utils.js";
 import { HttpError, logAndEnsureHttpError } from "../errors.js";
 import { calculateBaseValues } from "./base-value-formulas.js";
+import { calculateCombatValues } from "./combat-values.js";
 
 export class CharacterBuilder {
   private attributesSet = false;
@@ -212,8 +214,47 @@ export class CharacterBuilder {
       availablePoints: getCombatSkillHandling(name),
       handling: getCombatSkillHandling(name),
       attackValue: 0,
+      skilledAttackValue: 0,
       paradeValue: 0,
+      skilledParadeValue: 0,
     };
+  }
+
+  private setCombatValues(): void {
+    console.log("Set combat values for combat skills");
+
+    const rangedCombatCategory: keyof CharacterSheet["combatValues"] = "ranged";
+    for (const combatSkillName of Object.keys(this.characterSheet.skills.combat) as SkillName[]) {
+      const combatCategory = getCombatCategory(combatSkillName);
+
+      if (combatCategory === rangedCombatCategory) {
+        this.characterSheet.combatValues.ranged[combatSkillName as keyof CharacterSheet["combatValues"]["ranged"]] =
+          calculateCombatValues(
+            combatSkillName,
+            this.zeroSkill(`combat/${combatSkillName}` as SkillNameWithCategory), // Old skill not existing in character creation
+            this.characterSheet.skills.combat[combatSkillName as CombatSkillName],
+            this.characterSheet.baseValues.attackBaseValue,
+            this.characterSheet.baseValues.paradeBaseValue,
+            this.characterSheet.baseValues.rangedAttackBaseValue,
+            this.characterSheet.combatValues.ranged[
+              combatSkillName as keyof CharacterSheet["combatValues"]["ranged"]
+            ] as CombatValues,
+          );
+      } else {
+        this.characterSheet.combatValues.melee[combatSkillName as keyof CharacterSheet["combatValues"]["melee"]] =
+          calculateCombatValues(
+            combatSkillName,
+            this.zeroSkill(`combat/${combatSkillName}` as SkillNameWithCategory), // Old skill not existing in character creation
+            this.characterSheet.skills.combat[combatSkillName as CombatSkillName],
+            this.characterSheet.baseValues.attackBaseValue,
+            this.characterSheet.baseValues.paradeBaseValue,
+            this.characterSheet.baseValues.rangedAttackBaseValue,
+            this.characterSheet.combatValues.melee[
+              combatSkillName as keyof CharacterSheet["combatValues"]["melee"]
+            ] as CombatValues,
+          );
+      }
+    }
   }
 
   private createSkillObjectsFromSkillNames(skillCategory: SkillCategory, skillNames: SkillName[]) {
@@ -542,6 +583,7 @@ export class CharacterBuilder {
       this.characterSheet.skills.combat[skillName as CombatSkillName].start += start;
       this.characterSheet.skills.combat[skillName as CombatSkillName].current += start;
     }
+
     this.combatSkillsStartValuesSet = true;
     return this;
   }
@@ -563,6 +605,14 @@ export class CharacterBuilder {
     ) {
       throw new HttpError(400, "All steps must be completed before building the character.");
     }
+
+    /**
+     * Combat values are affected by different previous steps as
+     * attributes, profession/hobby, combat skills, etc.
+     * Therefore, they are set last.
+     */
+    this.setCombatValues();
+
     return {
       character: {
         userId: this.userId,

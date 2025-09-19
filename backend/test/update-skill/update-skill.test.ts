@@ -3,9 +3,9 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { getCombatCategory, getCombatValues, getSkill } from "core";
+import { getCombatCategory, getCombatValues, getSkill, combatValuesChanged, isCombatSkill } from "core";
 import { Character, SkillName, updateSkillResponseSchema } from "api-spec";
-import { _updateSkill, availableCombatPointsChanged } from "update-skill";
+import { _updateSkill } from "update-skill";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
@@ -821,7 +821,12 @@ describe("Valid requests", () => {
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
 
       // Skill and combat values are updated
-      if (availableCombatPointsChanged(parsedBody.changes.old.skill, parsedBody.changes.new.skill, skillCategory)) {
+      if (
+        isCombatSkill(skillCategory) &&
+        parsedBody.changes.old.combatValues &&
+        parsedBody.changes.new.combatValues &&
+        combatValuesChanged(parsedBody.changes.old.combatValues, parsedBody.changes.new.combatValues)
+      ) {
         expect(calls.length).toBe(2);
 
         expect(parsedBody.changes.old.combatValues).toBeDefined();
@@ -836,14 +841,17 @@ describe("Valid requests", () => {
           skillName,
         );
         expect(parsedBody.changes.old.combatValues).toStrictEqual(skillCombatValuesOld);
-        expect(parsedBody.changes.new.combatValues?.attackValue).toBe(skillCombatValuesOld.attackValue);
-        expect(parsedBody.changes.new.combatValues?.paradeValue).toBe(skillCombatValuesOld.paradeValue);
+        expect(parsedBody.changes.new.combatValues.handling).toBe(skillCombatValuesOld.handling);
+        expect(parsedBody.changes.new.combatValues.attackValue).toBe(skillCombatValuesOld.attackValue);
+        expect(parsedBody.changes.new.combatValues.skilledAttackValue).toBe(skillCombatValuesOld.skilledAttackValue);
+        expect(parsedBody.changes.new.combatValues.paradeValue).toBe(skillCombatValuesOld.paradeValue);
+        expect(parsedBody.changes.new.combatValues.skilledParadeValue).toBe(skillCombatValuesOld.skilledParadeValue);
 
         const availableCombatPointsNew =
           skillCombatValuesOld.availablePoints +
           (parsedBody.changes.new.skill.current - parsedBody.changes.old.skill.current) +
           (parsedBody.changes.new.skill.mod - parsedBody.changes.old.skill.mod);
-        expect(parsedBody.changes.new.combatValues?.availablePoints).toBe(availableCombatPointsNew);
+        expect(parsedBody.changes.new.combatValues.availablePoints).toBe(availableCombatPointsNew);
       }
       // Only skill is updated
       else {
