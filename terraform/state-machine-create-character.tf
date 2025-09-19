@@ -75,7 +75,7 @@ resource "aws_sfn_state_machine" "create_character_state_machine" {
               "adventurePoints" = null,
               "attributePoints" = null
             },
-            "comment" = "{% $parse($states.input.body).characterName %}"
+            "comment" = null
           }
         },
         Assign = {
