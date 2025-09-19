@@ -574,8 +574,8 @@ export class CharacterBuilder {
     return this;
   }
 
-  setCombatSkillsStartValues(combatSkills: CombatSkillsStartValues): this {
-    console.log("Set combat skills start values");
+  setStartValuesOfCombatSkills(combatSkills: CombatSkillsStartValues): this {
+    console.log("Set start values of combat skills");
 
     for (const [skillName, start] of Object.entries(combatSkills)) {
       this.characterSheet.skills.combat[skillName as CombatSkillName].start += start;
