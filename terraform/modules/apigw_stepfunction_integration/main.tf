@@ -71,7 +71,6 @@ resource "aws_api_gateway_integration" "step_function" {
   passthrough_behavior    = "WHEN_NO_TEMPLATES"
   credentials             = var.credentials
   request_parameters      = { for k, v in var.method_request_parameters : "integration.request.${replace(k, "method.request.", "")}" => k }
-  // TODO add request body model for method request. Optional?!
   request_templates = {
     "application/json" = <<EOF
     ## Template taken from https://github.com/aws/aws-cdk/blob/v1-main/packages/@aws-cdk/aws-apigateway/lib/integrations/stepfunctions.vtl
