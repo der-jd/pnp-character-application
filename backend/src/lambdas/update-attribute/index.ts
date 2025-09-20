@@ -11,6 +11,8 @@ import {
   CharacterSheet,
   InitialNew,
   InitialIncreased,
+  SkillName,
+  BaseValues,
 } from "api-spec";
 import {
   Request,
@@ -25,6 +27,9 @@ import {
   logZodError,
   getAttribute,
   calculateBaseValues,
+  calculateCombatValues,
+  combatValuesChanged,
+  updateCombatValues,
 } from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -80,14 +85,14 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
 
     console.log("Calculate base values");
     const baseValuesOld = characterSheet.baseValues;
-    let baseValuesNew: CharacterSheet["baseValues"] | undefined;
+    let baseValuesNew: BaseValues | undefined;
     const attributesNew = structuredClone(characterSheet.attributes);
     attributesNew[params.pathParams["attribute-name"] as keyof CharacterSheet["attributes"]] = attribute;
     const newBaseValuesByFormula = calculateBaseValues(attributesNew);
     const updates: Promise<void>[] = [];
-    const changedBaseValues: Partial<CharacterSheet["baseValues"]> = {};
+    const changedBaseValues: Partial<BaseValues> = {};
 
-    for (const baseValueName of Object.keys(baseValuesOld) as (keyof CharacterSheet["baseValues"])[]) {
+    for (const baseValueName of Object.keys(baseValuesOld) as (keyof BaseValues)[]) {
       const oldBaseValue = baseValuesOld[baseValueName];
       const newFormulaValue = newBaseValuesByFormula[baseValueName];
 
@@ -114,12 +119,30 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
       }
     }
 
-    if (updates.length > 0) {
+    const baseValuesChanged = Object.keys(changedBaseValues).length > 0;
+
+    if (baseValuesChanged) {
       await Promise.all(updates);
     } else {
       console.log("No base values changed, nothing to update.");
     }
 
+    const combatBaseValueChanged: boolean =
+      (changedBaseValues.attackBaseValue !== undefined ||
+        changedBaseValues.paradeBaseValue !== undefined ||
+        changedBaseValues.rangedAttackBaseValue !== undefined) &&
+      baseValuesNew !== undefined;
+    let changedCombatValues: Partial<CharacterSheet["combatValues"]> = {};
+    if (combatBaseValueChanged) {
+      changedCombatValues = await recalculateAndUpdateCombatValues(
+        params.userId,
+        params.pathParams["character-id"],
+        characterSheet.combatValues,
+        baseValuesNew!,
+      );
+    }
+
+    // TODO update response body
     const responseBody: UpdateAttributeResponse = {
       characterId: params.pathParams["character-id"],
       userId: params.userId,
@@ -127,14 +150,15 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
       changes: {
         old: {
           attribute: attributeOld,
-          baseValues:
-            Object.keys(changedBaseValues).length > 0
-              ? Object.fromEntries(Object.entries(baseValuesOld).filter(([k]) => k in changedBaseValues))
-              : undefined,
+          baseValues: baseValuesChanged
+            ? Object.fromEntries(Object.entries(baseValuesOld).filter(([k]) => k in changedBaseValues))
+            : undefined,
+          combatValues: combatBaseValueChanged ? characterSheet.combatValues : undefined,
         },
         new: {
           attribute: attribute,
-          baseValues: Object.keys(changedBaseValues).length > 0 ? changedBaseValues : undefined,
+          baseValues: baseValuesChanged ? changedBaseValues : undefined,
+          combatValues: combatBaseValueChanged ? changedCombatValues : undefined,
         },
       },
       attributePoints: {
@@ -173,6 +197,38 @@ function validateRequest(request: Request): Parameters {
     // Rethrow other errors
     throw error;
   }
+}
+
+async function recalculateAndUpdateCombatValues(
+  userId: string,
+  characterId: string,
+  combatValues: CharacterSheet["combatValues"],
+  baseValues: BaseValues,
+): Promise<Partial<CharacterSheet["combatValues"]>> {
+  console.log("Recalculate and update combat values");
+  const combatValueUpdates: Promise<void>[] = [];
+  const changedCombatValues: Partial<CharacterSheet["combatValues"]> = {};
+
+  const combatCategories = Object.keys(combatValues) as (keyof CharacterSheet["combatValues"])[];
+  for (const category of combatCategories) {
+    for (const [skillName, oldCombatValues] of Object.entries(combatValues[category])) {
+      const newCombatValues = calculateCombatValues(skillName as SkillName, null, null, baseValues, oldCombatValues);
+
+      if (combatValuesChanged(oldCombatValues, newCombatValues)) {
+        console.log(`Combat values for ${category}/${skillName} changed. Persisting...`);
+        combatValueUpdates.push(updateCombatValues(userId, characterId, category, skillName, newCombatValues));
+        changedCombatValues[category][skillName] = newCombatValues;
+      }
+    }
+  }
+
+  if (combatValueUpdates.length > 0) {
+    await Promise.all(combatValueUpdates);
+  } else {
+    console.log("No combat values changed, nothing to update.");
+  }
+
+  return changedCombatValues;
 }
 
 function updateStartValue(attribute: Attribute, startValue: InitialNew): Attribute {

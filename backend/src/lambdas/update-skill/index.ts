@@ -123,9 +123,7 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
         skillName,
         skillOld,
         skill,
-        characterSheet.baseValues.attackBaseValue,
-        characterSheet.baseValues.paradeBaseValue,
-        characterSheet.baseValues.rangedAttackBaseValue,
+        characterSheet.baseValues,
         skillCombatValuesOld,
       );
 

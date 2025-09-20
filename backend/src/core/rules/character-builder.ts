@@ -233,9 +233,7 @@ export class CharacterBuilder {
             combatSkillName,
             this.zeroSkill(`combat/${combatSkillName}` as SkillNameWithCategory), // Old skill not existing in character creation
             this.characterSheet.skills.combat[combatSkillName as CombatSkillName],
-            this.characterSheet.baseValues.attackBaseValue,
-            this.characterSheet.baseValues.paradeBaseValue,
-            this.characterSheet.baseValues.rangedAttackBaseValue,
+            this.characterSheet.baseValues,
             this.characterSheet.combatValues.ranged[
               combatSkillName as keyof CharacterSheet["combatValues"]["ranged"]
             ] as CombatValues,
@@ -246,9 +244,7 @@ export class CharacterBuilder {
             combatSkillName,
             this.zeroSkill(`combat/${combatSkillName}` as SkillNameWithCategory), // Old skill not existing in character creation
             this.characterSheet.skills.combat[combatSkillName as CombatSkillName],
-            this.characterSheet.baseValues.attackBaseValue,
-            this.characterSheet.baseValues.paradeBaseValue,
-            this.characterSheet.baseValues.rangedAttackBaseValue,
+            this.characterSheet.baseValues,
             this.characterSheet.combatValues.melee[
               combatSkillName as keyof CharacterSheet["combatValues"]["melee"]
             ] as CombatValues,

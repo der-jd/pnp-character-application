@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { attributeSchema, calculationPointsSchema, baseValuesSchema } from "../character-schemas.js";
+import {
+  attributeSchema,
+  calculationPointsSchema,
+  baseValuesSchema,
+  combatValuesSchema,
+} from "../character-schemas.js";
 import {
   initialIncreasedSchema,
   initialNewSchema,
@@ -38,12 +43,14 @@ export const updateAttributeResponseSchema = z
           .object({
             attribute: attributeSchema,
             baseValues: baseValuesSchema.partial().optional(),
+            combatValues: combatValuesSchema.partial().optional(), // TODO use correct schema
           })
           .strict(),
         new: z
           .object({
             attribute: attributeSchema,
             baseValues: baseValuesSchema.partial().optional(),
+            combatValues: combatValuesSchema.partial().optional(), // TODO use correct schema
           })
           .strict(),
       })

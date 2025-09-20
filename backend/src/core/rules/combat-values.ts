@@ -1,5 +1,5 @@
 import { isDeepStrictEqual } from "util";
-import { BaseValue, CombatValues, SkillName, Skill, CharacterSheet } from "api-spec";
+import { BaseValues, CombatValues, SkillName, Skill, CharacterSheet } from "api-spec";
 import { HttpError } from "../errors.js";
 import { getCombatCategory } from "../character-utils.js";
 
@@ -13,9 +13,7 @@ export function calculateCombatValues(
   combatSkillName: SkillName,
   oldCombatSkill: Skill | null,
   newCombatSkill: Skill | null,
-  attackBaseValue: BaseValue,
-  paradeBaseValue: BaseValue,
-  rangedAttackBaseValue: BaseValue,
+  baseValues: BaseValues,
   currentCombatValues: CombatValues,
   skilledAttackIncrease: number = 0,
   skilledParadeIncrease: number = 0,
@@ -28,13 +26,7 @@ export function calculateCombatValues(
 
   applySkilledValueIncreases(updatedCombatValues, combatSkillName, skilledAttackIncrease, skilledParadeIncrease);
 
-  recalculateDerivedValues(
-    updatedCombatValues,
-    combatSkillName,
-    attackBaseValue,
-    paradeBaseValue,
-    rangedAttackBaseValue,
-  );
+  recalculateDerivedValues(updatedCombatValues, combatSkillName, baseValues);
 
   return updatedCombatValues;
 }
@@ -99,9 +91,7 @@ function applySkilledValueIncreases(
 function recalculateDerivedValues(
   combatValues: CombatValues,
   combatSkillName: SkillName,
-  attackBaseValue: BaseValue,
-  paradeBaseValue: BaseValue,
-  rangedAttackBaseValue: BaseValue,
+  baseValues: BaseValues,
 ): void {
   const combatCategory = getCombatCategory(combatSkillName);
   const meleeCategory: keyof CharacterSheet["combatValues"] = "melee";
@@ -110,11 +100,13 @@ function recalculateDerivedValues(
   const isRanged = combatCategory === rangedCategory;
 
   if (isMelee) {
-    combatValues.attackValue = combatValues.skilledAttackValue + attackBaseValue.current + attackBaseValue.mod;
-    combatValues.paradeValue = combatValues.skilledParadeValue + paradeBaseValue.current + paradeBaseValue.mod;
+    combatValues.attackValue =
+      combatValues.skilledAttackValue + baseValues.attackBaseValue.current + baseValues.attackBaseValue.mod;
+    combatValues.paradeValue =
+      combatValues.skilledParadeValue + baseValues.paradeBaseValue.current + baseValues.paradeBaseValue.mod;
   } else if (isRanged) {
     combatValues.attackValue =
-      combatValues.skilledAttackValue + rangedAttackBaseValue.current + rangedAttackBaseValue.mod;
+      combatValues.skilledAttackValue + baseValues.rangedAttackBaseValue.current + baseValues.rangedAttackBaseValue.mod;
   } else {
     throw new Error(`Invalid combat category ${combatCategory} for skill ${combatSkillName}`);
   }

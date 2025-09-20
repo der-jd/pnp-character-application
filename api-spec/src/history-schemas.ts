@@ -127,6 +127,7 @@ export const attributeChangeSchema = z
   .object({
     attribute: attributeSchema,
     baseValues: characterSheetSchema.shape.baseValues.partial().optional(),
+    combatValues: combatValuesSchema.partial().optional(), // TODO use correct schema
   })
   .strict();
 
