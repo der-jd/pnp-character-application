@@ -30,6 +30,10 @@ resource "aws_dynamodb_table" "characters" {
     range_key       = "characterId"
     projection_type = "ALL"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_dynamodb_table" "characters_history" {
@@ -46,5 +50,9 @@ resource "aws_dynamodb_table" "characters_history" {
   attribute {
     name = "blockNumber"
     type = "N"
+  }
+
+  lifecycle {
+    prevent_destroy = true
   }
 }
