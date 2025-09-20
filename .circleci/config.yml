@@ -131,7 +131,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: make install-lint-terraform
+          command: npm run install-lint-terraform
       - run:
           name: Lint Terraform code
           command: npm run lint:terraform
