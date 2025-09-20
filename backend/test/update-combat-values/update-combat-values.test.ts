@@ -308,11 +308,9 @@ describe("Valid requests", () => {
       expect(parsedBody.combatValues.old).toStrictEqual(oldSkillCombatValues);
       expect(parsedBody.combatValues.new).toStrictEqual(parsedBody.combatValues.old);
 
-      expect(parsedBody.combatValues.new.attackValue).toBe(oldSkillCombatValues.attackValue);
       expect(parsedBody.combatValues.new.skilledAttackValue).toBe(
         _case.request.body.skilledAttackValue.initialValue + _case.request.body.skilledAttackValue.increasedPoints,
       );
-      expect(parsedBody.combatValues.new.paradeValue).toBe(oldSkillCombatValues.paradeValue);
       expect(parsedBody.combatValues.new.skilledParadeValue).toBe(
         _case.request.body.skilledParadeValue.initialValue + _case.request.body.skilledParadeValue.increasedPoints,
       );
