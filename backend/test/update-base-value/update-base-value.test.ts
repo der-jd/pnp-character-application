@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { updateBaseValueResponseSchema } from "api-spec";
 import { getBaseValue } from "core";
 import { _updateBaseValue } from "update-base-value";
@@ -272,8 +272,8 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           start: {
-            initialValue: 30,
-            newValue: 40,
+            initialValue: fakeCharacter.characterSheet.baseValues.healthPoints.start - 10,
+            newValue: fakeCharacter.characterSheet.baseValues.healthPoints.start,
           },
         },
       },
@@ -290,8 +290,8 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           byLvlUp: {
-            initialValue: 20,
-            newValue: 23,
+            initialValue: fakeCharacter.characterSheet.baseValues.healthPoints.byLvlUp! - 3,
+            newValue: fakeCharacter.characterSheet.baseValues.healthPoints.byLvlUp,
           },
         },
       },
@@ -308,8 +308,8 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           mod: {
-            initialValue: 3,
-            newValue: 10,
+            initialValue: fakeCharacter.characterSheet.baseValues.healthPoints.mod - 7,
+            newValue: fakeCharacter.characterSheet.baseValues.healthPoints.mod,
           },
         },
       },

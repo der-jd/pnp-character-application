@@ -134,7 +134,7 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          specialAbility: "Battle Cry",
+          specialAbility: fakeCharacter.characterSheet.specialAbilities[0],
         },
       },
       expectedStatusCode: 200,

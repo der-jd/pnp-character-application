@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { getCombatSkillHandling, getCombatValues } from "core";
 import { Character, CombatSkillName, SkillName, updateCombatValuesResponseSchema } from "api-spec";
 import { expectHttpError } from "../utils.js";
@@ -235,7 +235,7 @@ describe("Invalid requests", () => {
 describe("Valid requests", () => {
   const validTestCases = [
     {
-      name: "Combat values already updated to target value (idempotency)",
+      name: "Melee combat values already updated to target value (idempotency)",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -246,12 +246,35 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           skilledAttackValue: {
-            initialValue: 10,
+            initialValue: fakeCharacter.characterSheet.combatValues.melee.thrustingWeapons1h.skilledAttackValue - 3,
             increasedPoints: 3,
           },
           skilledParadeValue: {
-            initialValue: 8,
+            initialValue: fakeCharacter.characterSheet.combatValues.melee.thrustingWeapons1h.skilledParadeValue - 2,
             increasedPoints: 2,
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Ranged combat values already updated to target value (idempotency)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "combat-category": "ranged",
+          "combat-skill-name": "firearmSimple",
+        },
+        queryStringParameters: null,
+        body: {
+          skilledAttackValue: {
+            initialValue: fakeCharacter.characterSheet.combatValues.ranged.firearmSimple.skilledAttackValue - 3,
+            increasedPoints: 3,
+          },
+          skilledParadeValue: {
+            initialValue: fakeCharacter.characterSheet.combatValues.ranged.firearmSimple.skilledParadeValue,
+            increasedPoints: 0,
           },
         },
       },

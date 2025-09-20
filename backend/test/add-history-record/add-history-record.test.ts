@@ -514,6 +514,8 @@ describe("Valid requests", () => {
     });
   });
 
+  const latestHistoryBlock = fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1];
+
   const idempotencyTestCasesForExistingHistoryBlock = [
     {
       name: "Add a redundant history record to existing block (idempotency)",
@@ -523,50 +525,11 @@ describe("Valid requests", () => {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
-        body: {
-          userId: fakeUserId,
-          type: RecordType.SKILL_CHANGED,
-          name: "body/athletics",
-          data: {
-            old: {
-              skill: {
-                activated: true,
-                start: 12,
-                current: 16,
-                mod: 4,
-                totalCost: 40,
-                defaultCostCategory: CostCategory.CAT_2,
-              },
-            },
-            new: {
-              skill: {
-                activated: true,
-                start: 14,
-                current: 20,
-                mod: 5,
-                totalCost: 44,
-                defaultCostCategory: CostCategory.CAT_2,
-              },
-            },
-          },
-          learningMethod: "NORMAL",
-          calculationPoints: {
-            adventurePoints: {
-              old: {
-                start: 0,
-                available: 100,
-                total: 200,
-              },
-              new: {
-                start: 0,
-                available: 96,
-                total: 200,
-              },
-            },
-            attributePoints: null,
-          },
-          comment: null,
-        },
+        body: (() => {
+          const record = latestHistoryBlock.changes[latestHistoryBlock.changes.length - 1];
+          const { type, name, data, learningMethod, calculationPoints, comment } = record;
+          return { userId: fakeUserId, type, name, data, learningMethod, calculationPoints, comment };
+        })(),
       },
       expectedStatusCode: 200,
     },
@@ -584,7 +547,7 @@ describe("Valid requests", () => {
       const parsedBody = addHistoryRecordResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.type).toBe(_case.request.body.type);
       expect(parsedBody.name).toBe(_case.request.body.name);
-      expect(parsedBody.number).toBe(fakeHistoryBlock2.changes[fakeHistoryBlock2.changes.length - 1].number);
+      expect(parsedBody.number).toBe(latestHistoryBlock.changes[latestHistoryBlock.changes.length - 1].number);
       expect(parsedBody.id).toBeDefined();
       expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
       expect(parsedBody.data.new).toEqual(_case.request.body.data.new);
