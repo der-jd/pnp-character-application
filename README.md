@@ -10,6 +10,7 @@ Serverless web application for characters of a custom Pen & Paper game.
 
 ## Local development setup
 
+- Run `npm install` in the root folder to install dependencies for all packages via `npm workspaces`
 - Install the following tools
   - [Terraform](https://developer.hashicorp.com/terraform/install)
   - [tflint](https://github.com/terraform-linters/tflint) --> run `npm run install-lint-terraform`
