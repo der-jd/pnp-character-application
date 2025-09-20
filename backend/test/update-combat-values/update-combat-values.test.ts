@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { getCombatSkillHandling, getCombatValues } from "core";
 import { Character, CombatSkillName, SkillName, updateCombatValuesResponseSchema } from "api-spec";
 import { expectHttpError } from "../utils.js";
@@ -233,9 +233,9 @@ describe("Invalid requests", () => {
 });
 
 describe("Valid requests", () => {
-  const validTestCases = [
+  const idempotentTestCases = [
     {
-      name: "Combat values already updated to target value (idempotency)",
+      name: "Melee combat values already updated to target value (idempotency)",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -246,17 +246,86 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           skilledAttackValue: {
-            initialValue: 10,
+            initialValue: fakeCharacter.characterSheet.combatValues.melee.thrustingWeapons1h.skilledAttackValue - 3,
             increasedPoints: 3,
           },
           skilledParadeValue: {
-            initialValue: 8,
+            initialValue: fakeCharacter.characterSheet.combatValues.melee.thrustingWeapons1h.skilledParadeValue - 2,
             increasedPoints: 2,
           },
         },
       },
       expectedStatusCode: 200,
     },
+    {
+      name: "Ranged combat values already updated to target value (idempotency)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "combat-category": "ranged",
+          "combat-skill-name": "firearmSimple",
+        },
+        queryStringParameters: null,
+        body: {
+          skilledAttackValue: {
+            initialValue: fakeCharacter.characterSheet.combatValues.ranged.firearmSimple.skilledAttackValue - 3,
+            increasedPoints: 3,
+          },
+          skilledParadeValue: {
+            initialValue: fakeCharacter.characterSheet.combatValues.ranged.firearmSimple.skilledParadeValue,
+            increasedPoints: 0,
+          },
+        },
+      },
+      expectedStatusCode: 200,
+    },
+  ];
+
+  idempotentTestCases.forEach((_case) => {
+    test(_case.name, async () => {
+      mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
+
+      const result = await _updateCombatValues(_case.request);
+
+      expect(result.statusCode).toBe(_case.expectedStatusCode);
+
+      const parsedBody = updateCombatValuesResponseSchema.parse(JSON.parse(result.body));
+      expect(parsedBody.userId).toBe(fakeUserId);
+      expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
+      expect(parsedBody.combatCategory).toBe(_case.request.pathParameters["combat-category"]);
+      const skillName = _case.request.pathParameters["combat-skill-name"] as SkillName;
+      expect(parsedBody.combatSkillName).toBe(skillName);
+
+      const combatCategory = _case.request.pathParameters[
+        "combat-category"
+      ] as keyof Character["characterSheet"]["combatValues"];
+      const oldSkillCombatValues = getCombatValues(
+        fakeCharacterResponse.Item.characterSheet.combatValues,
+        combatCategory,
+        skillName,
+      );
+      expect(parsedBody.combatValues.old).toStrictEqual(oldSkillCombatValues);
+      expect(parsedBody.combatValues.new).toStrictEqual(parsedBody.combatValues.old);
+
+      expect(parsedBody.combatValues.new.skilledAttackValue).toBe(
+        _case.request.body.skilledAttackValue.initialValue + _case.request.body.skilledAttackValue.increasedPoints,
+      );
+      expect(parsedBody.combatValues.new.skilledParadeValue).toBe(
+        _case.request.body.skilledParadeValue.initialValue + _case.request.body.skilledParadeValue.increasedPoints,
+      );
+
+      const rangedCombatCategory: keyof Character["characterSheet"]["combatValues"] = "ranged";
+      if (combatCategory === rangedCombatCategory) {
+        expect(parsedBody.combatValues.new.skilledParadeValue).toBe(0);
+        expect(parsedBody.combatValues.new.paradeValue).toBe(0);
+      }
+
+      expect(parsedBody.combatValues.new.handling).toBe(getCombatSkillHandling(skillName as CombatSkillName));
+    });
+  });
+
+  const updateTestCases = [
     {
       name: "Increase attack value (melee combat skill)",
       request: {
@@ -351,7 +420,7 @@ describe("Valid requests", () => {
     },
   ];
 
-  validTestCases.forEach((_case) => {
+  updateTestCases.forEach((_case) => {
     test(_case.name, async () => {
       mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
@@ -421,20 +490,17 @@ describe("Valid requests", () => {
       expect(parsedBody.combatValues.new.handling).toBe(getCombatSkillHandling(skillName as CombatSkillName));
       expect(parsedBody.combatValues.new.handling).toBe(parsedBody.combatValues.old.handling);
 
-      // Skill was not already at the target value
-      if (JSON.stringify(parsedBody.combatValues.new) !== JSON.stringify(parsedBody.combatValues.old)) {
-        // Check if the skill was updated
-        const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
-        expect(calls).toHaveLength(1);
+      // Check for DynamoDB updates
+      const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
+      expect(calls).toHaveLength(1);
 
-        const matchingCall = calls.find((call: any) => {
-          const input = call.args[0].input;
-          return (
-            input.Key.characterId === _case.request.pathParameters["character-id"] && input.Key.userId === fakeUserId
-          );
-        });
-        expect(matchingCall).toBeTruthy();
-      }
+      const matchingCall = calls.find((call: any) => {
+        const input = call.args[0].input;
+        return (
+          input.Key.characterId === _case.request.pathParameters["character-id"] && input.Key.userId === fakeUserId
+        );
+      });
+      expect(matchingCall).toBeTruthy();
     });
   });
 });

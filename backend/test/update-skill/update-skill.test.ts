@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { getCombatCategory, getCombatValues, getSkill, combatValuesChanged, isCombatSkill } from "core";
 import { Character, SkillName, updateSkillResponseSchema } from "api-spec";
 import { _updateSkill } from "update-skill";
@@ -366,7 +366,7 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          activated: true,
+          activated: fakeCharacter.characterSheet.skills.body.athletics.activated,
           learningMethod: "NORMAL",
         },
       },
@@ -384,8 +384,8 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           start: {
-            initialValue: 9,
-            newValue: 12,
+            initialValue: fakeCharacter.characterSheet.skills.body.athletics.start - 3,
+            newValue: fakeCharacter.characterSheet.skills.body.athletics.start,
           },
         },
       },
@@ -403,7 +403,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           current: {
-            initialValue: 12,
+            initialValue: fakeCharacter.characterSheet.skills.body.athletics.current - 4,
             increasedPoints: 4,
           },
           learningMethod: "NORMAL",
@@ -423,8 +423,8 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           mod: {
-            initialValue: 2,
-            newValue: 4,
+            initialValue: fakeCharacter.characterSheet.skills.body.athletics.mod - 2,
+            newValue: fakeCharacter.characterSheet.skills.body.athletics.mod,
           },
         },
       },

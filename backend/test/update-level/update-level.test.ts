@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { updateLevelResponseSchema } from "api-spec";
 import { _updateLevel } from "update-level";
 import { expectHttpError } from "../utils.js";
@@ -133,7 +133,7 @@ describe("Valid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          initialLevel: 4,
+          initialLevel: fakeCharacter.characterSheet.generalInformation.level - 1,
         },
       },
       expectedStatusCode: 200,

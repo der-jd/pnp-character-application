@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { CharacterSheet, updateAttributeResponseSchema } from "api-spec";
 import { getAttribute } from "core";
 import { _updateAttribute } from "update-attribute";
@@ -254,8 +254,8 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           start: {
-            initialValue: 15,
-            newValue: 17,
+            initialValue: fakeCharacter.characterSheet.attributes.endurance.start - 2,
+            newValue: fakeCharacter.characterSheet.attributes.endurance.start,
           },
         },
       },
@@ -272,7 +272,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           current: {
-            initialValue: 17,
+            initialValue: fakeCharacter.characterSheet.attributes.endurance.current - 1,
             increasedPoints: 1,
           },
         },
@@ -290,8 +290,8 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           mod: {
-            initialValue: 0,
-            newValue: 1,
+            initialValue: fakeCharacter.characterSheet.attributes.endurance.mod - 1,
+            newValue: fakeCharacter.characterSheet.attributes.endurance.mod,
           },
         },
       },
