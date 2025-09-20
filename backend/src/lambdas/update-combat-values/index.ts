@@ -57,23 +57,28 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
 
     const characterSheet = character.characterSheet;
     const skillCombatValuesOld = getCombatValues(characterSheet.combatValues, combatCategory, combatSkillName);
+    let skillCombatValues = skillCombatValuesOld;
 
     validatePassedValues(skillCombatValuesOld, params);
 
-    const skillCombatValues = calculateCombatValues(
-      combatSkillName,
-      null,
-      null,
-      characterSheet.baseValues.attackBaseValue,
-      characterSheet.baseValues.paradeBaseValue,
-      characterSheet.baseValues.rangedAttackBaseValue,
-      skillCombatValuesOld,
-      params.body.skilledAttackValue.increasedPoints,
-      params.body.skilledParadeValue.increasedPoints,
-    );
+    if (idempotentUpdate(skillCombatValuesOld, params)) {
+      console.log("Combat values already updated to target value. Nothing to do.");
+    } else {
+      skillCombatValues = calculateCombatValues(
+        combatSkillName,
+        null,
+        null,
+        characterSheet.baseValues.attackBaseValue,
+        characterSheet.baseValues.paradeBaseValue,
+        characterSheet.baseValues.rangedAttackBaseValue,
+        skillCombatValuesOld,
+        params.body.skilledAttackValue.increasedPoints,
+        params.body.skilledParadeValue.increasedPoints,
+      );
 
-    if (combatValuesChanged(skillCombatValuesOld, skillCombatValues)) {
-      console.log("Combat values changed.");
+      if (!combatValuesChanged(skillCombatValuesOld, skillCombatValues)) {
+        throw new Error("Combat values didn't change, but should have changed!");
+      }
 
       await updateCombatValues(
         params.userId,
@@ -82,8 +87,6 @@ export async function _updateCombatValues(request: Request): Promise<APIGatewayP
         combatSkillName,
         skillCombatValues,
       );
-    } else {
-      console.log("Combat values already updated to target value. Nothing to do.");
     }
 
     const responseBody: UpdateCombatValuesResponse = {
@@ -138,14 +141,10 @@ function validateRequest(request: Request): Parameters {
 function validatePassedValues(combatValues: CombatValues, params: Parameters) {
   console.log("Compare passed skill combat values with the values in the backend");
 
-  // Values are valid if the passed values have already been applied (idempotent operation)
   if (
-    (params.body.skilledAttackValue.initialValue !== combatValues.skilledAttackValue &&
-      params.body.skilledAttackValue.initialValue + params.body.skilledAttackValue.increasedPoints !==
-        combatValues.skilledAttackValue) ||
-    (params.body.skilledParadeValue.initialValue !== combatValues.skilledParadeValue &&
-      params.body.skilledParadeValue.initialValue + params.body.skilledParadeValue.increasedPoints !==
-        combatValues.skilledParadeValue)
+    !idempotentUpdate(combatValues, params) &&
+    (params.body.skilledAttackValue.initialValue !== combatValues.skilledAttackValue ||
+      params.body.skilledParadeValue.initialValue !== combatValues.skilledParadeValue)
   ) {
     throw new HttpError(409, "The passed skill combat values don't match the values in the backend!", {
       characterId: params.pathParams["character-id"],
@@ -158,4 +157,13 @@ function validatePassedValues(combatValues: CombatValues, params: Parameters) {
   }
 
   console.log("Passed skill combat values match the values in the backend");
+}
+
+function idempotentUpdate(combatValues: CombatValues, params: Parameters) {
+  return (
+    params.body.skilledAttackValue.initialValue + params.body.skilledAttackValue.increasedPoints ===
+      combatValues.skilledAttackValue &&
+    params.body.skilledParadeValue.initialValue + params.body.skilledParadeValue.increasedPoints ===
+      combatValues.skilledParadeValue
+  );
 }
