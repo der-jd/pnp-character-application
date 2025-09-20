@@ -11,6 +11,20 @@ import { MAX_STRING_LENGTH_DEFAULT } from "api-spec";
 describe("Invalid requests", () => {
   const invalidTestCases = [
     {
+      name: "Authorization header is missing",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          specialAbility: "Iron Will",
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
       name: "Authorization header is malformed",
       request: {
         headers: {

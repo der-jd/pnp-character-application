@@ -3,13 +3,33 @@ import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import { fakeCharacterId } from "../test-data/character.js";
-import { getCombatCategory, getCombatValues, getSkill } from "core";
-import { Character, updateSkillResponseSchema } from "api-spec";
-import { _updateSkill, availableCombatPointsChanged } from "update-skill";
+import { getCombatCategory, getCombatValues, getSkill, combatValuesChanged, isCombatSkill } from "core";
+import { Character, SkillName, updateSkillResponseSchema } from "api-spec";
+import { _updateSkill } from "update-skill";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [
+    {
+      name: "Authorization header is missing",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "body",
+          "skill-name": "athletics",
+        },
+        queryStringParameters: null,
+        body: {
+          current: {
+            initialValue: 16,
+            increasedPoints: 1,
+          },
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 400,
+    },
     {
       name: "Authorization header is malformed",
       request: {
@@ -426,7 +446,7 @@ describe("Valid requests", () => {
         "skill-category"
       ] as keyof Character["characterSheet"]["skills"];
       expect(parsedBody.skillCategory).toBe(skillCategory);
-      const skillName = _case.request.pathParameters["skill-name"];
+      const skillName = _case.request.pathParameters["skill-name"] as SkillName;
       expect(parsedBody.skillName).toBe(skillName);
 
       if (_case.request.body.activated) {
@@ -724,7 +744,7 @@ describe("Valid requests", () => {
         "skill-category"
       ] as keyof Character["characterSheet"]["skills"];
       expect(parsedBody.skillCategory).toBe(skillCategory);
-      const skillName = _case.request.pathParameters["skill-name"];
+      const skillName = _case.request.pathParameters["skill-name"] as SkillName;
       expect(parsedBody.skillName).toBe(skillName);
 
       const oldAvailableAdventurePoints =
@@ -801,13 +821,18 @@ describe("Valid requests", () => {
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
 
       // Skill and combat values are updated
-      if (availableCombatPointsChanged(parsedBody.changes.old.skill, parsedBody.changes.new.skill, skillCategory)) {
+      if (
+        isCombatSkill(skillCategory) &&
+        parsedBody.changes.old.combatValues &&
+        parsedBody.changes.new.combatValues &&
+        combatValuesChanged(parsedBody.changes.old.combatValues, parsedBody.changes.new.combatValues)
+      ) {
         expect(calls.length).toBe(2);
 
         expect(parsedBody.changes.old.combatValues).toBeDefined();
         expect(parsedBody.changes.new.combatValues).toBeDefined();
 
-        const combatCategory = getCombatCategory(fakeCharacterResponse.Item.characterSheet.combatValues, skillName);
+        const combatCategory = getCombatCategory(skillName);
         expect(parsedBody.combatCategory).toBe(combatCategory);
 
         const skillCombatValuesOld = getCombatValues(
@@ -816,14 +841,17 @@ describe("Valid requests", () => {
           skillName,
         );
         expect(parsedBody.changes.old.combatValues).toStrictEqual(skillCombatValuesOld);
-        expect(parsedBody.changes.new.combatValues?.attackValue).toBe(skillCombatValuesOld.attackValue);
-        expect(parsedBody.changes.new.combatValues?.paradeValue).toBe(skillCombatValuesOld.paradeValue);
+        expect(parsedBody.changes.new.combatValues.handling).toBe(skillCombatValuesOld.handling);
+        expect(parsedBody.changes.new.combatValues.attackValue).toBe(skillCombatValuesOld.attackValue);
+        expect(parsedBody.changes.new.combatValues.skilledAttackValue).toBe(skillCombatValuesOld.skilledAttackValue);
+        expect(parsedBody.changes.new.combatValues.paradeValue).toBe(skillCombatValuesOld.paradeValue);
+        expect(parsedBody.changes.new.combatValues.skilledParadeValue).toBe(skillCombatValuesOld.skilledParadeValue);
 
         const availableCombatPointsNew =
           skillCombatValuesOld.availablePoints +
           (parsedBody.changes.new.skill.current - parsedBody.changes.old.skill.current) +
           (parsedBody.changes.new.skill.mod - parsedBody.changes.old.skill.mod);
-        expect(parsedBody.changes.new.combatValues?.availablePoints).toBe(availableCombatPointsNew);
+        expect(parsedBody.changes.new.combatValues.availablePoints).toBe(availableCombatPointsNew);
       }
       // Only skill is updated
       else {

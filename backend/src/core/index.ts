@@ -37,15 +37,16 @@ export {
   getSkill,
   getCombatValues,
   getCombatCategory,
+  getSkillCategoryAndName,
+  isCombatSkill,
 } from "./character-utils.js";
 export { parseRecordType } from "./history-utils.js";
-export {
-  ATTRIBUTE_POINTS_FOR_CREATION,
-  PROFESSION_SKILL_BONUS,
-  HOBBY_SKILL_BONUS,
-  MIN_ATTRIBUTE_VALUE_FOR_CREATION,
-  MAX_ATTRIBUTE_VALUE_FOR_CREATION,
-  NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
-} from "./rules/constants.js";
-export { createEmptyCharacterSheet } from "./rules/character-factory.js";
+export { CharacterBuilder } from "./rules/character-builder.js";
 export { calculateBaseValues } from "./rules/base-value-formulas.js";
+export {
+  COST_CATEGORY_COMBAT_SKILLS,
+  COST_CATEGORY_DEFAULT,
+  MAX_COST_CATEGORY,
+  getCombatSkillHandling,
+} from "./rules/constants.js";
+export { calculateCombatValues, combatValuesChanged } from "./rules/combat-values.js";

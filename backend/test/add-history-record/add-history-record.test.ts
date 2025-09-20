@@ -11,7 +11,7 @@ import {
   mockDynamoDBGetCharacterResponse,
   mockDynamoDBQueryHistoryResponse,
 } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { fakeBigHistoryBlock, fakeHistoryBlock2 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 
@@ -125,6 +125,45 @@ describe("Invalid requests", () => {
 
 describe("Valid requests", () => {
   const testCasesForExistingHistoryBlock = [
+    {
+      name: "Add history record for 'character created' to existing block",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          userId: fakeUserId,
+          type: RecordType.CHARACTER_CREATED,
+          name: "New Character",
+          data: {
+            new: {
+              character: fakeCharacter,
+              generationPoints: {
+                throughDisadvantages: 15,
+                spent: 20,
+                total: 20,
+              },
+              activatedSkills: [
+                "body/pickpocketing",
+                "body/bodyControl",
+                "social/convincing",
+                "nature/fishing",
+                "handcraft/stonework",
+              ],
+            },
+          },
+          learningMethod: null,
+          calculationPoints: {
+            adventurePoints: null,
+            attributePoints: null,
+          },
+          comment: null,
+        },
+      },
+      expectedStatusCode: 200,
+    },
     {
       name: "Add history record for 'calculation points changed' to existing block",
       request: {
@@ -412,13 +451,19 @@ describe("Valid requests", () => {
           data: {
             old: {
               availablePoints: 10,
-              attackValue: 108,
-              paradeValue: 78,
+              handling: 25,
+              attackValue: 218,
+              skilledAttackValue: 108,
+              paradeValue: 190,
+              skilledParadeValue: 78,
             },
             new: {
               availablePoints: 2,
-              attackValue: 110,
-              paradeValue: 84,
+              handling: 25,
+              attackValue: 220,
+              skilledAttackValue: 110,
+              paradeValue: 196,
+              skilledParadeValue: 84,
             },
           },
           learningMethod: null,

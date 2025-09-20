@@ -38,10 +38,21 @@ export const updateBaseValueResponseSchema = z
 
 export type UpdateBaseValueResponse = z.infer<typeof updateBaseValueResponseSchema>;
 
+export const patchBaseValueHistoryRecordSchema = recordSchema.extend({
+  data: z
+    .object({
+      old: baseValueSchema,
+      new: baseValueSchema,
+    })
+    .strict(),
+});
+
+export type PatchBaseValueHistoryRecord = z.infer<typeof patchBaseValueHistoryRecordSchema>;
+
 export const patchBaseValueResponseSchema = z
   .object({
     data: updateBaseValueResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: patchBaseValueHistoryRecordSchema.nullable(),
   })
   .strict();
 

@@ -10,6 +10,7 @@ import {
   attributeChangedRecord,
   baseValueChangedRecord,
   calculationPointsChangedRecord,
+  characterCreatedChangedRecord,
   combatSkillChangedRecord,
   combatValuesChangedRecord,
   levelChangedRecord,
@@ -25,6 +26,19 @@ describe("Invalid requests", () => {
   const fakeRecordId = lastBlock.changes[lastBlock.changes.length - 1].id;
 
   const invalidTestCases = [
+    {
+      name: "Authorization header is missing",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": fakeRecordId,
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
     {
       name: "Authorization header is malformed",
       request: {
@@ -107,11 +121,29 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 404,
     },
+    {
+      name: "Reverting a CHARACTER_CREATED record is not supported",
+      fakeRecord: characterCreatedChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
       mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
+
+      if (_case.fakeRecord) {
+        addFakeHistoryRecord(lastBlock, _case.fakeRecord);
+      }
 
       await expectHttpError(() => revertRecordFromHistory(_case.request), _case.expectedStatusCode);
     });

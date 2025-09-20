@@ -37,6 +37,8 @@ import {
   setSpecialAbilities,
   logZodError,
   isZodError,
+  getSkillCategoryAndName,
+  getCombatCategory,
 } from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -90,9 +92,10 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
       await deleteLatestHistoryRecord(latestBlock);
     }
 
+    const responseBody: DeleteHistoryRecordResponse = latestRecord;
     const response = {
       statusCode: 200,
-      body: JSON.stringify(latestRecord as DeleteHistoryRecordResponse),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
@@ -192,19 +195,10 @@ async function revertChange(userId: string, characterId: string, record: Record)
       case RecordType.SKILL_CHANGED: {
         const oldData = skillChangeSchema.parse(record.data.old);
 
-        const skillCategory = record.name.split("/")[0];
-        let skillName: string;
-        if (skillCategory === "combat") {
-          // name pattern is "skillCategory/skillName (combatCategory)"
-          skillName = record.name.split(" (")[0].split("/")[1];
-        } else {
-          // name pattern is "skillCategory/skillName"
-          skillName = record.name.split("/")[1];
-        }
+        const { category: skillCategory, name: skillName } = getSkillCategoryAndName(record.name);
 
         if (oldData.combatValues) {
-          // name pattern is "skillCategory/skillName (combatCategory)"
-          const combatCategory = record.name.split(" (")[1].slice(0, -1); // Remove the trailing ")"
+          const combatCategory = getCombatCategory(skillName);
           await updateCombatValues(userId, characterId, combatCategory, skillName, oldData.combatValues);
         }
 

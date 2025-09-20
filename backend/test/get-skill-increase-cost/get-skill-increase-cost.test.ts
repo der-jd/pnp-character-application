@@ -9,6 +9,22 @@ import { expectHttpError } from "../utils.js";
 describe("Invalid requests", () => {
   const invalidTestCases = [
     {
+      name: "Authorization header is missing",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "social",
+          "skill-name": "knowledgeOfHumanNature",
+        },
+        queryStringParameters: {
+          "learning-method": "NORMAL",
+        },
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
+    {
       name: "Authorization header is malformed",
       request: {
         headers: {

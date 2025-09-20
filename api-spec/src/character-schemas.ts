@@ -17,12 +17,16 @@ import {
   MIN_POINTS,
 } from "./general-schemas.js";
 
+export const combinedSkillCategoryAndNameSchema = z
+  .string()
+  .regex(new RegExp(`^[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}/[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}$`), {
+    message: `Skill must be in the format "skillCategory/skillName", each max ${MAX_STRING_LENGTH_DEFAULT} characters.`,
+  });
+
 export const professionHobbySchema = z
   .object({
     name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
-    skill: z.string().regex(new RegExp(`^[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}/[^/]{1,${MAX_STRING_LENGTH_DEFAULT}}$`), {
-      message: `Skill must be in the format "skillCategory/skillName", each max ${MAX_STRING_LENGTH_DEFAULT} characters.`,
-    }),
+    skill: combinedSkillCategoryAndNameSchema,
   })
   .strict();
 
@@ -65,7 +69,136 @@ export const calculationPointsSchema = z
 
 export type CalculationPoints = z.infer<typeof calculationPointsSchema>;
 
-export const dis_advantagesSchema = z.array(z.string().max(MAX_STRING_LENGTH_DEFAULT)).max(MAX_ARRAY_SIZE);
+export enum AdvantagesNames {
+  HIGH_SCHOOL_DEGREE,
+  CHARMER,
+  DARK_VISION,
+  LUCKY,
+  GOOD_LOOKING,
+  GOOD_MEMORY,
+  OUTSTANDING_SENSE_SIGHT_HEARING,
+  MASTER_OF_THE_SITUATION,
+  HIGH_GENERAL_KNOWLEDGE,
+  MASTER_OF_IMPROVISATION,
+  MILITARY_TRAINING,
+  BRAVE,
+  ATHLETIC,
+  COLLEGE_EDUCATION,
+  DARING,
+  MELODIOUS_VOICE,
+}
+
+export enum DisadvantagesNames {
+  SUPERSTITION,
+  COWARD,
+  LOW_GENERAL_KNOWLEDGE,
+  SOCIALLY_INEPT,
+  NO_DEGREE,
+  PACIFIST,
+  UNLUCKY,
+  EARLY_SCHOOL_DROPOUT,
+  FEAR_OF,
+  MISER,
+  SENSE_OF_JUSTICE,
+  IMPULSIVE,
+  HOT_TEMPERED,
+  LETHARGIC,
+  VENGEFUL,
+  QUARRELSOME,
+  SPEECH_IMPEDIMENT,
+  SLEEP_DISORDER,
+  SPENDTHRIFT,
+  NIGHT_BLIND,
+  BAD_HABIT,
+  BAD_TRAIT,
+  ADDICTION_CAFFEINE,
+  ADDICTION_NICOTINE,
+  ADDICTION_GAMBLING,
+  ADDICTION_ALCOHOL,
+  ADDICTION_DRUGS,
+  IMPAIRED_SENSE,
+  UNATTRACTIVE,
+  UNPLEASANT_VOICE,
+  POOR_MEMORY,
+}
+
+export const advantageSchema = z.tuple([
+  z.enum(AdvantagesNames),
+  z.string().max(MAX_STRING_LENGTH_DEFAULT),
+  z.number().int().min(-99).max(99),
+]);
+
+export type Advantage = z.infer<typeof advantageSchema>;
+
+export const advantagesSchema = z.array(advantageSchema).max(MAX_ARRAY_SIZE);
+
+export type Advantages = z.infer<typeof advantagesSchema>;
+
+export const disadvantageSchema = z.tuple([
+  z.enum(DisadvantagesNames),
+  z.string().max(MAX_STRING_LENGTH_DEFAULT),
+  z.number().int().min(-99).max(99),
+]);
+
+export type Disadvantage = z.infer<typeof disadvantageSchema>;
+
+export const disadvantagesSchema = z.array(disadvantageSchema).max(MAX_ARRAY_SIZE);
+
+export type Disadvantages = z.infer<typeof disadvantagesSchema>;
+
+export const ADVANTAGES: Advantages = [
+  [AdvantagesNames.HIGH_SCHOOL_DEGREE, "", 3],
+  [AdvantagesNames.CHARMER, "", 5],
+  [AdvantagesNames.DARK_VISION, "", 2],
+  [AdvantagesNames.LUCKY, "", 3],
+  [AdvantagesNames.GOOD_LOOKING, "", 2],
+  [AdvantagesNames.GOOD_MEMORY, "", 3],
+  [AdvantagesNames.OUTSTANDING_SENSE_SIGHT_HEARING, "", 3],
+  [AdvantagesNames.MASTER_OF_THE_SITUATION, "", 7],
+  [AdvantagesNames.HIGH_GENERAL_KNOWLEDGE, "", 6],
+  [AdvantagesNames.MASTER_OF_IMPROVISATION, "", 5],
+  [AdvantagesNames.MILITARY_TRAINING, "", 8],
+  [AdvantagesNames.BRAVE, "", 2],
+  [AdvantagesNames.ATHLETIC, "", 4],
+  [AdvantagesNames.COLLEGE_EDUCATION, "skillName", 5],
+  [AdvantagesNames.DARING, "", 4],
+  [AdvantagesNames.MELODIOUS_VOICE, "", 2],
+];
+
+export const DISADVANTAGES: Disadvantages = [
+  [DisadvantagesNames.SUPERSTITION, "", 4],
+  [DisadvantagesNames.COWARD, "", 4],
+  [DisadvantagesNames.LOW_GENERAL_KNOWLEDGE, "", 6],
+  [DisadvantagesNames.SOCIALLY_INEPT, "", 5],
+  [DisadvantagesNames.NO_DEGREE, "", 3],
+  [DisadvantagesNames.PACIFIST, "", 6],
+  [DisadvantagesNames.UNLUCKY, "", 3],
+  [DisadvantagesNames.EARLY_SCHOOL_DROPOUT, "", 7],
+  [DisadvantagesNames.FEAR_OF, "something", 2],
+  [DisadvantagesNames.FEAR_OF, "something", 5],
+  [DisadvantagesNames.MISER, "", 3],
+  [DisadvantagesNames.SENSE_OF_JUSTICE, "", 5],
+  [DisadvantagesNames.IMPULSIVE, "", 3],
+  [DisadvantagesNames.HOT_TEMPERED, "", 4],
+  [DisadvantagesNames.LETHARGIC, "", 3],
+  [DisadvantagesNames.VENGEFUL, "", 2],
+  [DisadvantagesNames.QUARRELSOME, "", 5],
+  [DisadvantagesNames.SPEECH_IMPEDIMENT, "", 1],
+  [DisadvantagesNames.SLEEP_DISORDER, "", 3],
+  [DisadvantagesNames.SPENDTHRIFT, "", 3],
+  [DisadvantagesNames.NIGHT_BLIND, "", 2],
+  [DisadvantagesNames.BAD_HABIT, "", 2],
+  [DisadvantagesNames.BAD_TRAIT, "", 4],
+  [DisadvantagesNames.ADDICTION_CAFFEINE, "", 2],
+  [DisadvantagesNames.ADDICTION_NICOTINE, "", 3],
+  [DisadvantagesNames.ADDICTION_GAMBLING, "", 3],
+  [DisadvantagesNames.ADDICTION_ALCOHOL, "", 10],
+  [DisadvantagesNames.ADDICTION_DRUGS, "", 10],
+  [DisadvantagesNames.IMPAIRED_SENSE, "", 4],
+  [DisadvantagesNames.UNATTRACTIVE, "", 2],
+  [DisadvantagesNames.UNPLEASANT_VOICE, "", 2],
+  [DisadvantagesNames.POOR_MEMORY, "", 3],
+];
 
 export const attributeSchema = z
   .object({
@@ -126,9 +259,15 @@ export type BaseValues = z.infer<typeof baseValuesSchema>;
 
 export const combatValuesSchema = z
   .object({
+    // availablePoints = handling + change of corresponding-skill.current + change of corresponding-skill.mod
     availablePoints: z.number().int().min(0).max(MAX_POINTS),
+    handling: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
+    // attackValue = skilledAttackValue + (ranged)attackBaseValue.current + (ranged)attackBaseValue.mod
     attackValue: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
+    skilledAttackValue: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
+    // paradeValue (only for melee combat) = skilledParadeValue + paradeBaseValue.current + paradeBaseValue.mod
     paradeValue: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
+    skilledParadeValue: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
   })
   .strict();
 
@@ -193,6 +332,67 @@ export const combatSkillsSchema = z
 
 export type CombatSkills = z.infer<typeof combatSkillsSchema>;
 
+export type CombatSkillName = keyof CombatSkills;
+export type BodySkillName = keyof CharacterSheet["skills"]["body"];
+export type SocialSkillName = keyof CharacterSheet["skills"]["social"];
+export type NatureSkillName = keyof CharacterSheet["skills"]["nature"];
+export type KnowledgeSkillName = keyof CharacterSheet["skills"]["knowledge"];
+export type HandcraftSkillName = keyof CharacterSheet["skills"]["handcraft"];
+
+export type SkillName =
+  | CombatSkillName
+  | BodySkillName
+  | SocialSkillName
+  | NatureSkillName
+  | KnowledgeSkillName
+  | HandcraftSkillName;
+
+export type SkillCategory = keyof CharacterSheet["skills"];
+
+type Join<K extends string, V extends string> = `${K}/${V}`;
+export type SkillNameWithCategory = {
+  [Category in keyof CharacterSheet["skills"]]: Join<
+    Category & string,
+    keyof CharacterSheet["skills"][Category] & string
+  >;
+}[keyof CharacterSheet["skills"]];
+
+const combatSkillCategory: SkillCategory = "combat";
+
+export const combatSkills = Object.keys(combatSkillsSchema.shape).map(
+  (skill) => `${combatSkillCategory}/${skill}` as SkillNameWithCategory,
+);
+
+export const START_SKILLS: SkillNameWithCategory[] = [
+  "body/athletics",
+  "body/climbing",
+  "body/bodyControl",
+  "body/sneaking",
+  "body/swimming",
+  "body/selfControl",
+  "body/hiding",
+  "body/singing",
+  "body/sharpnessOfSenses",
+  "body/quaffing",
+  "social/etiquette",
+  "social/knowledgeOfHumanNature",
+  "social/persuading",
+  "social/bargaining",
+  "nature/knottingSkills",
+  "knowledge/mathematics",
+  "knowledge/zoology",
+  "handcraft/woodwork",
+  "handcraft/foodProcessing",
+  "handcraft/fabricProcessing",
+  "handcraft/steeringVehicles",
+  "handcraft/firstAid",
+  "handcraft/calmingSbDown",
+  "handcraft/drawingAndPainting",
+  ...(Object.keys(combatSkillsSchema.shape) as Array<keyof CharacterSheet["skills"]["combat"]>).map(
+    (skill) => `${combatSkillCategory}/${skill}` as SkillNameWithCategory,
+  ),
+];
+
 export const specialAbilitySchema = z.string().max(MAX_STRING_LENGTH_DEFAULT);
 
 export const characterSheetSchema = z
@@ -204,8 +404,8 @@ export const characterSheetSchema = z
         attributePoints: calculationPointsSchema,
       })
       .strict(),
-    advantages: dis_advantagesSchema,
-    disadvantages: dis_advantagesSchema,
+    advantages: advantagesSchema,
+    disadvantages: disadvantagesSchema,
     /**
      * Duplicated special abilities are not allowed although
      * the type is an array instead of a Set.
@@ -247,6 +447,7 @@ export const characterSheetSchema = z
             knowledgeOfHumanNature: skillSchema,
             persuading: skillSchema,
             convincing: skillSchema,
+            bargaining: skillSchema,
           })
           .strict(),
         nature: z
@@ -293,7 +494,6 @@ export const characterSheetSchema = z
             steeringVehicles: skillSchema,
             fineMechanics: skillSchema,
             cheating: skillSchema,
-            bargaining: skillSchema,
             firstAid: skillSchema,
             calmingSbDown: skillSchema,
             drawingAndPainting: skillSchema,
@@ -344,3 +544,8 @@ export const characterSchema = z
   .strict();
 
 export type Character = z.infer<typeof characterSchema>;
+
+export const skillCategories = Object.keys(characterSheetSchema.shape.skills.shape) as SkillCategory[];
+export const skillNames = Object.values(characterSheetSchema.shape.skills.shape).flatMap(
+  (category) => category.keyof().options,
+);

@@ -15,8 +15,8 @@ export type PatchCombatValuesPathParams = z.infer<typeof patchCombatValuesPathPa
 
 export const patchCombatValuesRequestSchema = z
   .object({
-    attackValue: initialIncreasedSchema,
-    paradeValue: initialIncreasedSchema,
+    skilledAttackValue: initialIncreasedSchema,
+    skilledParadeValue: initialIncreasedSchema,
   })
   .strict();
 
@@ -39,10 +39,21 @@ export const updateCombatValuesResponseSchema = z
 
 export type UpdateCombatValuesResponse = z.infer<typeof updateCombatValuesResponseSchema>;
 
+export const patchCombatValuesHistoryRecordSchema = recordSchema.extend({
+  data: z
+    .object({
+      old: combatValuesSchema,
+      new: combatValuesSchema,
+    })
+    .strict(),
+});
+
+export type PatchCombatValuesHistoryRecord = z.infer<typeof patchCombatValuesHistoryRecordSchema>;
+
 export const patchCombatValuesResponseSchema = z
   .object({
     data: updateCombatValuesResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: patchCombatValuesHistoryRecordSchema.nullable(),
   })
   .strict();
 

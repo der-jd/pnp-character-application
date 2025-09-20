@@ -11,6 +11,24 @@ import { expectHttpError } from "../utils.js";
 describe("Invalid requests", () => {
   const invalidTestCases = [
     {
+      name: "Authorization header is missing",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "base-value-name": "healthPoints",
+        },
+        queryStringParameters: null,
+        body: {
+          byLvlUp: {
+            initialValue: 23,
+            newValue: 26,
+          },
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
       name: "Authorization header is malformed",
       request: {
         headers: {
@@ -174,7 +192,7 @@ describe("Invalid requests", () => {
           },
         },
       },
-      expectedStatusCode: 409,
+      expectedStatusCode: 400,
     },
     {
       name: "No byLvlUp change allowed for base value 'attackBaseValue'",
@@ -192,7 +210,7 @@ describe("Invalid requests", () => {
           },
         },
       },
-      expectedStatusCode: 409,
+      expectedStatusCode: 400,
     },
     {
       name: "No byLvlUp change allowed for base value 'paradeBaseValue'",
@@ -210,7 +228,7 @@ describe("Invalid requests", () => {
           },
         },
       },
-      expectedStatusCode: 409,
+      expectedStatusCode: 400,
     },
     {
       name: "No byLvlUp change allowed for base value 'rangedAttackBaseValue'",
@@ -228,7 +246,7 @@ describe("Invalid requests", () => {
           },
         },
       },
-      expectedStatusCode: 409,
+      expectedStatusCode: 400,
     },
   ];
 
