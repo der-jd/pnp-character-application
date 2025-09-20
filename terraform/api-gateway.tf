@@ -536,7 +536,6 @@ module "record_id_options" {
 
 // ================================================================================
 
-// TODO there is a new stage deployment with each CircleCI run -> fix this
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
     module.characters_post,
