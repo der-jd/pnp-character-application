@@ -8,7 +8,6 @@ import {
   headersSchema,
   Attribute,
   CalculationPoints,
-  CharacterSheet,
   InitialNew,
   InitialIncreased,
   SkillName,
