@@ -58,6 +58,7 @@ export function calculateBaseValues(attributes: Attributes): Record<BaseValueNam
   for (const baseValueName of Object.keys(baseValueFormulas) as BaseValueName[]) {
     const formula = baseValueFormulas[baseValueName];
     const value = formula(attributes);
+    console.debug(`Raw formula result for base value ${baseValueName}: ${value}`);
     result[baseValueName] = value ? Math.round(value) : undefined;
   }
 
