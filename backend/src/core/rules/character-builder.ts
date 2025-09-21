@@ -3,7 +3,7 @@ import {
   Attribute,
   BaseValue,
   CharacterSheet,
-  CombatValues,
+  CombatStats,
   Skill,
   ATTRIBUTE_POINTS_FOR_CREATION,
   MIN_LEVEL,
@@ -37,6 +37,7 @@ import {
   SkillCategory,
   CombatSkillName,
   CombatSkillsStartValues,
+  CombatSection,
 } from "api-spec";
 import {
   COST_CATEGORY_COMBAT_SKILLS,
@@ -54,7 +55,7 @@ import {
 } from "../character-utils.js";
 import { HttpError, logAndEnsureHttpError } from "../errors.js";
 import { calculateBaseValues } from "./base-value-formulas.js";
-import { calculateCombatValues } from "./combat-values.js";
+import { calculateCombatStats } from "./combat-stats.js";
 
 export class CharacterBuilder {
   private attributesSet = false;
@@ -148,25 +149,25 @@ export class CharacterBuilder {
           this.getHandcraftSkillNames(),
         ) as CharacterSheet["skills"]["handcraft"],
       },
-      combatValues: {
+      combat: {
         melee: {
-          martialArts: this.zeroCombatValues("martialArts"),
-          barehanded: this.zeroCombatValues("barehanded"),
-          chainWeapons: this.zeroCombatValues("chainWeapons"),
-          daggers: this.zeroCombatValues("daggers"),
-          slashingWeaponsSharp1h: this.zeroCombatValues("slashingWeaponsSharp1h"),
-          slashingWeaponsBlunt1h: this.zeroCombatValues("slashingWeaponsBlunt1h"),
-          thrustingWeapons1h: this.zeroCombatValues("thrustingWeapons1h"),
-          slashingWeaponsSharp2h: this.zeroCombatValues("slashingWeaponsSharp2h"),
-          slashingWeaponsBlunt2h: this.zeroCombatValues("slashingWeaponsBlunt2h"),
-          thrustingWeapons2h: this.zeroCombatValues("thrustingWeapons2h"),
+          martialArts: this.zeroCombatStats("martialArts"),
+          barehanded: this.zeroCombatStats("barehanded"),
+          chainWeapons: this.zeroCombatStats("chainWeapons"),
+          daggers: this.zeroCombatStats("daggers"),
+          slashingWeaponsSharp1h: this.zeroCombatStats("slashingWeaponsSharp1h"),
+          slashingWeaponsBlunt1h: this.zeroCombatStats("slashingWeaponsBlunt1h"),
+          thrustingWeapons1h: this.zeroCombatStats("thrustingWeapons1h"),
+          slashingWeaponsSharp2h: this.zeroCombatStats("slashingWeaponsSharp2h"),
+          slashingWeaponsBlunt2h: this.zeroCombatStats("slashingWeaponsBlunt2h"),
+          thrustingWeapons2h: this.zeroCombatStats("thrustingWeapons2h"),
         },
         ranged: {
-          missile: this.zeroCombatValues("missile"),
-          firearmSimple: this.zeroCombatValues("firearmSimple"),
-          firearmMedium: this.zeroCombatValues("firearmMedium"),
-          firearmComplex: this.zeroCombatValues("firearmComplex"),
-          heavyWeapons: this.zeroCombatValues("heavyWeapons"),
+          missile: this.zeroCombatStats("missile"),
+          firearmSimple: this.zeroCombatStats("firearmSimple"),
+          firearmMedium: this.zeroCombatStats("firearmMedium"),
+          firearmComplex: this.zeroCombatStats("firearmComplex"),
+          heavyWeapons: this.zeroCombatStats("heavyWeapons"),
         },
       },
     };
@@ -192,6 +193,10 @@ export class CharacterBuilder {
     const calculatedBaseValues = calculateBaseValues(this.characterSheet.attributes);
 
     for (const baseValueName of Object.keys(baseValuesSchema.shape) as (keyof BaseValues)[]) {
+      if (!calculatedBaseValues[baseValueName]) {
+        continue;
+      }
+
       this.characterSheet.baseValues[baseValueName].start += calculatedBaseValues[baseValueName];
       this.characterSheet.baseValues[baseValueName].current += calculatedBaseValues[baseValueName];
       this.characterSheet.baseValues[baseValueName].byFormula = calculatedBaseValues[baseValueName];
@@ -209,7 +214,7 @@ export class CharacterBuilder {
     };
   }
 
-  private zeroCombatValues(name: CombatSkillName): CombatValues {
+  private zeroCombatStats(name: CombatSkillName): CombatStats {
     return {
       availablePoints: getCombatSkillHandling(name),
       handling: getCombatSkillHandling(name),
@@ -220,40 +225,22 @@ export class CharacterBuilder {
     };
   }
 
-  private setCombatValues(): void {
-    console.log("Set combat values for combat skills");
+  private setCombatStats(): void {
+    console.log("Set combat stats for combat skills");
 
-    const rangedCombatCategory: keyof CharacterSheet["combatValues"] = "ranged";
-    for (const combatSkillName of Object.keys(this.characterSheet.skills.combat) as SkillName[]) {
+    for (const combatSkillName of Object.keys(this.characterSheet.skills.combat) as CombatSkillName[]) {
       const combatCategory = getCombatCategory(combatSkillName);
 
-      if (combatCategory === rangedCombatCategory) {
-        this.characterSheet.combatValues.ranged[combatSkillName as keyof CharacterSheet["combatValues"]["ranged"]] =
-          calculateCombatValues(
-            combatSkillName,
-            this.zeroSkill(`combat/${combatSkillName}` as SkillNameWithCategory), // Old skill not existing in character creation
-            this.characterSheet.skills.combat[combatSkillName as CombatSkillName],
-            this.characterSheet.baseValues.attackBaseValue,
-            this.characterSheet.baseValues.paradeBaseValue,
-            this.characterSheet.baseValues.rangedAttackBaseValue,
-            this.characterSheet.combatValues.ranged[
-              combatSkillName as keyof CharacterSheet["combatValues"]["ranged"]
-            ] as CombatValues,
-          );
-      } else {
-        this.characterSheet.combatValues.melee[combatSkillName as keyof CharacterSheet["combatValues"]["melee"]] =
-          calculateCombatValues(
-            combatSkillName,
-            this.zeroSkill(`combat/${combatSkillName}` as SkillNameWithCategory), // Old skill not existing in character creation
-            this.characterSheet.skills.combat[combatSkillName as CombatSkillName],
-            this.characterSheet.baseValues.attackBaseValue,
-            this.characterSheet.baseValues.paradeBaseValue,
-            this.characterSheet.baseValues.rangedAttackBaseValue,
-            this.characterSheet.combatValues.melee[
-              combatSkillName as keyof CharacterSheet["combatValues"]["melee"]
-            ] as CombatValues,
-          );
-      }
+      (this.characterSheet.combat[combatCategory] as Record<string, CombatStats>)[combatSkillName] =
+        calculateCombatStats(
+          combatSkillName,
+          this.zeroSkill(`combat/${combatSkillName}` as SkillNameWithCategory), // Old skill not existing in character creation
+          this.characterSheet.skills.combat[combatSkillName as CombatSkillName],
+          this.characterSheet.baseValues,
+          this.characterSheet.combat[combatCategory][
+            combatSkillName as keyof CombatSection[typeof combatCategory]
+          ] as CombatStats,
+        );
     }
   }
 
@@ -605,11 +592,11 @@ export class CharacterBuilder {
     }
 
     /**
-     * Combat values are affected by different previous steps as
+     * Combat stats are affected by different previous steps as
      * attributes, profession/hobby, combat skills, etc.
      * Therefore, they are set last.
      */
-    this.setCombatValues();
+    this.setCombatStats();
 
     return {
       character: {

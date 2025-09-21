@@ -9,7 +9,7 @@ export {
   updateSkill,
   updateAdventurePoints,
   updateAttributePoints,
-  updateCombatValues,
+  updateCombatStats,
   updateBaseValue,
   updateLevel,
 } from "./dynamodb_characters.js";
@@ -35,7 +35,7 @@ export {
   getAttribute,
   getBaseValue,
   getSkill,
-  getCombatValues,
+  getCombatStats,
   getCombatCategory,
   getSkillCategoryAndName,
   isCombatSkill,
@@ -49,4 +49,4 @@ export {
   MAX_COST_CATEGORY,
   getCombatSkillHandling,
 } from "./rules/constants.js";
-export { calculateCombatValues, combatValuesChanged } from "./rules/combat-values.js";
+export { calculateCombatStats, combatStatsChanged } from "./rules/combat-stats.js";

@@ -5,14 +5,15 @@ import {
   Attribute,
   BaseValue,
   Skill,
-  CombatValues,
+  CombatStats,
   AdvantagesNames,
   DisadvantagesNames,
-  characterSheetSchema,
   SkillCategory,
   SkillName,
   skillCategories,
   skillNames,
+  CombatSection,
+  combatSectionSchema,
 } from "api-spec";
 import {
   SKILL_ACTIVATION_COSTS,
@@ -72,32 +73,32 @@ export function isCombatSkill(skillCategory: string): boolean {
   return skillCategory === combatSkillCategory;
 }
 
-export function getCombatValues(
-  combatValues: CharacterSheet["combatValues"],
-  category: keyof CharacterSheet["combatValues"],
+export function getCombatStats(
+  combatSection: CombatSection,
+  category: keyof CombatSection,
   combatSkillName: SkillName,
-): CombatValues {
-  if (!(category in combatValues)) {
+): CombatStats {
+  if (!(category in combatSection)) {
     throw new Error(`Category ${category} is not a valid combat category!`);
   }
 
-  const combatCategory = combatValues[category] as Record<string, CombatValues>;
-  const skillCombatValues = combatCategory[combatSkillName];
-  if (!skillCombatValues) {
-    throw new Error(`Combat values for skill ${combatSkillName} not found!`);
+  const combatCategory = combatSection[category] as Record<string, CombatStats>;
+  const combatStats = combatCategory[combatSkillName];
+  if (!combatStats) {
+    throw new Error(`Combat stats for skill ${combatSkillName} not found!`);
   }
-  return skillCombatValues;
+  return combatStats;
 }
 
-export function getCombatCategory(combatSkillName: SkillName): keyof CharacterSheet["combatValues"] {
-  const meleeSkills = Object.keys(characterSheetSchema.shape.combatValues.shape.melee.shape);
-  const rangedSkills = Object.keys(characterSheetSchema.shape.combatValues.shape.ranged.shape);
+export function getCombatCategory(combatSkillName: SkillName): keyof CombatSection {
+  const meleeSkills = Object.keys(combatSectionSchema.shape.melee.shape);
+  const rangedSkills = Object.keys(combatSectionSchema.shape.ranged.shape);
 
   if (meleeSkills.includes(combatSkillName)) {
-    const meleeCategory: keyof CharacterSheet["combatValues"] = "melee";
+    const meleeCategory: keyof CombatSection = "melee";
     return meleeCategory;
   } else if (rangedSkills.includes(combatSkillName)) {
-    const rangedCategory: keyof CharacterSheet["combatValues"] = "ranged";
+    const rangedCategory: keyof CombatSection = "ranged";
     return rangedCategory;
   } else {
     throw new Error(`Combat category for skill ${combatSkillName} not found!`);

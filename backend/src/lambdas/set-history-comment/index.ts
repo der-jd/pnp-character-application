@@ -111,7 +111,6 @@ async function validateRequest(request: Request): Promise<Parameters> {
       throw new HttpError(400, "Invalid input values!");
     }
 
-    // Rethrow other errors
     throw error;
   }
 }

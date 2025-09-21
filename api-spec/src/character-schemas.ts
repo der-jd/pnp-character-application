@@ -13,7 +13,7 @@ import {
   MIN_ATTRIBUTE_VALUE,
   userIdSchema,
   MIN_BASE_VALUE,
-  MIN_COMBAT_VALUE,
+  MIN_COMBAT_STAT,
   MIN_POINTS,
 } from "./general-schemas.js";
 
@@ -257,21 +257,21 @@ export const baseValuesSchema = z
 
 export type BaseValues = z.infer<typeof baseValuesSchema>;
 
-export const combatValuesSchema = z
+export const combatStatsSchema = z
   .object({
     // availablePoints = handling + change of corresponding-skill.current + change of corresponding-skill.mod
     availablePoints: z.number().int().min(0).max(MAX_POINTS),
-    handling: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
+    handling: z.number().int().min(MIN_COMBAT_STAT).max(MAX_POINTS),
     // attackValue = skilledAttackValue + (ranged)attackBaseValue.current + (ranged)attackBaseValue.mod
-    attackValue: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
-    skilledAttackValue: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
+    attackValue: z.number().int().min(MIN_COMBAT_STAT).max(MAX_POINTS),
+    skilledAttackValue: z.number().int().min(MIN_COMBAT_STAT).max(MAX_POINTS),
     // paradeValue (only for melee combat) = skilledParadeValue + paradeBaseValue.current + paradeBaseValue.mod
-    paradeValue: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
-    skilledParadeValue: z.number().int().min(MIN_COMBAT_VALUE).max(MAX_POINTS),
+    paradeValue: z.number().int().min(MIN_COMBAT_STAT).max(MAX_POINTS),
+    skilledParadeValue: z.number().int().min(MIN_COMBAT_STAT).max(MAX_POINTS),
   })
   .strict();
 
-export type CombatValues = z.infer<typeof combatValuesSchema>;
+export type CombatStats = z.infer<typeof combatStatsSchema>;
 
 export const learningMethodSchema = z.enum(["FREE", "LOW_PRICED", "NORMAL", "EXPENSIVE"]);
 
@@ -395,6 +395,36 @@ export const START_SKILLS: SkillNameWithCategory[] = [
 
 export const specialAbilitySchema = z.string().max(MAX_STRING_LENGTH_DEFAULT);
 
+export const combatSectionSchema = z
+  .object({
+    melee: z
+      .object({
+        martialArts: combatStatsSchema,
+        barehanded: combatStatsSchema,
+        chainWeapons: combatStatsSchema,
+        daggers: combatStatsSchema,
+        slashingWeaponsSharp1h: combatStatsSchema,
+        slashingWeaponsBlunt1h: combatStatsSchema,
+        thrustingWeapons1h: combatStatsSchema,
+        slashingWeaponsSharp2h: combatStatsSchema,
+        slashingWeaponsBlunt2h: combatStatsSchema,
+        thrustingWeapons2h: combatStatsSchema,
+      })
+      .strict(),
+    ranged: z
+      .object({
+        missile: combatStatsSchema,
+        firearmSimple: combatStatsSchema,
+        firearmMedium: combatStatsSchema,
+        firearmComplex: combatStatsSchema,
+        heavyWeapons: combatStatsSchema,
+      })
+      .strict(),
+  })
+  .strict();
+
+export type CombatSection = z.infer<typeof combatSectionSchema>;
+
 export const characterSheetSchema = z
   .object({
     generalInformation: generalInformationSchema,
@@ -503,33 +533,7 @@ export const characterSheetSchema = z
           .strict(),
       })
       .strict(),
-    combatValues: z
-      .object({
-        melee: z
-          .object({
-            martialArts: combatValuesSchema,
-            barehanded: combatValuesSchema,
-            chainWeapons: combatValuesSchema,
-            daggers: combatValuesSchema,
-            slashingWeaponsSharp1h: combatValuesSchema,
-            slashingWeaponsBlunt1h: combatValuesSchema,
-            thrustingWeapons1h: combatValuesSchema,
-            slashingWeaponsSharp2h: combatValuesSchema,
-            slashingWeaponsBlunt2h: combatValuesSchema,
-            thrustingWeapons2h: combatValuesSchema,
-          })
-          .strict(),
-        ranged: z
-          .object({
-            missile: combatValuesSchema,
-            firearmSimple: combatValuesSchema,
-            firearmMedium: combatValuesSchema,
-            firearmComplex: combatValuesSchema,
-            heavyWeapons: combatValuesSchema,
-          })
-          .strict(),
-      })
-      .strict(),
+    combat: combatSectionSchema,
   })
   .strict();
 

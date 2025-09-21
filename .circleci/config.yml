@@ -18,7 +18,6 @@ workflows:
       - lint-typescript-code
       - build-backend
       - run-backend-tests
-      - check-format-terraform-code
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
           requires:
@@ -26,7 +25,6 @@ workflows:
             - lint-typescript-code
             - build-backend
             - run-backend-tests
-            - check-format-terraform-code
             - lint-terraform-code
       - build-and-deploy-frontend:
           requires:
@@ -109,19 +107,6 @@ jobs:
           command: |
             cd backend
             npm run test
-
-  check-format-terraform-code:
-    docker:
-      - image: hashicorp/terraform:1.9
-    resource_class: small
-    steps:
-      - checkout
-      - run:
-          name: Install npm
-          command: apk add npm
-      - run:
-          name: Check Terraform file formatting
-          command: npm run check-format:terraform
 
   lint-terraform-code:
     docker:

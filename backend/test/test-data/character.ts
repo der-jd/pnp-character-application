@@ -123,7 +123,6 @@ export const fakeCharacter: Character = {
       naturalArmor: {
         start: 0,
         current: 10,
-        byLvlUp: 10,
         mod: 5,
       },
       initiativeBaseValue: {
@@ -808,7 +807,7 @@ export const fakeCharacter: Character = {
         },
       },
     },
-    combatValues: {
+    combat: {
       melee: {
         martialArts: {
           availablePoints: 19,
@@ -1060,7 +1059,6 @@ export const fakeCharacter2: Character = {
       naturalArmor: {
         start: 0,
         current: 10,
-        byLvlUp: 10,
         mod: 5,
       },
       initiativeBaseValue: {
@@ -1745,7 +1743,7 @@ export const fakeCharacter2: Character = {
         },
       },
     },
-    combatValues: {
+    combat: {
       melee: {
         martialArts: {
           availablePoints: 19,

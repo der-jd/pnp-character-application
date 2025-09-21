@@ -1,8 +1,7 @@
-import { Attribute, CharacterSheet } from "api-spec";
+import { Attributes, BaseValues } from "api-spec";
 
-type AttributeName = keyof CharacterSheet["attributes"];
-type BaseValueName = keyof CharacterSheet["baseValues"];
-type FormulaFn = (attributes: Record<AttributeName, Attribute>) => number;
+type BaseValueName = keyof BaseValues;
+type FormulaFn = (attributes: Attributes) => number | undefined;
 
 const baseValueFormulas: Record<BaseValueName, FormulaFn> = {
   healthPoints: (attributes) =>
@@ -14,8 +13,8 @@ const baseValueFormulas: Record<BaseValueName, FormulaFn> = {
     attributes.courage.mod +
     2 * (attributes.mentalResilience.current + attributes.mentalResilience.mod) +
     8,
-  armorLevel: () => 0,
-  naturalArmor: () => 0,
+  armorLevel: () => undefined,
+  naturalArmor: () => undefined,
   initiativeBaseValue: (attributes) =>
     (2 * (attributes.courage.current + attributes.courage.mod) +
       (attributes.dexterity.current + attributes.dexterity.mod) +
@@ -48,18 +47,20 @@ const baseValueFormulas: Record<BaseValueName, FormulaFn> = {
         attributes.strength.current +
         attributes.strength.mod)) /
     5,
-  luckPoints: () => 0,
-  bonusActionsPerCombatRound: () => 0,
-  legendaryActions: () => 0,
+  luckPoints: () => undefined,
+  bonusActionsPerCombatRound: () => undefined,
+  legendaryActions: () => undefined,
 };
 
-export function calculateBaseValues(attributes: Record<AttributeName, Attribute>): Record<BaseValueName, number> {
-  const result: Partial<Record<BaseValueName, number>> = {};
+export function calculateBaseValues(attributes: Attributes): Record<BaseValueName, number | undefined> {
+  const result: Partial<Record<BaseValueName, number | undefined>> = {};
 
   for (const baseValueName of Object.keys(baseValueFormulas) as BaseValueName[]) {
     const formula = baseValueFormulas[baseValueName];
-    result[baseValueName] = Math.round(formula(attributes));
+    const value = formula(attributes);
+    console.debug(`Raw formula result for base value ${baseValueName}: ${value}`);
+    result[baseValueName] = value ? Math.round(value) : undefined;
   }
 
-  return result as Record<BaseValueName, number>;
+  return result as Record<BaseValueName, number | undefined>;
 }

@@ -405,31 +405,31 @@ module "special_abilities_options" {
   resource_id = aws_api_gateway_resource.special_abilities.id
 }
 
-// ================== /characters/{character-id}/combat-values ==================
+// ================== /characters/{character-id}/combat ==================
 
-resource "aws_api_gateway_resource" "combat_values" {
+resource "aws_api_gateway_resource" "combat" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.character_id.id
-  path_part   = "combat-values" // .../characters/{character-id}/combat-values
+  path_part   = "combat" // .../characters/{character-id}/combat
 }
 
-// ================== /characters/{character-id}/combat-values/{combat-category} ==================
+// ================== /characters/{character-id}/combat/{combat-category} ==================
 
 resource "aws_api_gateway_resource" "combat_category" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  parent_id   = aws_api_gateway_resource.combat_values.id
-  path_part   = "{combat-category}" // .../characters/{character-id}/combat-values/{combat-category}
+  parent_id   = aws_api_gateway_resource.combat.id
+  path_part   = "{combat-category}" // .../characters/{character-id}/combat/{combat-category}
 }
 
-// ================== /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
+// ================== /characters/{character-id}/combat/{combat-category}/{combat-skill-name} ==================
 
 resource "aws_api_gateway_resource" "combat_skill_name" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.combat_category.id
-  path_part   = "{combat-skill-name}" // .../characters/{character-id}/combat-values/{combat-category}/{combat-skill-name}
+  path_part   = "{combat-skill-name}" // .../characters/{character-id}/combat/{combat-category}/{combat-skill-name}
 }
 
-// ================== PATCH /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
+// ================== PATCH /characters/{character-id}/combat/{combat-category}/{combat-skill-name} ==================
 
 module "combat_skill_name_patch" {
   source        = "./modules/apigw_stepfunction_integration"
@@ -444,11 +444,11 @@ module "combat_skill_name_patch" {
   }
   aws_region        = data.aws_region.current.name
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.update_combat_values_state_machine.arn
+  state_machine_arn = aws_sfn_state_machine.update_combat_stats_state_machine.arn
 }
 
 
-// ================== OPTIONS /characters/{character-id}/combat-values/{combat-category}/{combat-skill-name} ==================
+// ================== OPTIONS /characters/{character-id}/combat/{combat-category}/{combat-skill-name} ==================
 
 module "combat_skill_name_options" {
   source      = "./modules/apigw_options_method"

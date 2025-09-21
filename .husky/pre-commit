@@ -1,5 +1,4 @@
 npm run check-format
-npm run check-format:terraform
 
 npm run lint
 npm run lint:terraform

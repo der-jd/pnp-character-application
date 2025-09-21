@@ -14,7 +14,7 @@ const TYPE_MAPPING: Record<string, string> = {
   '"2"': '"3"', // BASE_VALUE_CHANGED
   '"0"': '"2"', // CALCULATION_POINTS_CHANGED
   '"7"': '"4"', // SPECIAL_ABILITIES_CHANGED
-  '"11"': '"7"', // COMBAT_VALUES_CHANGED
+  '"11"': '"7"', // COMBAT_STATS_CHANGED
 };
 
 function updateTypeNumbers(jsonContent: string): string {

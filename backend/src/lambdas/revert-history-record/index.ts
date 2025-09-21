@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import {
   baseValueSchema,
-  combatValuesSchema,
+  combatStatsSchema,
   RecordType,
   Record,
   historyBlockSchema,
@@ -17,6 +17,7 @@ import {
   DeleteHistoryRecordPathParams,
   DeleteHistoryRecordResponse,
   headersSchema,
+  CombatSection,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -31,7 +32,7 @@ import {
   updateAttributePoints,
   updateAttribute,
   updateSkill,
-  updateCombatValues,
+  updateCombatStats,
   updateBaseValue,
   updateLevel,
   setSpecialAbilities,
@@ -158,25 +159,32 @@ async function revertChange(userId: string, characterId: string, record: Record)
       }
       case RecordType.ATTRIBUTE_CHANGED: {
         const oldData = attributeChangeSchema.parse(record.data.old);
-        const newData = attributeChangeSchema.parse(record.data.new);
 
-        if (oldData.baseValues && newData.baseValues) {
+        if (oldData.baseValues) {
           const updates: Promise<void>[] = [];
           for (const baseValueName of Object.keys(oldData.baseValues) as (keyof CharacterSheet["baseValues"])[]) {
             const oldBaseValue = oldData.baseValues[baseValueName];
-            const newBaseValue = newData.baseValues[baseValueName];
 
             // This check shouldn't be necessary as we loop over only existing base values. However, TypeScript complains without it.
-            if (oldBaseValue === undefined || newBaseValue === undefined) {
-              throw new HttpError(500, `Base value '${String(baseValueName)}' is missing in old / new data`);
+            if (oldBaseValue === undefined) {
+              throw new HttpError(500, `Base value '${String(baseValueName)}' is missing in old data`);
             }
 
-            /**
-             * This check is obsolete because the record only contains the base values that have changed.
-             * However, it is kept here for safety and efficiency in case the record is modified in the future.
-             */
-            if (oldBaseValue.byFormula && oldBaseValue.byFormula !== newBaseValue.byFormula) {
-              updates.push(updateBaseValue(userId, characterId, baseValueName, oldBaseValue));
+            updates.push(updateBaseValue(userId, characterId, baseValueName, oldBaseValue));
+          }
+          await Promise.all(updates);
+        }
+
+        if (oldData.combat) {
+          const updates: Promise<void>[] = [];
+          for (const combatCategory of Object.keys(oldData.combat) as (keyof CombatSection)[]) {
+            // This check shouldn't be necessary as we loop over only existing categories. However, TypeScript complains without it.
+            if (oldData.combat[combatCategory] === undefined) {
+              throw new HttpError(500, `Combat category '${String(combatCategory)}' is missing in old data`);
+            }
+
+            for (const [skillName, oldCombatStats] of Object.entries(oldData.combat[combatCategory])) {
+              updates.push(updateCombatStats(userId, characterId, combatCategory, skillName, oldCombatStats));
             }
           }
           await Promise.all(updates);
@@ -197,9 +205,9 @@ async function revertChange(userId: string, characterId: string, record: Record)
 
         const { category: skillCategory, name: skillName } = getSkillCategoryAndName(record.name);
 
-        if (oldData.combatValues) {
+        if (oldData.combatStats) {
           const combatCategory = getCombatCategory(skillName);
-          await updateCombatValues(userId, characterId, combatCategory, skillName, oldData.combatValues);
+          await updateCombatStats(userId, characterId, combatCategory, skillName, oldData.combatStats);
         }
 
         await updateSkill(
@@ -213,10 +221,10 @@ async function revertChange(userId: string, characterId: string, record: Record)
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         break;
       }
-      case RecordType.COMBAT_VALUES_CHANGED: {
-        const oldSkillCombatValues = combatValuesSchema.parse(record.data.old);
+      case RecordType.COMBAT_STATS_CHANGED: {
+        const oldCombatStats = combatStatsSchema.parse(record.data.old);
         const [combatCategory, combatSkillName] = record.name.split("/");
-        await updateCombatValues(userId, characterId, combatCategory, combatSkillName, oldSkillCombatValues);
+        await updateCombatStats(userId, characterId, combatCategory, combatSkillName, oldCombatStats);
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
@@ -230,7 +238,6 @@ async function revertChange(userId: string, characterId: string, record: Record)
       throw new HttpError(500, "Invalid history record values!");
     }
 
-    // Rethrow other errors
     throw error;
   }
 }

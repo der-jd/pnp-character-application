@@ -93,7 +93,6 @@ function validateRequest(request: Request): Parameters {
       throw new HttpError(400, "Invalid input values!");
     }
 
-    // Rethrow other errors
     throw error;
   }
 }

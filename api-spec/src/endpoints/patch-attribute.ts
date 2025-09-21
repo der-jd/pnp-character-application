@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { attributeSchema, calculationPointsSchema, baseValuesSchema } from "../character-schemas.js";
+import { calculationPointsSchema } from "../character-schemas.js";
 import {
   initialIncreasedSchema,
   initialNewSchema,
@@ -34,18 +34,8 @@ export const updateAttributeResponseSchema = z
     attributeName: z.string().max(MAX_STRING_LENGTH_DEFAULT),
     changes: z
       .object({
-        old: z
-          .object({
-            attribute: attributeSchema,
-            baseValues: baseValuesSchema.partial().optional(),
-          })
-          .strict(),
-        new: z
-          .object({
-            attribute: attributeSchema,
-            baseValues: baseValuesSchema.partial().optional(),
-          })
-          .strict(),
+        old: attributeChangeSchema,
+        new: attributeChangeSchema,
       })
       .strict(),
     attributePoints: z

@@ -18,7 +18,7 @@ export {
   ADVANTAGES,
   attributeSchema,
   baseValueSchema,
-  combatValuesSchema,
+  combatStatsSchema,
   skillSchema,
   characterSheetSchema,
   characterSchema,
@@ -36,7 +36,7 @@ export {
   Attribute,
   BaseValue,
   BaseValues,
-  CombatValues,
+  CombatStats,
   CostCategory,
   LearningMethod,
   LearningMethodString,
@@ -56,6 +56,8 @@ export {
   START_SKILLS,
   skillCategories,
   skillNames,
+  combatSectionSchema,
+  CombatSection,
 } from "./character-schemas.js";
 export {
   recordSchema,
@@ -200,17 +202,17 @@ export {
   PatchCalculationPointsHistoryRecord,
 } from "./endpoints/patch-calculation-points.js";
 export {
-  patchCombatValuesPathParamsSchema,
-  PatchCombatValuesPathParams,
-  patchCombatValuesRequestSchema,
-  PatchCombatValuesRequest,
-  updateCombatValuesResponseSchema,
-  UpdateCombatValuesResponse,
-  patchCombatValuesResponseSchema,
-  PatchCombatValuesResponse,
-  patchCombatValuesHistoryRecordSchema,
-  PatchCombatValuesHistoryRecord,
-} from "./endpoints/patch-combat-values.js";
+  patchCombatStatsPathParamsSchema,
+  PatchCombatStatsPathParams,
+  patchCombatStatsRequestSchema,
+  PatchCombatStatsRequest,
+  updateCombatStatsResponseSchema,
+  UpdateCombatStatsResponse,
+  patchCombatStatsResponseSchema,
+  PatchCombatStatsResponse,
+  patchCombatStatsHistoryRecordSchema,
+  PatchCombatStatsHistoryRecord,
+} from "./endpoints/patch-combat-stats.js";
 export {
   patchSkillPathParamsSchema,
   PatchSkillPathParams,

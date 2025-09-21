@@ -6,13 +6,14 @@ import { fakeHistoryBlockListResponse, mockDynamoDBQueryHistoryResponse } from "
 import { fakeCharacterId } from "../test-data/character.js";
 import {
   addFakeHistoryRecord,
-  attributeAndBaseValueChangedRecord,
+  attributeAndBaseValuesChangedRecord,
+  attributeAndBaseValuesAndCombatStatsChangedRecord,
   attributeChangedRecord,
   baseValueChangedRecord,
   calculationPointsChangedRecord,
   characterCreatedChangedRecord,
   combatSkillChangedRecord,
-  combatValuesChangedRecord,
+  combatStatsChangedRecord,
   levelChangedRecord,
   skillChangedRecord,
   specialAbilitiesChangedRecord,
@@ -210,7 +211,21 @@ describe("Valid requests", () => {
     },
     {
       name: "Revert history record for a changed attribute and base values",
-      fakeRecord: attributeAndBaseValueChangedRecord,
+      fakeRecord: attributeAndBaseValuesChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for a changed attribute, base values and combat stats",
+      fakeRecord: attributeAndBaseValuesAndCombatStatsChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -237,7 +252,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Revert history record for a changed combat skill and combat values",
+      name: "Revert history record for a changed combat skill and combat stats",
       fakeRecord: combatSkillChangedRecord,
       request: {
         headers: fakeHeaders,
@@ -251,8 +266,8 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Revert history record for changed combat values",
-      fakeRecord: combatValuesChangedRecord,
+      name: "Revert history record for changed combat stats",
+      fakeRecord: combatStatsChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {

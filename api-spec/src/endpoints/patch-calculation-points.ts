@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { initialNewSchema, initialIncreasedSchema, userIdSchema } from "../general-schemas.js";
-import { calculationPointsSchema } from "../character-schemas.js";
 import { calculationPointsChangeSchema, recordSchema } from "../history-schemas.js";
 
 export const patchCalculationPointsPathParamsSchema = z
@@ -38,18 +37,8 @@ export const updateCalculationPointsResponseSchema = z
     userId: userIdSchema,
     calculationPoints: z
       .object({
-        old: z
-          .object({
-            adventurePoints: calculationPointsSchema.optional(),
-            attributePoints: calculationPointsSchema.optional(),
-          })
-          .strict(),
-        new: z
-          .object({
-            adventurePoints: calculationPointsSchema.optional(),
-            attributePoints: calculationPointsSchema.optional(),
-          })
-          .strict(),
+        old: calculationPointsChangeSchema,
+        new: calculationPointsChangeSchema,
       })
       .strict(),
   })

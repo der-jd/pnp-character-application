@@ -1,13 +1,16 @@
 import { z } from "zod";
 import {
   attributeSchema,
+  baseValuesSchema,
   calculationPointsSchema,
   characterSchema,
-  characterSheetSchema,
-  combatValuesSchema,
+  combatSectionSchema,
+  combatStatsSchema,
   combinedSkillCategoryAndNameSchema,
   learningMethodSchema,
+  levelSchema,
   skillSchema,
+  specialAbilitySchema,
 } from "./character-schemas.js";
 import {
   MAX_STRING_LENGTH_DEFAULT,
@@ -29,7 +32,7 @@ export enum RecordType {
   SPECIAL_ABILITIES_CHANGED = 4,
   ATTRIBUTE_CHANGED = 5,
   SKILL_CHANGED = 6,
-  COMBAT_VALUES_CHANGED = 7,
+  COMBAT_STATS_CHANGED = 7,
 }
 
 export const recordSchema = z
@@ -123,10 +126,23 @@ export const stringArraySchema = z
   })
   .strict();
 
+export const levelChangeSchema = z
+  .object({
+    value: levelSchema,
+  })
+  .strict();
+
+export const specialAbilitiesChangeSchema = z
+  .object({
+    values: z.array(specialAbilitySchema).max(MAX_ARRAY_SIZE),
+  })
+  .strict();
+
 export const attributeChangeSchema = z
   .object({
     attribute: attributeSchema,
-    baseValues: characterSheetSchema.shape.baseValues.partial().optional(),
+    baseValues: baseValuesSchema.partial().optional(),
+    combat: combatSectionSchema.partial().optional(),
   })
   .strict();
 
@@ -140,6 +156,6 @@ export const calculationPointsChangeSchema = z
 export const skillChangeSchema = z
   .object({
     skill: skillSchema,
-    combatValues: combatValuesSchema.optional(),
+    combatStats: combatStatsSchema.optional(),
   })
   .strict();
