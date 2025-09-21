@@ -1,14 +1,16 @@
 import { z } from "zod";
 import {
   attributeSchema,
+  baseValuesSchema,
   calculationPointsSchema,
   characterSchema,
-  characterSheetSchema,
   combatSectionSchema,
   combatStatsSchema,
   combinedSkillCategoryAndNameSchema,
   learningMethodSchema,
+  levelSchema,
   skillSchema,
+  specialAbilitySchema,
 } from "./character-schemas.js";
 import {
   MAX_STRING_LENGTH_DEFAULT,
@@ -124,10 +126,22 @@ export const stringArraySchema = z
   })
   .strict();
 
+export const levelChangeSchema = z
+  .object({
+    value: levelSchema,
+  })
+  .strict();
+
+export const specialAbilitiesChangeSchema = z
+  .object({
+    values: z.array(specialAbilitySchema).max(MAX_ARRAY_SIZE),
+  })
+  .strict();
+
 export const attributeChangeSchema = z
   .object({
     attribute: attributeSchema,
-    baseValues: characterSheetSchema.shape.baseValues.partial().optional(),
+    baseValues: baseValuesSchema.partial().optional(),
     combat: combatSectionSchema.partial().optional(),
   })
   .strict();

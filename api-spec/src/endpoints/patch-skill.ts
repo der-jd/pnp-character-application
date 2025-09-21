@@ -6,7 +6,7 @@ import {
   MAX_STRING_LENGTH_DEFAULT,
   MAX_COST,
 } from "../general-schemas.js";
-import { skillSchema, combatStatsSchema, calculationPointsSchema, learningMethodSchema } from "../character-schemas.js";
+import { calculationPointsSchema, learningMethodSchema } from "../character-schemas.js";
 import { recordSchema, skillChangeSchema } from "../history-schemas.js";
 
 export const patchSkillPathParamsSchema = z
@@ -40,18 +40,8 @@ export const updateSkillResponseSchema = z
     combatCategory: z.string().max(MAX_STRING_LENGTH_DEFAULT).optional(),
     changes: z
       .object({
-        old: z
-          .object({
-            skill: skillSchema,
-            combatStats: combatStatsSchema.optional(),
-          })
-          .strict(),
-        new: z
-          .object({
-            skill: skillSchema,
-            combatStats: combatStatsSchema.optional(),
-          })
-          .strict(),
+        old: skillChangeSchema,
+        new: skillChangeSchema,
       })
       .strict(),
     learningMethod: learningMethodSchema.optional(),
