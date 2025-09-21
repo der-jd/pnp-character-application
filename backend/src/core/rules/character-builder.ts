@@ -224,28 +224,19 @@ export class CharacterBuilder {
   private setCombatStats(): void {
     console.log("Set combat stats for combat skills");
 
-    const rangedCombatCategory: keyof CombatSection = "ranged";
-    for (const combatSkillName of Object.keys(this.characterSheet.skills.combat) as SkillName[]) {
+    for (const combatSkillName of Object.keys(this.characterSheet.skills.combat) as CombatSkillName[]) {
       const combatCategory = getCombatCategory(combatSkillName);
 
-      // TODO if else not necessary?!
-      if (combatCategory === rangedCombatCategory) {
-        this.characterSheet.combat.ranged[combatSkillName as keyof CombatSection["ranged"]] = calculateCombatStats(
+      (this.characterSheet.combat[combatCategory] as Record<string, CombatStats>)[combatSkillName] =
+        calculateCombatStats(
           combatSkillName,
           this.zeroSkill(`combat/${combatSkillName}` as SkillNameWithCategory), // Old skill not existing in character creation
           this.characterSheet.skills.combat[combatSkillName as CombatSkillName],
           this.characterSheet.baseValues,
-          this.characterSheet.combat.ranged[combatSkillName as keyof CombatSection["ranged"]] as CombatStats,
+          this.characterSheet.combat[combatCategory][
+            combatSkillName as keyof CombatSection[typeof combatCategory]
+          ] as CombatStats,
         );
-      } else {
-        this.characterSheet.combat.melee[combatSkillName as keyof CombatSection["melee"]] = calculateCombatStats(
-          combatSkillName,
-          this.zeroSkill(`combat/${combatSkillName}` as SkillNameWithCategory), // Old skill not existing in character creation
-          this.characterSheet.skills.combat[combatSkillName as CombatSkillName],
-          this.characterSheet.baseValues,
-          this.characterSheet.combat.melee[combatSkillName as keyof CombatSection["melee"]] as CombatStats,
-        );
-      }
     }
   }
 
