@@ -87,7 +87,6 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
 
     console.log("Calculate base values");
     const baseValuesOld = characterSheet.baseValues;
-    let baseValuesNew: BaseValues | undefined;
     const attributesNew = structuredClone(characterSheet.attributes);
     attributesNew[params.pathParams["attribute-name"] as keyof CharacterSheet["attributes"]] = attribute;
     const newBaseValuesByFormula = calculateBaseValues(attributesNew);
@@ -99,14 +98,13 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
       const newFormulaValue = newBaseValuesByFormula[baseValueName];
 
       if (oldBaseValue.byFormula && newFormulaValue !== oldBaseValue.byFormula) {
-        if (!baseValuesNew) {
-          baseValuesNew = structuredClone(baseValuesOld);
-        }
-
         const diffByFormula = newFormulaValue - oldBaseValue.byFormula;
-        baseValuesNew[baseValueName].byFormula = newFormulaValue;
-        baseValuesNew[baseValueName].current += diffByFormula;
-        changedBaseValues[baseValueName] = baseValuesNew[baseValueName];
+        changedBaseValues[baseValueName] = {
+          ...baseValuesOld[baseValueName],
+          byFormula: newFormulaValue,
+          current: baseValuesOld[baseValueName].current + diffByFormula,
+        };
+
         console.log(`Update base value '${baseValueName}'`);
         console.log("Old base value:", oldBaseValue);
         console.log("New base value:", changedBaseValues[baseValueName]);
@@ -115,7 +113,7 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
             params.userId,
             params.pathParams["character-id"],
             baseValueName,
-            baseValuesNew[baseValueName],
+            changedBaseValues[baseValueName],
           ),
         );
       }
@@ -130,17 +128,16 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
     }
 
     const combatBaseValueChanged: boolean =
-      (changedBaseValues.attackBaseValue !== undefined ||
-        changedBaseValues.paradeBaseValue !== undefined ||
-        changedBaseValues.rangedAttackBaseValue !== undefined) &&
-      baseValuesNew !== undefined;
+      changedBaseValues.attackBaseValue !== undefined ||
+      changedBaseValues.paradeBaseValue !== undefined ||
+      changedBaseValues.rangedAttackBaseValue !== undefined;
     let changedCombatSection: Partial<CombatSection> = {};
     if (combatBaseValueChanged) {
       changedCombatSection = await recalculateAndUpdateCombatStats(
         params.userId,
         params.pathParams["character-id"],
         characterSheet.combat,
-        baseValuesNew!,
+        { ...baseValuesOld, ...changedBaseValues },
       );
     }
 
