@@ -17,6 +17,7 @@ import {
   DeleteHistoryRecordPathParams,
   DeleteHistoryRecordResponse,
   headersSchema,
+  CombatSection,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -170,6 +171,21 @@ async function revertChange(userId: string, characterId: string, record: Record)
             }
 
             updates.push(updateBaseValue(userId, characterId, baseValueName, oldBaseValue));
+          }
+          await Promise.all(updates);
+        }
+
+        if (oldData.combat) {
+          const updates: Promise<void>[] = [];
+          for (const combatCategory of Object.keys(oldData.combat) as (keyof CombatSection)[]) {
+            // This check shouldn't be necessary as we loop over only existing categories. However, TypeScript complains without it.
+            if (oldData.combat[combatCategory] === undefined) {
+              throw new HttpError(500, `Combat category '${String(combatCategory)}' is missing in old data`);
+            }
+
+            for (const [skillName, oldCombatStats] of Object.entries(oldData.combat[combatCategory])) {
+              updates.push(updateCombatStats(userId, characterId, combatCategory, skillName, oldCombatStats));
+            }
           }
           await Promise.all(updates);
         }
