@@ -218,9 +218,13 @@ async function recalculateAndUpdateCombatStats(
 
       if (combatStatsChanged(oldCombatStats, newCombatStats)) {
         console.log(`Combat stats for ${category}/${skillName} changed. Persisting...`);
+        console.log(`Old combat stats:`, oldCombatStats);
+        console.log(`New combat stats:`, newCombatStats);
         combatStatsUpdates.push(updateCombatStats(userId, characterId, category, skillName, newCombatStats));
         hasChanges = true;
         changedCombatCategorySection[skillName] = newCombatStats;
+      } else {
+        console.log(`Combat stats for ${category}/${skillName} unchanged.`);
       }
     }
 
