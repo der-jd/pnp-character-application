@@ -87,9 +87,10 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
 
     console.log("Calculate base values");
     const baseValuesOld = characterSheet.baseValues;
-    const attributesNew = structuredClone(characterSheet.attributes);
-    attributesNew[params.pathParams["attribute-name"] as keyof CharacterSheet["attributes"]] = attribute;
-    const newBaseValuesByFormula = calculateBaseValues(attributesNew);
+    const newBaseValuesByFormula = calculateBaseValues({
+      ...characterSheet.attributes,
+      [params.pathParams["attribute-name"]]: attribute,
+    });
     const updates: Promise<void>[] = [];
     const changedBaseValues: Partial<BaseValues> = {};
 
@@ -97,26 +98,28 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
       const oldBaseValue = baseValuesOld[baseValueName];
       const newFormulaValue = newBaseValuesByFormula[baseValueName];
 
-      if (oldBaseValue.byFormula && newFormulaValue !== oldBaseValue.byFormula) {
-        const diffByFormula = newFormulaValue - oldBaseValue.byFormula;
-        changedBaseValues[baseValueName] = {
-          ...baseValuesOld[baseValueName],
-          byFormula: newFormulaValue,
-          current: baseValuesOld[baseValueName].current + diffByFormula,
-        };
-
-        console.log(`Update base value '${baseValueName}'`);
-        console.log("Old base value:", oldBaseValue);
-        console.log("New base value:", changedBaseValues[baseValueName]);
-        updates.push(
-          updateBaseValue(
-            params.userId,
-            params.pathParams["character-id"],
-            baseValueName,
-            changedBaseValues[baseValueName],
-          ),
-        );
+      if (!oldBaseValue.byFormula || !newFormulaValue || newFormulaValue === oldBaseValue.byFormula) {
+        continue;
       }
+
+      const diffByFormula = newFormulaValue - oldBaseValue.byFormula;
+      changedBaseValues[baseValueName] = {
+        ...baseValuesOld[baseValueName],
+        byFormula: newFormulaValue,
+        current: baseValuesOld[baseValueName].current + diffByFormula,
+      };
+
+      console.log(`Update base value '${baseValueName}'`);
+      console.log("Old base value:", oldBaseValue);
+      console.log("New base value:", changedBaseValues[baseValueName]);
+      updates.push(
+        updateBaseValue(
+          params.userId,
+          params.pathParams["character-id"],
+          baseValueName,
+          changedBaseValues[baseValueName],
+        ),
+      );
     }
 
     const baseValuesChanged = Object.keys(changedBaseValues).length > 0;

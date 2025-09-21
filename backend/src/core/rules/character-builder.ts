@@ -193,6 +193,10 @@ export class CharacterBuilder {
     const calculatedBaseValues = calculateBaseValues(this.characterSheet.attributes);
 
     for (const baseValueName of Object.keys(baseValuesSchema.shape) as (keyof BaseValues)[]) {
+      if (!calculatedBaseValues[baseValueName]) {
+        continue;
+      }
+
       this.characterSheet.baseValues[baseValueName].start += calculatedBaseValues[baseValueName];
       this.characterSheet.baseValues[baseValueName].current += calculatedBaseValues[baseValueName];
       this.characterSheet.baseValues[baseValueName].byFormula = calculatedBaseValues[baseValueName];

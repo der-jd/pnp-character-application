@@ -30,6 +30,7 @@ import {
   COST_CATEGORY_COMBAT_SKILLS,
   COST_CATEGORY_DEFAULT,
   getCombatSkillHandling,
+  calculateBaseValues,
 } from "core";
 
 const characterCreationRequest: PostCharactersRequest = {
@@ -676,10 +677,17 @@ describe("Valid requests", () => {
       expect(parsedBody.changes.new.character.characterSheet.specialAbilities).toStrictEqual([]);
 
       // Check that base values are initialized correctly
+      const calculatedBaseValues = calculateBaseValues(parsedBody.changes.new.character.characterSheet.attributes);
       Object.entries(parsedBody.changes.new.character.characterSheet.baseValues).forEach(
         ([baseValueName, baseValue]) => {
-          expect(baseValue.byFormula).toBe(baseValue.current);
+          if (calculatedBaseValues[baseValueName as keyof BaseValues]) {
+            expect(baseValue.byFormula).toBe(baseValue.current);
+          } else {
+            expect(baseValue.byFormula).toBeUndefined();
+          }
+
           expect(baseValue.current).toBe(baseValue.start);
+
           if (baseValuesUpdatableByLvlUp.includes(baseValueName as keyof BaseValues)) {
             expect(baseValue.byLvlUp).toBe(0);
           } else {
