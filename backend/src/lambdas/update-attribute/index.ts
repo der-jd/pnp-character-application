@@ -10,10 +10,8 @@ import {
   CalculationPoints,
   InitialNew,
   InitialIncreased,
-  SkillName,
   BaseValues,
   CombatSection,
-  CombatStats,
 } from "api-spec";
 import {
   Request,
@@ -28,9 +26,8 @@ import {
   logZodError,
   getAttribute,
   calculateBaseValues,
-  calculateCombatStats,
-  combatStatsChanged,
-  updateCombatStats,
+  recalculateAndUpdateCombatStats,
+  combatBaseValuesChanged,
 } from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -135,10 +132,7 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
       console.log("No base values changed, nothing to update.");
     }
 
-    const combatBaseValueChanged: boolean =
-      changedBaseValues.attackBaseValue !== undefined ||
-      changedBaseValues.paradeBaseValue !== undefined ||
-      changedBaseValues.rangedAttackBaseValue !== undefined;
+    const combatBaseValueChanged: boolean = combatBaseValuesChanged(changedBaseValues);
     let changedCombatSection: Partial<CombatSection> = {};
     if (combatBaseValueChanged) {
       changedCombatSection = await recalculateAndUpdateCombatStats(
@@ -202,57 +196,6 @@ function validateRequest(request: Request): Parameters {
 
     throw error;
   }
-}
-
-async function recalculateAndUpdateCombatStats(
-  userId: string,
-  characterId: string,
-  combatSection: CombatSection,
-  baseValues: BaseValues,
-): Promise<Partial<CombatSection>> {
-  console.log("Recalculate and update combat stats");
-  const combatStatsUpdates: Promise<void>[] = [];
-  const changedCombatSection: Partial<CombatSection> = {};
-
-  const combatCategories = Object.keys(combatSection) as (keyof CombatSection)[];
-  for (const category of combatCategories) {
-    let hasChanges = false;
-    const changedCombatCategorySection: Record<string, CombatStats> = {};
-
-    for (const [skillName, oldCombatStats] of Object.entries(combatSection[category])) {
-      const newCombatStats = calculateCombatStats(skillName as SkillName, null, null, baseValues, oldCombatStats);
-
-      if (combatStatsChanged(oldCombatStats, newCombatStats)) {
-        console.log(`Combat stats for ${category}/${skillName} changed. Persisting...`);
-        console.log(`Old combat stats:`, oldCombatStats);
-        console.log(`New combat stats:`, newCombatStats);
-        combatStatsUpdates.push(updateCombatStats(userId, characterId, category, skillName, newCombatStats));
-        hasChanges = true;
-        changedCombatCategorySection[skillName] = newCombatStats;
-      } else {
-        console.log(`Combat stats for ${category}/${skillName} unchanged.`);
-      }
-    }
-
-    if (hasChanges) {
-      /**
-       * TypeScript's strict union type checking for CombatSection[keyof CombatSection] requires
-       * the value to satisfy both melee and ranged section types simultaneously.
-       * Since changedCombatCategorySection (Record<string, CombatStats>) only matches one category
-       * at a time (melee or ranged), we use 'as any' to bypass this limitation, as the runtime
-       * structure is guaranteed to be correct based on the category loop.
-       */
-      changedCombatSection[category] = changedCombatCategorySection as any;
-    }
-  }
-
-  if (combatStatsUpdates.length > 0) {
-    await Promise.all(combatStatsUpdates);
-  } else {
-    console.log("No combat stats changed, nothing to update.");
-  }
-
-  return changedCombatSection;
 }
 
 function updateStartValue(attribute: Attribute, startValue: InitialNew): Attribute {
