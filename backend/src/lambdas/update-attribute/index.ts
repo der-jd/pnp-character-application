@@ -97,7 +97,13 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
       const oldBaseValue = baseValuesOld[baseValueName];
       const newFormulaValue = newBaseValuesByFormula[baseValueName];
 
-      if (!oldBaseValue.byFormula || !newFormulaValue || newFormulaValue === oldBaseValue.byFormula) {
+      if (!oldBaseValue.byFormula || !newFormulaValue) {
+        continue;
+      }
+      if (newFormulaValue === oldBaseValue.byFormula) {
+        console.debug(`Base value '${baseValueName}' has not changed by formula, nothing to update.`);
+        console.debug("Old base by formula:", oldBaseValue.byFormula);
+        console.debug("New base by formula:", newFormulaValue);
         continue;
       }
 
