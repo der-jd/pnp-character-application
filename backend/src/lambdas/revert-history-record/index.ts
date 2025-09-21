@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import {
   baseValueSchema,
-  combatValuesSchema,
+  combatStatsSchema,
   RecordType,
   Record,
   historyBlockSchema,
@@ -31,7 +31,7 @@ import {
   updateAttributePoints,
   updateAttribute,
   updateSkill,
-  updateCombatValues,
+  updateCombatStats,
   updateBaseValue,
   updateLevel,
   setSpecialAbilities,
@@ -197,9 +197,9 @@ async function revertChange(userId: string, characterId: string, record: Record)
 
         const { category: skillCategory, name: skillName } = getSkillCategoryAndName(record.name);
 
-        if (oldData.combatValues) {
+        if (oldData.combatStats) {
           const combatCategory = getCombatCategory(skillName);
-          await updateCombatValues(userId, characterId, combatCategory, skillName, oldData.combatValues);
+          await updateCombatStats(userId, characterId, combatCategory, skillName, oldData.combatStats);
         }
 
         await updateSkill(
@@ -213,10 +213,10 @@ async function revertChange(userId: string, characterId: string, record: Record)
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         break;
       }
-      case RecordType.COMBAT_VALUES_CHANGED: {
-        const oldSkillCombatValues = combatValuesSchema.parse(record.data.old);
+      case RecordType.COMBAT_STATS_CHANGED: {
+        const oldCombatStats = combatStatsSchema.parse(record.data.old);
         const [combatCategory, combatSkillName] = record.name.split("/");
-        await updateCombatValues(userId, characterId, combatCategory, combatSkillName, oldSkillCombatValues);
+        await updateCombatStats(userId, characterId, combatCategory, combatSkillName, oldCombatStats);
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
@@ -230,7 +230,6 @@ async function revertChange(userId: string, characterId: string, record: Record)
       throw new HttpError(500, "Invalid history record values!");
     }
 
-    // Rethrow other errors
     throw error;
   }
 }

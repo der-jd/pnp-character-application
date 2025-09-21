@@ -12,7 +12,7 @@ import {
   calculationPointsChangedRecord,
   characterCreatedChangedRecord,
   combatSkillChangedRecord,
-  combatValuesChangedRecord,
+  combatStatsChangedRecord,
   levelChangedRecord,
   skillChangedRecord,
   specialAbilitiesChangedRecord,
@@ -237,7 +237,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Revert history record for a changed combat skill and combat values",
+      name: "Revert history record for a changed combat skill and combat stats",
       fakeRecord: combatSkillChangedRecord,
       request: {
         headers: fakeHeaders,
@@ -251,8 +251,8 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Revert history record for changed combat values",
-      fakeRecord: combatValuesChangedRecord,
+      name: "Revert history record for changed combat stats",
+      fakeRecord: combatStatsChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {

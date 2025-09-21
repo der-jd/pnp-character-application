@@ -84,9 +84,9 @@ module "delete_character_lambda" {
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
 }
 
-module "update_combat_values_lambda" {
+module "update_combat_stats_lambda" {
   source        = "./modules/lambda_function"
-  function_name = "update-combat-values"
+  function_name = "update-combat-stats"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
   }

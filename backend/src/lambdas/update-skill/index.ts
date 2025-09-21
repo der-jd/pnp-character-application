@@ -3,7 +3,7 @@ import {
   Skill,
   CalculationPoints,
   CostCategory,
-  CombatValues,
+  CombatStats,
   headersSchema,
   PatchSkillPathParams,
   PatchSkillRequest,
@@ -23,18 +23,18 @@ import {
   decodeUserId,
   HttpError,
   logAndEnsureHttpError,
-  updateCombatValues,
+  updateCombatStats,
   isZodError,
   logZodError,
   parseLearningMethod,
   adjustCostCategory,
   getSkillIncreaseCost,
   getSkill,
-  getCombatValues,
+  getCombatStats,
   getCombatCategory,
   getSkillActivationCost,
-  calculateCombatValues,
-  combatValuesChanged,
+  calculateCombatStats,
+  combatStatsChanged,
   isCombatSkill,
 } from "core";
 
@@ -108,39 +108,33 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
       adventurePoints,
     );
 
-    let combatValuesChange:
+    let combatStatsChange:
       | {
-          old: CombatValues;
-          new: CombatValues;
+          old: CombatStats;
+          new: CombatStats;
         }
       | undefined;
     if (isCombatSkill(skillCategory)) {
-      console.log("Calculate combat values");
+      console.log("Calculate combat stats");
 
       const combatCategory = getCombatCategory(skillName);
-      const skillCombatValuesOld = getCombatValues(characterSheet.combatValues, combatCategory, skillName);
-      const skillCombatValues = calculateCombatValues(
-        skillName,
-        skillOld,
-        skill,
-        characterSheet.baseValues,
-        skillCombatValuesOld,
-      );
+      const combatStatsOld = getCombatStats(characterSheet.combat, combatCategory, skillName);
+      const combatStats = calculateCombatStats(skillName, skillOld, skill, characterSheet.baseValues, combatStatsOld);
 
-      if (combatValuesChanged(skillCombatValuesOld, skillCombatValues)) {
-        console.log("Combat values changed.");
+      if (combatStatsChanged(combatStatsOld, combatStats)) {
+        console.log("Combat stats changed.");
 
-        combatValuesChange = {
-          old: skillCombatValuesOld,
-          new: skillCombatValues,
+        combatStatsChange = {
+          old: combatStatsOld,
+          new: combatStats,
         };
 
-        await updateCombatValues(
+        await updateCombatStats(
           params.userId,
           params.pathParams["character-id"],
           combatCategory,
           skillName,
-          skillCombatValues,
+          combatStats,
         );
       }
     }
@@ -154,11 +148,11 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
       changes: {
         old: {
           skill: skillOld,
-          combatValues: combatValuesChange?.old,
+          combatStats: combatStatsChange?.old,
         },
         new: {
           skill: skill,
-          combatValues: combatValuesChange?.new,
+          combatStats: combatStatsChange?.new,
         },
       },
       learningMethod: params.body.learningMethod,
@@ -218,7 +212,6 @@ function validateRequest(request: Request): Parameters {
       throw new HttpError(400, "Invalid input values!");
     }
 
-    // Rethrow other errors
     throw error;
   }
 }

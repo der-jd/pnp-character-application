@@ -1,5 +1,5 @@
 {
-  "name": "update-combat-values",
+  "name": "update-combat-stats",
   "version": "1.0.0",
   "main": "index.mjs",
   "type": "module",

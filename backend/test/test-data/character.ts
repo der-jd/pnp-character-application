@@ -808,7 +808,7 @@ export const fakeCharacter: Character = {
         },
       },
     },
-    combatValues: {
+    combat: {
       melee: {
         martialArts: {
           availablePoints: 19,
@@ -1745,7 +1745,7 @@ export const fakeCharacter2: Character = {
         },
       },
     },
-    combatValues: {
+    combat: {
       melee: {
         martialArts: {
           availablePoints: 19,

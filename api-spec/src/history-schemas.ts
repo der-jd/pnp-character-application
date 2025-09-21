@@ -4,7 +4,8 @@ import {
   calculationPointsSchema,
   characterSchema,
   characterSheetSchema,
-  combatValuesSchema,
+  combatSectionSchema,
+  combatStatsSchema,
   combinedSkillCategoryAndNameSchema,
   learningMethodSchema,
   skillSchema,
@@ -29,7 +30,7 @@ export enum RecordType {
   SPECIAL_ABILITIES_CHANGED = 4,
   ATTRIBUTE_CHANGED = 5,
   SKILL_CHANGED = 6,
-  COMBAT_VALUES_CHANGED = 7,
+  COMBAT_STATS_CHANGED = 7,
 }
 
 export const recordSchema = z
@@ -127,7 +128,7 @@ export const attributeChangeSchema = z
   .object({
     attribute: attributeSchema,
     baseValues: characterSheetSchema.shape.baseValues.partial().optional(),
-    combatValues: combatValuesSchema.partial().optional(), // TODO use correct schema
+    combat: combatSectionSchema.partial().optional(),
   })
   .strict();
 
@@ -141,6 +142,6 @@ export const calculationPointsChangeSchema = z
 export const skillChangeSchema = z
   .object({
     skill: skillSchema,
-    combatValues: combatValuesSchema.optional(),
+    combatStats: combatStatsSchema.optional(),
   })
   .strict();

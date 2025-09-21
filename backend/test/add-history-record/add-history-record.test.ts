@@ -437,7 +437,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'combat values changed' to existing block",
+      name: "Add history record for 'skill changed' (including combat stats) to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -446,7 +446,78 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.COMBAT_VALUES_CHANGED,
+          type: RecordType.SKILL_CHANGED,
+          name: "combat/martialArts",
+          data: {
+            old: {
+              skill: {
+                activated: true,
+                start: 5,
+                current: 12,
+                mod: 7,
+                totalCost: 30,
+                defaultCostCategory: CostCategory.CAT_2,
+              },
+              combatStats: {
+                availablePoints: 19,
+                handling: 25,
+                attackValue: 116,
+                skilledAttackValue: 6,
+                paradeValue: 118,
+                skilledParadeValue: 6,
+              },
+            },
+            new: {
+              skill: {
+                activated: true,
+                start: 5,
+                current: 17,
+                mod: 7,
+                totalCost: 35,
+                defaultCostCategory: CostCategory.CAT_2,
+              },
+              combatStats: {
+                availablePoints: 24,
+                handling: 25,
+                attackValue: 116,
+                skilledAttackValue: 6,
+                paradeValue: 118,
+                skilledParadeValue: 6,
+              },
+            },
+          },
+          learningMethod: "NORMAL",
+          calculationPoints: {
+            adventurePoints: {
+              old: {
+                start: 100,
+                available: 80,
+                total: 300,
+              },
+              new: {
+                start: 100,
+                available: 75,
+                total: 300,
+              },
+            },
+            attributePoints: null,
+          },
+          comment: null,
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Add history record for 'combat stats changed' to existing block",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          userId: fakeUserId,
+          type: RecordType.COMBAT_STATS_CHANGED,
           name: "melee/slashingWeaponsSharp1h",
           data: {
             old: {

@@ -11,7 +11,7 @@ import {
   PatchCalculationPointsHistoryRecord,
   PatchAttributeHistoryRecord,
   PatchSkillHistoryRecord,
-  PatchCombatValuesHistoryRecord,
+  PatchCombatStatsHistoryRecord,
   PostSpecialAbilitiesHistoryRecord,
 } from "api-spec";
 import { fakeCharacter, fakeCharacterId } from "./character.js";
@@ -377,7 +377,7 @@ export const combatSkillChangedRecord: PatchSkillHistoryRecord = {
         totalCost: 50,
         defaultCostCategory: CostCategory.CAT_3,
       },
-      combatValues: {
+      combatStats: {
         availablePoints: 26,
         handling: 25,
         attackValue: 120,
@@ -395,7 +395,7 @@ export const combatSkillChangedRecord: PatchSkillHistoryRecord = {
         totalCost: 58,
         defaultCostCategory: CostCategory.CAT_3,
       },
-      combatValues: {
+      combatStats: {
         availablePoints: 32,
         handling: 25,
         attackValue: 120,
@@ -425,8 +425,8 @@ export const combatSkillChangedRecord: PatchSkillHistoryRecord = {
   timestamp: new Date().toISOString(),
 };
 
-export const combatValuesChangedRecord: PatchCombatValuesHistoryRecord = {
-  type: RecordType.COMBAT_VALUES_CHANGED,
+export const combatStatsChangedRecord: PatchCombatStatsHistoryRecord = {
+  type: RecordType.COMBAT_STATS_CHANGED,
   name: "melee/thrustingWeapons1h",
   number: 3,
   id: "0f6b98a5-33c3-416e-bf1f-fde4ef49b166",

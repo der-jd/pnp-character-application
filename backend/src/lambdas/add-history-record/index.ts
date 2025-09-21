@@ -4,7 +4,7 @@ import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import {
   baseValueSchema,
-  combatValuesSchema,
+  combatStatsSchema,
   RecordType,
   Record,
   historyBlockSchema,
@@ -215,9 +215,9 @@ async function validateRequest(request: Request): Promise<Parameters> {
         skillChangeSchema.parse(body.data.old);
         skillChangeSchema.parse(body.data.new);
         break;
-      case RecordType.COMBAT_VALUES_CHANGED:
-        combatValuesSchema.parse(body.data.old);
-        combatValuesSchema.parse(body.data.new);
+      case RecordType.COMBAT_STATS_CHANGED:
+        combatStatsSchema.parse(body.data.old);
+        combatStatsSchema.parse(body.data.new);
         break;
       default:
         throw new HttpError(400, "Invalid history record type!");
@@ -233,7 +233,6 @@ async function validateRequest(request: Request): Promise<Parameters> {
       throw new HttpError(400, "Invalid input values!");
     }
 
-    // Rethrow other errors
     throw error;
   }
 }

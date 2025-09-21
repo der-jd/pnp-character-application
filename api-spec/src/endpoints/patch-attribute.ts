@@ -3,7 +3,7 @@ import {
   attributeSchema,
   calculationPointsSchema,
   baseValuesSchema,
-  combatValuesSchema,
+  combatSectionSchema,
 } from "../character-schemas.js";
 import {
   initialIncreasedSchema,
@@ -43,14 +43,14 @@ export const updateAttributeResponseSchema = z
           .object({
             attribute: attributeSchema,
             baseValues: baseValuesSchema.partial().optional(),
-            combatValues: combatValuesSchema.partial().optional(), // TODO use correct schema
+            combat: combatSectionSchema.partial().optional(),
           })
           .strict(),
         new: z
           .object({
             attribute: attributeSchema,
             baseValues: baseValuesSchema.partial().optional(),
-            combatValues: combatValuesSchema.partial().optional(), // TODO use correct schema
+            combat: combatSectionSchema.partial().optional(),
           })
           .strict(),
       })

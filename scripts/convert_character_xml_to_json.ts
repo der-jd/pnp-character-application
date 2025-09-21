@@ -240,7 +240,7 @@ function mapXmlToCharacterInterface(parsedData: any): Character {
         knowledge: {},
         handcraft: {},
       },
-      combatValues: {
+      combat: {
         // TODO
         melee: {},
         ranged: {},

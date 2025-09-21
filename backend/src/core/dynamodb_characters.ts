@@ -1,6 +1,6 @@
 import { DeleteCommand, GetCommand, PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { Attribute, Character, CalculationPoints, CombatValues, BaseValue, Skill, characterSchema } from "api-spec";
+import { Attribute, Character, CalculationPoints, CombatStats, BaseValue, Skill, characterSchema } from "api-spec";
 import { HttpError } from "./errors.js";
 import { dynamoDBDocClient } from "./dynamodb_client.js";
 
@@ -324,15 +324,15 @@ export async function updateSkill(
   console.log("Successfully updated DynamoDB item");
 }
 
-export async function updateCombatValues(
+export async function updateCombatStats(
   userId: string,
   characterId: string,
   combatCategory: string,
   combatSkillName: string,
-  combatValues: CombatValues,
+  combatStats: CombatStats,
 ): Promise<void> {
   console.log(
-    `Update combat values of combat skill '${combatSkillName}' of character ${characterId} (user ${userId}) in DynamoDB`,
+    `Update combat stats of combat skill '${combatSkillName}' of character ${characterId} (user ${userId}) in DynamoDB`,
   );
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
@@ -342,15 +342,15 @@ export async function updateCombatValues(
       userId: userId,
       characterId: characterId,
     },
-    UpdateExpression: "SET #characterSheet.#combatValues.#combatCategory.#combatSkillName = :combatValues",
+    UpdateExpression: "SET #characterSheet.#combat.#combatCategory.#combatSkillName = :combatStats",
     ExpressionAttributeNames: {
       "#characterSheet": "characterSheet",
-      "#combatValues": "combatValues",
+      "#combat": "combat",
       "#combatCategory": combatCategory,
       "#combatSkillName": combatSkillName,
     },
     ExpressionAttributeValues: {
-      ":combatValues": combatValues,
+      ":combatStats": combatStats,
     },
   });
 

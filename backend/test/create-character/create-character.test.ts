@@ -20,7 +20,7 @@ import {
   CombatSkillName,
   MAX_INITIAL_COMBAT_SKILL_VALUE,
   MIN_INITIAL_COMBAT_SKILL_VALUE,
-  CharacterSheet,
+  CombatSection,
 } from "api-spec";
 import { _createCharacter } from "create-character";
 import { expectHttpError } from "../utils.js";
@@ -616,43 +616,43 @@ describe("Valid requests", () => {
         });
       });
 
-      // Check combat values
-      const rangedCombatCategory: keyof CharacterSheet["combatValues"] = "ranged";
-      Object.entries(parsedBody.changes.new.character.characterSheet.combatValues).forEach(
-        ([category, combatValuesInCategory]) => {
-          Object.entries(combatValuesInCategory).forEach(([skillName, details]) => {
+      // Check combat stats
+      const rangedCombatCategory: keyof CombatSection = "ranged";
+      Object.entries(parsedBody.changes.new.character.characterSheet.combat).forEach(
+        ([category, combatStatsInCategory]) => {
+          Object.entries(combatStatsInCategory).forEach(([skillName, combatStats]) => {
             if (`combat/${skillName}` === _case.request.body.generalInformation.profession.skill) {
-              expect(details.availablePoints).toBe(
+              expect(combatStats.availablePoints).toBe(
                 getCombatSkillHandling(skillName as CombatSkillName) +
                   _case.request.body.combatSkillsStartValues[skillName] +
                   PROFESSION_SKILL_BONUS,
               );
             } else {
-              expect(details.availablePoints).toBe(
+              expect(combatStats.availablePoints).toBe(
                 getCombatSkillHandling(skillName as CombatSkillName) +
                   _case.request.body.combatSkillsStartValues[skillName],
               );
             }
 
-            expect(details.handling).toBe(getCombatSkillHandling(skillName as CombatSkillName));
-            expect(details.skilledAttackValue).toBe(0);
-            expect(details.skilledParadeValue).toBe(0);
+            expect(combatStats.handling).toBe(getCombatSkillHandling(skillName as CombatSkillName));
+            expect(combatStats.skilledAttackValue).toBe(0);
+            expect(combatStats.skilledParadeValue).toBe(0);
 
             if (category === rangedCombatCategory) {
               const rangedAttackBaseValue =
                 parsedBody.changes.new.character.characterSheet.baseValues.rangedAttackBaseValue.current +
                 parsedBody.changes.new.character.characterSheet.baseValues.rangedAttackBaseValue.mod;
-              expect(details.attackValue).toBe(details.skilledAttackValue + rangedAttackBaseValue);
-              expect(details.paradeValue).toBe(0);
+              expect(combatStats.attackValue).toBe(combatStats.skilledAttackValue + rangedAttackBaseValue);
+              expect(combatStats.paradeValue).toBe(0);
             } else {
               const attackBaseValue =
                 parsedBody.changes.new.character.characterSheet.baseValues.attackBaseValue.current +
                 parsedBody.changes.new.character.characterSheet.baseValues.attackBaseValue.mod;
-              expect(details.attackValue).toBe(details.skilledAttackValue + attackBaseValue);
+              expect(combatStats.attackValue).toBe(combatStats.skilledAttackValue + attackBaseValue);
               const paradeBaseValue =
                 parsedBody.changes.new.character.characterSheet.baseValues.paradeBaseValue.current +
                 parsedBody.changes.new.character.characterSheet.baseValues.paradeBaseValue.mod;
-              expect(details.paradeValue).toBe(details.skilledParadeValue + paradeBaseValue);
+              expect(combatStats.paradeValue).toBe(combatStats.skilledParadeValue + paradeBaseValue);
             }
           });
         },

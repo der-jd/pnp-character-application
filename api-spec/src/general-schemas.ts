@@ -15,10 +15,10 @@ export const MAX_COST = 100000;
 export const MAX_ARRAY_SIZE = 1000;
 export const MIN_LEVEL = 1;
 export const MAX_LEVEL = 1000;
-export const MIN_ATTRIBUTE_VALUE = -50; // Min attribute value (for negative mods)
+export const MIN_ATTRIBUTE_VALUE = -50;
 export const MAX_ATTRIBUTE_VALUE = 1000;
-export const MIN_BASE_VALUE = -200; // Min base value (for negative mods)
-export const MIN_COMBAT_VALUE = -10000; // Min combat value (for negative mods)
+export const MIN_BASE_VALUE = -200;
+export const MIN_COMBAT_STAT = -10000;
 
 export const initialNewSchema = z
   .object({
