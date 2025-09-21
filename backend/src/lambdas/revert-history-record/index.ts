@@ -158,26 +158,18 @@ async function revertChange(userId: string, characterId: string, record: Record)
       }
       case RecordType.ATTRIBUTE_CHANGED: {
         const oldData = attributeChangeSchema.parse(record.data.old);
-        const newData = attributeChangeSchema.parse(record.data.new);
 
-        if (oldData.baseValues && newData.baseValues) {
+        if (oldData.baseValues) {
           const updates: Promise<void>[] = [];
           for (const baseValueName of Object.keys(oldData.baseValues) as (keyof CharacterSheet["baseValues"])[]) {
             const oldBaseValue = oldData.baseValues[baseValueName];
-            const newBaseValue = newData.baseValues[baseValueName];
 
             // This check shouldn't be necessary as we loop over only existing base values. However, TypeScript complains without it.
-            if (oldBaseValue === undefined || newBaseValue === undefined) {
-              throw new HttpError(500, `Base value '${String(baseValueName)}' is missing in old / new data`);
+            if (oldBaseValue === undefined) {
+              throw new HttpError(500, `Base value '${String(baseValueName)}' is missing in old data`);
             }
 
-            /**
-             * This check is obsolete because the record only contains the base values that have changed.
-             * However, it is kept here for safety and efficiency in case the record is modified in the future.
-             */
-            if (oldBaseValue.byFormula && oldBaseValue.byFormula !== newBaseValue.byFormula) {
-              updates.push(updateBaseValue(userId, characterId, baseValueName, oldBaseValue));
-            }
+            updates.push(updateBaseValue(userId, characterId, baseValueName, oldBaseValue));
           }
           await Promise.all(updates);
         }
