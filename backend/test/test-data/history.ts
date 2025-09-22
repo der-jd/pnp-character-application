@@ -90,18 +90,22 @@ export const baseValueChangedRecord: PatchBaseValueHistoryRecord = {
   id: "abc2e95b-a1f6-47e0-84da-1eca56dbb192",
   data: {
     old: {
-      start: 50,
-      current: 97,
-      byFormula: 77,
-      byLvlUp: 20,
-      mod: 5,
+      baseValue: {
+        start: 50,
+        current: 97,
+        byFormula: 77,
+        byLvlUp: 20,
+        mod: 5,
+      },
     },
     new: {
-      start: 40,
-      current: 100,
-      byFormula: 77,
-      byLvlUp: 23,
-      mod: 10,
+      baseValue: {
+        start: 40,
+        current: 100,
+        byFormula: 77,
+        byLvlUp: 23,
+        mod: 10,
+      },
     },
   },
   learningMethod: null,

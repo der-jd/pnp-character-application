@@ -331,19 +331,19 @@ describe("Valid requests", () => {
       expect(parsedBody.baseValueName).toBe(baseValueName);
 
       const baseValueOld = getBaseValue(fakeCharacterResponse.Item.characterSheet.baseValues, baseValueName);
-      expect(parsedBody.baseValue.old).toStrictEqual(baseValueOld);
-      expect(parsedBody.baseValue.new).toStrictEqual(parsedBody.baseValue.old);
+      expect(parsedBody.changes.old.baseValue).toStrictEqual(baseValueOld);
+      expect(parsedBody.changes.new.baseValue).toStrictEqual(parsedBody.changes.old.baseValue);
 
       if (_case.request.body.start) {
-        expect(parsedBody.baseValue.new.start).toBe(_case.request.body.start.newValue);
+        expect(parsedBody.changes.new.baseValue.start).toBe(_case.request.body.start.newValue);
       }
 
       if (_case.request.body.byLvlUp) {
-        expect(parsedBody.baseValue.new.byLvlUp).toBe(_case.request.body.byLvlUp.newValue);
+        expect(parsedBody.changes.new.baseValue.byLvlUp).toBe(_case.request.body.byLvlUp.newValue);
       }
 
       if (_case.request.body.mod) {
-        expect(parsedBody.baseValue.new.mod).toBe(_case.request.body.mod.newValue);
+        expect(parsedBody.changes.new.baseValue.mod).toBe(_case.request.body.mod.newValue);
       }
     });
   });
@@ -445,24 +445,25 @@ describe("Valid requests", () => {
       expect(parsedBody.baseValueName).toBe(baseValueName);
 
       const baseValueOld = getBaseValue(fakeCharacterResponse.Item.characterSheet.baseValues, baseValueName);
-      expect(parsedBody.baseValue.old).toStrictEqual(baseValueOld);
+      expect(parsedBody.changes.old.baseValue).toStrictEqual(baseValueOld);
 
       if (_case.request.body.start) {
-        expect(parsedBody.baseValue.new.start).toBe(_case.request.body.start.newValue);
+        expect(parsedBody.changes.new.baseValue.start).toBe(_case.request.body.start.newValue);
       }
 
       if (_case.request.body.byLvlUp) {
-        expect(parsedBody.baseValue.new.byLvlUp).toBe(_case.request.body.byLvlUp.newValue);
-        const diffByLvlUp = (parsedBody.baseValue.new.byLvlUp ?? 0) - (parsedBody.baseValue.old.byLvlUp ?? 0);
-        const diffCurrent = parsedBody.baseValue.new.current - parsedBody.baseValue.old.current;
+        expect(parsedBody.changes.new.baseValue.byLvlUp).toBe(_case.request.body.byLvlUp.newValue);
+        const diffByLvlUp =
+          (parsedBody.changes.new.baseValue.byLvlUp ?? 0) - (parsedBody.changes.old.baseValue.byLvlUp ?? 0);
+        const diffCurrent = parsedBody.changes.new.baseValue.current - parsedBody.changes.old.baseValue.current;
         expect(diffByLvlUp).toBe(diffCurrent);
-        expect(parsedBody.baseValue.new.current).toBe(parsedBody.baseValue.old.current + diffByLvlUp);
+        expect(parsedBody.changes.new.baseValue.current).toBe(parsedBody.changes.old.baseValue.current + diffByLvlUp);
       } else {
-        expect(parsedBody.baseValue.new.current).toBe(baseValueOld.current);
+        expect(parsedBody.changes.new.baseValue.current).toBe(baseValueOld.current);
       }
 
       if (_case.request.body.mod) {
-        expect(parsedBody.baseValue.new.mod).toBe(_case.request.body.mod.newValue);
+        expect(parsedBody.changes.new.baseValue.mod).toBe(_case.request.body.mod.newValue);
       }
 
       // Check for DynamoDB updates
