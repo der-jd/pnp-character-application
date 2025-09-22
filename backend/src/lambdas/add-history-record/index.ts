@@ -8,15 +8,15 @@ import {
   RecordType,
   Record,
   historyBlockSchema,
-  integerSchema,
   skillChangeSchema,
   attributeChangeSchema,
   HistoryBlock,
   calculationPointsChangeSchema,
-  stringArraySchema,
   recordSchema,
   userIdSchema,
   characterCreationSchema,
+  levelChangeSchema,
+  specialAbilitiesChangeSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -192,8 +192,8 @@ async function validateRequest(request: Request): Promise<Parameters> {
         characterCreationSchema.parse(body.data.new);
         break;
       case RecordType.LEVEL_CHANGED:
-        integerSchema.parse(body.data.old);
-        integerSchema.parse(body.data.new);
+        levelChangeSchema.parse(body.data.old);
+        levelChangeSchema.parse(body.data.new);
         break;
       case RecordType.CALCULATION_POINTS_CHANGED:
         calculationPointsChangeSchema.parse(body.data.old);
@@ -204,8 +204,8 @@ async function validateRequest(request: Request): Promise<Parameters> {
         baseValueSchema.parse(body.data.new);
         break;
       case RecordType.SPECIAL_ABILITIES_CHANGED:
-        stringArraySchema.parse(body.data.old);
-        stringArraySchema.parse(body.data.new);
+        specialAbilitiesChangeSchema.parse(body.data.old);
+        specialAbilitiesChangeSchema.parse(body.data.new);
         break;
       case RecordType.ATTRIBUTE_CHANGED:
         attributeChangeSchema.parse(body.data.old);
