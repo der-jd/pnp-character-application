@@ -1,6 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import {
-  baseValueSchema,
   combatStatsSchema,
   RecordType,
   Record,
@@ -18,6 +17,7 @@ import {
   DeleteHistoryRecordResponse,
   headersSchema,
   CombatSection,
+  baseValueChangeSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -144,8 +144,24 @@ async function revertChange(userId: string, characterId: string, record: Record)
         break;
       }
       case RecordType.BASE_VALUE_CHANGED: {
-        const oldBaseValue = baseValueSchema.parse(record.data.old);
-        await updateBaseValue(userId, characterId, record.name, oldBaseValue);
+        const oldData = baseValueChangeSchema.parse(record.data.old);
+        await updateBaseValue(userId, characterId, record.name, oldData.baseValue);
+
+        if (oldData.combat) {
+          const updates: Promise<void>[] = [];
+          for (const combatCategory of Object.keys(oldData.combat) as (keyof CombatSection)[]) {
+            // This check shouldn't be necessary as we loop over only existing categories. However, TypeScript complains without it.
+            if (oldData.combat[combatCategory] === undefined) {
+              throw new HttpError(500, `Combat category '${String(combatCategory)}' is missing in old data`);
+            }
+
+            for (const [skillName, oldCombatStats] of Object.entries(oldData.combat[combatCategory])) {
+              updates.push(updateCombatStats(userId, characterId, combatCategory, skillName, oldCombatStats));
+            }
+          }
+          await Promise.all(updates);
+        }
+
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
