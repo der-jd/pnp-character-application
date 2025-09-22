@@ -69,6 +69,8 @@ export {
   stringArraySchema,
   attributeChangeSchema,
   baseValueChangeSchema,
+  levelChangeSchema,
+  specialAbilitiesChangeSchema,
   calculationPointsChangeSchema,
   skillChangeSchema,
   characterCreationSchema,

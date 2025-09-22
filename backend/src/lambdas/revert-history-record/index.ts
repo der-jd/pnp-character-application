@@ -5,13 +5,13 @@ import {
   Record,
   historyBlockSchema,
   recordSchema,
-  integerSchema,
   CalculationPoints,
   skillChangeSchema,
   attributeChangeSchema,
   CharacterSheet,
   calculationPointsChangeSchema,
-  stringArraySchema,
+  levelChangeSchema,
+  specialAbilitiesChangeSchema,
   deleteHistoryRecordPathParamsSchema,
   DeleteHistoryRecordPathParams,
   DeleteHistoryRecordResponse,
@@ -137,7 +137,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
         break;
       }
       case RecordType.LEVEL_CHANGED: {
-        const oldData = integerSchema.parse(record.data.old);
+        const oldData = levelChangeSchema.parse(record.data.old);
         await updateLevel(userId, characterId, oldData.value);
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
@@ -167,7 +167,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
         break;
       }
       case RecordType.SPECIAL_ABILITIES_CHANGED: {
-        const oldSpecialAbilities = stringArraySchema.parse(record.data.old).values;
+        const oldSpecialAbilities = specialAbilitiesChangeSchema.parse(record.data.old).values;
         await setSpecialAbilities(userId, characterId, oldSpecialAbilities);
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
