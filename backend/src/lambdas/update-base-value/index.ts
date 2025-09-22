@@ -10,6 +10,7 @@ import {
   CharacterSheet,
   InitialNew,
   baseValuesUpdatableByLvlUp,
+  CombatSection,
 } from "api-spec";
 import {
   Request,
@@ -22,6 +23,8 @@ import {
   isZodError,
   logZodError,
   getBaseValue,
+  combatBaseValuesChanged,
+  recalculateAndUpdateCombatStats,
 } from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -70,13 +73,37 @@ export async function _updateBaseValue(request: Request): Promise<APIGatewayProx
       baseValue,
     );
 
+    const combatBaseValueChanged: boolean = combatBaseValuesChanged({
+      [params.pathParams["base-value-name"]]: baseValue,
+    });
+    let changedCombatSection: Partial<CombatSection> = {};
+    if (combatBaseValueChanged) {
+      changedCombatSection = await recalculateAndUpdateCombatStats(
+        params.userId,
+        params.pathParams["character-id"],
+        characterSheet.combat,
+        {
+          ...characterSheet.baseValues,
+          [params.pathParams["base-value-name"]]: baseValue,
+        },
+      );
+    }
+
     const responseBody: UpdateBaseValueResponse = {
       characterId: params.pathParams["character-id"],
       userId: params.userId,
       baseValueName: params.pathParams["base-value-name"],
-      baseValue: {
-        old: baseValueOld,
-        new: baseValue,
+      changes: {
+        old: {
+          baseValue: baseValueOld,
+          combat: combatBaseValueChanged
+            ? Object.fromEntries(Object.entries(characterSheet.combat).filter(([k]) => k in changedCombatSection))
+            : undefined,
+        },
+        new: {
+          baseValue: baseValue,
+          combat: combatBaseValueChanged ? changedCombatSection : undefined,
+        },
       },
     };
     const response = {

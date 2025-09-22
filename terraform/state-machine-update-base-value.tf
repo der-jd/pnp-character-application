@@ -63,7 +63,7 @@ resource "aws_sfn_state_machine" "update_base_value_state_machine" {
         Choices = [
           {
             // The base value was not changed, so no history record is necessary
-            Condition = "{% $parse($states.input.body).baseValue.old = $parse($states.input.body).baseValue.new %}",
+            Condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}",
             Next      = "SuccessState"
           }
         ],
@@ -81,7 +81,7 @@ resource "aws_sfn_state_machine" "update_base_value_state_machine" {
             "userId"         = "{% $parse($states.input.body).userId %}",
             "type"           = "3", // BASE_VALUE_CHANGED
             "name"           = "{% $parse($states.input.body).baseValueName %}",
-            "data"           = "{% $parse($states.input.body).baseValue %}",
+            "data"           = "{% $parse($states.input.body).changes %}",
             "learningMethod" = null,
             "calculationPoints" = {
               "adventurePoints" = null,
