@@ -4,7 +4,6 @@ import {
   CharacterSheet,
   Attribute,
   BaseValue,
-  BaseValues,
   Skill,
   CombatStats,
   AdvantagesNames,
@@ -146,13 +145,5 @@ export function advantagesEnumToString(enumValue: AdvantagesNames): string | und
 export function disadvantagesEnumToString(enumValue: DisadvantagesNames): string | undefined {
   return Object.keys(DisadvantagesNames).find(
     (key) => DisadvantagesNames[key as keyof typeof DisadvantagesNames] === enumValue,
-  );
-}
-
-export function combatBaseValuesChanged(changedBaseValues: Partial<BaseValues>): boolean {
-  return (
-    changedBaseValues.attackBaseValue !== undefined ||
-    changedBaseValues.paradeBaseValue !== undefined ||
-    changedBaseValues.rangedAttackBaseValue !== undefined
   );
 }

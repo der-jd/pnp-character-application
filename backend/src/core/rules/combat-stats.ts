@@ -6,6 +6,32 @@ import { updateCombatStats } from "../dynamodb_characters.js";
 
 const INCREASE_COST_COMBAT_STATS = 1;
 
+export function combatBaseValuesChangedAffectingCombatStats(
+  oldBaseValues: Partial<BaseValues>,
+  newBaseValues: Partial<BaseValues>,
+): boolean {
+  const attackBaseValueKey: keyof BaseValues = "attackBaseValue";
+  const paradeBaseValueKey: keyof BaseValues = "paradeBaseValue";
+  const rangedAttackBaseValueKey: keyof BaseValues = "rangedAttackBaseValue";
+
+  for (const key of [attackBaseValueKey, paradeBaseValueKey, rangedAttackBaseValueKey]) {
+    const newValue = newBaseValues[key];
+    const oldValue = oldBaseValues[key];
+
+    if (newValue && !oldValue) {
+      return true;
+    }
+
+    if (newValue && oldValue) {
+      if (oldValue.mod !== newValue.mod || oldValue.current !== newValue.current) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 export function combatStatsChanged(combatStatsOld: CombatStats, combatStatsNew: CombatStats): boolean {
   return !isDeepStrictEqual(combatStatsOld, combatStatsNew);
 }

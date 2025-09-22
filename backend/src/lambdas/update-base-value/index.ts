@@ -23,7 +23,7 @@ import {
   isZodError,
   logZodError,
   getBaseValue,
-  combatBaseValuesChanged,
+  combatBaseValuesChangedAffectingCombatStats,
   recalculateAndUpdateCombatStats,
 } from "core";
 
@@ -73,9 +73,12 @@ export async function _updateBaseValue(request: Request): Promise<APIGatewayProx
       baseValue,
     );
 
-    const combatBaseValueChanged: boolean = combatBaseValuesChanged({
-      [params.pathParams["base-value-name"]]: baseValue,
-    });
+    const combatBaseValueChanged: boolean = combatBaseValuesChangedAffectingCombatStats(
+      { [params.pathParams["base-value-name"]]: baseValueOld },
+      {
+        [params.pathParams["base-value-name"]]: baseValue,
+      },
+    );
     let changedCombatSection: Partial<CombatSection> = {};
     if (combatBaseValueChanged) {
       changedCombatSection = await recalculateAndUpdateCombatStats(

@@ -27,7 +27,7 @@ import {
   getAttribute,
   calculateBaseValues,
   recalculateAndUpdateCombatStats,
-  combatBaseValuesChanged,
+  combatBaseValuesChangedAffectingCombatStats,
 } from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -132,7 +132,10 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
       console.log("No base values changed, nothing to update.");
     }
 
-    const combatBaseValueChanged: boolean = combatBaseValuesChanged(changedBaseValues);
+    const combatBaseValueChanged: boolean = combatBaseValuesChangedAffectingCombatStats(
+      baseValuesOld,
+      changedBaseValues,
+    );
     let changedCombatSection: Partial<CombatSection> = {};
     if (combatBaseValueChanged) {
       changedCombatSection = await recalculateAndUpdateCombatStats(
