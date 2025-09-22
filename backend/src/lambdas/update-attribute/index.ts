@@ -153,7 +153,9 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
           baseValues: baseValuesChanged
             ? Object.fromEntries(Object.entries(baseValuesOld).filter(([k]) => k in changedBaseValues))
             : undefined,
-          combat: combatBaseValueChanged ? characterSheet.combat : undefined,
+          combat: combatBaseValueChanged
+            ? Object.fromEntries(Object.entries(characterSheet.combat).filter(([k]) => k in changedCombatSection))
+            : undefined,
         },
         new: {
           attribute: attribute,
