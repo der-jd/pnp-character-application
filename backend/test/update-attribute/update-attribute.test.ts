@@ -961,6 +961,8 @@ describe("Valid requests", () => {
       if (!parsedBody.changes.old.baseValues || !parsedBody.changes.new.baseValues) {
         throw new Error("Base values should be defined but are missing in the response");
       }
+
+      // Combat stats should be defined
       expect(parsedBody.changes.old.combat).toBeDefined();
       expect(parsedBody.changes.new.combat).toBeDefined();
       if (!parsedBody.changes.old.combat || !parsedBody.changes.new.combat) {
@@ -970,7 +972,7 @@ describe("Valid requests", () => {
       const attributeEffects = attributeEffectOnBaseValueFormula[attributeName as keyof Attributes];
 
       // Check combat stats for melee skills
-      const meleeCombatStatsChanged =
+      const meleeCombatStatsChanged: boolean =
         parsedBody.changes.new.baseValues.attackBaseValue !== undefined ||
         parsedBody.changes.new.baseValues.paradeBaseValue !== undefined;
       if (meleeCombatStatsChanged) {
@@ -1041,7 +1043,7 @@ describe("Valid requests", () => {
       }
 
       // Check combat stats for ranged skills
-      const rangedCombatStatsChanged = parsedBody.changes.new.baseValues.rangedAttackBaseValue !== undefined;
+      const rangedCombatStatsChanged: boolean = parsedBody.changes.new.baseValues.rangedAttackBaseValue !== undefined;
       if (rangedCombatStatsChanged) {
         expect(parsedBody.changes.old.baseValues.rangedAttackBaseValue).toBeDefined();
         expect(parsedBody.changes.new.baseValues.rangedAttackBaseValue).toBeDefined();
