@@ -345,10 +345,13 @@ describe("Valid requests", () => {
       if (_case.request.body.mod) {
         expect(parsedBody.changes.new.baseValue.mod).toBe(_case.request.body.mod.newValue);
       }
+
+      expect(parsedBody.changes.old.combat).toBeUndefined();
+      expect(parsedBody.changes.new.combat).toBeUndefined();
     });
   });
 
-  const updateTestCases = [
+  const baseValueTestCases = [
     {
       name: "Update start value",
       request: {
@@ -431,7 +434,7 @@ describe("Valid requests", () => {
     },
   ];
 
-  updateTestCases.forEach((_case) => {
+  baseValueTestCases.forEach((_case) => {
     test(_case.name, async () => {
       mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 
@@ -446,6 +449,8 @@ describe("Valid requests", () => {
 
       const baseValueOld = getBaseValue(fakeCharacterResponse.Item.characterSheet.baseValues, baseValueName);
       expect(parsedBody.changes.old.baseValue).toStrictEqual(baseValueOld);
+
+      expect(parsedBody.changes.new.baseValue.byFormula).toBe(baseValueOld.byFormula);
 
       if (_case.request.body.start) {
         expect(parsedBody.changes.new.baseValue.start).toBe(_case.request.body.start.newValue);
@@ -465,6 +470,9 @@ describe("Valid requests", () => {
       if (_case.request.body.mod) {
         expect(parsedBody.changes.new.baseValue.mod).toBe(_case.request.body.mod.newValue);
       }
+
+      expect(parsedBody.changes.old.combat).toBeUndefined();
+      expect(parsedBody.changes.new.combat).toBeUndefined();
 
       // Check for DynamoDB updates
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
