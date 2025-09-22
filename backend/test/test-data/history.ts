@@ -501,77 +501,39 @@ export const calculationPointsChangedRecord: PatchCalculationPointsHistoryRecord
 
 export const attributeAndBaseValuesChangedRecord: PatchAttributeHistoryRecord = {
   type: RecordType.ATTRIBUTE_CHANGED,
-  name: "strength", // TODO change to mental resilience
+  name: "mentalResilience",
   number: 2,
   id: "fc0a5a71-80ac-47bc-85c2-85fc4c9de99a",
   data: {
     old: {
       attribute: {
-        start: 17,
-        current: 18,
-        mod: 1,
+        start: 8,
+        current: 10,
+        mod: 2,
         totalCost: 15,
       },
       baseValues: {
-        healthPoints: {
-          start: 40,
-          current: 100,
-          byFormula: 77,
-          byLvlUp: 23,
+        mentalHealth: {
+          start: 20,
+          current: 50,
+          byFormula: 50,
           mod: 10,
-        },
-        attackBaseValue: {
-          start: 30,
-          current: 110,
-          byFormula: 110,
-          mod: 0,
-        },
-        paradeBaseValue: {
-          start: 30,
-          current: 112,
-          byFormula: 112,
-          mod: 0,
-        },
-        rangedAttackBaseValue: {
-          start: 25,
-          current: 108,
-          byFormula: 108,
-          mod: 0,
         },
       },
     },
     new: {
       attribute: {
-        start: 17,
-        current: 20,
-        mod: 1,
-        totalCost: 17,
+        start: 8,
+        current: 15,
+        mod: 2,
+        totalCost: 20,
       },
       baseValues: {
-        healthPoints: {
-          start: 40,
-          current: 102,
-          byFormula: 79,
-          byLvlUp: 23,
+        mentalHealth: {
+          start: 20,
+          current: 60,
+          byFormula: 60,
           mod: 10,
-        },
-        attackBaseValue: {
-          start: 30,
-          current: 114,
-          byFormula: 114,
-          mod: 0,
-        },
-        paradeBaseValue: {
-          start: 30,
-          current: 116,
-          byFormula: 116,
-          mod: 0,
-        },
-        rangedAttackBaseValue: {
-          start: 25,
-          current: 112,
-          byFormula: 112,
-          mod: 0,
         },
       },
     },
@@ -587,7 +549,7 @@ export const attributeAndBaseValuesChangedRecord: PatchAttributeHistoryRecord = 
       },
       new: {
         start: 0,
-        available: 8,
+        available: 5,
         total: 10,
       },
     },
