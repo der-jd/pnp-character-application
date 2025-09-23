@@ -85,7 +85,7 @@ export function getCombatStats(
   const combatCategory = combatSection[category] as Record<string, CombatStats>;
   const combatStats = combatCategory[combatSkillName];
   if (!combatStats) {
-    throw new Error(`Combat stats for skill ${combatSkillName} not found!`);
+    throw new Error(`Combat stats for skill ${category}/${combatSkillName} not found!`);
   }
   return combatStats;
 }
