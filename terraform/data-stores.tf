@@ -4,10 +4,11 @@ locals {
 }
 
 resource "aws_dynamodb_table" "characters" {
-  name         = local.characters_table_name
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "userId"
-  range_key    = "characterId"
+  name                        = local.characters_table_name
+  billing_mode                = "PAY_PER_REQUEST"
+  deletion_protection_enabled = true
+  hash_key                    = "userId"
+  range_key                   = "characterId"
 
   attribute {
     name = "userId"
@@ -37,10 +38,11 @@ resource "aws_dynamodb_table" "characters" {
 }
 
 resource "aws_dynamodb_table" "characters_history" {
-  name         = local.history_table_name
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "characterId"
-  range_key    = "blockNumber"
+  name                        = local.history_table_name
+  billing_mode                = "PAY_PER_REQUEST"
+  deletion_protection_enabled = true
+  hash_key                    = "characterId"
+  range_key                   = "blockNumber"
 
   attribute {
     name = "characterId"
