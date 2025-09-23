@@ -10,7 +10,9 @@ resource "aws_backup_plan" "plan" {
     target_vault_name = aws_backup_vault.vault.name
 
     # Every day at 01:00 UTC => 03:00 CEST / 02:00 CET
-    schedule = "cron(0 1 * * ? *)"
+    schedule          = "cron(0 1 * * ? *)"
+    start_window      = 180 # minutes (3 hours)
+    completion_window = 300 # minutes (5 hours)
 
     lifecycle {
       delete_after = 90 # days
@@ -22,7 +24,9 @@ resource "aws_backup_plan" "plan" {
     target_vault_name = aws_backup_vault.vault.name
 
     # First day of every month at 02:00 UTC => 04:00 CEST / 03:00 CET
-    schedule = "cron(0 2 1 * ? *)"
+    schedule          = "cron(0 2 1 * ? *)"
+    start_window      = 180 # minutes (3 hours)
+    completion_window = 300 # minutes (5 hours)
 
     lifecycle {
       delete_after = 730 # days (24 months)
@@ -82,6 +86,20 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
   threshold           = 0
 
   alarm_description = "Alerts when an AWS Backup job for the PnP Character Application fails"
+  alarm_actions     = [aws_sns_topic.backup_failures.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
+  alarm_name          = "pnp-app-backup-job-expired"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "NumberOfBackupJobsExpired"
+  namespace           = "AWS/Backup"
+  period              = 3600 # seconds (1 hour)
+  statistic           = "Sum"
+  threshold           = 0
+
+  alarm_description = "Alerts when an AWS Backup job expires (misses completion window) for the PnP Character Application"
   alarm_actions     = [aws_sns_topic.backup_failures.arn]
 }
 
