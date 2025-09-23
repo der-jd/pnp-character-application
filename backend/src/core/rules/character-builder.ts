@@ -486,11 +486,6 @@ export class CharacterBuilder {
       );
     }
 
-    /**
-     * TODO
-     * - extract function to calculate base values from update-attribute lambda
-     * - use that function here, in update-attribute lambda and update base values lambda
-     */
     this.setBaseValuesByFormula();
 
     this.attributesSet = true;

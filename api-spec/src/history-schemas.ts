@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   attributeSchema,
+  baseValueSchema,
   baseValuesSchema,
   calculationPointsSchema,
   characterSchema,
@@ -142,6 +143,13 @@ export const attributeChangeSchema = z
   .object({
     attribute: attributeSchema,
     baseValues: baseValuesSchema.partial().optional(),
+    combat: combatSectionSchema.partial().optional(),
+  })
+  .strict();
+
+export const baseValueChangeSchema = z
+  .object({
+    baseValue: baseValueSchema,
     combat: combatSectionSchema.partial().optional(),
   })
   .strict();

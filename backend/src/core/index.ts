@@ -49,4 +49,9 @@ export {
   MAX_COST_CATEGORY,
   getCombatSkillHandling,
 } from "./rules/constants.js";
-export { calculateCombatStats, combatStatsChanged } from "./rules/combat-stats.js";
+export {
+  calculateCombatStats,
+  combatStatsChanged,
+  recalculateAndUpdateCombatStats,
+  combatBaseValuesChangedAffectingCombatStats,
+} from "./rules/combat-stats.js";

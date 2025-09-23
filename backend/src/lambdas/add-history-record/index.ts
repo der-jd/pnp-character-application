@@ -3,20 +3,20 @@ import { z } from "zod";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import {
-  baseValueSchema,
   combatStatsSchema,
   RecordType,
   Record,
   historyBlockSchema,
-  integerSchema,
   skillChangeSchema,
   attributeChangeSchema,
   HistoryBlock,
   calculationPointsChangeSchema,
-  stringArraySchema,
   recordSchema,
   userIdSchema,
   characterCreationSchema,
+  levelChangeSchema,
+  specialAbilitiesChangeSchema,
+  baseValueChangeSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -192,20 +192,20 @@ async function validateRequest(request: Request): Promise<Parameters> {
         characterCreationSchema.parse(body.data.new);
         break;
       case RecordType.LEVEL_CHANGED:
-        integerSchema.parse(body.data.old);
-        integerSchema.parse(body.data.new);
+        levelChangeSchema.parse(body.data.old);
+        levelChangeSchema.parse(body.data.new);
         break;
       case RecordType.CALCULATION_POINTS_CHANGED:
         calculationPointsChangeSchema.parse(body.data.old);
         calculationPointsChangeSchema.parse(body.data.new);
         break;
       case RecordType.BASE_VALUE_CHANGED:
-        baseValueSchema.parse(body.data.old);
-        baseValueSchema.parse(body.data.new);
+        baseValueChangeSchema.parse(body.data.old);
+        baseValueChangeSchema.parse(body.data.new);
         break;
       case RecordType.SPECIAL_ABILITIES_CHANGED:
-        stringArraySchema.parse(body.data.old);
-        stringArraySchema.parse(body.data.new);
+        specialAbilitiesChangeSchema.parse(body.data.old);
+        specialAbilitiesChangeSchema.parse(body.data.new);
         break;
       case RecordType.ATTRIBUTE_CHANGED:
         attributeChangeSchema.parse(body.data.old);

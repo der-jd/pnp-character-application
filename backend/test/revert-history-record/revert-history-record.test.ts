@@ -17,6 +17,8 @@ import {
   levelChangedRecord,
   skillChangedRecord,
   specialAbilitiesChangedRecord,
+  attackBaseValueAndCombatStatsChangedRecord,
+  rangedAttackBaseValueAndCombatStatsChangedRecord,
 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 import { revertRecordFromHistory } from "revert-history-record";
@@ -170,6 +172,34 @@ describe("Valid requests", () => {
     {
       name: "Revert history record for a changed base value",
       fakeRecord: baseValueChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for a changed base value and melee combat stats",
+      fakeRecord: attackBaseValueAndCombatStatsChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for a changed base value and ranged combat stats",
+      fakeRecord: rangedAttackBaseValueAndCombatStatsChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {
