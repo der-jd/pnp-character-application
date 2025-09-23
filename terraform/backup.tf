@@ -74,7 +74,6 @@ resource "aws_iam_role_policy_attachment" "backup_managed_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
 }
 
-# CloudWatch alarm when any backup job fails in this account/region
 resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
   alarm_name          = "pnp-app-backup-job-failed"
   comparison_operator = "GreaterThanThreshold"
@@ -86,7 +85,7 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
   threshold           = 0
 
   alarm_description = "Alerts when an AWS Backup job for the PnP Character Application fails"
-  alarm_actions     = [aws_sns_topic.backup_failures.arn]
+  alarm_actions     = [aws_sns_topic.backup_alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
@@ -100,15 +99,15 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
   threshold           = 0
 
   alarm_description = "Alerts when an AWS Backup job expires (misses completion window) for the PnP Character Application"
-  alarm_actions     = [aws_sns_topic.backup_failures.arn]
+  alarm_actions     = [aws_sns_topic.backup_alerts.arn]
 }
 
-resource "aws_sns_topic" "backup_failures" {
-  name = "pnp-app-backup-failures-topic"
+resource "aws_sns_topic" "backup_alerts" {
+  name = "pnp-app-backup-alerts-topic"
 }
 
 resource "aws_sns_topic_subscription" "email" {
-  topic_arn = aws_sns_topic.backup_failures.arn
+  topic_arn = aws_sns_topic.backup_alerts.arn
   protocol  = "email"
   endpoint  = var.backup_alert_email
 }
