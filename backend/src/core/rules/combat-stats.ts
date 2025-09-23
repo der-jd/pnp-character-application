@@ -131,14 +131,19 @@ function applySkilledValueIncreases(
     return;
   }
 
+  const initialSkilledAttackValue = combatStats.skilledAttackValue;
+  const initialSkilledParadeValue = combatStats.skilledParadeValue;
+  const initialAvailablePoints = combatStats.availablePoints;
+
   console.log(`Increasing skilled attack value by ${skilledAttackIncrease} points...`);
   for (let i = 0; i < skilledAttackIncrease; i++) {
     console.debug("---------------------------");
     if (INCREASE_COST_COMBAT_STATS > combatStats.availablePoints) {
       throw new HttpError(400, "Not enough points to increase the attack value!", {
         combatSkillName: combatSkillName,
-        skilledAttackValue: combatStats.skilledAttackValue,
-        availablePoints: combatStats.availablePoints,
+        skilledAttackValue: initialSkilledAttackValue,
+        availablePoints: initialAvailablePoints,
+        skilledAttackIncrease: skilledAttackIncrease,
       });
     }
     console.debug(`Skilled attack value: ${combatStats.skilledAttackValue}`);
@@ -154,8 +159,9 @@ function applySkilledValueIncreases(
     if (INCREASE_COST_COMBAT_STATS > combatStats.availablePoints) {
       throw new HttpError(400, "Not enough points to increase the parade value!", {
         combatSkillName: combatSkillName,
-        skilledParadeValue: combatStats.skilledParadeValue,
-        availablePoints: combatStats.availablePoints,
+        skilledParadeValue: initialSkilledParadeValue,
+        availablePoints: initialAvailablePoints,
+        skilledParadeIncrease: skilledParadeIncrease,
       });
     }
     console.debug(`Skilled parade value: ${combatStats.skilledParadeValue}`);
