@@ -1,5 +1,5 @@
 resource "aws_iam_role" "step_function_role" {
-  name = "step-function-role"
+  name = "pnp-app-step-function-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
