@@ -40,15 +40,15 @@ resource "aws_backup_selection" "selection" {
 
   iam_role_arn = aws_iam_role.backup_role.arn
 
+  # Limit selection to DynamoDB tables AND require them to have the defined tag
   resources = [
     "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*"
   ]
-
-  # Select every defined resource with the given tag
-  selection_tag {
-    type  = "STRINGEQUALS"
-    key   = var.project_tag_key
-    value = var.project_tag_value
+  condition {
+    string_equals {
+      key   = "aws:ResourceTag/${var.project_tag_key}"
+      value = var.project_tag_value
+    }
   }
 }
 
