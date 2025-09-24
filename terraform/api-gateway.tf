@@ -1,5 +1,5 @@
 resource "aws_iam_role" "api_gateway_role" {
-  name = "api-gateway-step-function-role"
+  name = "pnp-app-api-gateway-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
