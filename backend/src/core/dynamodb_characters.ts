@@ -1,6 +1,15 @@
 import { DeleteCommand, GetCommand, PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { Attribute, Character, CalculationPoints, CombatStats, BaseValue, Skill, characterSchema, LevelUpProgress } from "api-spec";
+import {
+  Attribute,
+  Character,
+  CalculationPoints,
+  CombatStats,
+  BaseValue,
+  Skill,
+  characterSchema,
+  LevelUpProgress,
+} from "api-spec";
 import { HttpError } from "./errors.js";
 import { dynamoDBDocClient } from "./dynamodb_client.js";
 
@@ -35,7 +44,12 @@ export async function setSpecialAbilities(
   console.log("Successfully updated DynamoDB item");
 }
 
-export async function setLevelUp(userId: string, characterId: string, level: number, levelUpProgress: LevelUpProgress): Promise<void> {
+export async function setLevelUp(
+  userId: string,
+  characterId: string,
+  level: number,
+  levelUpProgress: LevelUpProgress,
+): Promise<void> {
   console.log(`Set level up of character ${characterId} (user ${userId}) for level ${level} in DynamoDB`);
 
   const command = new UpdateCommand({
@@ -44,7 +58,8 @@ export async function setLevelUp(userId: string, characterId: string, level: num
       userId: userId,
       characterId: characterId,
     },
-    UpdateExpression: "SET #characterSheet.#generalInformation.#levelUpProgress = :progress, #characterSheet.#generalInformation.#level = :level",
+    UpdateExpression:
+      "SET #characterSheet.#generalInformation.#levelUpProgress = :progress, #characterSheet.#generalInformation.#level = :level",
     ExpressionAttributeNames: {
       "#characterSheet": "characterSheet",
       "#generalInformation": "generalInformation",
