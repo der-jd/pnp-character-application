@@ -27,7 +27,6 @@ import {
   CharacterCreation,
   ActivatedSkills,
   BaseValues,
-  baseValuesUpdatableByLvlUp,
   baseValuesSchema,
   DisadvantagesNames,
   AdvantagesNames,
@@ -76,6 +75,7 @@ export class CharacterBuilder {
       generalInformation: {
         name: "",
         level: MIN_LEVEL,
+        levelUpProgress: { effectsByLevel: {}, flags: { rerollUnlocked: false } },
         sex: "",
         profession: { name: "", skill: "{skillCategory}/{skillName}" },
         hobby: { name: "", skill: "<skillCategory/{skillName}" },
@@ -182,8 +182,8 @@ export class CharacterBuilder {
       // The values are updated again later when 'byFormula' is set
       start: 0,
       current: 0,
-      byLvlUp: baseValuesUpdatableByLvlUp.includes(baseValueName) ? 0 : undefined,
       mod: 0,
+      // byLvlUp will be managed by the level-up endpoint; default undefined
     };
   }
 

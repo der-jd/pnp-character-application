@@ -1,6 +1,6 @@
 import { DeleteCommand, GetCommand, PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { Attribute, Character, CalculationPoints, CombatStats, BaseValue, Skill, characterSchema } from "api-spec";
+import { Attribute, Character, CalculationPoints, CombatStats, BaseValue, Skill, characterSchema, LevelUpProgress } from "api-spec";
 import { HttpError } from "./errors.js";
 import { dynamoDBDocClient } from "./dynamodb_client.js";
 
@@ -33,6 +33,33 @@ export async function setSpecialAbilities(
   await dynamoDBDocClient.send(command);
 
   console.log("Successfully updated DynamoDB item");
+}
+
+export async function setLevelUp(userId: string, characterId: string, level: number, levelUpProgress: LevelUpProgress): Promise<void> {
+  console.log(`Set level up of character ${characterId} (user ${userId}) for level ${level} in DynamoDB`);
+
+  const command = new UpdateCommand({
+    TableName: process.env.TABLE_NAME_CHARACTERS,
+    Key: {
+      userId: userId,
+      characterId: characterId,
+    },
+    UpdateExpression: "SET #characterSheet.#generalInformation.#levelUpProgress = :progress, #characterSheet.#generalInformation.#level = :level",
+    ExpressionAttributeNames: {
+      "#characterSheet": "characterSheet",
+      "#generalInformation": "generalInformation",
+      "#levelUpProgress": "levelUpProgress",
+      "#level": "level",
+    },
+    ExpressionAttributeValues: {
+      ":progress": levelUpProgress,
+      ":level": level,
+    },
+  });
+
+  await dynamoDBDocClient.send(command);
+
+  console.log("Successfully set level up in DynamoDB");
 }
 
 export async function getCharacterItem(userId: string, characterId: string): Promise<Character> {
@@ -251,32 +278,6 @@ export async function updateBaseValue(
     },
     ExpressionAttributeValues: {
       ":baseValue": baseValue,
-    },
-  });
-
-  await dynamoDBDocClient.send(command);
-
-  console.log("Successfully updated DynamoDB item");
-}
-
-export async function updateLevel(userId: string, characterId: string, level: number): Promise<void> {
-  console.log(`Update level of character ${characterId} (user ${userId}) to ${level} in DynamoDB`);
-
-  // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
-  const command = new UpdateCommand({
-    TableName: process.env.TABLE_NAME_CHARACTERS,
-    Key: {
-      userId: userId,
-      characterId: characterId,
-    },
-    UpdateExpression: "SET #characterSheet.#generalInformation.#level = :level",
-    ExpressionAttributeNames: {
-      "#characterSheet": "characterSheet",
-      "#generalInformation": "generalInformation",
-      "#level": "level",
-    },
-    ExpressionAttributeValues: {
-      ":level": level,
     },
   });
 

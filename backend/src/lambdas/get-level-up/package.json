@@ -1,0 +1,13 @@
+{
+  "name": "get-level-up",
+  "version": "1.0.0",
+  "main": "index.mjs",
+  "type": "module",
+  "dependencies": {
+    "api-spec": "*",
+    "core": "*"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.0"
+  }
+}

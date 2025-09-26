@@ -1,14 +1,14 @@
-resource "aws_cloudwatch_log_group" "update_level_state_machine_log_group" {
-  name              = "/aws/vendedlogs/states/update-level"
+resource "aws_cloudwatch_log_group" "apply_level_up_state_machine_log_group" {
+  name              = "/aws/vendedlogs/states/apply-level-up"
   retention_in_days = 0
 }
 
-resource "aws_sfn_state_machine" "update_level_state_machine" {
-  name     = "update-level"
+resource "aws_sfn_state_machine" "apply_level_up_state_machine" {
+  name     = "apply-level-up"
   role_arn = aws_iam_role.step_function_role.arn
   type     = "EXPRESS"
   logging_configuration {
-    log_destination        = "${aws_cloudwatch_log_group.update_level_state_machine_log_group.arn}:*"
+    log_destination        = "${aws_cloudwatch_log_group.apply_level_up_state_machine_log_group.arn}:*"
     include_execution_data = true
     level                  = "ALL"
   }
@@ -17,15 +17,15 @@ resource "aws_sfn_state_machine" "update_level_state_machine" {
   // Best practices: https://docs.aws.amazon.com/step-functions/latest/dg/sfn-best-practices.html
   // Transforming input and output with JSONata: https://docs.aws.amazon.com/step-functions/latest/dg/transforming-data.html
   definition = jsonencode({
-    StartAt = "UpdateLevel",
+    StartAt = "ApplyLevelUp",
     States = {
-      UpdateLevel = {
+      ApplyLevelUp = {
         Type          = "Task",
         QueryLanguage = "JSONata",
-        Resource      = module.update_level_lambda.lambda_function.arn,
+        Resource      = module.apply_level_up_lambda.lambda_function.arn,
         Assign = {
-          statusCode      = "{% $states.result.statusCode %}",
-          updateLevelBody = "{% $states.result.body %}"
+          statusCode       = "{% $states.result.statusCode %}",
+          applyLevelUpBody = "{% $states.result.body %}"
         },
         TimeoutSeconds = 5 // Timeout to avoid waiting for a stuck task
         Retry = [
@@ -79,9 +79,9 @@ resource "aws_sfn_state_machine" "update_level_state_machine" {
           },
           "body" = {
             "userId"         = "{% $parse($states.input.body).userId %}",
-            "type"           = "1", // LEVEL_CHANGED
+            "type"           = "1", // LEVEL_UP_APPLIED
             "name"           = "Level up",
-            "data"           = "{% $parse($states.input.body).level %}",
+            "data"           = "{% $parse($states.input.body).changes %}",
             "learningMethod" = null,
             "calculationPoints" = {
               "adventurePoints" = null,
@@ -143,10 +143,9 @@ resource "aws_sfn_state_machine" "update_level_state_machine" {
            * $parse() is used to parse the stringified JSON inside the variables temporarily back to a JSON object before the whole
            * content is stringified with $string() again.
            */
-          "body" = "{% $string({'data': $parse($updateLevelBody),'historyRecord': $addHistoryRecordBody ? $parse($addHistoryRecordBody) : null}) %}"
+          "body" = "{% $string({'data': $parse($applyLevelUpBody),'historyRecord': $addHistoryRecordBody ? $parse($addHistoryRecordBody) : null}) %}"
         }
       }
     }
   })
 }
-

@@ -10,7 +10,6 @@ import {
   attributeChangeSchema,
   CharacterSheet,
   calculationPointsChangeSchema,
-  levelChangeSchema,
   specialAbilitiesChangeSchema,
   deleteHistoryRecordPathParamsSchema,
   DeleteHistoryRecordPathParams,
@@ -18,6 +17,7 @@ import {
   headersSchema,
   CombatSection,
   baseValueChangeSchema,
+  levelUpChangeSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -34,12 +34,12 @@ import {
   updateSkill,
   updateCombatStats,
   updateBaseValue,
-  updateLevel,
   setSpecialAbilities,
   logZodError,
   isZodError,
   getSkillCategoryAndName,
   getCombatCategory,
+  setLevelUp,
 } from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -136,9 +136,30 @@ async function revertChange(userId: string, characterId: string, record: Record)
         await updateAttributePointsIfExists(userId, characterId, oldData.attributePoints);
         break;
       }
-      case RecordType.LEVEL_CHANGED: {
-        const oldData = levelChangeSchema.parse(record.data.old);
-        await updateLevel(userId, characterId, oldData.value);
+      case RecordType.LEVEL_UP_APPLIED: {
+        const oldData = levelUpChangeSchema.parse(record.data.old);
+
+        await setLevelUp(userId, characterId, oldData.level, oldData.levelUpProgress);
+
+        if (oldData.baseValues) {
+          const updates: Promise<void>[] = [];
+          for (const baseValueName of Object.keys(oldData.baseValues) as (keyof CharacterSheet["baseValues"])[]) {
+            const oldBaseValue = oldData.baseValues[baseValueName];
+
+            // This check shouldn't be necessary as we loop over only existing base values. However, TypeScript complains without it.
+            if (oldBaseValue === undefined) {
+              throw new HttpError(500, `Base value '${String(baseValueName)}' is missing in old data`);
+            }
+
+            updates.push(updateBaseValue(userId, characterId, baseValueName, oldBaseValue));
+          }
+          await Promise.all(updates);
+        }
+
+        if (oldData.specialAbilities) {
+          await setSpecialAbilities(userId, characterId, oldData.specialAbilities);
+        }
+
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;

@@ -14,7 +14,7 @@ import {
   recordSchema,
   userIdSchema,
   characterCreationSchema,
-  levelChangeSchema,
+  levelUpChangeSchema,
   specialAbilitiesChangeSchema,
   baseValueChangeSchema,
 } from "api-spec";
@@ -191,9 +191,9 @@ async function validateRequest(request: Request): Promise<Parameters> {
         // There is no "old" data for character creation
         characterCreationSchema.parse(body.data.new);
         break;
-      case RecordType.LEVEL_CHANGED:
-        levelChangeSchema.parse(body.data.old);
-        levelChangeSchema.parse(body.data.new);
+      case RecordType.LEVEL_UP_APPLIED:
+        levelUpChangeSchema.parse(body.data.old);
+        levelUpChangeSchema.parse(body.data.new);
         break;
       case RecordType.CALCULATION_POINTS_CHANGED:
         calculationPointsChangeSchema.parse(body.data.old);

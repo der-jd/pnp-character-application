@@ -16,6 +16,7 @@ import {
   MIN_COMBAT_STAT,
   MIN_POINTS,
 } from "./general-schemas.js";
+import { levelUpProgressSchema } from "./level-up-schemas.js";
 
 export const combinedSkillCategoryAndNameSchema = z
   .string()
@@ -42,6 +43,7 @@ export const generalInformationSchema = z
   .object({
     name: characterNameSchema,
     level: levelSchema,
+    levelUpProgress: levelUpProgressSchema,
     sex: z.string().max(MAX_STRING_LENGTH_SHORT),
     profession: professionHobbySchema,
     hobby: professionHobbySchema,

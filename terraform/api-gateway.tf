@@ -274,20 +274,34 @@ module "calculation_points_options" {
   resource_id = aws_api_gateway_resource.calculation_points.id
 }
 
-// ================== /characters/{character-id}/level ==================
+// ================== /characters/{character-id}/level-up ==================
 
-resource "aws_api_gateway_resource" "level" {
+resource "aws_api_gateway_resource" "level_up" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.character_id.id
-  path_part   = "level" // .../characters/{character-id}/level
+  path_part   = "level-up" // .../characters/{character-id}/level-up
 }
 
-// ================== POST /characters/{character-id}/level ==================
+// ================== GET /characters/{character-id}/level-up ==================
 
-module "level_post" {
+module "level_up_get" {
+  source        = "./modules/apigw_lambda_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.level_up.id
+  http_method   = "GET"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  lambda_uri = module.get_level_up_lambda.lambda_function.invoke_arn
+}
+
+// ================== POST /characters/{character-id}/level-up ==================
+
+module "level_up_post" {
   source        = "./modules/apigw_stepfunction_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.level.id
+  resource_id   = aws_api_gateway_resource.level_up.id
   http_method   = "POST"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
@@ -295,15 +309,15 @@ module "level_post" {
   }
   aws_region        = data.aws_region.current.name
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.update_level_state_machine.arn
+  state_machine_arn = aws_sfn_state_machine.apply_level_up_state_machine.arn
 }
 
-// ================== OPTIONS /characters/{character-id}/level ==================
+// ================== OPTIONS /characters/{character-id}/level-up ==================
 
-module "level_options" {
+module "level_up_options" {
   source      = "./modules/apigw_options_method"
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.level.id
+  resource_id = aws_api_gateway_resource.level_up.id
 }
 
 // ================== /characters/{character-id}/skills ==================
@@ -552,8 +566,9 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     module.character_id_options,
     module.character_id_clone_post,
     module.character_id_clone_options,
-    module.level_post,
-    module.level_options,
+    module.level_up_get,
+    module.level_up_post,
+    module.level_up_options,
     module.special_abilities_post,
     module.special_abilities_options,
     module.skill_name_get,

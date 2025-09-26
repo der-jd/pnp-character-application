@@ -24,10 +24,11 @@ import {
   MAX_HISTORY_BLOCK_NUMBER,
   MIN_HISTORY_BLOCK_NUMBER,
 } from "./general-schemas.js";
+import { levelUpProgressSchema } from "./level-up-schemas.js";
 
 export enum RecordType {
   CHARACTER_CREATED = 0,
-  LEVEL_CHANGED = 1,
+  LEVEL_UP_APPLIED = 1,
   CALCULATION_POINTS_CHANGED = 2,
   BASE_VALUE_CHANGED = 3,
   SPECIAL_ABILITIES_CHANGED = 4,
@@ -121,15 +122,12 @@ export const integerSchema = z
   })
   .strict();
 
-export const stringArraySchema = z
+export const levelUpChangeSchema = z
   .object({
-    values: z.array(z.string().max(MAX_STRING_LENGTH_LONG)).max(MAX_ARRAY_SIZE),
-  })
-  .strict();
-
-export const levelChangeSchema = z
-  .object({
-    value: levelSchema,
+    level: levelSchema,
+    levelUpProgress: levelUpProgressSchema,
+    baseValues: baseValuesSchema.partial().optional(),
+    specialAbilities: z.array(specialAbilitySchema).max(MAX_ARRAY_SIZE).optional(),
   })
   .strict();
 
