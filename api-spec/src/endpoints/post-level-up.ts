@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { userIdSchema } from "../general-schemas.js";
+import { MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
 import { baseValuesSchema, combatSectionSchema, levelSchema } from "../character-schemas.js";
 import { levelUpChangeSchema, recordSchema } from "../history-schemas.js";
 import { levelUpDiceRollSchema, levelUpEffectKindSchema, levelUpEffectSchema } from "../level-up-schemas.js";
@@ -22,7 +22,7 @@ export const postLevelUpRequestSchema = z
       })
       .strict()
       .optional(),
-    optionsHash: z.string(),
+    optionsHash: z.string().max(MAX_STRING_LENGTH_DEFAULT),
   })
   .strict();
 
