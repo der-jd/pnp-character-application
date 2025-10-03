@@ -19,6 +19,27 @@ Serverless web application for characters of a custom Pen & Paper game.
 - Run `terraform init` in the `/terraform` working directory to initialize Terraform
   - Rerun this command if a module or backend configuration for Terraform is set or changed. This will then reinitialize the working directory
 
+## Contract Testing
+
+This project includes comprehensive contract testing to ensure API compatibility between frontend and backend.
+
+### Quick Start
+```bash
+# Complete setup and run all contract tests
+npm run contract-tests
+```
+
+### Individual Commands
+```bash
+# Setup LocalStack infrastructure for contract testing
+npm run contract-tests:setup
+
+# Run contract tests against LocalStack
+npm run contract-tests:run
+```
+
+📚 **[Full Contract Testing Guide →](CONTRACT_TESTING_GUIDE.md)**
+
 ## Tech stack
 
 - [Amazon Web Services (AWS)](https://aws.amazon.com/) as cloud provider for the infrastructure

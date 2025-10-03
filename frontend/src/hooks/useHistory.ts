@@ -6,7 +6,8 @@ import { useCharacterStore } from "../app/global/characterStore";
 import { ApiError, deleteHistoryEntry, getHistory, getHistoryBlock } from "../lib/api/utils/api_calls";
 import { useToast } from "./use-toast";
 import { RecordType } from "../lib/api/utils/historyEventType";
-import { CharacterSheet, CombatValues } from "../lib/api/models/Character/character";
+import { CharacterSheet } from "../lib/api/models/Character/character";
+import { CombatStats } from "api-spec";
 import { RecordEntry } from "../lib/api/models/history/interface";
 
 /**
@@ -185,11 +186,11 @@ export function useHistory() {
 
       case RecordType.COMBAT_VALUES_CHANGED: {
         const path = [
-          "combatValues",
+          "combat",
           lastEntry.name.toLowerCase().includes("melee") ? "melee" : "ranged",
         ] as (keyof CharacterSheet)[];
         const name = lastEntry.name.split("/")[1] as keyof CharacterSheet;
-        updateCombatValue(path, name, lastEntry.data.old as CombatValues);
+        updateCombatValue(path, name, lastEntry.data.old as CombatStats);
       }
     }
   };

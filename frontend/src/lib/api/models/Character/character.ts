@@ -6,7 +6,6 @@ export type {
   Attribute,
   BaseValue,
   Skill,
-  CombatValues,
   CostCategory,
   LearningMethod,
   LearningMethodString,

@@ -18,7 +18,11 @@
     "lint:terraform": "tflint --chdir=terraform && echo \"SUCCESS: No lint errors found!\"",
     "lint": "npm run lint --workspaces --if-present",
     "build": "cd api-spec && npm run build && cd .. && npm run build --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present",
+    "api-schema-tests:setup": "./scripts/terraform-symlink-setup.sh",
+    "api-schema-tests:run": "./scripts/run-api-schema-tests.sh",
+    "api-schema-tests:clean": "./scripts/clean-api-schema-tests.sh",
+    "api-schema-tests": "npm run api-schema-tests:setup && npm run api-schema-tests:run"
   },
   "devDependencies": {
     "husky": "^9.1.7",

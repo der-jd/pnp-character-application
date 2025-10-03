@@ -6,7 +6,6 @@ import {
   LearningMethodString,
   InitialNew,
   InitialIncreased,
-  CombatValues,
   Skill,
 } from "api-spec";
 
@@ -37,7 +36,7 @@ export interface SkillIncreaseData {
 
 export interface SkillState {
   skill: Skill;
-  combatValues?: CombatValues;
+  // Note: combatValues removed as it doesn't exist in api-spec, use combat property instead
 }
 
 export interface SkillIncreaseReply {

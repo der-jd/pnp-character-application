@@ -283,7 +283,7 @@ export function useSkillUpdater() {
 
   const tryIncreaseCombatValue = async (value: ICombatValue, subtype: string, pointsToSkill: number) => {
     console.log(subtype);
-    const path = ["combatValues", value.type] as (keyof CharacterSheet)[];
+    const path = ["combat", value.type] as (keyof CharacterSheet)[];
     const name = value.name as keyof CharacterSheet;
     const increaseCombatValueRequest: CombatValueIncreaseRequest = {
       attackValue: {
@@ -307,7 +307,7 @@ export function useSkillUpdater() {
           increaseCombatValueRequest,
         );
 
-        updateCombatValue(path, name, data.combatValues.new);
+        updateCombatValue(path, name, data.combatStats.new);
 
         if (historyRecord) updateReversibleHistory([historyRecord]);
       } catch (error) {

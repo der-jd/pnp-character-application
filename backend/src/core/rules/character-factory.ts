@@ -1,33 +1,47 @@
-import { Attribute, BaseValue, CharacterSheet, CombatValues, Skill } from "api-spec";
-import {
+import { 
+  Attribute, 
+  BaseValue, 
+  CharacterSheet, 
+  CombatStats, 
+  Skill,
   ATTRIBUTE_POINTS_FOR_CREATION,
+  START_SKILLS,
+  combatSkills
+} from "api-spec";
+import {
   COST_CATEGORY_COMBAT_SKILLS,
   COST_CATEGORY_DEFAULT,
-  START_SKILLS,
-  combatSkills,
 } from "./constants.js";
 
 export function createEmptyCharacterSheet(): CharacterSheet {
   const zeroAttribute = (): Attribute => ({ start: 0, current: 0, mod: 0, totalCost: 0 });
   const zeroBaseValue = (): BaseValue => ({ start: 0, current: 0, mod: 0 }); // TODO by formula and byLvlUp. See baseValueFormulas and baseValuesNotUpdatableByLvlUp
 
-  const zeroSkill = (skillName: string): Skill => {
+  const zeroSkill = (skillName: string, skillCategory?: string): Skill => {
+    // Create the full skill name with category for START_SKILLS check
+    const fullSkillName = skillCategory ? `${skillCategory}/${skillName}` as any : null;
+    const isStartSkill = fullSkillName ? START_SKILLS.includes(fullSkillName) : false;
+    const isCombatSkill = combatSkills.some((skill: any) => skill.endsWith(`/${skillName}`));
+    
     return {
-      activated: START_SKILLS.includes(skillName) ? true : false,
+      activated: isStartSkill,
       start: 0,
       current: 0,
       mod: 0,
       totalCost: 0,
-      defaultCostCategory: (combatSkills as string[]).includes(skillName)
+      defaultCostCategory: isCombatSkill
         ? COST_CATEGORY_COMBAT_SKILLS
         : COST_CATEGORY_DEFAULT,
-    } as Skill;
+    };
   };
 
-  const zeroCombatValues = (): CombatValues => ({
+  const zeroCombatStats = (): CombatStats => ({
     availablePoints: 0,
+    handling: 0,
     attackValue: 0,
+    skilledAttackValue: 0,
     paradeValue: 0,
+    skilledParadeValue: 0,
   });
 
   return {
@@ -121,6 +135,7 @@ export function createEmptyCharacterSheet(): CharacterSheet {
         knowledgeOfHumanNature: zeroSkill("knowledgeOfHumanNature"),
         persuading: zeroSkill("persuading"),
         convincing: zeroSkill("convincing"),
+        bargaining: zeroSkill("bargaining"),
       },
       nature: {
         tracking: zeroSkill("tracking"),
@@ -161,7 +176,6 @@ export function createEmptyCharacterSheet(): CharacterSheet {
         steeringVehicles: zeroSkill("steeringVehicles"),
         fineMechanics: zeroSkill("fineMechanics"),
         cheating: zeroSkill("cheating"),
-        bargaining: zeroSkill("bargaining"),
         firstAid: zeroSkill("firstAid"),
         calmingSbDown: zeroSkill("calmingSbDown"),
         drawingAndPainting: zeroSkill("drawingAndPainting"),
@@ -169,25 +183,25 @@ export function createEmptyCharacterSheet(): CharacterSheet {
         lockpicking: zeroSkill("lockpicking"),
       },
     },
-    combatValues: {
+    combat: {
       melee: {
-        martialArts: zeroCombatValues(),
-        barehanded: zeroCombatValues(),
-        chainWeapons: zeroCombatValues(),
-        daggers: zeroCombatValues(),
-        slashingWeaponsSharp1h: zeroCombatValues(),
-        slashingWeaponsBlunt1h: zeroCombatValues(),
-        thrustingWeapons1h: zeroCombatValues(),
-        slashingWeaponsSharp2h: zeroCombatValues(),
-        slashingWeaponsBlunt2h: zeroCombatValues(),
-        thrustingWeapons2h: zeroCombatValues(),
+        martialArts: zeroCombatStats(),
+        barehanded: zeroCombatStats(),
+        chainWeapons: zeroCombatStats(),
+        daggers: zeroCombatStats(),
+        slashingWeaponsSharp1h: zeroCombatStats(),
+        slashingWeaponsBlunt1h: zeroCombatStats(),
+        thrustingWeapons1h: zeroCombatStats(),
+        slashingWeaponsSharp2h: zeroCombatStats(),
+        slashingWeaponsBlunt2h: zeroCombatStats(),
+        thrustingWeapons2h: zeroCombatStats(),
       },
       ranged: {
-        missile: zeroCombatValues(),
-        firearmSimple: zeroCombatValues(),
-        firearmMedium: zeroCombatValues(),
-        firearmComplex: zeroCombatValues(),
-        heavyWeapons: zeroCombatValues(),
+        missile: zeroCombatStats(),
+        firearmSimple: zeroCombatStats(),
+        firearmMedium: zeroCombatStats(),
+        firearmComplex: zeroCombatStats(),
+        heavyWeapons: zeroCombatStats(),
       },
     },
   };
