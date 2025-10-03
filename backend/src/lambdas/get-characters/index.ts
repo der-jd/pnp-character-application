@@ -53,9 +53,10 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
       characters = items;
     }
 
+    const responseBody: GetCharactersResponse = { characters: characters };
     const response = {
       statusCode: 200,
-      body: JSON.stringify({ characters: characters } as GetCharactersResponse),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
@@ -78,7 +79,6 @@ function validateRequest(request: Request): Parameters {
       throw new HttpError(400, "Invalid input values!");
     }
 
-    // Rethrow other errors
     throw error;
   }
 }

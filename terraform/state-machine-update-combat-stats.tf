@@ -1,14 +1,14 @@
-resource "aws_cloudwatch_log_group" "update_combat_values_state_machine_log_group" {
-  name              = "/aws/vendedlogs/states/update-combat-values"
+resource "aws_cloudwatch_log_group" "update_combat_stats_state_machine_log_group" {
+  name              = "/aws/vendedlogs/states/update-combat-stats"
   retention_in_days = 0
 }
 
-resource "aws_sfn_state_machine" "update_combat_values_state_machine" {
-  name     = "update-combat-values"
+resource "aws_sfn_state_machine" "update_combat_stats_state_machine" {
+  name     = "update-combat-stats"
   role_arn = aws_iam_role.step_function_role.arn
   type     = "EXPRESS"
   logging_configuration {
-    log_destination        = "${aws_cloudwatch_log_group.update_combat_values_state_machine_log_group.arn}:*"
+    log_destination        = "${aws_cloudwatch_log_group.update_combat_stats_state_machine_log_group.arn}:*"
     include_execution_data = true
     level                  = "ALL"
   }
@@ -17,15 +17,15 @@ resource "aws_sfn_state_machine" "update_combat_values_state_machine" {
   // Best practices: https://docs.aws.amazon.com/step-functions/latest/dg/sfn-best-practices.html
   // Transforming input and output with JSONata: https://docs.aws.amazon.com/step-functions/latest/dg/transforming-data.html
   definition = jsonencode({
-    StartAt = "UpdateCombatValues",
+    StartAt = "UpdateCombatStats",
     States = {
-      UpdateCombatValues = {
+      UpdateCombatStats = {
         Type          = "Task",
         QueryLanguage = "JSONata",
-        Resource      = module.update_combat_values_lambda.lambda_function.arn,
+        Resource      = module.update_combat_stats_lambda.lambda_function.arn,
         Assign = {
-          statusCode             = "{% $states.result.statusCode %}",
-          updateCombatValuesBody = "{% $states.result.body %}"
+          statusCode            = "{% $states.result.statusCode %}",
+          updateCombatStatsBody = "{% $states.result.body %}"
         },
         TimeoutSeconds = 5 // Timeout to avoid waiting for a stuck task
         Retry = [
@@ -62,8 +62,8 @@ resource "aws_sfn_state_machine" "update_combat_values_state_machine" {
         QueryLanguage = "JSONata",
         Choices = [
           {
-            // The combat values were not changed, so no history record is necessary
-            Condition = "{% $parse($states.input.body).combatValues.old = $parse($states.input.body).combatValues.new %}",
+            // The combat stats were not changed, so no history record is necessary
+            Condition = "{% $parse($states.input.body).combatStats.old = $parse($states.input.body).combatStats.new %}",
             Next      = "SuccessState"
           }
         ],
@@ -79,9 +79,9 @@ resource "aws_sfn_state_machine" "update_combat_values_state_machine" {
           },
           "body" = {
             "userId"         = "{% $parse($states.input.body).userId %}",
-            "type"           = "7", // COMBAT_VALUES_CHANGED
+            "type"           = "7", // COMBAT_STATS_CHANGED
             "name"           = "{% $parse($states.input.body).combatCategory & '/' & $parse($states.input.body).combatSkillName %}",
-            "data"           = "{% $parse($states.input.body).combatValues %}",
+            "data"           = "{% $parse($states.input.body).combatStats %}",
             "learningMethod" = null,
             "calculationPoints" = {
               "adventurePoints" = null,
@@ -143,10 +143,9 @@ resource "aws_sfn_state_machine" "update_combat_values_state_machine" {
            * $parse() is used to parse the stringified JSON inside the variables temporarily back to a JSON object before the whole
            * content is stringified with $string() again.
            */
-          "body" = "{% $string({'data': $parse($updateCombatValuesBody),'historyRecord': $addHistoryRecordBody ? $parse($addHistoryRecordBody) : null}) %}"
+          "body" = "{% $string({'data': $parse($updateCombatStatsBody),'historyRecord': $addHistoryRecordBody ? $parse($addHistoryRecordBody) : null}) %}"
         }
       }
     }
   })
 }
-

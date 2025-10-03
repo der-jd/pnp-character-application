@@ -11,7 +11,7 @@ import {
   mockDynamoDBGetCharacterResponse,
   mockDynamoDBQueryHistoryResponse,
 } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { fakeBigHistoryBlock, fakeHistoryBlock2 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 
@@ -126,6 +126,45 @@ describe("Invalid requests", () => {
 describe("Valid requests", () => {
   const testCasesForExistingHistoryBlock = [
     {
+      name: "Add history record for 'character created' to existing block",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          userId: fakeUserId,
+          type: RecordType.CHARACTER_CREATED,
+          name: "New Character",
+          data: {
+            new: {
+              character: fakeCharacter,
+              generationPoints: {
+                throughDisadvantages: 15,
+                spent: 20,
+                total: 20,
+              },
+              activatedSkills: [
+                "body/pickpocketing",
+                "body/bodyControl",
+                "social/convincing",
+                "nature/fishing",
+                "handcraft/stonework",
+              ],
+            },
+          },
+          learningMethod: null,
+          calculationPoints: {
+            adventurePoints: null,
+            attributePoints: null,
+          },
+          comment: null,
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
       name: "Add history record for 'calculation points changed' to existing block",
       request: {
         headers: {},
@@ -239,16 +278,20 @@ describe("Valid requests", () => {
           name: "health points",
           data: {
             old: {
-              start: 20,
-              current: 20,
-              byLvlUp: 0,
-              mod: 0,
+              baseValue: {
+                start: 20,
+                current: 20,
+                byLvlUp: 0,
+                mod: 0,
+              },
             },
             new: {
-              start: 20,
-              current: 26,
-              byLvlUp: 6,
-              mod: 0,
+              baseValue: {
+                start: 20,
+                current: 26,
+                byLvlUp: 6,
+                mod: 0,
+              },
             },
           },
           learningMethod: null,
@@ -257,6 +300,342 @@ describe("Valid requests", () => {
             attributePoints: null,
           },
           comment: "Level 2",
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Add history record for 'base value changed' (including melee combat stats) to existing block",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          userId: fakeUserId,
+          type: RecordType.BASE_VALUE_CHANGED,
+          name: "attackBaseValue",
+          data: {
+            old: {
+              baseValue: {
+                start: 30,
+                current: 110,
+                byFormula: 110,
+                mod: 0,
+              },
+              combat: {
+                melee: {
+                  martialArts: {
+                    availablePoints: 19,
+                    handling: 25,
+                    attackValue: 116,
+                    skilledAttackValue: 6,
+                    paradeValue: 118,
+                    skilledParadeValue: 6,
+                  },
+                  barehanded: {
+                    availablePoints: 82,
+                    handling: 25,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  chainWeapons: {
+                    availablePoints: 26,
+                    handling: 15,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  daggers: {
+                    availablePoints: 26,
+                    handling: 25,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsSharp1h: {
+                    availablePoints: 10,
+                    handling: 25,
+                    attackValue: 218,
+                    skilledAttackValue: 108,
+                    paradeValue: 190,
+                    skilledParadeValue: 78,
+                  },
+                  slashingWeaponsBlunt1h: {
+                    availablePoints: 10,
+                    handling: 25,
+                    attackValue: 218,
+                    skilledAttackValue: 108,
+                    paradeValue: 190,
+                    skilledParadeValue: 78,
+                  },
+                  thrustingWeapons1h: {
+                    availablePoints: 58,
+                    handling: 20,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsSharp2h: {
+                    availablePoints: 83,
+                    handling: 15,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsBlunt2h: {
+                    availablePoints: 26,
+                    handling: 15,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  thrustingWeapons2h: {
+                    availablePoints: 57,
+                    handling: 15,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                },
+              },
+            },
+            new: {
+              baseValue: {
+                start: 30,
+                current: 114,
+                byFormula: 114,
+                mod: 0,
+              },
+              combat: {
+                melee: {
+                  martialArts: {
+                    availablePoints: 19,
+                    handling: 25,
+                    attackValue: 120,
+                    skilledAttackValue: 6,
+                    paradeValue: 122,
+                    skilledParadeValue: 6,
+                  },
+                  barehanded: {
+                    availablePoints: 82,
+                    handling: 25,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  chainWeapons: {
+                    availablePoints: 26,
+                    handling: 15,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  daggers: {
+                    availablePoints: 26,
+                    handling: 25,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsSharp1h: {
+                    availablePoints: 10,
+                    handling: 25,
+                    attackValue: 222,
+                    skilledAttackValue: 108,
+                    paradeValue: 194,
+                    skilledParadeValue: 78,
+                  },
+                  slashingWeaponsBlunt1h: {
+                    availablePoints: 10,
+                    handling: 25,
+                    attackValue: 222,
+                    skilledAttackValue: 108,
+                    paradeValue: 194,
+                    skilledParadeValue: 78,
+                  },
+                  thrustingWeapons1h: {
+                    availablePoints: 58,
+                    handling: 20,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsSharp2h: {
+                    availablePoints: 83,
+                    handling: 15,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsBlunt2h: {
+                    availablePoints: 26,
+                    handling: 15,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  thrustingWeapons2h: {
+                    availablePoints: 57,
+                    handling: 15,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                },
+              },
+            },
+          },
+          learningMethod: null,
+          calculationPoints: {
+            adventurePoints: null,
+            attributePoints: null,
+          },
+          comment: null,
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Add history record for 'base value changed' (including ranged combat stats) to existing block",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          userId: fakeUserId,
+          type: RecordType.BASE_VALUE_CHANGED,
+          name: "rangedAttackBaseValue",
+          data: {
+            old: {
+              baseValue: {
+                start: 25,
+                current: 108,
+                byFormula: 108,
+                mod: 0,
+              },
+              combat: {
+                ranged: {
+                  firearmSimple: {
+                    availablePoints: 18,
+                    handling: 30,
+                    attackValue: 114,
+                    skilledAttackValue: 6,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  firearmMedium: {
+                    availablePoints: 22,
+                    handling: 20,
+                    attackValue: 118,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  firearmComplex: {
+                    availablePoints: 22,
+                    handling: 10,
+                    attackValue: 118,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  heavyWeapons: {
+                    availablePoints: 22,
+                    handling: 5,
+                    attackValue: 118,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  missile: {
+                    availablePoints: 15,
+                    handling: 15,
+                    attackValue: 113,
+                    skilledAttackValue: 5,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                },
+              },
+            },
+            new: {
+              baseValue: {
+                start: 25,
+                current: 112,
+                byFormula: 112,
+                mod: 0,
+              },
+              combat: {
+                ranged: {
+                  firearmSimple: {
+                    availablePoints: 18,
+                    handling: 30,
+                    attackValue: 118,
+                    skilledAttackValue: 6,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  firearmMedium: {
+                    availablePoints: 22,
+                    handling: 20,
+                    attackValue: 122,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  firearmComplex: {
+                    availablePoints: 22,
+                    handling: 10,
+                    attackValue: 122,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  heavyWeapons: {
+                    availablePoints: 22,
+                    handling: 5,
+                    attackValue: 122,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  missile: {
+                    availablePoints: 15,
+                    handling: 15,
+                    attackValue: 117,
+                    skilledAttackValue: 5,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                },
+              },
+            },
+          },
+          learningMethod: null,
+          calculationPoints: {
+            adventurePoints: null,
+            attributePoints: null,
+          },
+          comment: null,
         },
       },
       expectedStatusCode: 200,
@@ -343,6 +722,468 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
+      name: "Add history record for 'attribute changed' (including base values) to existing block",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          userId: fakeUserId,
+          type: RecordType.ATTRIBUTE_CHANGED,
+          name: "strength",
+          data: {
+            old: {
+              attribute: {
+                start: 17,
+                current: 18,
+                mod: 1,
+                totalCost: 15,
+              },
+              baseValues: {
+                healthPoints: {
+                  start: 40,
+                  current: 100,
+                  byFormula: 77,
+                  byLvlUp: 23,
+                  mod: 10,
+                },
+                attackBaseValue: {
+                  start: 30,
+                  current: 110,
+                  byFormula: 110,
+                  mod: 0,
+                },
+                paradeBaseValue: {
+                  start: 30,
+                  current: 112,
+                  byFormula: 112,
+                  mod: 0,
+                },
+                rangedAttackBaseValue: {
+                  start: 25,
+                  current: 108,
+                  byFormula: 108,
+                  mod: 0,
+                },
+              },
+            },
+            new: {
+              attribute: {
+                start: 17,
+                current: 20,
+                mod: 1,
+                totalCost: 17,
+              },
+              baseValues: {
+                healthPoints: {
+                  start: 40,
+                  current: 102,
+                  byFormula: 79,
+                  byLvlUp: 23,
+                  mod: 10,
+                },
+                attackBaseValue: {
+                  start: 30,
+                  current: 114,
+                  byFormula: 114,
+                  mod: 0,
+                },
+                paradeBaseValue: {
+                  start: 30,
+                  current: 116,
+                  byFormula: 116,
+                  mod: 0,
+                },
+                rangedAttackBaseValue: {
+                  start: 25,
+                  current: 112,
+                  byFormula: 112,
+                  mod: 0,
+                },
+              },
+            },
+          },
+          learningMethod: null,
+          calculationPoints: {
+            adventurePoints: null,
+            attributePoints: {
+              old: {
+                start: 0,
+                available: 10,
+                total: 10,
+              },
+              new: {
+                start: 0,
+                available: 8,
+                total: 10,
+              },
+            },
+          },
+          comment: "Weight training",
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Add history record for 'attribute changed' (including base values and combat stats) to existing block",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          userId: fakeUserId,
+          type: RecordType.ATTRIBUTE_CHANGED,
+          name: "strength",
+          data: {
+            old: {
+              attribute: {
+                start: 17,
+                current: 18,
+                mod: 1,
+                totalCost: 15,
+              },
+              baseValues: {
+                healthPoints: {
+                  start: 40,
+                  current: 100,
+                  byFormula: 77,
+                  byLvlUp: 23,
+                  mod: 10,
+                },
+                attackBaseValue: {
+                  start: 30,
+                  current: 110,
+                  byFormula: 110,
+                  mod: 0,
+                },
+                paradeBaseValue: {
+                  start: 30,
+                  current: 112,
+                  byFormula: 112,
+                  mod: 0,
+                },
+                rangedAttackBaseValue: {
+                  start: 25,
+                  current: 108,
+                  byFormula: 108,
+                  mod: 0,
+                },
+              },
+              combat: {
+                melee: {
+                  martialArts: {
+                    availablePoints: 19,
+                    handling: 25,
+                    attackValue: 116,
+                    skilledAttackValue: 6,
+                    paradeValue: 118,
+                    skilledParadeValue: 6,
+                  },
+                  barehanded: {
+                    availablePoints: 82,
+                    handling: 25,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  chainWeapons: {
+                    availablePoints: 26,
+                    handling: 15,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  daggers: {
+                    availablePoints: 26,
+                    handling: 25,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsSharp1h: {
+                    availablePoints: 10,
+                    handling: 25,
+                    attackValue: 218,
+                    skilledAttackValue: 108,
+                    paradeValue: 190,
+                    skilledParadeValue: 78,
+                  },
+                  slashingWeaponsBlunt1h: {
+                    availablePoints: 10,
+                    handling: 25,
+                    attackValue: 218,
+                    skilledAttackValue: 108,
+                    paradeValue: 190,
+                    skilledParadeValue: 78,
+                  },
+                  thrustingWeapons1h: {
+                    availablePoints: 58,
+                    handling: 20,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsSharp2h: {
+                    availablePoints: 83,
+                    handling: 15,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsBlunt2h: {
+                    availablePoints: 26,
+                    handling: 15,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                  thrustingWeapons2h: {
+                    availablePoints: 57,
+                    handling: 15,
+                    attackValue: 120,
+                    skilledAttackValue: 10,
+                    paradeValue: 120,
+                    skilledParadeValue: 8,
+                  },
+                },
+                ranged: {
+                  firearmSimple: {
+                    availablePoints: 18,
+                    handling: 30,
+                    attackValue: 114,
+                    skilledAttackValue: 6,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  firearmMedium: {
+                    availablePoints: 22,
+                    handling: 20,
+                    attackValue: 118,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  firearmComplex: {
+                    availablePoints: 22,
+                    handling: 10,
+                    attackValue: 118,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  heavyWeapons: {
+                    availablePoints: 22,
+                    handling: 5,
+                    attackValue: 118,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  missile: {
+                    availablePoints: 15,
+                    handling: 15,
+                    attackValue: 113,
+                    skilledAttackValue: 5,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                },
+              },
+            },
+            new: {
+              attribute: {
+                start: 17,
+                current: 20,
+                mod: 1,
+                totalCost: 17,
+              },
+              baseValues: {
+                healthPoints: {
+                  start: 40,
+                  current: 102,
+                  byFormula: 79,
+                  byLvlUp: 23,
+                  mod: 10,
+                },
+                attackBaseValue: {
+                  start: 30,
+                  current: 114,
+                  byFormula: 114,
+                  mod: 0,
+                },
+                paradeBaseValue: {
+                  start: 30,
+                  current: 116,
+                  byFormula: 116,
+                  mod: 0,
+                },
+                rangedAttackBaseValue: {
+                  start: 25,
+                  current: 112,
+                  byFormula: 112,
+                  mod: 0,
+                },
+              },
+              combat: {
+                melee: {
+                  martialArts: {
+                    availablePoints: 19,
+                    handling: 25,
+                    attackValue: 120,
+                    skilledAttackValue: 6,
+                    paradeValue: 122,
+                    skilledParadeValue: 6,
+                  },
+                  barehanded: {
+                    availablePoints: 82,
+                    handling: 25,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  chainWeapons: {
+                    availablePoints: 26,
+                    handling: 15,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  daggers: {
+                    availablePoints: 26,
+                    handling: 25,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsSharp1h: {
+                    availablePoints: 10,
+                    handling: 25,
+                    attackValue: 222,
+                    skilledAttackValue: 108,
+                    paradeValue: 194,
+                    skilledParadeValue: 78,
+                  },
+                  slashingWeaponsBlunt1h: {
+                    availablePoints: 10,
+                    handling: 25,
+                    attackValue: 222,
+                    skilledAttackValue: 108,
+                    paradeValue: 194,
+                    skilledParadeValue: 78,
+                  },
+                  thrustingWeapons1h: {
+                    availablePoints: 58,
+                    handling: 20,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsSharp2h: {
+                    availablePoints: 83,
+                    handling: 15,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  slashingWeaponsBlunt2h: {
+                    availablePoints: 26,
+                    handling: 15,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                  thrustingWeapons2h: {
+                    availablePoints: 57,
+                    handling: 15,
+                    attackValue: 124,
+                    skilledAttackValue: 10,
+                    paradeValue: 124,
+                    skilledParadeValue: 8,
+                  },
+                },
+                ranged: {
+                  firearmSimple: {
+                    availablePoints: 18,
+                    handling: 30,
+                    attackValue: 118,
+                    skilledAttackValue: 6,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  firearmMedium: {
+                    availablePoints: 22,
+                    handling: 20,
+                    attackValue: 122,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  firearmComplex: {
+                    availablePoints: 22,
+                    handling: 10,
+                    attackValue: 122,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  heavyWeapons: {
+                    availablePoints: 22,
+                    handling: 5,
+                    attackValue: 122,
+                    skilledAttackValue: 10,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                  missile: {
+                    availablePoints: 15,
+                    handling: 15,
+                    attackValue: 117,
+                    skilledAttackValue: 5,
+                    paradeValue: 0,
+                    skilledParadeValue: 0,
+                  },
+                },
+              },
+            },
+          },
+          learningMethod: null,
+          calculationPoints: {
+            adventurePoints: null,
+            attributePoints: {
+              old: {
+                start: 0,
+                available: 10,
+                total: 10,
+              },
+              new: {
+                start: 0,
+                available: 8,
+                total: 10,
+              },
+            },
+          },
+          comment: "Weight training",
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
       name: "Add history record for 'skill changed' to existing block",
       request: {
         headers: {},
@@ -398,7 +1239,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'combat values changed' to existing block",
+      name: "Add history record for 'skill changed' (including combat stats) to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -407,18 +1248,95 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.COMBAT_VALUES_CHANGED,
+          type: RecordType.SKILL_CHANGED,
+          name: "combat/martialArts",
+          data: {
+            old: {
+              skill: {
+                activated: true,
+                start: 5,
+                current: 12,
+                mod: 7,
+                totalCost: 30,
+                defaultCostCategory: CostCategory.CAT_2,
+              },
+              combatStats: {
+                availablePoints: 19,
+                handling: 25,
+                attackValue: 116,
+                skilledAttackValue: 6,
+                paradeValue: 118,
+                skilledParadeValue: 6,
+              },
+            },
+            new: {
+              skill: {
+                activated: true,
+                start: 5,
+                current: 17,
+                mod: 7,
+                totalCost: 35,
+                defaultCostCategory: CostCategory.CAT_2,
+              },
+              combatStats: {
+                availablePoints: 24,
+                handling: 25,
+                attackValue: 116,
+                skilledAttackValue: 6,
+                paradeValue: 118,
+                skilledParadeValue: 6,
+              },
+            },
+          },
+          learningMethod: "NORMAL",
+          calculationPoints: {
+            adventurePoints: {
+              old: {
+                start: 100,
+                available: 80,
+                total: 300,
+              },
+              new: {
+                start: 100,
+                available: 75,
+                total: 300,
+              },
+            },
+            attributePoints: null,
+          },
+          comment: null,
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Add history record for 'combat stats changed' to existing block",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          userId: fakeUserId,
+          type: RecordType.COMBAT_STATS_CHANGED,
           name: "melee/slashingWeaponsSharp1h",
           data: {
             old: {
               availablePoints: 10,
-              attackValue: 108,
-              paradeValue: 78,
+              handling: 25,
+              attackValue: 218,
+              skilledAttackValue: 108,
+              paradeValue: 190,
+              skilledParadeValue: 78,
             },
             new: {
               availablePoints: 2,
-              attackValue: 110,
-              paradeValue: 84,
+              handling: 25,
+              attackValue: 220,
+              skilledAttackValue: 110,
+              paradeValue: 196,
+              skilledParadeValue: 84,
             },
           },
           learningMethod: null,
@@ -469,6 +1387,8 @@ describe("Valid requests", () => {
     });
   });
 
+  const latestHistoryBlock = fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1];
+
   const idempotencyTestCasesForExistingHistoryBlock = [
     {
       name: "Add a redundant history record to existing block (idempotency)",
@@ -478,50 +1398,11 @@ describe("Valid requests", () => {
           "character-id": fakeCharacterId,
         },
         queryStringParameters: null,
-        body: {
-          userId: fakeUserId,
-          type: RecordType.SKILL_CHANGED,
-          name: "body/athletics",
-          data: {
-            old: {
-              skill: {
-                activated: true,
-                start: 12,
-                current: 16,
-                mod: 4,
-                totalCost: 40,
-                defaultCostCategory: CostCategory.CAT_2,
-              },
-            },
-            new: {
-              skill: {
-                activated: true,
-                start: 14,
-                current: 20,
-                mod: 5,
-                totalCost: 44,
-                defaultCostCategory: CostCategory.CAT_2,
-              },
-            },
-          },
-          learningMethod: "NORMAL",
-          calculationPoints: {
-            adventurePoints: {
-              old: {
-                start: 0,
-                available: 100,
-                total: 200,
-              },
-              new: {
-                start: 0,
-                available: 96,
-                total: 200,
-              },
-            },
-            attributePoints: null,
-          },
-          comment: null,
-        },
+        body: (() => {
+          const record = latestHistoryBlock.changes[latestHistoryBlock.changes.length - 1];
+          const { type, name, data, learningMethod, calculationPoints, comment } = record;
+          return { userId: fakeUserId, type, name, data, learningMethod, calculationPoints, comment };
+        })(),
       },
       expectedStatusCode: 200,
     },
@@ -539,7 +1420,7 @@ describe("Valid requests", () => {
       const parsedBody = addHistoryRecordResponseSchema.parse(JSON.parse(result.body));
       expect(parsedBody.type).toBe(_case.request.body.type);
       expect(parsedBody.name).toBe(_case.request.body.name);
-      expect(parsedBody.number).toBe(fakeHistoryBlock2.changes[fakeHistoryBlock2.changes.length - 1].number);
+      expect(parsedBody.number).toBe(latestHistoryBlock.changes[latestHistoryBlock.changes.length - 1].number);
       expect(parsedBody.id).toBeDefined();
       expect(parsedBody.data.old).toEqual(_case.request.body.data.old);
       expect(parsedBody.data.new).toEqual(_case.request.body.data.new);

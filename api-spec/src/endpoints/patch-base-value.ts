@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { BaseValues, baseValueSchema } from "../character-schemas.js";
+import { BaseValues } from "../character-schemas.js";
 import { initialNewSchema, MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
-import { recordSchema } from "../history-schemas.js";
+import { baseValueChangeSchema, recordSchema } from "../history-schemas.js";
 
 export const patchBaseValuePathParamsSchema = z
   .object({
@@ -27,10 +27,10 @@ export const updateBaseValueResponseSchema = z
     characterId: z.uuid(),
     userId: userIdSchema,
     baseValueName: z.string().max(MAX_STRING_LENGTH_DEFAULT),
-    baseValue: z
+    changes: z
       .object({
-        old: baseValueSchema,
-        new: baseValueSchema,
+        old: baseValueChangeSchema,
+        new: baseValueChangeSchema,
       })
       .strict(),
   })
@@ -38,10 +38,21 @@ export const updateBaseValueResponseSchema = z
 
 export type UpdateBaseValueResponse = z.infer<typeof updateBaseValueResponseSchema>;
 
+export const patchBaseValueHistoryRecordSchema = recordSchema.extend({
+  data: z
+    .object({
+      old: baseValueChangeSchema,
+      new: baseValueChangeSchema,
+    })
+    .strict(),
+});
+
+export type PatchBaseValueHistoryRecord = z.infer<typeof patchBaseValueHistoryRecordSchema>;
+
 export const patchBaseValueResponseSchema = z
   .object({
     data: updateBaseValueResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: patchBaseValueHistoryRecordSchema.nullable(),
   })
   .strict();
 

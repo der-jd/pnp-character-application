@@ -1,5 +1,5 @@
 resource "aws_iam_role" "step_function_role" {
-  name = "step-function-role"
+  name = "pnp-app-step-function-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -116,13 +116,11 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
           "body" = {
             "userId" = "{% $parse($updateSkillBody).userId %}",
             "type"   = "6", // SKILL_CHANGED
-            // name pattern combat skill: "skillCategory/skillName (combatCategory)"
-            // e.g. "combat/sword1h (melee)"
-            // name pattern other skills: "skillCategory/skillName"
+            // Skill name pattern: "skillCategory/skillName"
             // e.g. "knowledge/history"
-            "name"           = "{% $parse($updateSkillBody).skillCategory & '/' & $parse($updateSkillBody).skillName & ($parse($updateSkillBody).combatCategory ? ' (' & $parse($updateSkillBody).combatCategory & ')' : '') %}",
-            "data"           = "{% $parse($updateSkillBody).changes %}",
-            "learningMethod" = "{% $parse($updateSkillBody).learningMethod ? $parse($updateSkillBody).learningMethod : null %}",
+            "name"           = "{% $parse($states.input.body).skillCategory & '/' & $parse($states.input.body).skillName %}",
+            "data"           = "{% $parse($states.input.body).changes %}",
+            "learningMethod" = "{% $parse($states.input.body).learningMethod ? $parse($states.input.body).learningMethod : null %}",
             "calculationPoints" = {
               "adventurePoints" = "{% $parse($updateSkillBody).adventurePoints %}",
               "attributePoints" = null

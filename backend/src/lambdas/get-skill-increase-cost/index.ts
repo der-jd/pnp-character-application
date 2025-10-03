@@ -6,7 +6,8 @@ import {
   getSkillPathParamsSchema,
   getSkillQueryParamsSchema,
   headersSchema,
-  Character,
+  SkillName,
+  SkillCategory,
 } from "api-spec";
 import {
   adjustCostCategory,
@@ -41,34 +42,32 @@ interface Parameters {
 export async function getSkillCost(request: Request): Promise<APIGatewayProxyResult> {
   try {
     const params = validateRequest(request);
+    const skillName = params.pathParams["skill-name"] as SkillName;
+    const skillCategory = params.pathParams["skill-category"] as SkillCategory;
 
     console.log(
-      `Get increase cost for skill '${params.pathParams["skill-category"]}/${params.pathParams["skill-name"]}' (learning method '${params.queryParams["learning-method"]}') of character ${params.pathParams["character-id"]} of user ${params.userId}`,
+      `Get increase cost for skill '${skillCategory}/${skillName}' (learning method '${params.queryParams["learning-method"]}') of character ${params.pathParams["character-id"]} of user ${params.userId}`,
     );
 
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
 
     const characterSheet = character.characterSheet;
-    const skillCategory = params.pathParams["skill-category"] as keyof Character["characterSheet"]["skills"];
-    const defaultCostCategory = getSkill(
-      characterSheet.skills,
-      skillCategory,
-      params.pathParams["skill-name"],
-    ).defaultCostCategory;
+    const defaultCostCategory = getSkill(characterSheet.skills, skillCategory, skillName).defaultCostCategory;
     const adjustedCostCategory = adjustCostCategory(
       defaultCostCategory,
       parseLearningMethod(params.queryParams["learning-method"]),
     );
-    const skillValue = getSkill(characterSheet.skills, skillCategory, params.pathParams["skill-name"]).current;
+    const skillValue = getSkill(characterSheet.skills, skillCategory, skillName).current;
 
     console.log(`Default cost category: ${defaultCostCategory}`);
     console.log(`Adjusted cost category: ${adjustedCostCategory}`);
 
     const increaseCost = getSkillIncreaseCost(skillValue, adjustedCostCategory);
 
+    // TODO update get-skill-increase-cost endpoint to include skill activation costs. Rename endpoint?
     const responseBody: GetSkillResponse = {
       characterId: params.pathParams["character-id"],
-      skillName: params.pathParams["skill-name"],
+      skillName: skillName,
       increaseCost: increaseCost,
     };
     const response = {
@@ -96,7 +95,6 @@ function validateRequest(request: Request): Parameters {
       throw new HttpError(400, "Invalid input values!");
     }
 
-    // Rethrow other errors
     throw error;
   }
 }

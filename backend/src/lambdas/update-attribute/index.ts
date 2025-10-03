@@ -8,9 +8,10 @@ import {
   headersSchema,
   Attribute,
   CalculationPoints,
-  CharacterSheet,
   InitialNew,
   InitialIncreased,
+  BaseValues,
+  CombatSection,
 } from "api-spec";
 import {
   Request,
@@ -25,6 +26,8 @@ import {
   logZodError,
   getAttribute,
   calculateBaseValues,
+  recalculateAndUpdateCombatStats,
+  combatBaseValuesChangedAffectingCombatStats,
 } from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -80,44 +83,67 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
 
     console.log("Calculate base values");
     const baseValuesOld = characterSheet.baseValues;
-    let baseValuesNew: CharacterSheet["baseValues"] | undefined;
-    const attributesNew = structuredClone(characterSheet.attributes);
-    attributesNew[params.pathParams["attribute-name"] as keyof CharacterSheet["attributes"]] = attribute;
-    const newBaseValuesByFormula = calculateBaseValues(attributesNew);
+    const newBaseValuesByFormula = calculateBaseValues({
+      ...characterSheet.attributes,
+      [params.pathParams["attribute-name"]]: attribute,
+    });
     const updates: Promise<void>[] = [];
-    const changedBaseValues: Partial<CharacterSheet["baseValues"]> = {};
+    const changedBaseValues: Partial<BaseValues> = {};
 
-    for (const baseValueName of Object.keys(baseValuesOld) as (keyof CharacterSheet["baseValues"])[]) {
+    for (const baseValueName of Object.keys(baseValuesOld) as (keyof BaseValues)[]) {
       const oldBaseValue = baseValuesOld[baseValueName];
       const newFormulaValue = newBaseValuesByFormula[baseValueName];
 
-      if (oldBaseValue.byFormula && newFormulaValue !== oldBaseValue.byFormula) {
-        if (!baseValuesNew) {
-          baseValuesNew = structuredClone(baseValuesOld);
-        }
-
-        const diffByFormula = newFormulaValue - oldBaseValue.byFormula;
-        baseValuesNew[baseValueName].byFormula = newFormulaValue;
-        baseValuesNew[baseValueName].current += diffByFormula;
-        changedBaseValues[baseValueName] = baseValuesNew[baseValueName];
-        console.log(`Update base value '${baseValueName}'`);
-        console.log("Old base value:", oldBaseValue);
-        console.log("New base value:", changedBaseValues[baseValueName]);
-        updates.push(
-          updateBaseValue(
-            params.userId,
-            params.pathParams["character-id"],
-            baseValueName,
-            baseValuesNew[baseValueName],
-          ),
-        );
+      if (!oldBaseValue.byFormula || !newFormulaValue) {
+        continue;
       }
+      if (newFormulaValue === oldBaseValue.byFormula) {
+        console.debug(`Base value '${baseValueName}' has not changed by formula, nothing to update.`);
+        console.debug("Old base by formula:", oldBaseValue.byFormula);
+        console.debug("New base by formula:", newFormulaValue);
+        continue;
+      }
+
+      const diffByFormula = newFormulaValue - oldBaseValue.byFormula;
+      changedBaseValues[baseValueName] = {
+        ...baseValuesOld[baseValueName],
+        byFormula: newFormulaValue,
+        current: baseValuesOld[baseValueName].current + diffByFormula,
+      };
+
+      console.log(`Update base value '${baseValueName}'`);
+      console.log("Old base value:", oldBaseValue);
+      console.log("New base value:", changedBaseValues[baseValueName]);
+      updates.push(
+        updateBaseValue(
+          params.userId,
+          params.pathParams["character-id"],
+          baseValueName,
+          changedBaseValues[baseValueName],
+        ),
+      );
     }
 
-    if (updates.length > 0) {
+    const baseValuesChanged = Object.keys(changedBaseValues).length > 0;
+
+    if (baseValuesChanged) {
       await Promise.all(updates);
     } else {
       console.log("No base values changed, nothing to update.");
+    }
+
+    const combatBaseValueChanged: boolean = combatBaseValuesChangedAffectingCombatStats(
+      baseValuesOld,
+      changedBaseValues,
+    );
+    let changedCombatSection: Partial<CombatSection> = {};
+    if (combatBaseValueChanged) {
+      changedCombatSection = await recalculateAndUpdateCombatStats(
+        params.userId,
+        params.pathParams["character-id"],
+        characterSheet.combat,
+        { ...baseValuesOld, ...changedBaseValues },
+      );
     }
 
     const responseBody: UpdateAttributeResponse = {
@@ -127,14 +153,17 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
       changes: {
         old: {
           attribute: attributeOld,
-          baseValues:
-            Object.keys(changedBaseValues).length > 0
-              ? Object.fromEntries(Object.entries(baseValuesOld).filter(([k]) => k in changedBaseValues))
-              : undefined,
+          baseValues: baseValuesChanged
+            ? Object.fromEntries(Object.entries(baseValuesOld).filter(([k]) => k in changedBaseValues))
+            : undefined,
+          combat: combatBaseValueChanged
+            ? Object.fromEntries(Object.entries(characterSheet.combat).filter(([k]) => k in changedCombatSection))
+            : undefined,
         },
         new: {
           attribute: attribute,
-          baseValues: Object.keys(changedBaseValues).length > 0 ? changedBaseValues : undefined,
+          baseValues: baseValuesChanged ? changedBaseValues : undefined,
+          combat: combatBaseValueChanged ? changedCombatSection : undefined,
         },
       },
       attributePoints: {
@@ -170,7 +199,6 @@ function validateRequest(request: Request): Parameters {
       throw new HttpError(400, "Invalid input values!");
     }
 
-    // Rethrow other errors
     throw error;
   }
 }

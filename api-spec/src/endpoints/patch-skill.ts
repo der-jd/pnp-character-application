@@ -6,13 +6,8 @@ import {
   MAX_STRING_LENGTH_DEFAULT,
   MAX_COST,
 } from "../general-schemas.js";
-import {
-  skillSchema,
-  combatValuesSchema,
-  calculationPointsSchema,
-  learningMethodSchema,
-} from "../character-schemas.js";
-import { recordSchema } from "../history-schemas.js";
+import { calculationPointsSchema, learningMethodSchema } from "../character-schemas.js";
+import { recordSchema, skillChangeSchema } from "../history-schemas.js";
 
 export const patchSkillPathParamsSchema = z
   .object({
@@ -45,18 +40,8 @@ export const updateSkillResponseSchema = z
     combatCategory: z.string().max(MAX_STRING_LENGTH_DEFAULT).optional(),
     changes: z
       .object({
-        old: z
-          .object({
-            skill: skillSchema,
-            combatValues: combatValuesSchema.optional(),
-          })
-          .strict(),
-        new: z
-          .object({
-            skill: skillSchema,
-            combatValues: combatValuesSchema.optional(),
-          })
-          .strict(),
+        old: skillChangeSchema,
+        new: skillChangeSchema,
       })
       .strict(),
     learningMethod: learningMethodSchema.optional(),
@@ -72,10 +57,21 @@ export const updateSkillResponseSchema = z
 
 export type UpdateSkillResponse = z.infer<typeof updateSkillResponseSchema>;
 
+export const patchSkillHistoryRecordSchema = recordSchema.extend({
+  data: z
+    .object({
+      old: skillChangeSchema,
+      new: skillChangeSchema,
+    })
+    .strict(),
+});
+
+export type PatchSkillHistoryRecord = z.infer<typeof patchSkillHistoryRecordSchema>;
+
 export const patchSkillResponseSchema = z
   .object({
     data: updateSkillResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: patchSkillHistoryRecordSchema.nullable(),
   })
   .strict();
 

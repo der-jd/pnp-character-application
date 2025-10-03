@@ -1,11 +1,17 @@
 import { z } from "zod";
 import {
   attributeSchema,
+  baseValueSchema,
+  baseValuesSchema,
   calculationPointsSchema,
-  characterSheetSchema,
-  combatValuesSchema,
+  characterSchema,
+  combatSectionSchema,
+  combatStatsSchema,
+  combinedSkillCategoryAndNameSchema,
   learningMethodSchema,
+  levelSchema,
   skillSchema,
+  specialAbilitySchema,
 } from "./character-schemas.js";
 import {
   MAX_STRING_LENGTH_DEFAULT,
@@ -27,7 +33,7 @@ export enum RecordType {
   SPECIAL_ABILITIES_CHANGED = 4,
   ATTRIBUTE_CHANGED = 5,
   SKILL_CHANGED = 6,
-  COMBAT_VALUES_CHANGED = 7,
+  COMBAT_STATS_CHANGED = 7,
 }
 
 export const recordSchema = z
@@ -38,7 +44,7 @@ export const recordSchema = z
     id: z.uuid(),
     data: z
       .object({
-        old: z.record(z.string().max(MAX_STRING_LENGTH_DEFAULT), z.unknown()),
+        old: z.record(z.string().max(MAX_STRING_LENGTH_DEFAULT), z.unknown()).optional(),
         new: z.record(z.string().max(MAX_STRING_LENGTH_DEFAULT), z.unknown()),
       })
       .strict(),
@@ -85,6 +91,30 @@ export const historyBlockSchema = z
 
 export type HistoryBlock = z.infer<typeof historyBlockSchema>;
 
+export const NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION = 5;
+
+export const activatedSkillsSchema = z
+  .array(combinedSkillCategoryAndNameSchema)
+  .length(NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION);
+
+export type ActivatedSkills = z.infer<typeof activatedSkillsSchema>;
+
+export const characterCreationSchema = z
+  .object({
+    character: characterSchema,
+    generationPoints: z
+      .object({
+        throughDisadvantages: z.number().int().min(0).max(MAX_POINTS),
+        spent: z.number().int().min(0).max(MAX_POINTS),
+        total: z.number().int().min(0).max(MAX_POINTS),
+      })
+      .strict(),
+    activatedSkills: activatedSkillsSchema,
+  })
+  .strict();
+
+export type CharacterCreation = z.infer<typeof characterCreationSchema>;
+
 export const integerSchema = z
   .object({
     value: z.number().int().min(MIN_POINTS).max(MAX_POINTS),
@@ -97,10 +127,30 @@ export const stringArraySchema = z
   })
   .strict();
 
+export const levelChangeSchema = z
+  .object({
+    value: levelSchema,
+  })
+  .strict();
+
+export const specialAbilitiesChangeSchema = z
+  .object({
+    values: z.array(specialAbilitySchema).max(MAX_ARRAY_SIZE),
+  })
+  .strict();
+
 export const attributeChangeSchema = z
   .object({
     attribute: attributeSchema,
-    baseValues: characterSheetSchema.shape.baseValues.partial().optional(),
+    baseValues: baseValuesSchema.partial().optional(),
+    combat: combatSectionSchema.partial().optional(),
+  })
+  .strict();
+
+export const baseValueChangeSchema = z
+  .object({
+    baseValue: baseValueSchema,
+    combat: combatSectionSchema.partial().optional(),
   })
   .strict();
 
@@ -114,6 +164,6 @@ export const calculationPointsChangeSchema = z
 export const skillChangeSchema = z
   .object({
     skill: skillSchema,
-    combatValues: combatValuesSchema.optional(),
+    combatStats: combatStatsSchema.optional(),
   })
   .strict();

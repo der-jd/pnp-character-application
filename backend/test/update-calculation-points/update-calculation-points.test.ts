@@ -2,13 +2,32 @@ import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { updateCalculationPointsResponseSchema } from "api-spec";
 import { _updateCalculationPoints } from "update-calculation-points";
 import { expectHttpError } from "../utils.js";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [
+    {
+      name: "Authorization header is missing",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          adventurePoints: {
+            total: {
+              initialValue: 300,
+              increasedPoints: 100,
+            },
+          },
+        },
+      },
+      expectedStatusCode: 400,
+    },
     {
       name: "Authorization header is malformed",
       request: {
@@ -208,8 +227,8 @@ describe("Valid requests", () => {
         body: {
           adventurePoints: {
             start: {
-              initialValue: 80,
-              newValue: 100,
+              initialValue: fakeCharacter.characterSheet.calculationPoints.adventurePoints.start - 20,
+              newValue: fakeCharacter.characterSheet.calculationPoints.adventurePoints.start,
             },
           },
         },
@@ -227,8 +246,8 @@ describe("Valid requests", () => {
         body: {
           attributePoints: {
             start: {
-              initialValue: 5,
-              newValue: 10,
+              initialValue: fakeCharacter.characterSheet.calculationPoints.attributePoints.start - 5,
+              newValue: fakeCharacter.characterSheet.calculationPoints.attributePoints.start,
             },
           },
         },
@@ -246,7 +265,7 @@ describe("Valid requests", () => {
         body: {
           adventurePoints: {
             total: {
-              initialValue: 200,
+              initialValue: fakeCharacter.characterSheet.calculationPoints.adventurePoints.total - 100,
               increasedPoints: 100,
             },
           },
@@ -265,7 +284,7 @@ describe("Valid requests", () => {
         body: {
           attributePoints: {
             total: {
-              initialValue: 30,
+              initialValue: fakeCharacter.characterSheet.calculationPoints.attributePoints.total - 20,
               increasedPoints: 20,
             },
           },

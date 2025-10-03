@@ -6,15 +6,19 @@ import { fakeHistoryBlockListResponse, mockDynamoDBQueryHistoryResponse } from "
 import { fakeCharacterId } from "../test-data/character.js";
 import {
   addFakeHistoryRecord,
-  attributeAndBaseValueChangedRecord,
+  attributeAndBaseValuesChangedRecord,
+  attributeAndBaseValuesAndCombatStatsChangedRecord,
   attributeChangedRecord,
   baseValueChangedRecord,
   calculationPointsChangedRecord,
+  characterCreatedChangedRecord,
   combatSkillChangedRecord,
-  combatValuesChangedRecord,
+  combatStatsChangedRecord,
   levelChangedRecord,
   skillChangedRecord,
   specialAbilitiesChangedRecord,
+  attackBaseValueAndCombatStatsChangedRecord,
+  rangedAttackBaseValueAndCombatStatsChangedRecord,
 } from "../test-data/history.js";
 import { expectHttpError } from "../utils.js";
 import { revertRecordFromHistory } from "revert-history-record";
@@ -25,6 +29,19 @@ describe("Invalid requests", () => {
   const fakeRecordId = lastBlock.changes[lastBlock.changes.length - 1].id;
 
   const invalidTestCases = [
+    {
+      name: "Authorization header is missing",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": fakeRecordId,
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
     {
       name: "Authorization header is malformed",
       request: {
@@ -107,11 +124,29 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 404,
     },
+    {
+      name: "Reverting a CHARACTER_CREATED record is not supported",
+      fakeRecord: characterCreatedChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {
     test(_case.name, async () => {
       mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
+
+      if (_case.fakeRecord) {
+        addFakeHistoryRecord(lastBlock, _case.fakeRecord);
+      }
 
       await expectHttpError(() => revertRecordFromHistory(_case.request), _case.expectedStatusCode);
     });
@@ -137,6 +172,34 @@ describe("Valid requests", () => {
     {
       name: "Revert history record for a changed base value",
       fakeRecord: baseValueChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for a changed base value and melee combat stats",
+      fakeRecord: attackBaseValueAndCombatStatsChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for a changed base value and ranged combat stats",
+      fakeRecord: rangedAttackBaseValueAndCombatStatsChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -178,7 +241,21 @@ describe("Valid requests", () => {
     },
     {
       name: "Revert history record for a changed attribute and base values",
-      fakeRecord: attributeAndBaseValueChangedRecord,
+      fakeRecord: attributeAndBaseValuesChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for a changed attribute, base values and combat stats",
+      fakeRecord: attributeAndBaseValuesAndCombatStatsChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -205,7 +282,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Revert history record for a changed combat skill and combat values",
+      name: "Revert history record for a changed combat skill and combat stats",
       fakeRecord: combatSkillChangedRecord,
       request: {
         headers: fakeHeaders,
@@ -219,8 +296,8 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Revert history record for changed combat values",
-      fakeRecord: combatValuesChangedRecord,
+      name: "Revert history record for changed combat stats",
+      fakeRecord: combatStatsChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {

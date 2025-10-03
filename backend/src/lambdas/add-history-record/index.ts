@@ -3,19 +3,20 @@ import { z } from "zod";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import {
-  baseValueSchema,
-  combatValuesSchema,
+  combatStatsSchema,
   RecordType,
   Record,
   historyBlockSchema,
-  integerSchema,
   skillChangeSchema,
   attributeChangeSchema,
   HistoryBlock,
   calculationPointsChangeSchema,
-  stringArraySchema,
   recordSchema,
   userIdSchema,
+  characterCreationSchema,
+  levelChangeSchema,
+  specialAbilitiesChangeSchema,
+  baseValueChangeSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -30,6 +31,13 @@ import {
 } from "core";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
+
+/**
+ * This Lambda is only called internally as part of step functions,
+ * it is not exposed via API Gateway.
+ * Therefore, the API schemas and types are not in the api-spec package,
+ * but directly in this package.
+ */
 
 export const addHistoryRecordPathParamsSchema = z
   .object({
@@ -149,9 +157,10 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       }
     }
 
+    const responseBody: AddHistoryRecordResponse = record;
     const response = {
       statusCode: 200,
-      body: JSON.stringify(record as AddHistoryRecordResponse),
+      body: JSON.stringify(responseBody),
     };
     console.log(response);
     return response;
@@ -178,21 +187,25 @@ async function validateRequest(request: Request): Promise<Parameters> {
     //await getCharacterItem(body.userId, characterId);
 
     switch (body.type) {
+      case RecordType.CHARACTER_CREATED:
+        // There is no "old" data for character creation
+        characterCreationSchema.parse(body.data.new);
+        break;
+      case RecordType.LEVEL_CHANGED:
+        levelChangeSchema.parse(body.data.old);
+        levelChangeSchema.parse(body.data.new);
+        break;
       case RecordType.CALCULATION_POINTS_CHANGED:
         calculationPointsChangeSchema.parse(body.data.old);
         calculationPointsChangeSchema.parse(body.data.new);
         break;
-      case RecordType.LEVEL_CHANGED:
-        integerSchema.parse(body.data.old);
-        integerSchema.parse(body.data.new);
-        break;
       case RecordType.BASE_VALUE_CHANGED:
-        baseValueSchema.parse(body.data.old);
-        baseValueSchema.parse(body.data.new);
+        baseValueChangeSchema.parse(body.data.old);
+        baseValueChangeSchema.parse(body.data.new);
         break;
       case RecordType.SPECIAL_ABILITIES_CHANGED:
-        stringArraySchema.parse(body.data.old);
-        stringArraySchema.parse(body.data.new);
+        specialAbilitiesChangeSchema.parse(body.data.old);
+        specialAbilitiesChangeSchema.parse(body.data.new);
         break;
       case RecordType.ATTRIBUTE_CHANGED:
         attributeChangeSchema.parse(body.data.old);
@@ -202,9 +215,9 @@ async function validateRequest(request: Request): Promise<Parameters> {
         skillChangeSchema.parse(body.data.old);
         skillChangeSchema.parse(body.data.new);
         break;
-      case RecordType.COMBAT_VALUES_CHANGED:
-        combatValuesSchema.parse(body.data.old);
-        combatValuesSchema.parse(body.data.new);
+      case RecordType.COMBAT_STATS_CHANGED:
+        combatStatsSchema.parse(body.data.old);
+        combatStatsSchema.parse(body.data.new);
         break;
       default:
         throw new HttpError(400, "Invalid history record type!");
@@ -220,7 +233,6 @@ async function validateRequest(request: Request): Promise<Parameters> {
       throw new HttpError(400, "Invalid input values!");
     }
 
-    // Rethrow other errors
     throw error;
   }
 }

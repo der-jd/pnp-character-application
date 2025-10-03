@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { attributeSchema, calculationPointsSchema, baseValuesSchema } from "../character-schemas.js";
+import { calculationPointsSchema } from "../character-schemas.js";
 import {
   initialIncreasedSchema,
   initialNewSchema,
   MAX_STRING_LENGTH_DEFAULT,
   userIdSchema,
 } from "../general-schemas.js";
-import { recordSchema } from "../history-schemas.js";
+import { attributeChangeSchema, recordSchema } from "../history-schemas.js";
 
 export const patchAttributePathParamsSchema = z
   .object({
@@ -34,18 +34,8 @@ export const updateAttributeResponseSchema = z
     attributeName: z.string().max(MAX_STRING_LENGTH_DEFAULT),
     changes: z
       .object({
-        old: z
-          .object({
-            attribute: attributeSchema,
-            baseValues: baseValuesSchema.partial().optional(),
-          })
-          .strict(),
-        new: z
-          .object({
-            attribute: attributeSchema,
-            baseValues: baseValuesSchema.partial().optional(),
-          })
-          .strict(),
+        old: attributeChangeSchema,
+        new: attributeChangeSchema,
       })
       .strict(),
     attributePoints: z
@@ -59,10 +49,21 @@ export const updateAttributeResponseSchema = z
 
 export type UpdateAttributeResponse = z.infer<typeof updateAttributeResponseSchema>;
 
+export const patchAttributeHistoryRecordSchema = recordSchema.extend({
+  data: z
+    .object({
+      old: attributeChangeSchema,
+      new: attributeChangeSchema,
+    })
+    .strict(),
+});
+
+export type PatchAttributeHistoryRecord = z.infer<typeof patchAttributeHistoryRecordSchema>;
+
 export const patchAttributeResponseSchema = z
   .object({
     data: updateAttributeResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: patchAttributeHistoryRecordSchema.nullable(),
   })
   .strict();
 

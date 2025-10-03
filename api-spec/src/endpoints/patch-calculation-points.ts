@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { initialNewSchema, initialIncreasedSchema, userIdSchema } from "../general-schemas.js";
-import { calculationPointsSchema } from "../character-schemas.js";
-import { recordSchema } from "../history-schemas.js";
+import { calculationPointsChangeSchema, recordSchema } from "../history-schemas.js";
 
 export const patchCalculationPointsPathParamsSchema = z
   .object({
@@ -38,18 +37,8 @@ export const updateCalculationPointsResponseSchema = z
     userId: userIdSchema,
     calculationPoints: z
       .object({
-        old: z
-          .object({
-            adventurePoints: calculationPointsSchema.optional(),
-            attributePoints: calculationPointsSchema.optional(),
-          })
-          .strict(),
-        new: z
-          .object({
-            adventurePoints: calculationPointsSchema.optional(),
-            attributePoints: calculationPointsSchema.optional(),
-          })
-          .strict(),
+        old: calculationPointsChangeSchema,
+        new: calculationPointsChangeSchema,
       })
       .strict(),
   })
@@ -57,10 +46,21 @@ export const updateCalculationPointsResponseSchema = z
 
 export type UpdateCalculationPointsResponse = z.infer<typeof updateCalculationPointsResponseSchema>;
 
+export const patchCalculationPointsHistoryRecordSchema = recordSchema.extend({
+  data: z
+    .object({
+      old: calculationPointsChangeSchema,
+      new: calculationPointsChangeSchema,
+    })
+    .strict(),
+});
+
+export type PatchCalculationPointsHistoryRecord = z.infer<typeof patchCalculationPointsHistoryRecordSchema>;
+
 export const patchCalculationPointsResponseSchema = z
   .object({
     data: updateCalculationPointsResponseSchema,
-    historyRecord: recordSchema,
+    historyRecord: patchCalculationPointsHistoryRecordSchema.nullable(),
   })
   .strict();
 

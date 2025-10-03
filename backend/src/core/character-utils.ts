@@ -1,4 +1,20 @@
-import { CostCategory, LearningMethod, CharacterSheet, Attribute, BaseValue, Skill, CombatValues } from "api-spec";
+import {
+  CostCategory,
+  LearningMethod,
+  CharacterSheet,
+  Attribute,
+  BaseValue,
+  Skill,
+  CombatStats,
+  AdvantagesNames,
+  DisadvantagesNames,
+  SkillCategory,
+  SkillName,
+  skillCategories,
+  skillNames,
+  CombatSection,
+  combatSectionSchema,
+} from "api-spec";
 import {
   SKILL_ACTIVATION_COSTS,
   COST_MATRIX,
@@ -23,11 +39,27 @@ export function getBaseValue(baseValues: CharacterSheet["baseValues"], name: str
   return baseValue;
 }
 
-export function getSkill(
-  skills: CharacterSheet["skills"],
-  category: keyof CharacterSheet["skills"],
-  name: string,
-): Skill {
+export function getSkillCategoryAndName(categoryAndName: string): { category: SkillCategory; name: SkillName } {
+  // Pattern is "skillCategory/skillName"
+  const skillCategory = categoryAndName.split("/")[0] as SkillCategory;
+  const skillName = categoryAndName.split("/")[1] as SkillName;
+
+  if (!skillCategories.includes(skillCategory)) {
+    throw new Error(`Skill category ${skillCategory} is not valid!`);
+  }
+
+  if (!skillNames.includes(skillName)) {
+    throw new Error(`Skill name ${skillName} is not valid!`);
+  }
+
+  return { category: skillCategory, name: skillName };
+}
+
+export function getSkill(skills: CharacterSheet["skills"], category: SkillCategory, name: SkillName): Skill {
+  if (!(category in skills)) {
+    throw new Error(`Category ${category} is not a valid skill category!`);
+  }
+
   const skillCategory = skills[category] as Record<string, Skill>;
   const skill = skillCategory[name];
   if (!skill) {
@@ -36,30 +68,41 @@ export function getSkill(
   return skill;
 }
 
-export function getCombatValues(
-  combatValues: CharacterSheet["combatValues"],
-  category: keyof CharacterSheet["combatValues"],
-  combatSkillName: string,
-): CombatValues {
-  const combatCategory = combatValues[category] as Record<string, CombatValues>;
-  const skillCombatValues = combatCategory[combatSkillName];
-  if (!skillCombatValues) {
-    throw new Error(`Combat values for skill ${combatSkillName} not found!`);
-  }
-  return skillCombatValues;
+export function isCombatSkill(skillCategory: string): boolean {
+  const combatSkillCategory: SkillCategory = "combat";
+  return skillCategory === combatSkillCategory;
 }
 
-export function getCombatCategory(
-  combatValues: CharacterSheet["combatValues"],
-  combatSkillName: string,
-): keyof CharacterSheet["combatValues"] {
-  for (const category in combatValues) {
-    const combatCategory = combatValues[category as keyof CharacterSheet["combatValues"]] as Record<string, any>;
-    if (combatCategory[combatSkillName]) {
-      return category as keyof CharacterSheet["combatValues"];
-    }
+export function getCombatStats(
+  combatSection: CombatSection,
+  category: keyof CombatSection,
+  combatSkillName: SkillName,
+): CombatStats {
+  if (!(category in combatSection)) {
+    throw new Error(`Category ${category} is not a valid combat category!`);
   }
-  throw new Error(`Combat category for skill ${combatSkillName} not found!`);
+
+  const combatCategory = combatSection[category] as Record<string, CombatStats>;
+  const combatStats = combatCategory[combatSkillName];
+  if (!combatStats) {
+    throw new Error(`Combat stats for skill ${category}/${combatSkillName} not found!`);
+  }
+  return combatStats;
+}
+
+export function getCombatCategory(combatSkillName: SkillName): keyof CombatSection {
+  const meleeSkills = Object.keys(combatSectionSchema.shape.melee.shape);
+  const rangedSkills = Object.keys(combatSectionSchema.shape.ranged.shape);
+
+  if (meleeSkills.includes(combatSkillName)) {
+    const meleeCategory: keyof CombatSection = "melee";
+    return meleeCategory;
+  } else if (rangedSkills.includes(combatSkillName)) {
+    const rangedCategory: keyof CombatSection = "ranged";
+    return rangedCategory;
+  } else {
+    throw new Error(`Combat category for skill ${combatSkillName} not found!`);
+  }
 }
 
 export function parseLearningMethod(method: string): LearningMethod {
@@ -93,4 +136,14 @@ export function getSkillIncreaseCost(skillValue: number, costCategory: CostCateg
 
 export function getSkillActivationCost(costCategory: CostCategory): number {
   return SKILL_ACTIVATION_COSTS[costCategory];
+}
+
+export function advantagesEnumToString(enumValue: AdvantagesNames): string | undefined {
+  return Object.keys(AdvantagesNames).find((key) => AdvantagesNames[key as keyof typeof AdvantagesNames] === enumValue);
+}
+
+export function disadvantagesEnumToString(enumValue: DisadvantagesNames): string | undefined {
+  return Object.keys(DisadvantagesNames).find(
+    (key) => DisadvantagesNames[key as keyof typeof DisadvantagesNames] === enumValue,
+  );
 }
