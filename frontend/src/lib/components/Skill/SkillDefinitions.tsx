@@ -69,15 +69,8 @@ import { GiBestialFangs } from "react-icons/gi";
 import { GiTinker } from "react-icons/gi";
 import { GiDespair } from "react-icons/gi";
 
-import {
-  Skill,
-  LearningMethod,
-  CostCategory,
-  Character,
-  Attribute,
-  BaseValue,
-  CharacterSheet,
-} from "@api/models/Character/character";
+import { LearningMethod, CostCategory } from "api-spec";
+import type { Skill, Character, Attribute, BaseValue, CharacterSheet } from "api-spec";
 
 export interface ISkillProps {
   name: string;
@@ -170,7 +163,7 @@ export const nodeExtractors: NodeExtractor[] = [
   { key: "skills", type: "Skill" },
   { key: "attributes", type: "Attribute", category: "Attributes" },
   { key: "baseValues", type: "BaseValue", category: "BaseValues" },
-  { key: "combatValues", type: "CombatValue" },
+  { key: "combat", type: "CombatValue" },
 ];
 
 export function extract_properties_data(characterSheet: CharacterSheet | null): ISkillProps[] {
@@ -182,7 +175,7 @@ export function extract_properties_data(characterSheet: CharacterSheet | null): 
     const key = extractor.key;
 
     // Skip baseValues and combatValues completely
-    if (key === "combatValues" || key === "baseValues") continue;
+    if (key === "combat" || key === "baseValues") continue;
 
     const node = characterSheet[key];
     const category = extractor.category || key;
