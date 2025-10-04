@@ -1,5 +1,5 @@
-import { 
-  LoadCharacterUseCase, 
+import {
+  LoadCharacterUseCase,
   LoadAllCharactersUseCase,
   IncreaseSkillUseCase,
   UpdateAttributeUseCase,
@@ -25,20 +25,20 @@ import {
   LoadHistoryInput,
   LoadHistoryOutput,
   DeleteHistoryEntryInput,
-  DeleteHistoryEntryOutput
-} from '../use-cases';
-import { CharacterService, HistoryService, AuthService } from '../../services';
-import { Result } from '../../types/result';
+  DeleteHistoryEntryOutput,
+} from "../use-cases";
+import { CharacterService, HistoryService, AuthService } from "../../services";
+import { Result } from "../../types/result";
 
 /**
  * Character Application Service
- * 
+ *
  * Coordinates Use Cases and handles cross-cutting concerns like:
  * - Transaction management
  * - Caching
  * - Event publishing
  * - Authorization
- * 
+ *
  * Following clean architecture principles:
  * - Application Services orchestrate Use Cases
  * - Handle infrastructure concerns
@@ -59,7 +59,7 @@ export class CharacterApplicationService {
   constructor(
     private readonly characterService: CharacterService,
     private readonly historyService: HistoryService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
   ) {
     // Initialize Use Cases with dependencies
     this.loadCharacterUseCase = new LoadCharacterUseCase(characterService);
@@ -93,7 +93,7 @@ export class CharacterApplicationService {
   async increaseSkill(input: IncreaseSkillInput): Promise<Result<IncreaseSkillOutput, Error>> {
     try {
       const result = await this.increaseSkillUseCase.execute(input);
-      
+
       if (!result.success) {
         return result;
       }
@@ -105,9 +105,9 @@ export class CharacterApplicationService {
 
       return result;
     } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error : new Error('Unknown error occurred') 
+      return {
+        success: false,
+        error: error instanceof Error ? error : new Error("Unknown error occurred"),
       };
     }
   }

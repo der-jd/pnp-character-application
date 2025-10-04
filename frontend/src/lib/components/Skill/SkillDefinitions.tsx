@@ -163,7 +163,7 @@ export const nodeExtractors: NodeExtractor[] = [
   { key: "skills", type: "Skill" },
   { key: "attributes", type: "Attribute", category: "Attributes" },
   { key: "baseValues", type: "BaseValue", category: "BaseValues" },
-    { key: "combat", type: "CombatValue" },
+  { key: "combat", type: "CombatValue" },
 ];
 
 export function extract_properties_data(characterSheet: CharacterSheet | null): ISkillProps[] {

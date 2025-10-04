@@ -1,19 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { AddSpecialAbilityUseCase } from '../lib/application/use-cases/AddSpecialAbilityUseCase'
-import { CharacterService } from '../lib/services/characterService'
-import { 
-  createSuccessResult,
-  createErrorResult,
-  TEST_SCENARIOS 
-} from './test-utils'
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { AddSpecialAbilityUseCase } from "../lib/application/use-cases/AddSpecialAbilityUseCase";
+import { CharacterService } from "../lib/services/characterService";
+import { createSuccessResult, createErrorResult, TEST_SCENARIOS } from "./test-utils";
 
 // Mock the CharacterService
-vi.mock('../lib/services/characterService')
+vi.mock("../lib/services/characterService");
 
-describe('AddSpecialAbilityUseCase', () => {
-  let useCase: AddSpecialAbilityUseCase
-  let mockCharacterService: CharacterService
-  
+describe("AddSpecialAbilityUseCase", () => {
+  let mockCharacterService: CharacterService;
+  let useCase: AddSpecialAbilityUseCase;
+
   beforeEach(() => {
     mockCharacterService = {
       getCharacter: vi.fn(),
@@ -28,98 +24,108 @@ describe('AddSpecialAbilityUseCase', () => {
       addSpecialAbility: vi.fn(),
       updateCalculationPoints: vi.fn(),
       deleteCharacter: vi.fn(),
-      apiClient: {} as any
-    } as any
+    } as unknown as CharacterService;
 
-    useCase = new AddSpecialAbilityUseCase(mockCharacterService)
-  })
+    useCase = new AddSpecialAbilityUseCase(mockCharacterService);
+  });
 
-  describe('Input Validation', () => {
-    it('should reject empty character ID', async () => {
+  describe("Input Validation", () => {
+    it("should reject empty character ID", async () => {
       const result = await useCase.execute({
-        characterId: '',
-        specialAbilityName: 'Special Ability',
-        idToken: TEST_SCENARIOS.VALID_ID_TOKEN
-      })
+        characterId: "",
+        specialAbilityName: "Special Ability",
+        idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
+      });
 
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toBe('Character ID is required')
+        expect(result.error.message).toBe("Character ID is required");
       }
-    })
+    });
 
-    it('should reject empty special ability name', async () => {
-      const result = await useCase.execute({
-        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
-        specialAbilityName: '',
-        idToken: TEST_SCENARIOS.VALID_ID_TOKEN
-      })
-
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error.message).toBe('Special ability name is required')
-      }
-    })
-
-    it('should reject empty ID token', async () => {
+    it("should reject empty special ability name", async () => {
       const result = await useCase.execute({
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
-        specialAbilityName: 'Special Ability',
-        idToken: ''
-      })
+        specialAbilityName: "",
+        idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
+      });
 
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toBe('Authentication token is required')
+        expect(result.error.message).toBe("Special ability name is required");
       }
-    })
-  })
+    });
 
-  describe('Business Logic', () => {
-    it('should successfully add special ability when valid input provided', async () => {
+    it("should reject empty ID token", async () => {
+      const result = await useCase.execute({
+        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
+        specialAbilityName: "Special Ability",
+        idToken: "",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.message).toBe("Authentication token is required");
+      }
+    });
+  });
+
+  describe("Business Logic", () => {
+    it("should successfully add special ability when valid input provided", async () => {
       // Arrange - Mock simple success response
       vi.mocked(mockCharacterService.addSpecialAbility).mockResolvedValue(
-        createSuccessResult({ success: true, abilityAdded: 'Special Ability' })
-      )
+        createSuccessResult({
+          data: {
+            characterId: "test-character-123",
+            userId: "test-user-456",
+            specialAbilityName: "Special Ability",
+            specialAbilities: {
+              old: { values: [] },
+              new: { values: ["Special Ability"] },
+            },
+          },
+          historyRecord: null,
+        }),
+      );
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
-        specialAbilityName: 'Special Ability',
-        idToken: TEST_SCENARIOS.VALID_ID_TOKEN
-      }
+        specialAbilityName: "Special Ability",
+        idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
+      };
 
       // Act
-      const result = await useCase.execute(input)
+      const result = await useCase.execute(input);
 
       // Assert
-      expect(result.success).toBe(true)
+      expect(result.success).toBe(true);
       expect(mockCharacterService.addSpecialAbility).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
-        'Special Ability',
-        TEST_SCENARIOS.VALID_ID_TOKEN
-      )
-    })
+        "Special Ability",
+        TEST_SCENARIOS.VALID_ID_TOKEN,
+      );
+    });
 
-    it('should handle service errors gracefully', async () => {
+    it("should handle service errors gracefully", async () => {
       // Arrange
       vi.mocked(mockCharacterService.addSpecialAbility).mockResolvedValue(
-        createErrorResult('Special ability not found')
-      )
+        createErrorResult("Special ability not found"),
+      );
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
-        specialAbilityName: 'Special Ability',
-        idToken: TEST_SCENARIOS.VALID_ID_TOKEN
-      }
+        specialAbilityName: "Special Ability",
+        idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
+      };
 
       // Act
-      const result = await useCase.execute(input)
+      const result = await useCase.execute(input);
 
       // Assert
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain('Special ability not found')
+        expect(result.error.message).toContain("Special ability not found");
       }
-    })
-  })
-})
+    });
+  });
+});

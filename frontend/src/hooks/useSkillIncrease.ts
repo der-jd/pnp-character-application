@@ -5,12 +5,12 @@ import { useToast } from "./use-toast";
 
 /**
  * Thin hook wrapper for skill updates using clean architecture
- * 
+ *
  * Responsibilities:
  * - UI state management (loading)
  * - Error handling and user feedback (toasts)
  * - Delegation to Application Service through store
- * 
+ *
  * Following clean architecture principles:
  * - Thin presentation layer
  * - Business logic in Application Service
@@ -51,7 +51,7 @@ export function useSkillIncrease() {
 
       // Delegate to Application Service through store
       const success = await increaseSkill(selectedCharacterId, skillName, idToken);
-      
+
       if (success) {
         toast.toast({
           title: "Skill Increased",
@@ -81,6 +81,6 @@ export function useSkillIncrease() {
 
   return {
     tryIncreaseSkill,
-    loading
+    loading,
   };
 }

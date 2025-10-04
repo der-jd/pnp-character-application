@@ -1,19 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { LevelUpUseCase } from '../lib/application/use-cases/LevelUpUseCase'
-import { CharacterService } from '../lib/services/characterService'
-import { 
-  createSuccessResult,
-  createErrorResult,
-  TEST_SCENARIOS 
-} from './test-utils'
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { LevelUpUseCase } from "../lib/application/use-cases/LevelUpUseCase";
+import { CharacterService } from "../lib/services/characterService";
+import { createErrorResult, TEST_SCENARIOS } from "./test-utils";
 
 // Mock the CharacterService
-vi.mock('../lib/services/characterService')
+vi.mock("../lib/services/characterService");
 
-describe('LevelUpUseCase', () => {
-  let useCase: LevelUpUseCase
-  let mockCharacterService: CharacterService
-  
+describe("LevelUpUseCase", () => {
+  let useCase: LevelUpUseCase;
+  let mockCharacterService: CharacterService;
+
   beforeEach(() => {
     mockCharacterService = {
       getCharacter: vi.fn(),
@@ -28,74 +24,71 @@ describe('LevelUpUseCase', () => {
       addSpecialAbility: vi.fn(),
       updateCalculationPoints: vi.fn(),
       deleteCharacter: vi.fn(),
-      apiClient: {} as any
-    } as any
+    } as unknown as CharacterService;
 
-    useCase = new LevelUpUseCase(mockCharacterService)
-  })
+    useCase = new LevelUpUseCase(mockCharacterService);
+  });
 
-  describe('Input Validation', () => {
-    it('should reject empty character ID', async () => {
+  describe("Input Validation", () => {
+    it("should reject empty character ID", async () => {
       const result = await useCase.execute({
-        characterId: '',
+        characterId: "",
         currentLevel: 1,
-        idToken: TEST_SCENARIOS.VALID_ID_TOKEN
-      })
+        idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
+      });
 
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toBe('Character ID is required')
+        expect(result.error.message).toBe("Character ID is required");
       }
-    })
+    });
 
-    it('should reject invalid current level', async () => {
+    it("should reject invalid current level", async () => {
       const result = await useCase.execute({
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
         currentLevel: 0,
-        idToken: TEST_SCENARIOS.VALID_ID_TOKEN
-      })
+        idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
+      });
 
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain('Level must be positive')
+        expect(result.error.message).toContain("Level must be positive");
       }
-    })
+    });
 
-    it('should reject empty ID token', async () => {
+    it("should reject empty ID token", async () => {
       const result = await useCase.execute({
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
         currentLevel: 1,
-        idToken: ''
-      })
+        idToken: "",
+      });
 
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toBe('Authentication token is required')
+        expect(result.error.message).toBe("Authentication token is required");
       }
-    })
-  })
+    });
+  });
 
-  describe('Error Handling', () => {
-    it('should handle service errors gracefully', async () => {
+  describe("Error Handling", () => {
+    it("should handle service errors gracefully", async () => {
       // Arrange
-      vi.mocked(mockCharacterService.levelUp).mockResolvedValue(
-        createErrorResult('Level up failed')
-      )
+      vi.mocked(mockCharacterService.levelUp).mockResolvedValue(createErrorResult("Level up failed"));
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
         currentLevel: 1,
-        idToken: TEST_SCENARIOS.VALID_ID_TOKEN
-      }
+        idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
+      };
 
       // Act
-      const result = await useCase.execute(input)
+      const result = await useCase.execute(input);
 
       // Assert
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain('Level up failed')
+        expect(result.error.message).toContain("Level up failed");
       }
-    })
-  })
-})
+    });
+  });
+});

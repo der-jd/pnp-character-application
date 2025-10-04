@@ -5,6 +5,7 @@
 We've set up **Vitest** with React Testing Library for comprehensive frontend testing.
 
 ### **Why Vitest?**
+
 - ✅ **Consistency**: Backend already uses Vitest
 - ✅ **Performance**: Extremely fast test execution
 - ✅ **TypeScript**: Zero-config TypeScript support
@@ -15,7 +16,7 @@ We've set up **Vitest** with React Testing Library for comprehensive frontend te
 ```
 frontend/src/test/
 ├── setup.ts              # Global test configuration
-├── test-utils.ts          # Test utilities and mocks  
+├── test-utils.ts          # Test utilities and mocks
 ├── result.test.ts         # Result type tests ✅
 ├── LoadCharacterUseCase.test.ts  # Use Case tests ✅
 └── *.test.ts             # Additional test files
@@ -34,10 +35,12 @@ npm run test:watch     # Explicit watch mode
 ## 📊 **Current Test Status**
 
 ### ✅ **Working Tests**
+
 - **Result Types** (6/6 tests passing)
 - **LoadCharacterUseCase** (5/5 tests passing)
 
 ### 🔧 **In Progress**
+
 - **IncreaseSkillUseCase** (5/7 tests passing) - mocking issues
 
 ## 🧪 **Testing Use Cases**
@@ -52,47 +55,52 @@ Our Application Layer Use Cases are perfect for unit testing because they:
 ### **Example Test Structure**
 
 ```typescript
-describe('LoadCharacterUseCase', () => {
-  describe('Input Validation', () => {
-    it('should reject empty character ID')
-    it('should reject empty ID token')
-  })
+describe("LoadCharacterUseCase", () => {
+  describe("Input Validation", () => {
+    it("should reject empty character ID");
+    it("should reject empty ID token");
+  });
 
-  describe('Business Logic', () => {
-    it('should successfully load character')
-    it('should handle service errors')
-  })
+  describe("Business Logic", () => {
+    it("should successfully load character");
+    it("should handle service errors");
+  });
 
-  describe('Error Handling', () => {
-    it('should handle unexpected errors')
-  })
-})
+  describe("Error Handling", () => {
+    it("should handle unexpected errors");
+  });
+});
 ```
 
 ## 🎯 **Testing Strategy**
 
 ### **1. Unit Tests** (Current Focus)
+
 - **Use Cases**: Business logic validation
 - **Result Types**: Type system correctness
 - **Utilities**: Helper functions
 
 ### **2. Integration Tests** (Next Phase)
+
 - **Application Services**: Use Case coordination
 - **API Integration**: With MSW mocking
 
 ### **3. Component Tests** (Future)
+
 - **React Components**: Using Use Cases
 - **Hooks**: Thin wrappers over Use Cases
 
 ## 🔧 **Configuration**
 
 ### **Coverage Thresholds**
+
 - Branches: 80%
 - Functions: 80%
 - Lines: 80%
 - Statements: 80%
 
 ### **Test Environment**
+
 - **Environment**: jsdom (React components)
 - **Setup**: Global mocks for Next.js
 - **TypeScript**: Full support

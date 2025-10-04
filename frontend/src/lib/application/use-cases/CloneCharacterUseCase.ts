@@ -1,10 +1,10 @@
-import { UseCase, CloneCharacterInput, CloneCharacterOutput } from './interfaces';
-import { Result, ResultSuccess, ResultError } from '../../types/result';
-import { CharacterService } from '../../services/characterService';
+import { UseCase, CloneCharacterInput, CloneCharacterOutput } from "./interfaces";
+import { Result, ResultSuccess, ResultError } from "../../types/result";
+import { CharacterService } from "../../services/characterService";
 
 /**
  * Use Case for cloning an existing character
- * 
+ *
  * Business Rules:
  * - Validates source character exists and is accessible
  * - Creates complete copy of character including history
@@ -18,11 +18,11 @@ export class CloneCharacterUseCase implements UseCase<CloneCharacterInput, Clone
     try {
       // Validate input at application boundary
       if (!input.sourceCharacterId) {
-        return ResultError(new Error('Source character ID is required'));
+        return ResultError(new Error("Source character ID is required"));
       }
-      
+
       if (!input.idToken) {
-        return ResultError(new Error('Authentication token is required'));
+        return ResultError(new Error("Authentication token is required"));
       }
 
       // Validate source character exists and is accessible
@@ -36,7 +36,7 @@ export class CloneCharacterUseCase implements UseCase<CloneCharacterInput, Clone
       const cloneResult = await this.characterService.cloneCharacter(
         input.sourceCharacterId,
         { userIdOfCharacter: sourceCharacter.userId },
-        input.idToken
+        input.idToken,
       );
 
       if (!cloneResult.success) {
@@ -48,16 +48,16 @@ export class CloneCharacterUseCase implements UseCase<CloneCharacterInput, Clone
       // Load the complete cloned character data
       const clonedCharacterResult = await this.characterService.getCharacter(cloneResponse.characterId, input.idToken);
       if (!clonedCharacterResult.success) {
-        return ResultError(new Error('Character cloned but failed to load complete data'));
+        return ResultError(new Error("Character cloned but failed to load complete data"));
       }
 
       // Return application-layer result
       return ResultSuccess({
         clonedCharacter: clonedCharacterResult.data,
-        characterId: cloneResponse.characterId
+        characterId: cloneResponse.characterId,
       });
     } catch (error) {
-      return ResultError(error instanceof Error ? error : new Error('Unknown error occurred'));
+      return ResultError(error instanceof Error ? error : new Error("Unknown error occurred"));
     }
   }
 }

@@ -1,16 +1,17 @@
 import { useCharacterStore, CharacterStore } from "@/src/app/global/characterStore";
-import React, { useState, useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { SkillViewModel } from "../../domain/Skills";
+import { Skill } from "api-spec";
 
 /**
  * ViewModel for Skills Page
- * 
+ *
  * Responsibilities:
  * - Presentation logic and state management
  * - UI state transformations
  * - Event handling coordination
  * - Data formatting for display
- * 
+ *
  * Following clean architecture principles:
  * - Separates presentation concerns from business logic
  * - Encapsulates UI state management
@@ -20,9 +21,7 @@ export class SkillsPageViewModel {
   private _editMode: boolean = false;
   private _isLoading: boolean = false;
 
-  constructor(
-    private readonly characterStore: CharacterStore
-  ) {
+  constructor(private readonly characterStore: CharacterStore) {
     this._editMode = characterStore.editMode;
   }
 
@@ -60,12 +59,12 @@ export class SkillsPageViewModel {
     }
 
     return {
-      combat: this.transformSkillsForCategory('combat', character.skills.combat),
-      body: this.transformSkillsForCategory('body', character.skills.body),
-      social: this.transformSkillsForCategory('social', character.skills.social),
-      nature: this.transformSkillsForCategory('nature', character.skills.nature),
-      knowledge: this.transformSkillsForCategory('knowledge', character.skills.knowledge),
-      handcraft: this.transformSkillsForCategory('handcraft', character.skills.handcraft),
+      combat: this.transformSkillsForCategory("combat", character.skills.combat),
+      body: this.transformSkillsForCategory("body", character.skills.body),
+      social: this.transformSkillsForCategory("social", character.skills.social),
+      nature: this.transformSkillsForCategory("nature", character.skills.nature),
+      knowledge: this.transformSkillsForCategory("knowledge", character.skills.knowledge),
+      handcraft: this.transformSkillsForCategory("handcraft", character.skills.handcraft),
     };
   }
 
@@ -75,16 +74,16 @@ export class SkillsPageViewModel {
       // Save changes and clear open history entries
       this.characterStore.setOpenHistoryEntries([]);
     }
-    
+
     this.characterStore.toggleEdit();
     this._editMode = !this._editMode;
   };
 
   // === Private Helpers ===
-  private transformSkillsForCategory(categoryName: string, categorySkills: any): SkillViewModel[] {
+  private transformSkillsForCategory(categoryName: string, categorySkills: Record<string, Skill>): SkillViewModel[] {
     if (!categorySkills) return [];
 
-    return Object.entries(categorySkills).map(([skillName, skill]: [string, any]) => ({
+    return Object.entries(categorySkills).map(([skillName, skill]: [string, Skill]) => ({
       name: skillName,
       category: categoryName,
       displayName: this.formatSkillName(skillName),
@@ -93,14 +92,14 @@ export class SkillsPageViewModel {
       modifier: skill.mod || 0,
       isActivated: skill.activated || false,
       totalCost: skill.totalCost || 0,
-      defaultCostCategory: skill.defaultCostCategory || 'NORMAL',
+      defaultCostCategory: skill.defaultCostCategory || "NORMAL",
     }));
   }
 
   private formatSkillName(name: string): string {
     return name
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase())
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase())
       .trim();
   }
 }
@@ -111,10 +110,10 @@ export class SkillsPageViewModel {
  */
 export function useSkillsPageViewModel() {
   const characterStore = useCharacterStore();
-  
+
   const viewModel = useMemo(
     () => new SkillsPageViewModel(characterStore),
-    []  // Empty dependency array since we want a single instance
+    [characterStore], // Include characterStore in dependency array
   );
 
   // For now, return the viewModel directly

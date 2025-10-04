@@ -1,37 +1,40 @@
-import { UseCase, UpdateCalculationPointsInput, UpdateCalculationPointsOutput } from './interfaces';
-import { Result, ResultSuccess, ResultError } from '../../types/result';
-import { CharacterService } from '../../services/characterService';
+import { UseCase, UpdateCalculationPointsInput, UpdateCalculationPointsOutput } from "./interfaces";
+import { Result, ResultSuccess, ResultError } from "../../types/result";
+import { CharacterService } from "../../services/characterService";
+import { PatchCalculationPointsRequest } from "api-spec";
 
 /**
  * Use Case for updating character calculation points (adventure points, attribute points)
- * 
+ *
  * Business Rules:
  * - Validates point adjustments are reasonable
  * - Prevents negative point values
  * - Updates character through domain service
  * - Maintains point consistency
- * 
+ *
  * Following clean architecture principles:
  * - Application layer coordinates business logic
  * - Domain services handle complex operations
  * - All types from api-spec for consistency
  */
-export class UpdateCalculationPointsUseCase implements UseCase<UpdateCalculationPointsInput, UpdateCalculationPointsOutput> {
+export class UpdateCalculationPointsUseCase
+  implements UseCase<UpdateCalculationPointsInput, UpdateCalculationPointsOutput>
+{
   constructor(private readonly characterService: CharacterService) {}
 
   async execute(input: UpdateCalculationPointsInput): Promise<Result<UpdateCalculationPointsOutput, Error>> {
     try {
       // Validate input at application boundary
       if (!input.characterId) {
-        return ResultError(new Error('Character ID is required'));
+        return ResultError(new Error("Character ID is required"));
       }
-      
+
       if (!input.idToken) {
-        return ResultError(new Error('Authentication token is required'));
+        return ResultError(new Error("Authentication token is required"));
       }
 
       if (!input.adventurePoints && !input.attributePoints) {
-        return ResultError(new Error('At least one point type update is required'));
+        return ResultError(new Error("At least one point type update is required"));
       }
 
       // Load current character to validate current state
@@ -40,43 +43,35 @@ export class UpdateCalculationPointsUseCase implements UseCase<UpdateCalculation
         return ResultError(new Error(`Failed to load character: ${characterResult.error.message}`));
       }
 
-      const character = characterResult.data;
-
       // Validate point updates don't result in negative values
       if (input.adventurePoints?.total) {
-        const currentPoints = character.adventurePoints;
         const newTotal = input.adventurePoints.total.initialValue + input.adventurePoints.total.increasedPoints;
         if (newTotal < 0) {
-          return ResultError(new Error('Adventure points cannot be negative'));
+          return ResultError(new Error("Adventure points cannot be negative"));
         }
       }
 
       if (input.attributePoints?.total) {
-        const currentPoints = character.attributePoints;
         const newTotal = input.attributePoints.total.initialValue + input.attributePoints.total.increasedPoints;
         if (newTotal < 0) {
-          return ResultError(new Error('Attribute points cannot be negative'));
+          return ResultError(new Error("Attribute points cannot be negative"));
         }
       }
 
       // Prepare the update request according to api-spec format
-      const updateData: any = {};
-      
+      const updateData: Partial<PatchCalculationPointsRequest> = {};
+
       if (input.adventurePoints) {
         updateData.adventurePoints = input.adventurePoints;
       }
-      
+
       if (input.attributePoints) {
         updateData.attributePoints = input.attributePoints;
       }
 
       // Execute calculation points update through domain service
       // Note: We need to add this method to CharacterService
-      const updateResult = await this.updateCalculationPointsViaService(
-        input.characterId,
-        updateData,
-        input.idToken
-      );
+      const updateResult = await this.updateCalculationPointsViaService(input.characterId, updateData, input.idToken);
 
       if (!updateResult.success) {
         return ResultError(new Error(`Failed to update calculation points: ${updateResult.error}`));
@@ -85,11 +80,11 @@ export class UpdateCalculationPointsUseCase implements UseCase<UpdateCalculation
       // Reload character to get updated state
       const updatedCharacterResult = await this.characterService.getCharacter(input.characterId, input.idToken);
       if (!updatedCharacterResult.success) {
-        return ResultError(new Error('Points updated but failed to reload character'));
+        return ResultError(new Error("Points updated but failed to reload character"));
       }
 
       // Calculate changes for response
-      const pointsChanged: any = {};
+      const pointsChanged: Record<string, number> = {};
       if (input.adventurePoints?.total) {
         pointsChanged.adventurePoints = input.adventurePoints.total.increasedPoints;
       }
@@ -100,10 +95,10 @@ export class UpdateCalculationPointsUseCase implements UseCase<UpdateCalculation
       // Return application-layer result
       return ResultSuccess({
         updatedCharacter: updatedCharacterResult.data,
-        pointsChanged: pointsChanged
+        pointsChanged: pointsChanged,
       });
     } catch (error) {
-      return ResultError(error instanceof Error ? error : new Error('Unknown error occurred'));
+      return ResultError(error instanceof Error ? error : new Error("Unknown error occurred"));
     }
   }
 
@@ -112,19 +107,19 @@ export class UpdateCalculationPointsUseCase implements UseCase<UpdateCalculation
    */
   private async updateCalculationPointsViaService(
     characterId: string,
-    updateData: any,
-    idToken: string
+    updateData: Partial<PatchCalculationPointsRequest>,
+    idToken: string,
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const result = await this.characterService.updateCalculationPoints(characterId, updateData, idToken);
-      return { 
-        success: result.success, 
-        error: result.success ? undefined : result.error.message 
+      return {
+        success: result.success,
+        error: result.success ? undefined : result.error.message,
       };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   }

@@ -1,14 +1,14 @@
-import type { Headers } from 'api-spec';
-import { Result, ResultSuccess, ResultError, ApiError, createApiError } from '../types/result';
+import type { Headers } from "api-spec";
+import { Result, ResultSuccess, ResultError, ApiError, createApiError } from "../types/result";
 
 /**
  * HTTP methods supported by the API client
  */
 export enum HttpMethod {
-  GET = 'GET',
-  POST = 'POST',
-  PATCH = 'PATCH',
-  DELETE = 'DELETE'
+  GET = "GET",
+  POST = "POST",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
 }
 
 /**
@@ -30,39 +30,31 @@ export class ApiClient {
   private readonly defaultHeaders: Headers;
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || process.env.NEXT_PUBLIC_API_BASE_URL || '';
+    this.baseUrl = baseUrl || process.env.NEXT_PUBLIC_API_BASE_URL || "";
     this.defaultHeaders = {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     };
   }
 
   /**
    * Makes an authenticated API request
    */
-  async makeRequest<T>(
-    config: ApiRequestConfig,
-    idToken: string
-  ): Promise<Result<T, ApiError>> {
+  async makeRequest<T>(config: ApiRequestConfig, idToken: string): Promise<Result<T, ApiError>> {
     if (!idToken) {
-      return ResultError(createApiError(
-        'Authentication token is required',
-        401,
-        config.endpoint,
-        config.method
-      ));
+      return ResultError(createApiError("Authentication token is required", 401, config.endpoint, config.method));
     }
 
     const url = `${this.baseUrl}/${config.endpoint}`;
-    
+
     const headers = {
       ...this.defaultHeaders,
       Authorization: `Bearer ${idToken}`,
-      ...config.headers
+      ...config.headers,
     };
 
     const requestInit: RequestInit = {
       method: config.method,
-      headers
+      headers,
     };
 
     if (config.body) {
@@ -71,27 +63,30 @@ export class ApiClient {
 
     try {
       const response = await fetch(url, requestInit);
-      
+
       if (!response.ok) {
         const errorBody = await this.safeParseJson(response);
-        return ResultError(createApiError(
-          errorBody?.message || `HTTP ${response.status}: ${response.statusText}`,
-          response.status,
-          config.endpoint,
-          config.method
-        ));
+        return ResultError(
+          createApiError(
+            (errorBody as { message?: string })?.message || `HTTP ${response.status}: ${response.statusText}`,
+            response.status,
+            config.endpoint,
+            config.method,
+          ),
+        );
       }
 
       const data = await response.json();
       return ResultSuccess<T, ApiError>(data as T);
-      
     } catch (error) {
-      return ResultError(createApiError(
-        error instanceof Error ? error.message : 'Network request failed',
-        0,
-        config.endpoint,
-        config.method
-      ));
+      return ResultError(
+        createApiError(
+          error instanceof Error ? error.message : "Network request failed",
+          0,
+          config.endpoint,
+          config.method,
+        ),
+      );
     }
   }
 
@@ -105,22 +100,14 @@ export class ApiClient {
   /**
    * Convenience method for POST requests
    */
-  async post<T>(
-    endpoint: string, 
-    body: unknown, 
-    idToken: string
-  ): Promise<Result<T, ApiError>> {
+  async post<T>(endpoint: string, body: unknown, idToken: string): Promise<Result<T, ApiError>> {
     return this.makeRequest<T>({ endpoint, method: HttpMethod.POST, body }, idToken);
   }
 
   /**
    * Convenience method for PATCH requests
    */
-  async patch<T>(
-    endpoint: string, 
-    body: unknown, 
-    idToken: string
-  ): Promise<Result<T, ApiError>> {
+  async patch<T>(endpoint: string, body: unknown, idToken: string): Promise<Result<T, ApiError>> {
     return this.makeRequest<T>({ endpoint, method: HttpMethod.PATCH, body }, idToken);
   }
 
@@ -134,7 +121,7 @@ export class ApiClient {
   /**
    * Safely parse JSON response, returning null if parsing fails
    */
-  private async safeParseJson(response: Response): Promise<any | null> {
+  private async safeParseJson(response: Response): Promise<unknown | null> {
     try {
       return await response.json();
     } catch {

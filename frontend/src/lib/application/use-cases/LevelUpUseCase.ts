@@ -1,16 +1,16 @@
-import { UseCase, LevelUpInput, LevelUpOutput } from './interfaces';
-import { Result, ResultSuccess, ResultError } from '../../types/result';
-import { CharacterService } from '../../services/characterService';
+import { UseCase, LevelUpInput, LevelUpOutput } from "./interfaces";
+import { Result, ResultSuccess, ResultError } from "../../types/result";
+import { CharacterService } from "../../services/characterService";
 
 /**
  * Use Case for leveling up a character
- * 
+ *
  * Business Rules:
  * - Validates character can level up
  * - Calculates points gained according to level progression rules
  * - Updates character through domain service
  * - Records level up in history
- * 
+ *
  * Following clean architecture principles:
  * - Application layer coordinates business logic
  * - Domain services handle complex operations
@@ -23,15 +23,15 @@ export class LevelUpUseCase implements UseCase<LevelUpInput, LevelUpOutput> {
     try {
       // Validate input at application boundary
       if (!input.characterId) {
-        return ResultError(new Error('Character ID is required'));
+        return ResultError(new Error("Character ID is required"));
       }
-      
+
       if (!input.idToken) {
-        return ResultError(new Error('Authentication token is required'));
+        return ResultError(new Error("Authentication token is required"));
       }
 
       if (input.currentLevel < 1) {
-        return ResultError(new Error('Invalid current level'));
+        return ResultError(new Error("Invalid current level"));
       }
 
       // Load current character to validate level
@@ -41,21 +41,19 @@ export class LevelUpUseCase implements UseCase<LevelUpInput, LevelUpOutput> {
       }
 
       const character = characterResult.data;
-      
+
       // Validate character level matches input
       if (character.level !== input.currentLevel) {
-        return ResultError(new Error('Character level mismatch. Please reload character and try again.'));
+        return ResultError(new Error("Character level mismatch. Please reload character and try again."));
       }
-
-      const newLevel = input.currentLevel + 1;
 
       // Execute level up through domain service using proper api-spec format
       const updateResult = await this.characterService.levelUp(
         input.characterId,
         {
-          initialLevel: input.currentLevel
+          initialLevel: input.currentLevel,
         },
-        input.idToken
+        input.idToken,
       );
 
       if (!updateResult.success) {
@@ -65,16 +63,16 @@ export class LevelUpUseCase implements UseCase<LevelUpInput, LevelUpOutput> {
       // Extract level information from response
       const responseData = updateResult.data.data;
       const actualNewLevel = responseData.level.new.value;
-      
+
       // For now, set points gained to reasonable defaults
       // TODO: Extract actual points from response when available
       const adventurePointsGained = 10; // Standard adventure points per level
-      const attributePointsGained = 1;  // Standard attribute points per level
+      const attributePointsGained = 1; // Standard attribute points per level
 
       // Reload character to get updated state
       const updatedCharacterResult = await this.characterService.getCharacter(input.characterId, input.idToken);
       if (!updatedCharacterResult.success) {
-        return ResultError(new Error('Level up successful but failed to reload character'));
+        return ResultError(new Error("Level up successful but failed to reload character"));
       }
 
       // Return application-layer result with level up information
@@ -83,11 +81,11 @@ export class LevelUpUseCase implements UseCase<LevelUpInput, LevelUpOutput> {
         newLevel: actualNewLevel,
         pointsGained: {
           adventurePoints: adventurePointsGained,
-          attributePoints: attributePointsGained
-        }
+          attributePoints: attributePointsGained,
+        },
       });
     } catch (error) {
-      return ResultError(error instanceof Error ? error : new Error('Unknown error occurred'));
+      return ResultError(error instanceof Error ? error : new Error("Unknown error occurred"));
     }
   }
 }

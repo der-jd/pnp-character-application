@@ -1,19 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { IncreaseSkillUseCase } from '../lib/application/use-cases/IncreaseSkillUseCase'
-import { CharacterService } from '../lib/services/characterService'
-import { 
-  createSuccessResult,
-  createErrorResult,
-  TEST_SCENARIOS 
-} from './test-utils'
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { IncreaseSkillUseCase } from "../lib/application/use-cases/IncreaseSkillUseCase";
+import { CharacterService } from "../lib/services/characterService";
+import { createErrorResult, TEST_SCENARIOS } from "./test-utils";
 
 // Mock the CharacterService
-vi.mock('../lib/services/characterService')
+vi.mock("../lib/services/characterService");
 
-describe('IncreaseSkillUseCase', () => {
-  let useCase: IncreaseSkillUseCase
-  let mockCharacterService: CharacterService
-  
+describe("IncreaseSkillUseCase", () => {
+  let useCase: IncreaseSkillUseCase;
+  let mockCharacterService: CharacterService;
+
   beforeEach(() => {
     mockCharacterService = {
       getCharacter: vi.fn(),
@@ -28,74 +24,71 @@ describe('IncreaseSkillUseCase', () => {
       addSpecialAbility: vi.fn(),
       updateCalculationPoints: vi.fn(),
       deleteCharacter: vi.fn(),
-      apiClient: {} as any
-    } as any
+    } as unknown as CharacterService;
 
-    useCase = new IncreaseSkillUseCase(mockCharacterService)
-  })
+    useCase = new IncreaseSkillUseCase(mockCharacterService);
+  });
 
-  describe('Input Validation', () => {
-    it('should reject empty character ID', async () => {
+  describe("Input Validation", () => {
+    it("should reject empty character ID", async () => {
       const result = await useCase.execute({
-        characterId: '',
-        skillName: 'combat.swords',
-        idToken: TEST_SCENARIOS.VALID_ID_TOKEN
-      })
+        characterId: "",
+        skillName: "combat.swords",
+        idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
+      });
 
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toBe('Character ID is required')
+        expect(result.error.message).toBe("Character ID is required");
       }
-    })
+    });
 
-    it('should reject empty skill name', async () => {
-      const result = await useCase.execute({
-        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
-        skillName: '',
-        idToken: TEST_SCENARIOS.VALID_ID_TOKEN
-      })
-
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error.message).toBe('Skill name is required')
-      }
-    })
-
-    it('should reject empty ID token', async () => {
+    it("should reject empty skill name", async () => {
       const result = await useCase.execute({
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
-        skillName: 'combat.swords',
-        idToken: ''
-      })
+        skillName: "",
+        idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
+      });
 
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toBe('Authentication token is required')
+        expect(result.error.message).toBe("Skill name is required");
       }
-    })
-  })
+    });
 
-  describe('Error Handling', () => {
-    it('should handle character loading errors gracefully', async () => {
+    it("should reject empty ID token", async () => {
+      const result = await useCase.execute({
+        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
+        skillName: "combat.swords",
+        idToken: "",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.message).toBe("Authentication token is required");
+      }
+    });
+  });
+
+  describe("Error Handling", () => {
+    it("should handle character loading errors gracefully", async () => {
       // Arrange
-      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(
-        createErrorResult('Character not found')
-      )
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createErrorResult("Character not found"));
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
-        skillName: 'combat.swords',
-        idToken: TEST_SCENARIOS.VALID_ID_TOKEN
-      }
+        skillName: "combat.swords",
+        idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
+      };
 
       // Act
-      const result = await useCase.execute(input)
+      const result = await useCase.execute(input);
 
       // Assert
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain('Failed to load character')
+        expect(result.error.message).toContain("Failed to load character");
       }
-    })
-  })
-})
+    });
+  });
+});

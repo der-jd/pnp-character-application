@@ -1,4 +1,4 @@
-import { Result, ResultSuccess, ResultError, ApiError, createApiError } from '../types/result';
+import { Result, ResultSuccess, ResultError, ApiError, createApiError } from "../types/result";
 
 /**
  * Authentication token information
@@ -33,8 +33,8 @@ export interface AuthState {
  * Manages tokens, user sessions, and authentication state
  */
 export class AuthService {
-  private static readonly TOKEN_STORAGE_KEY = 'auth_tokens';
-  private static readonly USER_STORAGE_KEY = 'auth_user';
+  private static readonly TOKEN_STORAGE_KEY = "auth_tokens";
+  private static readonly USER_STORAGE_KEY = "auth_user";
 
   /**
    * Gets the current authentication state
@@ -42,13 +42,13 @@ export class AuthService {
   getAuthState(): AuthState {
     const tokens = this.getStoredTokens();
     const user = this.getStoredUser();
-    
+
     const isAuthenticated = tokens !== null && user !== null && !this.isTokenExpired(tokens);
 
     return {
       isAuthenticated,
       user,
-      tokens
+      tokens,
     };
   }
 
@@ -57,7 +57,7 @@ export class AuthService {
    */
   getIdToken(): string | null {
     const tokens = this.getStoredTokens();
-    
+
     if (!tokens || this.isTokenExpired(tokens)) {
       return null;
     }
@@ -70,20 +70,23 @@ export class AuthService {
    */
   async storeAuthData(tokens: AuthTokens, user: AuthUser): Promise<Result<void, Error>> {
     try {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(AuthService.TOKEN_STORAGE_KEY, JSON.stringify({
-          idToken: tokens.idToken,
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          expiresAt: tokens.expiresAt.toISOString()
-        }));
-        
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          AuthService.TOKEN_STORAGE_KEY,
+          JSON.stringify({
+            idToken: tokens.idToken,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            expiresAt: tokens.expiresAt.toISOString(),
+          }),
+        );
+
         localStorage.setItem(AuthService.USER_STORAGE_KEY, JSON.stringify(user));
       }
-      
+
       return ResultSuccess(undefined);
     } catch (error) {
-      return ResultError(error instanceof Error ? error : new Error('Failed to store auth data'));
+      return ResultError(error instanceof Error ? error : new Error("Failed to store auth data"));
     }
   }
 
@@ -92,14 +95,14 @@ export class AuthService {
    */
   async clearAuthData(): Promise<Result<void, Error>> {
     try {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         localStorage.removeItem(AuthService.TOKEN_STORAGE_KEY);
         localStorage.removeItem(AuthService.USER_STORAGE_KEY);
       }
-      
+
       return ResultSuccess(undefined);
     } catch (error) {
-      return ResultError(error instanceof Error ? error : new Error('Failed to clear auth data'));
+      return ResultError(error instanceof Error ? error : new Error("Failed to clear auth data"));
     }
   }
 
@@ -124,21 +127,18 @@ export class AuthService {
    */
   validateTokenForApiCall(): Result<string, ApiError> {
     const idToken = this.getIdToken();
-    
+
     if (!idToken) {
-      return ResultError(createApiError(
-        'No valid authentication token available',
-        401,
-        'auth/token-validation',
-        'GET'
-      ));
+      return ResultError(
+        createApiError("No valid authentication token available", 401, "auth/token-validation", "GET"),
+      );
     }
 
     return ResultSuccess(idToken);
   }
 
   private getStoredTokens(): AuthTokens | null {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return null;
     }
 
@@ -153,7 +153,7 @@ export class AuthService {
         idToken: parsed.idToken,
         accessToken: parsed.accessToken,
         refreshToken: parsed.refreshToken,
-        expiresAt: new Date(parsed.expiresAt)
+        expiresAt: new Date(parsed.expiresAt),
       };
     } catch {
       return null;
@@ -161,7 +161,7 @@ export class AuthService {
   }
 
   private getStoredUser(): AuthUser | null {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return null;
     }
 
@@ -176,6 +176,6 @@ export class AuthService {
   private isTokenExpired(tokens: AuthTokens): boolean {
     // Add some buffer time (5 minutes) to account for clock skew
     const bufferTime = 5 * 60 * 1000; // 5 minutes in milliseconds
-    return new Date().getTime() > (tokens.expiresAt.getTime() - bufferTime);
+    return new Date().getTime() > tokens.expiresAt.getTime() - bufferTime;
   }
 }

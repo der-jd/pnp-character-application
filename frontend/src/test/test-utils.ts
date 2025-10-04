@@ -1,6 +1,6 @@
-import { vi } from 'vitest'
-import { Result, ResultSuccess, ResultError } from '../lib/types/result'
-import { Character } from 'api-spec'
+import { vi } from "vitest";
+import { Result, ResultSuccess, ResultError, ApiError, createApiError } from "../lib/types/result";
+import { Character } from "api-spec";
 
 /**
  * Test utilities for mocking services and creating test data
@@ -13,7 +13,7 @@ export function createMockApiClient() {
     post: vi.fn(),
     patch: vi.fn(),
     delete: vi.fn(),
-  }
+  };
 }
 
 // Mock Character Service
@@ -30,7 +30,7 @@ export function createMockCharacterService() {
     cloneCharacter: vi.fn(),
     addSpecialAbility: vi.fn(),
     updateCalculationPoints: vi.fn(),
-  }
+  };
 }
 
 // Mock History Service
@@ -38,7 +38,7 @@ export function createMockHistoryService() {
   return {
     getHistory: vi.fn(),
     deleteHistoryEntry: vi.fn(),
-  }
+  };
 }
 
 // Test Data Factories
@@ -49,24 +49,24 @@ export function createMockHistoryService() {
 export function createTestCharacter(overrides: Partial<Character> = {}): Character {
   // Use JSON parsing to create a valid Character object without TypeScript complexity
   const baseJson = {
-    userId: 'test-user-id',
-    characterId: 'test-character-id',
+    userId: "test-user-id",
+    characterId: "test-character-id",
     characterSheet: {
       generalInformation: {
-        name: 'Test Character',
+        name: "Test Character",
         level: 1,
-        sex: 'male',
-        profession: { name: 'Test Profession', skill: 'test-skill' },
-        hobby: { name: 'Test Hobby', skill: 'test-hobby-skill' },
-        birthday: '1990-01-01',
-        birthplace: 'Test City',
-        size: '180 cm',
-        weight: '75 kg',
-        hairColor: 'brown',
-        eyeColor: 'blue',
-        residence: 'Test Town',
-        appearance: 'Test appearance',
-        specialCharacteristics: 'Test characteristics'
+        sex: "male",
+        profession: { name: "Test Profession", skill: "test-skill" },
+        hobby: { name: "Test Hobby", skill: "test-hobby-skill" },
+        birthday: "1990-01-01",
+        birthplace: "Test City",
+        size: "180 cm",
+        weight: "75 kg",
+        hairColor: "brown",
+        eyeColor: "blue",
+        residence: "Test Town",
+        appearance: "Test appearance",
+        specialCharacteristics: "Test characteristics",
       },
       attributes: {
         courage: { start: 10, current: 10, mod: 0, totalCost: 0 },
@@ -76,7 +76,7 @@ export function createTestCharacter(overrides: Partial<Character> = {}): Charact
         agility: { start: 10, current: 10, mod: 0, totalCost: 0 },
         charisma: { start: 10, current: 10, mod: 0, totalCost: 0 },
         fingerdexterity: { start: 10, current: 10, mod: 0, totalCost: 0 },
-        strength: { start: 10, current: 10, mod: 0, totalCost: 0 }
+        strength: { start: 10, current: 10, mod: 0, totalCost: 0 },
       },
       baseValues: {
         healthPoints: { start: 30, current: 30, mod: 0 },
@@ -86,29 +86,29 @@ export function createTestCharacter(overrides: Partial<Character> = {}): Charact
         socialStatus: { start: 1, current: 1, mod: 0 },
         magicPoints: { start: 0, current: 0, mod: 0 },
         divineGrace: { start: 0, current: 0, mod: 0 },
-        legendaryActions: { start: 0, current: 0, mod: 0 }
+        legendaryActions: { start: 0, current: 0, mod: 0 },
       },
       combat: {
         // Simplified combat structure - we'll let JSON parsing handle the details
         melee: {},
-        ranged: {}
+        ranged: {},
       },
       skills: {
         combat: {},
         physical: {},
         social: {},
         mental: {},
-        handcraft: {}
+        handcraft: {},
       },
-      specialAbilities: []
-    }
-  }
+      specialAbilities: [],
+    },
+  };
 
   // Simple merge - for complex nested testing, use specific override helpers
   return {
     ...baseJson,
-    ...overrides
-  } as Character
+    ...overrides,
+  } as Character;
 }
 
 /**
@@ -116,44 +116,53 @@ export function createTestCharacter(overrides: Partial<Character> = {}): Charact
  */
 export function createSimpleTestCharacter() {
   return {
-    userId: 'test-user-id',
-    characterId: 'test-character-id',
+    userId: "test-user-id",
+    characterId: "test-character-id",
     characterSheet: {
       generalInformation: {
-        name: 'Test Character',
-        level: 1
+        name: "Test Character",
+        level: 1,
       },
       attributes: {
         strength: { current: 10 },
-        dexterity: { current: 10 }
+        dexterity: { current: 10 },
       },
       skills: {
         combat: {
-          swords: { current: 8, start: 6 }
-        }
-      }
-    }
-  }
+          swords: { current: 8, start: 6 },
+        },
+      },
+    },
+  };
 }
 
 // Result helpers
-export function createSuccessResult<T>(data: T): Result<T, any> {
-  return ResultSuccess(data)
+export function createSuccessResult<T>(data: T): Result<T, ApiError> {
+  return ResultSuccess(data);
 }
 
-export function createErrorResult(message: string, code = 'TEST_ERROR'): Result<any, any> {
-  return ResultError(new Error(message))
+export function createErrorResult<T = unknown>(message: string): Result<T, ApiError> {
+  return ResultError(createApiError(message, 400, "/test", "GET"));
+}
+
+export function createApiErrorResult<T = unknown>(
+  message: string,
+  statusCode: number = 400,
+  endpoint: string = "/test",
+  method: string = "GET",
+): Result<T, ApiError> {
+  return ResultError(createApiError(message, statusCode, endpoint, method));
 }
 
 // Common test scenarios
 export const TEST_SCENARIOS = {
-  VALID_CHARACTER_ID: 'test-character-123',
-  VALID_USER_ID: 'test-user-456',
-  VALID_ID_TOKEN: 'mock-jwt-token',
-  INVALID_CHARACTER_ID: 'invalid-id',
-  NETWORK_ERROR: 'Network request failed',
-  AUTH_ERROR: 'Unauthorized',
-}
+  VALID_CHARACTER_ID: "test-character-123",
+  VALID_USER_ID: "test-user-456",
+  VALID_ID_TOKEN: "mock-jwt-token",
+  INVALID_CHARACTER_ID: "invalid-id",
+  NETWORK_ERROR: "Network request failed",
+  AUTH_ERROR: "Unauthorized",
+};
 
 // Mock implementations for common scenarios
 export function setupSuccessfulCharacterService(character: Character) {
@@ -169,11 +178,11 @@ export function setupSuccessfulCharacterService(character: Character) {
     cloneCharacter: vi.fn().mockResolvedValue(createSuccessResult(character)),
     addSpecialAbility: vi.fn().mockResolvedValue(createSuccessResult({})),
     updateCalculationPoints: vi.fn().mockResolvedValue(createSuccessResult({})),
-  }
+  };
 }
 
 export function setupFailingCharacterService(errorMessage: string) {
-  const error = createErrorResult(errorMessage)
+  const error = createErrorResult(errorMessage);
   return {
     getCharacter: vi.fn().mockResolvedValue(error),
     getAllCharacters: vi.fn().mockResolvedValue(error),
@@ -186,5 +195,5 @@ export function setupFailingCharacterService(errorMessage: string) {
     cloneCharacter: vi.fn().mockResolvedValue(error),
     addSpecialAbility: vi.fn().mockResolvedValue(error),
     updateCalculationPoints: vi.fn().mockResolvedValue(error),
-  }
+  };
 }

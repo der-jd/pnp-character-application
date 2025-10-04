@@ -17,14 +17,14 @@ export interface SkillViewModel {
  * Collection class for managing character skills with business logic
  */
 export class SkillCollection {
-  constructor(private skills: CharacterSheet['skills']) {}
+  constructor(private skills: CharacterSheet["skills"]) {}
 
   /**
    * Gets all skills flattened into a single array with view models
    */
   getAllSkills(): SkillViewModel[] {
     const skillViewModels: SkillViewModel[] = [];
-    
+
     // Helper function to process a skill category
     const processCategory = (categoryName: string, categorySkills: Record<string, Skill>) => {
       Object.entries(categorySkills).forEach(([skillName, skill]) => {
@@ -33,12 +33,12 @@ export class SkillCollection {
     };
 
     // Process all skill categories
-    processCategory('combat', this.skills.combat);
-    processCategory('body', this.skills.body);
-    processCategory('social', this.skills.social);
-    processCategory('nature', this.skills.nature);
-    processCategory('knowledge', this.skills.knowledge);
-    processCategory('handcraft', this.skills.handcraft);
+    processCategory("combat", this.skills.combat);
+    processCategory("body", this.skills.body);
+    processCategory("social", this.skills.social);
+    processCategory("nature", this.skills.nature);
+    processCategory("knowledge", this.skills.knowledge);
+    processCategory("handcraft", this.skills.handcraft);
 
     return skillViewModels;
   }
@@ -46,10 +46,10 @@ export class SkillCollection {
   /**
    * Gets skills for a specific category
    */
-  getByCategory(category: keyof CharacterSheet['skills']): SkillViewModel[] {
+  getByCategory(category: keyof CharacterSheet["skills"]): SkillViewModel[] {
     const categorySkills = this.skills[category];
-    return Object.entries(categorySkills).map(([skillName, skill]) => 
-      this.createSkillViewModel(skillName, category, skill)
+    return Object.entries(categorySkills).map(([skillName, skill]) =>
+      this.createSkillViewModel(skillName, category, skill),
     );
   }
 
@@ -57,23 +57,19 @@ export class SkillCollection {
    * Gets a specific skill
    */
   getSkill(category: string, skillName: string): SkillViewModel | null {
-    const categorySkills = this.skills[category as keyof CharacterSheet['skills']];
+    const categorySkills = this.skills[category as keyof CharacterSheet["skills"]];
     if (!categorySkills || !categorySkills[skillName as keyof typeof categorySkills]) {
       return null;
     }
     return this.createSkillViewModel(skillName, category, categorySkills[skillName as keyof typeof categorySkills]);
   }
 
-
-
   /**
    * Gets only activated skills
    */
   getActivatedSkills(): SkillViewModel[] {
-    return this.getAllSkills().filter(skill => skill.isActivated);
+    return this.getAllSkills().filter((skill) => skill.isActivated);
   }
-
-
 
   private createSkillViewModel(name: string, category: string, skill: Skill): SkillViewModel {
     return {
@@ -91,16 +87,15 @@ export class SkillCollection {
   }
 
   private getSkillData(category: string, skillName: string): Skill | null {
-    const categorySkills = this.skills[category as keyof CharacterSheet['skills']];
+    const categorySkills = this.skills[category as keyof CharacterSheet["skills"]];
     return categorySkills?.[skillName as keyof typeof categorySkills] || null;
   }
 
   private formatSkillName(name: string): string {
     // Convert camelCase to readable format
     return name
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase())
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase())
       .trim();
   }
 }
-

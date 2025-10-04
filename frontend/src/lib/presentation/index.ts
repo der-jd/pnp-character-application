@@ -11,7 +11,7 @@
 // - Proper abstraction of UI state
 
 // ViewModels
-export * from './viewmodels/SkillsPageViewModel';
+export * from "./viewmodels/SkillsPageViewModel";
 
 // TODO: Add more ViewModels as they are implemented:
 // export * from './viewmodels/CharacterPageViewModel';

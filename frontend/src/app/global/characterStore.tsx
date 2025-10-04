@@ -3,7 +3,7 @@ import { CombatStats } from "api-spec";
 import { AllCharactersCharacter } from "@/src/lib/api/models/allCharacters/interface";
 import { CharacterService, AuthService, HistoryService } from "@/src/lib/services";
 import { CharacterApplicationService } from "@/src/lib/application";
-import { Character } from '@/src/lib/domain/Character';
+
 import { create } from "zustand";
 import * as R from "ramda";
 import { RecordEntry } from "@/src/lib/api/models/history/interface";
@@ -16,11 +16,7 @@ function asPath(path: (string | number | symbol)[]): (string | number)[] {
 const characterService = new CharacterService();
 const authService = new AuthService();
 const historyService = new HistoryService();
-const characterApplicationService = new CharacterApplicationService(
-  characterService,
-  historyService,
-  authService
-);
+const characterApplicationService = new CharacterApplicationService(characterService, historyService, authService);
 
 export interface CharacterStore {
   availableCharacters: Array<AllCharactersCharacter>;
@@ -47,7 +43,7 @@ export interface CharacterStore {
   updateCharacter: (idToken: string, charId: string) => void;
   updateHistoryEntries: (newEntries: RecordEntry[]) => void;
   updateOpenHistoryEntries: (newEntries: RecordEntry[]) => void;
-  
+
   // New Application Service methods
   increaseSkill: (characterId: string, skillName: string, idToken: string) => Promise<boolean>;
 }
@@ -141,16 +137,16 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
     // TODO: Use LoadAllCharactersUseCase when implemented
     // For now, use service directly but through application service pattern
     const result = await characterService.getAllCharacters(idToken);
-    
+
     if (result.success) {
       // Convert domain characters back to interface format for compatibility
-      const characters = result.data.map(char => ({
+      const characters = result.data.map((char) => ({
         userId: char.userId,
         characterId: char.characterId,
         name: char.name,
-        level: char.level
+        level: char.level,
       }));
-      
+
       set(() => ({
         availableCharacters: characters,
       }));
@@ -169,9 +165,9 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
   updateCharacter: async (idToken: string, charId: string) => {
     const result = await characterApplicationService.loadCharacter({
       characterId: charId,
-      idToken: idToken
+      idToken: idToken,
     });
-    
+
     if (result.success) {
       const character = result.data.character;
       set(() => ({
@@ -216,7 +212,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
     const result = await characterApplicationService.increaseSkill({
       characterId,
       skillName,
-      idToken
+      idToken,
     });
 
     if (result.success) {
@@ -225,8 +221,10 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       set(() => ({
         characterSheet: updatedCharacter.toApiData().characterSheet,
       }));
-      
-      console.log(`[Character store] Skill '${skillName}' increased successfully. Cost: ${result.data.costCalculation.cost} points`);
+
+      console.log(
+        `[Character store] Skill '${skillName}' increased successfully. Cost: ${result.data.costCalculation.cost} points`,
+      );
       return true;
     } else {
       console.error(`[Character store] Error while increasing skill '${skillName}':`, result.error);

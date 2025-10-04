@@ -1,6 +1,6 @@
-import { Result } from '../../types/result';
-import { Character } from 'api-spec';
-import { Character as DomainCharacter } from '../../domain/Character';
+import { Result } from "../../types/result";
+import { Character as DomainCharacter } from "../../domain/Character";
+import { PostCharactersRequest } from "api-spec";
 
 /**
  * Base interface for all Use Cases
@@ -52,7 +52,7 @@ export interface UpdateBaseValueInput {
 
 export interface UpdateCombatValueInput {
   characterId: string;
-  combatType: 'melee' | 'ranged';
+  combatType: "melee" | "ranged";
   combatValueName: string;
   newAttackValue: number;
   idToken: string;
@@ -76,7 +76,7 @@ export interface DeleteHistoryEntryInput {
 }
 
 export interface CreateCharacterInput {
-  characterData: any; // Will be typed with PostCharactersRequest
+  characterData: PostCharactersRequest;
   idToken: string;
 }
 

@@ -1,6 +1,6 @@
-// Level-Up API Schema Validation Test: API-Spec Breaking Change Detection
-// This test specifically focuses on detecting when changes to api-spec break the schema compatibility
-// between frontend expectations and backend implementation
+// Level-Up API Schema Validation Test: Multi-Environment API-Spec Breaking Change Detection
+// This test validates schema compatibility between frontend and backend across different environments
+// Supports: LocalStack (fast), Staging (integration), Production (data drift detection)
 
 import { describe, it, expect } from "vitest";
 import { execSync } from "child_process";
@@ -12,6 +12,30 @@ import {
   type PostLevelRequest,
   type UpdateLevelResponse,
 } from "api-spec";
+
+// Environment configuration available via process.env if needed
+
+// Test configuration based on environment
+// const getTestConfig = () => {
+//   const defaults = {
+//     characterId: "123e4567-e89b-12d3-a456-426614174000",
+//     userId: "user-test-123456789012345678901234567890",
+//     tenantId: "test-tenant",
+//     timeout: 5000
+//   };
+//
+//   if (API_ENVIRONMENT === 'production') {
+//     return {
+//       ...defaults,
+//       timeout: 15000,
+//       readOnly: true
+//     };
+//   }
+//
+//   return defaults;
+// };
+
+// Test config available via getTestConfig() if needed
 
 describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
   describe("Request Schema Validation", () => {

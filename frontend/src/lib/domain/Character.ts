@@ -17,7 +17,7 @@ export class Character {
   private constructor(
     private readonly _userId: string,
     private readonly _characterId: string,
-    private _characterSheet: CharacterSheet
+    private _characterSheet: CharacterSheet,
   ) {
     this._skillCollection = new SkillCollection(_characterSheet.skills);
     this._attributeCollection = new AttributeCollection(_characterSheet.attributes);
@@ -29,11 +29,7 @@ export class Character {
    * Creates a Character domain object from API data
    */
   static fromApiData(apiData: ApiCharacter): Character {
-    return new Character(
-      apiData.userId,
-      apiData.characterId,
-      apiData.characterSheet
-    );
+    return new Character(apiData.userId, apiData.characterId, apiData.characterSheet);
   }
 
   // === Getters ===
@@ -100,7 +96,7 @@ export class Character {
     return {
       userId: this._userId,
       characterId: this._characterId,
-      characterSheet: this._characterSheet
+      characterSheet: this._characterSheet,
     };
   }
 
@@ -112,7 +108,7 @@ export class Character {
       characterId: this._characterId,
       name: this.name,
       level: this.level,
-      userId: this._userId
+      userId: this._userId,
     };
   }
 }
