@@ -12,6 +12,7 @@ The Domain Layer contains the core business entities and domain logic for the Pn
 ## Key Components
 
 ### Character.ts
+
 The main domain entity representing a player character.
 
 ```typescript
@@ -23,12 +24,14 @@ export class Character {
 ```
 
 **Responsibilities:**
+
 - Encapsulate character data and state
 - Provide methods for character operations (level up, attribute changes, etc.)
 - Validate business rules and constraints
 - Calculate derived values (combat stats, skill totals, etc.)
 
 ### Skills.ts
+
 Domain model for character skills and skill management.
 
 ```typescript
@@ -39,12 +42,14 @@ export class SkillCollection {
 ```
 
 **Responsibilities:**
+
 - Manage character skill collections
 - Handle skill increase calculations
 - Validate skill constraints and prerequisites
 - Calculate skill-related derived values
 
 ### Attributes.ts
+
 Domain model for character attributes (Courage, Cleverness, etc.).
 
 ```typescript
@@ -55,12 +60,14 @@ export class AttributeCollection {
 ```
 
 **Responsibilities:**
+
 - Manage character attributes
 - Handle attribute modifications and validations
 - Calculate attribute-based derived values
 - Enforce attribute constraints
 
 ### BaseValues.ts
+
 Domain model for character base values (Life Points, Astral Points, etc.).
 
 ```typescript
@@ -71,12 +78,14 @@ export class BaseValueCollection {
 ```
 
 **Responsibilities:**
+
 - Manage character base values
 - Calculate base values from attributes
 - Handle base value modifications
 - Maintain base value relationships
 
 ### CombatValues.ts
+
 Domain model for combat-related values (Attack, Parade, Initiative).
 
 ```typescript
@@ -87,6 +96,7 @@ export class CombatValueCollection {
 ```
 
 **Responsibilities:**
+
 - Manage combat-related values
 - Calculate combat values from attributes and skills
 - Handle combat value modifications
@@ -95,16 +105,19 @@ export class CombatValueCollection {
 ## Design Principles
 
 ### Rich Domain Model
+
 - Entities contain behavior, not just data
 - Business logic is encapsulated within domain objects
 - Objects maintain their own invariants
 
 ### Domain-Driven Design
+
 - Models reflect the ubiquitous language of the PnP game system
 - Complex business rules are expressed clearly in code
 - Domain concepts are explicit and well-defined
 
 ### Immutability Where Appropriate
+
 - Value objects are immutable
 - State changes go through controlled methods
 - Prevents accidental state corruption
@@ -112,12 +125,14 @@ export class CombatValueCollection {
 ## Usage Examples
 
 ### Creating a Character
+
 ```typescript
 // Character creation with validation
 const character = Character.create(userId, characterData);
 ```
 
 ### Skill Operations
+
 ```typescript
 // Increase a skill with business rule validation
 character.increaseSkill(skillId, targetValue);
@@ -127,6 +142,7 @@ const cost = character.getSkillIncreaseCost(skillId, targetValue);
 ```
 
 ### Attribute Management
+
 ```typescript
 // Modify attributes with constraints
 character.updateAttribute(attributeId, newValue);
@@ -138,6 +154,7 @@ const derivedStats = character.getCalculatedStats();
 ## Testing Strategy
 
 Domain entities are tested with:
+
 - Unit tests for business logic
 - Property-based testing for invariants
 - Test scenarios covering edge cases
@@ -151,6 +168,7 @@ Domain entities are tested with:
 ## Integration
 
 The domain layer is consumed by:
+
 - **Application Layer**: Use cases orchestrate domain operations
 - **Presentation Layer**: View models transform domain data for UI
 - **Services Layer**: Maps between domain objects and external APIs

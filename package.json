@@ -22,11 +22,13 @@
     "api-schema-tests:setup": "./scripts/terraform-symlink-setup.sh",
     "api-schema-tests:run": "./scripts/run-api-schema-tests.sh",
     "api-schema-tests:clean": "./scripts/clean-api-schema-tests.sh",
-    "api-schema-tests": "npm run api-schema-tests:setup && npm run api-schema-tests:run"
+    "api-schema-tests": "npm run api-schema-tests:setup && npm run api-schema-tests:run",
+    "api-schema-tests:localstack": "./scripts/run-api-schema-tests-env.sh --env=localstack",
+    "api-schema-tests:prod": "./scripts/run-api-schema-tests-env.sh --env=prod",
+    "api-schema-tests:all": "npm run api-schema-tests:setup && npm run api-schema-tests:localstack"
   },
   "devDependencies": {
     "husky": "^9.1.7",
-    "prettier": "^3.5.3",
-    "prettier-plugin-terraform-formatter": "^1.2.1"
+    "prettier": "^3.5.3"
   }
 }

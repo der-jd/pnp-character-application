@@ -19,6 +19,7 @@ Use cases represent specific user actions or business scenarios. Each use case e
 #### Character Management Use Cases
 
 **CreateCharacterUseCase.ts**
+
 ```typescript
 export class CreateCharacterUseCase implements UseCase<CreateCharacterInput, CreateCharacterOutput> {
   // Creates new character with validation
@@ -27,6 +28,7 @@ export class CreateCharacterUseCase implements UseCase<CreateCharacterInput, Cre
 ```
 
 **LoadCharacterUseCase.ts**
+
 ```typescript
 export class LoadCharacterUseCase implements UseCase<LoadCharacterInput, LoadCharacterOutput> {
   // Loads character data
@@ -35,6 +37,7 @@ export class LoadCharacterUseCase implements UseCase<LoadCharacterInput, LoadCha
 ```
 
 **LoadAllCharactersUseCase.ts**
+
 ```typescript
 export class LoadAllCharactersUseCase implements UseCase<LoadAllCharactersInput, LoadAllCharactersOutput> {
   // Loads all characters for a user
@@ -43,6 +46,7 @@ export class LoadAllCharactersUseCase implements UseCase<LoadAllCharactersInput,
 ```
 
 **CloneCharacterUseCase.ts**
+
 ```typescript
 export class CloneCharacterUseCase implements UseCase<CloneCharacterInput, CloneCharacterOutput> {
   // Creates a copy of existing character
@@ -53,6 +57,7 @@ export class CloneCharacterUseCase implements UseCase<CloneCharacterInput, Clone
 #### Character Development Use Cases
 
 **LevelUpUseCase.ts**
+
 ```typescript
 export class LevelUpUseCase implements UseCase<LevelUpInput, LevelUpOutput> {
   // Handles character level progression
@@ -62,6 +67,7 @@ export class LevelUpUseCase implements UseCase<LevelUpInput, LevelUpOutput> {
 ```
 
 **IncreaseSkillUseCase.ts**
+
 ```typescript
 export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, IncreaseSkillOutput> {
   // Manages skill improvements
@@ -71,6 +77,7 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
 ```
 
 **UpdateAttributeUseCase.ts**
+
 ```typescript
 export class UpdateAttributeUseCase implements UseCase<UpdateAttributeInput, UpdateAttributeOutput> {
   // Handles attribute modifications
@@ -80,6 +87,7 @@ export class UpdateAttributeUseCase implements UseCase<UpdateAttributeInput, Upd
 ```
 
 **UpdateBaseValueUseCase.ts**
+
 ```typescript
 export class UpdateBaseValueUseCase implements UseCase<UpdateBaseValueInput, UpdateBaseValueOutput> {
   // Manages base value changes (Life Points, etc.)
@@ -88,6 +96,7 @@ export class UpdateBaseValueUseCase implements UseCase<UpdateBaseValueInput, Upd
 ```
 
 **UpdateCombatValueUseCase.ts**
+
 ```typescript
 export class UpdateCombatValueUseCase implements UseCase<UpdateCombatValueInput, UpdateCombatValueOutput> {
   // Handles combat value modifications
@@ -96,14 +105,17 @@ export class UpdateCombatValueUseCase implements UseCase<UpdateCombatValueInput,
 ```
 
 **UpdateCalculationPointsUseCase.ts**
+
 ```typescript
-export class UpdateCalculationPointsUseCase implements UseCase<UpdateCalculationPointsInput, UpdateCalculationPointsOutput> {
+export class UpdateCalculationPointsUseCase
+  implements UseCase<UpdateCalculationPointsInput, UpdateCalculationPointsOutput> {
   // Manages character point calculations
   // Handles point redistribution
 }
 ```
 
 **AddSpecialAbilityUseCase.ts**
+
 ```typescript
 export class AddSpecialAbilityUseCase implements UseCase<AddSpecialAbilityInput, AddSpecialAbilityOutput> {
   // Adds special abilities to characters
@@ -114,6 +126,7 @@ export class AddSpecialAbilityUseCase implements UseCase<AddSpecialAbilityInput,
 #### History Management Use Cases
 
 **LoadHistoryUseCase.ts**
+
 ```typescript
 export class LoadHistoryUseCase implements UseCase<LoadHistoryInput, LoadHistoryOutput> {
   // Loads character development history
@@ -122,6 +135,7 @@ export class LoadHistoryUseCase implements UseCase<LoadHistoryInput, LoadHistory
 ```
 
 **DeleteHistoryEntryUseCase.ts**
+
 ```typescript
 export class DeleteHistoryEntryUseCase implements UseCase<DeleteHistoryEntryInput, DeleteHistoryEntryOutput> {
   // Removes history entries
@@ -145,29 +159,37 @@ export class CharacterApplicationService {
 ### Interfaces and Types
 
 **interfaces.ts**
+
 ```typescript
 export interface UseCase<TInput, TOutput> {
   execute(input: TInput): Promise<Result<TOutput>>;
 }
 
 // Input/Output types for each use case
-export interface LevelUpInput { /* ... */ }
-export interface LevelUpOutput { /* ... */ }
+export interface LevelUpInput {
+  /* ... */
+}
+export interface LevelUpOutput {
+  /* ... */
+}
 ```
 
 ## Design Principles
 
 ### Use Case Pattern
+
 - Each use case represents a single business operation
 - Use cases are independent and composable
 - Clear input/output contracts
 
 ### Result Pattern
+
 - All operations return `Result<T>` for explicit error handling
 - Success and error states are type-safe
 - No throwing exceptions for business logic errors
 
 ### Dependency Injection
+
 - Use cases depend on abstractions (interfaces)
 - Services are injected via constructor
 - Easy to test and mock dependencies
@@ -175,33 +197,35 @@ export interface LevelUpOutput { /* ... */ }
 ## Usage Examples
 
 ### Executing a Use Case
+
 ```typescript
 // Inject dependencies
 const useCase = new LevelUpUseCase(characterService);
 
 // Execute with proper error handling
 const result = await useCase.execute({
-  characterId: 'char-123',
-  newLevel: 2
+  characterId: "char-123",
+  newLevel: 2,
 });
 
 if (result.success) {
   // Handle success
-  console.log('Character leveled up:', result.value);
+  console.log("Character leveled up:", result.value);
 } else {
   // Handle error
-  console.error('Level up failed:', result.error);
+  console.error("Level up failed:", result.error);
 }
 ```
 
 ### Composing Use Cases
+
 ```typescript
 // Application service coordinates multiple use cases
 class CharacterApplicationService {
   async levelUpAndAddAbility(characterId: string, newLevel: number, abilityId: string) {
     const levelUpResult = await this.levelUpUseCase.execute({ characterId, newLevel });
     if (!levelUpResult.success) return levelUpResult;
-    
+
     const abilityResult = await this.addAbilityUseCase.execute({ characterId, abilityId });
     return abilityResult;
   }
@@ -211,16 +235,17 @@ class CharacterApplicationService {
 ## Testing Strategy
 
 ### Use Case Testing
+
 ```typescript
-describe('LevelUpUseCase', () => {
-  it('should level up character successfully', async () => {
+describe("LevelUpUseCase", () => {
+  it("should level up character successfully", async () => {
     // Arrange
     const mockCharacterService = createMockCharacterService();
     const useCase = new LevelUpUseCase(mockCharacterService);
-    
+
     // Act
-    const result = await useCase.execute({ characterId: 'test', newLevel: 2 });
-    
+    const result = await useCase.execute({ characterId: "test", newLevel: 2 });
+
     // Assert
     expect(result.success).toBe(true);
   });
@@ -228,6 +253,7 @@ describe('LevelUpUseCase', () => {
 ```
 
 ### Integration Testing
+
 - Test use case interactions with real services
 - Verify complete business workflows
 - Test error handling and edge cases
@@ -242,11 +268,13 @@ describe('LevelUpUseCase', () => {
 ## Integration Points
 
 ### Consumed By
+
 - **Presentation Layer**: View models call use cases
 - **React Components**: Direct use case invocation
 - **API Handlers**: Server-side use case execution
 
 ### Consumes
+
 - **Domain Entities**: Operates on domain objects
 - **Services**: Calls infrastructure services
 - **External APIs**: Via service layer abstraction

@@ -378,12 +378,12 @@ folder "frontend/src/" {
         file "layout.tsx"
         folder "characters/"
     }
-    
+
     folder "hooks/" {
         file "useCharacter.ts"
         file "useSkillIncrease.ts"
     }
-    
+
     folder "lib/" {
         folder "application/" {
             folder "use-cases/" {
@@ -395,31 +395,31 @@ folder "frontend/src/" {
                 file "CharacterApplicationService.ts"
             }
         }
-        
+
         folder "domain/" {
             file "Character.ts"
             file "Skills.ts"
             file "Attributes.ts"
         }
-        
+
         folder "presentation/" {
             folder "viewmodels/" {
                 file "SkillsPageViewModel.ts"
             }
         }
-        
+
         folder "services/" {
             file "characterService.ts"
             file "apiClient.ts"
             file "authService.ts"
         }
-        
+
         folder "types/" {
             file "result.ts"
             file "index.ts"
         }
     }
-    
+
     folder "test/" {
         folder "api-schema/" {
             file "level-up-api-schema-validation.test.ts"
@@ -435,6 +435,7 @@ folder "frontend/src/" {
 ## Getting Started
 
 Each layer documentation provides:
+
 - Purpose and responsibilities
 - Key components and their roles
 - Usage examples
