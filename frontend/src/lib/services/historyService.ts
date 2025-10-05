@@ -3,7 +3,6 @@ import type {
   DeleteHistoryRecordResponse,
   PatchHistoryRecordRequest,
   PatchHistoryRecordResponse,
-  HistoryBlock,
   Record as HistoryRecord,
 } from "api-spec";
 

@@ -81,8 +81,8 @@ export class LoadHistoryUseCase implements UseCase<LoadHistoryInput, LoadHistory
   /**
    * Formats change description for display
    */
-  private formatChangeDescription(entry: any): string {
-    if (entry.changeDescription) {
+  private formatChangeDescription(entry: Record<string, unknown>): string {
+    if (entry.changeDescription && typeof entry.changeDescription === 'string') {
       return entry.changeDescription;
     }
 
