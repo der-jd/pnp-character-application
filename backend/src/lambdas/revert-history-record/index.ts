@@ -61,13 +61,13 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
     const params = await validateRequest(request);
 
     console.log(
-      `Delete record ${params.pathParams["record-id"]} from history of character ${params.pathParams["character-id"]}`,
+      `Delete record ${params.pathParams["record-id"]} from history of character ${params.pathParams["character-id"]}`
     );
 
     const items = await getHistoryItems(
       params.pathParams["character-id"],
       false, // Sort descending to get highest block number (latest item) first
-      1, // Only need the top result
+      1 // Only need the top result
     );
 
     if (!items || items.length === 0) {
@@ -211,7 +211,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
           characterId,
           record.name,
           oldData.attribute,
-          requireProperty(record.calculationPoints.attributePoints?.old, "attributePoints"),
+          requireProperty(record.calculationPoints.attributePoints?.old, "attributePoints")
         );
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
@@ -232,7 +232,7 @@ async function revertChange(userId: string, characterId: string, record: Record)
           skillCategory,
           skillName,
           oldData.skill,
-          requireProperty(record.calculationPoints.adventurePoints?.old, "adventurePoints"),
+          requireProperty(record.calculationPoints.adventurePoints?.old, "adventurePoints")
         );
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         break;
@@ -268,7 +268,7 @@ function requireProperty<T>(property: T | undefined | null, name: string): T {
 async function updateAttributePointsIfExists(
   userId: string,
   characterId: string,
-  points: CalculationPoints | undefined,
+  points: CalculationPoints | undefined
 ): Promise<void> {
   if (points) {
     await updateAttributePoints(userId, characterId, points);
@@ -278,7 +278,7 @@ async function updateAttributePointsIfExists(
 async function updateAdventurePointsIfExists(
   userId: string,
   characterId: string,
-  points: CalculationPoints | undefined,
+  points: CalculationPoints | undefined
 ): Promise<void> {
   if (points) {
     await updateAdventurePoints(userId, characterId, points);

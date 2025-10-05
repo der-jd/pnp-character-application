@@ -3,6 +3,7 @@ import type {
   DeleteHistoryRecordResponse,
   PatchHistoryRecordRequest,
   PatchHistoryRecordResponse,
+  HistoryBlock,
   Record as HistoryRecord,
 } from "api-spec";
 
@@ -33,11 +34,11 @@ export class HistoryService {
   async getHistoryBlock(
     characterId: string,
     blockNumber: number,
-    idToken: string,
+    idToken: string
   ): Promise<Result<GetHistoryResponse, ApiError>> {
     return await this.apiClient.get<GetHistoryResponse>(
       `characters/${characterId}/history?block=${blockNumber}`,
-      idToken,
+      idToken
     );
   }
 
@@ -47,11 +48,11 @@ export class HistoryService {
   async deleteHistoryRecord(
     characterId: string,
     entryId: string,
-    idToken: string,
+    idToken: string
   ): Promise<Result<DeleteHistoryRecordResponse, ApiError>> {
     return await this.apiClient.delete<DeleteHistoryRecordResponse>(
       `characters/${characterId}/history/${entryId}`,
-      idToken,
+      idToken
     );
   }
 
@@ -62,12 +63,12 @@ export class HistoryService {
     characterId: string,
     entryId: string,
     updateData: PatchHistoryRecordRequest,
-    idToken: string,
+    idToken: string
   ): Promise<Result<PatchHistoryRecordResponse, ApiError>> {
     return await this.apiClient.patch<PatchHistoryRecordResponse>(
       `characters/${characterId}/history/${entryId}`,
       updateData,
-      idToken,
+      idToken
     );
   }
 

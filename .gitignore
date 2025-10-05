@@ -2,9 +2,14 @@
 .terraform/
 terraform.tfstate
 terraform.tfstate.*
+terraform/terraform_output
 
 .venv/
 
 node_modules/
 build/
 dist/
+
+# API schema testing environment files (contain sensitive data)
+frontend/.env.production
+frontend/.env.api-testing

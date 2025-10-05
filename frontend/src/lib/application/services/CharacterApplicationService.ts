@@ -59,7 +59,7 @@ export class CharacterApplicationService {
   constructor(
     private readonly characterService: CharacterService,
     private readonly historyService: HistoryService,
-    private readonly authService: AuthService,
+    private readonly authService: AuthService
   ) {
     // Initialize Use Cases with dependencies
     this.loadCharacterUseCase = new LoadCharacterUseCase(characterService);

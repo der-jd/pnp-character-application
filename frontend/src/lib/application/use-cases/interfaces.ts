@@ -1,6 +1,6 @@
 import { Result } from "../../types/result";
+import { Character, PostCharactersRequest } from "api-spec";
 import { Character as DomainCharacter } from "../../domain/Character";
-import { PostCharactersRequest } from "api-spec";
 
 /**
  * Base interface for all Use Cases

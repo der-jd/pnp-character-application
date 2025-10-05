@@ -59,7 +59,7 @@ export class AddSpecialAbilityUseCase implements UseCase<AddSpecialAbilityInput,
       const addResult = await this.addSpecialAbilityViaService(
         input.characterId,
         input.specialAbilityName,
-        input.idToken,
+        input.idToken
       );
 
       if (!addResult.success) {
@@ -116,13 +116,13 @@ export class AddSpecialAbilityUseCase implements UseCase<AddSpecialAbilityInput,
   private async addSpecialAbilityViaService(
     characterId: string,
     specialAbilityName: string,
-    idToken: string,
+    idToken: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const result = await this.characterService.addSpecialAbility(
         characterId,
         { specialAbility: specialAbilityName },
-        idToken,
+        idToken
       );
       return {
         success: result.success,

@@ -98,7 +98,7 @@ describe("UpdateCalculationPointsUseCase", () => {
             start: { initialValue: 100, newValue: 110 },
           },
         }),
-        TEST_SCENARIOS.VALID_ID_TOKEN,
+        TEST_SCENARIOS.VALID_ID_TOKEN
       );
     });
 
@@ -126,7 +126,7 @@ describe("UpdateCalculationPointsUseCase", () => {
     it("should handle service errors gracefully", async () => {
       // Arrange
       vi.mocked(mockCharacterService.updateCalculationPoints).mockResolvedValue(
-        createErrorResult("Calculation points update failed"),
+        createErrorResult("Calculation points update failed")
       );
 
       const input = {

@@ -70,7 +70,7 @@ export class UpdateBaseValueUseCase implements UseCase<UpdateBaseValueInput, Upd
             newValue: input.newValue,
           },
         },
-        input.idToken,
+        input.idToken
       );
 
       if (!updateResult.success) {

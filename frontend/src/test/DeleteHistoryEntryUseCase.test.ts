@@ -100,7 +100,7 @@ describe("DeleteHistoryEntryUseCase", () => {
       expect(mockHistoryService.deleteHistoryRecord).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         "history-123",
-        TEST_SCENARIOS.VALID_ID_TOKEN,
+        TEST_SCENARIOS.VALID_ID_TOKEN
       );
     });
 

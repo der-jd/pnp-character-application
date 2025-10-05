@@ -698,7 +698,7 @@ describe("Valid requests", () => {
         }
 
         expect(parsedBody.changes.old.combat.melee).toStrictEqual(
-          fakeCharacterResponse.Item.characterSheet.combat.melee,
+          fakeCharacterResponse.Item.characterSheet.combat.melee
         );
 
         for (const skillName of Object.keys(parsedBody.changes.old.combat.melee)) {
@@ -753,7 +753,7 @@ describe("Valid requests", () => {
         }
 
         expect(parsedBody.changes.old.combat.ranged).toStrictEqual(
-          fakeCharacterResponse.Item.characterSheet.combat.ranged,
+          fakeCharacterResponse.Item.characterSheet.combat.ranged
         );
 
         for (const skillName of Object.keys(parsedBody.changes.old.combat.ranged)) {

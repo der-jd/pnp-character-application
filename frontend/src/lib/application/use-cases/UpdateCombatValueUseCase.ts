@@ -79,7 +79,7 @@ export class UpdateCombatValueUseCase implements UseCase<UpdateCombatValueInput,
             increasedPoints: 0, // Only updating attack value in this use case
           },
         },
-        input.idToken,
+        input.idToken
       );
 
       if (!updateResult.success) {

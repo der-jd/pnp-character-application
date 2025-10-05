@@ -17,7 +17,7 @@ export class Character {
   private constructor(
     private readonly _userId: string,
     private readonly _characterId: string,
-    private _characterSheet: CharacterSheet,
+    private _characterSheet: CharacterSheet
   ) {
     this._skillCollection = new SkillCollection(_characterSheet.skills);
     this._attributeCollection = new AttributeCollection(_characterSheet.attributes);

@@ -83,7 +83,7 @@ describe("LoadCharacterUseCase", () => {
       }
       expect(mockCharacterService.getCharacter).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
-        TEST_SCENARIOS.VALID_ID_TOKEN,
+        TEST_SCENARIOS.VALID_ID_TOKEN
       );
     });
 

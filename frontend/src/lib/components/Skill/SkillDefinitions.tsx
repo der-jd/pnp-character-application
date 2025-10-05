@@ -139,7 +139,7 @@ function mapNodeToISkillProps(
   name: string,
   category: string,
   data: any, // eslint-disable-line
-  type: string,
+  type: string
 ): ISkillProps {
   switch (type) {
     case "Skill":

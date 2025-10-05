@@ -8,7 +8,7 @@ const INCREASE_COST_COMBAT_STATS = 1;
 
 export function combatBaseValuesChangedAffectingCombatStats(
   oldBaseValues: Partial<BaseValues>,
-  newBaseValues: Partial<BaseValues>,
+  newBaseValues: Partial<BaseValues>
 ): boolean {
   const attackBaseValueKey: keyof BaseValues = "attackBaseValue";
   const paradeBaseValueKey: keyof BaseValues = "paradeBaseValue";
@@ -40,7 +40,7 @@ export async function recalculateAndUpdateCombatStats(
   userId: string,
   characterId: string,
   combatSection: CombatSection,
-  baseValues: BaseValues,
+  baseValues: BaseValues
 ): Promise<Partial<CombatSection>> {
   console.log("Recalculate and update combat stats");
   const combatStatsUpdates: Promise<void>[] = [];
@@ -94,7 +94,7 @@ export function calculateCombatStats(
   baseValues: BaseValues,
   currentCombatStats: CombatStats,
   skilledAttackIncrease: number = 0,
-  skilledParadeIncrease: number = 0,
+  skilledParadeIncrease: number = 0
 ): CombatStats {
   console.log(`Calculate combat stats for skill ${combatSkillName}`);
 
@@ -112,7 +112,7 @@ export function calculateCombatStats(
 function adjustAvailablePoints(
   combatStats: CombatStats,
   oldCombatSkill: Skill | null,
-  newCombatSkill: Skill | null,
+  newCombatSkill: Skill | null
 ): void {
   if (oldCombatSkill && newCombatSkill) {
     combatStats.availablePoints +=
@@ -125,7 +125,7 @@ function applySkilledValueIncreases(
   combatStats: CombatStats,
   combatSkillName: SkillName,
   skilledAttackIncrease: number,
-  skilledParadeIncrease: number,
+  skilledParadeIncrease: number
 ): void {
   if (skilledAttackIncrease === 0 && skilledParadeIncrease === 0) {
     return;

@@ -124,7 +124,7 @@ export function useSkillUpdater() {
           idToken,
           selectedChar,
           skill.name,
-          increaseAttributeRequest,
+          increaseAttributeRequest
         );
 
         applyUpdate({
@@ -169,7 +169,7 @@ export function useSkillUpdater() {
           selectedChar,
           skill.name,
           skill.category,
-          increaseSkillRequest,
+          increaseSkillRequest
         );
 
         applyUpdate({
@@ -211,7 +211,7 @@ export function useSkillUpdater() {
           idToken,
           selectedChar,
           value.name,
-          increaseBaseValueRequest,
+          increaseBaseValueRequest
         );
 
         applyUpdate({
@@ -304,7 +304,7 @@ export function useSkillUpdater() {
           selectedChar,
           value.name,
           value.type,
-          increaseCombatValueRequest,
+          increaseCombatValueRequest
         );
 
         updateCombatValue(path, name, data.combatStats.new);

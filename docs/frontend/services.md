@@ -246,7 +246,7 @@ class CharacterApplicationService {
   constructor(
     private characterService: CharacterService,
     private historyService: HistoryService,
-    private authService: AuthService,
+    private authService: AuthService
   ) {}
 
   async levelUpCharacter(characterId: string, newLevel: number): Promise<Result<void>> {

@@ -70,14 +70,14 @@ export async function _updateBaseValue(request: Request): Promise<APIGatewayProx
       params.userId,
       params.pathParams["character-id"],
       params.pathParams["base-value-name"],
-      baseValue,
+      baseValue
     );
 
     const combatBaseValueChanged: boolean = combatBaseValuesChangedAffectingCombatStats(
       { [params.pathParams["base-value-name"]]: baseValueOld },
       {
         [params.pathParams["base-value-name"]]: baseValue,
-      },
+      }
     );
     let changedCombatSection: Partial<CombatSection> = {};
     if (combatBaseValueChanged) {
@@ -88,7 +88,7 @@ export async function _updateBaseValue(request: Request): Promise<APIGatewayProx
         {
           ...characterSheet.baseValues,
           [params.pathParams["base-value-name"]]: baseValue,
-        },
+        }
       );
     }
 
@@ -163,7 +163,7 @@ function updateStartValue(baseValue: BaseValue, startValue: InitialNew): BaseVal
 function updateByLvlUpValue(
   baseValueName: keyof CharacterSheet["baseValues"] | string,
   baseValue: BaseValue,
-  byLvlUp: InitialNew,
+  byLvlUp: InitialNew
 ): BaseValue {
   console.log(`Update byLvlUp value of the base value from ${byLvlUp.initialValue} to ${byLvlUp.newValue}`);
 

@@ -76,7 +76,7 @@ export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialD
               checked={skill.activated}
               onCheckedChange={(checked) => {
                 setData((prevData) =>
-                  prevData.map((item) => (item.name === skill.name ? { ...item, activated: Boolean(checked) } : item)),
+                  prevData.map((item) => (item.name === skill.name ? { ...item, activated: Boolean(checked) } : item))
                 );
               }}
               aria-label={`Set ${skill.name} as active`}

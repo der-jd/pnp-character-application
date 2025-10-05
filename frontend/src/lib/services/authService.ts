@@ -78,7 +78,7 @@ export class AuthService {
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
             expiresAt: tokens.expiresAt.toISOString(),
-          }),
+          })
         );
 
         localStorage.setItem(AuthService.USER_STORAGE_KEY, JSON.stringify(user));
@@ -130,7 +130,7 @@ export class AuthService {
 
     if (!idToken) {
       return ResultError(
-        createApiError("No valid authentication token available", 401, "auth/token-validation", "GET"),
+        createApiError("No valid authentication token available", 401, "auth/token-validation", "GET")
       );
     }
 

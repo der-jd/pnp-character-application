@@ -113,7 +113,7 @@ describe("UpdateAttributeUseCase", () => {
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         "strength",
         { targetValue: 12 },
-        TEST_SCENARIOS.VALID_ID_TOKEN,
+        TEST_SCENARIOS.VALID_ID_TOKEN
       );
     });
 

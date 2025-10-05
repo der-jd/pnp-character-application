@@ -78,7 +78,7 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
       params.pathParams["character-id"],
       params.pathParams["attribute-name"],
       attribute,
-      attributePoints,
+      attributePoints
     );
 
     console.log("Calculate base values");
@@ -119,8 +119,8 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
           params.userId,
           params.pathParams["character-id"],
           baseValueName,
-          changedBaseValues[baseValueName],
-        ),
+          changedBaseValues[baseValueName]
+        )
       );
     }
 
@@ -134,7 +134,7 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
 
     const combatBaseValueChanged: boolean = combatBaseValuesChangedAffectingCombatStats(
       baseValuesOld,
-      changedBaseValues,
+      changedBaseValues
     );
     let changedCombatSection: Partial<CombatSection> = {};
     if (combatBaseValueChanged) {
@@ -142,7 +142,7 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
         params.userId,
         params.pathParams["character-id"],
         characterSheet.combat,
-        { ...baseValuesOld, ...changedBaseValues },
+        { ...baseValuesOld, ...changedBaseValues }
       );
     }
 
@@ -225,10 +225,10 @@ function updateStartValue(attribute: Attribute, startValue: InitialNew): Attribu
 function updateCurrentValue(
   attribute: Attribute,
   currentValue: InitialIncreased,
-  attributePoints: CalculationPoints,
+  attributePoints: CalculationPoints
 ): { attribute: Attribute; attributePoints: CalculationPoints } {
   console.log(
-    `Update current value of the attribute from ${currentValue.initialValue} to ${currentValue.initialValue + currentValue.increasedPoints}`,
+    `Update current value of the attribute from ${currentValue.initialValue} to ${currentValue.initialValue + currentValue.increasedPoints}`
   );
 
   if (currentValue.increasedPoints <= 0) {

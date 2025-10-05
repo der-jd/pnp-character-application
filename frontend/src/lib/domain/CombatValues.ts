@@ -42,7 +42,7 @@ export class CombatValueCollection {
    */
   getMeleeCombatValues(): CombatValueViewModel[] {
     return Object.entries(this.combat.melee).map(([name, stats]) =>
-      this.createCombatValueViewModel(name, "melee", stats),
+      this.createCombatValueViewModel(name, "melee", stats)
     );
   }
 
@@ -51,7 +51,7 @@ export class CombatValueCollection {
    */
   getRangedCombatValues(): CombatValueViewModel[] {
     return Object.entries(this.combat.ranged).map(([name, stats]) =>
-      this.createCombatValueViewModel(name, "ranged", stats),
+      this.createCombatValueViewModel(name, "ranged", stats)
     );
   }
 

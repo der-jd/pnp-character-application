@@ -53,7 +53,7 @@ export class LevelUpUseCase implements UseCase<LevelUpInput, LevelUpOutput> {
         {
           initialLevel: input.currentLevel,
         },
-        input.idToken,
+        input.idToken
       );
 
       if (!updateResult.success) {

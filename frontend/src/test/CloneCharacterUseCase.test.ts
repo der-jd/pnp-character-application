@@ -79,7 +79,7 @@ describe("CloneCharacterUseCase", () => {
       expect(result.success).toBe(true);
       expect(mockCharacterService.cloneCharacter).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
-        TEST_SCENARIOS.VALID_ID_TOKEN,
+        TEST_SCENARIOS.VALID_ID_TOKEN
       );
     });
 

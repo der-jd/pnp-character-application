@@ -69,7 +69,7 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
             increasedPoints: 1,
           },
         },
-        input.idToken,
+        input.idToken
       );
 
       if (!updateResult.success) {

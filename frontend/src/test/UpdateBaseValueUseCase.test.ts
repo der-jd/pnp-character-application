@@ -120,7 +120,7 @@ describe("UpdateBaseValueUseCase", () => {
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         "healthPoints",
         35,
-        TEST_SCENARIOS.VALID_ID_TOKEN,
+        TEST_SCENARIOS.VALID_ID_TOKEN
       );
     });
 

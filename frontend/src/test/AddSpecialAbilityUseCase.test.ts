@@ -85,7 +85,7 @@ describe("AddSpecialAbilityUseCase", () => {
             },
           },
           historyRecord: null,
-        }),
+        })
       );
 
       const input = {
@@ -102,14 +102,14 @@ describe("AddSpecialAbilityUseCase", () => {
       expect(mockCharacterService.addSpecialAbility).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         "Special Ability",
-        TEST_SCENARIOS.VALID_ID_TOKEN,
+        TEST_SCENARIOS.VALID_ID_TOKEN
       );
     });
 
     it("should handle service errors gracefully", async () => {
       // Arrange
       vi.mocked(mockCharacterService.addSpecialAbility).mockResolvedValue(
-        createErrorResult("Special ability not found"),
+        createErrorResult("Special ability not found")
       );
 
       const input = {

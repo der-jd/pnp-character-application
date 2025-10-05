@@ -1,17 +1,14 @@
-import { 
-  Attribute, 
-  BaseValue, 
-  CharacterSheet, 
-  CombatStats, 
+import {
+  Attribute,
+  BaseValue,
+  CharacterSheet,
+  CombatStats,
   Skill,
   ATTRIBUTE_POINTS_FOR_CREATION,
   START_SKILLS,
-  combatSkills
+  combatSkills,
 } from "api-spec";
-import {
-  COST_CATEGORY_COMBAT_SKILLS,
-  COST_CATEGORY_DEFAULT,
-} from "./constants.js";
+import { COST_CATEGORY_COMBAT_SKILLS, COST_CATEGORY_DEFAULT } from "./constants.js";
 
 export function createEmptyCharacterSheet(): CharacterSheet {
   const zeroAttribute = (): Attribute => ({ start: 0, current: 0, mod: 0, totalCost: 0 });
@@ -19,19 +16,17 @@ export function createEmptyCharacterSheet(): CharacterSheet {
 
   const zeroSkill = (skillName: string, skillCategory?: string): Skill => {
     // Create the full skill name with category for START_SKILLS check
-    const fullSkillName = skillCategory ? `${skillCategory}/${skillName}` as any : null;
+    const fullSkillName = skillCategory ? (`${skillCategory}/${skillName}` as any) : null;
     const isStartSkill = fullSkillName ? START_SKILLS.includes(fullSkillName) : false;
     const isCombatSkill = combatSkills.some((skill: any) => skill.endsWith(`/${skillName}`));
-    
+
     return {
       activated: isStartSkill,
       start: 0,
       current: 0,
       mod: 0,
       totalCost: 0,
-      defaultCostCategory: isCombatSkill
-        ? COST_CATEGORY_COMBAT_SKILLS
-        : COST_CATEGORY_DEFAULT,
+      defaultCostCategory: isCombatSkill ? COST_CATEGORY_COMBAT_SKILLS : COST_CATEGORY_DEFAULT,
     };
   };
 

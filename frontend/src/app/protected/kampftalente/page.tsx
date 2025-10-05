@@ -46,7 +46,7 @@ export default function CombatValuesPage() {
 
 function transformCombatValuesToRows(
   input: Record<string, CombatStats>,
-  inputType: "ranged" | "melee",
+  inputType: "ranged" | "melee"
 ): ICombatValue[] {
   return Object.entries(input).map(([key, values]) => ({
     name: key,

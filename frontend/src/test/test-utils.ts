@@ -149,7 +149,7 @@ export function createApiErrorResult<T = unknown>(
   message: string,
   statusCode: number = 400,
   endpoint: string = "/test",
-  method: string = "GET",
+  method: string = "GET"
 ): Result<T, ApiError> {
   return ResultError(createApiError(message, statusCode, endpoint, method));
 }

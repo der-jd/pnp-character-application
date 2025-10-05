@@ -20,7 +20,7 @@ import { CharacterService } from "../../services/characterService";
 export class DeleteHistoryEntryUseCase implements UseCase<DeleteHistoryEntryInput, DeleteHistoryEntryOutput> {
   constructor(
     private readonly historyService: HistoryService,
-    private readonly characterService: CharacterService,
+    private readonly characterService: CharacterService
   ) {}
 
   async execute(input: DeleteHistoryEntryInput): Promise<Result<DeleteHistoryEntryOutput, Error>> {
@@ -48,7 +48,7 @@ export class DeleteHistoryEntryUseCase implements UseCase<DeleteHistoryEntryInpu
       const deleteResult = await this.historyService.deleteHistoryRecord(
         input.characterId,
         input.historyEntryId,
-        input.idToken,
+        input.idToken
       );
 
       if (!deleteResult.success) {

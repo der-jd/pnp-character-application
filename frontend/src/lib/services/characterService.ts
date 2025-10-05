@@ -105,12 +105,12 @@ export class CharacterService {
   async cloneCharacter(
     sourceCharacterId: string,
     cloneData: PostCharacterCloneRequest,
-    idToken: string,
+    idToken: string
   ): Promise<Result<PostCharacterCloneResponse, ApiError>> {
     return await this.apiClient.post<PostCharacterCloneResponse>(
       `characters/${sourceCharacterId}/clone`,
       cloneData,
-      idToken,
+      idToken
     );
   }
 
@@ -120,12 +120,12 @@ export class CharacterService {
   async addSpecialAbility(
     characterId: string,
     abilityData: PostSpecialAbilitiesRequest,
-    idToken: string,
+    idToken: string
   ): Promise<Result<PostSpecialAbilitiesResponse, ApiError>> {
     return await this.apiClient.post<PostSpecialAbilitiesResponse>(
       `characters/${characterId}/special-abilities`,
       abilityData,
-      idToken,
+      idToken
     );
   }
 
@@ -135,12 +135,12 @@ export class CharacterService {
   async updateCalculationPoints(
     characterId: string,
     updateData: PatchCalculationPointsRequest,
-    idToken: string,
+    idToken: string
   ): Promise<Result<PatchCalculationPointsResponse, ApiError>> {
     return await this.apiClient.patch<PatchCalculationPointsResponse>(
       `characters/${characterId}/calculation-points`,
       updateData,
-      idToken,
+      idToken
     );
   }
 
@@ -153,12 +153,12 @@ export class CharacterService {
     skillCategory: string,
     skillName: string,
     updateData: PatchSkillRequest,
-    idToken: string,
+    idToken: string
   ): Promise<Result<PatchSkillResponse, ApiError>> {
     return await this.apiClient.patch<PatchSkillResponse>(
       `characters/${characterId}/skills/${skillCategory}/${skillName}`,
       updateData,
-      idToken,
+      idToken
     );
   }
 
@@ -170,12 +170,12 @@ export class CharacterService {
     characterId: string,
     attributeName: string,
     updateData: PatchAttributeRequest,
-    idToken: string,
+    idToken: string
   ): Promise<Result<PatchAttributeResponse, ApiError>> {
     return await this.apiClient.patch<PatchAttributeResponse>(
       `characters/${characterId}/attributes/${attributeName}`,
       updateData,
-      idToken,
+      idToken
     );
   }
 
@@ -187,12 +187,12 @@ export class CharacterService {
     characterId: string,
     baseValueName: string,
     updateData: PatchBaseValueRequest,
-    idToken: string,
+    idToken: string
   ): Promise<Result<PatchBaseValueResponse, ApiError>> {
     return await this.apiClient.patch<PatchBaseValueResponse>(
       `characters/${characterId}/base-values/${baseValueName}`,
       updateData,
-      idToken,
+      idToken
     );
   }
 
@@ -205,12 +205,12 @@ export class CharacterService {
     combatType: string,
     combatSkillName: string,
     updateData: PatchCombatStatsRequest,
-    idToken: string,
+    idToken: string
   ): Promise<Result<PatchCombatStatsResponse, ApiError>> {
     return await this.apiClient.patch<PatchCombatStatsResponse>(
       `characters/${characterId}/combat-stats/${combatType}/${combatSkillName}`,
       updateData,
-      idToken,
+      idToken
     );
   }
 
@@ -221,7 +221,7 @@ export class CharacterService {
   async levelUp(
     characterId: string,
     levelUpData: PostLevelRequest,
-    idToken: string,
+    idToken: string
   ): Promise<Result<PostLevelResponse, ApiError>> {
     return await this.apiClient.post<PostLevelResponse>(`characters/${characterId}/level`, levelUpData, idToken);
   }

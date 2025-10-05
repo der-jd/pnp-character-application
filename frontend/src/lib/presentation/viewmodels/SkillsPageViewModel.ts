@@ -113,7 +113,7 @@ export function useSkillsPageViewModel() {
 
   const viewModel = useMemo(
     () => new SkillsPageViewModel(characterStore),
-    [characterStore], // Include characterStore in dependency array
+    [characterStore] // Include characterStore in dependency array
   );
 
   // For now, return the viewModel directly

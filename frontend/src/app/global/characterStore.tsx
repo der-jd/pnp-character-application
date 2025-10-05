@@ -223,7 +223,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       }));
 
       console.log(
-        `[Character store] Skill '${skillName}' increased successfully. Cost: ${result.data.costCalculation.cost} points`,
+        `[Character store] Skill '${skillName}' increased successfully. Cost: ${result.data.costCalculation.cost} points`
       );
       return true;
     } else {

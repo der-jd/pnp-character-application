@@ -71,8 +71,8 @@ export class ApiClient {
             (errorBody as { message?: string })?.message || `HTTP ${response.status}: ${response.statusText}`,
             response.status,
             config.endpoint,
-            config.method,
-          ),
+            config.method
+          )
         );
       }
 
@@ -84,8 +84,8 @@ export class ApiClient {
           error instanceof Error ? error.message : "Network request failed",
           0,
           config.endpoint,
-          config.method,
-        ),
+          config.method
+        )
       );
     }
   }

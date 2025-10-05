@@ -36,7 +36,7 @@ export class CloneCharacterUseCase implements UseCase<CloneCharacterInput, Clone
       const cloneResult = await this.characterService.cloneCharacter(
         input.sourceCharacterId,
         { userIdOfCharacter: sourceCharacter.userId },
-        input.idToken,
+        input.idToken
       );
 
       if (!cloneResult.success) {

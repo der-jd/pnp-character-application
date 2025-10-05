@@ -1,7 +1,7 @@
 import { UseCase, LoadHistoryInput, LoadHistoryOutput } from "./interfaces";
 import { Result, ResultSuccess, ResultError } from "../../types/result";
 import { HistoryService } from "../../services/historyService";
-import { GetHistoryResponse, Record as HistoryRecord } from "api-spec";
+import { GetHistoryResponse } from "api-spec";
 
 /**
  * Use Case for loading character history
@@ -70,23 +70,32 @@ export class LoadHistoryUseCase implements UseCase<LoadHistoryInput, LoadHistory
 
     return entries.map((entry, index: number) => ({
       id: entry.id || `entry-${index}`,
-      characterId: "", // Will be extracted from block level
-      changeType: String(entry.type) || "unknown",
+      characterId: entry.characterId || "",
+      changeType: entry.changeType || "unknown",
       changeDescription: this.formatChangeDescription(entry),
       timestamp: entry.timestamp || new Date().toISOString(),
-      isReverted: false, // Default value since not available in this structure
+      isReverted: entry.isReverted || false,
     }));
   }
 
   /**
    * Formats change description for display
    */
-  private formatChangeDescription(entry: HistoryRecord): string {
-    // Generate description based on record name and type
-    if (entry.name) {
-      return `${entry.type}: ${entry.name}`;
+  private formatChangeDescription(entry: any): string {
+    if (entry.changeDescription) {
+      return entry.changeDescription;
     }
 
-    return `${entry.type} change`;
+    // Generate description based on change type
+    switch (entry.changeType) {
+      case "skill_increase":
+        return `Increased ${entry.skillName || "skill"} to ${entry.newValue || "unknown"}`;
+      case "attribute_increase":
+        return `Increased ${entry.attributeName || "attribute"} to ${entry.newValue || "unknown"}`;
+      case "level_up":
+        return `Leveled up to level ${entry.newLevel || "unknown"}`;
+      default:
+        return "Character change";
+    }
   }
 }
