@@ -48,8 +48,8 @@ export const combatSkillsStartValuesSchema = z
       Object.keys(combatSkillsSchema.shape).map((skill) => [
         skill,
         z.number().int().min(MIN_INITIAL_COMBAT_SKILL_VALUE).max(MAX_INITIAL_COMBAT_SKILL_VALUE),
-      ]),
-    ),
+      ])
+    )
   )
   .strict();
 

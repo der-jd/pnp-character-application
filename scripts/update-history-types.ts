@@ -69,7 +69,7 @@ function main(): void {
     console.error("");
     console.error("This script updates record type numbers for DynamoDB history items in JSON format.");
     console.error(
-      "Copy the JSON data from the DynamoDB console and save it to a local file, then run this script with the file path as an argument.",
+      "Copy the JSON data from the DynamoDB console and save it to a local file, then run this script with the file path as an argument."
     );
     console.error("Copy the resulting updated JSON back to the DynamoDB console to update the item.");
     process.exit(1);

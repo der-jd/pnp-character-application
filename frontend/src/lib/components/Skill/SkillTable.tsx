@@ -6,7 +6,7 @@ import { ColumnDef, flexRender, getCoreRowModel, useReactTable, VisibilityState 
 import { Button } from "@lib/components/ui/button";
 import { Checkbox } from "@lib/components/ui/checkbox";
 import { ISkillProps, render_skill_icon } from "./SkillDefinitions";
-import { LearningMethod } from "@/src/lib/api/models/Character/character";
+import { LearningMethod } from "api-spec";
 import { useSkillUpdater } from "@/src/hooks/useSkillUpdate";
 import { useLoadingOverlay } from "@/src/app/global/OverlayContext";
 import { useCharacterStore } from "@/src/app/global/characterStore";
@@ -76,7 +76,7 @@ export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialD
               checked={skill.activated}
               onCheckedChange={(checked) => {
                 setData((prevData) =>
-                  prevData.map((item) => (item.name === skill.name ? { ...item, activated: Boolean(checked) } : item)),
+                  prevData.map((item) => (item.name === skill.name ? { ...item, activated: Boolean(checked) } : item))
                 );
               }}
               aria-label={`Set ${skill.name} as active`}

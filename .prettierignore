@@ -3,3 +3,8 @@ build/
 dist/
 .next/
 frontend/out/
+volume/
+
+# Terraform files (use tflint instead)
+*.tf
+terraform/

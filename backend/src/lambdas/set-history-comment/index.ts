@@ -48,7 +48,7 @@ export async function setHistoryComment(request: Request): Promise<APIGatewayPro
     await getCharacterItem(params.userId, params.pathParams["character-id"]);
 
     console.log(
-      `Set comment for history record ${params.pathParams["record-id"]} of character ${params.pathParams["character-id"]}`,
+      `Set comment for history record ${params.pathParams["record-id"]} of character ${params.pathParams["character-id"]}`
     );
     console.log(`Comment: ${params.body.comment}`);
 
@@ -59,7 +59,7 @@ export async function setHistoryComment(request: Request): Promise<APIGatewayPro
       items = await getHistoryItems(
         params.pathParams["character-id"],
         false, // Sort descending to get highest block number (latest item) first
-        1, // Only get the last item
+        1 // Only get the last item
       );
     }
 

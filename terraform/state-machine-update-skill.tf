@@ -63,7 +63,7 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
           statusCode      = "{% $states.result.statusCode %}",
           updateSkillBody = "{% $states.result.body %}"
         },
-        TimeoutSeconds = 5 // Timeout to avoid waiting for a stuck task
+        TimeoutSeconds = 15 // Timeout to avoid waiting for a stuck task
         Retry = [
           {
             // Retry in case of Lambda service exceptions
@@ -99,7 +99,7 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
         Choices = [
           {
             // The skill was not updated, so no history record is necessary
-            Condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}",
+            Condition = "{% $parse($updateSkillBody).changes.old = $parse($updateSkillBody).changes.new %}",
             Next      = "SuccessState"
           }
         ],
@@ -111,10 +111,10 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
         Resource      = module.add_history_record_lambda.lambda_function.arn,
         Arguments = {
           "pathParameters" = {
-            "character-id" = "{% $parse($states.input.body).characterId %}"
+            "character-id" = "{% $parse($updateSkillBody).characterId %}"
           },
           "body" = {
-            "userId" = "{% $parse($states.input.body).userId %}",
+            "userId" = "{% $parse($updateSkillBody).userId %}",
             "type"   = "6", // SKILL_CHANGED
             // Skill name pattern: "skillCategory/skillName"
             // e.g. "knowledge/history"
@@ -122,7 +122,7 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
             "data"           = "{% $parse($states.input.body).changes %}",
             "learningMethod" = "{% $parse($states.input.body).learningMethod ? $parse($states.input.body).learningMethod : null %}",
             "calculationPoints" = {
-              "adventurePoints" = "{% $parse($states.input.body).adventurePoints %}",
+              "adventurePoints" = "{% $parse($updateSkillBody).adventurePoints %}",
               "attributePoints" = null
             },
             "comment" = null
@@ -172,7 +172,8 @@ resource "aws_sfn_state_machine" "update_skill_state_machine" {
         Type          = "Succeed",
         QueryLanguage = "JSONata",
         Output = {
-          "statusCode" = "{% $statusCode %}",
+          "statusCode"   = "{% $statusCode %}",
+          "errorMessage" = "",
           /**
            * The content of "body" should be a stringified JSON to be consistent with output coming directly from a Lambda function.
            * The body of a Lambda function is always a stringified JSON object.
