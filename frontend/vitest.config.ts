@@ -9,6 +9,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
     css: true,
+
     // Include source files for coverage
     coverage: {
       provider: "v8",
@@ -35,7 +36,7 @@ export default defineConfig({
       "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
       "test/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
     ],
-    exclude: ["node_modules/", "dist/", ".next/", "coverage/"],
+    exclude: ["node_modules/", "dist/", ".next/", "coverage/", "**/src/test/api-schema/**"],
   },
   resolve: {
     alias: {
