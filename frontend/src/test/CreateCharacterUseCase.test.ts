@@ -44,7 +44,11 @@ describe("CreateCharacterUseCase", () => {
 
     it("should reject empty ID token", async () => {
       const result = await useCase.execute({
-        characterData: { name: "Test Character" },
+        characterData: {
+          generalInformation: { name: "Test Character" },
+          attributes: {},
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
         idToken: "",
       });
 
@@ -58,7 +62,11 @@ describe("CreateCharacterUseCase", () => {
   describe("Business Logic", () => {
     it("should validate character name is provided", async () => {
       const result = await useCase.execute({
-        characterData: { name: "" },
+        characterData: {
+          generalInformation: { name: "" },
+          attributes: {},
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
         idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
       });
 
@@ -73,7 +81,11 @@ describe("CreateCharacterUseCase", () => {
       vi.mocked(mockCharacterService.createCharacter).mockResolvedValue(createErrorResult("Character creation failed"));
 
       const input = {
-        characterData: { name: "Test Character" },
+        characterData: {
+          generalInformation: { name: "Test Character" },
+          attributes: {},
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
         idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
       };
 
@@ -83,7 +95,7 @@ describe("CreateCharacterUseCase", () => {
       // Assert
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain("Character creation failed");
+        expect(result.error.message).toContain("Failed to create character: Character creation failed");
       }
     });
   });

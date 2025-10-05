@@ -72,7 +72,17 @@ describe("AddSpecialAbilityUseCase", () => {
 
   describe("Business Logic", () => {
     it("should successfully add special ability when valid input provided", async () => {
-      // Arrange - Mock simple success response
+      // Arrange - Mock getCharacter calls (initial load and reload)
+      const mockCharacter = {
+        characterId: "test-char-123",
+        name: "Test Character",
+        level: 3,
+        specialAbilities: [],
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
+
+      // Mock addSpecialAbility success
       vi.mocked(mockCharacterService.addSpecialAbility).mockResolvedValue(
         createSuccessResult({
           data: {
@@ -101,13 +111,23 @@ describe("AddSpecialAbilityUseCase", () => {
       expect(result.success).toBe(true);
       expect(mockCharacterService.addSpecialAbility).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
-        "Special Ability",
+        { specialAbility: "Special Ability" },
         TEST_SCENARIOS.VALID_ID_TOKEN
       );
     });
 
     it("should handle service errors gracefully", async () => {
-      // Arrange
+      // Arrange - Mock getCharacter success first
+      const mockCharacter = {
+        characterId: "test-char-123",
+        name: "Test Character",
+        level: 1,
+        specialAbilities: [],
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
+
+      // Mock addSpecialAbility failure
       vi.mocked(mockCharacterService.addSpecialAbility).mockResolvedValue(
         createErrorResult("Special ability not found")
       );
@@ -124,7 +144,7 @@ describe("AddSpecialAbilityUseCase", () => {
       // Assert
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain("Special ability not found");
+        expect(result.error.message).toContain("Failed to add special ability");
       }
     });
   });

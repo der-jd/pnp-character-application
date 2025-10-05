@@ -84,7 +84,30 @@ describe("DeleteHistoryEntryUseCase", () => {
   describe("Business Logic", () => {
     it("should successfully delete history entry when valid input provided", async () => {
       // Arrange
-      vi.mocked(mockHistoryService.deleteHistoryRecord).mockResolvedValue(createSuccessResult({ success: true }));
+      const mockCharacter = {
+        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
+        name: "Test Character",
+        level: 3,
+      };
+
+      const updatedCharacter = {
+        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
+        name: "Test Character",
+        level: 2, // Reverted back after history deletion
+      };
+
+      // Mock getCharacter calls (initial load and reload after deletion)
+      vi.mocked(mockCharacterService.getCharacter)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .mockResolvedValueOnce(createSuccessResult(mockCharacter as any))
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .mockResolvedValueOnce(createSuccessResult(updatedCharacter as any));
+
+      // Mock deleteHistoryRecord
+      vi.mocked(mockHistoryService.deleteHistoryRecord).mockResolvedValue(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        createSuccessResult({ success: true } as any)
+      );
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
@@ -105,7 +128,16 @@ describe("DeleteHistoryEntryUseCase", () => {
     });
 
     it("should handle service errors gracefully", async () => {
-      // Arrange
+      // Arrange - Mock getCharacter success first
+      const mockCharacter = {
+        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
+        name: "Test Character",
+        level: 3,
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
+
+      // Mock deleteHistoryRecord failure
       vi.mocked(mockHistoryService.deleteHistoryRecord).mockResolvedValue(createErrorResult("History entry not found"));
 
       const input = {
@@ -120,7 +152,7 @@ describe("DeleteHistoryEntryUseCase", () => {
       // Assert
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain("History entry not found");
+        expect(result.error.message).toContain("Failed to delete history entry");
       }
     });
   });

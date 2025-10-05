@@ -58,14 +58,35 @@ describe("CloneCharacterUseCase", () => {
   describe("Business Logic", () => {
     it("should successfully clone character when valid input provided", async () => {
       // Arrange
-      const mockClonedCharacter = {
-        userId: TEST_SCENARIOS.VALID_USER_ID,
-        characterId: "new-character-id",
-        name: "Test Character (Clone)",
+      const sourceCharacter = {
+        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
+        userId: "user-123",
+        name: "Test Character",
         level: 1,
       };
 
-      vi.mocked(mockCharacterService.cloneCharacter).mockResolvedValue(createSuccessResult(mockClonedCharacter));
+      const cloneResponse = {
+        characterId: "cloned-char-456",
+        userId: "user-123",
+      };
+
+      const clonedCharacter = {
+        characterId: "cloned-char-456",
+        userId: "user-123",
+        name: "Test Character (Copy)",
+        level: 1,
+      };
+
+      // Mock getCharacter (source character)
+      vi.mocked(mockCharacterService.getCharacter)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .mockResolvedValueOnce(createSuccessResult(sourceCharacter as any))
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .mockResolvedValueOnce(createSuccessResult(clonedCharacter as any));
+
+      // Mock cloneCharacter
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.cloneCharacter).mockResolvedValue(createSuccessResult(cloneResponse as any));
 
       const input = {
         sourceCharacterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
@@ -79,12 +100,23 @@ describe("CloneCharacterUseCase", () => {
       expect(result.success).toBe(true);
       expect(mockCharacterService.cloneCharacter).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
+        { userIdOfCharacter: "user-123" },
         TEST_SCENARIOS.VALID_ID_TOKEN
       );
     });
 
     it("should handle service errors gracefully", async () => {
-      // Arrange
+      // Arrange - Mock getCharacter success first
+      const sourceCharacter = {
+        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
+        userId: "user-123",
+        name: "Test Character",
+        level: 1,
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(sourceCharacter as any));
+
+      // Mock cloneCharacter failure
       vi.mocked(mockCharacterService.cloneCharacter).mockResolvedValue(createErrorResult("Character not found"));
 
       const input = {
@@ -98,7 +130,7 @@ describe("CloneCharacterUseCase", () => {
       // Assert
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain("Character not found");
+        expect(result.error.message).toContain("Failed to clone character");
       }
     });
   });

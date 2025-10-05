@@ -52,7 +52,7 @@ describe("LevelUpUseCase", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain("Level must be positive");
+        expect(result.error.message).toContain("Invalid current level");
       }
     });
 
@@ -73,6 +73,18 @@ describe("LevelUpUseCase", () => {
   describe("Error Handling", () => {
     it("should handle service errors gracefully", async () => {
       // Arrange
+      const mockCharacter = {
+        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
+        level: 1,
+        generalInformation: { name: "Test Character" },
+      };
+
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue({
+        success: true,
+        data: mockCharacter,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
+
       vi.mocked(mockCharacterService.levelUp).mockResolvedValue(createErrorResult("Level up failed"));
 
       const input = {
@@ -87,7 +99,7 @@ describe("LevelUpUseCase", () => {
       // Assert
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain("Level up failed");
+        expect(result.error.message).toContain("Failed to level up character: Level up failed");
       }
     });
   });

@@ -82,7 +82,7 @@ describe("UpdateBaseValueUseCase", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain("must be non-negative");
+        expect(result.error.message).toContain("Base value cannot be negative");
       }
     });
   });
@@ -90,19 +90,32 @@ describe("UpdateBaseValueUseCase", () => {
   describe("Business Logic", () => {
     it("should successfully update base value when valid input provided", async () => {
       // Arrange
-      const mockResponse = {
-        data: {
-          characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
-          userId: TEST_SCENARIOS.VALID_USER_ID,
-          baseValueName: "healthPoints",
-          changes: {
-            old: { baseValue: { current: 30 } },
-            new: { baseValue: { current: 35 } },
-          },
+      const mockCharacter = {
+        characterId: "test-char-123",
+        name: "Test Character",
+        level: 3,
+        baseValues: {
+          getBaseValue: vi.fn().mockReturnValue({ current: 30, start: 30, mod: 0 }),
+          healthPoints: { current: 30, start: 30, mod: 0 },
         },
       };
 
-      vi.mocked(mockCharacterService.updateBaseValue).mockResolvedValue(createSuccessResult(mockResponse));
+      const mockUpdatedCharacter = {
+        characterId: "test-char-123",
+        name: "Test Character",
+        level: 3,
+        baseValues: {
+          healthPoints: { current: 35, start: 30, mod: 5 },
+        },
+      };
+
+      // Mock getCharacter and updateBaseValue
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
+      vi.mocked(mockCharacterService.updateBaseValue).mockResolvedValue(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        createSuccessResult(mockUpdatedCharacter as any)
+      );
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
@@ -119,13 +132,25 @@ describe("UpdateBaseValueUseCase", () => {
       expect(mockCharacterService.updateBaseValue).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         "healthPoints",
-        35,
+        { start: { initialValue: undefined, newValue: 35 } },
         TEST_SCENARIOS.VALID_ID_TOKEN
       );
     });
 
     it("should handle service errors gracefully", async () => {
-      // Arrange
+      // Arrange - Mock getCharacter success first
+      const mockCharacter = {
+        characterId: "test-char-123",
+        name: "Test Character",
+        level: 3,
+        baseValues: {
+          getBaseValue: vi.fn().mockReturnValue({ current: 30, start: 30, mod: 0 }),
+        },
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
+
+      // Mock updateBaseValue failure
       vi.mocked(mockCharacterService.updateBaseValue).mockResolvedValue(createErrorResult("Update failed"));
 
       const input = {
@@ -141,7 +166,7 @@ describe("UpdateBaseValueUseCase", () => {
       // Assert
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain("Update failed");
+        expect(result.error.message).toContain("Failed to update base value");
       }
     });
   });

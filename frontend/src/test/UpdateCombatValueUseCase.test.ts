@@ -86,11 +86,25 @@ describe("UpdateCombatValueUseCase", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain("must be non-negative");
+        expect(result.error.message).toContain("Combat value cannot be negative");
       }
     });
 
     it("should validate combat type", async () => {
+      const mockCharacter = {
+        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
+        adventurePoints: 100,
+        combatValues: {
+          getCombatValue: vi.fn().mockReturnValue(null), // Invalid combat type returns null
+        },
+      };
+
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue({
+        success: true,
+        data: mockCharacter,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
+
       const result = await useCase.execute({
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
         combatType: "invalid",
@@ -101,7 +115,7 @@ describe("UpdateCombatValueUseCase", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain("Combat type must be melee or ranged");
+        expect(result.error.message).toContain("Combat value 'swords' not found on character");
       }
     });
   });
@@ -109,6 +123,23 @@ describe("UpdateCombatValueUseCase", () => {
   describe("Error Handling", () => {
     it("should handle service errors gracefully", async () => {
       // Arrange
+      const mockCharacter = {
+        characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
+        adventurePoints: 100,
+        combatValues: {
+          getCombatValue: vi.fn().mockReturnValue({
+            attackValue: 5,
+            skilledParadeValue: 3,
+          }),
+        },
+      };
+
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue({
+        success: true,
+        data: mockCharacter,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
+
       vi.mocked(mockCharacterService.updateCombatStats).mockResolvedValue(createErrorResult("Combat update failed"));
 
       const input = {
@@ -125,7 +156,7 @@ describe("UpdateCombatValueUseCase", () => {
       // Assert
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain("Combat update failed");
+        expect(result.error.message).toContain("Failed to update combat value: Combat update failed");
       }
     });
   });

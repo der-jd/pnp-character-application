@@ -18,6 +18,7 @@ workflows:
       - lint-typescript-code
       - build-backend
       - run-backend-tests
+      - run-frontend-tests
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
           requires:
@@ -25,6 +26,7 @@ workflows:
             - lint-typescript-code
             - build-backend
             - run-backend-tests
+            - run-frontend-tests
             - lint-terraform-code
       - build-and-deploy-frontend:
           requires:
@@ -113,6 +115,31 @@ jobs:
           command: |
             cd backend
             npm run test
+
+  run-frontend-tests:
+    docker:
+      - image: cimg/node:22.10
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - run:
+          name: Build api-spec package
+          command: |
+            cd api-spec
+            npm run build
+      - run:
+          name: Install frontend dependencies
+          command: |
+            cd frontend
+            npm ci
+      - run:
+          name: Run frontend tests
+          command: |
+            cd frontend
+            npm run test:run
 
   lint-terraform-code:
     docker:

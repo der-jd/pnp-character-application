@@ -65,7 +65,7 @@ describe("UpdateAttributeUseCase", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toBe("Attribute value must be positive");
+        expect(result.error.message).toBe("Attribute value cannot be negative");
       }
     });
 
@@ -88,16 +88,32 @@ describe("UpdateAttributeUseCase", () => {
     it("should successfully update attribute when valid input provided", async () => {
       // Arrange
       const mockCharacter = {
-        userId: "test-user",
-        characterId: "test-char",
-        characterSheet: {
-          generalInformation: { name: "Test Character", level: 1 },
-          attributes: { strength: { current: 10 } },
+        characterId: "test-char-123",
+        name: "Test Character",
+        level: 3,
+        attributes: {
+          getAttribute: vi.fn().mockReturnValue({
+            currentValue: 10,
+            name: "strength",
+          }),
         },
+        attributePoints: 20,
       };
 
-      mockCharacterService.getCharacter.mockResolvedValue(createSuccessResult(mockCharacter));
-      mockCharacterService.updateAttribute.mockResolvedValue(createSuccessResult({ success: true }));
+      const mockUpdatedCharacter = {
+        characterId: "test-char-123",
+        name: "Test Character",
+        level: 3,
+        attributes: { strength: { current: 12 } },
+      };
+
+      // Mock getCharacter and updateAttribute
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
+      vi.mocked(mockCharacterService.updateAttribute).mockResolvedValue(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        createSuccessResult(mockUpdatedCharacter as any)
+      );
 
       // Act
       const result = await useCase.execute({
@@ -112,14 +128,14 @@ describe("UpdateAttributeUseCase", () => {
       expect(mockCharacterService.updateAttribute).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         "strength",
-        { targetValue: 12 },
+        { current: { increasedPoints: 2, initialValue: 10 } },
         TEST_SCENARIOS.VALID_ID_TOKEN
       );
     });
 
     it("should handle character loading failure", async () => {
       // Arrange
-      mockCharacterService.getCharacter.mockResolvedValue(createErrorResult("Character not found"));
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createErrorResult("Character not found"));
 
       // Act
       const result = await useCase.execute({
@@ -138,9 +154,23 @@ describe("UpdateAttributeUseCase", () => {
 
     it("should handle attribute update failure", async () => {
       // Arrange
-      const mockCharacter = { characterId: "test" };
-      mockCharacterService.getCharacter.mockResolvedValue(createSuccessResult(mockCharacter));
-      mockCharacterService.updateAttribute.mockResolvedValue(createErrorResult("Insufficient attribute points"));
+      const mockCharacter = {
+        characterId: "test-char-123",
+        name: "Test Character",
+        level: 3,
+        attributes: {
+          getAttribute: vi.fn().mockReturnValue({
+            currentValue: 10,
+            name: "strength",
+          }),
+        },
+        attributePoints: 20,
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
+      vi.mocked(mockCharacterService.updateAttribute).mockResolvedValue(
+        createErrorResult("Insufficient attribute points")
+      );
 
       // Act
       const result = await useCase.execute({
@@ -161,7 +191,7 @@ describe("UpdateAttributeUseCase", () => {
   describe("Error Handling", () => {
     it("should handle unexpected errors gracefully", async () => {
       // Arrange
-      mockCharacterService.getCharacter.mockRejectedValue(new Error("Network timeout"));
+      vi.mocked(mockCharacterService.getCharacter).mockRejectedValue(new Error("Network timeout"));
 
       // Act
       const result = await useCase.execute({
