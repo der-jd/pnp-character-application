@@ -130,11 +130,7 @@ jobs:
           command: |
             cd api-spec
             npm run build
-      - run:
-          name: Install frontend dependencies
-          command: |
-            cd frontend
-            npm ci
+
       - run:
           name: Run frontend tests
           command: |
