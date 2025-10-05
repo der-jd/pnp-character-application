@@ -45,7 +45,7 @@ workflows:
 jobs:
   check-format-files:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: small
     steps:
       - checkout
@@ -54,33 +54,33 @@ jobs:
           command: npm cache clean --force
       - run:
           name: Install dependencies
-          command: npm ci
+          command: npm ci --ignore-scripts
       - run:
           name: Check file formatting
           command: npm run check-format
 
   lint-typescript-code:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: small
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: npm ci
+          command: npm ci --ignore-scripts
       - run:
           name: Lint TypeScript code
           command: npm run lint
 
   build-backend:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: medium
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: npm ci
+          command: npm ci --ignore-scripts
       - run:
           name: Build api-spec package
           command: |
@@ -98,13 +98,13 @@ jobs:
 
   run-backend-tests:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: medium
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: npm ci
+          command: npm ci --ignore-scripts
       - run:
           name: Build api-spec package
           command: |
@@ -118,13 +118,13 @@ jobs:
 
   run-frontend-tests:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: medium
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: npm ci
+          command: npm ci --ignore-scripts
       - run:
           name: Build api-spec package
           command: |
@@ -134,7 +134,7 @@ jobs:
           name: Install frontend dependencies
           command: |
             cd frontend
-            npm ci
+            npm ci --ignore-scripts
       - run:
           name: Run frontend tests
           command: |
@@ -143,7 +143,7 @@ jobs:
 
   lint-terraform-code:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: small
     steps:
       - checkout
@@ -201,7 +201,7 @@ jobs:
 
   build-and-deploy-frontend:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: medium
     steps:
       - checkout
@@ -211,7 +211,7 @@ jobs:
           role_arn: "$AWS_ROLE_ARN"
       - run:
           name: Install dependencies
-          command: npm ci
+          command: npm ci --ignore-scripts
       - run:
           name: Prepare cache restoring
           command: |
@@ -245,7 +245,7 @@ jobs:
 
   run-api-schema-tests:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: medium
     steps:
       - checkout
@@ -253,7 +253,7 @@ jobs:
           at: ~/project
       - run:
           name: Install dependencies
-          command: npm ci
+          command: npm ci --ignore-scripts
       - run:
           name: Run API schema tests
           command: |
