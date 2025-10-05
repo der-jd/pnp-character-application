@@ -54,7 +54,7 @@ jobs:
           command: npm cache clean --force
       - run:
           name: Install dependencies
-          command: npm ci --ignore-scripts
+          command: npm ci
       - run:
           name: Check file formatting
           command: npm run check-format
@@ -67,7 +67,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm ci --ignore-scripts
+          command: npm ci
       - run:
           name: Lint TypeScript code
           command: npm run lint
@@ -80,7 +80,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm ci --ignore-scripts
+          command: npm ci
       - run:
           name: Build api-spec package
           command: |
@@ -104,7 +104,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm ci --ignore-scripts
+          command: npm ci
       - run:
           name: Build api-spec package
           command: |
@@ -124,7 +124,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm ci --ignore-scripts
+          command: npm ci
       - run:
           name: Build api-spec package
           command: |
@@ -134,7 +134,7 @@ jobs:
           name: Install frontend dependencies
           command: |
             cd frontend
-            npm ci --ignore-scripts
+            npm ci
       - run:
           name: Run frontend tests
           command: |
@@ -211,7 +211,7 @@ jobs:
           role_arn: "$AWS_ROLE_ARN"
       - run:
           name: Install dependencies
-          command: npm ci --ignore-scripts
+          command: npm ci
       - run:
           name: Prepare cache restoring
           command: |
@@ -253,7 +253,7 @@ jobs:
           at: ~/project
       - run:
           name: Install dependencies
-          command: npm ci --ignore-scripts
+          command: npm ci
       - run:
           name: Run API schema tests
           command: |
