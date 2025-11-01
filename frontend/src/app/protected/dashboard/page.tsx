@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useCharacterStore } from "@/src/app/global/characterStore";
-import { useAuth } from "@/src/app/global/AuthContext";
+import { useAuthState } from "@/src/app/global/AuthContext";
 import { Button } from "@/src/lib/components/ui/button";
 import { useRouter } from "next/navigation";
 
@@ -10,16 +10,16 @@ export default function Dashboard() {
   const { availableCharacters, updateAvailableCharacters, toggleEdit, updateCharacter, setSelectedCharacter } =
     useCharacterStore();
   const isEditMode = useCharacterStore((state) => state.editMode);
-  const { idToken } = useAuth();
+  const { tokens } = useAuthState();
   const [shareOpenId, setShareOpenId] = useState<string | null>(null);
   const [shareEmail, setShareEmail] = useState("");
   const router = useRouter();
 
   useEffect(() => {
-    if (idToken) {
-      updateAvailableCharacters(idToken);
+    if (tokens?.idToken) {
+      updateAvailableCharacters(tokens.idToken);
     }
-  }, [idToken, updateAvailableCharacters]);
+  }, [tokens?.idToken, updateAvailableCharacters]);
 
   const handleShareToggle = (id: string) => {
     if (shareOpenId === id) {
@@ -37,10 +37,10 @@ export default function Dashboard() {
   };
 
   const handleEdit = (charId: string) => {
-    if (!idToken) {
+    if (!tokens?.idToken) {
       return; // TODO Show Error Toast
     }
-    updateCharacter(idToken, charId);
+    updateCharacter(tokens.idToken, charId);
     setSelectedCharacter(charId);
 
     if (!isEditMode) {

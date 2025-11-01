@@ -4,7 +4,7 @@ import { useCharacterStore } from "@/src/app/global/characterStore";
 import { useState } from "react";
 import AsyncSelect from "react-select/async";
 import { Button } from "../../ui/button";
-import { useAuth } from "@/src/app/global/AuthContext";
+import { useAuthState } from "@/src/app/global/AuthContext";
 import { useSkillUpdater } from "@/src/hooks/useSkillUpdate";
 import { useLoadingOverlay } from "@/src/app/global/OverlayContext";
 
@@ -22,7 +22,6 @@ export type LevelUpOption = {
 
 const CharacterInfoContent: React.FC = () => {
   const [selectedValue, selectValue] = useState<string>("");
-
   const setSelectedCharacter = useCharacterStore((state) => state.setSelectedCharacter);
   const updateAvailableCharacters = useCharacterStore((state) => state.updateAvailableCharacters);
   const updateCharacter = useCharacterStore((state) => state.updateCharacter);
@@ -33,7 +32,7 @@ const CharacterInfoContent: React.FC = () => {
   const { show, hide } = useLoadingOverlay();
   const [apInput, setApInput] = useState(0);
   const [epInput, setEpInput] = useState(0);
-  const idToken = useAuth().idToken;
+  const { tokens } = useAuthState();
   const [modifiedTile, setModifiedTile] = useState<{ key: string; value: number } | null>(null);
 
   const loadCharacterOptions = async (idToken: string) => {
@@ -49,8 +48,8 @@ const CharacterInfoContent: React.FC = () => {
   const promiseCharacterOptions = () =>
     new Promise<CharacterOptions[]>((resolve) => {
       setTimeout(async () => {
-        if (idToken) {
-          const options = await loadCharacterOptions(idToken);
+        if (tokens?.idToken) {
+          const options = await loadCharacterOptions(tokens.idToken);
           resolve(options);
         } else {
           resolve([]);
@@ -78,8 +77,8 @@ const CharacterInfoContent: React.FC = () => {
   };
 
   const loadCharacter = async () => {
-    if (idToken) {
-      updateCharacter(idToken, selectedValue);
+    if (tokens?.idToken) {
+      updateCharacter(tokens.idToken, selectedValue);
     }
   };
 

@@ -8,6 +8,7 @@ import type {
 
 import { ApiClient } from "./apiClient";
 import { Result, ApiError } from "../types/result";
+import { featureLogger } from "../utils/featureLogger";
 
 /**
  * Service for managing character history records
@@ -18,13 +19,25 @@ export class HistoryService {
 
   constructor(apiClient?: ApiClient) {
     this.apiClient = apiClient || new ApiClient();
+    featureLogger.debug('service', 'HistoryService', 'Service initialized');
   }
 
   /**
    * Retrieves the complete history for a character
    */
   async getHistory(characterId: string, idToken: string): Promise<Result<GetHistoryResponse, ApiError>> {
-    return await this.apiClient.get<GetHistoryResponse>(`characters/${characterId}/history`, idToken);
+    featureLogger.debug('service', 'HistoryService', 'Getting history for character:', characterId);
+    
+    const result = await this.apiClient.get<GetHistoryResponse>(`characters/${characterId}/history`, idToken);
+    
+    if (result.success) {
+      const recordCount = HistoryService.extractRecordsFromHistory(result.data).length;
+      featureLogger.info('service', 'HistoryService', 'History loaded, records:', recordCount);
+    } else {
+      featureLogger.error('HistoryService', 'Failed to get history:', result.error);
+    }
+    
+    return result;
   }
 
   /**
@@ -35,10 +48,20 @@ export class HistoryService {
     blockNumber: number,
     idToken: string
   ): Promise<Result<GetHistoryResponse, ApiError>> {
-    return await this.apiClient.get<GetHistoryResponse>(
+    featureLogger.debug('service', 'HistoryService', `Getting history block ${blockNumber} for:`, characterId);
+    
+    const result = await this.apiClient.get<GetHistoryResponse>(
       `characters/${characterId}/history?block=${blockNumber}`,
       idToken
     );
+    
+    if (result.success) {
+      featureLogger.info('service', 'HistoryService', 'History block loaded:', blockNumber);
+    } else {
+      featureLogger.error('HistoryService', 'Failed to get history block:', result.error);
+    }
+    
+    return result;
   }
 
   /**
@@ -49,10 +72,20 @@ export class HistoryService {
     entryId: string,
     idToken: string
   ): Promise<Result<DeleteHistoryRecordResponse, ApiError>> {
-    return await this.apiClient.delete<DeleteHistoryRecordResponse>(
+    featureLogger.debug('service', 'HistoryService', 'Deleting history record:', entryId);
+    
+    const result = await this.apiClient.delete<DeleteHistoryRecordResponse>(
       `characters/${characterId}/history/${entryId}`,
       idToken
     );
+    
+    if (result.success) {
+      featureLogger.info('service', 'HistoryService', 'History record deleted:', entryId);
+    } else {
+      featureLogger.error('HistoryService', 'Failed to delete history record:', result.error);
+    }
+    
+    return result;
   }
 
   /**
@@ -64,11 +97,21 @@ export class HistoryService {
     updateData: PatchHistoryRecordRequest,
     idToken: string
   ): Promise<Result<PatchHistoryRecordResponse, ApiError>> {
-    return await this.apiClient.patch<PatchHistoryRecordResponse>(
+    featureLogger.debug('service', 'HistoryService', 'Updating history record:', entryId);
+    
+    const result = await this.apiClient.patch<PatchHistoryRecordResponse>(
       `characters/${characterId}/history/${entryId}`,
       updateData,
       idToken
     );
+    
+    if (result.success) {
+      featureLogger.info('service', 'HistoryService', 'History record updated:', entryId);
+    } else {
+      featureLogger.error('HistoryService', 'Failed to update history record:', result.error);
+    }
+    
+    return result;
   }
 
   /**

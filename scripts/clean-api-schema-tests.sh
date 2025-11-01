@@ -9,55 +9,42 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCHEMA_TESTING_DIR="$PROJECT_ROOT/terraform/api-schema-testing"
 
 # Colors for output
-RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 print_step() {
-    echo -e "${BLUE}==> $1${NC}"
+    echo -e "${BLUE}▸ $1${NC}"
 }
 
 print_success() {
-    echo -e "${GREEN}[+] $1${NC}"
+    echo -e "${GREEN}✓ $1${NC}"
 }
 
-print_warning() {
-    echo -e "${YELLOW}[!] $1${NC}"
-}
+echo ""
+print_step "Cleaning up LocalStack testing environment..."
 
-echo "*** API Schema Testing Cleanup ***"
-echo "=================================="
-
-# Stop LocalStack container
-print_step "Stopping LocalStack container..."
-if docker ps | grep -q localstack; then
-    docker compose -f "$PROJECT_ROOT/docker-compose.localstack.yml" down
-    print_success "LocalStack container stopped"
-else
-    print_warning "LocalStack container not running"
+# Stop LocalStack containers and remove volumes
+if docker ps -a | grep -q localstack; then
+    docker compose -f "$PROJECT_ROOT/docker-compose.localstack.yml" down --volumes 2>/dev/null || true
+    print_success "Stopped containers and removed volumes"
 fi
 
-# Remove testing directory
+# Remove Terraform testing directory
 if [ -d "$SCHEMA_TESTING_DIR" ]; then
-    print_step "Removing API schema testing directory..."
     rm -rf "$SCHEMA_TESTING_DIR"
-    print_success "Testing directory removed"
-else
-    print_warning "Testing directory not found"
+    print_success "Removed Terraform testing directory"
 fi
 
 # Remove environment file
 if [ -f "$PROJECT_ROOT/frontend/.env.api-testing" ]; then
-    print_step "Removing environment file..."
     rm -f "$PROJECT_ROOT/frontend/.env.api-testing"
-    print_success "Environment file removed"
-else
-    print_warning "Environment file not found"
+    print_success "Removed environment file"
 fi
 
+# Clean up any orphaned Docker volumes
+docker volume prune -f > /dev/null 2>&1 || true
+
 echo ""
-print_success "API schema testing environment cleaned up!"
+print_success "Cleanup complete!"
 echo ""
-print_step "You can now run 'npm run api-schema-tests:setup' to recreate the testing environment"

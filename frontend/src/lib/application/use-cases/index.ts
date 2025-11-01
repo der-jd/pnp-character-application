@@ -15,3 +15,4 @@ export { CreateCharacterUseCase } from "./CreateCharacterUseCase";
 export { CloneCharacterUseCase } from "./CloneCharacterUseCase";
 export { UpdateCalculationPointsUseCase } from "./UpdateCalculationPointsUseCase";
 export { AddSpecialAbilityUseCase } from "./AddSpecialAbilityUseCase";
+export { SignInUseCase } from "./SignInUseCase";

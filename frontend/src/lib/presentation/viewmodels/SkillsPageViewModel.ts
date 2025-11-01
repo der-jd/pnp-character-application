@@ -92,7 +92,8 @@ export class SkillsPageViewModel {
       modifier: skill.mod || 0,
       isActivated: skill.activated || false,
       totalCost: skill.totalCost || 0,
-      defaultCostCategory: skill.defaultCostCategory || "NORMAL",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      defaultCostCategory: skill.defaultCostCategory as any,
     }));
   }
 

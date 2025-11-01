@@ -26,6 +26,7 @@ import type {
 import { Character } from "../domain/Character";
 import { ApiClient } from "./apiClient";
 import { Result, ApiError } from "../types/result";
+import { featureLogger } from "../utils/featureLogger";
 
 /**
  * Service for managing character data and operations
@@ -36,20 +37,25 @@ export class CharacterService {
 
   constructor(apiClient?: ApiClient) {
     this.apiClient = apiClient || new ApiClient();
+    featureLogger.debug('service', 'CharacterService', 'Service initialized');
   }
 
   /**
    * Retrieves a single character by ID
    */
   async getCharacter(characterId: string, idToken: string): Promise<Result<Character, ApiError>> {
+    featureLogger.debug('service', 'CharacterService', 'Getting character:', characterId);
+    
     const result = await this.apiClient.get<GetCharacterResponse>(`characters/${characterId}`, idToken);
 
     if (!result.success) {
+      featureLogger.error('CharacterService', 'Failed to get character:', result.error);
       return result;
     }
 
     // GetCharacterResponse is directly a Character (api-spec)
     const character = Character.fromApiData(result.data);
+    featureLogger.info('service', 'CharacterService', 'Character loaded:', character.name);
     return { success: true, data: character };
   }
 
@@ -57,9 +63,12 @@ export class CharacterService {
    * Retrieves all characters for the current user
    */
   async getAllCharacters(idToken: string): Promise<Result<Character[], ApiError>> {
+    featureLogger.debug('service', 'CharacterService', 'Getting all characters');
+    
     const result = await this.apiClient.get<GetCharactersResponse>("characters?character-short=true", idToken);
 
     if (!result.success) {
+      featureLogger.error('CharacterService', 'Failed to get all characters:', result.error);
       return result;
     }
 
@@ -68,6 +77,7 @@ export class CharacterService {
       .filter((apiChar): apiChar is ApiCharacter => "characterSheet" in apiChar)
       .map((apiChar) => Character.fromApiData(apiChar));
 
+    featureLogger.info('service', 'CharacterService', 'Loaded characters:', characters.length);
     return { success: true, data: characters };
   }
 
@@ -75,13 +85,17 @@ export class CharacterService {
    * Creates a new character
    */
   async createCharacter(characterData: PostCharactersRequest, idToken: string): Promise<Result<Character, ApiError>> {
+    featureLogger.debug('service', 'CharacterService', 'Creating character:', characterData.generalInformation.name);
+    
     const result = await this.apiClient.post<PostCharactersResponse>("characters", characterData, idToken);
 
     if (!result.success) {
+      featureLogger.error('CharacterService', 'Failed to create character:', result.error);
       return result;
     }
 
     const character = Character.fromApiData(result.data.data.changes.new.character);
+    featureLogger.info('service', 'CharacterService', 'Character created:', character.characterId);
     return { success: true, data: character };
   }
 
@@ -89,12 +103,16 @@ export class CharacterService {
    * Deletes a character by ID
    */
   async deleteCharacter(characterId: string, idToken: string): Promise<Result<void, ApiError>> {
+    featureLogger.debug('service', 'CharacterService', 'Deleting character:', characterId);
+    
     const result = await this.apiClient.delete<DeleteCharacterResponse>(`characters/${characterId}`, idToken);
 
     if (!result.success) {
+      featureLogger.error('CharacterService', 'Failed to delete character:', result.error);
       return result;
     }
 
+    featureLogger.info('service', 'CharacterService', 'Character deleted:', characterId);
     return { success: true, data: undefined };
   }
 
@@ -107,11 +125,21 @@ export class CharacterService {
     cloneData: PostCharacterCloneRequest,
     idToken: string
   ): Promise<Result<PostCharacterCloneResponse, ApiError>> {
-    return await this.apiClient.post<PostCharacterCloneResponse>(
+    featureLogger.debug('service', 'CharacterService', 'Cloning character:', sourceCharacterId);
+    
+    const result = await this.apiClient.post<PostCharacterCloneResponse>(
       `characters/${sourceCharacterId}/clone`,
       cloneData,
       idToken
     );
+    
+    if (result.success) {
+      featureLogger.info('service', 'CharacterService', 'Character cloned successfully');
+    } else {
+      featureLogger.error('CharacterService', 'Failed to clone character:', result.error);
+    }
+    
+    return result;
   }
 
   /**
@@ -122,11 +150,21 @@ export class CharacterService {
     abilityData: PostSpecialAbilitiesRequest,
     idToken: string
   ): Promise<Result<PostSpecialAbilitiesResponse, ApiError>> {
-    return await this.apiClient.post<PostSpecialAbilitiesResponse>(
+    featureLogger.debug('service', 'CharacterService', 'Adding special ability to:', characterId);
+    
+    const result = await this.apiClient.post<PostSpecialAbilitiesResponse>(
       `characters/${characterId}/special-abilities`,
       abilityData,
       idToken
     );
+    
+    if (result.success) {
+      featureLogger.info('service', 'CharacterService', 'Special ability added');
+    } else {
+      featureLogger.error('CharacterService', 'Failed to add special ability:', result.error);
+    }
+    
+    return result;
   }
 
   /**
@@ -137,11 +175,21 @@ export class CharacterService {
     updateData: PatchCalculationPointsRequest,
     idToken: string
   ): Promise<Result<PatchCalculationPointsResponse, ApiError>> {
-    return await this.apiClient.patch<PatchCalculationPointsResponse>(
+    featureLogger.debug('service', 'CharacterService', 'Updating calculation points:', characterId);
+    
+    const result = await this.apiClient.patch<PatchCalculationPointsResponse>(
       `characters/${characterId}/calculation-points`,
       updateData,
       idToken
     );
+    
+    if (result.success) {
+      featureLogger.info('service', 'CharacterService', 'Calculation points updated');
+    } else {
+      featureLogger.error('CharacterService', 'Failed to update calculation points:', result.error);
+    }
+    
+    return result;
   }
 
   /**
@@ -155,11 +203,21 @@ export class CharacterService {
     updateData: PatchSkillRequest,
     idToken: string
   ): Promise<Result<PatchSkillResponse, ApiError>> {
-    return await this.apiClient.patch<PatchSkillResponse>(
+    featureLogger.debug('service', 'CharacterService', `Updating skill ${skillCategory}/${skillName}:`, characterId);
+    
+    const result = await this.apiClient.patch<PatchSkillResponse>(
       `characters/${characterId}/skills/${skillCategory}/${skillName}`,
       updateData,
       idToken
     );
+    
+    if (result.success) {
+      featureLogger.info('service', 'CharacterService', 'Skill updated:', skillName);
+    } else {
+      featureLogger.error('CharacterService', 'Failed to update skill:', result.error);
+    }
+    
+    return result;
   }
 
   /**
@@ -172,11 +230,21 @@ export class CharacterService {
     updateData: PatchAttributeRequest,
     idToken: string
   ): Promise<Result<PatchAttributeResponse, ApiError>> {
-    return await this.apiClient.patch<PatchAttributeResponse>(
+    featureLogger.debug('service', 'CharacterService', 'Updating attribute:', attributeName);
+    
+    const result = await this.apiClient.patch<PatchAttributeResponse>(
       `characters/${characterId}/attributes/${attributeName}`,
       updateData,
       idToken
     );
+    
+    if (result.success) {
+      featureLogger.info('service', 'CharacterService', 'Attribute updated:', attributeName);
+    } else {
+      featureLogger.error('CharacterService', 'Failed to update attribute:', result.error);
+    }
+    
+    return result;
   }
 
   /**
@@ -189,11 +257,21 @@ export class CharacterService {
     updateData: PatchBaseValueRequest,
     idToken: string
   ): Promise<Result<PatchBaseValueResponse, ApiError>> {
-    return await this.apiClient.patch<PatchBaseValueResponse>(
+    featureLogger.debug('service', 'CharacterService', 'Updating base value:', baseValueName);
+    
+    const result = await this.apiClient.patch<PatchBaseValueResponse>(
       `characters/${characterId}/base-values/${baseValueName}`,
       updateData,
       idToken
     );
+    
+    if (result.success) {
+      featureLogger.info('service', 'CharacterService', 'Base value updated:', baseValueName);
+    } else {
+      featureLogger.error('CharacterService', 'Failed to update base value:', result.error);
+    }
+    
+    return result;
   }
 
   /**
@@ -207,11 +285,21 @@ export class CharacterService {
     updateData: PatchCombatStatsRequest,
     idToken: string
   ): Promise<Result<PatchCombatStatsResponse, ApiError>> {
-    return await this.apiClient.patch<PatchCombatStatsResponse>(
+    featureLogger.debug('service', 'CharacterService', `Updating combat stats ${combatType}/${combatSkillName}`);
+    
+    const result = await this.apiClient.patch<PatchCombatStatsResponse>(
       `characters/${characterId}/combat-stats/${combatType}/${combatSkillName}`,
       updateData,
       idToken
     );
+    
+    if (result.success) {
+      featureLogger.info('service', 'CharacterService', 'Combat stats updated:', combatSkillName);
+    } else {
+      featureLogger.error('CharacterService', 'Failed to update combat stats:', result.error);
+    }
+    
+    return result;
   }
 
   /**
@@ -223,6 +311,16 @@ export class CharacterService {
     levelUpData: PostLevelRequest,
     idToken: string
   ): Promise<Result<PostLevelResponse, ApiError>> {
-    return await this.apiClient.post<PostLevelResponse>(`characters/${characterId}/level`, levelUpData, idToken);
+    featureLogger.debug('service', 'CharacterService', 'Leveling up character:', characterId);
+    
+    const result = await this.apiClient.post<PostLevelResponse>(`characters/${characterId}/level`, levelUpData, idToken);
+    
+    if (result.success) {
+      featureLogger.info('service', 'CharacterService', 'Character leveled up');
+    } else {
+      featureLogger.error('CharacterService', 'Failed to level up character:', result.error);
+    }
+    
+    return result;
   }
 }

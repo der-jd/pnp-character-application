@@ -24,10 +24,10 @@ export default defineConfig({
       include: ["src/lib/**/*", "src/hooks/**/*", "src/stores/**/*", "src/components/**/*"],
       thresholds: {
         global: {
-          branches: 80,
-          functions: 80,
-          lines: 80,
-          statements: 80,
+          branches: 85,
+          functions: 85,
+          lines: 85,
+          statements: 85,
         },
       },
     },
@@ -36,7 +36,15 @@ export default defineConfig({
       "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
       "test/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
     ],
-    exclude: ["node_modules/", "dist/", ".next/", "coverage/", "**/src/test/api-schema/**"],
+    // Exclude api-schema tests from regular test runs (they need LocalStack)
+    // They can be run explicitly via: npm run api-schema-tests:run
+    exclude: [
+      "node_modules/",
+      "dist/",
+      ".next/",
+      "coverage/",
+      ...(process.env.INCLUDE_API_SCHEMA_TESTS !== "true" ? ["**/src/test/api-schema/**"] : []),
+    ],
   },
   resolve: {
     alias: {

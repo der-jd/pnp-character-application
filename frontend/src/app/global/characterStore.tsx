@@ -3,6 +3,7 @@ import { CombatStats } from "api-spec";
 import { AllCharactersCharacter } from "@/src/lib/api/models/allCharacters/interface";
 import { CharacterService, AuthService, HistoryService } from "@/src/lib/services";
 import { CharacterApplicationService } from "@/src/lib/application";
+import { featureLogger } from "@/src/lib/utils/featureLogger";
 
 import { create } from "zustand";
 import * as R from "ramda";
@@ -151,7 +152,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
         availableCharacters: characters,
       }));
     } else {
-      console.error(`[Character store] Error while fetching available characters:`, result.error);
+      featureLogger.error('CharacterStore', 'Error fetching available characters:', result.error);
     }
   },
 
@@ -174,7 +175,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
         characterSheet: character.toApiData().characterSheet,
       }));
     } else {
-      console.error(`[Character store] Error while fetching character data for ${charId}:`, result.error);
+      featureLogger.error('CharacterStore', `Error fetching character ${charId}:`, result.error);
     }
   },
 

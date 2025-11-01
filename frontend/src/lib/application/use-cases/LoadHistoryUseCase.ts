@@ -66,36 +66,29 @@ export class LoadHistoryUseCase implements UseCase<LoadHistoryInput, LoadHistory
       return [];
     }
 
-    const entries = historyResponse.items.flatMap((block) => block.changes || []);
+    // Flatten all changes from all blocks with characterId from the block
+    const entries = historyResponse.items.flatMap((block) =>
+      (block.changes || []).map((change) => ({
+        change,
+        characterId: block.characterId,
+      }))
+    );
 
-    return entries.map((entry, index: number) => ({
-      id: entry.id || `entry-${index}`,
-      characterId: entry.characterId || "",
-      changeType: entry.changeType || "unknown",
-      changeDescription: this.formatChangeDescription(entry),
-      timestamp: entry.timestamp || new Date().toISOString(),
-      isReverted: entry.isReverted || false,
+    return entries.map((item, index: number) => ({
+      id: item.change.id || `entry-${index}`,
+      characterId: item.characterId,
+      changeType: item.change.type.toString(),
+      changeDescription: this.formatChangeDescription(item.change),
+      timestamp: item.change.timestamp || new Date().toISOString(),
+      isReverted: (item.change as Record<string, unknown>).isReverted as boolean || false,
     }));
   }
 
   /**
    * Formats change description for display
    */
-  private formatChangeDescription(entry: Record<string, unknown>): string {
-    if (entry.changeDescription && typeof entry.changeDescription === "string") {
-      return entry.changeDescription;
-    }
-
-    // Generate description based on change type
-    switch (entry.changeType) {
-      case "skill_increase":
-        return `Increased ${entry.skillName || "skill"} to ${entry.newValue || "unknown"}`;
-      case "attribute_increase":
-        return `Increased ${entry.attributeName || "attribute"} to ${entry.newValue || "unknown"}`;
-      case "level_up":
-        return `Leveled up to level ${entry.newLevel || "unknown"}`;
-      default:
-        return "Character change";
-    }
+  private formatChangeDescription(entry: { type: number; name: string; data: Record<string, unknown> }): string {
+    // Generate description based on record type
+    return `Changed ${entry.name}`;
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "../app/global/AuthContext";
+import { useAuthState } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
 import { CharacterSheet, LearningMethod, LearningMethodString } from "api-spec";
 
@@ -45,7 +45,7 @@ import { ICombatValue } from "../lib/components/ui/combatTable/definitions";
  */
 export function useSkillUpdater() {
   const toast = useToast();
-  const { idToken } = useAuth();
+  const { tokens } = useAuthState();
   const [loading, setLoading] = useState(false);
   const updateValue = useCharacterStore((state) => state.updateValue);
   const updateCombatValue = useCharacterStore((state) => state.updateCombatValue);
@@ -116,12 +116,12 @@ export function useSkillUpdater() {
       },
     };
 
-    if (selectedChar && idToken) {
+    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
 
         const { data, historyRecord } = await increaseAttribute(
-          idToken,
+          tokens!.idToken,
           selectedChar,
           skill.name,
           increaseAttributeRequest
@@ -161,11 +161,11 @@ export function useSkillUpdater() {
       learningMethod: convertLearningMethodToString(skill.learning_method),
     };
 
-    if (selectedChar && idToken) {
+    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
         const { data, historyRecord } = await increaseSkill(
-          idToken,
+          tokens!.idToken,
           selectedChar,
           skill.name,
           skill.category,
@@ -204,11 +204,11 @@ export function useSkillUpdater() {
       },
     };
 
-    if (selectedChar && idToken) {
+    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
         const { data, historyRecord } = await increaseBaseValue(
-          idToken,
+          tokens!.idToken,
           selectedChar,
           value.name,
           increaseBaseValueRequest
@@ -252,10 +252,10 @@ export function useSkillUpdater() {
       initialLevel: currentLevel,
     };
 
-    if (selectedChar && idToken) {
+    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
-        const { data, historyRecord } = await levelUp(idToken, selectedChar, lvlUpRequest);
+        const { data, historyRecord } = await levelUp(tokens!.idToken, selectedChar, lvlUpRequest);
         try {
           applyUpdate({
             keyPath: path,
@@ -296,11 +296,11 @@ export function useSkillUpdater() {
       },
     };
 
-    if (selectedChar && idToken) {
+    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
         const { data, historyRecord } = await increaseCombatValue(
-          idToken,
+          tokens!.idToken,
           selectedChar,
           value.name,
           value.type,

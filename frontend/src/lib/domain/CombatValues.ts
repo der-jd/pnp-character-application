@@ -59,6 +59,9 @@ export class CombatValueCollection {
    * Gets a specific combat value
    */
   getCombatValue(type: "melee" | "ranged", name: string): CombatValueViewModel | null {
+    if (!this.combat[type]) {
+      return null;
+    }
     const stats = this.combat[type][name as keyof (typeof this.combat)[typeof type]];
     return stats ? this.createCombatValueViewModel(name, type, stats) : null;
   }
@@ -75,6 +78,31 @@ export class CombatValueCollection {
       skilledParadeValue: stats.skilledParadeValue,
       availablePoints: stats.availablePoints,
     };
+  }
+
+  /**
+   * Gets the best combat values based on attack value
+   */
+  getBestMeleeCombatValues(limit: number): CombatValueViewModel[] {
+    return this.getMeleeCombatValues()
+      .sort((a, b) => b.attackValue - a.attackValue)
+      .slice(0, limit);
+  }
+
+  /**
+   * Gets the best ranged combat values based on attack value
+   */
+  getBestRangedCombatValues(limit: number): CombatValueViewModel[] {
+    return this.getRangedCombatValues()
+      .sort((a, b) => b.attackValue - a.attackValue)
+      .slice(0, limit);
+  }
+
+  /**
+   * Calculates total available points across all combat values
+   */
+  getTotalAvailablePoints(): number {
+    return this.getAllCombatValues().reduce((total, combatValue) => total + combatValue.availablePoints, 0);
   }
 
   private formatCombatValueName(name: string): string {

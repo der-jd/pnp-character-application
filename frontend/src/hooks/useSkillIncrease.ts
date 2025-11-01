@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../app/global/AuthContext";
+import { useAuthState } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
 import { useToast } from "./use-toast";
 
@@ -18,7 +18,7 @@ import { useToast } from "./use-toast";
  */
 export function useSkillIncrease() {
   const toast = useToast();
-  const { idToken } = useAuth();
+  const { tokens } = useAuthState();
   const [loading, setLoading] = useState(false);
   const selectedCharacterId = useCharacterStore((state) => state.selectedCharacterId);
   const increaseSkill = useCharacterStore((state) => state.increaseSkill);
@@ -32,27 +32,25 @@ export function useSkillIncrease() {
       toast.toast({
         title: "No Character Selected",
         description: "Please select a character before increasing skills",
-        variant: "destructive",
-      });
-      return false;
-    }
+      variant: "destructive",
+    });
+    return false;
+  }
 
-    if (!idToken) {
-      toast.toast({
-        title: "Authentication Required",
-        description: "Please log in to modify characters",
-        variant: "destructive",
-      });
-      return false;
-    }
+  if (!tokens?.idToken) {
+    toast.toast({
+      title: "Authentication Required",
+      description: "Please log in to modify characters",
+      variant: "destructive",
+    });
+    return false;
+  }
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      // Delegate to Application Service through store
-      const success = await increaseSkill(selectedCharacterId, skillName, idToken);
-
-      if (success) {
+    // Delegate to Application Service through store
+    const success = await increaseSkill(selectedCharacterId, skillName, tokens.idToken);      if (success) {
         toast.toast({
           title: "Skill Increased",
           description: `Successfully increased ${skillName}`,

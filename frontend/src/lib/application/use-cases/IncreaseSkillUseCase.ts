@@ -1,6 +1,7 @@
 import { UseCase, IncreaseSkillInput, IncreaseSkillOutput } from "./interfaces";
 import { Result, ResultSuccess, ResultError } from "../../types/result";
 import { CharacterService } from "../../services/characterService";
+import { featureLogger } from "../../utils/featureLogger";
 
 /**
  * Use Case for increasing a character's skill
@@ -20,6 +21,8 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
   constructor(private readonly characterService: CharacterService) {}
 
   async execute(input: IncreaseSkillInput): Promise<Result<IncreaseSkillOutput, Error>> {
+    featureLogger.debug('usecase', 'IncreaseSkillUseCase', 'Increasing skill:', input.skillName);
+    
     try {
       // Validate input at application boundary
       if (!input.characterId) {
@@ -37,6 +40,7 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
       // Load current character to validate skill exists and get current value
       const characterResult = await this.characterService.getCharacter(input.characterId, input.idToken);
       if (!characterResult.success) {
+        featureLogger.error('IncreaseSkillUseCase', 'Failed to load character:', characterResult.error);
         return ResultError(new Error(`Failed to load character: ${characterResult.error.message}`));
       }
 
@@ -48,6 +52,7 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
       // Validate skill exists through the skill collection
       const skillViewModel = character.skills.getSkill(category, skillName);
       if (!skillViewModel) {
+        featureLogger.error('IncreaseSkillUseCase', 'Skill not found:', input.skillName);
         return ResultError(new Error(`Skill '${input.skillName}' not found on character`));
       }
 
@@ -55,6 +60,7 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
 
       // Validate character has enough adventure points (business rule)
       if (character.adventurePoints <= 0) {
+        featureLogger.error('IncreaseSkillUseCase', 'Insufficient adventure points');
         return ResultError(new Error("Insufficient adventure points for skill increase"));
       }
 
@@ -73,6 +79,7 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
       );
 
       if (!updateResult.success) {
+        featureLogger.error('IncreaseSkillUseCase', 'Failed to update skill:', updateResult.error);
         return ResultError(new Error(`Failed to increase skill: ${updateResult.error.message}`));
       }
 
@@ -88,8 +95,11 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
       // Reload character to get updated state
       const updatedCharacterResult = await this.characterService.getCharacter(input.characterId, input.idToken);
       if (!updatedCharacterResult.success) {
+        featureLogger.error('IncreaseSkillUseCase', 'Failed to reload character after update');
         return ResultError(new Error("Skill updated but failed to reload character"));
       }
+
+      featureLogger.info('usecase', 'IncreaseSkillUseCase', `Skill increased: ${input.skillName} (${currentValue} → ${newValue}, cost: ${cost})`);
 
       // Return application-layer result with proper cost calculation from backend
       return ResultSuccess({
@@ -101,6 +111,7 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
         },
       });
     } catch (error) {
+      featureLogger.error('IncreaseSkillUseCase', 'Unexpected error:', error);
       return ResultError(error instanceof Error ? error : new Error("Unknown error occurred"));
     }
   }
