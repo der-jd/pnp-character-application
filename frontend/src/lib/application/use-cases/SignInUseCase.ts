@@ -35,7 +35,7 @@ export class SignInUseCase implements UseCase<SignInInput, SignInOutput> {
   constructor(private readonly authService: AuthService) {}
 
   async execute(input: SignInInput): Promise<Result<SignInOutput, Error>> {
-    featureLogger.debug('usecase', 'SignInUseCase', 'Executing sign in for:', input.email);
+    featureLogger.debug("usecase", "SignInUseCase", "Executing sign in for:", input.email);
 
     try {
       // Validate input at application boundary
@@ -60,10 +60,10 @@ export class SignInUseCase implements UseCase<SignInInput, SignInOutput> {
       }
 
       // Return the complete SignInResult with tokens and user
-      featureLogger.info('usecase', 'SignInUseCase', 'Sign in successful:', result.data.user.email);
+      featureLogger.info("usecase", "SignInUseCase", "Sign in successful:", result.data.user.email);
       return ResultSuccess(result.data);
     } catch (error) {
-      featureLogger.error('SignInUseCase', 'Error:', error);
+      featureLogger.error("SignInUseCase", "Error:", error);
       return ResultError(error instanceof Error ? error : new Error("Unknown error occurred"));
     }
   }

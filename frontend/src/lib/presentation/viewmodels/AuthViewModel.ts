@@ -51,11 +51,11 @@ export class AuthViewModel extends BaseViewModel<AuthViewModelState> {
    */
   async initialize(): Promise<void> {
     if (this.state.isInitialized) {
-      featureLogger.debug('auth', 'AuthViewModel', 'Already initialized, skipping');
+      featureLogger.debug("auth", "AuthViewModel", "Already initialized, skipping");
       return;
     }
 
-    featureLogger.debug('auth', 'AuthViewModel', 'Initializing authentication state');
+    featureLogger.debug("auth", "AuthViewModel", "Initializing authentication state");
     this.setLoading(true);
 
     try {
@@ -64,7 +64,7 @@ export class AuthViewModel extends BaseViewModel<AuthViewModelState> {
       if (authState.isAuthenticated && authState.tokens) {
         // Check if session is still valid
         if (this.authService.isSessionValid()) {
-          featureLogger.info('auth', 'AuthViewModel', 'Restored authenticated session');
+          featureLogger.info("auth", "AuthViewModel", "Restored authenticated session");
           this.updateState({
             isAuthenticated: true,
             user: authState.user,
@@ -75,7 +75,7 @@ export class AuthViewModel extends BaseViewModel<AuthViewModelState> {
           });
           return;
         } else {
-          featureLogger.warn('auth', 'AuthViewModel', 'Stored token is invalid, clearing auth state');
+          featureLogger.warn("auth", "AuthViewModel", "Stored token is invalid, clearing auth state");
           await this.authService.signOut();
         }
       }
@@ -90,16 +90,16 @@ export class AuthViewModel extends BaseViewModel<AuthViewModelState> {
         error: null,
       });
 
-      featureLogger.debug('auth', 'AuthViewModel', 'No authenticated session found');
+      featureLogger.debug("auth", "AuthViewModel", "No authenticated session found");
     } catch (error) {
-      featureLogger.error('AuthViewModel', 'Initialization error:', error);
+      featureLogger.error("AuthViewModel", "Initialization error:", error);
       this.updateState({
         isAuthenticated: false,
         user: null,
         tokens: null,
         isInitialized: true,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to initialize authentication',
+        error: error instanceof Error ? error.message : "Failed to initialize authentication",
       });
     }
   }
@@ -109,7 +109,7 @@ export class AuthViewModel extends BaseViewModel<AuthViewModelState> {
    * Called by SignInViewModel after successful authentication
    */
   setAuthState(tokens: AuthTokens, user: AuthUser): void {
-    featureLogger.info('auth', 'AuthViewModel', 'Setting authenticated state for:', user.email);
+    featureLogger.info("auth", "AuthViewModel", "Setting authenticated state for:", user.email);
 
     this.updateState({
       isAuthenticated: true,
@@ -124,7 +124,7 @@ export class AuthViewModel extends BaseViewModel<AuthViewModelState> {
    * Sign out the current user
    */
   async signOut(): Promise<void> {
-    featureLogger.debug('auth', 'AuthViewModel', 'Signing out user');
+    featureLogger.debug("auth", "AuthViewModel", "Signing out user");
     this.setLoading(true);
 
     try {
@@ -138,15 +138,15 @@ export class AuthViewModel extends BaseViewModel<AuthViewModelState> {
           isLoading: false,
           error: null,
         });
-        featureLogger.info('auth', 'AuthViewModel', 'User signed out successfully');
+        featureLogger.info("auth", "AuthViewModel", "User signed out successfully");
       } else {
         this.setError(result.error.message);
-        featureLogger.error('AuthViewModel', 'Sign out failed:', result.error);
+        featureLogger.error("AuthViewModel", "Sign out failed:", result.error);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Sign out failed';
+      const errorMessage = error instanceof Error ? error.message : "Sign out failed";
       this.setError(errorMessage);
-      featureLogger.error('AuthViewModel', 'Sign out error:', error);
+      featureLogger.error("AuthViewModel", "Sign out error:", error);
     }
   }
 

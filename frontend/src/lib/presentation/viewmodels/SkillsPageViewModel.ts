@@ -1,85 +1,133 @@
-import { useCharacterStore, CharacterStore } from "@/src/app/global/characterStore";
-import { useMemo } from "react";
-import { SkillViewModel } from "../../domain/Skills";
-import { Skill } from "api-spec";
+import { BaseViewModel } from "./BaseViewModel";
+import { featureLogger } from "../../utils/featureLogger";
+import { CharacterSheet, Skill } from "api-spec";
+
+/**
+ * Skill view model for display
+ */
+export interface SkillViewModel {
+  name: string;
+  category: string;
+  displayName: string;
+  currentLevel: number;
+  startLevel: number;
+  modifier: number;
+  isActivated: boolean;
+  totalCost: number;
+  defaultCostCategory: number;
+}
+
+/**
+ * Skills page state
+ */
+export interface SkillsPageViewModelState {
+  characterSheet: CharacterSheet | null;
+  editMode: boolean;
+  isLoading: boolean;
+  error: string | null;
+  skillsByCategory: Record<string, SkillViewModel[]>;
+}
 
 /**
  * ViewModel for Skills Page
  *
  * Responsibilities:
- * - Presentation logic and state management
- * - UI state transformations
- * - Event handling coordination
- * - Data formatting for display
+ * - Manage skills page state
+ * - Transform character skills for display
+ * - Handle edit mode toggle
+ * - Format skill data for UI
  *
  * Following clean architecture principles:
- * - Separates presentation concerns from business logic
- * - Encapsulates UI state management
- * - Provides clean interface for React components
+ * - Extends BaseViewModel for reactive state
+ * - Separates presentation from business logic
+ * - Framework-agnostic implementation
  */
-export class SkillsPageViewModel {
-  private _editMode: boolean = false;
-  private _isLoading: boolean = false;
+export class SkillsPageViewModel extends BaseViewModel<SkillsPageViewModelState> {
+  constructor(characterSheet: CharacterSheet | null = null) {
+    super({
+      characterSheet,
+      editMode: false,
+      isLoading: false,
+      error: null,
+      skillsByCategory: {},
+    });
 
-  constructor(private readonly characterStore: CharacterStore) {
-    this._editMode = characterStore.editMode;
-  }
-
-  // === Getters ===
-  get editMode(): boolean {
-    return this._editMode;
-  }
-
-  get isLoading(): boolean {
-    return this._isLoading;
-  }
-
-  get characterSheet() {
-    return this.characterStore.characterSheet;
-  }
-
-  get hasCharacterSelected(): boolean {
-    return this.characterStore.selectedCharacterId !== null;
-  }
-
-  get editButtonText(): string {
-    return this._editMode ? "Save" : "Edit";
-  }
-
-  // === Computed Properties ===
-  get skillsByCategory(): Record<string, SkillViewModel[]> {
-    if (!this.characterSheet) {
-      return {};
+    // Initialize skills if character sheet provided
+    if (characterSheet) {
+      this.setCharacterSheet(characterSheet);
     }
+  }
 
-    // Transform character skills using domain logic
-    const character = this.characterStore.characterSheet;
-    if (!character?.skills) {
+  /**
+   * Set the character sheet and update skills
+   */
+  setCharacterSheet(characterSheet: CharacterSheet | null): void {
+    featureLogger.debug("viewmodel", "SkillsPageViewModel", "Setting character sheet");
+
+    const skillsByCategory = characterSheet ? this.transformAllSkills(characterSheet) : {};
+
+    this.updateState({
+      characterSheet,
+      skillsByCategory,
+    });
+  }
+
+  /**
+   * Toggle edit mode
+   */
+  toggleEdit(): void {
+    const newEditMode = !this.state.editMode;
+    featureLogger.debug("viewmodel", "SkillsPageViewModel", `Toggle edit mode: ${newEditMode}`);
+
+    this.updateState({
+      editMode: newEditMode,
+    });
+  }
+
+  /**
+   * Get edit button text
+   */
+  getEditButtonText(): string {
+    return this.state.editMode ? "Save" : "Edit";
+  }
+
+  /**
+   * Check if character is loaded
+   */
+  hasCharacter(): boolean {
+    return this.state.characterSheet !== null;
+  }
+
+  /**
+   * Clear error
+   */
+  clearError(): void {
+    this.updateState({ error: null });
+  }
+
+  // === Private Helpers ===
+
+  /**
+   * Transform all skill categories for display
+   */
+  private transformAllSkills(characterSheet: CharacterSheet): Record<string, SkillViewModel[]> {
+    if (!characterSheet?.skills) {
       return {};
     }
 
     return {
-      combat: this.transformSkillsForCategory("combat", character.skills.combat),
-      body: this.transformSkillsForCategory("body", character.skills.body),
-      social: this.transformSkillsForCategory("social", character.skills.social),
-      nature: this.transformSkillsForCategory("nature", character.skills.nature),
-      knowledge: this.transformSkillsForCategory("knowledge", character.skills.knowledge),
-      handcraft: this.transformSkillsForCategory("handcraft", character.skills.handcraft),
+      combat: this.transformSkillsForCategory("combat", characterSheet.skills.combat),
+      body: this.transformSkillsForCategory("body", characterSheet.skills.body),
+      social: this.transformSkillsForCategory("social", characterSheet.skills.social),
+      nature: this.transformSkillsForCategory("nature", characterSheet.skills.nature),
+      knowledge: this.transformSkillsForCategory("knowledge", characterSheet.skills.knowledge),
+      handcraft: this.transformSkillsForCategory("handcraft", characterSheet.skills.handcraft),
     };
   }
 
-  // === Actions ===
-  toggleEdit = (): void => {
-    if (this._editMode) {
-      // Save changes and clear open history entries
-      this.characterStore.setOpenHistoryEntries([]);
-    }
-
-    this.characterStore.toggleEdit();
-    this._editMode = !this._editMode;
-  };
-
-  // === Private Helpers ===
+  /**
+   * Transform skills for a specific category
+   */
   private transformSkillsForCategory(categoryName: string, categorySkills: Record<string, Skill>): SkillViewModel[] {
     if (!categorySkills) return [];
 
@@ -92,32 +140,17 @@ export class SkillsPageViewModel {
       modifier: skill.mod || 0,
       isActivated: skill.activated || false,
       totalCost: skill.totalCost || 0,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      defaultCostCategory: skill.defaultCostCategory as any,
+      defaultCostCategory: skill.defaultCostCategory as number,
     }));
   }
 
+  /**
+   * Format skill name for display
+   */
   private formatSkillName(name: string): string {
     return name
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase())
       .trim();
   }
-}
-
-/**
- * Hook for using SkillsPageViewModel in React components
- * Provides reactive updates and proper lifecycle management
- */
-export function useSkillsPageViewModel() {
-  const characterStore = useCharacterStore();
-
-  const viewModel = useMemo(
-    () => new SkillsPageViewModel(characterStore),
-    [characterStore] // Include characterStore in dependency array
-  );
-
-  // For now, return the viewModel directly
-  // In a more complex setup, you'd implement proper reactivity
-  return viewModel;
 }

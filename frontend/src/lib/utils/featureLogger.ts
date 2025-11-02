@@ -1,11 +1,11 @@
 /**
  * Feature Flag Based Logger
- * 
+ *
  * Can be controlled via NEXT_PUBLIC_DEBUG_ENABLED env variable
  * Allows granular control over different debug categories
  */
 
-export type LogCategory = 'auth' | 'api' | 'viewmodel' | 'usecase' | 'service' | 'ui' | 'all';
+export type LogCategory = "auth" | "api" | "viewmodel" | "usecase" | "service" | "ui" | "all";
 
 interface LoggerConfig {
   enabled: boolean;
@@ -16,13 +16,9 @@ class FeatureFlagLogger {
   private config: LoggerConfig;
 
   constructor() {
-    const debugEnabled = 
-      process.env.NODE_ENV === 'development' || 
-      process.env.NEXT_PUBLIC_DEBUG_ENABLED === 'true';
-    
-    const categories = this.parseCategories(
-      process.env.NEXT_PUBLIC_DEBUG_CATEGORIES || 'all'
-    );
+    const debugEnabled = process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_DEBUG_ENABLED === "true";
+
+    const categories = this.parseCategories(process.env.NEXT_PUBLIC_DEBUG_CATEGORIES || "all");
 
     this.config = {
       enabled: debugEnabled,
@@ -35,23 +31,22 @@ class FeatureFlagLogger {
    * Example: NEXT_PUBLIC_DEBUG_CATEGORIES="auth,api,viewmodel"
    */
   private parseCategories(categoriesString: string): Set<LogCategory> {
-    const cats = categoriesString.split(',').map(c => c.trim());
-    if (cats.includes('all')) {
-      return new Set<LogCategory>(['all']);
+    const cats = categoriesString.split(",").map((c) => c.trim());
+    if (cats.includes("all")) {
+      return new Set<LogCategory>(["all"]);
     }
-    return new Set(cats.filter(c => this.isValidCategory(c)) as LogCategory[]);
+    return new Set(cats.filter((c) => this.isValidCategory(c)) as LogCategory[]);
   }
 
   private isValidCategory(cat: string): cat is LogCategory {
-    return ['auth', 'api', 'viewmodel', 'usecase', 'service', 'ui', 'all'].includes(cat);
+    return ["auth", "api", "viewmodel", "usecase", "service", "ui", "all"].includes(cat);
   }
 
   /**
    * Check if a category is enabled
    */
   private isCategoryEnabled(category: LogCategory): boolean {
-    return this.config.enabled && 
-           (this.config.categories.has('all') || this.config.categories.has(category));
+    return this.config.enabled && (this.config.categories.has("all") || this.config.categories.has(category));
   }
 
   /**

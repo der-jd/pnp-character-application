@@ -51,7 +51,7 @@ export class SignInViewModel extends BaseViewModel<SignInViewModelState> {
    * Sign in with email and password
    */
   public async signIn(formData: SignInFormData): Promise<void> {
-    featureLogger.debug('viewmodel', 'SignInViewModel', 'Sign in attempt for:', formData.email);
+    featureLogger.debug("viewmodel", "SignInViewModel", "Sign in attempt for:", formData.email);
 
     this.setLoading(true);
 
@@ -62,12 +62,12 @@ export class SignInViewModel extends BaseViewModel<SignInViewModelState> {
       });
 
       if (!result.success) {
-        featureLogger.error('SignInViewModel', 'Sign in failed:', result.error);
+        featureLogger.error("SignInViewModel", "Sign in failed:", result.error);
         this.setError(result.error.message || "Sign in failed. Please check your credentials.");
         return;
       }
 
-      featureLogger.info('viewmodel', 'SignInViewModel', 'Sign in successful:', result.data.user.email);
+      featureLogger.info("viewmodel", "SignInViewModel", "Sign in successful:", result.data.user.email);
 
       this.updateState({
         isLoading: false,
@@ -80,7 +80,7 @@ export class SignInViewModel extends BaseViewModel<SignInViewModelState> {
         this.onSuccessCallback(result.data);
       }
     } catch (error) {
-      featureLogger.error('SignInViewModel', 'Exception during sign in:', error);
+      featureLogger.error("SignInViewModel", "Exception during sign in:", error);
       this.setError(error instanceof Error ? error.message : "An unexpected error occurred");
     }
   }

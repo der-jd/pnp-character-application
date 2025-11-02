@@ -1,32 +1,28 @@
 /**
  * Decorator-Based Logger
- * 
+ *
  * Use decorators to automatically log method entry/exit
  * Only active in development mode
  */
 
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === "development";
 
 /**
  * Decorator to log method calls
  * Usage: @logMethod('ClassName')
  */
 export function logMethod(className: string) {
-  return function (
-    target: unknown,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     if (!isDev) return descriptor;
 
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: unknown[]) {
-      console.log(`[${className}] → ${propertyKey}`, args.length > 0 ? args : '');
-      
+      console.log(`[${className}] → ${propertyKey}`, args.length > 0 ? args : "");
+
       try {
         const result = await originalMethod.apply(this, args);
-        console.log(`[${className}] ← ${propertyKey}`, result !== undefined ? result : 'void');
+        console.log(`[${className}] ← ${propertyKey}`, result !== undefined ? result : "void");
         return result;
       } catch (error) {
         console.error(`[${className}] ✗ ${propertyKey}`, error);
@@ -43,11 +39,7 @@ export function logMethod(className: string) {
  * Usage: @timeMethod('ClassName')
  */
 export function timeMethod(className: string) {
-  return function (
-    target: unknown,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     if (!isDev) return descriptor;
 
     const originalMethod = descriptor.value;
@@ -55,7 +47,7 @@ export function timeMethod(className: string) {
     descriptor.value = async function (...args: unknown[]) {
       const label = `[${className}] ${propertyKey}`;
       console.time(label);
-      
+
       try {
         const result = await originalMethod.apply(this, args);
         console.timeEnd(label);
@@ -75,11 +67,7 @@ export function timeMethod(className: string) {
  * Usage: @logErrors('ClassName')
  */
 export function logErrors(className: string) {
-  return function (
-    target: unknown,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: unknown[]) {

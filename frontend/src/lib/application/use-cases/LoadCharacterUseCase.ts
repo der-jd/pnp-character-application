@@ -16,8 +16,8 @@ export class LoadCharacterUseCase implements UseCase<LoadCharacterInput, LoadCha
   constructor(private readonly characterService: CharacterService) {}
 
   async execute(input: LoadCharacterInput): Promise<Result<LoadCharacterOutput, Error>> {
-    featureLogger.debug('usecase', 'LoadCharacterUseCase', 'Loading character:', input.characterId);
-    
+    featureLogger.debug("usecase", "LoadCharacterUseCase", "Loading character:", input.characterId);
+
     try {
       // Validate input at application boundary
       if (!input.characterId) {
@@ -32,18 +32,18 @@ export class LoadCharacterUseCase implements UseCase<LoadCharacterInput, LoadCha
       const result = await this.characterService.getCharacter(input.characterId, input.idToken);
 
       if (!result.success) {
-        featureLogger.error('LoadCharacterUseCase', 'Failed to load character:', result.error);
+        featureLogger.error("LoadCharacterUseCase", "Failed to load character:", result.error);
         return ResultError(new Error(`Failed to load character: ${result.error.message}`));
       }
 
-      featureLogger.info('usecase', 'LoadCharacterUseCase', 'Character loaded:', result.data.name);
+      featureLogger.info("usecase", "LoadCharacterUseCase", "Character loaded:", result.data.name);
 
       // Return application-layer result with domain data
       return ResultSuccess({
         character: result.data,
       });
     } catch (error) {
-      featureLogger.error('LoadCharacterUseCase', 'Unexpected error:', error);
+      featureLogger.error("LoadCharacterUseCase", "Unexpected error:", error);
       return ResultError(error instanceof Error ? error : new Error("Unknown error occurred"));
     }
   }

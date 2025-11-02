@@ -100,7 +100,7 @@ describe("CreateCharacterUseCase", () => {
     });
 
     it("should reject character name that is too long", async () => {
-      const longName = 'A'.repeat(51);
+      const longName = "A".repeat(51);
       const result = await useCase.execute({
         characterData: {
           generalInformation: { name: longName },
@@ -111,14 +111,14 @@ describe("CreateCharacterUseCase", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain('Character name too long');
+        expect(result.error.message).toContain("Character name too long");
       }
     });
 
     it("should reject attributes outside allowed range (too low)", async () => {
       const result = await useCase.execute({
         characterData: {
-          generalInformation: { name: 'Valid Name' },
+          generalInformation: { name: "Valid Name" },
           attributes: {
             courage: { current: 3 },
           },
@@ -128,14 +128,14 @@ describe("CreateCharacterUseCase", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain('Attribute courage must be between 4 and 7');
+        expect(result.error.message).toContain("Attribute courage must be between 4 and 7");
       }
     });
 
     it("should reject attributes outside allowed range (too high)", async () => {
       const result = await useCase.execute({
         characterData: {
-          generalInformation: { name: 'Valid Name' },
+          generalInformation: { name: "Valid Name" },
           attributes: {
             intelligence: { current: 8 },
           },
@@ -145,15 +145,15 @@ describe("CreateCharacterUseCase", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain('Attribute intelligence must be between 4 and 7');
+        expect(result.error.message).toContain("Attribute intelligence must be between 4 and 7");
       }
     });
 
     it("should create character successfully when data is valid", async () => {
       const createdCharacter = {
-        userId: 'u1',
-        characterId: 'new-char-1',
-        characterSheet: { generalInformation: { name: 'Hero', level: 1 } },
+        userId: "u1",
+        characterId: "new-char-1",
+        characterSheet: { generalInformation: { name: "Hero", level: 1 } },
       } as any;
 
       vi.mocked(mockCharacterService.createCharacter).mockResolvedValue(
@@ -163,7 +163,7 @@ describe("CreateCharacterUseCase", () => {
 
       const result = await useCase.execute({
         characterData: {
-          generalInformation: { name: 'Hero' },
+          generalInformation: { name: "Hero" },
         } as any,
         idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
       });
@@ -171,7 +171,7 @@ describe("CreateCharacterUseCase", () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.createdCharacter).toBeDefined();
-        expect(result.data.characterId).toBe('new-char-1');
+        expect(result.data.characterId).toBe("new-char-1");
       }
     });
   });

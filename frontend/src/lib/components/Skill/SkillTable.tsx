@@ -17,6 +17,16 @@ export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialD
   const { tryIncrease } = useSkillUpdater();
   const [data, setData] = useState(initialData);
 
+  // Debug: Log first skill to check data structure
+  useEffect(() => {
+    if (initialData.length > 0) {
+      console.log("SkillTable - First skill data:", initialData[0]);
+      console.log("SkillTable - current_level:", initialData[0].current_level);
+      console.log("SkillTable - mod:", initialData[0].mod);
+      console.log("SkillTable - cost:", initialData[0].cost);
+    }
+  }, [initialData]);
+
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     is_active: isEditMode,
     cost_category: isEditMode,
@@ -44,7 +54,9 @@ export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialD
     hide();
   };
 
-  const filteredData = useMemo(() => (isEditMode ? data.filter((skill) => skill.activated) : data), [data, isEditMode]);
+  // In edit mode: show ALL skills
+  // In view mode: show only ACTIVATED skills
+  const filteredData = useMemo(() => (isEditMode ? data : data.filter((skill) => skill.activated)), [data, isEditMode]);
 
   const columns: ColumnDef<ISkillProps>[] = [
     {
@@ -63,6 +75,20 @@ export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialD
       cell: ({ row }) => {
         const value = row.original.current_level;
         return <div className="text-center">{value}</div>;
+      },
+    },
+    {
+      accessorKey: "mod",
+      header: () => <div className="text-center">Modifier</div>,
+      cell: ({ row }) => {
+        const value = row.original.mod;
+        const sign = value >= 0 ? "+" : "";
+        return (
+          <div className="text-center">
+            {sign}
+            {value}
+          </div>
+        );
       },
     },
     {
@@ -92,21 +118,36 @@ export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialD
       cell: ({ row }) => <div className="text-center">{LearningMethod[row.original.learning_method]}</div>,
     },
     {
+      accessorKey: "cost",
+      header: () => <div className="text-center">Total Cost</div>,
+      cell: ({ row }) => {
+        const value = row.original.cost;
+        return <div className="text-center">{value}</div>;
+      },
+    },
+    {
       accessorKey: "skilling",
       header: () => <div className="text-center">Increase</div>,
-      cell: ({ row }) => (
-        <div className="flex justify-evenly items-right w-full space-x-4">
-          {[1, 5, 10].map((points) => (
-            <Button
-              key={points}
-              className="flex-1 bg-black hover:bg-gray-300 hover:text-black text-white rounded-lg"
-              onClick={() => skillButtonPushed(row.original, points)}
-            >
-              {points}
-            </Button>
-          ))}
-        </div>
-      ),
+      cell: ({ row }) => {
+        // Only show increase buttons for activated skills
+        if (!row.original.activated) {
+          return <div className="text-center text-gray-400 text-sm">Activate first</div>;
+        }
+
+        return (
+          <div className="flex justify-evenly items-right w-full space-x-4">
+            {[1, 5, 10].map((points) => (
+              <Button
+                key={points}
+                className="flex-1 bg-black hover:bg-gray-300 hover:text-black text-white rounded-lg"
+                onClick={() => skillButtonPushed(row.original, points)}
+              >
+                {points}
+              </Button>
+            ))}
+          </div>
+        );
+      },
     },
   ];
 

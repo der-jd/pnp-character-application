@@ -103,8 +103,8 @@ describe("UpdateCombatValueUseCase", () => {
         success: true,
         data: mockCharacter,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       const result = await useCase.execute({
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
@@ -139,8 +139,8 @@ describe("UpdateCombatValueUseCase", () => {
         success: true,
         data: mockCharacter,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       vi.mocked(mockCharacterService.updateCombatStats).mockResolvedValue(createErrorResult("Combat update failed"));
 
@@ -174,8 +174,8 @@ describe("UpdateCombatValueUseCase", () => {
         },
       };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValue({ success: true, data: mockCharacter } as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue({ success: true, data: mockCharacter } as any);
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
@@ -185,8 +185,8 @@ describe("UpdateCombatValueUseCase", () => {
         idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
       };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const result = await useCase.execute(input as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await useCase.execute(input as any);
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -207,14 +207,14 @@ describe("UpdateCombatValueUseCase", () => {
       };
 
       // First load succeeds
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(mockCharacter as any));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(mockCharacter as any));
       // Update succeeds
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.updateCombatStats).mockResolvedValue(createSuccessResult({} as any) as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.updateCombatStats).mockResolvedValue(createSuccessResult({} as any) as any);
       // Reload fails
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createErrorResult("reload fail") as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createErrorResult("reload fail") as any);
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
@@ -224,8 +224,8 @@ describe("UpdateCombatValueUseCase", () => {
         idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
       };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const result = await useCase.execute(input as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await useCase.execute(input as any);
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -246,15 +246,15 @@ describe("UpdateCombatValueUseCase", () => {
       };
 
       // Initial load returns current character
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(mockCharacter as any));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(mockCharacter as any));
       // Update succeeds
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.updateCombatStats).mockResolvedValue(createSuccessResult({} as any) as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.updateCombatStats).mockResolvedValue(createSuccessResult({} as any) as any);
       // Reload returns updated character
       const updatedChar = { ...mockCharacter, characterId: TEST_SCENARIOS.VALID_CHARACTER_ID, adventurePoints: 95 };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(updatedChar as any));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(updatedChar as any));
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
@@ -264,14 +264,14 @@ describe("UpdateCombatValueUseCase", () => {
         idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
       };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const result = await useCase.execute(input as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await useCase.execute(input as any);
 
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.updatedCharacter).toBeDefined();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  expect((result.data.updatedCharacter as any).adventurePoints).toBe(95);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect((result.data.updatedCharacter as any).adventurePoints).toBe(95);
       }
     });
   });

@@ -10,6 +10,11 @@ node_modules/
 build/
 dist/
 
+# Test coverage reports
+coverage/
+*.coverage
+htmlcov/
+
 # API schema testing environment files (contain sensitive data)
 frontend/.env.production
 frontend/.env.api-testing

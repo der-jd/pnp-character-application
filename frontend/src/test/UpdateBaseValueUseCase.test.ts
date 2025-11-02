@@ -110,11 +110,11 @@ describe("UpdateBaseValueUseCase", () => {
       };
 
       // Mock getCharacter and updateBaseValue
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
       vi.mocked(mockCharacterService.updateBaseValue).mockResolvedValue(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createSuccessResult(mockUpdatedCharacter as any)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        createSuccessResult(mockUpdatedCharacter as any)
       );
 
       const input = {
@@ -147,8 +147,8 @@ describe("UpdateBaseValueUseCase", () => {
           getBaseValue: vi.fn().mockReturnValue({ current: 30, start: 30, mod: 0 }),
         },
       };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
 
       // Mock updateBaseValue failure
       vi.mocked(mockCharacterService.updateBaseValue).mockResolvedValue(createErrorResult("Update failed"));

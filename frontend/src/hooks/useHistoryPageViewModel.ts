@@ -11,10 +11,7 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import {
-  HistoryPageViewModel,
-  HistoryPageViewModelState,
-} from "../lib/presentation/viewmodels/HistoryPageViewModel";
+import { HistoryPageViewModel, HistoryPageViewModelState } from "../lib/presentation/viewmodels/HistoryPageViewModel";
 import { DeleteHistoryEntryUseCase } from "../lib/application/use-cases/DeleteHistoryEntryUseCase";
 import { HistoryService } from "../lib/services/historyService";
 import { CharacterService } from "../lib/services/characterService";
@@ -27,7 +24,7 @@ import { featureLogger } from "../lib/utils/featureLogger";
 export function useHistoryPageViewModel() {
   // Create ViewModel instance (memoized to prevent recreation on every render)
   const viewModel = useMemo(() => {
-    featureLogger.debug('ui', 'useHistoryPageViewModel', 'Creating ViewModel instance...');
+    featureLogger.debug("ui", "useHistoryPageViewModel", "Creating ViewModel instance...");
     const apiClient = new ApiClient();
     const historyService = new HistoryService(apiClient);
     const characterService = new CharacterService(apiClient);
@@ -35,7 +32,7 @@ export function useHistoryPageViewModel() {
     const deleteHistoryEntryUseCase = new DeleteHistoryEntryUseCase(historyService, characterService);
 
     const vm = new HistoryPageViewModel(deleteHistoryEntryUseCase, historyService);
-    featureLogger.debug('ui', 'useHistoryPageViewModel', 'ViewModel created');
+    featureLogger.debug("ui", "useHistoryPageViewModel", "ViewModel created");
     return vm;
   }, []);
 

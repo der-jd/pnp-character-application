@@ -32,25 +32,26 @@ export function useSkillIncrease() {
       toast.toast({
         title: "No Character Selected",
         description: "Please select a character before increasing skills",
-      variant: "destructive",
-    });
-    return false;
-  }
+        variant: "destructive",
+      });
+      return false;
+    }
 
-  if (!tokens?.idToken) {
-    toast.toast({
-      title: "Authentication Required",
-      description: "Please log in to modify characters",
-      variant: "destructive",
-    });
-    return false;
-  }
+    if (!tokens?.idToken) {
+      toast.toast({
+        title: "Authentication Required",
+        description: "Please log in to modify characters",
+        variant: "destructive",
+      });
+      return false;
+    }
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    // Delegate to Application Service through store
-    const success = await increaseSkill(selectedCharacterId, skillName, tokens.idToken);      if (success) {
+      // Delegate to Application Service through store
+      const success = await increaseSkill(selectedCharacterId, skillName, tokens.idToken);
+      if (success) {
         toast.toast({
           title: "Skill Increased",
           description: `Successfully increased ${skillName}`,

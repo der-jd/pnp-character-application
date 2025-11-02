@@ -15,15 +15,22 @@ export default function History() {
   const selectedCharacterId = useCharacterStore((state) => state.selectedCharacterId);
   const { tokens } = useAuthState();
   const { toast } = useToast();
-  
+
   // Use the new ViewModel hook
   const { historyEntries, isLoading, error, loadHistory, clearError } = useHistoryPageViewModel();
-  
+
   const { show, hide } = useLoadingOverlay();
 
   // Load history on mount
   useEffect(() => {
-    console.log("[History Page] Effect running - hasFetched:", hasFetched.current, "selectedCharacterId:", selectedCharacterId, "tokens:", tokens?.idToken ? "present" : "missing");
+    console.log(
+      "[History Page] Effect running - hasFetched:",
+      hasFetched.current,
+      "selectedCharacterId:",
+      selectedCharacterId,
+      "tokens:",
+      tokens?.idToken ? "present" : "missing"
+    );
     if (!hasFetched.current && selectedCharacterId && tokens?.idToken) {
       hasFetched.current = true;
       console.log("[History Page] Calling loadHistory...");

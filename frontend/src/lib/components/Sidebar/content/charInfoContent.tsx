@@ -1,12 +1,14 @@
 "use client";
 
 import { useCharacterStore } from "@/src/app/global/characterStore";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import AsyncSelect from "react-select/async";
 import { Button } from "../../ui/button";
 import { useAuthState } from "@/src/app/global/AuthContext";
 import { useSkillUpdater } from "@/src/hooks/useSkillUpdate";
 import { useLoadingOverlay } from "@/src/app/global/OverlayContext";
+import { useCharacterSelectionViewModel } from "@/src/hooks/useCharacterSelectionViewModel";
+import { useToast } from "@/src/hooks/use-toast";
 
 export type CharacterOptions = {
   value: string;
@@ -21,41 +23,61 @@ export type LevelUpOption = {
 };
 
 const CharacterInfoContent: React.FC = () => {
-  const [selectedValue, selectValue] = useState<string>("");
-  const setSelectedCharacter = useCharacterStore((state) => state.setSelectedCharacter);
-  const updateAvailableCharacters = useCharacterStore((state) => state.updateAvailableCharacters);
+  // Character selection from new architecture
+  const {
+    availableCharacters,
+    selectedCharacterId,
+    isLoading: isLoadingCharacters,
+    error: characterError,
+    loadAvailableCharacters,
+    setSelectedCharacterId,
+    clearError,
+  } = useCharacterSelectionViewModel();
+
+  // Still need store for character sheet and edit mode (will refactor later)
   const updateCharacter = useCharacterStore((state) => state.updateCharacter);
-  const characters = useCharacterStore((state) => state.availableCharacters);
   const characterSheet = useCharacterStore((state) => state.characterSheet);
   const editMode = useCharacterStore((state) => state.editMode);
+  const setSelectedCharacter = useCharacterStore((state) => state.setSelectedCharacter);
+
   const { lvlUp } = useSkillUpdater();
   const { show, hide } = useLoadingOverlay();
+  const { toast } = useToast();
   const [apInput, setApInput] = useState(0);
   const [epInput, setEpInput] = useState(0);
   const { tokens } = useAuthState();
   const [modifiedTile, setModifiedTile] = useState<{ key: string; value: number } | null>(null);
+  const hasLoadedCharacters = useRef(false);
 
-  const loadCharacterOptions = async (idToken: string) => {
-    await updateAvailableCharacters(idToken);
-    return characters.map((char) => ({
+  // Show errors via toast
+  useEffect(() => {
+    if (characterError) {
+      toast({
+        variant: "destructive",
+        title: "Error loading characters",
+        description: characterError,
+      });
+      clearError();
+    }
+  }, [characterError, toast, clearError]);
+
+  const handleMenuOpen = async () => {
+    // Only load characters once when dropdown is first opened
+    if (!hasLoadedCharacters.current && tokens?.idToken) {
+      hasLoadedCharacters.current = true;
+      await loadAvailableCharacters(tokens.idToken);
+    }
+  };
+
+  const promiseCharacterOptions = async (): Promise<CharacterOptions[]> => {
+    // Return current available characters
+    return availableCharacters.map((char) => ({
       value: char.characterId,
       label: char.name,
       userId: char.userId,
       level: char.level,
     }));
   };
-
-  const promiseCharacterOptions = () =>
-    new Promise<CharacterOptions[]>((resolve) => {
-      setTimeout(async () => {
-        if (tokens?.idToken) {
-          const options = await loadCharacterOptions(tokens.idToken);
-          resolve(options);
-        } else {
-          resolve([]);
-        }
-      }, 0);
-    });
 
   const handleLvlUp = async () => {
     show();
@@ -67,8 +89,8 @@ const CharacterInfoContent: React.FC = () => {
 
   const handleChange = (value: CharacterOptions | null) => {
     if (value) {
-      selectValue(value.value);
-      setSelectedCharacter(value.value);
+      setSelectedCharacterId(value.value);
+      setSelectedCharacter(value.value); // Update store for compatibility
     }
   };
 
@@ -77,8 +99,8 @@ const CharacterInfoContent: React.FC = () => {
   };
 
   const loadCharacter = async () => {
-    if (tokens?.idToken) {
-      updateCharacter(tokens.idToken, selectedValue);
+    if (tokens?.idToken && selectedCharacterId) {
+      updateCharacter(tokens.idToken, selectedCharacterId);
     }
   };
 
@@ -95,19 +117,31 @@ const CharacterInfoContent: React.FC = () => {
       <nav className="flex flex-col gap-4">
         <div className="flex gap-2 items-center">
           <AsyncSelect
-            defaultOptions={characters.map((char) => ({
+            value={
+              selectedCharacterId
+                ? {
+                    value: selectedCharacterId,
+                    label: availableCharacters.find((char) => char.characterId === selectedCharacterId)?.name || "",
+                    userId: availableCharacters.find((char) => char.characterId === selectedCharacterId)?.userId || "",
+                    level: availableCharacters.find((char) => char.characterId === selectedCharacterId)?.level || 0,
+                  }
+                : null
+            }
+            defaultOptions={availableCharacters.map((char) => ({
               value: char.characterId,
               label: char.name,
               userId: char.userId,
               level: char.level,
             }))}
             cacheOptions
-            onMenuOpen={promiseCharacterOptions}
+            onMenuOpen={handleMenuOpen}
             loadOptions={promiseCharacterOptions}
             onChange={handleChange}
             className="w-1/2"
+            isLoading={isLoadingCharacters}
+            placeholder="Select character..."
           />
-          <Button onClick={loadCharacter} className="w-1/2">
+          <Button onClick={loadCharacter} className="w-1/2" disabled={!selectedCharacterId || isLoadingCharacters}>
             Load Character
           </Button>
         </div>

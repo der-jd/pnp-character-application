@@ -3,22 +3,21 @@
 import { Button } from "@lib/components/ui/button";
 import SkillCategory from "@lib/components/Skill/SkillCategory";
 import { extract_properties_data } from "@lib/components/Skill/SkillDefinitions";
-import { useCharacterStore } from "@global/characterStore";
+import { useSkillsPageViewModel } from "@/src/hooks/useSkillsPageViewModel";
 
 export default function SkillsPage() {
-  const currentCharacterSheet = useCharacterStore((state) => state.characterSheet);
-  const setOpenHistoryEntries = useCharacterStore((state) => state.setOpenHistoryEntries);
-  const changeEdit = useCharacterStore((state) => state.toggleEdit);
-  const editMode = useCharacterStore((state) => state.editMode);
+  const { characterSheet, toggleEdit, getEditButtonText, hasCharacter } = useSkillsPageViewModel();
 
-  const toggleEdit = () => {
-    if (editMode) {
-      // TODO use correct function to save history entries
-      setOpenHistoryEntries([]);
-    }
-    changeEdit();
-  };
-  const isEditMode = useCharacterStore((state) => state.editMode);
+  if (!hasCharacter()) {
+    return (
+      <div className="container mx-auto py-5">
+        <div className="text-center text-gray-500 py-10">
+          <p className="text-xl">No character selected</p>
+          <p className="text-sm mt-2">Please select a character from the sidebar to view skills</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-5">
@@ -28,11 +27,11 @@ export default function SkillsPage() {
           className="bg-black font-bold text-white hover:bg-gray-300 rounded-lg"
           onClick={toggleEdit}
         >
-          {isEditMode ? "Save" : "Edit"}
+          {getEditButtonText()}
         </Button>
       </div>
       <div className="flex flex-wrap rounded-lg w-full p-4">
-        <SkillCategory data={extract_properties_data(currentCharacterSheet ?? null)} />
+        <SkillCategory data={extract_properties_data(characterSheet)} />
       </div>
     </div>
   );

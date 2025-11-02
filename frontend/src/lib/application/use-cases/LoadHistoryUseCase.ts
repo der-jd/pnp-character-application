@@ -80,7 +80,7 @@ export class LoadHistoryUseCase implements UseCase<LoadHistoryInput, LoadHistory
       changeType: item.change.type.toString(),
       changeDescription: this.formatChangeDescription(item.change),
       timestamp: item.change.timestamp || new Date().toISOString(),
-      isReverted: (item.change as Record<string, unknown>).isReverted as boolean || false,
+      isReverted: ((item.change as Record<string, unknown>).isReverted as boolean) || false,
     }));
   }
 

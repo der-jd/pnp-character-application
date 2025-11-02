@@ -46,27 +46,27 @@ export class HistoryPageViewModel extends BaseViewModel<HistoryPageViewModelStat
    * Load history for character
    */
   public async loadHistory(characterId: string, idToken: string): Promise<void> {
-    featureLogger.debug('viewmodel', 'HistoryPageViewModel', 'Loading history for character:', characterId);
+    featureLogger.debug("viewmodel", "HistoryPageViewModel", "Loading history for character:", characterId);
     this.setLoading(true);
 
     try {
       // For now, use the service directly to get RecordEntry[]
       // Later we can refactor the use case to return the proper format
-      featureLogger.debug('viewmodel', 'HistoryPageViewModel', 'Calling historyService.getHistory...');
+      featureLogger.debug("viewmodel", "HistoryPageViewModel", "Calling historyService.getHistory...");
       const result = await this.historyService.getHistory(characterId, idToken);
-      
-      featureLogger.debug('viewmodel', 'HistoryPageViewModel', 'Service result:', result);
+
+      featureLogger.debug("viewmodel", "HistoryPageViewModel", "Service result:", result);
 
       if (!result.success) {
-        featureLogger.error('HistoryPageViewModel', 'Failed to load history:', result.error);
+        featureLogger.error("HistoryPageViewModel", "Failed to load history:", result.error);
         this.setError(result.error.message || "Failed to load history");
         return;
       }
 
       // Transform the history response to flat RecordEntry array
-      featureLogger.debug('viewmodel', 'HistoryPageViewModel', 'Transforming history response...');
+      featureLogger.debug("viewmodel", "HistoryPageViewModel", "Transforming history response...");
       const historyEntries = this.transformHistoryResponse(result.data);
-      featureLogger.debug('viewmodel', 'HistoryPageViewModel', 'Transformed entries:', historyEntries.length);
+      featureLogger.debug("viewmodel", "HistoryPageViewModel", "Transformed entries:", historyEntries.length);
 
       this.updateState({
         isLoading: false,
@@ -74,7 +74,7 @@ export class HistoryPageViewModel extends BaseViewModel<HistoryPageViewModelStat
         error: null,
       });
     } catch (error) {
-      featureLogger.error('HistoryPageViewModel', 'Exception while loading history:', error);
+      featureLogger.error("HistoryPageViewModel", "Exception while loading history:", error);
       this.setError(error instanceof Error ? error.message : "Unknown error occurred");
     }
   }
@@ -112,11 +112,7 @@ export class HistoryPageViewModel extends BaseViewModel<HistoryPageViewModelStat
   /**
    * Delete a history entry (revert a change)
    */
-  public async deleteHistoryEntry(
-    characterId: string,
-    idToken: string,
-    entryId: string
-  ): Promise<boolean> {
+  public async deleteHistoryEntry(characterId: string, idToken: string, entryId: string): Promise<boolean> {
     this.setLoading(true);
 
     const result = await this.deleteHistoryEntryUseCase.execute({

@@ -83,8 +83,8 @@ describe("LevelUpUseCase", () => {
         success: true,
         data: mockCharacter,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       vi.mocked(mockCharacterService.levelUp).mockResolvedValue(createErrorResult("Level up failed"));
 
@@ -122,8 +122,8 @@ describe("LevelUpUseCase", () => {
 
     it("should handle character level mismatch", async () => {
       const mockCharacter = { characterId: TEST_SCENARIOS.VALID_CHARACTER_ID, level: 2 } as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter) as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter) as any);
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
@@ -141,8 +141,8 @@ describe("LevelUpUseCase", () => {
     it("should handle reload failure after successful levelUp", async () => {
       // initial load
       const mockCharacter = { characterId: TEST_SCENARIOS.VALID_CHARACTER_ID, level: 1 } as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(mockCharacter) as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(mockCharacter) as any);
 
       // successful levelUp response
       vi.mocked(mockCharacterService.levelUp).mockResolvedValue(
@@ -150,8 +150,8 @@ describe("LevelUpUseCase", () => {
       );
 
       // reload fails
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createErrorResult('Reload failed') as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createErrorResult("Reload failed") as any);
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
@@ -162,15 +162,15 @@ describe("LevelUpUseCase", () => {
       const result = await useCase.execute(input);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toContain('Level up successful but failed to reload character');
+        expect(result.error.message).toContain("Level up successful but failed to reload character");
       }
     });
 
     it("should level up successfully and return new level and points gained", async () => {
       const mockCharacter = { characterId: TEST_SCENARIOS.VALID_CHARACTER_ID, level: 1 } as any;
       // initial load
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(mockCharacter) as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(mockCharacter) as any);
 
       // levelUp success
       vi.mocked(mockCharacterService.levelUp).mockResolvedValue(
@@ -179,8 +179,8 @@ describe("LevelUpUseCase", () => {
 
       // reload success returns updated character
       const reloadedCharacter = { characterId: TEST_SCENARIOS.VALID_CHARACTER_ID, level: 2 } as any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(reloadedCharacter) as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(reloadedCharacter) as any);
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,

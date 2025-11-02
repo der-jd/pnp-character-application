@@ -96,14 +96,14 @@ describe("IncreaseSkillUseCase", () => {
           getSkill: vi.fn().mockReturnValue(null),
         },
         adventurePoints: 100,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
 
       vi.mocked(mockCharacterService.getCharacter).mockResolvedValue({
         success: true,
         data: mockCharacter,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
@@ -130,14 +130,14 @@ describe("IncreaseSkillUseCase", () => {
           }),
         },
         adventurePoints: 0,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
 
       vi.mocked(mockCharacterService.getCharacter).mockResolvedValue({
         success: true,
         data: mockCharacter,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       const input = {
         characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
@@ -175,8 +175,8 @@ describe("IncreaseSkillUseCase", () => {
       vi.mocked(mockCharacterService.getCharacter).mockResolvedValue({
         success: true,
         data: mockCharacter,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       // Mock a realistic backend response shape expected by the use case
       vi.mocked(mockCharacterService.updateSkill).mockResolvedValue(
@@ -190,8 +190,8 @@ describe("IncreaseSkillUseCase", () => {
               new: { available: 49 },
             },
           },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any) as any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any) as any
       );
 
       const input = {
@@ -233,14 +233,14 @@ describe("IncreaseSkillUseCase", () => {
           }),
         },
         adventurePoints: 30,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
 
       vi.mocked(mockCharacterService.getCharacter).mockResolvedValue({
         success: true,
         data: mockCharacter,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       // Mock realistic backend response for default-category skill increase
       vi.mocked(mockCharacterService.updateSkill).mockResolvedValue(
@@ -254,8 +254,8 @@ describe("IncreaseSkillUseCase", () => {
               new: { available: 29 },
             },
           },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any) as any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any) as any
       );
 
       const input = {
@@ -287,14 +287,14 @@ describe("IncreaseSkillUseCase", () => {
           }),
         },
         adventurePoints: 50,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
 
       vi.mocked(mockCharacterService.getCharacter).mockResolvedValue({
         success: true,
         data: mockCharacter,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
 
       vi.mocked(mockCharacterService.updateSkill).mockResolvedValue(createErrorResult("Skill update failed"));
 

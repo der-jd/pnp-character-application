@@ -1,25 +1,46 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useCharacterStore } from "@/src/app/global/characterStore";
 import { useAuthState } from "@/src/app/global/AuthContext";
+import { useDashboardViewModel } from "@/src/hooks/useDashboardViewModel";
 import { Button } from "@/src/lib/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/src/hooks/use-toast";
 
 export default function Dashboard() {
-  const { availableCharacters, updateAvailableCharacters, toggleEdit, updateCharacter, setSelectedCharacter } =
-    useCharacterStore();
+  const { toggleEdit, updateCharacter, setSelectedCharacter } = useCharacterStore();
   const isEditMode = useCharacterStore((state) => state.editMode);
   const { tokens } = useAuthState();
-  const [shareOpenId, setShareOpenId] = useState<string | null>(null);
-  const [shareEmail, setShareEmail] = useState("");
+  const { toast } = useToast();
   const router = useRouter();
 
+  // Use ViewModel hook
+  const { ownCharacters, sharedCharacters, isLoading, error, loadCharacters, clearError } = useDashboardViewModel();
+
+  const [shareOpenId, setShareOpenId] = useState<string | null>(null);
+  const [shareEmail, setShareEmail] = useState("");
+  const hasFetched = useRef(false);
+
+  // Load characters on mount
   useEffect(() => {
-    if (tokens?.idToken) {
-      updateAvailableCharacters(tokens.idToken);
+    if (!hasFetched.current && tokens?.idToken) {
+      hasFetched.current = true;
+      loadCharacters(tokens.idToken);
     }
-  }, [tokens?.idToken, updateAvailableCharacters]);
+  }, [tokens?.idToken, loadCharacters]);
+
+  // Handle errors with toast
+  useEffect(() => {
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error loading characters",
+        description: error,
+      });
+      clearError();
+    }
+  }, [error, toast, clearError]);
 
   const handleShareToggle = (id: string) => {
     if (shareOpenId === id) {
@@ -61,125 +82,110 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Character tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {availableCharacters.length === 0 ? (
-          <div className="col-span-full text-sm text-gray-500">No characters yet.</div>
-        ) : (
-          availableCharacters.map((char) => {
-            const isExpanded = shareOpenId === char.characterId;
-            return (
-              <div
-                key={char.characterId}
-                className={`border rounded-lg p-4 bg-white shadow flex flex-col justify-between transition-all duration-300 ${
-                  isExpanded ? "col-span-full lg:col-span-2" : ""
-                }`}
-              >
-                <div>
-                  <div className="font-semibold truncate">{char.name}</div>
-                  <div className="text-sm text-gray-500 mt-1">Level {char.level}</div>
-                  <div className="text-sm text-gray-400 mt-1">Owner: {"Unknown"}</div>
-                </div>
+      {/* Loading state */}
+      {isLoading && <div className="text-center text-gray-500">Loading characters...</div>}
 
-                <div className="mt-4 flex flex-col gap-2">
-                  <Button
-                    className="border border-black hover:bg-gray-100"
-                    onClick={() => handleEdit(char.characterId)}
+      {/* Character tiles - Own Characters */}
+      {!isLoading && (
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {ownCharacters.length === 0 ? (
+              <div className="col-span-full text-sm text-gray-500">No characters yet.</div>
+            ) : (
+              ownCharacters.map((char) => {
+                const isExpanded = shareOpenId === char.characterId;
+                return (
+                  <div
+                    key={char.characterId}
+                    className={`border rounded-lg p-4 bg-white shadow flex flex-col justify-between transition-all duration-300 ${
+                      isExpanded ? "col-span-full lg:col-span-2" : ""
+                    }`}
                   >
-                    Edit Character
-                  </Button>
-                  <Button
-                    onClick={() => handleShareToggle(char.characterId)}
-                    className="border border-black hover:bg-gray-100"
-                  >
-                    Share Character
-                  </Button>
+                    <div>
+                      <div className="font-semibold truncate">{char.name}</div>
+                      <div className="text-sm text-gray-500 mt-1">Level {char.level}</div>
+                      <div className="text-sm text-gray-400 mt-1">Owner: You</div>
+                    </div>
 
-                  {isExpanded && (
-                    <div className="flex flex-col sm:flex-row gap-2 mt-2">
-                      <input
-                        type="email"
-                        placeholder="Enter email"
-                        value={shareEmail}
-                        onChange={(e) => setShareEmail(e.target.value)}
-                        className="border px-2 py-1 rounded-md flex-1"
-                      />
-                      <Button className="bg-black text-white" onClick={() => handleShareConfirm(char.characterId)}>
-                        Confirm
+                    <div className="mt-4 flex flex-col gap-2">
+                      <Button
+                        className="border border-black hover:bg-gray-100"
+                        onClick={() => handleEdit(char.characterId)}
+                      >
+                        Edit Character
                       </Button>
-                      <Button className="border border-gray-300" onClick={() => handleShareToggle(char.characterId)}>
-                        Cancel
+                      <Button
+                        onClick={() => handleShareToggle(char.characterId)}
+                        className="border border-black hover:bg-gray-100"
+                      >
+                        Share Character
+                      </Button>
+
+                      {isExpanded && (
+                        <div className="flex flex-col sm:flex-row gap-2 mt-2">
+                          <input
+                            type="email"
+                            placeholder="Enter email"
+                            value={shareEmail}
+                            onChange={(e) => setShareEmail(e.target.value)}
+                            className="border px-2 py-1 rounded-md flex-1"
+                          />
+                          <Button className="bg-black text-white" onClick={() => handleShareConfirm(char.characterId)}>
+                            Confirm
+                          </Button>
+                          <Button
+                            className="border border-gray-300"
+                            onClick={() => handleShareToggle(char.characterId)}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      )}
+
+                      <Button className="bg-red-600 text-white hover:bg-red-700">Delete Character</Button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Shared Characters Section */}
+          <h1 className="text-2xl font-bold mt-10 mb-6">Shared with you</h1>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {sharedCharacters.length === 0 ? (
+              <div className="col-span-full text-sm text-gray-500">No shared characters.</div>
+            ) : (
+              sharedCharacters.map((char) => {
+                const isExpanded = shareOpenId === char.characterId;
+                return (
+                  <div
+                    key={char.characterId}
+                    className={`border rounded-lg p-4 bg-white shadow flex flex-col justify-between transition-all duration-300 ${
+                      isExpanded ? "col-span-full lg:col-span-2" : ""
+                    }`}
+                  >
+                    <div>
+                      <div className="font-semibold truncate">{char.name}</div>
+                      <div className="text-sm text-gray-500 mt-1">Level {char.level}</div>
+                      <div className="text-sm text-gray-400 mt-1">Owner: {char.owner || "Unknown"}</div>
+                    </div>
+
+                    <div className="mt-4 flex flex-col gap-2">
+                      <Button
+                        className="border border-black hover:bg-gray-100"
+                        onClick={() => handleEdit(char.characterId)}
+                      >
+                        View Character
                       </Button>
                     </div>
-                  )}
-
-                  <Button className="bg-red-600 text-white hover:bg-red-700">Delete Character</Button>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-      <h1 className="text-2xl font-bold mt-10 mb-10">Shared with you</h1>
-      {/* Character tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {availableCharacters.length === 0 ? (
-          <div className="col-span-full text-sm text-gray-500">No characters yet.</div>
-        ) : (
-          availableCharacters.map((char) => {
-            const isExpanded = shareOpenId === char.characterId;
-            return (
-              <div
-                key={char.characterId}
-                className={`border rounded-lg p-4 bg-white shadow flex flex-col justify-between transition-all duration-300 ${
-                  isExpanded ? "col-span-full lg:col-span-2" : ""
-                }`}
-              >
-                <div>
-                  <div className="font-semibold truncate">{char.name}</div>
-                  <div className="text-sm text-gray-500 mt-1">Level {char.level}</div>
-                  <div className="text-sm text-gray-400 mt-1">Owner: {"Unknown"}</div>
-                </div>
-
-                <div className="mt-4 flex flex-col gap-2">
-                  <Button
-                    className="border border-black hover:bg-gray-100"
-                    onClick={() => handleEdit(char.characterId)}
-                  >
-                    Edit Character
-                  </Button>
-                  <Button
-                    onClick={() => handleShareToggle(char.characterId)}
-                    className="border border-black hover:bg-gray-100"
-                  >
-                    Share Character
-                  </Button>
-
-                  {isExpanded && (
-                    <div className="flex flex-col sm:flex-row gap-2 mt-2">
-                      <input
-                        type="email"
-                        placeholder="Enter email"
-                        value={shareEmail}
-                        onChange={(e) => setShareEmail(e.target.value)}
-                        className="border px-2 py-1 rounded-md flex-1"
-                      />
-                      <Button className="bg-black text-white" onClick={() => handleShareConfirm(char.characterId)}>
-                        Confirm
-                      </Button>
-                      <Button className="border border-gray-300" onClick={() => handleShareToggle(char.characterId)}>
-                        Cancel
-                      </Button>
-                    </div>
-                  )}
-
-                  <Button className="bg-red-600 text-white hover:bg-red-700">Delete Character</Button>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -33,7 +33,8 @@ variable "integration_response_parameters" {
     "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
     //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
-    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,POST'"
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,POST,DELETE'"
+    "method.response.header.Access-Control-Max-Age"       = "'86400'" // Cache preflight for 24 hours
   }
 }
 
@@ -58,6 +59,7 @@ resource "aws_api_gateway_method_response" "step_function" {
     "method.response.header.Access-Control-Allow-Origin"  = true
     "method.response.header.Access-Control-Allow-Methods" = true
     "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Max-Age"       = true
   }
 }
 

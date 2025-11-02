@@ -36,8 +36,8 @@ describe("AttributeCollection Domain Model", () => {
     });
 
     it("should return null for non-existent attributes", () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const nonExistentAttribute = attributeCollection.getAttribute("nonexistent" as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const nonExistentAttribute = attributeCollection.getAttribute("nonexistent" as any);
       expect(nonExistentAttribute).toBeNull();
     });
 
@@ -195,22 +195,22 @@ describe("AttributeCollection Domain Model", () => {
 
     it("should handle missing attributes gracefully in primary list", () => {
       // Remove one primary attribute and ensure getPrimaryAttributes filters nulls
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const partialAttributes = { ...mockAttributes } as any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const partialAttributes = { ...mockAttributes } as any;
       delete partialAttributes.concentration;
 
       const partialCollection = new AttributeCollection(partialAttributes);
       const primary = partialCollection.getPrimaryAttributes();
 
       // concentration was removed, so primary count should be one less than full
-      expect(primary.find(p => p.name === 'concentration')).toBeUndefined();
+      expect(primary.find((p) => p.name === "concentration")).toBeUndefined();
       expect(primary.length).toBeLessThanOrEqual(7);
     });
 
     it("should compute total attribute points spent correctly for custom costs", () => {
       // Modify costs to known values and verify sum
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const custom = { ...mockAttributes } as any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const custom = { ...mockAttributes } as any;
       custom.courage.totalCost = 5;
       custom.intelligence.totalCost = 3;
       custom.concentration.totalCost = 7;
@@ -218,7 +218,16 @@ describe("AttributeCollection Domain Model", () => {
       const customCollection = new AttributeCollection(custom);
       const total = customCollection.getTotalAttributePointsSpent();
 
-      expect(total).toBe(5 + 3 + 7 + custom.dexterity.totalCost + custom.strength.totalCost + custom.mentalResilience.totalCost + custom.endurance.totalCost + custom.charisma.totalCost);
+      expect(total).toBe(
+        5 +
+          3 +
+          7 +
+          custom.dexterity.totalCost +
+          custom.strength.totalCost +
+          custom.mentalResilience.totalCost +
+          custom.endurance.totalCost +
+          custom.charisma.totalCost
+      );
     });
   });
 });

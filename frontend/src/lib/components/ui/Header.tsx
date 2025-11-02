@@ -55,11 +55,7 @@ export default function Header() {
 
         {/* User info and logout button */}
         <div className="flex items-center space-x-4">
-          {user && (
-            <span className="text-sm text-gray-700">
-              {user.email}
-            </span>
-          )}
+          {user && <span className="text-sm text-gray-700">{user.email}</span>}
           <Button
             onClick={handleLogout}
             variant="outline"

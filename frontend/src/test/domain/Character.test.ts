@@ -17,7 +17,7 @@ describe("Character Domain Model", () => {
       },
       // Add minimal required properties as needed
     },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any; // Use any for now to focus on testing behavior
 
   describe("Character Creation", () => {
@@ -89,9 +89,9 @@ describe("Character Domain Model", () => {
       const character = Character.fromApiData(mockApiCharacter);
       const apiData = character.toApiData();
 
-      expect(apiData).toHaveProperty('userId', 'user123');
-      expect(apiData).toHaveProperty('characterId', 'char456');
-      expect(apiData).toHaveProperty('characterSheet');
+      expect(apiData).toHaveProperty("userId", "user123");
+      expect(apiData).toHaveProperty("characterId", "char456");
+      expect(apiData).toHaveProperty("characterSheet");
     });
 
     it("should update character sheet via updateCharacterSheet and reflect in getters", () => {
@@ -100,13 +100,13 @@ describe("Character Domain Model", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const newSheet = {
         ...mockApiCharacter.characterSheet,
-        generalInformation: { name: 'Updated Name', level: 5 },
+        generalInformation: { name: "Updated Name", level: 5 },
         calculationPoints: { adventurePoints: { available: 5 }, attributePoints: { available: 2 } },
       } as any;
 
       character.updateCharacterSheet(newSheet);
 
-      expect(character.name).toBe('Updated Name');
+      expect(character.name).toBe("Updated Name");
       expect(character.level).toBe(5);
       expect(character.adventurePoints).toBe(5);
       expect(character.attributePoints).toBe(2);
@@ -116,7 +116,7 @@ describe("Character Domain Model", () => {
       const character = Character.fromApiData(mockApiCharacter);
       const summary = character.toSummary();
 
-      expect(summary).toEqual({ characterId: 'char456', name: 'Test Character', level: 3, userId: 'user123' });
+      expect(summary).toEqual({ characterId: "char456", name: "Test Character", level: 3, userId: "user123" });
     });
   });
 });

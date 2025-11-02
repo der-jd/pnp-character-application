@@ -152,7 +152,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
         availableCharacters: characters,
       }));
     } else {
-      featureLogger.error('CharacterStore', 'Error fetching available characters:', result.error);
+      featureLogger.error("CharacterStore", "Error fetching available characters:", result.error);
     }
   },
 
@@ -175,7 +175,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
         characterSheet: character.toApiData().characterSheet,
       }));
     } else {
-      featureLogger.error('CharacterStore', `Error fetching character ${charId}:`, result.error);
+      featureLogger.error("CharacterStore", `Error fetching character ${charId}:`, result.error);
     }
   },
 

@@ -41,7 +41,7 @@ export class ApiClient {
    * Makes an authenticated API request
    */
   async makeRequest<T>(config: ApiRequestConfig, idToken: string): Promise<Result<T, ApiError>> {
-    featureLogger.debug('api', 'ApiClient', `${config.method} ${config.endpoint}`);
+    featureLogger.debug("api", "ApiClient", `${config.method} ${config.endpoint}`);
 
     if (!idToken) {
       return ResultError(createApiError("Authentication token is required", 401, config.endpoint, config.method));
@@ -66,27 +66,21 @@ export class ApiClient {
 
     try {
       const response = await fetch(url, requestInit);
-      
-      featureLogger.debug('api', 'ApiClient', `Response ${response.status}:`, config.endpoint);
+
+      featureLogger.debug("api", "ApiClient", `Response ${response.status}:`, config.endpoint);
 
       if (!response.ok) {
         const errorBody = await this.safeParseJson(response);
-        const errorMessage = (errorBody as { message?: string })?.message || `HTTP ${response.status}: ${response.statusText}`;
-        featureLogger.error('ApiClient', `API error ${response.status}:`, errorMessage);
-        return ResultError(
-          createApiError(
-            errorMessage,
-            response.status,
-            config.endpoint,
-            config.method
-          )
-        );
+        const errorMessage =
+          (errorBody as { message?: string })?.message || `HTTP ${response.status}: ${response.statusText}`;
+        featureLogger.error("ApiClient", `API error ${response.status}:`, errorMessage);
+        return ResultError(createApiError(errorMessage, response.status, config.endpoint, config.method));
       }
 
       const data = await response.json();
       return ResultSuccess<T, ApiError>(data as T);
     } catch (error) {
-      featureLogger.error('ApiClient', 'Network error:', error);
+      featureLogger.error("ApiClient", "Network error:", error);
       return ResultError(
         createApiError(
           error instanceof Error ? error.message : "Network request failed",

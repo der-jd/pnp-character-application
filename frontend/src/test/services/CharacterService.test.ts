@@ -21,7 +21,7 @@ describe("CharacterService", () => {
       patch: vi.fn(),
       put: vi.fn(),
       delete: vi.fn(),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     // Make the mocked constructor return our mock

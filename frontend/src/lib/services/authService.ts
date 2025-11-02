@@ -66,7 +66,7 @@ export interface SignInResult {
 /**
  * Service for handling authentication with AWS Cognito
  * Manages tokens, user sessions, and authentication state
- * 
+ *
  * Following clean architecture:
  * - Encapsulates all Cognito SDK interactions
  * - Provides clean interface for authentication operations
@@ -80,11 +80,7 @@ export class AuthService {
   private readonly userPoolId: string;
   private readonly clientId: string;
 
-  constructor(
-    region?: string,
-    userPoolId?: string,
-    clientId?: string
-  ) {
+  constructor(region?: string, userPoolId?: string, clientId?: string) {
     this.cognitoClient = new CognitoIdentityProviderClient({
       region: region || process.env.NEXT_PUBLIC_COGNITO_REGION || "eu-central-1",
     });
@@ -96,7 +92,7 @@ export class AuthService {
    * Sign in with email and password
    */
   async signIn(credentials: SignInCredentials): Promise<Result<SignInResult, ApiError>> {
-    featureLogger.debug('auth', 'AuthService', 'Signing in user:', credentials.email);
+    featureLogger.debug("auth", "AuthService", "Signing in user:", credentials.email);
 
     try {
       const command = new InitiateAuthCommand({
@@ -121,9 +117,7 @@ export class AuthService {
       // Parse tokens
       const tokens = this.parseAuthenticationResult(authResult);
       if (!tokens) {
-        return ResultError(
-          createApiError("Failed to parse authentication tokens", 500, "auth/signin", "POST")
-        );
+        return ResultError(createApiError("Failed to parse authentication tokens", 500, "auth/signin", "POST"));
       }
 
       // Get user info
@@ -137,21 +131,16 @@ export class AuthService {
       // Store auth data
       await this.storeAuthData(tokens, user);
 
-      featureLogger.info('auth', 'AuthService', 'Sign in successful for:', user.email);
+      featureLogger.info("auth", "AuthService", "Sign in successful for:", user.email);
 
       return ResultSuccess({
         tokens,
         user,
       });
     } catch (error) {
-      featureLogger.error('AuthService', 'Sign in error:', error);
+      featureLogger.error("AuthService", "Sign in error:", error);
       return ResultError(
-        createApiError(
-          error instanceof Error ? error.message : "Sign in failed",
-          401,
-          "auth/signin",
-          "POST"
-        )
+        createApiError(error instanceof Error ? error.message : "Sign in failed", 401, "auth/signin", "POST")
       );
     }
   }
@@ -160,7 +149,7 @@ export class AuthService {
    * Sign up a new user
    */
   async signUp(data: SignUpData): Promise<Result<{ email: string; userSub: string }, ApiError>> {
-    featureLogger.debug('auth', 'AuthService', 'Signing up user:', data.email);
+    featureLogger.debug("auth", "AuthService", "Signing up user:", data.email);
 
     try {
       const command = new SignUpCommand({
@@ -189,30 +178,25 @@ export class AuthService {
         return ResultError(createApiError("Sign up failed - no user sub", 500, "auth/signup", "POST"));
       }
 
-      featureLogger.info('auth', 'AuthService', 'Sign up successful:', data.email);
+      featureLogger.info("auth", "AuthService", "Sign up successful:", data.email);
 
       return ResultSuccess({
         email: data.email,
         userSub: response.UserSub,
       });
     } catch (error) {
-      featureLogger.error('AuthService', 'Sign up error:', error);
+      featureLogger.error("AuthService", "Sign up error:", error);
       return ResultError(
-        createApiError(
-          error instanceof Error ? error.message : "Sign up failed",
-          400,
-          "auth/signup",
-          "POST"
-        )
+        createApiError(error instanceof Error ? error.message : "Sign up failed", 400, "auth/signup", "POST")
       );
     }
   }
 
-    /**
+  /**
    * Confirm user sign up with verification code
    */
   async confirmSignUp(email: string, code: string): Promise<Result<void, ApiError>> {
-    featureLogger.debug('auth', 'AuthService', 'Confirming sign up for:', email);
+    featureLogger.debug("auth", "AuthService", "Confirming sign up for:", email);
 
     try {
       const command = new ConfirmSignUpCommand({
@@ -223,18 +207,13 @@ export class AuthService {
 
       await this.cognitoClient.send(command);
 
-      featureLogger.info('auth', 'AuthService', 'Sign up confirmed for:', email);
+      featureLogger.info("auth", "AuthService", "Sign up confirmed for:", email);
 
       return ResultSuccess(undefined);
     } catch (error) {
-      featureLogger.error('AuthService', 'Confirm sign up error:', error);
+      featureLogger.error("AuthService", "Confirm sign up error:", error);
       return ResultError(
-        createApiError(
-          error instanceof Error ? error.message : "Confirmation failed",
-          400,
-          "auth/confirm",
-          "POST"
-        )
+        createApiError(error instanceof Error ? error.message : "Confirmation failed", 400, "auth/confirm", "POST")
       );
     }
   }
@@ -243,7 +222,7 @@ export class AuthService {
    * Sign out the current user
    */
   async signOut(): Promise<Result<void, ApiError>> {
-    featureLogger.debug('auth', 'AuthService', 'Signing out user');
+    featureLogger.debug("auth", "AuthService", "Signing out user");
 
     try {
       const tokens = this.getStoredTokens();
@@ -258,11 +237,11 @@ export class AuthService {
 
       this.clearAuthData();
 
-      featureLogger.info('auth', 'AuthService', 'User signed out successfully');
+      featureLogger.info("auth", "AuthService", "User signed out successfully");
 
       return ResultSuccess(undefined);
     } catch (error) {
-      featureLogger.error('AuthService', 'Sign out error:', error);
+      featureLogger.error("AuthService", "Sign out error:", error);
       // Still clear local data even if API call fails
       this.clearAuthData();
       return ResultError(
@@ -446,9 +425,7 @@ export class AuthService {
       const response = await this.cognitoClient.send(command);
 
       if (!response.Username) {
-        return ResultError(
-          createApiError("Failed to get user info - no username", 500, "auth/userinfo", "GET")
-        );
+        return ResultError(createApiError("Failed to get user info - no username", 500, "auth/userinfo", "GET"));
       }
 
       // Extract email and name from user attributes
@@ -462,12 +439,7 @@ export class AuthService {
       });
     } catch (error) {
       return ResultError(
-        createApiError(
-          error instanceof Error ? error.message : "Failed to get user info",
-          500,
-          "auth/userinfo",
-          "GET"
-        )
+        createApiError(error instanceof Error ? error.message : "Failed to get user info", 500, "auth/userinfo", "GET")
       );
     }
   }

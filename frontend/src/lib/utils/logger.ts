@@ -1,14 +1,14 @@
 /**
  * Debug Logger Utility
- * 
+ *
  * Provides conditional logging that only outputs in development mode
  * Automatically disabled in production builds
  */
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export type LogLevel = "debug" | "info" | "warn" | "error";
 
 class Logger {
-  private isDevelopment = process.env.NODE_ENV === 'development';
+  private isDevelopment = process.env.NODE_ENV === "development";
 
   /**
    * Debug log - only shows in development

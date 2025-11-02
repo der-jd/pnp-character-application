@@ -108,11 +108,11 @@ describe("UpdateAttributeUseCase", () => {
       };
 
       // Mock getCharacter and updateAttribute
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
       vi.mocked(mockCharacterService.updateAttribute).mockResolvedValue(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createSuccessResult(mockUpdatedCharacter as any)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        createSuccessResult(mockUpdatedCharacter as any)
       );
 
       // Act
@@ -166,8 +166,8 @@ describe("UpdateAttributeUseCase", () => {
         },
         attributePoints: 20,
       };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
       vi.mocked(mockCharacterService.updateAttribute).mockResolvedValue(
         createErrorResult("Insufficient attribute points")
       );

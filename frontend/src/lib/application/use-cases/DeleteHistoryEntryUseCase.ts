@@ -25,8 +25,8 @@ export class DeleteHistoryEntryUseCase implements UseCase<DeleteHistoryEntryInpu
   ) {}
 
   async execute(input: DeleteHistoryEntryInput): Promise<Result<DeleteHistoryEntryOutput, Error>> {
-    featureLogger.debug('usecase', 'DeleteHistoryEntryUseCase', 'Deleting history entry:', input.historyEntryId);
-    
+    featureLogger.debug("usecase", "DeleteHistoryEntryUseCase", "Deleting history entry:", input.historyEntryId);
+
     try {
       // Validate input at application boundary
       if (!input.characterId) {
@@ -44,7 +44,7 @@ export class DeleteHistoryEntryUseCase implements UseCase<DeleteHistoryEntryInpu
       // Load current character to validate access and get current state
       const characterResult = await this.characterService.getCharacter(input.characterId, input.idToken);
       if (!characterResult.success) {
-        featureLogger.error('DeleteHistoryEntryUseCase', 'Failed to load character:', characterResult.error);
+        featureLogger.error("DeleteHistoryEntryUseCase", "Failed to load character:", characterResult.error);
         return ResultError(new Error(`Failed to load character: ${characterResult.error.message}`));
       }
 
@@ -56,18 +56,18 @@ export class DeleteHistoryEntryUseCase implements UseCase<DeleteHistoryEntryInpu
       );
 
       if (!deleteResult.success) {
-        featureLogger.error('DeleteHistoryEntryUseCase', 'Failed to delete history entry:', deleteResult.error);
+        featureLogger.error("DeleteHistoryEntryUseCase", "Failed to delete history entry:", deleteResult.error);
         return ResultError(new Error(`Failed to delete history entry: ${deleteResult.error.message}`));
       }
 
       // Reload character to get updated state after reversion
       const updatedCharacterResult = await this.characterService.getCharacter(input.characterId, input.idToken);
       if (!updatedCharacterResult.success) {
-        featureLogger.error('DeleteHistoryEntryUseCase', 'Failed to reload character after deletion');
+        featureLogger.error("DeleteHistoryEntryUseCase", "Failed to reload character after deletion");
         return ResultError(new Error("History entry deleted but failed to reload character"));
       }
 
-      featureLogger.info('usecase', 'DeleteHistoryEntryUseCase', 'History entry deleted successfully');
+      featureLogger.info("usecase", "DeleteHistoryEntryUseCase", "History entry deleted successfully");
 
       // Return application-layer result
       return ResultSuccess({
@@ -75,7 +75,7 @@ export class DeleteHistoryEntryUseCase implements UseCase<DeleteHistoryEntryInpu
         revertedCharacter: updatedCharacterResult.data,
       });
     } catch (error) {
-      featureLogger.error('DeleteHistoryEntryUseCase', 'Unexpected error:', error);
+      featureLogger.error("DeleteHistoryEntryUseCase", "Unexpected error:", error);
       return ResultError(error instanceof Error ? error : new Error("Unknown error occurred"));
     }
   }

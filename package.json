@@ -24,10 +24,15 @@
     "api-schema-tests:setup": "./scripts/terraform-symlink-setup.sh",
     "api-schema-tests:run": "./scripts/run-api-schema-tests.sh",
     "api-schema-tests:clean": "./scripts/clean-api-schema-tests.sh",
+    "api-schema-tests:stop": "./scripts/stop-localstack.sh",
+    "api-schema-tests:teardown": "./scripts/clean-api-schema-tests.sh",
     "api-schema-tests": "npm run api-schema-tests:setup && npm run api-schema-tests:run",
     "api-schema-tests:localstack": "./scripts/run-api-schema-tests-env.sh --env=localstack",
     "api-schema-tests:prod": "./scripts/run-api-schema-tests-env.sh --env=prod",
-    "api-schema-tests:all": "npm run api-schema-tests:setup && npm run api-schema-tests:localstack"
+    "api-schema-tests:all": "npm run api-schema-tests:setup && npm run api-schema-tests:localstack",
+    "localstack:start": "./scripts/terraform-symlink-setup.sh",
+    "localstack:stop": "./scripts/stop-localstack.sh",
+    "localstack:clean": "./scripts/clean-api-schema-tests.sh"
   },
   "devDependencies": {
     "husky": "^9.1.7",

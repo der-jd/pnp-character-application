@@ -6,7 +6,7 @@ import { AuthService } from "@/src/lib/services";
 
 /**
  * AuthContext - React Context wrapper for AuthViewModel
- * 
+ *
  * Following clean architecture:
  * - Context is just a delivery mechanism (React-specific)
  * - AuthViewModel contains all the business logic
@@ -31,7 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 /**
  * Hook to access AuthViewModel from any component
- * 
+ *
  * Usage:
  * const auth = useAuth();
  * const state = useAuthState(); // To trigger re-renders on state changes
@@ -46,13 +46,13 @@ export const useAuth = () => {
 
 /**
  * Hook to access auth state with automatic re-renders
- * 
+ *
  * This uses useSyncExternalStore to subscribe to AuthViewModel state changes
  * Components will re-render when authentication state changes
  */
 export const useAuthState = () => {
   const authViewModel = useAuth();
-  
+
   return useSyncExternalStore(
     (callback) => authViewModel.subscribe(callback),
     () => authViewModel.getState(),
@@ -66,4 +66,3 @@ export const useAuthState = () => {
     }) // getServerSnapshot - return safe default for SSR
   );
 };
-

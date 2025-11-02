@@ -13,7 +13,7 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  
+
   // Get AuthViewModel instance and current auth state
   const authViewModel = useAuth();
   const { isAuthenticated } = useAuthState();
@@ -25,7 +25,7 @@ export default function SignIn() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      featureLogger.debug('ui', 'SignIn', 'Already authenticated, redirecting to dashboard');
+      featureLogger.debug("ui", "SignIn", "Already authenticated, redirecting to dashboard");
       router.push("/protected/dashboard");
     }
   }, [isAuthenticated, router]);
@@ -33,15 +33,15 @@ export default function SignIn() {
   // Setup success callback
   useEffect(() => {
     onSuccess((data) => {
-      featureLogger.info('ui', 'SignIn', 'Sign in successful, updating auth state');
-      featureLogger.debug('ui', 'SignIn', 'User ID:', data.user.userId);
-      
+      featureLogger.info("ui", "SignIn", "Sign in successful, updating auth state");
+      featureLogger.debug("ui", "SignIn", "User ID:", data.user.userId);
+
       // Update AuthViewModel with authenticated state (data contains tokens and user)
       authViewModel.setAuthState(data.tokens, data.user);
-      
+
       // Load characters
       updateAvailableCharacters(data.tokens.idToken);
-      
+
       // Navigate to dashboard
       router.push("/protected/dashboard");
     });
@@ -56,8 +56,8 @@ export default function SignIn() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    featureLogger.debug('ui', 'SignIn', 'Form submitted, signing in:', email);
-    
+    featureLogger.debug("ui", "SignIn", "Form submitted, signing in:", email);
+
     await signIn({
       email,
       password,
@@ -75,13 +75,9 @@ export default function SignIn() {
             <Image src="/images/logo.png" alt="Logo" width={100} height={100} />
           </div>
           <h1 className="text-2xl font-bold text-center text-gray-900">Sign In</h1>
-          
-          {error && (
-            <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
-              {error}
-            </div>
-          )}
-          
+
+          {error && <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">{error}</div>}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">

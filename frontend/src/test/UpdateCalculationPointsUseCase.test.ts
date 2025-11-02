@@ -31,22 +31,25 @@ describe("UpdateCalculationPointsUseCase", () => {
   });
 
   it("should require at least one point type update", async () => {
-    const result = await useCase.execute({ characterId: TEST_SCENARIOS.VALID_CHARACTER_ID, idToken: TEST_SCENARIOS.VALID_ID_TOKEN });
+    const result = await useCase.execute({
+      characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
+      idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
+    });
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error.message).toBe("At least one point type update is required");
   });
 
   it("should reject negative resulting adventure points", async () => {
     const mockChar = createSimpleTestCharacter();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockChar as any));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockChar as any));
 
     const result = await useCase.execute({
       characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
       idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
       adventurePoints: { total: { initialValue: 0, increasedPoints: -1 } },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error.message).toBe("Adventure points cannot be negative");
@@ -54,15 +57,15 @@ describe("UpdateCalculationPointsUseCase", () => {
 
   it("should reject negative resulting attribute points", async () => {
     const mockChar = createSimpleTestCharacter();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockChar as any));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockChar as any));
 
     const result = await useCase.execute({
       characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
       idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
       attributePoints: { total: { initialValue: 0, increasedPoints: -5 } },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error.message).toBe("Attribute points cannot be negative");
@@ -83,17 +86,19 @@ describe("UpdateCalculationPointsUseCase", () => {
 
   it("should handle service update failure", async () => {
     const mockChar = createSimpleTestCharacter();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockChar as any));
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.updateCalculationPoints).mockResolvedValue(createErrorResult("update failed") as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockChar as any));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(mockCharacterService.updateCalculationPoints).mockResolvedValue(
+      createErrorResult("update failed") as any
+    );
 
     const result = await useCase.execute({
       characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
       idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
       adventurePoints: { total: { initialValue: 1, increasedPoints: 1 } },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
     expect(result.success).toBe(false);
     if (!result.success) expect(result.error.message).toContain("Failed to update calculation points");
@@ -101,16 +106,16 @@ describe("UpdateCalculationPointsUseCase", () => {
 
   it("should handle reload failure after successful update", async () => {
     const mockChar = createSimpleTestCharacter();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(mockChar as any));
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.updateCalculationPoints).mockResolvedValue(createSuccessResult({} as any) as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createSuccessResult(mockChar as any));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(mockCharacterService.updateCalculationPoints).mockResolvedValue(createSuccessResult({} as any) as any);
     // Second call to getCharacter fails
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createErrorResult("reload fail") as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(mockCharacterService.getCharacter).mockResolvedValueOnce(createErrorResult("reload fail") as any);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const result = await useCase.execute({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await useCase.execute({
       characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
       idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
       adventurePoints: { total: { initialValue: 1, increasedPoints: 1 } },
@@ -122,22 +127,24 @@ describe("UpdateCalculationPointsUseCase", () => {
 
   it("should update points successfully", async () => {
     const mockChar = createSimpleTestCharacter();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockChar as any));
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.updateCalculationPoints).mockResolvedValue(createSuccessResult({} as any) as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockChar as any));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(mockCharacterService.updateCalculationPoints).mockResolvedValue(createSuccessResult({} as any) as any);
 
     // After update, reload returns updated char
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult({ ...mockChar, characterId: TEST_SCENARIOS.VALID_CHARACTER_ID } as any));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(
+      createSuccessResult({ ...mockChar, characterId: TEST_SCENARIOS.VALID_CHARACTER_ID } as any)
+    );
 
     const result = await useCase.execute({
       characterId: TEST_SCENARIOS.VALID_CHARACTER_ID,
       idToken: TEST_SCENARIOS.VALID_ID_TOKEN,
       adventurePoints: { total: { initialValue: 5, increasedPoints: 3 } },
       attributePoints: { total: { initialValue: 2, increasedPoints: 1 } },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
     expect(result.success).toBe(true);
     if (result.success) {

@@ -1,5 +1,6 @@
 import { Result } from "../../types/result";
 import { Character as DomainCharacter } from "../../domain/Character";
+import { CharacterSummary } from "../../domain/CharacterSummary";
 import { PostCharactersRequest } from "api-spec";
 
 /**
@@ -119,7 +120,7 @@ export interface LoadCharacterOutput {
 }
 
 export interface LoadAllCharactersOutput {
-  characters: DomainCharacter[];
+  characters: CharacterSummary[];
 }
 
 export interface IncreaseSkillOutput {

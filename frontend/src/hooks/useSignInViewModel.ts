@@ -22,7 +22,7 @@ import { featureLogger } from "../lib/utils/featureLogger";
 export function useSignInViewModel() {
   // Create ViewModel instance (memoized to prevent recreation on every render)
   const viewModel = useMemo(() => {
-    featureLogger.debug('ui', 'useSignInViewModel', 'Creating ViewModel instance');
+    featureLogger.debug("ui", "useSignInViewModel", "Creating ViewModel instance");
     const authService = new AuthService();
     const signInUseCase = new SignInUseCase(authService);
     const vm = new SignInViewModel(signInUseCase);
