@@ -2,7 +2,7 @@
 
 import { useCharacterStore } from "@/src/app/global/characterStore";
 import { useSkillUpdater } from "@/src/hooks/useSkillUpdate";
-import { CombatValues } from "@/src/lib/api/models/Character/character";
+import { CombatStats } from "api-spec";
 import { Button } from "@lib/components/ui/button";
 import { CombatValueTable } from "@lib/components/ui/combatTable/dataTable";
 import { ICombatValue } from "@lib/components/ui/combatTable/definitions";
@@ -21,8 +21,8 @@ export default function CombatValuesPage() {
     hide();
   };
 
-  const ranged = characterSheet?.combatValues.ranged;
-  const melee = characterSheet?.combatValues.melee;
+  const ranged = characterSheet?.combat.ranged;
+  const melee = characterSheet?.combat.melee;
   const rangedData = ranged ? transformCombatValuesToRows(ranged, "ranged") : [];
   const meleeData = melee ? transformCombatValuesToRows(melee, "melee") : [];
 
@@ -45,8 +45,8 @@ export default function CombatValuesPage() {
 }
 
 function transformCombatValuesToRows(
-  input: Record<string, CombatValues>,
-  inputType: "ranged" | "melee",
+  input: Record<string, CombatStats>,
+  inputType: "ranged" | "melee"
 ): ICombatValue[] {
   return Object.entries(input).map(([key, values]) => ({
     name: key,

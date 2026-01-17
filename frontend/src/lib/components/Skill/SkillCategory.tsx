@@ -24,7 +24,7 @@ const SkillCategory = ({ data }: SkillCategoryProps) => {
       acc[category].push(skill);
       return acc;
     },
-    {} as Record<string, ISkillProps[]>,
+    {} as Record<string, ISkillProps[]>
   );
 
   const categories = Object.keys(groupedSkills).sort((a, b) => {

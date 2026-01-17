@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "../app/global/AuthContext";
+import { useAuthState } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
 import { ApiError, deleteHistoryEntry, getHistory, getHistoryBlock } from "../lib/api/utils/api_calls";
 import { useToast } from "./use-toast";
 import { RecordType } from "../lib/api/utils/historyEventType";
-import { CharacterSheet, CombatValues } from "../lib/api/models/Character/character";
+import { CharacterSheet } from "../lib/api/models/Character/character";
+import { CombatStats } from "api-spec";
 import { RecordEntry } from "../lib/api/models/history/interface";
 
 /**
@@ -22,11 +23,11 @@ export function useHistory() {
   const updateValue = useCharacterStore((state) => state.updateValue);
   const updateCombatValue = useCharacterStore((state) => state.updateCombatValue);
   const openHistoryEntries = useCharacterStore((state) => state.openHistoryEntries);
-  const { idToken } = useAuth();
+  const { tokens } = useAuthState();
 
   const [isLoading, setLoading] = useState<boolean>(false);
 
-  function hasIdToken(idToken: string | null): idToken is string {
+  function hasIdToken(idToken: string | null | undefined): idToken is string {
     if (!idToken) {
       toast.toast({
         title: `[History Error] No Character!`,
@@ -51,7 +52,7 @@ export function useHistory() {
   }
 
   const validateRequest = (): boolean => {
-    return hasIdToken(idToken) && hasSelectedChar(selectedChar);
+    return hasIdToken(tokens?.idToken) && hasSelectedChar(selectedChar);
   };
 
   const updateHistory = async (isBlocking: boolean) => {
@@ -59,7 +60,7 @@ export function useHistory() {
       return;
     }
 
-    const token = idToken!;
+    const token = tokens!.idToken;
     const character = selectedChar!;
 
     const fetchHistory = async () => {
@@ -122,7 +123,7 @@ export function useHistory() {
       return false;
     }
 
-    const token = idToken!;
+    const token = tokens!.idToken;
     const character = selectedChar!;
 
     setLoading(true);
@@ -185,11 +186,11 @@ export function useHistory() {
 
       case RecordType.COMBAT_VALUES_CHANGED: {
         const path = [
-          "combatValues",
+          "combat",
           lastEntry.name.toLowerCase().includes("melee") ? "melee" : "ranged",
         ] as (keyof CharacterSheet)[];
         const name = lastEntry.name.split("/")[1] as keyof CharacterSheet;
-        updateCombatValue(path, name, lastEntry.data.old as CombatValues);
+        updateCombatValue(path, name, lastEntry.data.old as CombatStats);
       }
     }
   };

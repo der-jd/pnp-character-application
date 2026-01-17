@@ -1,9 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "../app/global/AuthContext";
+import { useAuthState } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
-import { CharacterSheet, LearningMethod } from "../lib/api/models/Character/character";
+import { CharacterSheet, LearningMethod, LearningMethodString } from "api-spec";
+
+// Helper function to convert from numeric LearningMethod to string
+const convertLearningMethodToString = (numericMethod: LearningMethod): LearningMethodString => {
+  switch (numericMethod) {
+    case LearningMethod.FREE:
+      return "FREE";
+    case LearningMethod.LOW_PRICED:
+      return "LOW_PRICED";
+    case LearningMethod.NORMAL:
+      return "NORMAL";
+    case LearningMethod.EXPENSIVE:
+      return "EXPENSIVE";
+    default:
+      return "NORMAL";
+  }
+};
 import {
   increaseAttribute,
   increaseBaseValue,
@@ -29,7 +45,7 @@ import { ICombatValue } from "../lib/components/ui/combatTable/definitions";
  */
 export function useSkillUpdater() {
   const toast = useToast();
-  const { idToken } = useAuth();
+  const { tokens } = useAuthState();
   const [loading, setLoading] = useState(false);
   const updateValue = useCharacterStore((state) => state.updateValue);
   const updateCombatValue = useCharacterStore((state) => state.updateCombatValue);
@@ -100,15 +116,15 @@ export function useSkillUpdater() {
       },
     };
 
-    if (selectedChar && idToken) {
+    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
 
         const { data, historyRecord } = await increaseAttribute(
-          idToken,
+          tokens!.idToken,
           selectedChar,
           skill.name,
-          increaseAttributeRequest,
+          increaseAttributeRequest
         );
 
         applyUpdate({
@@ -142,18 +158,18 @@ export function useSkillUpdater() {
         initialValue: skill.current_level,
         increasedPoints: pointsToSkill,
       },
-      learningMethod: LearningMethod[skill.learning_method],
+      learningMethod: convertLearningMethodToString(skill.learning_method),
     };
 
-    if (selectedChar && idToken) {
+    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
         const { data, historyRecord } = await increaseSkill(
-          idToken,
+          tokens!.idToken,
           selectedChar,
           skill.name,
           skill.category,
-          increaseSkillRequest,
+          increaseSkillRequest
         );
 
         applyUpdate({
@@ -188,14 +204,14 @@ export function useSkillUpdater() {
       },
     };
 
-    if (selectedChar && idToken) {
+    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
         const { data, historyRecord } = await increaseBaseValue(
-          idToken,
+          tokens!.idToken,
           selectedChar,
           value.name,
-          increaseBaseValueRequest,
+          increaseBaseValueRequest
         );
 
         applyUpdate({
@@ -236,10 +252,10 @@ export function useSkillUpdater() {
       initialLevel: currentLevel,
     };
 
-    if (selectedChar && idToken) {
+    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
-        const { data, historyRecord } = await levelUp(idToken, selectedChar, lvlUpRequest);
+        const { data, historyRecord } = await levelUp(tokens!.idToken, selectedChar, lvlUpRequest);
         try {
           applyUpdate({
             keyPath: path,
@@ -267,7 +283,7 @@ export function useSkillUpdater() {
 
   const tryIncreaseCombatValue = async (value: ICombatValue, subtype: string, pointsToSkill: number) => {
     console.log(subtype);
-    const path = ["combatValues", value.type] as (keyof CharacterSheet)[];
+    const path = ["combat", value.type] as (keyof CharacterSheet)[];
     const name = value.name as keyof CharacterSheet;
     const increaseCombatValueRequest: CombatValueIncreaseRequest = {
       attackValue: {
@@ -280,18 +296,18 @@ export function useSkillUpdater() {
       },
     };
 
-    if (selectedChar && idToken) {
+    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
         const { data, historyRecord } = await increaseCombatValue(
-          idToken,
+          tokens!.idToken,
           selectedChar,
           value.name,
           value.type,
-          increaseCombatValueRequest,
+          increaseCombatValueRequest
         );
 
-        updateCombatValue(path, name, data.combatValues.new);
+        updateCombatValue(path, name, data.combatStats.new);
 
         if (historyRecord) updateReversibleHistory([historyRecord]);
       } catch (error) {
