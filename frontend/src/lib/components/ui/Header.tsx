@@ -50,6 +50,13 @@ export default function Header() {
                 <Button className="bg-black text-white hover:bg-gray-300 hover:text-black px-4 py-2">History</Button>
               </Link>
             </li>
+            <li>
+              <Link href="/protected/character-card-test">
+                <Button className="bg-black text-white hover:bg-gray-300 hover:text-black px-4 py-2">
+                  Character Card
+                </Button>
+              </Link>
+            </li>
           </ul>
         </nav>
 
