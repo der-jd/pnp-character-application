@@ -59,16 +59,16 @@ export async function setLevelUp(
       characterId: characterId,
     },
     UpdateExpression:
-      "SET #characterSheet.#generalInformation.#levelUpProgress = :progress, #characterSheet.#generalInformation.#level = :level",
+      "SET #characterSheet.#generalInformation.#level = :level, #characterSheet.#generalInformation.#levelUpProgress = :progress",
     ExpressionAttributeNames: {
       "#characterSheet": "characterSheet",
       "#generalInformation": "generalInformation",
-      "#levelUpProgress": "levelUpProgress",
       "#level": "level",
+      "#levelUpProgress": "levelUpProgress",
     },
     ExpressionAttributeValues: {
-      ":progress": levelUpProgress,
       ":level": level,
+      ":progress": levelUpProgress,
     },
   });
 

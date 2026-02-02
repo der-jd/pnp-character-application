@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { MAX_LEVEL } from "./general-schemas.js";
+import { MAX_LEVEL, MIN_LEVEL } from "./general-schemas.js";
+
+export const levelSchema = z.number().int().min(MIN_LEVEL).max(MAX_LEVEL);
+
+export type Level = z.infer<typeof levelSchema>;
 
 export const LEVEL_UP_DICE_EXPRESSION = "1d4+2" as const;
 export const LEVEL_UP_DICE_MIN_TOTAL = 3;
@@ -49,28 +53,39 @@ const levelUpRerollUnlockEffectSchema = z
   })
   .strict();
 
-export const levelUpEffectSchema = z.union([
+export const effectByLevelUpSchema = z.union([
   levelUpDiceEffectSchema,
   levelUpIncrementEffectSchema,
   levelUpRerollUnlockEffectSchema,
 ]);
 
-export type LevelUpEffect = z.infer<typeof levelUpEffectSchema>;
+export type EffectByLevelUp = z.infer<typeof effectByLevelUpSchema>;
+
+export const selectionCountSchema = z.number().int().min(0).max(MAX_LEVEL);
+
+export const levelUpEffectProgressSchema = z
+  .object({
+    selectionCount: selectionCountSchema,
+    firstChosenLevel: levelSchema.min(MIN_LEVEL + 1),
+    lastChosenLevel: levelSchema.min(MIN_LEVEL + 1),
+  })
+  .strict();
+
+export type LevelUpEffectProgress = z.infer<typeof levelUpEffectProgressSchema>;
+
+const effectProgressShape = Object.fromEntries(
+  levelUpEffectKindSchema.options.map((kind) => [kind, levelUpEffectProgressSchema]),
+) as Record<LevelUpEffectKind, typeof levelUpEffectProgressSchema>;
 
 export const levelUpProgressSchema = z
   .object({
-    effectsByLevel: z.record(z.string(), z.array(levelUpEffectSchema).max(MAX_LEVEL)).default({}),
-    flags: z
-      .object({
-        rerollUnlocked: z.boolean().default(false),
-      })
-      .strict()
-      .default({ rerollUnlocked: false }),
+    effectsByLevel: z.record(z.string(), z.array(effectByLevelUpSchema).max(MAX_LEVEL)).default({}),
+    effects: z.object(effectProgressShape).partial().strict().default({}),
   })
   .strict()
   .default({
     effectsByLevel: {},
-    flags: { rerollUnlocked: false },
+    effects: {},
   });
 
 export type LevelUpProgress = z.infer<typeof levelUpProgressSchema>;

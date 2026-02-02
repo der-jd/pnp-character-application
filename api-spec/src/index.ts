@@ -1,6 +1,5 @@
 export { headersSchema, Headers } from "./headers.js";
 export {
-  levelSchema,
   professionHobbySchema,
   generalInformationSchema,
   calculationPointsSchema,
@@ -40,7 +39,6 @@ export {
   CostCategory,
   LearningMethod,
   LearningMethodString,
-  Level,
   Attributes,
   CombatSkills,
   CombatSkillName,
@@ -249,20 +247,22 @@ export {
   MIN_INITIAL_COMBAT_SKILL_VALUE,
   MAX_INITIAL_COMBAT_SKILL_VALUE,
 } from "./endpoints/post-characters.js";
-
-// Level-up schemas and endpoints
 export {
   LEVEL_UP_DICE_EXPRESSION,
   LEVEL_UP_DICE_MIN_TOTAL,
   LEVEL_UP_DICE_MAX_TOTAL,
   levelUpEffectKindSchema,
   LevelUpEffectKind,
-  levelUpEffectSchema,
-  LevelUpEffect,
+  effectByLevelUpSchema,
+  EffectByLevelUp,
   levelUpProgressSchema,
   LevelUpProgress,
+  levelSchema,
+  Level,
+  levelUpEffectProgressSchema,
+  LevelUpEffectProgress,
+  selectionCountSchema,
 } from "./level-up-schemas.js";
-
 export {
   getLevelUpPathParamsSchema,
   GetLevelUpPathParams,
@@ -271,12 +271,13 @@ export {
   levelUpOptionSchema,
   LevelUpOption,
 } from "./endpoints/get-level-up.js";
-
 export {
   postLevelUpPathParamsSchema,
   PostLevelUpPathParams,
   postLevelUpRequestSchema,
   PostLevelUpRequest,
+  applyLevelUpResponseSchema,
+  ApplyLevelUpResponse,
   postLevelUpResponseSchema,
   PostLevelUpResponse,
   postLevelUpHistoryRecordSchema,

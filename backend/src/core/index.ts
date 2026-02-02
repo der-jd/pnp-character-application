@@ -11,7 +11,7 @@ export {
   updateAttributePoints,
   updateCombatStats,
   updateBaseValue,
-  updateLevel,
+  setLevelUp,
 } from "./dynamodb_characters.js";
 export {
   getHistoryItem,
@@ -55,3 +55,4 @@ export {
   recalculateAndUpdateCombatStats,
   combatBaseValuesChangedAffectingCombatStats,
 } from "./rules/combat-stats.js";
+export { computeLevelUpOptionsHash, planApplyLevelUp, computeLevelUpOptions } from "./rules/level-up.js";

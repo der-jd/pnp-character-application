@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
-import { baseValuesSchema, combatSectionSchema, levelSchema } from "../character-schemas.js";
 import { levelUpChangeSchema, recordSchema } from "../history-schemas.js";
-import { levelUpDiceRollSchema, levelUpEffectKindSchema, levelUpEffectSchema } from "../level-up-schemas.js";
+import { levelUpDiceRollSchema, levelUpEffectKindSchema, levelSchema } from "../level-up-schemas.js";
 
 export const postLevelUpPathParamsSchema = z
   .object({
@@ -28,7 +27,7 @@ export const postLevelUpRequestSchema = z
 
 export type PostLevelUpRequest = z.infer<typeof postLevelUpRequestSchema>;
 
-export const applyLevelUpResponseDataSchema = z
+export const applyLevelUpResponseSchema = z
   .object({
     characterId: z.uuid(),
     userId: userIdSchema,
@@ -38,11 +37,10 @@ export const applyLevelUpResponseDataSchema = z
         new: levelUpChangeSchema,
       })
       .strict(),
-    effect: levelUpEffectSchema,
   })
   .strict();
 
-export type ApplyLevelUpResponseData = z.infer<typeof applyLevelUpResponseDataSchema>;
+export type ApplyLevelUpResponse = z.infer<typeof applyLevelUpResponseSchema>;
 
 export const postLevelUpHistoryRecordSchema = recordSchema.extend({
   data: z
@@ -57,7 +55,7 @@ export type PostLevelUpHistoryRecord = z.infer<typeof postLevelUpHistoryRecordSc
 
 export const postLevelUpResponseSchema = z
   .object({
-    data: applyLevelUpResponseDataSchema,
+    data: applyLevelUpResponseSchema,
     historyRecord: postLevelUpHistoryRecordSchema.nullable(),
   })
   .strict();

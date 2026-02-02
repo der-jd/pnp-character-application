@@ -1,4 +1,4 @@
-import { CostCategory, CombatSkillName } from "api-spec";
+import { CostCategory, CombatSkillName, LevelUpEffectKind } from "api-spec";
 
 export const COST_CATEGORY_DEFAULT = CostCategory.CAT_2;
 export const COST_CATEGORY_COMBAT_SKILLS = CostCategory.CAT_3;
@@ -67,3 +67,47 @@ export function getCombatSkillHandling(combatSkillName: CombatSkillName): number
 
   return combatSkillsHandling[combatSkillName];
 }
+
+type LevelUpOptionConfig = {
+  firstAllowedLevel: number;
+  cooldownLevels: number;
+  maxSelectionCount: number;
+};
+
+export const levelUpOptionsConfig: Record<LevelUpEffectKind, LevelUpOptionConfig> = {
+  hpRoll: {
+    firstAllowedLevel: 2,
+    cooldownLevels: 0,
+    maxSelectionCount: Number.POSITIVE_INFINITY,
+  },
+  armorLevelRoll: {
+    firstAllowedLevel: 2,
+    cooldownLevels: 2,
+    maxSelectionCount: Number.POSITIVE_INFINITY,
+  },
+  initiativePlusOne: {
+    firstAllowedLevel: 2,
+    cooldownLevels: 1,
+    maxSelectionCount: Number.POSITIVE_INFINITY,
+  },
+  luckPlusOne: {
+    firstAllowedLevel: 2,
+    cooldownLevels: 2,
+    maxSelectionCount: 3,
+  },
+  bonusActionPlusOne: {
+    firstAllowedLevel: 6,
+    cooldownLevels: 9,
+    maxSelectionCount: 3,
+  },
+  legendaryActionPlusOne: {
+    firstAllowedLevel: 11,
+    cooldownLevels: 9,
+    maxSelectionCount: 3,
+  },
+  rerollUnlock: {
+    firstAllowedLevel: 2,
+    cooldownLevels: Number.POSITIVE_INFINITY,
+    maxSelectionCount: 1,
+  },
+};

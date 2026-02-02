@@ -63,7 +63,7 @@ resource "aws_sfn_state_machine" "apply_level_up_state_machine" {
         Choices = [
           {
             // The level was not changed, so no history record is necessary
-            Condition = "{% $parse($states.input.body).level.old = $parse($states.input.body).level.new %}",
+            Condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}",
             Next      = "SuccessState"
           }
         ],

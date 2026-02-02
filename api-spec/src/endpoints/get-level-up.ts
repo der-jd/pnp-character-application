@@ -1,33 +1,26 @@
 import { z } from "zod";
 import {
   MAX_ARRAY_SIZE,
-  MAX_LEVEL,
   MAX_STRING_LENGTH_DEFAULT,
   MAX_STRING_LENGTH_VERY_LONG,
   MIN_LEVEL,
   userIdSchema,
 } from "../general-schemas.js";
-import { levelUpEffectKindSchema } from "../level-up-schemas.js";
-import { levelSchema } from "../character-schemas.js";
+import { levelSchema, levelUpEffectKindSchema, selectionCountSchema } from "../level-up-schemas.js";
 
 export const levelUpOptionSchema = z
   .object({
     kind: levelUpEffectKindSchema,
     description: z.string().max(MAX_STRING_LENGTH_VERY_LONG),
-    diceExpression: z.string().max(MAX_STRING_LENGTH_DEFAULT).optional(),
     allowed: z.boolean(),
+    firstLevel: levelSchema.min(MIN_LEVEL + 1),
+    selectionCount: selectionCountSchema,
+    maxSelectionCount: selectionCountSchema,
+    cooldownLevels: levelSchema,
     reasonIfDenied: z.string().max(MAX_STRING_LENGTH_VERY_LONG).optional(),
-    currentCount: z.number().int().min(0).max(MAX_LEVEL).optional(),
-    maxCount: z.number().int().min(0).max(MAX_LEVEL).optional(),
-    firstLevel: levelSchema.min(MIN_LEVEL + 1).optional(),
-    cooldownLevels: levelSchema.optional(),
-    window: z
-      .object({
-        size: levelSchema,
-        lastChosenLevel: levelSchema.min(MIN_LEVEL + 1).optional(),
-      })
-      .strict()
-      .optional(),
+    diceExpression: z.string().max(MAX_STRING_LENGTH_DEFAULT).optional(),
+    firstChosenLevel: levelSchema.min(MIN_LEVEL + 1).optional(),
+    lastChosenLevel: levelSchema.min(MIN_LEVEL + 1).optional(),
   })
   .strict();
 

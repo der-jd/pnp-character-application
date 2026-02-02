@@ -9,13 +9,11 @@ import {
   combatStatsSchema,
   combinedSkillCategoryAndNameSchema,
   learningMethodSchema,
-  levelSchema,
   skillSchema,
   specialAbilitySchema,
 } from "./character-schemas.js";
 import {
   MAX_STRING_LENGTH_DEFAULT,
-  MAX_STRING_LENGTH_LONG,
   MAX_STRING_LENGTH_VERY_LONG,
   MAX_ARRAY_SIZE,
   MAX_POINTS,
@@ -24,7 +22,7 @@ import {
   MAX_HISTORY_BLOCK_NUMBER,
   MIN_HISTORY_BLOCK_NUMBER,
 } from "./general-schemas.js";
-import { levelUpProgressSchema } from "./level-up-schemas.js";
+import { levelSchema, levelUpProgressSchema } from "./level-up-schemas.js";
 
 export enum RecordType {
   CHARACTER_CREATED = 0,
