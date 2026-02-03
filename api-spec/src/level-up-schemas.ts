@@ -47,7 +47,7 @@ const levelUpIncrementEffectSchema = z
   })
   .strict();
 
-const levelUpRerollUnlockEffectSchema = z
+const levelUpUnlockEffectSchema = z
   .object({
     kind: z.literal("rerollUnlock"),
   })
@@ -56,7 +56,7 @@ const levelUpRerollUnlockEffectSchema = z
 export const effectByLevelUpSchema = z.union([
   levelUpDiceEffectSchema,
   levelUpIncrementEffectSchema,
-  levelUpRerollUnlockEffectSchema,
+  levelUpUnlockEffectSchema,
 ]);
 
 export type EffectByLevelUp = z.infer<typeof effectByLevelUpSchema>;
@@ -79,7 +79,7 @@ const effectProgressShape = Object.fromEntries(
 
 export const levelUpProgressSchema = z
   .object({
-    effectsByLevel: z.record(z.string(), z.array(effectByLevelUpSchema).max(MAX_LEVEL)).default({}),
+    effectsByLevel: z.record(z.string(), effectByLevelUpSchema).default({}),
     effects: z.object(effectProgressShape).partial().strict().default({}),
   })
   .strict()

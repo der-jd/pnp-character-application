@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
 import { levelUpChangeSchema, recordSchema } from "../history-schemas.js";
-import { levelUpDiceRollSchema, levelUpEffectKindSchema, levelSchema } from "../level-up-schemas.js";
+import { levelUpEffectKindSchema, levelSchema, effectByLevelUpSchema } from "../level-up-schemas.js";
 
 export const postLevelUpPathParamsSchema = z
   .object({
@@ -14,13 +14,7 @@ export type PostLevelUpPathParams = z.infer<typeof postLevelUpPathParamsSchema>;
 export const postLevelUpRequestSchema = z
   .object({
     initialLevel: levelSchema,
-    selectedEffect: levelUpEffectKindSchema,
-    effectParams: z
-      .object({
-        roll: levelUpDiceRollSchema,
-      })
-      .strict()
-      .optional(),
+    effect: effectByLevelUpSchema,
     optionsHash: z.string().max(MAX_STRING_LENGTH_DEFAULT),
   })
   .strict();
@@ -31,6 +25,7 @@ export const applyLevelUpResponseSchema = z
   .object({
     characterId: z.uuid(),
     userId: userIdSchema,
+    effectKind: levelUpEffectKindSchema,
     changes: z
       .object({
         old: levelUpChangeSchema,

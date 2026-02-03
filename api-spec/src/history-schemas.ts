@@ -129,6 +129,8 @@ export const levelUpChangeSchema = z
   })
   .strict();
 
+export type LevelUpChange = z.infer<typeof levelUpChangeSchema>;
+
 export const specialAbilitiesChangeSchema = z
   .object({
     values: z.array(specialAbilitySchema).max(MAX_ARRAY_SIZE),

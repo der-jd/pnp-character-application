@@ -75,6 +75,7 @@ export {
   NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
   activatedSkillsSchema,
   ActivatedSkills,
+  LevelUpChange,
 } from "./history-schemas.js";
 export {
   initialNewSchema,

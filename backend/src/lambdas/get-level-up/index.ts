@@ -31,16 +31,21 @@ export async function _getLevelUp(request: Request): Promise<APIGatewayProxyResu
   try {
     const params = validateRequest(request);
 
-    const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
+    console.log(`Get level-up options for character ${params.pathParams["character-id"]}`);
 
+    const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
     const nextLevel = character.characterSheet.generalInformation.level + 1;
+    const levelUpOptions = computeLevelUpOptions(
+      nextLevel,
+      character.characterSheet.generalInformation.levelUpProgress,
+    );
 
     const responseBody: GetLevelUpResponse = {
       characterId: character.characterId,
       userId: character.userId,
       nextLevel: nextLevel,
-      options: computeLevelUpOptions(nextLevel, character.characterSheet.generalInformation.levelUpProgress),
-      optionsHash: computeLevelUpOptionsHash(character),
+      options: levelUpOptions,
+      optionsHash: computeLevelUpOptionsHash(levelUpOptions),
     };
 
     const response = {
