@@ -75,7 +75,7 @@ export class CharacterBuilder {
       generalInformation: {
         name: "",
         level: MIN_LEVEL,
-        levelUpProgress: { effectsByLevel: {}, flags: { rerollUnlocked: false } },
+        levelUpProgress: { effectsByLevel: {}, effects: {} },
         sex: "",
         profession: { name: "", skill: "{skillCategory}/{skillName}" },
         hobby: { name: "", skill: "<skillCategory/{skillName}" },
@@ -101,17 +101,17 @@ export class CharacterBuilder {
       disadvantages: [],
       specialAbilities: [],
       baseValues: {
-        healthPoints: this.zeroBaseValue("healthPoints"),
-        mentalHealth: this.zeroBaseValue("mentalHealth"),
-        armorLevel: this.zeroBaseValue("armorLevel"),
-        naturalArmor: this.zeroBaseValue("naturalArmor"),
-        initiativeBaseValue: this.zeroBaseValue("initiativeBaseValue"),
-        attackBaseValue: this.zeroBaseValue("attackBaseValue"),
-        paradeBaseValue: this.zeroBaseValue("paradeBaseValue"),
-        rangedAttackBaseValue: this.zeroBaseValue("rangedAttackBaseValue"),
-        luckPoints: this.zeroBaseValue("luckPoints"),
-        bonusActionsPerCombatRound: this.zeroBaseValue("bonusActionsPerCombatRound"),
-        legendaryActions: this.zeroBaseValue("legendaryActions"),
+        healthPoints: this.zeroBaseValue(),
+        mentalHealth: this.zeroBaseValue(),
+        armorLevel: this.zeroBaseValue(),
+        naturalArmor: this.zeroBaseValue(),
+        initiativeBaseValue: this.zeroBaseValue(),
+        attackBaseValue: this.zeroBaseValue(),
+        paradeBaseValue: this.zeroBaseValue(),
+        rangedAttackBaseValue: this.zeroBaseValue(),
+        luckPoints: this.zeroBaseValue(),
+        bonusActionsPerCombatRound: this.zeroBaseValue(),
+        legendaryActions: this.zeroBaseValue(),
       },
       attributes: {
         courage: this.zeroAttribute(),
@@ -177,13 +177,13 @@ export class CharacterBuilder {
     return { start: 0, current: 0, mod: 0, totalCost: 0 };
   }
 
-  private zeroBaseValue(baseValueName: keyof BaseValues): BaseValue {
+  private zeroBaseValue(): BaseValue {
     return {
       // The values are updated again later when 'byFormula' is set
+      // byLvlUp will be managed by the level-up endpoint; default undefined
       start: 0,
       current: 0,
       mod: 0,
-      // byLvlUp will be managed by the level-up endpoint; default undefined
     };
   }
 

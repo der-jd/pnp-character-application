@@ -1,6 +1,5 @@
 import {
   BaseValues,
-  Character,
   CharacterSheet,
   EffectByLevelUp,
   LEVEL_UP_DICE_EXPRESSION,
