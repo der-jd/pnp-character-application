@@ -6,7 +6,7 @@ import {
   Record,
   LearningMethodString,
   PostCharactersHistoryRecord,
-  PostLevelHistoryRecord,
+  PostLevelUpHistoryRecord,
   PatchBaseValueHistoryRecord,
   PatchCalculationPointsHistoryRecord,
   PatchAttributeHistoryRecord,
@@ -33,7 +33,7 @@ export function addFakeHistoryRecord(
 export const characterCreatedChangedRecord: PostCharactersHistoryRecord = {
   type: RecordType.CHARACTER_CREATED,
   name: "New Character",
-  number: 3,
+  number: 1,
   id: "df6daaa8-d13c-47c0-b633-69c6396df4fd",
   data: {
     new: {
@@ -61,17 +61,48 @@ export const characterCreatedChangedRecord: PostCharactersHistoryRecord = {
   timestamp: new Date().toISOString(),
 };
 
-export const levelChangedRecord: PostLevelHistoryRecord = {
-  type: RecordType.LEVEL_CHANGED,
+export const levelChangedRecord: PostLevelUpHistoryRecord = {
+  type: RecordType.LEVEL_UP_APPLIED,
   name: "Level up",
   number: 2,
   id: "24f2aeb9-11a2-4b82-8307-f97fe30cfef2",
   data: {
     old: {
-      value: 1,
+      level: 1,
+      levelUpProgress: {
+        effectsByLevel: {},
+        effects: {},
+      },
     },
     new: {
-      value: 2,
+      level: 2,
+      levelUpProgress: {
+        effectsByLevel: {
+          "2": {
+            kind: "hpRoll",
+            roll: {
+              dice: "1d4+2",
+              value: 3,
+            },
+          },
+        },
+        effects: {
+          hpRoll: {
+            selectionCount: 1,
+            firstChosenLevel: 2,
+            lastChosenLevel: 2,
+          },
+        },
+      },
+      baseValues: {
+        healthPoints: {
+          start: 50,
+          current: 53,
+          byFormula: 50,
+          byLvlUp: 3,
+          mod: 10,
+        }
+      }
     },
   },
   learningMethod: null,
@@ -1121,16 +1152,25 @@ export const fakeHistoryBlock1: HistoryBlock = {
   previousBlockId: null,
   changes: [
     {
-      type: RecordType.LEVEL_CHANGED,
-      name: "Lvl 1",
+      type: RecordType.CHARACTER_CREATED,
+      name: "New Character",
       number: 1,
       id: "5a17703e-c5fa-4fbb-bc6c-4d7f4ed50a67",
       data: {
-        old: {
-          value: 0,
-        },
         new: {
-          value: 1,
+          character: fakeCharacter,
+          generationPoints: {
+            throughDisadvantages: 15,
+            spent: 20,
+            total: 20,
+          },
+          activatedSkills: [
+            "body/pickpocketing",
+            "body/bodyControl",
+            "social/convincing",
+            "nature/fishing",
+            "handcraft/stonework",
+          ],
         },
       },
       learningMethod: null,
@@ -1138,7 +1178,7 @@ export const fakeHistoryBlock1: HistoryBlock = {
         adventurePoints: null,
         attributePoints: null,
       },
-      comment: "Character created",
+      comment: null,
       timestamp: new Date().toISOString(),
     },
     attributeChangedRecord,
