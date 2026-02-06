@@ -1,4 +1,4 @@
-import { CostCategory, CombatSkillName, LevelUpEffectKind } from "api-spec";
+import { CostCategory, CombatSkillName, LevelUpEffectKind, MAX_LEVEL } from "api-spec";
 
 export const COST_CATEGORY_DEFAULT = CostCategory.CAT_2;
 export const COST_CATEGORY_COMBAT_SKILLS = CostCategory.CAT_3;
@@ -78,17 +78,17 @@ export const levelUpOptionsConfig: Record<LevelUpEffectKind, LevelUpOptionConfig
   hpRoll: {
     firstAllowedLevel: 2,
     cooldownLevels: 0,
-    maxSelectionCount: Number.POSITIVE_INFINITY,
+    maxSelectionCount: MAX_LEVEL - 1, // The character starts at level 1
   },
   armorLevelRoll: {
     firstAllowedLevel: 2,
     cooldownLevels: 2,
-    maxSelectionCount: Number.POSITIVE_INFINITY,
+    maxSelectionCount: MAX_LEVEL - 1, // The character starts at level 1
   },
   initiativePlusOne: {
     firstAllowedLevel: 2,
     cooldownLevels: 1,
-    maxSelectionCount: Number.POSITIVE_INFINITY,
+    maxSelectionCount: MAX_LEVEL - 1, // The character starts at level 1
   },
   luckPlusOne: {
     firstAllowedLevel: 2,
@@ -107,7 +107,7 @@ export const levelUpOptionsConfig: Record<LevelUpEffectKind, LevelUpOptionConfig
   },
   rerollUnlock: {
     firstAllowedLevel: 2,
-    cooldownLevels: Number.POSITIVE_INFINITY,
+    cooldownLevels: MAX_LEVEL,
     maxSelectionCount: 1,
   },
 };

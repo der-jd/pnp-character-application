@@ -63,7 +63,7 @@ export const characterCreatedChangedRecord: PostCharactersHistoryRecord = {
 
 export const levelChangedRecord: PostLevelUpHistoryRecord = {
   type: RecordType.LEVEL_UP_APPLIED,
-  name: "Level up",
+  name: "Level 2",
   number: 2,
   id: "24f2aeb9-11a2-4b82-8307-f97fe30cfef2",
   data: {
@@ -72,6 +72,14 @@ export const levelChangedRecord: PostLevelUpHistoryRecord = {
       levelUpProgress: {
         effectsByLevel: {},
         effects: {},
+      },
+      baseValues: {
+        healthPoints: {
+          start: 50,
+          current: 50,
+          byFormula: 50,
+          mod: 10,
+        },
       },
     },
     new: {
@@ -101,8 +109,8 @@ export const levelChangedRecord: PostLevelUpHistoryRecord = {
           byFormula: 50,
           byLvlUp: 3,
           mod: 10,
-        }
-      }
+        },
+      },
     },
   },
   learningMethod: null,

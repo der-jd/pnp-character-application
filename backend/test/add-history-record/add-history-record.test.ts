@@ -235,7 +235,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Add history record for 'level changed' to existing block",
+      name: "Add history record for 'level up applied' to existing block",
       request: {
         headers: {},
         pathParameters: {
@@ -244,14 +244,53 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.LEVEL_CHANGED,
+          type: RecordType.LEVEL_UP_APPLIED,
           name: "Level 2",
           data: {
             old: {
-              value: 1,
+              level: 1,
+              levelUpProgress: {
+                effectsByLevel: {},
+                effects: {},
+              },
+              baseValues: {
+                healthPoints: {
+                  start: 50,
+                  current: 50,
+                  byFormula: 50,
+                  mod: 10,
+                },
+              },
             },
             new: {
-              value: 2,
+              level: 2,
+              levelUpProgress: {
+                effectsByLevel: {
+                  "2": {
+                    kind: "hpRoll",
+                    roll: {
+                      dice: "1d4+2",
+                      value: 3,
+                    },
+                  },
+                },
+                effects: {
+                  hpRoll: {
+                    selectionCount: 1,
+                    firstChosenLevel: 2,
+                    lastChosenLevel: 2,
+                  },
+                },
+              },
+              baseValues: {
+                healthPoints: {
+                  start: 50,
+                  current: 53,
+                  byFormula: 50,
+                  byLvlUp: 3,
+                  mod: 10,
+                },
+              },
             },
           },
           learningMethod: null,

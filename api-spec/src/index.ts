@@ -88,6 +88,7 @@ export {
   MAX_STRING_LENGTH_LONG,
   MAX_STRING_LENGTH_VERY_LONG,
   MIN_LEVEL,
+  MAX_LEVEL,
 } from "./general-schemas.js";
 export {
   deleteHistoryRecordPathParamsSchema,

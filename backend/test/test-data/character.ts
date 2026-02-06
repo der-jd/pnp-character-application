@@ -13,10 +13,10 @@ export const fakeCharacter: Character = {
       levelUpProgress: {
         effectsByLevel: {
           "2": {
-            kind: "armorLevelRoll",
+            kind: "hpRoll",
             roll: {
               dice: "1d4+2",
-              value: 4,
+              value: 5,
             },
           },
           "3": {
@@ -24,16 +24,16 @@ export const fakeCharacter: Character = {
             delta: 1,
           },
           "4": {
-            kind: "hpRoll",
+            kind: "armorLevelRoll",
             roll: {
               dice: "1d4+2",
-              value: 5,
+              value: 4,
             },
           },
           "5": {
             kind: "luckPlusOne",
             delta: 1,
-          }
+          },
         },
         effects: {
           hpRoll: {
@@ -55,7 +55,7 @@ export const fakeCharacter: Character = {
             selectionCount: 1,
             firstChosenLevel: 5,
             lastChosenLevel: 5,
-          }
+          },
         },
       },
       sex: "Male",
@@ -1016,7 +1016,7 @@ export const fakeCharacter2: Character = {
           "5": {
             kind: "luckPlusOne",
             delta: 1,
-          }
+          },
         },
         effects: {
           hpRoll: {
@@ -1038,7 +1038,7 @@ export const fakeCharacter2: Character = {
             selectionCount: 1,
             firstChosenLevel: 5,
             lastChosenLevel: 5,
-          }
+          },
         },
       },
       sex: "Female",

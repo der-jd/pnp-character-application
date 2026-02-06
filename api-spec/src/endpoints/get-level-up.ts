@@ -4,9 +4,12 @@ import {
   MAX_STRING_LENGTH_DEFAULT,
   MAX_STRING_LENGTH_VERY_LONG,
   MIN_LEVEL,
+  MAX_LEVEL,
   userIdSchema,
 } from "../general-schemas.js";
 import { levelSchema, levelUpEffectKindSchema, selectionCountSchema } from "../level-up-schemas.js";
+
+const cooldownLevelsSchema = z.number().int().min(0).max(MAX_LEVEL);
 
 export const levelUpOptionSchema = z
   .object({
@@ -16,7 +19,7 @@ export const levelUpOptionSchema = z
     firstLevel: levelSchema.min(MIN_LEVEL + 1),
     selectionCount: selectionCountSchema,
     maxSelectionCount: selectionCountSchema,
-    cooldownLevels: levelSchema,
+    cooldownLevels: cooldownLevelsSchema,
     reasonIfDenied: z.string().max(MAX_STRING_LENGTH_VERY_LONG).optional(),
     diceExpression: z.string().max(MAX_STRING_LENGTH_DEFAULT).optional(),
     firstChosenLevel: levelSchema.min(MIN_LEVEL + 1).optional(),
