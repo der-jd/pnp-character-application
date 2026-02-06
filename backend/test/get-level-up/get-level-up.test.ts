@@ -9,7 +9,6 @@ import {
   LEVEL_UP_DICE_EXPRESSION,
   LevelUpEffectKind,
   LevelUpOption,
-  LevelUpProgress,
   MAX_LEVEL,
 } from "api-spec";
 import { _getLevelUp } from "get-level-up";
@@ -328,7 +327,7 @@ describe("Valid requests", () => {
       },
     ];
 
-    test.each(allowedCases)("$name", async ({ name, kind, setup, assert }) => {
+    test.each(allowedCases)("$name", async ({ kind, setup, assert }) => {
       const custom = structuredClone(fakeCharacter);
       setup(custom);
 
@@ -371,7 +370,7 @@ describe("Valid requests", () => {
       },
     ];
 
-    test.each(firstLevelCases)("$name", async ({ name, kind, requiredLevel, setup }) => {
+    test.each(firstLevelCases)("$name", async ({ kind, requiredLevel, setup }) => {
       const custom = structuredClone(fakeCharacter);
       setup(custom);
 
@@ -495,7 +494,7 @@ describe("Valid requests", () => {
       },
     ];
 
-    test.each(cooldownCases)("$name", async ({ name, kind, setup }) => {
+    test.each(cooldownCases)("$name", async ({ kind, setup }) => {
       const custom = structuredClone(fakeCharacter);
       setup(custom);
 
