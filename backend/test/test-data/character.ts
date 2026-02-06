@@ -13,11 +13,7 @@ export const fakeCharacter: Character = {
       levelUpProgress: {
         effectsByLevel: {
           "2": {
-            kind: "hpRoll",
-            roll: {
-              dice: "1d4+2",
-              value: 5,
-            },
+            kind: "rerollUnlock",
           },
           "3": {
             kind: "initiativePlusOne",
@@ -36,10 +32,10 @@ export const fakeCharacter: Character = {
           },
         },
         effects: {
-          hpRoll: {
+          rerollUnlock: {
             selectionCount: 1,
-            firstChosenLevel: 4,
-            lastChosenLevel: 4,
+            firstChosenLevel: 2,
+            lastChosenLevel: 2,
           },
           armorLevelRoll: {
             selectionCount: 1,
