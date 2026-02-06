@@ -151,7 +151,7 @@ describe("Valid requests", () => {
           expect(option.allowed).toBe(true);
           expect(option.firstLevel).toBe(2);
           expect(option.selectionCount).toBe(1);
-          expect(option.maxSelectionCount).toBe(MAX_LEVEL-1);
+          expect(option.maxSelectionCount).toBe(MAX_LEVEL - 1);
           expect(option.cooldownLevels).toBe(0);
           expect(option.reasonIfDenied).toBeUndefined();
           expect(option.diceExpression).toBe("1d4+2");
@@ -182,7 +182,7 @@ describe("Valid requests", () => {
           expect(option.allowed).toBe(true);
           expect(option.firstLevel).toBe(2);
           expect(option.selectionCount).toBe(2);
-          expect(option.maxSelectionCount).toBe(MAX_LEVEL-1);
+          expect(option.maxSelectionCount).toBe(MAX_LEVEL - 1);
           expect(option.cooldownLevels).toBe(2);
           expect(option.reasonIfDenied).toBeUndefined();
           expect(option.diceExpression).toBe("1d4+2");
@@ -213,7 +213,7 @@ describe("Valid requests", () => {
           expect(option.allowed).toBe(true);
           expect(option.firstLevel).toBe(2);
           expect(option.selectionCount).toBe(2);
-          expect(option.maxSelectionCount).toBe(MAX_LEVEL-1);
+          expect(option.maxSelectionCount).toBe(MAX_LEVEL - 1);
           expect(option.cooldownLevels).toBe(1);
           expect(option.reasonIfDenied).toBeUndefined();
           expect(option.diceExpression).toBeUndefined();
