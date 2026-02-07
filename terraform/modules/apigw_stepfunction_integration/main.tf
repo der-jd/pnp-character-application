@@ -148,14 +148,17 @@ resource "aws_api_gateway_integration_response" "step_function" {
   response_parameters = var.integration_response_parameters
   response_templates = {
     "application/json" = <<EOT
-    #set($output = $util.parseJson($input.path('$.output')))
-    #if($output.errorMessage != "")
-        #set($errorJsonObject = $util.parseJson($output.errorMessage))
+    ## --- Handle error case for step function ---
+    ## Step Function wraps Lambda output in $.output, so we parse that first
+    #set($errorJson = $input.path('$.output.errorMessage'))
+    #if($errorJson != "")
+        #set($errorJsonObject = $util.parseJson($errorJson))
         #set($context.responseOverride.status = $errorJsonObject.statusCode)
-        $output.errorMessage
+        $errorJson
+    ## --- Handle success case for step function ---
     #else
-        #set($context.responseOverride.status = $output.statusCode)
-        $output.body
+        #set($context.responseOverride.status = $input.path('$.output.statusCode'))
+        $input.path('$.output.body')
     #end
     EOT
   }
