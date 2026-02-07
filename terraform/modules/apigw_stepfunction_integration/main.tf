@@ -138,7 +138,7 @@ resource "aws_api_gateway_integration" "step_function" {
   }
 }
 
-resource "aws_api_gateway_integration_response" "step_function_200" {
+resource "aws_api_gateway_integration_response" "step_function_success" {
   depends_on = [aws_api_gateway_integration.step_function, aws_api_gateway_method_response.step_function]
 
   rest_api_id         = var.rest_api_id
@@ -152,11 +152,11 @@ resource "aws_api_gateway_integration_response" "step_function_200" {
     $output.body
     EOT
   }
-  selection_pattern = ""
+  selection_pattern = ".*\"statusCode\"\\s*:\\s*200.*"
 }
 
 resource "aws_api_gateway_integration_response" "step_function_errors" {
-  for_each = toset([for code in var.status_codes : code if code != "200"])
+  for_each = { for code in var.status_codes : code => code if code != "200" }
 
   depends_on = [aws_api_gateway_integration.step_function, aws_api_gateway_method_response.step_function]
 
@@ -171,5 +171,5 @@ resource "aws_api_gateway_integration_response" "step_function_errors" {
     $output.errorMessage
     EOT
   }
-  selection_pattern = ".*\"statusCode\":${each.value}.*"
+  selection_pattern = ".*\"statusCode\"\\s*:\\s*${each.value}.*"
 }
