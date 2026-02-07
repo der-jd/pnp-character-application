@@ -138,7 +138,7 @@ resource "aws_api_gateway_integration" "step_function" {
   }
 }
 
-resource "aws_api_gateway_integration_response" "step_function" {
+resource "aws_api_gateway_integration_response" "step_function_200" {
   depends_on = [aws_api_gateway_integration.step_function, aws_api_gateway_method_response.step_function]
 
   rest_api_id         = var.rest_api_id
@@ -148,18 +148,28 @@ resource "aws_api_gateway_integration_response" "step_function" {
   response_parameters = var.integration_response_parameters
   response_templates = {
     "application/json" = <<EOT
-    ## --- Handle error case for step function ---
     #set($output = $util.parseJson($input.path('$.output')))
-    #if($output.errorMessage != "")
-        #set($errorJsonObject = $util.parseJson($output.errorMessage))
-        #set($context.responseOverride.status = $errorJsonObject.statusCode)
-        $output.errorMessage
-    ## --- Handle success case for step function ---
-    #else
-        #set($context.responseOverride.status = $output.statusCode)
-        $output.body
-    #end
+    $output.body
     EOT
   }
-  selection_pattern = ".*"
+  selection_pattern = ""
+}
+
+resource "aws_api_gateway_integration_response" "step_function_errors" {
+  for_each = toset([for code in var.status_codes : code if code != "200"])
+
+  depends_on = [aws_api_gateway_integration.step_function, aws_api_gateway_method_response.step_function]
+
+  rest_api_id         = var.rest_api_id
+  resource_id         = var.resource_id
+  http_method         = aws_api_gateway_method.step_function.http_method
+  status_code         = each.value
+  response_parameters = var.integration_response_parameters
+  response_templates = {
+    "application/json" = <<EOT
+    #set($output = $util.parseJson($input.path('$.output')))
+    $output.errorMessage
+    EOT
+  }
+  selection_pattern = ".*\"statusCode\":${each.value}.*"
 }
