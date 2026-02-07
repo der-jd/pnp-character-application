@@ -157,9 +157,7 @@ resource "aws_api_gateway_integration_response" "step_function" {
     ## --- Handle success case for step function ---
     #else
         #set($context.responseOverride.status = $output.statusCode)
-        ## Parse the stringified JSON body before returning
-        #set($bodyJson = $util.parseJson($output.body))
-        $util.toJson($bodyJson)
+        $output.body
     #end
     EOT
   }

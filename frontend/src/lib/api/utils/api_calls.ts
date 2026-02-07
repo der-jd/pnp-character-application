@@ -1,6 +1,7 @@
 import { AllCharactersReply } from "../models/allCharacters/interface";
 import { Character } from "../models/Character/character";
-import { SkillIncreaseReply, SkillIncreaseRequest } from "../models/skills/interface";
+import { SkillIncreaseRequest } from "../models/skills/interface";
+import { PatchSkillResponse } from "api-spec";
 import { HistoryReply } from "../models/history/interface";
 import { AttributeIncreaseReply, AttributeIncreaseRequest } from "../models/attributes/interface";
 import { BaseValueIncreaseReply, BaseValueIncreaseRequest } from "../models/baseValues/interface";
@@ -123,9 +124,9 @@ export async function increaseSkill(
   name: string,
   category: string,
   body: SkillIncreaseRequest
-): Promise<SkillIncreaseReply> {
+): Promise<PatchSkillResponse> {
   const endpoint_url = `characters/${charId}/skills/${category}/${name}`;
-  return await patch<SkillIncreaseReply, SkillIncreaseRequest>(idToken, endpoint_url, body);
+  return await patch<PatchSkillResponse, SkillIncreaseRequest>(idToken, endpoint_url, body);
 }
 
 /**

@@ -129,9 +129,7 @@ resource "aws_api_gateway_integration_response" "lambda" {
     ## --- Handle success case ---
     #else
         #set($context.responseOverride.status = $input.path('$.statusCode'))
-        ## Parse the stringified JSON body before returning
-        #set($bodyJson = $util.parseJson($input.path('$.body')))
-        $util.toJson($bodyJson)
+        $input.path('$.body')
     #end
     EOT
   }

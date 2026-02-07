@@ -164,7 +164,7 @@ export function useSkillUpdater() {
     if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
-        const { data, historyRecord } = await increaseSkill(
+        const response = await increaseSkill(
           tokens!.idToken,
           selectedChar,
           skill.name,
@@ -175,9 +175,9 @@ export function useSkillUpdater() {
         applyUpdate({
           keyPath: path,
           name: name,
-          newValue: data.changes.new.skill.current,
-          historyRecord: historyRecord,
-          updatedAdventurePoints: data.adventurePoints?.new.available,
+          newValue: response.data.changes.new.skill.current,
+          historyRecord: response.historyRecord,
+          updatedAdventurePoints: response.data.adventurePoints?.new.available,
         });
       } catch (error) {
         if (error instanceof ApiError) {
