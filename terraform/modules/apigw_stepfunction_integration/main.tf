@@ -149,10 +149,17 @@ resource "aws_api_gateway_integration_response" "step_function_success" {
   response_templates = {
     "application/json" = <<EOT
     #set($output = $util.parseJson($input.path('$.output')))
-    $output.body
+    #if($output.errorMessage != "")
+        #set($errorJsonObject = $util.parseJson($output.errorMessage))
+        #set($context.responseOverride.status = $errorJsonObject.statusCode)
+        $output.errorMessage
+    #else
+        #set($context.responseOverride.status = $output.statusCode)
+        $output.body
+    #end
     EOT
   }
-  selection_pattern = ".*\"statusCode\"\\s*:\\s*200.*"
+  selection_pattern = ".*"
 }
 
 resource "aws_api_gateway_integration_response" "step_function_errors" {
@@ -171,5 +178,5 @@ resource "aws_api_gateway_integration_response" "step_function_errors" {
     $output.errorMessage
     EOT
   }
-  selection_pattern = ".*\"statusCode\"\\s*:\\s*${each.value}.*"
+  selection_pattern = ""
 }
