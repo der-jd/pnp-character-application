@@ -43,6 +43,112 @@ resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   }
 }
 
+// ================== Gateway Responses for CORS ==================
+// These handle errors that occur at the API Gateway level (before reaching integrations)
+// and ensure CORS headers are returned even for authorization failures
+
+resource "aws_api_gateway_gateway_response" "unauthorized" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  response_type = "UNAUTHORIZED"
+  status_code   = "401"
+
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,POST,DELETE'"
+  }
+
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
+}
+
+resource "aws_api_gateway_gateway_response" "access_denied" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  response_type = "ACCESS_DENIED"
+  status_code   = "403"
+
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,POST,DELETE'"
+  }
+
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
+}
+
+resource "aws_api_gateway_gateway_response" "missing_authentication_token" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  response_type = "MISSING_AUTHENTICATION_TOKEN"
+  status_code   = "403"
+
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,POST,DELETE'"
+  }
+
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
+}
+
+resource "aws_api_gateway_gateway_response" "expired_token" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  response_type = "EXPIRED_TOKEN"
+  status_code   = "403"
+
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,POST,DELETE'"
+  }
+
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
+}
+
+resource "aws_api_gateway_gateway_response" "invalid_signature" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  response_type = "INVALID_SIGNATURE"
+  status_code   = "403"
+
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,POST,DELETE'"
+  }
+
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
+}
+
+resource "aws_api_gateway_gateway_response" "default_4xx" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  response_type = "DEFAULT_4XX"
+
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,POST,DELETE'"
+  }
+}
+
+resource "aws_api_gateway_gateway_response" "default_5xx" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  response_type = "DEFAULT_5XX"
+
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,POST,DELETE'"
+  }
+}
+
 // ================== /characters ==================
 
 resource "aws_api_gateway_resource" "characters" {
