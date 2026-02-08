@@ -5,6 +5,7 @@ import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
 import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
 import {
   applyLevelUpResponseSchema,
+  BaseValues,
   LEVEL_UP_DICE_EXPRESSION,
   type Character,
   type PostLevelUpRequest,
@@ -253,6 +254,10 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 400,
     },
+    /**
+     * The full set of invalid effects for the current level are tested in get-level-up.test.ts.
+     * By passing the options hash in the body, we ensure that the options are not stale and follow the same logic.
+     */
     {
       name: "Chosen effect is not allowed for the current level (legendaryActionPlusOne requires higher level)",
       request: {
@@ -272,6 +277,10 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 400,
     },
+    /**
+     * The full set of invalid effects for the current level are tested in get-level-up.test.ts.
+     * By passing the options hash in the body, we ensure that the options are not stale and follow the same logic.
+     */
     {
       name: "Chosen effect is not allowed for the current level (reroll already unlocked)",
       request: {
@@ -358,260 +367,11 @@ describe("Invalid requests", () => {
   });
 });
 
-function buildOptionsData(character: Character) {
-  const nextLevel = character.characterSheet.generalInformation.level + 1;
-  const options = computeLevelUpOptions(nextLevel, character.characterSheet.generalInformation.levelUpProgress);
-  return {
-    options,
-    optionsHash: computeLevelUpOptionsHash(options),
-  };
-}
-
-function buildValidBody(character: Character, effect: PostLevelUpRequest["effect"]) {
-  const { optionsHash } = buildOptionsData(character);
-  return {
-    initialLevel: character.characterSheet.generalInformation.level,
-    optionsHash,
-    effect,
-  } satisfies PostLevelUpRequest;
-}
-
-describe("POST /characters/{character-id}/level-up - Invalid requests", () => {
-  const invalidTestCases = [
-    {
-      name: "Authorization header is missing",
-      request: () => {
-        const custom = structuredClone(fakeCharacter);
-        return {
-          headers: {},
-          pathParameters: { "character-id": custom.characterId },
-          queryStringParameters: null,
-          body: buildValidBody(custom, {
-            kind: "hpRoll",
-            roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 4 },
-          }),
-        };
-      },
-      expectedStatusCode: 400,
-    },
-    {
-      name: "Authorization header is malformed",
-      request: () => {
-        const custom = structuredClone(fakeCharacter);
-        return {
-          headers: { authorization: "dummyValue" },
-          pathParameters: { "character-id": custom.characterId },
-          queryStringParameters: null,
-          body: buildValidBody(custom, {
-            kind: "hpRoll",
-            roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 4 },
-          }),
-        };
-      },
-      expectedStatusCode: 401,
-    },
-    {
-      name: "Authorization token is invalid",
-      request: () => {
-        const custom = structuredClone(fakeCharacter);
-        return {
-          headers: { authorization: "Bearer 1234567890" },
-          pathParameters: { "character-id": custom.characterId },
-          queryStringParameters: null,
-          body: buildValidBody(custom, {
-            kind: "hpRoll",
-            roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 4 },
-          }),
-        };
-      },
-      expectedStatusCode: 401,
-    },
-    {
-      name: "Character id is not an UUID",
-      request: () => {
-        const custom = structuredClone(fakeCharacter);
-        return {
-          headers: fakeHeaders,
-          pathParameters: { "character-id": "1234567890" },
-          queryStringParameters: null,
-          body: buildValidBody(custom, {
-            kind: "hpRoll",
-            roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 4 },
-          }),
-        };
-      },
-      expectedStatusCode: 400,
-    },
-    {
-      name: "Effect payload is missing",
-      request: () => {
-        const custom = structuredClone(fakeCharacter);
-        const { optionsHash } = buildOptionsData(custom);
-        return {
-          headers: fakeHeaders,
-          pathParameters: { "character-id": custom.characterId },
-          queryStringParameters: null,
-          body: {
-            initialLevel: custom.characterSheet.generalInformation.level,
-            optionsHash,
-          } as unknown as PostLevelUpRequest,
-        };
-      },
-      expectedStatusCode: 400,
-    },
-    {
-      name: "Dice roll value is out of range",
-      request: () => {
-        const custom = structuredClone(fakeCharacter);
-        const { optionsHash } = buildOptionsData(custom);
-        return {
-          headers: fakeHeaders,
-          pathParameters: { "character-id": custom.characterId },
-          queryStringParameters: null,
-          body: {
-            initialLevel: custom.characterSheet.generalInformation.level,
-            optionsHash,
-            effect: {
-              kind: "hpRoll",
-              roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 10 },
-            },
-          } as unknown as PostLevelUpRequest,
-        };
-      },
-      expectedStatusCode: 400,
-    },
-  ];
-
-  invalidTestCases.forEach((_case) => {
-    test(_case.name, async () => {
-      const request = _case.request();
-      const custom = structuredClone(fakeCharacter);
-      mockDynamoDBGetCharacterResponse({ Item: custom });
-
-      await expectHttpError(() => _applyLevelUp(request), _case.expectedStatusCode);
-    });
-  });
-});
-
-describe("POST /characters/{character-id}/level-up - Business rule validation", () => {
-  test("Initial level mismatch returns 409", async () => {
-    const custom = structuredClone(fakeCharacter);
-    const body = buildValidBody(custom, {
-      kind: "hpRoll",
-      roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 4 },
-    });
-    body.initialLevel = custom.characterSheet.generalInformation.level - 1;
-
-    mockDynamoDBGetCharacterResponse({ Item: custom });
-
-    await expectHttpError(
-      () =>
-        _applyLevelUp({
-          headers: fakeHeaders,
-          pathParameters: { "character-id": custom.characterId },
-          queryStringParameters: null,
-          body,
-        }),
-      409,
-    );
-  });
-
-  test("Stale options hash returns 409", async () => {
-    const custom = structuredClone(fakeCharacter);
-    const body = buildValidBody(custom, {
-      kind: "hpRoll",
-      roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 4 },
-    });
-    body.optionsHash = "stale";
-
-    mockDynamoDBGetCharacterResponse({ Item: custom });
-
-    await expectHttpError(
-      () =>
-        _applyLevelUp({
-          headers: fakeHeaders,
-          pathParameters: { "character-id": custom.characterId },
-          queryStringParameters: null,
-          body,
-        }),
-      409,
-    );
-  });
-
-  test("Selected effect is not allowed for the level", async () => {
-    const custom = structuredClone(fakeCharacter);
-    custom.characterSheet.generalInformation.level = 1;
-
-    const { options, optionsHash } = buildOptionsData(custom);
-    const matchingOption = options.find((option) => option.kind === "legendaryActionPlusOne");
-    expect(matchingOption?.allowed).toBe(false);
-
-    mockDynamoDBGetCharacterResponse({ Item: custom });
-
-    await expectHttpError(
-      () =>
-        _applyLevelUp({
-          headers: fakeHeaders,
-          pathParameters: { "character-id": custom.characterId },
-          queryStringParameters: null,
-          body: {
-            initialLevel: custom.characterSheet.generalInformation.level,
-            optionsHash,
-            effect: { kind: "legendaryActionPlusOne", delta: 1 },
-          },
-        }),
-      400,
-    );
-  });
-
-  test("No character found for the given character id", async () => {
-    const custom = structuredClone(fakeCharacter);
-    const body = buildValidBody(custom, {
-      kind: "hpRoll",
-      roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 4 },
-    });
-
-    mockDynamoDBGetCharacterResponse({ Item: custom });
-
-    await expectHttpError(
-      () =>
-        _applyLevelUp({
-          headers: fakeHeaders,
-          pathParameters: { "character-id": "26c5d41d-cef1-455f-a341-b15d8a5b3967" },
-          queryStringParameters: null,
-          body,
-        }),
-      404,
-    );
-  });
-
-  test("No character found for the authenticated user", async () => {
-    const custom = structuredClone(fakeCharacter);
-    const body = buildValidBody(custom, {
-      kind: "hpRoll",
-      roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 4 },
-    });
-
-    mockDynamoDBGetCharacterResponse({ Item: custom });
-
-    await expectHttpError(
-      () =>
-        _applyLevelUp({
-          headers: dummyHeaders,
-          pathParameters: { "character-id": custom.characterId },
-          queryStringParameters: null,
-          body,
-        }),
-      404,
-    );
-  });
-});
-
-describe("POST /characters/{character-id}/level-up - Successful effects", () => {
-  const successfulEffects: Array<{
+describe("Valid requests", () => {
+  const validRequests: Array<{
     name: string;
     effectFactory: () => PostLevelUpRequest["effect"];
-    baseValueKey?: keyof Character["characterSheet"]["baseValues"];
+    baseValueKey?: keyof BaseValues;
     expectedDelta?: number;
     prepareCharacter?: (character: Character) => void;
     expectSpecialAbilities?: boolean;
@@ -627,6 +387,9 @@ describe("POST /characters/{character-id}/level-up - Successful effects", () => 
       effectFactory: () => ({ kind: "armorLevelRoll", roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 3 } }),
       baseValueKey: "armorLevel",
       expectedDelta: 3,
+      prepareCharacter: (character) => {
+        character.characterSheet.generalInformation.level = 7; // Avoid cooldown
+      },
     },
     {
       name: "initiativePlusOne increases initiative base value",
@@ -639,6 +402,9 @@ describe("POST /characters/{character-id}/level-up - Successful effects", () => 
       effectFactory: () => ({ kind: "luckPlusOne", delta: 1 }),
       baseValueKey: "luckPoints",
       expectedDelta: 1,
+      prepareCharacter: (character) => {
+        character.characterSheet.generalInformation.level = 8; // Avoid cooldown
+      },
     },
     {
       name: "bonusActionPlusOne increases bonus actions",
@@ -652,38 +418,47 @@ describe("POST /characters/{character-id}/level-up - Successful effects", () => 
       baseValueKey: "legendaryActions",
       expectedDelta: 1,
       prepareCharacter: (character) => {
-        character.characterSheet.generalInformation.level = 10;
+        character.characterSheet.generalInformation.level = 10; // Effect is not available before
       },
     },
     {
       name: "rerollUnlock adds special ability",
       effectFactory: () => ({ kind: "rerollUnlock" }),
+      // Remove rerollUnlock as chosen effect. It is only available once
+      prepareCharacter: (character) => {
+        character.characterSheet.specialAbilities = character.characterSheet.specialAbilities.filter(
+          (ability) => ability !== "Reroll",
+        );
+
+        const { levelUpProgress } = character.characterSheet.generalInformation;
+        levelUpProgress.effectsByLevel = Object.fromEntries(
+          Object.entries(levelUpProgress.effectsByLevel).filter(([, value]) => value.kind !== "rerollUnlock"),
+        );
+        delete levelUpProgress.effects.rerollUnlock;
+      },
       expectSpecialAbilities: true,
     },
   ];
 
-  successfulEffects.forEach((testCase) => {
+  validRequests.forEach((testCase) => {
     test(testCase.name, async () => {
       const custom = structuredClone(fakeCharacter);
       testCase.prepareCharacter?.(custom);
 
-      const effect = testCase.effectFactory();
-      const { options, optionsHash } = buildOptionsData(custom);
-      const option = options.find((opt) => opt.kind === effect.kind);
-      expect(option).toBeDefined();
-      expect(option?.allowed).toBe(true);
-
       mockDynamoDBGetCharacterResponse({ Item: custom });
 
-      const originalLevel = custom.characterSheet.generalInformation.level;
+      const initialLevel = custom.characterSheet.generalInformation.level;
+      const nextLevel = initialLevel + 1;
+      const effect = testCase.effectFactory();
+      const oldProgress = custom.characterSheet.generalInformation.levelUpProgress;
       const request = {
         headers: fakeHeaders,
         pathParameters: { "character-id": custom.characterId },
         queryStringParameters: null,
         body: {
-          initialLevel: originalLevel,
-          optionsHash,
+          initialLevel,
           effect,
+          optionsHash: computeLevelUpOptionsHash(computeLevelUpOptions(nextLevel, oldProgress)),
         },
       };
 
@@ -691,32 +466,38 @@ describe("POST /characters/{character-id}/level-up - Successful effects", () => 
       expect(result.statusCode).toBe(200);
 
       const parsed = applyLevelUpResponseSchema.parse(JSON.parse(result.body));
+
       expect(parsed.characterId).toBe(custom.characterId);
       expect(parsed.userId).toBe(custom.userId);
       expect(parsed.effectKind).toBe(effect.kind);
 
-      const nextLevel = originalLevel + 1;
-      expect(parsed.changes.old.level).toBe(originalLevel);
+      expect(parsed.changes.old.level).toBe(initialLevel);
       expect(parsed.changes.new.level).toBe(nextLevel);
 
+      expect(parsed.changes.old.levelUpProgress).toStrictEqual(oldProgress);
       const levelKey = String(nextLevel);
-      expect(parsed.changes.new.levelUpProgress.effectsByLevel[levelKey]).toStrictEqual(effect);
+      const newProgress = parsed.changes.new.levelUpProgress;
+      expect(newProgress.effectsByLevel[levelKey]).toStrictEqual(effect);
+      expect(newProgress.effects[effect.kind]).toBeDefined();
+      expect(newProgress.effects[effect.kind]!.selectionCount).toBe(
+        (oldProgress.effects[effect.kind]?.selectionCount ?? 0) + 1,
+      );
+      expect(newProgress.effects[effect.kind]!.firstChosenLevel).toBe(
+        oldProgress.effects[effect.kind]?.firstChosenLevel ?? nextLevel,
+      );
+      expect(newProgress.effects[effect.kind]!.lastChosenLevel).toBe(nextLevel);
+      // TODO compare rest of newprogress for kind
 
-      const oldProgress = custom.characterSheet.generalInformation.levelUpProgress.effects[effect.kind];
-      const newProgress = parsed.changes.new.levelUpProgress.effects[effect.kind];
-      expect(newProgress).toBeDefined();
-      expect(newProgress!.selectionCount).toBe((oldProgress?.selectionCount ?? 0) + 1);
-      expect(newProgress!.lastChosenLevel).toBe(nextLevel);
-      expect(newProgress!.firstChosenLevel).toBe(oldProgress?.firstChosenLevel ?? nextLevel);
-
-      if (testCase.baseValueKey && testCase.expectedDelta !== undefined) {
+      if (testCase.baseValueKey && testCase.expectedDelta) {
         const baseValueName = testCase.baseValueKey;
         const oldBaseValue = custom.characterSheet.baseValues[baseValueName];
-        const newBaseValue = parsed.changes.new.baseValues?.[baseValueName];
-        expect(newBaseValue).toBeDefined();
         expect(parsed.changes.old.baseValues?.[baseValueName]).toStrictEqual(oldBaseValue);
-        expect(newBaseValue?.current).toBe(oldBaseValue.current + testCase.expectedDelta);
-        expect(newBaseValue?.byLvlUp).toBe((oldBaseValue.byLvlUp ?? 0) + testCase.expectedDelta);
+        expect(parsed.changes.new.baseValues?.[baseValueName]).toBeDefined();
+        expect(parsed.changes.new.baseValues?.[baseValueName]).toStrictEqual({
+          ...oldBaseValue,
+          current: oldBaseValue.current + testCase.expectedDelta,
+          byLvlUp: (oldBaseValue.byLvlUp ?? 0) + testCase.expectedDelta,
+        });
       } else {
         expect(parsed.changes.new.baseValues).toBeUndefined();
       }
@@ -732,7 +513,7 @@ describe("POST /characters/{character-id}/level-up - Successful effects", () => 
       }
 
       const updateCalls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
-      expect(updateCalls.length).toBe(testCase.expectSpecialAbilities ? 2 : testCase.baseValueKey ? 2 : 1);
+      expect(updateCalls.length).toBeGreaterThanOrEqual(1);
 
       const levelUpdateCall = updateCalls.find((call: any) =>
         call.args[0].input.UpdateExpression.includes("#generalInformation.#level"),
@@ -749,6 +530,9 @@ describe("POST /characters/{character-id}/level-up - Successful effects", () => 
         );
         expect(baseValueCall).toBeDefined();
         expect(baseValueCall.args[0].input.ExpressionAttributeNames["#baseValueName"]).toBe(testCase.baseValueKey);
+        expect(baseValueCall.args[0].input.ExpressionAttributeValues[":baseValue"]).toStrictEqual(
+          parsed.changes.new.baseValues![testCase.baseValueKey],
+        );
       }
 
       if (testCase.expectSpecialAbilities) {

@@ -37,15 +37,15 @@ export const fakeCharacter: Character = {
             firstChosenLevel: 2,
             lastChosenLevel: 2,
           },
-          armorLevelRoll: {
-            selectionCount: 1,
-            firstChosenLevel: 2,
-            lastChosenLevel: 2,
-          },
           initiativePlusOne: {
             selectionCount: 1,
             firstChosenLevel: 3,
             lastChosenLevel: 3,
+          },
+          armorLevelRoll: {
+            selectionCount: 1,
+            firstChosenLevel: 4,
+            lastChosenLevel: 4,
           },
           luckPlusOne: {
             selectionCount: 1,
@@ -93,7 +93,7 @@ export const fakeCharacter: Character = {
       [DisadvantagesNames.VENGEFUL, "", 2],
       [DisadvantagesNames.FEAR_OF, "Heights", 2],
     ],
-    specialAbilities: ["Berserker Rage", "Battle Cry"],
+    specialAbilities: ["Berserker Rage", "Battle Cry", "Reroll"],
     attributes: {
       courage: {
         start: 12,
@@ -1015,11 +1015,6 @@ export const fakeCharacter2: Character = {
           },
         },
         effects: {
-          hpRoll: {
-            selectionCount: 1,
-            firstChosenLevel: 4,
-            lastChosenLevel: 4,
-          },
           armorLevelRoll: {
             selectionCount: 1,
             firstChosenLevel: 2,
@@ -1029,6 +1024,11 @@ export const fakeCharacter2: Character = {
             selectionCount: 1,
             firstChosenLevel: 3,
             lastChosenLevel: 3,
+          },
+          hpRoll: {
+            selectionCount: 1,
+            firstChosenLevel: 4,
+            lastChosenLevel: 4,
           },
           luckPlusOne: {
             selectionCount: 1,
