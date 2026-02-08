@@ -107,7 +107,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       record = {
         number: 1,
         id: uuidv4(),
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString(), // Always store time in UTC
         ...bodyWithoutUserId,
       };
       await addHistoryRecord(record, newBlock);
@@ -121,7 +121,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       record = {
         number: latestRecord.number + 1,
         id: uuidv4(),
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString(), // Always store time in UTC
         ...bodyWithoutUserId,
       };
 
