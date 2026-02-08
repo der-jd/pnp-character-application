@@ -595,7 +595,9 @@ describe("Valid requests", () => {
       // Check old and new base value
       const baseValueOld = getBaseValue(fakeCharacterResponse.Item.characterSheet.baseValues, baseValueName);
       expect(parsedBody.changes.old.baseValue).toStrictEqual(baseValueOld);
-      expect(parsedBody.changes.new.baseValue.byLvlUp).toBeUndefined();
+      expect(parsedBody.changes.new.baseValue.byFormula).toBe(baseValueOld.byFormula);
+      expect(parsedBody.changes.new.baseValue.current).toBe(baseValueOld.current);
+      expect(parsedBody.changes.new.baseValue.byLvlUp).toBe(baseValueOld.byLvlUp);
 
       if (_case.request.body.start) {
         expect(parsedBody.changes.new.baseValue.start).toBe(_case.request.body.start.newValue);
