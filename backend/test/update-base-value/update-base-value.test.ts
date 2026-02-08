@@ -598,6 +598,7 @@ describe("Valid requests", () => {
       expect(parsedBody.changes.new.baseValue.byFormula).toBe(baseValueOld.byFormula);
       expect(parsedBody.changes.new.baseValue.current).toBe(baseValueOld.current);
       expect(parsedBody.changes.new.baseValue.byLvlUp).toBe(baseValueOld.byLvlUp);
+      expect(parsedBody.changes.new.baseValue.byLvlUp).toBeUndefined();
 
       if (_case.request.body.start) {
         expect(parsedBody.changes.new.baseValue.start).toBe(_case.request.body.start.newValue);
