@@ -20,9 +20,9 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 26,
+          mod: {
+            initialValue: 10,
+            newValue: 15,
           },
         },
       },
@@ -40,9 +40,9 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 26,
+          mod: {
+            initialValue: 10,
+            newValue: 15,
           },
         },
       },
@@ -60,9 +60,9 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 26,
+          mod: {
+            initialValue: 10,
+            newValue: 15,
           },
         },
       },
@@ -114,9 +114,9 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 26,
+          mod: {
+            initialValue: 10,
+            newValue: 15,
           },
         },
       },
@@ -157,78 +157,6 @@ describe("Invalid requests", () => {
         },
       },
       expectedStatusCode: 404,
-    },
-    {
-      name: "No byLvlUp change allowed for base value 'mentalHealth'",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "base-value-name": "mentalHealth",
-        },
-        queryStringParameters: null,
-        body: {
-          byLvlUp: {
-            initialValue: 0,
-            newValue: 2,
-          },
-        },
-      },
-      expectedStatusCode: 400,
-    },
-    {
-      name: "No byLvlUp change allowed for base value 'attackBaseValue'",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "base-value-name": "attackBaseValue",
-        },
-        queryStringParameters: null,
-        body: {
-          byLvlUp: {
-            initialValue: 0,
-            newValue: 2,
-          },
-        },
-      },
-      expectedStatusCode: 400,
-    },
-    {
-      name: "No byLvlUp change allowed for base value 'paradeBaseValue'",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "base-value-name": "paradeBaseValue",
-        },
-        queryStringParameters: null,
-        body: {
-          byLvlUp: {
-            initialValue: 0,
-            newValue: 2,
-          },
-        },
-      },
-      expectedStatusCode: 400,
-    },
-    {
-      name: "No byLvlUp change allowed for base value 'rangedAttackBaseValue'",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "base-value-name": "rangedAttackBaseValue",
-        },
-        queryStringParameters: null,
-        body: {
-          byLvlUp: {
-            initialValue: 0,
-            newValue: 2,
-          },
-        },
-      },
-      expectedStatusCode: 400,
     },
   ];
 
@@ -425,13 +353,12 @@ describe("Valid requests", () => {
       expect(parsedBody.changes.old.baseValue).toStrictEqual(baseValueOld);
 
       expect(parsedBody.changes.new.baseValue.byFormula).toBe(baseValueOld.byFormula);
+      expect(parsedBody.changes.new.baseValue.current).toBe(baseValueOld.current);
+      expect(parsedBody.changes.new.baseValue.byLvlUp).toBe(baseValueOld.byLvlUp);
 
       if (_case.request.body.start) {
         expect(parsedBody.changes.new.baseValue.start).toBe(_case.request.body.start.newValue);
       }
-
-      expect(parsedBody.changes.new.baseValue.current).toBe(baseValueOld.current);
-      expect(parsedBody.changes.new.baseValue.byLvlUp).toBe(baseValueOld.byLvlUp);
 
       if (_case.request.body.mod) {
         expect(parsedBody.changes.new.baseValue.mod).toBe(_case.request.body.mod.newValue);
