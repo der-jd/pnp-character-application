@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { characterNameSchema, levelSchema } from "../character-schemas.js";
+import { characterNameSchema } from "../character-schemas.js";
 import { userIdSchema } from "../general-schemas.js";
+import { levelSchema } from "../level-up-schemas.js";
 
 export const postCharacterClonePathParamsSchema = z
   .object({

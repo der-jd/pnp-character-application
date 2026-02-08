@@ -20,9 +20,9 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 26,
+          mod: {
+            initialValue: 10,
+            newValue: 15,
           },
         },
       },
@@ -40,9 +40,9 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 26,
+          mod: {
+            initialValue: 10,
+            newValue: 15,
           },
         },
       },
@@ -60,9 +60,9 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 26,
+          mod: {
+            initialValue: 10,
+            newValue: 15,
           },
         },
       },
@@ -81,24 +81,6 @@ describe("Invalid requests", () => {
           start: {
             initialValue: 20,
             newValue: 30,
-          },
-        },
-      },
-      expectedStatusCode: 409,
-    },
-    {
-      name: "Passed initial byLvlUp value doesn't match the value in the backend",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "base-value-name": "healthPoints",
-        },
-        queryStringParameters: null,
-        body: {
-          byLvlUp: {
-            initialValue: 10,
-            newValue: 15,
           },
         },
       },
@@ -132,9 +114,9 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 26,
+          mod: {
+            initialValue: 10,
+            newValue: 15,
           },
         },
       },
@@ -150,9 +132,9 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 26,
+          mod: {
+            initialValue: 10,
+            newValue: 15,
           },
         },
       },
@@ -168,85 +150,13 @@ describe("Invalid requests", () => {
         },
         queryStringParameters: null,
         body: {
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 26,
+          mod: {
+            initialValue: 10,
+            newValue: 15,
           },
         },
       },
       expectedStatusCode: 404,
-    },
-    {
-      name: "No byLvlUp change allowed for base value 'mentalHealth'",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "base-value-name": "mentalHealth",
-        },
-        queryStringParameters: null,
-        body: {
-          byLvlUp: {
-            initialValue: 0,
-            newValue: 2,
-          },
-        },
-      },
-      expectedStatusCode: 400,
-    },
-    {
-      name: "No byLvlUp change allowed for base value 'attackBaseValue'",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "base-value-name": "attackBaseValue",
-        },
-        queryStringParameters: null,
-        body: {
-          byLvlUp: {
-            initialValue: 0,
-            newValue: 2,
-          },
-        },
-      },
-      expectedStatusCode: 400,
-    },
-    {
-      name: "No byLvlUp change allowed for base value 'paradeBaseValue'",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "base-value-name": "paradeBaseValue",
-        },
-        queryStringParameters: null,
-        body: {
-          byLvlUp: {
-            initialValue: 0,
-            newValue: 2,
-          },
-        },
-      },
-      expectedStatusCode: 400,
-    },
-    {
-      name: "No byLvlUp change allowed for base value 'rangedAttackBaseValue'",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "base-value-name": "rangedAttackBaseValue",
-        },
-        queryStringParameters: null,
-        body: {
-          byLvlUp: {
-            initialValue: 0,
-            newValue: 2,
-          },
-        },
-      },
-      expectedStatusCode: 400,
     },
   ];
 
@@ -274,24 +184,6 @@ describe("Valid requests", () => {
           start: {
             initialValue: fakeCharacter.characterSheet.baseValues.healthPoints.start - 10,
             newValue: fakeCharacter.characterSheet.baseValues.healthPoints.start,
-          },
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
-      name: "Base value has already been updated to the target byLvlUp value (idempotency)",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "base-value-name": "healthPoints",
-        },
-        queryStringParameters: null,
-        body: {
-          byLvlUp: {
-            initialValue: fakeCharacter.characterSheet.baseValues.healthPoints.byLvlUp! - 3,
-            newValue: fakeCharacter.characterSheet.baseValues.healthPoints.byLvlUp,
           },
         },
       },
@@ -336,10 +228,6 @@ describe("Valid requests", () => {
 
       if (_case.request.body.start) {
         expect(parsedBody.changes.new.baseValue.start).toBe(_case.request.body.start.newValue);
-      }
-
-      if (_case.request.body.byLvlUp) {
-        expect(parsedBody.changes.new.baseValue.byLvlUp).toBe(_case.request.body.byLvlUp.newValue);
       }
 
       if (_case.request.body.mod) {
@@ -407,24 +295,6 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Update byLvlUp value of healthPoints",
-      request: {
-        headers: fakeHeaders,
-        pathParameters: {
-          "character-id": fakeCharacterId,
-          "base-value-name": "healthPoints",
-        },
-        queryStringParameters: null,
-        body: {
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 26,
-          },
-        },
-      },
-      expectedStatusCode: 200,
-    },
-    {
       name: "Update mod value of healthPoints",
       request: {
         headers: fakeHeaders,
@@ -443,7 +313,7 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
-      name: "Update all values (start, byLvlUp, mod) of healthPoints",
+      name: "Update all values (start, mod) of healthPoints",
       request: {
         headers: fakeHeaders,
         pathParameters: {
@@ -455,10 +325,6 @@ describe("Valid requests", () => {
           start: {
             initialValue: 40,
             newValue: 30,
-          },
-          byLvlUp: {
-            initialValue: 23,
-            newValue: 25,
           },
           mod: {
             initialValue: 10,
@@ -487,20 +353,11 @@ describe("Valid requests", () => {
       expect(parsedBody.changes.old.baseValue).toStrictEqual(baseValueOld);
 
       expect(parsedBody.changes.new.baseValue.byFormula).toBe(baseValueOld.byFormula);
+      expect(parsedBody.changes.new.baseValue.current).toBe(baseValueOld.current);
+      expect(parsedBody.changes.new.baseValue.byLvlUp).toBe(baseValueOld.byLvlUp);
 
       if (_case.request.body.start) {
         expect(parsedBody.changes.new.baseValue.start).toBe(_case.request.body.start.newValue);
-      }
-
-      if (_case.request.body.byLvlUp) {
-        expect(parsedBody.changes.new.baseValue.byLvlUp).toBe(_case.request.body.byLvlUp.newValue);
-        const diffByLvlUp =
-          (parsedBody.changes.new.baseValue.byLvlUp ?? 0) - (parsedBody.changes.old.baseValue.byLvlUp ?? 0);
-        const diffCurrent = parsedBody.changes.new.baseValue.current - parsedBody.changes.old.baseValue.current;
-        expect(diffByLvlUp).toBe(diffCurrent);
-        expect(parsedBody.changes.new.baseValue.current).toBe(parsedBody.changes.old.baseValue.current + diffByLvlUp);
-      } else {
-        expect(parsedBody.changes.new.baseValue.current).toBe(baseValueOld.current);
       }
 
       if (_case.request.body.mod) {

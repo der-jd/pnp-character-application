@@ -124,6 +124,16 @@ module "get_history_lambda" {
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
 }
 
+module "get_level_up_lambda" {
+  source        = "./modules/lambda_function"
+  function_name = "get-level-up"
+  environment_vars = {
+    TABLE_NAME_CHARACTERS = local.characters_table_name
+  }
+  role_arn        = aws_iam_role.lambda_exec_role.arn
+  api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
+}
+
 module "get_skill_increase_cost_lambda" {
   source        = "./modules/lambda_function"
   function_name = "get-skill-increase-cost"
@@ -164,11 +174,12 @@ module "update_calculation_points_lambda" {
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn
 }
 
-module "update_level_lambda" {
+module "apply_level_up_lambda" {
   source        = "./modules/lambda_function"
-  function_name = "update-level"
+  function_name = "apply-level-up"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
+    TABLE_NAME_HISTORY    = local.history_table_name
   }
   role_arn        = aws_iam_role.lambda_exec_role.arn
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn

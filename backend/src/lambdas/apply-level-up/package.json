@@ -1,0 +1,15 @@
+{
+  "name": "apply-level-up",
+  "version": "1.0.0",
+  "main": "index.mjs",
+  "type": "module",
+  "dependencies": {
+    "api-spec": "*",
+    "core": "*",
+    "uuid": "^9.0.1",
+    "@aws-sdk/util-dynamodb": "^3.614.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.0"
+  }
+}

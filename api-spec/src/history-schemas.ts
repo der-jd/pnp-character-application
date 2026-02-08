@@ -9,13 +9,11 @@ import {
   combatStatsSchema,
   combinedSkillCategoryAndNameSchema,
   learningMethodSchema,
-  levelSchema,
   skillSchema,
   specialAbilitySchema,
 } from "./character-schemas.js";
 import {
   MAX_STRING_LENGTH_DEFAULT,
-  MAX_STRING_LENGTH_LONG,
   MAX_STRING_LENGTH_VERY_LONG,
   MAX_ARRAY_SIZE,
   MAX_POINTS,
@@ -24,10 +22,11 @@ import {
   MAX_HISTORY_BLOCK_NUMBER,
   MIN_HISTORY_BLOCK_NUMBER,
 } from "./general-schemas.js";
+import { levelSchema, levelUpProgressSchema } from "./level-up-schemas.js";
 
 export enum RecordType {
   CHARACTER_CREATED = 0,
-  LEVEL_CHANGED = 1,
+  LEVEL_UP_APPLIED = 1,
   CALCULATION_POINTS_CHANGED = 2,
   BASE_VALUE_CHANGED = 3,
   SPECIAL_ABILITIES_CHANGED = 4,
@@ -68,7 +67,7 @@ export const recordSchema = z
       })
       .strict(),
     comment: z.string().max(MAX_STRING_LENGTH_VERY_LONG).nullable(),
-    timestamp: z.iso.datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2023-03-15T16:00:00Z (UTC) or 2023-03-15T16:00:00-07:00 (PDT)
+    timestamp: z.iso.datetime(), // YYYY-MM-DDThh:mm:ssZ/±hh:mm, e.g. 2023-03-15T16:00:00Z (UTC). Always store time in UTC.
   })
   .strict();
 
@@ -121,17 +120,16 @@ export const integerSchema = z
   })
   .strict();
 
-export const stringArraySchema = z
+export const levelUpChangeSchema = z
   .object({
-    values: z.array(z.string().max(MAX_STRING_LENGTH_LONG)).max(MAX_ARRAY_SIZE),
+    level: levelSchema,
+    levelUpProgress: levelUpProgressSchema,
+    baseValues: baseValuesSchema.partial().optional(),
+    specialAbilities: z.array(specialAbilitySchema).max(MAX_ARRAY_SIZE).optional(),
   })
   .strict();
 
-export const levelChangeSchema = z
-  .object({
-    value: levelSchema,
-  })
-  .strict();
+export type LevelUpChange = z.infer<typeof levelUpChangeSchema>;
 
 export const specialAbilitiesChangeSchema = z
   .object({

@@ -1,6 +1,5 @@
 export { headersSchema, Headers } from "./headers.js";
 export {
-  levelSchema,
   professionHobbySchema,
   generalInformationSchema,
   calculationPointsSchema,
@@ -40,7 +39,6 @@ export {
   CostCategory,
   LearningMethod,
   LearningMethodString,
-  Level,
   Attributes,
   CombatSkills,
   CombatSkillName,
@@ -66,10 +64,9 @@ export {
   historyBlockSchema,
   HistoryBlock,
   integerSchema,
-  stringArraySchema,
   attributeChangeSchema,
   baseValueChangeSchema,
-  levelChangeSchema,
+  levelUpChangeSchema,
   specialAbilitiesChangeSchema,
   calculationPointsChangeSchema,
   skillChangeSchema,
@@ -78,6 +75,7 @@ export {
   NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
   activatedSkillsSchema,
   ActivatedSkills,
+  LevelUpChange,
 } from "./history-schemas.js";
 export {
   initialNewSchema,
@@ -90,6 +88,7 @@ export {
   MAX_STRING_LENGTH_LONG,
   MAX_STRING_LENGTH_VERY_LONG,
   MIN_LEVEL,
+  MAX_LEVEL,
 } from "./general-schemas.js";
 export {
   deleteHistoryRecordPathParamsSchema,
@@ -107,18 +106,6 @@ export {
   patchHistoryRecordResponseSchema,
   PatchHistoryRecordResponse,
 } from "./endpoints/patch-history-record.js";
-export {
-  postLevelPathParamsSchema,
-  PostLevelPathParams,
-  postLevelRequestSchema,
-  PostLevelRequest,
-  updateLevelResponseSchema,
-  UpdateLevelResponse,
-  postLevelResponseSchema,
-  PostLevelResponse,
-  postLevelHistoryRecordSchema,
-  PostLevelHistoryRecord,
-} from "./endpoints/post-level.js";
 export {
   postSpecialAbilitiesPathParamsSchema,
   PostSpecialAbilitiesPathParams,
@@ -188,7 +175,6 @@ export {
   UpdateBaseValueResponse,
   patchBaseValueResponseSchema,
   PatchBaseValueResponse,
-  baseValuesUpdatableByLvlUp,
   patchBaseValueHistoryRecordSchema,
   PatchBaseValueHistoryRecord,
 } from "./endpoints/patch-base-value.js";
@@ -263,3 +249,39 @@ export {
   MIN_INITIAL_COMBAT_SKILL_VALUE,
   MAX_INITIAL_COMBAT_SKILL_VALUE,
 } from "./endpoints/post-characters.js";
+export {
+  LEVEL_UP_DICE_EXPRESSION,
+  LEVEL_UP_DICE_MIN_TOTAL,
+  LEVEL_UP_DICE_MAX_TOTAL,
+  levelUpEffectKindSchema,
+  LevelUpEffectKind,
+  effectByLevelUpSchema,
+  EffectByLevelUp,
+  levelUpProgressSchema,
+  LevelUpProgress,
+  levelSchema,
+  Level,
+  levelUpEffectProgressSchema,
+  LevelUpEffectProgress,
+  selectionCountSchema,
+} from "./level-up-schemas.js";
+export {
+  getLevelUpPathParamsSchema,
+  GetLevelUpPathParams,
+  getLevelUpResponseSchema,
+  GetLevelUpResponse,
+  levelUpOptionSchema,
+  LevelUpOption,
+} from "./endpoints/get-level-up.js";
+export {
+  postLevelUpPathParamsSchema,
+  PostLevelUpPathParams,
+  postLevelUpRequestSchema,
+  PostLevelUpRequest,
+  applyLevelUpResponseSchema,
+  ApplyLevelUpResponse,
+  postLevelUpResponseSchema,
+  PostLevelUpResponse,
+  postLevelUpHistoryRecordSchema,
+  PostLevelUpHistoryRecord,
+} from "./endpoints/post-level-up.js";

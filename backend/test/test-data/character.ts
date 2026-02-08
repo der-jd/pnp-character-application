@@ -10,6 +10,50 @@ export const fakeCharacter: Character = {
     generalInformation: {
       name: "Aldred Stormblade",
       level: 5,
+      levelUpProgress: {
+        effectsByLevel: {
+          "2": {
+            kind: "rerollUnlock",
+          },
+          "3": {
+            kind: "initiativePlusOne",
+            delta: 1,
+          },
+          "4": {
+            kind: "armorLevelRoll",
+            roll: {
+              dice: "1d4+2",
+              value: 4,
+            },
+          },
+          "5": {
+            kind: "luckPlusOne",
+            delta: 1,
+          },
+        },
+        effects: {
+          rerollUnlock: {
+            selectionCount: 1,
+            firstChosenLevel: 2,
+            lastChosenLevel: 2,
+          },
+          initiativePlusOne: {
+            selectionCount: 1,
+            firstChosenLevel: 3,
+            lastChosenLevel: 3,
+          },
+          armorLevelRoll: {
+            selectionCount: 1,
+            firstChosenLevel: 4,
+            lastChosenLevel: 4,
+          },
+          luckPlusOne: {
+            selectionCount: 1,
+            firstChosenLevel: 5,
+            lastChosenLevel: 5,
+          },
+        },
+      },
       sex: "Male",
       profession: {
         name: "Warrior",
@@ -49,7 +93,7 @@ export const fakeCharacter: Character = {
       [DisadvantagesNames.VENGEFUL, "", 2],
       [DisadvantagesNames.FEAR_OF, "Heights", 2],
     ],
-    specialAbilities: ["Berserker Rage", "Battle Cry"],
+    specialAbilities: ["Berserker Rage", "Battle Cry", "Reroll"],
     attributes: {
       courage: {
         start: 12,
@@ -945,6 +989,54 @@ export const fakeCharacter2: Character = {
     generalInformation: {
       name: "Iselda Stormblade",
       level: 5,
+      levelUpProgress: {
+        effectsByLevel: {
+          "2": {
+            kind: "armorLevelRoll",
+            roll: {
+              dice: "1d4+2",
+              value: 4,
+            },
+          },
+          "3": {
+            kind: "initiativePlusOne",
+            delta: 1,
+          },
+          "4": {
+            kind: "hpRoll",
+            roll: {
+              dice: "1d4+2",
+              value: 5,
+            },
+          },
+          "5": {
+            kind: "luckPlusOne",
+            delta: 1,
+          },
+        },
+        effects: {
+          armorLevelRoll: {
+            selectionCount: 1,
+            firstChosenLevel: 2,
+            lastChosenLevel: 2,
+          },
+          initiativePlusOne: {
+            selectionCount: 1,
+            firstChosenLevel: 3,
+            lastChosenLevel: 3,
+          },
+          hpRoll: {
+            selectionCount: 1,
+            firstChosenLevel: 4,
+            lastChosenLevel: 4,
+          },
+          luckPlusOne: {
+            selectionCount: 1,
+            firstChosenLevel: 5,
+            lastChosenLevel: 5,
+          },
+        },
+      },
       sex: "Female",
       profession: {
         name: "Warrior",
