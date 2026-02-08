@@ -477,7 +477,10 @@ describe("Valid requests", () => {
       expect(parsed.changes.old.levelUpProgress).toStrictEqual(oldProgress);
       const levelKey = String(nextLevel);
       const newProgress = parsed.changes.new.levelUpProgress;
-      expect(newProgress.effectsByLevel[levelKey]).toStrictEqual(effect);
+      expect(newProgress.effectsByLevel).toStrictEqual({
+        ...oldProgress.effectsByLevel,
+        [levelKey]: effect,
+      });
       expect(newProgress.effects[effect.kind]).toBeDefined();
       expect(newProgress.effects[effect.kind]!.selectionCount).toBe(
         (oldProgress.effects[effect.kind]?.selectionCount ?? 0) + 1,
@@ -486,7 +489,12 @@ describe("Valid requests", () => {
         oldProgress.effects[effect.kind]?.firstChosenLevel ?? nextLevel,
       );
       expect(newProgress.effects[effect.kind]!.lastChosenLevel).toBe(nextLevel);
-      // TODO compare rest of newprogress for kind
+      // Except for the effect that was just chosen, all other effects should be the same
+      const newEffects = { ...newProgress.effects };
+      delete newEffects[effect.kind];
+      const oldEffects = { ...oldProgress.effects };
+      delete oldEffects[effect.kind];
+      expect(newEffects).toStrictEqual(oldEffects);
 
       if (testCase.baseValueKey && testCase.expectedDelta) {
         const baseValueName = testCase.baseValueKey;
