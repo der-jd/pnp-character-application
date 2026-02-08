@@ -140,9 +140,9 @@ export const baseValueChangedRecord: PatchBaseValueHistoryRecord = {
     new: {
       baseValue: {
         start: 40,
-        current: 100,
+        current: 97,
         byFormula: 77,
-        byLvlUp: 23,
+        byLvlUp: 20,
         mod: 10,
       },
     },
