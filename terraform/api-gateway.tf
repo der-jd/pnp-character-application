@@ -24,8 +24,14 @@ resource "aws_iam_role_policy" "api_gateway_policy" {
         Effect = "Allow",
         Action = "states:StartSyncExecution",
         Resource = [
+          aws_sfn_state_machine.create_character_state_machine.arn,
           aws_sfn_state_machine.update_skill_state_machine.arn,
-          aws_sfn_state_machine.update_attribute_state_machine.arn
+          aws_sfn_state_machine.update_attribute_state_machine.arn,
+          aws_sfn_state_machine.update_base_value_state_machine.arn,
+          aws_sfn_state_machine.update_calculation_points_state_machine.arn,
+          aws_sfn_state_machine.apply_level_up_state_machine.arn,
+          aws_sfn_state_machine.update_combat_stats_state_machine.arn,
+          aws_sfn_state_machine.add_special_ability_state_machine.arn
         ]
       }
     ]
