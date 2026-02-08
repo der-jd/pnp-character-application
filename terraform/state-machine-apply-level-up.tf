@@ -80,7 +80,7 @@ resource "aws_sfn_state_machine" "apply_level_up_state_machine" {
           "body" = {
             "userId"         = "{% $parse($states.input.body).userId %}",
             "type"           = "1", // LEVEL_UP_APPLIED
-            "name"           = "Level {% $parse($states.input.body).changes.new.level %}",
+            "name"           = "{% 'Level ' & $string($parse($states.input.body).changes.new.level) %}",
             "data"           = "{% $parse($states.input.body).changes %}",
             "learningMethod" = null,
             "calculationPoints" = {
