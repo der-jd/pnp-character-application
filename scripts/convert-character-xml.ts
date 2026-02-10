@@ -528,7 +528,9 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
     .filter(Boolean);
   const specialCharacteristics = asText(general.special_characteristics);
   if (languages.length > 0) {
-    warnings.push(`Languages/Scripts entries dropped during conversion: ${languages.join(", ")}`);
+    console.info(
+      `Languages/Scripts entries dropped during conversion (not part of new schema): ${languages.join(", ")}`,
+    );
   }
   characterSheet.generalInformation.specialCharacteristics = specialCharacteristics;
 
@@ -1026,7 +1028,7 @@ function buildHistoryRecords(
     const typeLabel = normalizeLabel(asText(entry.type));
     if (IGNORED_HISTORY_TYPES.has(typeLabel)) {
       if (IGNORED_HISTORY_TYPES_WITH_WARNING.has(typeLabel)) {
-        warnings.push(`History entry type '${typeLabel}' ignored during conversion`);
+        console.info(`History entry type '${typeLabel}' ignored during conversion (not part of new schema)`);
       }
       continue;
     }
