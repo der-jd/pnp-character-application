@@ -34,9 +34,15 @@ import {
   combatSkills,
   historyBlockSchema,
   levelUpProgressSchema,
+  LevelUpProgress,
+  EffectByLevelUp,
+  LevelUpEffectKind,
   ATTRIBUTE_POINTS_FOR_CREATION,
   GENERATION_POINTS,
   NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
+  LEVEL_UP_DICE_EXPRESSION,
+  LEVEL_UP_DICE_MIN_TOTAL,
+  LEVEL_UP_DICE_MAX_TOTAL,
 } from "api-spec";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB, matches backend/src/lambdas/add-history-record/index.ts
@@ -179,6 +185,15 @@ const IGNORED_HISTORY_TYPES = new Set([
   normalizeLabel("Sprache/Schrift geändert"),
 ]);
 const IGNORED_HISTORY_TYPES_WITH_WARNING = new Set([normalizeLabel("Sprache/Schrift geändert")]);
+const LEVEL_UP_COMMENT_PATTERN = /level\s*(\d+)/i;
+const BASE_VALUE_TO_LEVEL_UP_EFFECT: Record<string, LevelUpEffectKind> = {
+  [normalizeLabel("Lebenspunkte (LeP)")]: "hpRoll",
+  [normalizeLabel("Rüstungslevel")]: "armorLevelRoll",
+  [normalizeLabel("INI-Basiswert")]: "initiativePlusOne",
+  [normalizeLabel("Glückspunkte")]: "luckPlusOne",
+  [normalizeLabel("Bonusaktionen pro KR")]: "bonusActionPlusOne",
+  [normalizeLabel("Legendäre Aktionen")]: "legendaryActionPlusOne",
+};
 
 const ADVANTAGE_MAP: Record<string, AdvantagesNames> = {
   [normalizeLabel("Abitur")]: AdvantagesNames.HIGH_SCHOOL_DEGREE,
@@ -293,6 +308,7 @@ async function main(): Promise<void> {
   const historyNode = asRecord(sheet.history);
   const rawHistoryEntries = ensureArray(historyNode.entry) as HistoryEntry[];
   const historyEntries = aggregateCombatSkillModEntries(rawHistoryEntries, warnings);
+  characterSheet.generalInformation.levelUpProgress = buildLevelUpProgressFromHistory(historyEntries);
   const creationTimestamp = getEarliestHistoryTimestamp(rawHistoryEntries);
   const creationRecord = buildCharacterCreatedRecord(characterSheet, activatedSkills, creationTimestamp);
   const subsequentRecords = buildHistoryRecords(historyEntries, characterSheet, warnings, creationRecord.number + 1);
@@ -387,6 +403,10 @@ async function findRepoRoot(startDir: string): Promise<string> {
 function toInt(value: unknown, fallback = 0): number {
   const parsed = Number.parseInt(asText(value), 10);
   return Number.isNaN(parsed) ? fallback : parsed;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
 }
 
 function toOptionalInt(value: unknown): number | null {
@@ -1146,6 +1166,83 @@ function calculateGenerationPoints(characterSheet: CharacterSheet): {
     spent,
     total: GENERATION_POINTS + throughDisadvantages,
   };
+}
+
+function buildLevelUpProgressFromHistory(entries: HistoryEntry[]): LevelUpProgress {
+  const progress = levelUpProgressSchema.parse({});
+  const effectsByLevel: Record<string, EffectByLevelUp> = {};
+  const summaries: Partial<
+    Record<LevelUpEffectKind, { selectionCount: number; firstChosenLevel: number; lastChosenLevel: number }>
+  > = {};
+
+  for (const entry of entries) {
+    const typeLabel = normalizeLabel(asText(entry.type));
+    if (typeLabel !== normalizeLabel("Ereignis (Basiswerte)")) {
+      continue;
+    }
+
+    const comment = asText(entry.comment);
+    const levelMatch = comment.match(LEVEL_UP_COMMENT_PATTERN);
+    if (!levelMatch) {
+      continue;
+    }
+    const level = Number.parseInt(levelMatch[1], 10);
+    if (Number.isNaN(level)) {
+      continue;
+    }
+
+    const effectKind = BASE_VALUE_TO_LEVEL_UP_EFFECT[normalizeLabel(asText(entry.name))];
+    if (!effectKind) {
+      continue;
+    }
+
+    const newValue = toInt(entry.new_value, 0);
+    const oldValue = toInt(entry.old_value, 0);
+    const delta = newValue - oldValue;
+    if (delta <= 0 && effectKind !== "rerollUnlock") {
+      continue;
+    }
+
+    let effect: EffectByLevelUp;
+    if (effectKind === "hpRoll" || effectKind === "armorLevelRoll") {
+      effect = {
+        kind: effectKind,
+        roll: {
+          dice: LEVEL_UP_DICE_EXPRESSION,
+          value: clamp(delta, LEVEL_UP_DICE_MIN_TOTAL, LEVEL_UP_DICE_MAX_TOTAL),
+        },
+      };
+    } else if (effectKind === "rerollUnlock") {
+      effect = { kind: effectKind };
+    } else {
+      effect = {
+        kind: effectKind as Exclude<LevelUpEffectKind, "hpRoll" | "armorLevelRoll" | "rerollUnlock">,
+        delta: 1,
+      } as EffectByLevelUp;
+    }
+
+    const levelKey = String(level);
+    if (!(levelKey in effectsByLevel)) {
+      effectsByLevel[levelKey] = effect;
+    }
+
+    const summary = summaries[effectKind];
+    if (summary) {
+      summary.selectionCount += 1;
+      summary.lastChosenLevel = Math.max(summary.lastChosenLevel, level);
+      summary.firstChosenLevel = Math.min(summary.firstChosenLevel, level);
+    } else {
+      summaries[effectKind] = {
+        selectionCount: 1,
+        firstChosenLevel: level,
+        lastChosenLevel: level,
+      };
+    }
+  }
+
+  progress.effectsByLevel = effectsByLevel;
+  progress.effects = summaries as LevelUpProgress["effects"];
+  return progress;
 }
 
 function mapRecordType(typeLabel: string, warnings: string[]): RecordType {
