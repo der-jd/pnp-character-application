@@ -38,6 +38,8 @@ import {
   EffectByLevelUp,
   LevelUpEffectKind,
   ATTRIBUTE_POINTS_FOR_CREATION,
+  HOBBY_SKILL_BONUS,
+  PROFESSION_SKILL_BONUS,
   GENERATION_POINTS,
   NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
   LEVEL_UP_DICE_EXPRESSION,
@@ -185,6 +187,7 @@ const IGNORED_HISTORY_TYPES = new Set([
   normalizeLabel("Sprache/Schrift geändert"),
 ]);
 const IGNORED_HISTORY_TYPES_WITH_WARNING = new Set([normalizeLabel("Sprache/Schrift geändert")]);
+const DEFAULT_GENERAL_INFORMATION_SKILL = "body/athletics" as SkillNameWithCategory;
 const LEVEL_UP_COMMENT_PATTERN = /level\s*(\d+)/i;
 const BASE_VALUE_TO_LEVEL_UP_EFFECT: Record<string, LevelUpEffectKind> = {
   [normalizeLabel("Lebenspunkte (LeP)")]: "hpRoll",
@@ -557,26 +560,35 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
   const profession = asRecord(general.profession);
   const professionName = asText(profession.name);
   const professionSkillName = asText(profession.skill);
-  const professionSkill = mapNonCombatSkill(professionSkillName);
+  const professionSkill = mapGeneralInformationSkill(professionSkillName);
   if (!professionSkill) {
-    warnings.push(`Unknown profession skill '${professionSkillName}', defaulting to body/athletics`);
+    warnings.push(`Unknown profession skill '${professionSkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`);
   }
+  const resolvedProfessionSkill: SkillNameWithCategory = professionSkill ?? DEFAULT_GENERAL_INFORMATION_SKILL;
   characterSheet.generalInformation.profession = {
     name: professionName,
-    skill: professionSkill ?? "body/athletics",
+    skill: resolvedProfessionSkill,
   };
+  applyGeneralInformationSkillEffect(characterSheet, resolvedProfessionSkill, PROFESSION_SKILL_BONUS, warnings);
 
   const hobby = asRecord(general.hobby);
   const hobbyName = asText(hobby.name);
   const hobbySkillName = asText(hobby.skill);
-  const hobbySkill = mapNonCombatSkill(hobbySkillName);
-  if (!hobbySkill && hobbySkillName) {
-    warnings.push(`Unknown hobby skill '${hobbySkillName}', defaulting to body/athletics`);
+  const normalizedHobbyName = normalizeLabel(hobbyName);
+  const jiujitsuHobbyName = normalizeLabel("Jiu-Jitsu");
+  const forcedHobbySkill: SkillNameWithCategory | null = normalizedHobbyName === jiujitsuHobbyName ? "combat/martialArts" : null;
+  const hobbySkillFromXml = mapGeneralInformationSkill(hobbySkillName);
+  if (!forcedHobbySkill && !hobbySkillFromXml && hobbySkillName) {
+    warnings.push(`Unknown hobby skill '${hobbySkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`);
   }
+  const resolvedHobbySkill: SkillNameWithCategory =
+    forcedHobbySkill ?? hobbySkillFromXml ?? DEFAULT_GENERAL_INFORMATION_SKILL;
   characterSheet.generalInformation.hobby = {
     name: hobbyName,
-    skill: hobbySkill ?? "body/athletics",
+    skill: resolvedHobbySkill,
   };
+
+  applyGeneralInformationSkillEffect(characterSheet, resolvedHobbySkill, HOBBY_SKILL_BONUS, warnings);
 
   const calculationPoints = asRecord(sheet.calculation_points);
   const attributePoints = asRecord(calculationPoints.attribute_points);
@@ -970,6 +982,42 @@ function mapNonCombatSkill(name: string): SkillNameWithCategory | null {
     return null;
   }
   return NON_COMBAT_SKILL_MAP.get(normalizeLabel(name)) ?? null;
+}
+
+function mapGeneralInformationSkill(name: string): SkillNameWithCategory | null {
+  if (!name) {
+    return null;
+  }
+  if (name.includes("/")) {
+    return name as SkillNameWithCategory;
+  }
+  const normalized = normalizeLabel(name);
+  const nonCombat = NON_COMBAT_SKILL_MAP.get(normalized);
+  if (nonCombat) {
+    return nonCombat;
+  }
+  const combatSkill = COMBAT_SKILL_MAP[normalized];
+  if (combatSkill) {
+    return `combat/${combatSkill}` as SkillNameWithCategory;
+  }
+  return null;
+}
+
+function applyGeneralInformationSkillEffect(
+  characterSheet: CharacterSheet,
+  skillName: SkillNameWithCategory,
+  bonus: number,
+  warnings: string[],
+): void {
+  const { category, name } = splitSkill(skillName);
+  const skillsInCategory = getSkillCategorySection(characterSheet.skills, category);
+  const skill = skillsInCategory[name];
+  if (!skill) {
+    warnings.push(`Unable to apply general information skill effect for '${skillName}', skill not found in character sheet`);
+    return;
+  }
+  skill.activated = true;
+  skill.mod += bonus;
 }
 
 function splitSkill(skill: SkillNameWithCategory): { category: SkillCategory; name: SkillName } {
