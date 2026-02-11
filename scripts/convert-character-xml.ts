@@ -10,6 +10,7 @@ import { hideBin } from "yargs/helpers";
 import {
   ADVANTAGES,
   DISADVANTAGES,
+  Attributes,
   AdvantagesNames,
   BaseValue,
   BaseValues,
@@ -661,6 +662,7 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
   }
 
   applyBaseValues(sheet, characterSheet, warnings);
+  applyBaseValueFormulas(characterSheet);
 
   const spentOnSkills = applyNonCombatSkills(sheet, characterSheet, warnings);
   const spentOnCombatSkills = applyCombatSkills(sheet, characterSheet, warnings);
@@ -862,23 +864,60 @@ function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterShee
       continue;
     }
     const value = rawValue as Record<string, unknown>;
-    const startFromFormula = toInt(value.start);
     const mod = toInt(value.mod);
-    const baseValue: BaseValue = {
-      start: startFromFormula,
-      current: startFromFormula,
-      mod,
-      byFormula: startFromFormula,
-    };
 
     const points = asRecord(basePoints[rawName]);
+    const start = toInt(points.start);
     const bought = toInt(points.bought);
+
+    const baseValue: BaseValue = {
+      start,
+      current: start,
+      mod,
+    };
+
     if (bought !== 0) {
       baseValue.byLvlUp = bought;
       baseValue.current += bought;
     }
 
     characterSheet.baseValues[baseKey] = baseValue;
+  }
+}
+
+// Keep in sync with backend/src/core/rules/base-value-formulas.ts
+function calculateBaseValueByFormula(baseValueName: keyof BaseValues, attributes: Attributes): number | undefined {
+  const attr = (name: keyof Attributes) => attributes[name].current + attributes[name].mod;
+
+  switch (baseValueName) {
+    case "healthPoints":
+      return 2 * attr("endurance") + attr("strength") + 20;
+    case "mentalHealth":
+      return attr("courage") + 2 * attr("mentalResilience") + 8;
+    case "initiativeBaseValue":
+      return (2 * attr("courage") + attr("dexterity") + attr("endurance")) / 5;
+    case "attackBaseValue":
+      return (10 * (attr("courage") + attr("dexterity") + attr("strength"))) / 5;
+    case "paradeBaseValue":
+      return (10 * (attr("endurance") + attr("dexterity") + attr("strength"))) / 5;
+    case "rangedAttackBaseValue":
+      return (10 * (attr("concentration") + attr("dexterity") + attr("strength"))) / 5;
+    case "legendaryActions":
+      return 1;
+    default:
+      return undefined;
+  }
+}
+
+function applyBaseValueFormulas(characterSheet: CharacterSheet): void {
+  for (const baseValueName of Object.keys(characterSheet.baseValues) as (keyof BaseValues)[]) {
+    const formulaValue = calculateBaseValueByFormula(baseValueName, characterSheet.attributes);
+    if (formulaValue === undefined) {
+      continue;
+    }
+    const rounded = Math.round(formulaValue);
+    characterSheet.baseValues[baseValueName].byFormula = rounded;
+    characterSheet.baseValues[baseValueName].current += rounded;
   }
 }
 
