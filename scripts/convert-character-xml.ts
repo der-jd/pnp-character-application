@@ -562,7 +562,9 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
   const professionSkillName = asText(profession.skill);
   const professionSkill = mapGeneralInformationSkill(professionSkillName);
   if (!professionSkill) {
-    warnings.push(`Unknown profession skill '${professionSkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`);
+    warnings.push(
+      `Unknown profession skill '${professionSkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`,
+    );
   }
   const resolvedProfessionSkill: SkillNameWithCategory = professionSkill ?? DEFAULT_GENERAL_INFORMATION_SKILL;
   characterSheet.generalInformation.profession = {
@@ -576,7 +578,8 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
   const hobbySkillName = asText(hobby.skill);
   const normalizedHobbyName = normalizeLabel(hobbyName);
   const jiujitsuHobbyName = normalizeLabel("Jiu-Jitsu");
-  const forcedHobbySkill: SkillNameWithCategory | null = normalizedHobbyName === jiujitsuHobbyName ? "combat/martialArts" : null;
+  const forcedHobbySkill: SkillNameWithCategory | null =
+    normalizedHobbyName === jiujitsuHobbyName ? "combat/martialArts" : null;
   const hobbySkillFromXml = mapGeneralInformationSkill(hobbySkillName);
   if (!forcedHobbySkill && !hobbySkillFromXml && hobbySkillName) {
     warnings.push(`Unknown hobby skill '${hobbySkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`);
@@ -1013,7 +1016,9 @@ function applyGeneralInformationSkillEffect(
   const skillsInCategory = getSkillCategorySection(characterSheet.skills, category);
   const skill = skillsInCategory[name];
   if (!skill) {
-    warnings.push(`Unable to apply general information skill effect for '${skillName}', skill not found in character sheet`);
+    warnings.push(
+      `Unable to apply general information skill effect for '${skillName}', skill not found in character sheet`,
+    );
     return;
   }
   skill.activated = true;
