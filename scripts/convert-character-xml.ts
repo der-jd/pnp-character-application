@@ -345,15 +345,18 @@ async function main(): Promise<void> {
     await fs.writeFile(historyOutPath, JSON.stringify(block, null, 2), "utf-8");
   }
 
-  if (warnings.length > 0) {
-    console.warn("Warnings during conversion:");
-    for (const warning of warnings) {
-      console.warn(`- ${warning}`);
-    }
-  }
-
   console.log(`Character JSON written to ${characterOutPath}`);
   console.log(`History blocks written to ${outDir}`);
+
+  if (warnings.length > 0) {
+    console.warn("\n" + "=".repeat(60));
+    console.warn(`  ${warnings.length} WARNING(S) DURING CONVERSION`);
+    console.warn("=".repeat(60));
+    for (const warning of warnings) {
+      console.warn(`  - ${warning}`);
+    }
+    console.warn("=".repeat(60) + "\n");
+  }
 }
 
 function normalizeTagName(value: string): string {
