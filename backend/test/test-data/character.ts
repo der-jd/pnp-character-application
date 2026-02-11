@@ -207,8 +207,9 @@ export const fakeCharacter: Character = {
         mod: 1,
       },
       legendaryActions: {
-        start: 0,
-        current: 1,
+        start: 1,
+        current: 2,
+        byFormula: 1,
         byLvlUp: 1,
         mod: 1,
       },
@@ -1191,8 +1192,9 @@ export const fakeCharacter2: Character = {
         mod: 1,
       },
       legendaryActions: {
-        start: 0,
-        current: 1,
+        start: 1,
+        current: 2,
+        byFormula: 1,
         byLvlUp: 1,
         mod: 1,
       },
