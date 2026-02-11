@@ -187,6 +187,8 @@ const IGNORED_HISTORY_TYPES = new Set([
   normalizeLabel("Sprache/Schrift geändert"),
 ]);
 const IGNORED_HISTORY_TYPES_WITH_WARNING = new Set([normalizeLabel("Sprache/Schrift geändert")]);
+const ADVANTAGE_CHANGED_TYPE = normalizeLabel("Vorteil geändert");
+const STUDIUM_NAME = normalizeLabel("Studium");
 const DEFAULT_GENERAL_INFORMATION_SKILL = "body/athletics" as SkillNameWithCategory;
 const LEVEL_UP_COMMENT_PATTERN = /level\s*(\d+)/i;
 const BASE_VALUE_TO_LEVEL_UP_EFFECT: Record<string, LevelUpEffectKind> = {
@@ -300,6 +302,12 @@ async function main(): Promise<void> {
   const { characterSheet, warnings } = buildCharacterSheet(sheet);
   const activatedSkills = extractActivatedSkills(sheet, warnings);
 
+  const historyNode = asRecord(sheet.history);
+  const rawHistoryEntries = ensureArray(historyNode.entry) as HistoryEntry[];
+
+  const collegeSkillName = extractCollegeSkillName(rawHistoryEntries);
+  patchCollegeEducationSkillName(characterSheet, collegeSkillName, warnings);
+
   const character: Character = {
     userId,
     characterId,
@@ -307,9 +315,6 @@ async function main(): Promise<void> {
   };
 
   characterSchema.parse(character);
-
-  const historyNode = asRecord(sheet.history);
-  const rawHistoryEntries = ensureArray(historyNode.entry) as HistoryEntry[];
   const historyEntries = aggregateCombatSkillModEntries(rawHistoryEntries, warnings);
 
   const lastAPFromHistory = getLastAdventurePointsAvailable(rawHistoryEntries);
@@ -1101,9 +1106,51 @@ function mapDisadvantages(disadvantages: string[], warnings: string[]): Characte
     }
     const [, info, value] = defaultEntry;
     const infoOverride = enumValue === DisadvantagesNames.FEAR_OF ? rawName : info;
+    if (enumValue === DisadvantagesNames.FEAR_OF) {
+      warnings.push(
+        `FEAR_OF disadvantage detected ('${rawName}'). Please manually enter the specific matter of fear in the resulting character JSON.`,
+      );
+    }
     result.push([enumValue, infoOverride, value]);
   }
   return result;
+}
+
+function extractCollegeSkillName(entries: HistoryEntry[]): string | null {
+  for (const entry of entries) {
+    const typeLabel = normalizeLabel(asText(entry.type));
+    if (typeLabel !== ADVANTAGE_CHANGED_TYPE) {
+      continue;
+    }
+    const newValue = normalizeLabel(asText(entry.new_value));
+    if (newValue !== STUDIUM_NAME) {
+      continue;
+    }
+    const comment = asText(entry.comment).trim();
+    if (comment) {
+      return comment;
+    }
+  }
+  return null;
+}
+
+function patchCollegeEducationSkillName(
+  characterSheet: CharacterSheet,
+  collegeSkillName: string | null,
+  warnings: string[],
+): void {
+  const index = characterSheet.advantages.findIndex(([name]) => name === AdvantagesNames.COLLEGE_EDUCATION);
+  if (index === -1) {
+    return;
+  }
+  if (!collegeSkillName) {
+    warnings.push(
+      `COLLEGE_EDUCATION advantage detected but no skill name found in history. Please manually enter the skill name in the resulting character JSON.`,
+    );
+    return;
+  }
+  const [enumValue, , value] = characterSheet.advantages[index];
+  characterSheet.advantages[index] = [enumValue, collegeSkillName, value];
 }
 
 function buildHistoryRecords(
