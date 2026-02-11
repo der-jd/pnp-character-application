@@ -311,6 +311,14 @@ async function main(): Promise<void> {
   const historyNode = asRecord(sheet.history);
   const rawHistoryEntries = ensureArray(historyNode.entry) as HistoryEntry[];
   const historyEntries = aggregateCombatSkillModEntries(rawHistoryEntries, warnings);
+
+  const lastAPFromHistory = getLastAdventurePointsAvailable(rawHistoryEntries);
+  const computedAP = characterSheet.calculationPoints.adventurePoints.available;
+  if (lastAPFromHistory !== null && lastAPFromHistory !== computedAP) {
+    warnings.push(
+      `Adventure points mismatch: computed from totalCost = ${computedAP}, last history entry = ${lastAPFromHistory}`,
+    );
+  }
   characterSheet.generalInformation.levelUpProgress = buildLevelUpProgressFromHistory(historyEntries);
   const creationTimestamp = getEarliestHistoryTimestamp(rawHistoryEntries);
   const creationRecord = buildCharacterCreatedRecord(characterSheet, activatedSkills, creationTimestamp);
@@ -608,7 +616,7 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
   const adventurePointsTotal = toInt(adventurePoints.total);
   characterSheet.calculationPoints.adventurePoints = {
     start: 0,
-    available: 0, // TODO: insert manually
+    available: 0,
     total: adventurePointsTotal,
   };
 
@@ -646,8 +654,11 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
 
   applyBaseValues(sheet, characterSheet, warnings);
 
-  applyNonCombatSkills(sheet, characterSheet, warnings);
-  applyCombatSkills(sheet, characterSheet, warnings);
+  const spentOnSkills = applyNonCombatSkills(sheet, characterSheet, warnings);
+  const spentOnCombatSkills = applyCombatSkills(sheet, characterSheet, warnings);
+
+  characterSheet.calculationPoints.adventurePoints.available =
+    adventurePointsTotal - spentOnSkills - spentOnCombatSkills;
 
   return { characterSheet, warnings };
 }
@@ -863,9 +874,10 @@ function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterShee
   }
 }
 
-function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): void {
+function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): number {
   const skillsNode = asRecord(sheet.skills);
   delete (skillsNode as Record<string, unknown>).activated_skills;
+  let spentTotal = 0;
   for (const [rawName, rawValue] of Object.entries(skillsNode)) {
     const normalizedName = normalizeLabel(rawName);
     const mappedSkill = mapNonCombatSkill(normalizedName);
@@ -876,6 +888,8 @@ function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: Characte
     const { category, name } = splitSkill(mappedSkill);
     const value = rawValue as Record<string, unknown>;
     const activated = value.activated !== undefined ? toInt(value.activated) > 0 : START_SKILLS.includes(mappedSkill);
+    const totalCost = toInt(value.total_costs);
+    spentTotal += totalCost;
 
     const skillCategory = getSkillCategorySection(characterSheet.skills, category);
     skillCategory[name] = {
@@ -884,12 +898,13 @@ function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: Characte
       start: toInt(value.start),
       current: toInt(value.taw),
       mod: toInt(value.mod),
-      totalCost: toInt(value.total_costs),
+      totalCost,
     };
   }
+  return spentTotal;
 }
 
-function applyCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): void {
+function applyCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): number {
   const combatSkillsNode = asRecord(sheet.combat_skills);
   const baseValues = characterSheet.baseValues;
 
@@ -898,13 +913,15 @@ function applyCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSh
   const meleeSkills = ensureArray(meleeNode.skill) as Record<string, unknown>[];
   const rangedSkills = ensureArray(rangedNode.skill) as Record<string, unknown>[];
 
+  let spentTotal = 0;
   for (const skillEntry of meleeSkills) {
-    applyCombatSkillEntry(skillEntry, "melee", characterSheet, baseValues, warnings);
+    spentTotal += applyCombatSkillEntry(skillEntry, "melee", characterSheet, baseValues, warnings);
   }
 
   for (const skillEntry of rangedSkills) {
-    applyCombatSkillEntry(skillEntry, "ranged", characterSheet, baseValues, warnings);
+    spentTotal += applyCombatSkillEntry(skillEntry, "ranged", characterSheet, baseValues, warnings);
   }
+  return spentTotal;
 }
 
 function applyCombatSkillEntry(
@@ -913,12 +930,12 @@ function applyCombatSkillEntry(
   characterSheet: CharacterSheet,
   baseValues: BaseValues,
   warnings: string[],
-): void {
+): number {
   const name = normalizeLabel(asText(entry.name));
   const combatSkillName = COMBAT_SKILL_MAP[name];
   if (!combatSkillName) {
     warnings.push(`Unknown combat skill '${name}', skipping`);
-    return;
+    return 0;
   }
 
   const skill = characterSheet.skills.combat[combatSkillName];
@@ -951,6 +968,7 @@ function applyCombatSkillEntry(
   );
 
   combatCategory[combatSkillName] = updatedCombatStats;
+  return totalCost;
 }
 
 function recalculateCombatStats(
@@ -1163,6 +1181,22 @@ function buildHistoryRecords(
   }
 
   return records;
+}
+
+function getLastAdventurePointsAvailable(entries: HistoryEntry[]): number | null {
+  let lastAvailable: number | null = null;
+  for (const entry of entries) {
+    const typeLabel = normalizeLabel(asText(entry.type));
+    const name = normalizeLabel(asText(entry.name)).toLowerCase();
+    const isAPEvent = typeLabel === normalizeLabel("Ereignis (Berechnungspunkte)") && name.includes("abenteuer");
+    const isSkillIncrease =
+      typeLabel === normalizeLabel("Talent gesteigert") || typeLabel === normalizeLabel("Kampftalent gesteigert");
+    if (!isAPEvent && !isSkillIncrease) continue;
+    const change = toInt(entry.calculation_points_change);
+    if (change === 0) continue;
+    lastAvailable = toInt(entry.new_calculation_points_available);
+  }
+  return lastAvailable;
 }
 
 function getEarliestHistoryTimestamp(entries: HistoryEntry[]): string {
