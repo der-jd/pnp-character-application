@@ -170,6 +170,7 @@ const COMBAT_SKILL_MAP: Record<string, CombatSkillName> = {
   [normalizeLabel("Stichwaffe kurz")]: "daggers",
   [normalizeLabel("Messer")]: "daggers",
   [normalizeLabel("Gro\u00dfschwert")]: "slashingWeaponsSharp2h",
+  [normalizeLabel("Katana")]: "slashingWeaponsSharp2h",
   [normalizeLabel("Werfen")]: "missile",
   [normalizeLabel("Wurfgeschoss Faust")]: "missile",
   [normalizeLabel("Ringe")]: "missile",
