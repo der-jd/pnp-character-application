@@ -94,6 +94,7 @@ const BASE_VALUE_MAP: Record<string, keyof BaseValues> = {
 };
 
 const NON_COMBAT_SKILL_MAP = new Map<string, SkillNameWithCategory>([
+  [normalizeLabel("Akrobatik"), "body/athletics"],
   [normalizeLabel("Athletik"), "body/athletics"],
   [normalizeLabel("Gaukeleien"), "body/juggleries"],
   [normalizeLabel("Klettern"), "body/climbing"],
