@@ -939,13 +939,14 @@ function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: Characte
     spentTotal += totalCost;
 
     const skillCategory = getSkillCategorySection(characterSheet.skills, category);
+    const existing = skillCategory[name];
     skillCategory[name] = {
-      ...skillCategory[name],
-      activated,
-      start: toInt(value.start),
-      current: toInt(value.taw),
-      mod: toInt(value.mod),
-      totalCost,
+      ...existing,
+      activated: activated || existing.activated,
+      start: existing.start + toInt(value.start),
+      current: existing.current + toInt(value.taw),
+      mod: existing.mod + toInt(value.mod),
+      totalCost: existing.totalCost + totalCost,
     };
   }
   return spentTotal;
