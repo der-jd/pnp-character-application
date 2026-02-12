@@ -175,6 +175,7 @@ const COMBAT_SKILL_MAP: Record<string, CombatSkillName> = {
   [normalizeLabel("Armbrust")]: "firearmMedium",
   [normalizeLabel("Schusswaffe Mittel")]: "firearmMedium",
   [normalizeLabel("Schusswaffe mittel")]: "firearmMedium",
+  [normalizeLabel("Handfeuerwaffe")]: "firearmSimple",
   [normalizeLabel("Bogen")]: "firearmComplex",
   [normalizeLabel("Schusswaffe schwierig")]: "firearmComplex",
 };
