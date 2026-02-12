@@ -657,7 +657,7 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
       start,
       current,
       mod,
-      totalCost: 0,
+      totalCost: current,
     };
   }
 
