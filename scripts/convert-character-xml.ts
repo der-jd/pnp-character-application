@@ -1463,6 +1463,8 @@ function mapRecordType(typeLabel: string, warnings: string[]): RecordType {
     case normalizeLabel("Vorteil ge\u00e4ndert"):
     case normalizeLabel("Nachteil ge\u00e4ndert"):
     case normalizeLabel("Beruf ge\u00e4ndert"):
+    case normalizeLabel("Hobby ge\u00e4ndert"):
+      // TODO this is actually CHARACTER_CREATED
       return RecordType.SPECIAL_ABILITIES_CHANGED;
     default:
       warnings.push(`Unknown history entry type '${typeLabel}', defaulting to SPECIAL_ABILITIES_CHANGED`);
