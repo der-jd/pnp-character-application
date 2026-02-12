@@ -969,6 +969,19 @@ function applyCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSh
   for (const skillEntry of rangedSkills) {
     spentTotal += applyCombatSkillEntry(skillEntry, "ranged", characterSheet, baseValues, warnings);
   }
+
+  for (const category of ["melee", "ranged"] as const) {
+    const section = getCombatCategorySection(characterSheet.combat, category);
+    for (const [skillName, stats] of Object.entries(section)) {
+      section[skillName] = recalculateCombatStats(
+        stats,
+        category,
+        characterSheet.skills.combat[skillName as CombatSkillName],
+        baseValues,
+      );
+    }
+  }
+
   return spentTotal;
 }
 
