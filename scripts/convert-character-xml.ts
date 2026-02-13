@@ -50,6 +50,8 @@ import {
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB, matches backend/src/lambdas/add-history-record/index.ts
 
+const infoMessages = new Map<string, string[]>();
+
 const COMBAT_SKILL_HANDLING: Record<CombatSkillName, number> = {
   // Keep in sync with backend/src/core/rules/constants.ts
   martialArts: 25,
@@ -350,6 +352,8 @@ async function main(): Promise<void> {
     await fs.writeFile(historyOutPath, JSON.stringify(block, null, 2), "utf-8");
   }
 
+  flushInfoBlocks();
+
   console.log(`Character JSON written to ${characterOutPath}`);
   console.log(`History blocks written to ${outDir}`);
 
@@ -377,6 +381,18 @@ function ensureArray<T>(value: T | T[] | null | undefined): T[] {
     return [];
   }
   return Array.isArray(value) ? value : [value];
+}
+
+function queueInfoBlock(title: string, lines: string[]): void {
+  const existing = infoMessages.get(title) ?? [];
+  infoMessages.set(title, existing.concat(lines));
+}
+
+function flushInfoBlocks(): void {
+  for (const [title, lines] of infoMessages) {
+    console.info(["", `${title}:`, ...lines.map((line) => `  • ${line}`), ""].join("\n"));
+  }
+  infoMessages.clear();
 }
 
 function asText(value: unknown): string {
@@ -572,9 +588,9 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
     .filter(Boolean);
   const specialCharacteristics = asText(general.special_characteristics);
   if (languages.length > 0) {
-    console.info(
+    queueInfoBlock("Info", [
       `Languages/Scripts entries dropped during conversion (not part of new schema): ${languages.join(", ")}`,
-    );
+    ]);
   }
   characterSheet.generalInformation.specialCharacteristics = specialCharacteristics;
 
@@ -592,7 +608,7 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
     name: professionName,
     skill: resolvedProfessionSkill,
   };
-  applyGeneralInformationSkillEffect(characterSheet, resolvedProfessionSkill, PROFESSION_SKILL_BONUS, warnings);
+  applyProfessionOrHobbyBonus(characterSheet, resolvedProfessionSkill, PROFESSION_SKILL_BONUS, warnings);
 
   const hobby = asRecord(general.hobby);
   const hobbyName = asText(hobby.name);
@@ -612,7 +628,11 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
     skill: resolvedHobbySkill,
   };
 
-  applyGeneralInformationSkillEffect(characterSheet, resolvedHobbySkill, HOBBY_SKILL_BONUS, warnings);
+  applyProfessionOrHobbyBonus(characterSheet, resolvedHobbySkill, HOBBY_SKILL_BONUS, warnings);
+  queueInfoBlock("!! Notice !!", [
+    "Profession/Hobby bonus for non-combat skills is now stored as the skill's mod value instead of being baked into the current value.",
+    "Profession/Hobby bonus for combat skills is expected to already be stored in the mod value in the XML; please adjust manually if that's not the case.",
+  ]);
 
   const calculationPoints = asRecord(sheet.calculation_points);
   const attributePoints = asRecord(calculationPoints.attribute_points);
@@ -1089,23 +1109,27 @@ function mapGeneralInformationSkill(name: string): SkillNameWithCategory | null 
   return null;
 }
 
-function applyGeneralInformationSkillEffect(
+function applyProfessionOrHobbyBonus(
   characterSheet: CharacterSheet,
   skillName: SkillNameWithCategory,
   bonus: number,
   warnings: string[],
 ): void {
   const { category, name } = splitSkill(skillName);
+  if (category === "combat") { // combat skills are expected to already have the bonus in the mod value
+    return;
+  }
   const skillsInCategory = getSkillCategorySection(characterSheet.skills, category);
   const skill = skillsInCategory[name];
   if (!skill) {
     warnings.push(
-      `Unable to apply general information skill effect for '${skillName}', skill not found in character sheet`,
+      `Unable to apply profession/hobby bonus for '${skillName}', skill not found in character sheet`,
     );
     return;
   }
-  skill.activated = true;
+  // In the XML the bonus has been added to the current value, but in the new schema it is added to the mod value
   skill.mod += bonus;
+  skill.current -= bonus;
 }
 
 function splitSkill(skill: SkillNameWithCategory): { category: SkillCategory; name: SkillName } {
