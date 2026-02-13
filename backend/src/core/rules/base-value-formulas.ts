@@ -49,7 +49,7 @@ const baseValueFormulas: Record<BaseValueName, FormulaFn> = {
     5,
   luckPoints: () => undefined,
   bonusActionsPerCombatRound: () => undefined,
-  legendaryActions: () => undefined,
+  legendaryActions: () => 1,
 };
 
 export function calculateBaseValues(attributes: Attributes): Record<BaseValueName, number | undefined> {

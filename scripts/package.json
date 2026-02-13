@@ -2,7 +2,9 @@
   "name": "scripts",
   "version": "1.0.0",
   "scripts": {
-    "update-history-types": "npx ts-node update-history-types.ts"
+    "build": "tsc -p tsconfig.json",
+    "update-history-types": "npx ts-node update-history-types.ts",
+    "convert-character-xml": "npm run build && node build/convert-character-xml.js"
   },
   "devDependencies": {
     "@aws-sdk/util-dynamodb": "^3.758.0",
@@ -11,6 +13,8 @@
     "@types/uuid": "^10.0.0",
     "@types/xml2js": "^0.4.14",
     "@types/yargs": "^17.0.33",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2",
     "unidecode": "^1.1.0",
     "xml2js": "^0.6.2",
     "yargs": "^17.7.2"
