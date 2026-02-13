@@ -183,7 +183,6 @@ const COMBAT_SKILL_MAP: Record<string, CombatSkillName> = {
   [normalizeLabel("Bogen")]: "firearmComplex",
   [normalizeLabel("Schusswaffe schwierig")]: "firearmComplex",
 };
-// TODO throw an error if there is a missing combat skill found in the XML
 
 const GEWUERFELTE_BEGABUNG_COMMENT = normalizeLabel("Gewürfelte Begabung");
 const COMBAT_SKILL_HISTORY_TYPE_LABELS = new Set([normalizeLabel("Kampftalent gesteigert")]);
@@ -1027,7 +1026,7 @@ function applyCombatSkillEntry(
   const name = normalizeLabel(asText(entry.name));
   const combatSkillName = COMBAT_SKILL_MAP[name];
   if (!combatSkillName) {
-    warnings.push(`Unknown combat skill '${name}', skipping`);
+    warnings.push(`Unknown combat skill '${name}', skipping. Please update COMBAT_SKILL_MAP in the script to include this entry`);
     return 0;
   }
 
