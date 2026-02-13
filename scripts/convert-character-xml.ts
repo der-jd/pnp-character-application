@@ -1209,8 +1209,15 @@ function patchCollegeEducationSkillName(
     );
     return;
   }
+  const mappedSkill = mapNonCombatSkill(collegeSkillName);
+  const mappedSkillName = mappedSkill?.startsWith("knowledge/") ? mappedSkill.replace("knowledge/", "") : null;
+  if (!mappedSkillName) {
+    warnings.push(
+      `COLLEGE_EDUCATION: unknown knowledge skill '${collegeSkillName}', using raw value. Please manually correct the skill name in the resulting character JSON.`,
+    );
+  }
   const [enumValue, , value] = characterSheet.advantages[index];
-  characterSheet.advantages[index] = [enumValue, collegeSkillName, value];
+  characterSheet.advantages[index] = [enumValue, mappedSkillName ?? collegeSkillName, value];
 }
 
 function buildHistoryRecords(
