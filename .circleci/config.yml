@@ -52,7 +52,8 @@ jobs:
           command: |
             TER_VER=1.14.5
             curl --fail --location --output terraform.zip https://releases.hashicorp.com/terraform/${TER_VER}/terraform_${TER_VER}_linux_amd64.zip
-            unzip -o terraform.zip # Overwrite potentially existing file from previous run
+            rm -rf terraform # Remove any leftover file/directory from previous run
+            unzip terraform.zip
             sudo mv terraform /usr/local/bin/
             terraform -version
             rm terraform.zip
