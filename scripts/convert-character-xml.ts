@@ -1026,7 +1026,9 @@ function applyCombatSkillEntry(
   const name = normalizeLabel(asText(entry.name));
   const combatSkillName = COMBAT_SKILL_MAP[name];
   if (!combatSkillName) {
-    warnings.push(`Unknown combat skill '${name}', skipping. Please update COMBAT_SKILL_MAP in the script to include this entry`);
+    warnings.push(
+      `Unknown combat skill '${name}', skipping. Please update COMBAT_SKILL_MAP in the script to include this entry`,
+    );
     return 0;
   }
 
