@@ -1242,6 +1242,20 @@ function patchCollegeEducationSkillName(
   }
   const [enumValue, , value] = characterSheet.advantages[index];
   characterSheet.advantages[index] = [enumValue, mappedSkillName ?? collegeSkillName, value];
+
+  // In the XML the COLLEGE_EDUCATION bonus is baked into the current value,
+  // but in the new schema it is stored as mod. Subtract the bonus from current
+  // so that current + mod stays the same as the original XML value.
+  const additionalBonus = 20;
+  if (mappedSkillName && mappedSkillName in characterSheet.skills.knowledge) {
+    const chosenSkill =
+      characterSheet.skills.knowledge[mappedSkillName as keyof CharacterSheet["skills"]["knowledge"]];
+    chosenSkill.mod += additionalBonus;
+    chosenSkill.current -= additionalBonus;
+  }
+  queueInfoBlock("!! Notice !!", [
+    `COLLEGE_EDUCATION for ${mappedSkillName}: added ${additionalBonus} to skill mod value and subtracted ${additionalBonus} from skill current value. In the new schema, the bonus is stored as mod value instead of being baked into the current value.`,
+  ]);
 }
 
 function buildHistoryRecords(
@@ -1257,7 +1271,9 @@ function buildHistoryRecords(
     const typeLabel = normalizeLabel(asText(entry.type));
     if (IGNORED_HISTORY_TYPES.has(typeLabel)) {
       if (IGNORED_HISTORY_TYPES_WITH_WARNING.has(typeLabel)) {
-        console.info(`History entry type '${typeLabel}' ignored during conversion (not part of new schema)`);
+        queueInfoBlock("Info", [
+          `History entry type '${typeLabel}' ignored during conversion (not part of new schema)`,
+        ]);
       }
       continue;
     }
