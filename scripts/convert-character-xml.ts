@@ -354,6 +354,8 @@ async function main(): Promise<void> {
 
   flushInfoBlocks();
 
+  warnings.push("Please compare the converted character sheet and history against the original source data; conversion may contain errors and requires manual verification.");
+
   console.log(`Character JSON written to ${characterOutPath}`);
   console.log(`History blocks written to ${outDir}`);
 
@@ -1116,15 +1118,14 @@ function applyProfessionOrHobbyBonus(
   warnings: string[],
 ): void {
   const { category, name } = splitSkill(skillName);
-  if (category === "combat") { // combat skills are expected to already have the bonus in the mod value
+  if (category === "combat") {
+    // combat skills are expected to already have the bonus in the mod value
     return;
   }
   const skillsInCategory = getSkillCategorySection(characterSheet.skills, category);
   const skill = skillsInCategory[name];
   if (!skill) {
-    warnings.push(
-      `Unable to apply profession/hobby bonus for '${skillName}', skill not found in character sheet`,
-    );
+    warnings.push(`Unable to apply profession/hobby bonus for '${skillName}', skill not found in character sheet`);
     return;
   }
   // In the XML the bonus has been added to the current value, but in the new schema it is added to the mod value
@@ -1248,8 +1249,7 @@ function patchCollegeEducationSkillName(
   // so that current + mod stays the same as the original XML value.
   const additionalBonus = 20;
   if (mappedSkillName && mappedSkillName in characterSheet.skills.knowledge) {
-    const chosenSkill =
-      characterSheet.skills.knowledge[mappedSkillName as keyof CharacterSheet["skills"]["knowledge"]];
+    const chosenSkill = characterSheet.skills.knowledge[mappedSkillName as keyof CharacterSheet["skills"]["knowledge"]];
     chosenSkill.mod += additionalBonus;
     chosenSkill.current -= additionalBonus;
   }
