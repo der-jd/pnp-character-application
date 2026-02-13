@@ -354,7 +354,9 @@ async function main(): Promise<void> {
 
   flushInfoBlocks();
 
-  warnings.push("Please compare the converted character sheet and history against the original source data; conversion may contain errors and requires manual verification.");
+  warnings.push(
+    "Please compare the converted character sheet and history against the original source data; conversion may contain errors and requires manual verification.",
+  );
 
   console.log(`Character JSON written to ${characterOutPath}`);
   console.log(`History blocks written to ${outDir}`);
