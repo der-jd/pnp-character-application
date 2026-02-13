@@ -227,7 +227,7 @@ const ADVANTAGE_MAP: Record<string, AdvantagesNames> = {
 
 const DISADVANTAGE_MAP: Record<string, DisadvantagesNames> = {
   [normalizeLabel("Aberglaube")]: DisadvantagesNames.SUPERSTITION,
-  [normalizeLabel("Angst vor \u2026 (h\u00e4ufig)")]: DisadvantagesNames.FEAR_OF, // TODO: capture intensity in tuple info
+  [normalizeLabel("Angst vor \u2026 (h\u00e4ufig)")]: DisadvantagesNames.FEAR_OF,
   [normalizeLabel("Angst vor \u2026 (selten)")]: DisadvantagesNames.FEAR_OF,
   [normalizeLabel("Angsthase")]: DisadvantagesNames.COWARD,
   [normalizeLabel("Eingeschr\u00e4nkter Sinn")]: DisadvantagesNames.IMPAIRED_SENSE,
@@ -258,6 +258,11 @@ const DISADVANTAGE_MAP: Record<string, DisadvantagesNames> = {
   [normalizeLabel("Unansehnlich")]: DisadvantagesNames.UNATTRACTIVE,
   [normalizeLabel("Verschwendungssucht")]: DisadvantagesNames.SPENDTHRIFT,
   [normalizeLabel("Vorzeitiger Schulabbruch")]: DisadvantagesNames.EARLY_SCHOOL_DROPOUT,
+};
+
+const FEAR_OF_COST_BY_LABEL: Record<string, number> = {
+  [normalizeLabel("Angst vor … (häufig)")]: 5,
+  [normalizeLabel("Angst vor … (selten)")]: 2,
 };
 
 type XmlCharacterSheet = Record<string, unknown>;
@@ -1182,8 +1187,9 @@ function mapDisadvantages(disadvantages: string[], warnings: string[]): Characte
 
     let defaultEntry = DISADVANTAGES.find(([name]) => name === enumValue);
     if (enumValue === DisadvantagesNames.FEAR_OF) {
-      // TODO: verify cost level for fear-of disadvantages
-      defaultEntry = DISADVANTAGES.find(([, , value]) => value === 5) ?? defaultEntry;
+      const fearCost = FEAR_OF_COST_BY_LABEL[normalized];
+      defaultEntry =
+        DISADVANTAGES.find(([name, , value]) => name === enumValue && value === (fearCost ?? 5)) ?? defaultEntry;
     }
 
     if (!defaultEntry) {
