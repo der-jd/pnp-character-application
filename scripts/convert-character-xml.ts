@@ -165,7 +165,6 @@ const NON_COMBAT_SKILL_MAP = new Map<string, SkillNameWithCategory>([
   [normalizeLabel("Schl\u00f6sserknacken"), "handcraft/lockpicking"],
   [normalizeLabel("Ackerbau"), "handcraft/foodProcessing"],
 ]);
-// TODO double check that combined skills are correct (e.g. foodProcessing)
 
 const COMBAT_SKILL_MAP: Record<string, CombatSkillName> = {
   [normalizeLabel("Jiu-Jitsu")]: "martialArts",
