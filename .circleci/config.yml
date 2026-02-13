@@ -48,6 +48,16 @@ jobs:
           name: Install dependencies
           command: npm ci
       - run:
+          name: Install Terraform
+          command: |
+            TER_VER=1.14.5
+            curl --fail --location --output terraform.zip https://releases.hashicorp.com/terraform/${TER_VER}/terraform_${TER_VER}_linux_amd64.zip
+            rm -rf terraform # Remove any leftover file/directory from previous run
+            unzip terraform.zip
+            sudo mv terraform /usr/local/bin/
+            terraform -version
+            rm terraform.zip
+      - run:
           name: Check file formatting
           command: npm run check-format
 
@@ -124,7 +134,7 @@ jobs:
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
     docker:
-      - image: hashicorp/terraform:1.9
+      - image: hashicorp/terraform:1.14
     resource_class: medium
     steps:
       - checkout
