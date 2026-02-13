@@ -57,7 +57,7 @@ export const columns: ColumnDef<RecordEntry>[] = [
   {
     id: "spent",
     accessorFn: (row) => {
-      if ("skill" in row.data?.new && "skill" in row.data?.old) {
+      if (row.data?.new && row.data?.old && "skill" in row.data.new && "skill" in row.data.old) {
         return row.data.new.skill.totalCost - row.data.old.skill.totalCost;
       }
       return 0;
@@ -72,8 +72,8 @@ export const columns: ColumnDef<RecordEntry>[] = [
   {
     id: "old",
     accessorFn: (row) => {
-      if ("skill" in row.data?.new && "skill" in row.data?.old) {
-        return row.data?.old.skill.current ?? 0;
+      if (row.data?.new && row.data?.old && "skill" in row.data.new && "skill" in row.data.old) {
+        return row.data.old.skill.current ?? 0;
       }
       return 0;
     },
@@ -87,8 +87,8 @@ export const columns: ColumnDef<RecordEntry>[] = [
   {
     id: "new",
     accessorFn: (row) => {
-      if ("skill" in row.data?.new && "skill" in row.data?.old) {
-        return row.data?.new.skill.current ?? 0;
+      if (row.data?.new && row.data?.old && "skill" in row.data.new && "skill" in row.data.old) {
+        return row.data.new.skill.current ?? 0;
       }
       return 0;
     },
@@ -102,8 +102,8 @@ export const columns: ColumnDef<RecordEntry>[] = [
   {
     id: "spent total",
     accessorFn: (row) => {
-      if ("skill" in row.data?.new && "skill" in row.data?.old) {
-        return row.data?.new.skill.totalCost ?? 0;
+      if (row.data?.new && row.data?.old && "skill" in row.data.new && "skill" in row.data.old) {
+        return row.data.new.skill.totalCost ?? 0;
       }
       return 0;
     },
