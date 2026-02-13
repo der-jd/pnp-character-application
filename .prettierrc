@@ -1,4 +1,5 @@
 {
   "printWidth": 120,
-  "plugins": ["prettier-plugin-terraform-formatter"]
+  "plugins": ["prettier-plugin-terraform-formatter"],
+  "terraformStrictError": true
 }
