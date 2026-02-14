@@ -49,7 +49,7 @@ function discoverPackages() {
 
 export default defineConfig({
   test: {
-    setupFiles: ["./test/setup.ts"],
+    setupFiles: ["./test/unit-tests/setup.ts"],
     exclude: ["build/", "dist/", "**/node_modules/**"],
   },
   resolve: {
