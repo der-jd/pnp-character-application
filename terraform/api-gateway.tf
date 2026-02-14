@@ -655,6 +655,7 @@ resource "aws_acm_certificate_validation" "api_cert_validation" {
 resource "aws_api_gateway_domain_name" "api_domain" {
   domain_name              = var.api_domain_name
   regional_certificate_arn = aws_acm_certificate_validation.api_cert_validation.certificate_arn
+  security_policy          = "TLS_1_2"
 
   endpoint_configuration {
     types = ["REGIONAL"]
