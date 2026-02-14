@@ -27,15 +27,19 @@ workflows:
       - check-format-files
       - lint-typescript-code
       - build-backend
-      - run-backend-tests
+      - run-backend-unit-tests
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
           requires:
             - check-format-files
             - lint-typescript-code
             - build-backend
-            - run-backend-tests
+            - run-backend-unit-tests
             - lint-terraform-code
+      # TODO enable when component tests are ready
+      #- run-backend-component-tests:
+      #    requires:
+      #      - deploy-backend-and-infrastructure
       - build-and-deploy-frontend:
           requires:
             - check-format-files
@@ -102,7 +106,7 @@ jobs:
           paths:
             - backend/build
 
-  run-backend-tests:
+  run-backend-unit-tests:
     executor: node-medium-executor
     steps:
       - checkout
@@ -115,10 +119,10 @@ jobs:
             cd api-spec
             npm run build
       - run:
-          name: Run tests
+          name: Run unit tests
           command: |
             cd backend
-            npm run test
+            npm run test:unit
 
   lint-terraform-code:
     executor: node-small-executor
@@ -130,6 +134,26 @@ jobs:
       - run:
           name: Lint Terraform code
           command: npm run lint:terraform
+
+  run-backend-component-tests:
+    docker:
+      - image: cimg/node:22.10
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - run:
+          name: Build api-spec package
+          command: |
+            cd api-spec
+            npm run build
+      - run:
+          name: Run component tests
+          command: |
+            cd backend
+            npm run test:component
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
