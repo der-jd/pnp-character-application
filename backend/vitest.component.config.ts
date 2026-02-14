@@ -49,8 +49,10 @@ function discoverPackages() {
 
 export default defineConfig({
   test: {
-    setupFiles: ["./test/unit-tests/setup.ts"],
-    exclude: ["build/", "dist/", "**/node_modules/**"],
+    setupFiles: ["./test/component-tests/setup.ts"],
+    exclude: ["build/", "dist/", "**/node_modules/**", "test/unit-tests/**"],
+    environment: "node",
+    testTimeout: 30000,
   },
   resolve: {
     alias: discoverPackages(),
