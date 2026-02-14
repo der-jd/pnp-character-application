@@ -198,7 +198,7 @@ export async function getHistory(idToken: string, id: string): Promise<HistoryRe
  * @returns A History reply containing the requested block
  */
 export async function getHistoryBlock(idToken: string, id: string, blockNumber: number): Promise<HistoryReply> {
-  const endpoint_url = `characters/${id}/history?${blockNumber}`;
+  const endpoint_url = `characters/${id}/history?block-number=${blockNumber}`;
   return get<HistoryReply>(idToken, endpoint_url);
 }
 

@@ -17,7 +17,6 @@ export default function SignIn() {
   // Get AuthViewModel instance and current auth state
   const authViewModel = useAuth();
   const { isAuthenticated } = useAuthState();
-  const updateAvailableCharacters = useCharacterStore((state) => state.updateAvailableCharacters);
 
   // Use SignInViewModel hook
   const { isLoading, error, signIn, clearError, onSuccess } = useSignInViewModel();
@@ -40,12 +39,12 @@ export default function SignIn() {
       authViewModel.setAuthState(data.tokens, data.user);
 
       // Load characters
-      updateAvailableCharacters(data.tokens.idToken);
+      useCharacterStore.getState().updateAvailableCharacters(data.tokens.idToken);
 
       // Navigate to dashboard
       router.push("/protected/dashboard");
     });
-  }, [onSuccess, authViewModel, updateAvailableCharacters, router]);
+  }, [onSuccess, authViewModel, router]);
 
   // Clear error when user starts typing
   useEffect(() => {

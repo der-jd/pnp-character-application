@@ -1,69 +1,131 @@
 "use client";
 
-import { columns } from "@/src/lib/components/ui/historyTable/columns";
-import { DataTable } from "@/src/lib/components/ui/historyTable/dataTable";
-import { useCharacterStore } from "../../global/characterStore";
-import { useHistoryPageViewModel } from "@/src/hooks/useHistoryPageViewModel";
-import { useAuthState } from "../../global/AuthContext";
-import { useLoadingOverlay } from "../../global/OverlayContext";
-import { useRef, useEffect } from "react";
+import { useCharacterStore } from "@/src/app/global/characterStore";
+import { useAuthState } from "@/src/app/global/AuthContext";
+import { useLoadingOverlay } from "@/src/app/global/OverlayContext";
 import { useToast } from "@/src/hooks/use-toast";
+import { HistoryView } from "@/src/lib/components/History";
+import { HistoryCollection } from "@/src/lib/domain/History";
+import { HistoryService } from "@/src/lib/services/HistoryService";
+import { useEffect, useMemo, useCallback, useState } from "react";
+import type { Record } from "api-spec";
 
-export default function History() {
-  const hasFetched = useRef(false);
-  const characterName = useCharacterStore((state) => state.characterSheet?.generalInformation.name);
+export default function HistoryPage() {
+  const characterSheet = useCharacterStore((state) => state.characterSheet);
   const selectedCharacterId = useCharacterStore((state) => state.selectedCharacterId);
   const { tokens } = useAuthState();
+  const { show, hide } = useLoadingOverlay();
   const { toast } = useToast();
 
-  // Use the new ViewModel hook
-  const { historyEntries, isLoading, error, loadHistory, clearError } = useHistoryPageViewModel();
+  const [historyRecords, setHistoryRecords] = useState<Record[]>([]);
 
-  const { show, hide } = useLoadingOverlay();
+  // Memoize the history collection
+  const historyCollection = useMemo(() => {
+    return new HistoryCollection(historyRecords);
+  }, [historyRecords]);
+
+  // Memoize the history entries view models
+  const historyEntries = useMemo(() => {
+    return historyCollection.getAllEntries();
+  }, [historyCollection]);
 
   // Load history on mount
   useEffect(() => {
-    console.log(
-      "[History Page] Effect running - hasFetched:",
-      hasFetched.current,
-      "selectedCharacterId:",
-      selectedCharacterId,
-      "tokens:",
-      tokens?.idToken ? "present" : "missing"
+    const loadHistory = async () => {
+      if (!selectedCharacterId || !tokens?.idToken) return;
+
+      show();
+
+      try {
+        const historyService = new HistoryService();
+        const result = await historyService.getHistory(selectedCharacterId, tokens.idToken);
+
+        if (result.success) {
+          setHistoryRecords(result.data);
+        } else {
+          toast({
+            title: "Error",
+            description: `Failed to load history: ${result.error}`,
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred while loading history",
+          variant: "destructive",
+        });
+      } finally {
+        hide();
+      }
+    };
+
+    loadHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCharacterId, tokens?.idToken]);
+
+  // Handle revert action
+  const handleRevert = useCallback(
+    async (entryId: string) => {
+      if (!selectedCharacterId || !tokens?.idToken) return;
+
+      show();
+      try {
+        const historyService = new HistoryService();
+        const result = await historyService.revertHistoryEntry(selectedCharacterId, entryId, tokens.idToken);
+
+        if (result.success) {
+          toast({
+            title: "Success",
+            description: "History entry reverted successfully",
+          });
+
+          // Reload history
+          const historyResult = await historyService.getHistory(selectedCharacterId, tokens.idToken);
+          if (historyResult.success) {
+            setHistoryRecords(historyResult.data);
+          }
+
+          // TODO: Reload character to reflect changes
+        } else {
+          toast({
+            title: "Error",
+            description: `Failed to revert: ${result.error}`,
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred",
+          variant: "destructive",
+        });
+      } finally {
+        hide();
+      }
+    },
+    [selectedCharacterId, tokens?.idToken, show, hide, toast]
+  );
+
+  // Check if character is loaded
+  if (!characterSheet) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="text-center text-gray-500 py-10">
+          <p className="text-xl">No character selected</p>
+          <p className="text-sm mt-2">Please select a character from the sidebar to view history</p>
+        </div>
+      </div>
     );
-    if (!hasFetched.current && selectedCharacterId && tokens?.idToken) {
-      hasFetched.current = true;
-      console.log("[History Page] Calling loadHistory...");
-      loadHistory(selectedCharacterId, tokens.idToken);
-    }
-  }, [selectedCharacterId, tokens?.idToken, loadHistory]);
+  }
 
-  // Handle loading overlay
-  useEffect(() => {
-    if (isLoading) show();
-    else hide();
-  }, [isLoading, show, hide]);
-
-  // Handle errors with toast notifications
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "[History Error]",
-        description: error,
-        variant: "destructive",
-      });
-      clearError();
-    }
-  }, [error, toast, clearError]);
+  const characterName = characterSheet.generalInformation.name;
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4 text-center">The Life of {characterName}</h1>
-      {(historyEntries?.length ?? 0) > 0 ? (
-        <DataTable columns={columns} data={historyEntries ?? []} />
-      ) : (
-        <p>No history data available.</p>
-      )}
+    <div className="flex flex-col h-full">
+      <h1 className="text-3xl font-bold mb-6 text-center">The Life of {characterName}</h1>
+
+      <HistoryView entries={historyEntries} onRevert={handleRevert} />
     </div>
   );
 }

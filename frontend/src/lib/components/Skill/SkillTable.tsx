@@ -19,12 +19,7 @@ export const SkillsTable: React.FC<{ initialData: ISkillProps[] }> = ({ initialD
 
   // Debug: Log first skill to check data structure
   useEffect(() => {
-    if (initialData.length > 0) {
-      console.log("SkillTable - First skill data:", initialData[0]);
-      console.log("SkillTable - current_level:", initialData[0].current_level);
-      console.log("SkillTable - mod:", initialData[0].mod);
-      console.log("SkillTable - cost:", initialData[0].cost);
-    }
+    // Data structure validation moved to development logs only
   }, [initialData]);
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({

@@ -1,7 +1,7 @@
 // Service Layer Exports
 export { ApiClient } from "./apiClient";
 export { CharacterService } from "./characterService";
-export { HistoryService } from "./historyService";
+export { HistoryService } from "./HistoryService";
 export { AuthService } from "./authService";
 
 // Type Exports

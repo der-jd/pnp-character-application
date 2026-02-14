@@ -9,8 +9,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/src/hooks/use-toast";
 
 export default function Dashboard() {
-  const { toggleEdit, updateCharacter, setSelectedCharacter } = useCharacterStore();
-  const isEditMode = useCharacterStore((state) => state.editMode);
+  const { updateCharacter, setSelectedCharacter } = useCharacterStore();
   const { tokens } = useAuthState();
   const { toast } = useToast();
   const router = useRouter();
@@ -51,23 +50,45 @@ export default function Dashboard() {
     }
   };
 
-  const handleShareConfirm = (id: string) => {
-    console.log(`Sharing character ${id} with ${shareEmail}`);
+  const handleShareConfirm = () => {
+    // TODO: Implement actual sharing logic
     setShareOpenId(null);
     setShareEmail("");
   };
 
   const handleEdit = (charId: string) => {
     if (!tokens?.idToken) {
-      return; // TODO Show Error Toast
+      toast({
+        variant: "destructive",
+        title: "Authentication Error",
+        description: "Please log in again",
+      });
+      return;
     }
+
+    // Load character data
     updateCharacter(tokens.idToken, charId);
     setSelectedCharacter(charId);
 
-    if (!isEditMode) {
-      toggleEdit();
+    // Navigate to skills page
+    router.push("/protected/talente");
+  };
+
+  const handleView = (charId: string) => {
+    if (!tokens?.idToken) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Error",
+        description: "Please log in again",
+      });
+      return;
     }
 
+    // Load character data
+    updateCharacter(tokens.idToken, charId);
+    setSelectedCharacter(charId);
+
+    // Navigate to skills page
     router.push("/protected/talente");
   };
 
@@ -109,10 +130,10 @@ export default function Dashboard() {
 
                     <div className="mt-4 flex flex-col gap-2">
                       <Button
-                        className="border border-black hover:bg-gray-100"
+                        className="bg-black text-white hover:bg-gray-300 hover:text-black"
                         onClick={() => handleEdit(char.characterId)}
                       >
-                        Edit Character
+                        Load Character
                       </Button>
                       <Button
                         onClick={() => handleShareToggle(char.characterId)}
@@ -173,10 +194,10 @@ export default function Dashboard() {
 
                     <div className="mt-4 flex flex-col gap-2">
                       <Button
-                        className="border border-black hover:bg-gray-100"
-                        onClick={() => handleEdit(char.characterId)}
+                        className="bg-black text-white hover:bg-gray-300 hover:text-black"
+                        onClick={() => handleView(char.characterId)}
                       >
-                        View Character
+                        Load Character
                       </Button>
                     </div>
                   </div>

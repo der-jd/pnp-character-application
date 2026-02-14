@@ -121,7 +121,6 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       }
 
       const fullPath = [...path, name].map(String);
-      console.log(fullPath);
       return {
         characterSheet: R.modifyPath(fullPath, () => newValue, state.characterSheet),
       };

@@ -10,7 +10,6 @@ import { useLoadingOverlay } from "../../global/OverlayContext";
 
 export default function CombatValuesPage() {
   const editMode = useCharacterStore((state) => state.editMode);
-  const setEditMode = useCharacterStore((state) => state.toggleEdit);
   const characterSheet = useCharacterStore((state) => state.characterSheet);
   const { tryIncreaseCombatValue } = useSkillUpdater();
   const { show, hide } = useLoadingOverlay();
@@ -30,7 +29,7 @@ export default function CombatValuesPage() {
     <div className="w-full p-4">
       <div className="flex justify-end mb-4">
         <Button
-          onClick={() => setEditMode()}
+          onClick={() => useCharacterStore.getState().toggleEdit()}
           variant="outline"
           className="bg-black font-bold text-white hover:bg-gray-300 rounded-lg"
         >

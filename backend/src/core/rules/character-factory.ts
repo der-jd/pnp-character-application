@@ -16,9 +16,9 @@ export function createEmptyCharacterSheet(): CharacterSheet {
 
   const zeroSkill = (skillName: string, skillCategory?: string): Skill => {
     // Create the full skill name with category for START_SKILLS check
-    const fullSkillName = skillCategory ? (`${skillCategory}/${skillName}` as any) : null;
+    const fullSkillName = skillCategory ? (`${skillCategory}/${skillName}` as SkillNameWithCategory) : null;
     const isStartSkill = fullSkillName ? START_SKILLS.includes(fullSkillName) : false;
-    const isCombatSkill = combatSkills.some((skill: any) => skill.endsWith(`/${skillName}`));
+    const isCombatSkill = combatSkills.some((skill: string) => skill.endsWith(`/${skillName}`));
 
     return {
       activated: isStartSkill,

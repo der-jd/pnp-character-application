@@ -17,11 +17,6 @@ import { RecordEntry } from "../lib/api/models/history/interface";
 export function useHistory() {
   const toast = useToast();
   const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
-  const setHistory = useCharacterStore((state) => state.setHistoryEntries);
-  const updateHistoryEntries = useCharacterStore((state) => state.updateHistoryEntries);
-  const setOpenHistoryEntries = useCharacterStore((state) => state.setOpenHistoryEntries);
-  const updateValue = useCharacterStore((state) => state.updateValue);
-  const updateCombatValue = useCharacterStore((state) => state.updateCombatValue);
   const openHistoryEntries = useCharacterStore((state) => state.openHistoryEntries);
   const { tokens } = useAuthState();
 
@@ -77,7 +72,7 @@ export function useHistory() {
           allChanges = [...allChanges, ...flattenHistory(response)];
         }
 
-        updateHistoryEntries(allChanges);
+        useCharacterStore.getState().updateHistoryEntries(allChanges);
       } catch (error) {
         if (error instanceof ApiError) {
           toast.toast({
@@ -105,7 +100,7 @@ export function useHistory() {
   };
 
   const resetHistory = () => {
-    setHistory([]);
+    useCharacterStore.getState().setHistoryEntries([]);
   };
 
   const revertHistoryEntry = async () => {
@@ -148,14 +143,14 @@ export function useHistory() {
     }
 
     setLoading(false);
-    setOpenHistoryEntries(openHistoryEntries ?? []);
+    useCharacterStore.getState().setOpenHistoryEntries(openHistoryEntries ?? []);
 
     switch (lastEntry.type) {
       case RecordType.ATTRIBUTE_CHANGED:
         {
           const path = ["attributes"] as (keyof CharacterSheet)[];
           const name = lastEntry.name as keyof CharacterSheet;
-          updateValue(path, name, lastEntry.data.old.attribute.current);
+          useCharacterStore.getState().updateValue(path, name, lastEntry.data.old.attribute.current);
         }
         break;
 
@@ -163,7 +158,7 @@ export function useHistory() {
         {
           const path = ["skills", lastEntry.name.split("/")[0]] as (keyof CharacterSheet)[];
           const name = lastEntry.name.split("/")[1] as keyof CharacterSheet;
-          updateValue(path, name, lastEntry.data.old.skill.current);
+          useCharacterStore.getState().updateValue(path, name, lastEntry.data.old.skill.current);
         }
         break;
 
@@ -171,7 +166,7 @@ export function useHistory() {
         {
           const path = ["baseValues"] as (keyof CharacterSheet)[];
           const name = lastEntry.name as keyof CharacterSheet;
-          updateValue(path, name, lastEntry.data.old.current);
+          useCharacterStore.getState().updateValue(path, name, lastEntry.data.old.current);
         }
         break;
 
@@ -180,7 +175,7 @@ export function useHistory() {
           const path = ["generalInformation"] as (keyof CharacterSheet)[];
           const name = "level" as keyof CharacterSheet;
           console.log(lastEntry.data.old);
-          updateValue(path, name, lastEntry.data.old.value);
+          useCharacterStore.getState().updateValue(path, name, lastEntry.data.old.value);
         }
         break;
 
@@ -190,7 +185,7 @@ export function useHistory() {
           lastEntry.name.toLowerCase().includes("melee") ? "melee" : "ranged",
         ] as (keyof CharacterSheet)[];
         const name = lastEntry.name.split("/")[1] as keyof CharacterSheet;
-        updateCombatValue(path, name, lastEntry.data.old as CombatStats);
+        useCharacterStore.getState().updateCombatValue(path, name, lastEntry.data.old as CombatStats);
       }
     }
   };

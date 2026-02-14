@@ -1,9 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useAuthState } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
 import { CharacterSheet, LearningMethod, LearningMethodString } from "api-spec";
+import type { SkillViewModel } from "../lib/domain/Skills";
+import { increaseCombatValue, increaseSkill, levelUp } from "../lib/api/utils/api_calls";
+import { ApiError } from "@lib/api/utils/api_calls";
+import { useToast } from "./use-toast";
+import { SkillIncreaseRequest } from "../lib/api/models/skills/interface";
+import { LevelupRequest } from "../lib/api/models/lvlUp/interface";
+import { CombatValueIncreaseRequest } from "../lib/api/models/combatValues/interface";
+import { ICombatValue } from "../lib/components/ui/combatTable/definitions";
 
 // Helper function to convert from numeric LearningMethod to string
 const convertLearningMethodToString = (numericMethod: LearningMethod): LearningMethodString => {
@@ -20,119 +28,64 @@ const convertLearningMethodToString = (numericMethod: LearningMethod): LearningM
       return "NORMAL";
   }
 };
-import {
-  increaseAttribute,
-  increaseBaseValue,
-  increaseCombatValue,
-  increaseSkill,
-  levelUp,
-} from "../lib/api/utils/api_calls";
-import { ISkillProps } from "../lib/components/Skill/SkillDefinitions";
-import { ApiError } from "@lib/api/utils/api_calls";
-import { useToast } from "./use-toast";
-import { SkillIncreaseRequest } from "../lib/api/models/skills/interface";
-import { AttributeIncreaseRequest } from "../lib/api/models/attributes/interface";
-import { BaseValueIncreaseRequest } from "../lib/api/models/baseValues/interface";
-import { LevelupRequest } from "../lib/api/models/lvlUp/interface";
-import { CombatValueIncreaseRequest } from "../lib/api/models/combatValues/interface";
-import { ICombatValue } from "../lib/components/ui/combatTable/definitions";
 
 /**
- * Hook that provides functionallity to update a skill via api call, handles and shows errors and
- * provides a loading state while the api call is pending
+ * Hook that provides functionality to update skills, attributes, and other character values via API calls.
+ * Handles errors, loading states, and updates the character store with backend responses.
  *
- * @returns The tryIncreaseSkill function object and the loading state of the update proccess
+ * CRITICAL: Only subscribes to data, not store functions, to avoid infinite re-render loops.
+ *
+ * @returns Object containing increase functions and loading state
  */
 export function useSkillUpdater() {
   const toast = useToast();
   const { tokens } = useAuthState();
   const [loading, setLoading] = useState(false);
-  const updateValue = useCharacterStore((state) => state.updateValue);
-  const updateCombatValue = useCharacterStore((state) => state.updateCombatValue);
-  const updateReversibleHistory = useCharacterStore((state) => state.updateOpenHistoryEntries);
+
+  // IMPORTANT: Only subscribe to data, NOT functions
+  // Store functions change their reference on every state update, causing infinite loops
   const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
-  const setCharacterSheet = useCharacterStore((state) => state.setCharacterSheet);
-  const characterSheet = useCharacterStore((state) => state.characterSheet);
 
-  function applyUpdate({
-    keyPath,
-    name,
-    newValue,
-    historyRecord,
-    updatedAdventurePoints,
-    updatedAttributePoints,
-  }: {
-    keyPath: (keyof CharacterSheet)[];
-    name: keyof CharacterSheet;
-    newValue: number;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    historyRecord?: any;
-    updatedAdventurePoints?: number;
-    updatedAttributePoints?: number;
-  }) {
-    console.log("applyUpdate called with newValue:", newValue);
-    if (!characterSheet) {
-      toast.toast({
-        title: `Error updating ${name}, character sheet not defined!`,
-        description: `The character sheet is missing in the store. Please reload the character and try again!`,
-        variant: "destructive",
-      });
-      return;
-    }
+  // Get characterSheet when needed, don't subscribe to it
+  const getCharacterSheet = useCallback(() => useCharacterStore.getState().characterSheet, []);
 
-    const updatedCharacterSheet = { ...characterSheet };
+  // Increase skill with modern SkillViewModel
+  const tryIncrease = useCallback(
+    async (skill: SkillViewModel, points: number) => {
+      if (!selectedChar || !tokens?.idToken) return;
 
-    if (updatedCharacterSheet.calculationPoints) {
-      if (updatedAdventurePoints !== undefined) {
-        updatedCharacterSheet.calculationPoints.adventurePoints.available = updatedAdventurePoints;
-      }
-      if (updatedAttributePoints !== undefined) {
-        updatedCharacterSheet.calculationPoints.attributePoints.available = updatedAttributePoints;
-      }
-    }
+      const request: SkillIncreaseRequest = {
+        current: {
+          initialValue: skill.currentLevel,
+          increasedPoints: points,
+        },
+        learningMethod: convertLearningMethodToString(skill.learningMethod),
+      };
 
-    setCharacterSheet(updatedCharacterSheet);
-    updateValue(keyPath, name, newValue);
-
-    if (!historyRecord) {
-      toast.toast({
-        title: `Error updating ${name}`,
-        description: `History Entry is missing from backend reply!`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    updateReversibleHistory([historyRecord]);
-  }
-
-  const tryIncreaseAttribute = async (skill: ISkillProps, pointsToSkill: number) => {
-    const path = ["attributes"] as (keyof CharacterSheet)[];
-    const name = skill.name as keyof CharacterSheet;
-    const increaseAttributeRequest: AttributeIncreaseRequest = {
-      current: {
-        initialValue: skill.current_level,
-        increasedPoints: pointsToSkill,
-      },
-    };
-
-    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
+        const response = await increaseSkill(tokens.idToken, selectedChar, skill.name, skill.category, request);
 
-        const { data, historyRecord } = await increaseAttribute(
-          tokens!.idToken,
-          selectedChar,
-          skill.name,
-          increaseAttributeRequest
-        );
+        // Update the entire skill object from backend
+        const characterSheet = getCharacterSheet();
+        if (characterSheet) {
+          const updatedSheet = { ...characterSheet };
+          const categorySkills = updatedSheet.skills[skill.category];
+          if (categorySkills) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (categorySkills as any)[skill.name] = response.data.changes.new.skill;
+            useCharacterStore.getState().setCharacterSheet(updatedSheet);
+          }
+        }
 
-        applyUpdate({
-          keyPath: path,
-          name: name,
-          newValue: data.changes.new.attribute.current,
-          historyRecord: historyRecord,
-          updatedAttributePoints: data.attributePoints?.new.available,
+        // Update history
+        if (response.historyRecord) {
+          useCharacterStore.getState().updateOpenHistoryEntries([response.historyRecord]);
+        }
+
+        toast.toast({
+          title: "Success",
+          description: `${skill.displayName} increased to ${response.data.changes.new.skill.current}`,
         });
       } catch (error) {
         if (error instanceof ApiError) {
@@ -142,43 +95,37 @@ export function useSkillUpdater() {
             variant: "destructive",
           });
         }
-        return;
       } finally {
         setLoading(false);
       }
-    }
-  };
+    },
+    [selectedChar, tokens, getCharacterSheet, toast]
+  );
 
-  const tryIncreaseSkill = async (skill: ISkillProps, pointsToSkill: number) => {
-    const path = ["skills", skill.category] as (keyof CharacterSheet)[];
-    const name = skill.name as keyof CharacterSheet;
+  // Level up
+  const lvlUp = useCallback(
+    async (currentLevel: number) => {
+      if (!selectedChar || !tokens?.idToken) return;
 
-    const increaseSkillRequest: SkillIncreaseRequest = {
-      current: {
-        initialValue: skill.current_level,
-        increasedPoints: pointsToSkill,
-      },
-      learningMethod: convertLearningMethodToString(skill.learning_method),
-    };
+      const request: LevelupRequest = {
+        initialLevel: currentLevel,
+      };
 
-    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
-        const response = await increaseSkill(
-          tokens!.idToken,
-          selectedChar,
-          skill.name,
-          skill.category,
-          increaseSkillRequest
+        const { data, historyRecord } = await levelUp(tokens.idToken, selectedChar, request);
+
+        // Get store functions directly
+        const store = useCharacterStore.getState();
+        store.updateValue(
+          ["generalInformation" as keyof CharacterSheet],
+          "level" as keyof CharacterSheet,
+          data.level.new.value
         );
 
-        applyUpdate({
-          keyPath: path,
-          name: name,
-          newValue: response.data.changes.new.skill.current,
-          historyRecord: response.historyRecord,
-          updatedAdventurePoints: response.data.adventurePoints?.new.available,
-        });
+        if (historyRecord) {
+          store.updateOpenHistoryEntries([historyRecord]);
+        }
       } catch (error) {
         if (error instanceof ApiError) {
           toast.toast({
@@ -187,129 +134,50 @@ export function useSkillUpdater() {
             variant: "destructive",
           });
         }
-        return;
       } finally {
         setLoading(false);
       }
-    }
-  };
+    },
+    [selectedChar, tokens, toast]
+  );
 
-  const tryIncreaseBaseValue = async (value: ISkillProps, pointsToSkill: number) => {
-    const path = ["baseValues"] as (keyof CharacterSheet)[];
-    const name = value.name as keyof CharacterSheet;
-    const increaseBaseValueRequest: BaseValueIncreaseRequest = {
-      byLvlUp: {
-        initialValue: value.current_level,
-        newValue: pointsToSkill,
-      },
-    };
+  // Increase combat value
+  const tryIncreaseCombatValue = useCallback(
+    async (value: ICombatValue, subtype: string, pointsToSkill: number) => {
+      if (!selectedChar || !tokens?.idToken) return;
 
-    if (selectedChar && tokens?.idToken) {
-      try {
-        setLoading(true);
-        const { data, historyRecord } = await increaseBaseValue(
-          tokens!.idToken,
-          selectedChar,
-          value.name,
-          increaseBaseValueRequest
-        );
+      const request: CombatValueIncreaseRequest = {
+        attackValue: {
+          initialValue: value.attack,
+          increasedPoints: subtype === "attack" ? pointsToSkill : 0,
+        },
+        paradeValue: {
+          initialValue: value.parry,
+          increasedPoints: subtype === "parry" ? pointsToSkill : 0,
+        },
+      };
 
-        applyUpdate({
-          keyPath: path,
-          name: name,
-          newValue: data.baseValue.new.current,
-          historyRecord: historyRecord,
-        });
-      } catch (error) {
-        if (error instanceof ApiError) {
-          toast.toast({
-            title: `Error ${error.statusCode}`,
-            description: `${error.body}`,
-            variant: "destructive",
-          });
-        }
-        setLoading(false);
-        return;
-      }
-      setLoading(false);
-    }
-  };
-
-  const tryIncrease = async (value: ISkillProps, pointsToSkill: number) => {
-    if (value.category == "Attributes") {
-      await tryIncreaseAttribute(value, pointsToSkill);
-    } else if (value.category == "BaseValues") {
-      await tryIncreaseBaseValue(value, pointsToSkill);
-    } else {
-      await tryIncreaseSkill(value, pointsToSkill);
-    }
-  };
-
-  const lvlUp = async (currentLevel: number) => {
-    const path = ["generalInformation"] as (keyof CharacterSheet)[];
-    const name = "level" as keyof CharacterSheet;
-    const lvlUpRequest: LevelupRequest = {
-      initialLevel: currentLevel,
-    };
-
-    if (selectedChar && tokens?.idToken) {
-      try {
-        setLoading(true);
-        const { data, historyRecord } = await levelUp(tokens!.idToken, selectedChar, lvlUpRequest);
-        try {
-          applyUpdate({
-            keyPath: path,
-            name: name,
-            newValue: data.level.new.value,
-            historyRecord: historyRecord,
-          });
-        } catch (e) {
-          console.log(e);
-        }
-      } catch (error) {
-        if (error instanceof ApiError) {
-          toast.toast({
-            title: `Error ${error.statusCode}`,
-            description: `${error.body}`,
-            variant: "destructive",
-          });
-        }
-        setLoading(false);
-        return;
-      }
-      setLoading(false);
-    }
-  };
-
-  const tryIncreaseCombatValue = async (value: ICombatValue, subtype: string, pointsToSkill: number) => {
-    console.log(subtype);
-    const path = ["combat", value.type] as (keyof CharacterSheet)[];
-    const name = value.name as keyof CharacterSheet;
-    const increaseCombatValueRequest: CombatValueIncreaseRequest = {
-      attackValue: {
-        initialValue: value.attack,
-        increasedPoints: subtype === "attack" ? pointsToSkill : 0,
-      },
-      paradeValue: {
-        initialValue: value.parry,
-        increasedPoints: subtype === "parry" ? pointsToSkill : 0,
-      },
-    };
-
-    if (selectedChar && tokens?.idToken) {
       try {
         setLoading(true);
         const { data, historyRecord } = await increaseCombatValue(
-          tokens!.idToken,
+          tokens.idToken,
           selectedChar,
           value.name,
           value.type,
-          increaseCombatValueRequest
+          request
         );
 
-        updateCombatValue(path, name, data.combatStats.new);
+        // Get store functions directly
+        const store = useCharacterStore.getState();
+        store.updateCombatValue(
+          ["combat", value.type] as (keyof CharacterSheet)[],
+          value.name as keyof CharacterSheet,
+          data.combatStats.new
+        );
 
-        if (historyRecord) updateReversibleHistory([historyRecord]);
+        if (historyRecord) {
+          store.updateOpenHistoryEntries([historyRecord]);
+        }
       } catch (error) {
         if (error instanceof ApiError) {
           toast.toast({
@@ -318,12 +186,12 @@ export function useSkillUpdater() {
             variant: "destructive",
           });
         }
+      } finally {
         setLoading(false);
-        return;
       }
-      setLoading(false);
-    }
-  };
+    },
+    [selectedChar, tokens, toast]
+  );
 
   return { tryIncrease, lvlUp, tryIncreaseCombatValue, loading };
 }

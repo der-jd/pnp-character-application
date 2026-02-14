@@ -24,7 +24,6 @@ export default function CharacterCardTestPage() {
     const roll = Math.floor(Math.random() * 20) + 1;
     const total = roll + baseInitiative;
     setRolledInitiative(total);
-    console.log(`Rolled ${roll} + ${baseInitiative} = ${total} for initiative`);
   };
 
   if (!characterSheet) {

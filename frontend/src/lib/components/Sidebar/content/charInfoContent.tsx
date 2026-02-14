@@ -104,8 +104,8 @@ const CharacterInfoContent: React.FC = () => {
     }
   };
 
-  const updateCharacterPoints = (type: "adventurePoints" | "attributePoints", amount: number) => {
-    console.log(`Updating ${type} by ${amount}`);
+  const updateCharacterPoints = () => {
+    // TODO: Implement character points update
   };
 
   return (

@@ -537,8 +537,6 @@ export class CharacterBuilder {
   }
 
   activateSkills(activatedSkills: ActivatedSkills): this {
-    console.log("Activate skills for free:", activatedSkills);
-
     for (const skill of activatedSkills) {
       try {
         const { category, name } = getSkillCategoryAndName(skill);
@@ -557,8 +555,6 @@ export class CharacterBuilder {
   }
 
   setStartValuesOfCombatSkills(combatSkills: CombatSkillsStartValues): this {
-    console.log("Set start values of combat skills");
-
     for (const [skillName, start] of Object.entries(combatSkills)) {
       this.characterSheet.skills.combat[skillName as CombatSkillName].start += start;
       this.characterSheet.skills.combat[skillName as CombatSkillName].current += start;

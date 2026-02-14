@@ -237,7 +237,7 @@ async function validateRequest(request: Request): Promise<Parameters> {
   }
 }
 
-function estimateItemSize(item: any): number {
+function estimateItemSize(item: Record<string, unknown>): number {
   const marshalled = marshall(item);
   const json = JSON.stringify(marshalled);
   return Buffer.byteLength(json, "utf8");

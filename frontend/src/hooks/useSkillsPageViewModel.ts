@@ -18,10 +18,8 @@ import { useCharacterStore } from "@/src/app/global/characterStore";
  * } = useSkillsPageViewModel();
  */
 export function useSkillsPageViewModel() {
-  // Get character sheet and store methods
+  // Get character sheet (data only)
   const characterSheet = useCharacterStore((state) => state.characterSheet);
-  const toggleStoreEdit = useCharacterStore((state) => state.toggleEdit);
-  const setOpenHistoryEntries = useCharacterStore((state) => state.setOpenHistoryEntries);
 
   // Create ViewModel instance (singleton per component)
   const viewModel = useMemo(() => {
@@ -47,11 +45,11 @@ export function useSkillsPageViewModel() {
 
     // If leaving edit mode, clear open history entries
     if (state.editMode) {
-      setOpenHistoryEntries([]);
+      useCharacterStore.getState().setOpenHistoryEntries([]);
     }
 
     // Toggle store edit mode (for SkillTable and other components)
-    toggleStoreEdit();
+    useCharacterStore.getState().toggleEdit();
   };
 
   // Return state and operations
