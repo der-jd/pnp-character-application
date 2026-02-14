@@ -605,7 +605,79 @@ resource "aws_api_gateway_stage" "api_stage" {
   stage_name    = var.env
 }
 
-output "api_gateway_url" {
-  value     = "https://${aws_api_gateway_rest_api.pnp_rest_api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_stage.api_stage.stage_name}"
-  sensitive = true
+# ================== Custom Domain Configuration ==================
+
+# Read API version from package.json
+data "local_file" "api_spec_package" {
+  filename = "${path.root}/../api-spec/package.json"
+}
+
+locals {
+  # Extract major version from package.json (e.g., "1.0.0" -> "v1")
+  api_major_version = "v${jsondecode(data.local_file.api_spec_package.content).version}"
+}
+
+# ACM Certificate for API domain
+resource "aws_acm_certificate" "api_cert" {
+  domain_name       = var.api_domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# DNS validation records for ACM certificate
+resource "aws_route53_record" "api_cert_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.api_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = aws_route53_zone.main.zone_id
+}
+
+# Wait for certificate validation
+resource "aws_acm_certificate_validation" "api_cert_validation" {
+  certificate_arn         = aws_acm_certificate.api_cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.api_cert_validation : record.fqdn]
+}
+
+# API Gateway custom domain name
+resource "aws_api_gateway_domain_name" "api_domain" {
+  domain_name              = var.api_domain_name
+  regional_certificate_arn = aws_acm_certificate_validation.api_cert_validation.certificate_arn
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+
+  depends_on = [aws_acm_certificate_validation.api_cert_validation]
+}
+
+# Base path mapping for API Gateway
+resource "aws_api_gateway_base_path_mapping" "api_mapping" {
+  api_id     = aws_api_gateway_rest_api.pnp_rest_api.id
+  stage_name = aws_api_gateway_stage.api_stage.stage_name
+
+  domain_name = aws_api_gateway_domain_name.api_domain.domain_name
+  base_path   = local.api_major_version
+}
+
+output "api_versioned_url" {
+  value     = "${aws_api_gateway_domain_name.api_domain.regional_domain_name}/${local.api_major_version}"
+  sensitive = false
+}
+
+output "api_version" {
+  value     = local.api_major_version
+  sensitive = false
 }

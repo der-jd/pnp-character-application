@@ -18,6 +18,11 @@ variable "domain_name" {
   type        = string
 }
 
+variable "api_domain_name" {
+  description = "The domain name for the API"
+  type        = string
+}
+
 // Will be set via an environment variable in CircleCI
 variable "backup_alert_email" {
   description = "Email address that receives CloudWatch/SNS backup failure notifications"

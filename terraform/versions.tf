@@ -9,6 +9,11 @@ terraform {
       source  = "hashicorp/archive"
       version = "~> 2"
     }
+
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2"
+    }
   }
 
   required_version = ">= 1.14.5"

@@ -23,19 +23,18 @@ output "route53_zone_id" {
 
 # ================== DNS Records ==================
 
-# API subdomain record (will be added later when API Gateway custom domain is created)
-# This is commented out for now - will be added when we create the API Gateway custom domain
-# resource "aws_route53_record" "api" {
-#   zone_id = aws_route53_zone.main.zone_id
-#   name    = "api.${var.domain_name}"
-#   type    = "A"
-#
-#   alias {
-#     name                   = aws_api_gateway_domain_name.api_domain.regional_domain_name
-#     zone_id                = aws_api_gateway_domain_name.api_domain.regional_zone_id
-#     evaluate_target_health = false
-#   }
-# }
+# API subdomain record (pointing to API Gateway custom domain)
+resource "aws_route53_record" "api" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = var.api_domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_api_gateway_domain_name.api_domain.regional_domain_name
+    zone_id                = aws_api_gateway_domain_name.api_domain.regional_zone_id
+    evaluate_target_health = false
+  }
+}
 
 # Frontend record (pointing to CloudFront distribution)
 resource "aws_route53_record" "frontend" {
