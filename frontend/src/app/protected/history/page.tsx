@@ -13,6 +13,7 @@ import type { Record } from "api-spec";
 export default function HistoryPage() {
   const characterSheet = useCharacterStore((state) => state.characterSheet);
   const selectedCharacterId = useCharacterStore((state) => state.selectedCharacterId);
+  const updateCharacter = useCharacterStore((state) => state.updateCharacter);
   const { tokens } = useAuthState();
   const { show, hide } = useLoadingOverlay();
   const { toast } = useToast();
@@ -86,7 +87,8 @@ export default function HistoryPage() {
             setHistoryRecords(historyResult.data);
           }
 
-          // TODO: Reload character to reflect changes
+          // Reload character using the standard method (same as dashboard)
+          await updateCharacter(tokens.idToken, selectedCharacterId);
         } else {
           toast({
             title: "Error",
@@ -104,11 +106,11 @@ export default function HistoryPage() {
         hide();
       }
     },
-    [selectedCharacterId, tokens?.idToken, show, hide, toast]
+    [selectedCharacterId, tokens?.idToken, show, hide, toast, updateCharacter]
   );
 
   // Check if character is loaded
-  if (!characterSheet) {
+  if (!characterSheet || !characterSheet.generalInformation) {
     return (
       <div className="flex flex-col h-full">
         <div className="text-center text-gray-500 py-10">

@@ -74,6 +74,10 @@ export class Character {
     return this._baseValueCollection;
   }
 
+  get characterSheet(): CharacterSheet {
+    return this._characterSheet;
+  }
+
   // === Business Logic Methods ===
   // Note: All calculation methods should be handled by backend API
   // Frontend only displays data and collects user input
