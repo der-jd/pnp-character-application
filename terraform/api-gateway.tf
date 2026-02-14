@@ -599,13 +599,13 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   }
 }
 
-resource "aws_api_gateway_stage" "prod" {
+resource "aws_api_gateway_stage" "api_stage" {
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   deployment_id = aws_api_gateway_deployment.api_deployment.id
-  stage_name    = "prod"
+  stage_name    = var.env
 }
 
 output "api_gateway_url" {
-  value     = "https://${aws_api_gateway_rest_api.pnp_rest_api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_stage.prod.stage_name}"
+  value     = "https://${aws_api_gateway_rest_api.pnp_rest_api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_stage.api_stage.stage_name}"
   sensitive = true
 }
