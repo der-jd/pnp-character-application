@@ -4,6 +4,7 @@ import {
   CharacterSheet,
   CombatStats,
   Skill,
+  SkillNameWithCategory,
   ATTRIBUTE_POINTS_FOR_CREATION,
   START_SKILLS,
   combatSkills,
