@@ -3,6 +3,12 @@
 # Main hosted zone for the domain
 resource "aws_route53_zone" "main" {
   name = var.domain_name
+
+  # Enable deletion protection to prevent the removal of the hosted zone and the corresponding nameservers.
+  # This would break the DNS delegation from the external DNS provider where the domain is registered.
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Output the nameservers for delegation to another DNS provider
