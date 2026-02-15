@@ -22,7 +22,7 @@ describe("Invalid requests", () => {
         },
         body: null,
       },
-      expectedStatusCode: 400,
+      expectedStatusCode: 401,
     },
     {
       name: "Authorization header is malformed",

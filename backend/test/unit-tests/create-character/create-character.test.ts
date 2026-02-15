@@ -129,7 +129,7 @@ describe("Invalid requests", () => {
         queryStringParameters: null,
         body: characterCreationRequest,
       },
-      expectedStatusCode: 400,
+      expectedStatusCode: 401,
     },
     {
       name: "Authorization header is malformed",

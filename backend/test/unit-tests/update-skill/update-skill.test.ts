@@ -28,7 +28,7 @@ describe("Invalid requests", () => {
           learningMethod: "NORMAL",
         },
       },
-      expectedStatusCode: 400,
+      expectedStatusCode: 401,
     },
     {
       name: "Authorization header is malformed",

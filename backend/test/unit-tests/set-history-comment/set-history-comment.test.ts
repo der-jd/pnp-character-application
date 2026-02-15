@@ -32,7 +32,7 @@ describe("Invalid requests", () => {
           comment: "This is a test comment",
         },
       },
-      expectedStatusCode: 400,
+      expectedStatusCode: 401,
     },
     {
       name: "Authorization header is malformed",

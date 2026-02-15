@@ -4,20 +4,24 @@ import { HttpError } from "./errors.js";
 export function decodeUserId(authorizationHeader: string | undefined): string {
   // Trim the authorization header as it could contain spaces at the beginning
   const authHeader = authorizationHeader?.trim();
+
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new HttpError(401, "Unauthorized: No token provided!");
+    console.error("No authorization token provided!");
+    throw new HttpError(401, "Unauthorized");
   }
 
   const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
   // Decode the token without verification (the access to the API itself is already protected by the authorizer)
   const decoded = jwt.decode(token) as JwtPayload | null;
   if (!decoded) {
-    throw new HttpError(401, "Unauthorized: Invalid token!");
+    console.error("Invalid authorization token!");
+    throw new HttpError(401, "Unauthorized");
   }
 
   const userId = decoded.sub; // Cognito User ID
   if (!userId) {
-    throw new HttpError(401, "Unauthorized: User ID not found in token!");
+    console.error("User ID not found in authorization token!");
+    throw new HttpError(401, "Unauthorized");
   }
 
   return userId;
