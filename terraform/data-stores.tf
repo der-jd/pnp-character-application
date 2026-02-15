@@ -25,6 +25,7 @@ resource "aws_dynamodb_table" "characters" {
     type = "S"
   }
 
+  # TODO obsolete and can be removed?!
   global_secondary_index {
     name            = "indexForCognitoGroup"
     hash_key        = "groupId"

@@ -43,7 +43,7 @@ resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   name        = "pnp-app-api"
   description = "REST API for the PnP character application"
   endpoint_configuration {
-    // Distribute the regional API only via our own CloudFront distribution.
+    // Using Regional API endpoint for direct access without CloudFront distribution.
     // See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-endpoint-types.html#api-gateway-api-endpoint-types-regional
     types = ["REGIONAL"]
   }
@@ -599,13 +599,53 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   }
 }
 
-resource "aws_api_gateway_stage" "prod" {
+resource "aws_api_gateway_stage" "api_stage" {
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   deployment_id = aws_api_gateway_deployment.api_deployment.id
-  stage_name    = "prod"
+  stage_name    = var.env
 }
 
-output "api_gateway_url" {
-  value     = "https://${aws_api_gateway_rest_api.pnp_rest_api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_stage.prod.stage_name}"
-  sensitive = true
+# ================== Custom Domain Configuration ==================
+
+# Read API version from package.json
+data "local_file" "api_spec_package" {
+  filename = "${path.root}/../api-spec/package.json"
+}
+
+locals {
+  # Extract major version from package.json (e.g., "1.0.0" -> "v1")
+  api_version_parts = split(".", jsondecode(data.local_file.api_spec_package.content).version)
+  api_major_version = "v${local.api_version_parts[0]}"
+}
+
+# API Gateway custom domain name
+resource "aws_api_gateway_domain_name" "api_domain" {
+  domain_name              = var.api_domain_name
+  regional_certificate_arn = aws_acm_certificate_validation.api_cert_validation.certificate_arn
+  security_policy          = "TLS_1_2"
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+
+  depends_on = [aws_acm_certificate_validation.api_cert_validation]
+}
+
+# Base path mapping for API Gateway
+resource "aws_api_gateway_base_path_mapping" "api_mapping" {
+  api_id     = aws_api_gateway_rest_api.pnp_rest_api.id
+  stage_name = aws_api_gateway_stage.api_stage.stage_name
+
+  domain_name = aws_api_gateway_domain_name.api_domain.domain_name
+  base_path   = local.api_major_version
+}
+
+output "api_versioned_url" {
+  value     = "${aws_api_gateway_domain_name.api_domain.regional_domain_name}/${local.api_major_version}"
+  sensitive = false
+}
+
+output "api_version" {
+  value     = local.api_major_version
+  sensitive = false
 }
