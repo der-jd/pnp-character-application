@@ -29,19 +29,6 @@ output "route53_zone_id" {
 
 # ================== DNS Records ==================
 
-# API subdomain record (pointing to API Gateway custom domain)
-resource "aws_route53_record" "api" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = var.api_domain_name
-  type    = "A"
-
-  alias {
-    name                   = aws_api_gateway_domain_name.api_domain.regional_domain_name
-    zone_id                = aws_api_gateway_domain_name.api_domain.regional_zone_id
-    evaluate_target_health = false
-  }
-}
-
 # Frontend record (pointing to CloudFront distribution)
 resource "aws_route53_record" "frontend" {
   zone_id = aws_route53_zone.main.zone_id
@@ -55,6 +42,19 @@ resource "aws_route53_record" "frontend" {
   }
 }
 
+# API subdomain record (pointing to API Gateway custom domain)
+resource "aws_route53_record" "api" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = var.api_domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_api_gateway_domain_name.api_domain.regional_domain_name
+    zone_id                = aws_api_gateway_domain_name.api_domain.regional_zone_id
+    evaluate_target_health = false
+  }
+}
+
 # WWW record (optional - pointing to main domain)
 resource "aws_route53_record" "www" {
   zone_id = aws_route53_zone.main.zone_id
@@ -62,4 +62,74 @@ resource "aws_route53_record" "www" {
   type    = "CNAME"
   ttl     = 300
   records = [var.domain_name]
+}
+
+# DNS validation record for main domain ACM certificate
+resource "aws_route53_record" "main_cert_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.main_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = aws_route53_zone.main.zone_id
+}
+
+# DNS validation record for api domain ACM certificate
+resource "aws_route53_record" "api_cert_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.api_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = aws_route53_zone.main.zone_id
+}
+
+# ================== Certificates ==================
+
+# ACM Certificate for main domain
+resource "aws_acm_certificate" "main_cert" {
+  domain_name       = var.domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Wait for main domain certificate validation
+resource "aws_acm_certificate_validation" "main_cert_validation" {
+  certificate_arn         = aws_acm_certificate.main_cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.main_cert_validation : record.fqdn]
+}
+
+# ACM Certificate for API domain
+resource "aws_acm_certificate" "api_cert" {
+  domain_name       = var.api_domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Wait for API domain certificate validation
+resource "aws_acm_certificate_validation" "api_cert_validation" {
+  certificate_arn         = aws_acm_certificate.api_cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.api_cert_validation : record.fqdn]
 }
