@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { getCharacterResponseSchema, postCharacterCloneResponseSchema } from "api-spec";
 import { INVALID_UUID, NON_EXISTENT_UUID, expectApiError } from "../shared.js";
-import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
+import { apiClient, setupTestContext, cleanUpTestContext, deleteCharacter } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
