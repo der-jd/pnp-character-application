@@ -17,6 +17,19 @@ provider "aws" {
   }
 }
 
+# Additional provider for us-east-1 (required for CloudFront certificates)
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+
+  default_tags {
+    tags = {
+      (var.project_tag_key) = var.project_tag_value
+      environment           = var.env
+    }
+  }
+}
+
 output "aws_region" {
   value = "eu-central-1"
 }

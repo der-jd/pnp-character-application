@@ -67,7 +67,7 @@ resource "aws_route53_record" "www" {
 # DNS validation record for main domain ACM certificate
 resource "aws_route53_record" "main_cert_validation" {
   for_each = {
-    for dvo in aws_acm_certificate.main_cert.domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.main_cert_us_east_1.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -102,8 +102,9 @@ resource "aws_route53_record" "api_cert_validation" {
 
 # ================== Certificates ==================
 
-# ACM Certificate for main domain
-resource "aws_acm_certificate" "main_cert" {
+# ACM Certificate for main domain (required in us-east-1 for CloudFront)
+resource "aws_acm_certificate" "main_cert_us_east_1" {
+  provider          = aws.us_east_1
   domain_name       = var.domain_name
   validation_method = "DNS"
 
@@ -112,9 +113,10 @@ resource "aws_acm_certificate" "main_cert" {
   }
 }
 
-# Wait for main domain certificate validation
-resource "aws_acm_certificate_validation" "main_cert_validation" {
-  certificate_arn         = aws_acm_certificate.main_cert.arn
+# Wait for main domain certificate validation (us-east-1)
+resource "aws_acm_certificate_validation" "main_cert_validation_us_east_1" {
+  provider                = aws.us_east_1
+  certificate_arn         = aws_acm_certificate.main_cert_us_east_1.arn
   validation_record_fqdns = [for record in aws_route53_record.main_cert_validation : record.fqdn]
 }
 
