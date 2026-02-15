@@ -614,7 +614,8 @@ data "local_file" "api_spec_package" {
 
 locals {
   # Extract major version from package.json (e.g., "1.0.0" -> "v1")
-  api_major_version = "v${jsondecode(data.local_file.api_spec_package.content).version}"
+  api_version_parts = split(".", jsondecode(data.local_file.api_spec_package.content).version)
+  api_major_version = "v${local.api_version_parts[0]}"
 }
 
 # ACM Certificate for API domain
