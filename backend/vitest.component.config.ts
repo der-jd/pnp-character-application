@@ -53,6 +53,9 @@ export default defineConfig({
     exclude: ["build/", "dist/", "**/node_modules/**", "test/unit-tests/**"],
     environment: "node",
     testTimeout: 30000,
+    sequence: {
+      concurrent: false, // This would lead to race conditions for the database
+    },
   },
   resolve: {
     alias: discoverPackages(),
