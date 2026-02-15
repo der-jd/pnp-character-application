@@ -371,7 +371,7 @@ export const fakeCharacter: Character = {
           defaultCostCategory: CostCategory.CAT_2,
         },
         riding: {
-          activated: true,
+          activated: false,
           start: 12,
           current: 16,
           mod: 4,
@@ -1332,7 +1332,7 @@ export const fakeCharacter2: Character = {
           defaultCostCategory: CostCategory.CAT_2,
         },
         juggleries: {
-          activated: true,
+          activated: false,
           start: 12,
           current: 16,
           mod: 4,

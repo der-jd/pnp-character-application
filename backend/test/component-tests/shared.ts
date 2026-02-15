@@ -6,6 +6,7 @@ import {
   Character,
   CombatSection,
   CombatStats,
+  Record as HistoryRecord,
   Skill,
   LEVEL_UP_DICE_EXPRESSION,
   PostLevelUpRequest,
@@ -190,14 +191,11 @@ export function pickCombatSkill(
 
 export async function getLatestHistoryRecord(characterId: string) {
   const history = getHistoryResponseSchema.parse(await apiClient.get(`characters/${characterId}/history`));
-  if (history.items.length === 0) {
-    throw new Error("Expected at least one history block");
-  }
+
+  expect(history.items.length).toBeGreaterThanOrEqual(1);
 
   const latestBlock = history.items[0];
-  if (latestBlock.changes.length === 0) {
-    throw new Error("Expected latest history block to include records");
-  }
+  expect(latestBlock.changes.length).toBeGreaterThanOrEqual(1);
 
   const latestRecord = latestBlock.changes[latestBlock.changes.length - 1];
   return { history, latestBlock, latestRecord };
@@ -229,9 +227,23 @@ export function toLevelUpEffect(option: LevelUpOption): PostLevelUpRequest["effe
   }
 }
 
-export async function verifyCharacterUpdate(characterId: string, expectedCharacter: Character): Promise<void> {
-  const updatedCharacterResponse = await apiClient.get(`characters/${characterId}`) as { data: GetCharacterResponse };
+/**
+ * Verifies that the character state on the backend matches the expected character state.
+ */
+export async function verifyCharacterState(characterId: string, expectedCharacter: Character): Promise<void> {
+  const updatedCharacterResponse = (await apiClient.get(`characters/${characterId}`)) as { data: GetCharacterResponse };
   const updatedCharacter = updatedCharacterResponse.data;
 
   expect(updatedCharacter).toStrictEqual(expectedCharacter);
+}
+
+/**
+ * Verifies that the latest history record on the backend matches the expected history record.
+ */
+export async function verifyLatestHistoryRecord<T extends HistoryRecord>(
+  characterId: string,
+  expectedHistoryRecord: T,
+): Promise<void> {
+  const { latestRecord } = await getLatestHistoryRecord(characterId);
+  expect(latestRecord).toStrictEqual(expectedHistoryRecord);
 }
