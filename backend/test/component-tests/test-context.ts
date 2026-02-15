@@ -4,36 +4,30 @@ export interface TestContext {
   apiBaseUrl: string;
   idToken: string;
   userName: string;
-  userId: string;
-  seedCharacterId: string;
-  character?: Character;
+  character: Character;
 }
 
-export const testContext: TestContext = {
+const _testContext = {
   apiBaseUrl: "",
   idToken: "",
   userName: "",
   userId: "",
-  seedCharacterId: "",
+  seedCharacter: undefined,
   character: undefined,
 };
 
-export function getTestCharacter(): Character {
-  if (!testContext.character) {
-    throw new Error("Test character not set!");
-  }
-  return testContext.character;
-}
-
 export function setTestContext(context: Partial<TestContext>): void {
-  Object.assign(testContext, context);
+  Object.assign(_testContext, context);
 }
 
-export function resetTestContext(): void {
-  testContext.apiBaseUrl = "";
-  testContext.idToken = "";
-  testContext.userName = "";
-  testContext.userId = "";
-  testContext.character = undefined;
-  testContext.seedCharacterId = "";
+export function getTestContext(): TestContext {
+  if (!_testContext.character) {
+    throw new Error("Test context not initialized - character not set");
+  }
+  return {
+    apiBaseUrl: _testContext.apiBaseUrl,
+    idToken: _testContext.idToken,
+    userName: _testContext.userName,
+    character: _testContext.character,
+  };
 }

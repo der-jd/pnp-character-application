@@ -1,53 +1,45 @@
 import { beforeAll } from "vitest";
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { createHmac } from "crypto";
-import {
-  Character,
-  deleteCharacterResponseSchema,
-  getCharacterResponseSchema,
-  postCharacterCloneResponseSchema,
-} from "api-spec";
-import { testContext, setTestContext } from "./test-context.js";
+import { deleteCharacterResponseSchema, getCharacterResponseSchema, postCharacterCloneResponseSchema } from "api-spec";
+import { getTestContext, setTestContext } from "./test-context.js";
 import { ApiClient, ApiError } from "./api-client.js";
 import { getTestSecrets, TestSecrets } from "./test-secrets.js";
 import { requireEnv } from "./shared.js";
 
 export let apiClient: ApiClient;
 
+let _seedCharacterId: string = "";
+let _userId: string = "";
+
 beforeAll(async () => {
   console.log("Setting up component tests...");
 
   // Environment variables from CircleCI
   const apiBaseUrl = requireEnv("COMPONENT_TESTS_API_BASE_URL");
-  const seedCharacterId = requireEnv("COMPONENT_TESTS_SEED_CHARACTER_ID");
+  _seedCharacterId = requireEnv("COMPONENT_TESTS_SEED_CHARACTER_ID");
 
   const secrets = getTestSecrets();
   const idToken = await authenticate(secrets);
-
-  // Extract user ID from JWT token
-  const tokenParts = idToken.split(".");
-  const payload = JSON.parse(Buffer.from(tokenParts[1], "base64").toString());
-  const userId = payload.sub || payload["cognito:username"];
-
-  apiClient = new ApiClient(apiBaseUrl, idToken);
+  _userId = extractUserIdFromToken(idToken);
 
   console.log(`API Base URL: ${apiBaseUrl}`);
   console.log(`User name: ${secrets.cognitoUsername}`);
-  console.log(`User ID: ${userId}`);
-  console.log(`Seed character: ${seedCharacterId}`);
+  console.log(`User ID: ${_userId}`);
+  console.log(`Seed character ID: ${_seedCharacterId}`);
+
+  apiClient = new ApiClient(apiBaseUrl, idToken);
 
   setTestContext({
     apiBaseUrl,
     idToken,
     userName: secrets.cognitoUsername,
-    userId,
-    seedCharacterId,
   });
 });
 
-export async function setupTestCharacter(): Promise<Character> {
-  const cloneResponse = await apiClient.post(`characters/${testContext.seedCharacterId}/clone`, {
-    userIdOfCharacter: testContext.userId,
+export async function setupTestContext(): Promise<void> {
+  const cloneResponse = await apiClient.post(`characters/${_seedCharacterId}/clone`, {
+    userIdOfCharacter: _userId,
   });
   const parsedClone = postCharacterCloneResponseSchema.parse(cloneResponse);
   const clonedCharacterId = parsedClone.characterId;
@@ -58,17 +50,12 @@ export async function setupTestCharacter(): Promise<Character> {
   }
 
   setTestContext({ character: clonedCharacter });
-  console.log(`Cloned character ${testContext.seedCharacterId} -> ${clonedCharacterId}`);
-
-  return clonedCharacter;
+  console.log(`Cloned character ${_seedCharacterId} -> ${clonedCharacterId}`);
 }
 
-export async function cleanupTestCharacter(clonedCharacterId: string): Promise<void> {
-  if (clonedCharacterId) {
-    await deleteCharacter(clonedCharacterId);
-    // Clear character from test context
-    setTestContext({ character: undefined });
-  }
+export async function cleanUpTestContext(): Promise<void> {
+  await deleteCharacter(getTestContext().character.characterId);
+  setTestContext({ character: undefined });
 }
 
 export async function deleteCharacter(characterId: string): Promise<void> {
@@ -88,6 +75,12 @@ export async function deleteCharacter(characterId: string): Promise<void> {
 
 function createSecretHash(username: string, clientId: string, clientSecret: string): string {
   return createHmac("sha256", clientSecret).update(`${username}${clientId}`).digest("base64");
+}
+
+function extractUserIdFromToken(idToken: string): string {
+  const tokenParts = idToken.split(".");
+  const payload = JSON.parse(Buffer.from(tokenParts[1], "base64").toString());
+  return payload.sub || payload["cognito:username"];
 }
 
 async function authenticate(secrets: TestSecrets): Promise<string> {
