@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { randomUUID } from "crypto";
 import { postSpecialAbilitiesResponseSchema, MAX_STRING_LENGTH_DEFAULT } from "api-spec";
-import { INVALID_UUID, NON_EXISTENT_UUID, expectApiError } from "../shared.js";
+import { INVALID_UUID, NON_EXISTENT_UUID, expectApiError, verifyCharacterUpdate } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
@@ -115,9 +115,6 @@ describe("add-special-ability component tests", () => {
     expect(response.data.specialAbilities.new).toStrictEqual(response.data.specialAbilities.old);
     expect(response.data.specialAbilities.new.values).toContain(ability);
     expect(response.historyRecord).toBeNull();
-
-    // Update test context
-    getTestContext().character.characterSheet.specialAbilities = response.data.specialAbilities.new.values;
   });
 
   test("add new special ability", async () => {
@@ -144,5 +141,7 @@ describe("add-special-ability component tests", () => {
 
     // Update test context
     getTestContext().character.characterSheet.specialAbilities = response.data.specialAbilities.new.values;
+
+    await verifyCharacterUpdate(getTestContext().character.characterId, getTestContext().character);
   });
 });

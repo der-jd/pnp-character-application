@@ -11,6 +11,7 @@ import {
   PostLevelUpRequest,
   getHistoryResponseSchema,
   getLevelUpResponseSchema,
+  GetCharacterResponse,
 } from "api-spec";
 import { ApiError } from "./api-client.js";
 import { apiClient } from "./setup.js";
@@ -226,4 +227,11 @@ export function toLevelUpEffect(option: LevelUpOption): PostLevelUpRequest["effe
     default:
       throw new Error("Unsupported level-up option kind");
   }
+}
+
+export async function verifyCharacterUpdate(characterId: string, expectedCharacter: Character): Promise<void> {
+  const updatedCharacterResponse = await apiClient.get(`characters/${characterId}`) as { data: GetCharacterResponse };
+  const updatedCharacter = updatedCharacterResponse.data;
+
+  expect(updatedCharacter).toStrictEqual(expectedCharacter);
 }
