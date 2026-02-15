@@ -55,6 +55,7 @@ export async function setupTestContext(): Promise<void> {
 
 export async function cleanUpTestContext(): Promise<void> {
   await deleteCharacter(getTestContext().character.characterId);
+  console.log(`Deleted character ${getTestContext().character.characterId}`);
   setTestContext({ character: undefined });
 }
 

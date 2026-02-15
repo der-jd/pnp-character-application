@@ -412,6 +412,26 @@ describe("Valid requests", () => {
       expectedStatusCode: 200,
     },
     {
+      name: "Combat skill has already been increased to the target current value (idempotency)",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "combat",
+          "skill-name": "slashingWeaponsBlunt2h",
+        },
+        queryStringParameters: null,
+        body: {
+          current: {
+            initialValue: fakeCharacter.characterSheet.skills.combat.slashingWeaponsBlunt2h.current - 4,
+            increasedPoints: 4,
+          },
+          learningMethod: "NORMAL",
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
       name: "Skill has already been updated to the target mod value (idempotency)",
       request: {
         headers: fakeHeaders,
@@ -449,9 +469,13 @@ describe("Valid requests", () => {
       const skillName = _case.request.pathParameters["skill-name"] as SkillName;
       expect(parsedBody.skillName).toBe(skillName);
 
+      // Verify learning method if present
+      if (_case.request.body.learningMethod) {
+        expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
+      }
+
       if (_case.request.body.activated) {
         expect(parsedBody.changes.new.skill.activated).toBe(_case.request.body.activated);
-        expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
       }
 
       if (_case.request.body.start) {
@@ -462,7 +486,6 @@ describe("Valid requests", () => {
         expect(parsedBody.changes.new.skill.current).toBe(
           _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
         );
-        expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
       }
 
       if (_case.request.body.mod) {
@@ -482,7 +505,22 @@ describe("Valid requests", () => {
       const diffSkillTotalCost = parsedBody.changes.new.skill.totalCost - oldTotalSkillCost;
       expect(diffAvailableAdventurePoints).toBeCloseTo(diffSkillTotalCost);
 
-      expect(parsedBody.combatCategory).toBeUndefined();
+      if (parsedBody.increaseCost) {
+        if (skillCategory === "combat") {
+          // Below first cost threshold for combat skills
+          expect(parsedBody.increaseCost).toBe(2);
+        } else {
+          // Below first cost threshold for non-combat skills
+          expect(parsedBody.increaseCost).toBe(1);
+        }
+      }
+
+      if (skillCategory === "combat") {
+        const expectedCombatCategory = getCombatCategory(skillName);
+        expect(parsedBody.combatCategory).toBe(expectedCombatCategory);
+      } else {
+        expect(parsedBody.combatCategory).toBeUndefined();
+      }
       expect(parsedBody.changes.old.combatStats).toBeUndefined();
       expect(parsedBody.changes.new.combatStats).toBeUndefined();
     });
