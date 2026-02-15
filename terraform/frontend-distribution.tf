@@ -16,7 +16,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
 
   default_cache_behavior {
     // Using the CachingDisabled managed policy ID.
-    // If caching should be enabled, a response headers policy for CORS nis necessary.
+    // If caching should be enabled, a response headers policy for CORS is necessary.
     cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
