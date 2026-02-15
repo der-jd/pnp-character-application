@@ -32,7 +32,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     }
   }
 
-  aliases = [var.domain_name]
+  aliases = [var.domain_name, "www.${var.domain_name}"]
 
   viewer_certificate {
     acm_certificate_arn      = aws_acm_certificate_validation.main_cert_validation_us_east_1.certificate_arn
