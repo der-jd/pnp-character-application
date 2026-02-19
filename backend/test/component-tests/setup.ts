@@ -22,17 +22,18 @@ beforeAll(async () => {
   const secrets = getTestSecrets();
   const idToken = await authenticate(secrets);
   _userId = extractUserIdFromToken(idToken);
+  const authorizationHeader = `Bearer ${idToken}`;
 
   console.log(`API Base URL: ${apiBaseUrl}`);
   console.log(`User name: ${secrets.cognitoUsername}`);
   console.log(`User ID: ${_userId}`);
   console.log(`Seed character ID: ${_seedCharacterId}`);
 
-  apiClient = new ApiClient(apiBaseUrl, idToken);
+  apiClient = new ApiClient(apiBaseUrl, authorizationHeader);
 
   setTestContext({
     apiBaseUrl,
-    authorizationHeader: `Bearer ${idToken}`,
+    authorizationHeader,
     userName: secrets.cognitoUsername,
   });
 });
