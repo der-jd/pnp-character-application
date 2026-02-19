@@ -10,12 +10,7 @@ import {
   RecordType,
   PatchAttributeHistoryRecord,
 } from "api-spec";
-import {
-  expectApiError,
-  verifyCharacterState,
-  verifyLatestHistoryRecord,
-  commonInvalidTestCases,
-} from "../shared.js";
+import { expectApiError, verifyCharacterState, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
