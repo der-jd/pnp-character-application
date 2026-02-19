@@ -330,10 +330,12 @@ describe("Valid requests", () => {
       expect(parsedBody.changes.old.attribute).toStrictEqual(attributeOld);
       expect(parsedBody.changes.new.attribute).toStrictEqual(parsedBody.changes.old.attribute);
 
-      const oldAvailableAttributePoints =
-        fakeCharacterResponse.Item.characterSheet.calculationPoints.attributePoints.available;
+      const oldAttributePoints = fakeCharacterResponse.Item.characterSheet.calculationPoints.attributePoints;
+      const oldAvailableAttributePoints = oldAttributePoints.available;
       const diffAvailableAttributePoints = oldAvailableAttributePoints - parsedBody.attributePoints.new.available;
       expect(diffAvailableAttributePoints).toBe(0);
+      expect(parsedBody.attributePoints.old).toStrictEqual(oldAttributePoints);
+      expect(parsedBody.attributePoints.new).toStrictEqual(oldAttributePoints);
 
       const oldTotalAttributeCost = attributeOld.totalCost;
       const diffAttributeTotalCost = parsedBody.changes.new.attribute.totalCost - oldTotalAttributeCost;

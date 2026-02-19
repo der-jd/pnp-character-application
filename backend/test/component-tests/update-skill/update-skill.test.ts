@@ -486,6 +486,9 @@ describe("update-skill component tests", () => {
 
         // Character from the backend should be still identical to the one before the update
         await verifyCharacterState(character.characterId, getTestContext().character);
+
+        // Latest history record should be the same as the one before the update
+        await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
       });
     });
   });
@@ -800,10 +803,11 @@ describe("update-skill component tests", () => {
         }
         (getTestContext().character.characterSheet.calculationPoints.adventurePoints as CalculationPoints) =
           response.data.adventurePoints.new;
+        getTestContext().lastHistoryRecord = response.historyRecord!;
 
         await verifyCharacterState(character.characterId, getTestContext().character);
 
-        await verifyLatestHistoryRecord(character.characterId, response.historyRecord!);
+        await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
       });
     });
   });

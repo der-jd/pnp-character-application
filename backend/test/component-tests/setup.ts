@@ -5,7 +5,7 @@ import { deleteCharacterResponseSchema, getCharacterResponseSchema, postCharacte
 import { getTestContext, setTestContext } from "./test-context.js";
 import { ApiClient, ApiError } from "./api-client.js";
 import { getTestSecrets, TestSecrets } from "./test-secrets.js";
-import { requireEnv } from "./shared.js";
+import { getLatestHistoryRecord, requireEnv } from "./shared.js";
 
 export let apiClient: ApiClient;
 
@@ -49,7 +49,9 @@ export async function setupTestContext(): Promise<void> {
     throw new Error("Failed to fetch cloned character");
   }
 
-  setTestContext({ character: clonedCharacter });
+  const { latestRecord } = await getLatestHistoryRecord(clonedCharacterId);
+
+  setTestContext({ character: clonedCharacter, lastHistoryRecord: latestRecord });
   console.log(`Cloned character ${_seedCharacterId} -> ${clonedCharacterId}`);
 }
 
