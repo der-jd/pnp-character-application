@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeAll, afterAll } from "vitest";
 import { getHistoryResponseSchema, HistoryBlock } from "api-spec";
-import { INVALID_UUID, NON_EXISTENT_UUID, expectApiError } from "../shared.js";
+import { expectApiError, commonInvalidTestCases } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
@@ -21,45 +21,18 @@ describe.sequential("get-history component tests", () => {
    */
 
   describe("Invalid requests", () => {
-    test("authorization header is missing", async () => {
-      // Create a client without authorization header
-      const unauthorizedClient = new ApiClient(getTestContext().apiBaseUrl, "");
+    commonInvalidTestCases.forEach((_case) => {
+      test(_case.name, async () => {
+        const character = getTestContext().character;
 
-      await expectApiError(
-        () => unauthorizedClient.get(`characters/${getTestContext().character.characterId}/history`),
-        401,
-        "Unauthorized",
-      );
-    });
+        const authorizationHeader = _case.authorizationHeader ?? getTestContext().authorizationHeader;
+        const path = _case.characterId
+          ? `characters/${_case.characterId}/history`
+          : `characters/${character.characterId}/history`;
+        const client = new ApiClient(getTestContext().apiBaseUrl, authorizationHeader);
 
-    test("authorization header is malformed", async () => {
-      // Create a client with malformed authorization
-      const malformedClient = new ApiClient(getTestContext().apiBaseUrl, "dummyValue");
-
-      await expectApiError(
-        () => malformedClient.get(`characters/${getTestContext().character.characterId}/history`),
-        401,
-        "Unauthorized",
-      );
-    });
-
-    test("authorization token is invalid", async () => {
-      // Create a client with invalid authorization
-      const invalidClient = new ApiClient(getTestContext().apiBaseUrl, "Bearer 1234567890");
-
-      await expectApiError(
-        () => invalidClient.get(`characters/${getTestContext().character.characterId}/history`),
-        401,
-        "Unauthorized",
-      );
-    });
-
-    test("character id is not a uuid", async () => {
-      await expectApiError(() => apiClient.get(`characters/${INVALID_UUID}/history`), 400, "Invalid input values");
-    });
-
-    test("no character found for non-existing character id", async () => {
-      await expectApiError(() => apiClient.get(`characters/${NON_EXISTENT_UUID}/history`), 404, "No character found");
+        await expectApiError(() => client.get(path), _case.expectedStatusCode, _case.expectedErrorMessage);
+      });
     });
 
     test("invalid block number query - non-numeric", async () => {

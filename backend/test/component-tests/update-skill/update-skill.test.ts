@@ -9,11 +9,10 @@ import {
   PatchSkillHistoryRecord,
 } from "api-spec";
 import {
-  INVALID_UUID,
-  NON_EXISTENT_UUID,
   expectApiError,
   verifyCharacterState,
   verifyLatestHistoryRecord,
+  commonInvalidTestCases,
 } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
@@ -35,91 +34,29 @@ describe("update-skill component tests", () => {
    */
 
   describe("Invalid requests", () => {
-    test("authorization header is missing", async () => {
-      const character = getTestContext().character;
-      // Create a client without authorization header
-      const unauthorizedClient = new ApiClient(getTestContext().apiBaseUrl, "");
+    commonInvalidTestCases.forEach((_case) => {
+      test(_case.name, async () => {
+        const character = getTestContext().character;
 
-      await expectApiError(
-        () =>
-          unauthorizedClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
-            current: {
-              initialValue: 16,
-              increasedPoints: 1,
-            },
-            learningMethod: "NORMAL",
-          }),
-        401,
-        "Unauthorized",
-      );
-    });
+        const authorizationHeader = _case.authorizationHeader ?? getTestContext().authorizationHeader;
+        const path = _case.characterId
+          ? `characters/${_case.characterId}/skills/body/athletics`
+          : `characters/${character.characterId}/skills/body/athletics`;
+        const client = new ApiClient(getTestContext().apiBaseUrl, authorizationHeader);
 
-    test("authorization token is invalid", async () => {
-      const character = getTestContext().character;
-      // Create a client with invalid authorization
-      const malformedClient = new ApiClient(getTestContext().apiBaseUrl, "Bearer 1234567890");
-
-      await expectApiError(
-        () =>
-          malformedClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
-            current: {
-              initialValue: 16,
-              increasedPoints: 1,
-            },
-            learningMethod: "NORMAL",
-          }),
-        401,
-        "Unauthorized",
-      );
-    });
-
-    test("character id is not an uuid", async () => {
-      await expectApiError(
-        () =>
-          apiClient.patch(`characters/${INVALID_UUID}/skills/body/athletics`, {
-            current: {
-              initialValue: 16,
-              increasedPoints: 1,
-            },
-            learningMethod: "NORMAL",
-          }),
-        400,
-        "Invalid input values",
-      );
-    });
-
-    test("no character found for non-existing character id", async () => {
-      await expectApiError(
-        () =>
-          apiClient.patch(`characters/${NON_EXISTENT_UUID}/skills/body/athletics`, {
-            current: {
-              initialValue: 16,
-              increasedPoints: 1,
-            },
-            learningMethod: "NORMAL",
-          }),
-        404,
-        "No character found",
-      );
-    });
-
-    test("no character found for non-existing user id", async () => {
-      const character = getTestContext().character;
-      // Create a client with a different user token
-      const unauthorizedClient = new ApiClient(getTestContext().apiBaseUrl, "Bearer invalid-user-token");
-
-      await expectApiError(
-        () =>
-          unauthorizedClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
-            current: {
-              initialValue: 16,
-              increasedPoints: 1,
-            },
-            learningMethod: "NORMAL",
-          }),
-        401,
-        "Unauthorized",
-      );
+        await expectApiError(
+          () =>
+            client.patch(path, {
+              current: {
+                initialValue: 16,
+                increasedPoints: 1,
+              },
+              learningMethod: "NORMAL",
+            }),
+          _case.expectedStatusCode,
+          _case.expectedErrorMessage,
+        );
+      });
     });
 
     test("activating a skill without learning method", async () => {

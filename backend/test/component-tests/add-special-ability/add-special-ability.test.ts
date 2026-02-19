@@ -2,11 +2,10 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { randomUUID } from "crypto";
 import { postSpecialAbilitiesResponseSchema, MAX_STRING_LENGTH_DEFAULT } from "api-spec";
 import {
-  INVALID_UUID,
-  NON_EXISTENT_UUID,
   expectApiError,
   verifyCharacterState,
   verifyLatestHistoryRecord,
+  commonInvalidTestCases,
 } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
@@ -32,68 +31,25 @@ describe("add-special-ability component tests", () => {
    */
 
   describe("Invalid requests", () => {
-    test("authorization header is missing", async () => {
-      // Create a client without authorization header
-      const unauthorizedClient = new ApiClient(getTestContext().apiBaseUrl, "");
+    commonInvalidTestCases.forEach((_case) => {
+      test(_case.name, async () => {
+        const character = getTestContext().character;
 
-      await expectApiError(
-        () =>
-          unauthorizedClient.post(`characters/${getTestContext().character.characterId}/special-abilities`, {
-            specialAbility: "Iron Will",
-          }),
-        401,
-        "Unauthorized",
-      );
-    });
+        const authorizationHeader = _case.authorizationHeader ?? getTestContext().authorizationHeader;
+        const path = _case.characterId
+          ? `characters/${_case.characterId}/special-abilities`
+          : `characters/${character.characterId}/special-abilities`;
+        const client = new ApiClient(getTestContext().apiBaseUrl, authorizationHeader);
 
-    test("authorization token is invalid", async () => {
-      // Create a client with invalid authorization
-      const malformedClient = new ApiClient(getTestContext().apiBaseUrl, "Bearer 1234567890");
-
-      await expectApiError(
-        () =>
-          malformedClient.post(`characters/${getTestContext().character.characterId}/special-abilities`, {
-            specialAbility: "Iron Will",
-          }),
-        401,
-        "Unauthorized",
-      );
-    });
-
-    test("character id is not a uuid", async () => {
-      await expectApiError(
-        () =>
-          apiClient.post(`characters/${INVALID_UUID}/special-abilities`, {
-            specialAbility: "Iron Will",
-          }),
-        400,
-        "Invalid input values",
-      );
-    });
-
-    test("no character found for non-existing character id", async () => {
-      await expectApiError(
-        () =>
-          apiClient.post(`characters/${NON_EXISTENT_UUID}/special-abilities`, {
-            specialAbility: "Iron Will",
-          }),
-        404,
-        "No character found",
-      );
-    });
-
-    test("no character found for non-existing user id", async () => {
-      // Create a client with a different user token
-      const unauthorizedClient = new ApiClient(getTestContext().apiBaseUrl, "Bearer invalid-user-token");
-
-      await expectApiError(
-        () =>
-          unauthorizedClient.post(`characters/${getTestContext().character.characterId}/special-abilities`, {
-            specialAbility: "Iron Will",
-          }),
-        401,
-        "Unauthorized",
-      );
+        await expectApiError(
+          () =>
+            client.post(path, {
+              specialAbility: "Iron Will",
+            }),
+          _case.expectedStatusCode,
+          _case.expectedErrorMessage,
+        );
+      });
     });
 
     test("special ability name exceeds max length", async () => {
