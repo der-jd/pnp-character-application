@@ -91,6 +91,62 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 404,
     },
+    {
+      name: "Invalid block number query - non-numeric",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: {
+          "block-number": "abc",
+        },
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Invalid block number query - negative",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: {
+          "block-number": "-1",
+        },
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Invalid block number query - zero",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: {
+          "block-number": "0",
+        },
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Invalid block number query - too large",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: {
+          "block-number": "100001",
+        },
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {
@@ -164,8 +220,8 @@ describe("Valid requests", () => {
 
       // Initial history block has no previous block
       if (parsedBody.items[parsedBody.items.length - 1].blockNumber === 1) {
-        expect(parsedBody.previousBlockNumber).toBe(null);
-        expect(parsedBody.previousBlockId).toBe(null);
+        expect(parsedBody.previousBlockNumber).toBeNull();
+        expect(parsedBody.previousBlockId).toBeNull();
       }
       // Check that the previous block number is equal to the block number of the last item minus 1
       else {
