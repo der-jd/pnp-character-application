@@ -32,7 +32,7 @@ beforeAll(async () => {
 
   setTestContext({
     apiBaseUrl,
-    idToken,
+    authorizationHeader: `Bearer ${idToken}`,
     userName: secrets.cognitoUsername,
   });
 });

@@ -14,11 +14,11 @@ export class ApiError extends Error {
 
 export class ApiClient {
   private readonly baseUrl: string;
-  private readonly token?: string;
+  private readonly authorizationHeader?: string;
 
-  constructor(baseUrl: string, token?: string) {
+  constructor(baseUrl: string, authorizationHeader?: string) {
     this.baseUrl = normalizeBaseUrl(baseUrl);
-    this.token = token;
+    this.authorizationHeader = authorizationHeader;
   }
 
   get<T>(path: string, query?: QueryParams): Promise<T> {
@@ -47,8 +47,8 @@ export class ApiClient {
       Accept: "application/json",
     };
 
-    if (this.token) {
-      headers.Authorization = `Bearer ${this.token}`;
+    if (this.authorizationHeader) {
+      headers.Authorization = this.authorizationHeader;
     }
 
     let payload: BodyInit | undefined;

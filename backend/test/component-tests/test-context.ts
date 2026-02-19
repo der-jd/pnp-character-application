@@ -2,7 +2,7 @@ import { Character, Record } from "api-spec";
 
 export interface TestContext {
   apiBaseUrl: string;
-  idToken: string;
+  authorizationHeader: string;
   userName: string;
   character: Character;
   lastHistoryRecord: Record;
@@ -10,7 +10,7 @@ export interface TestContext {
 
 const _testContext = {
   apiBaseUrl: "",
-  idToken: "",
+  authorizationHeader: "",
   userName: "",
   userId: "",
   character: undefined,
@@ -32,7 +32,7 @@ export function getTestContext(): TestContext {
 
   return {
     apiBaseUrl: _testContext.apiBaseUrl,
-    idToken: _testContext.idToken,
+    authorizationHeader: _testContext.authorizationHeader,
     userName: _testContext.userName,
     character: _testContext.character,
     lastHistoryRecord: _testContext.lastHistoryRecord,
