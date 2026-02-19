@@ -1,12 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { randomUUID } from "crypto";
 import { postSpecialAbilitiesResponseSchema, MAX_STRING_LENGTH_DEFAULT } from "api-spec";
-import {
-  expectApiError,
-  verifyCharacterState,
-  verifyLatestHistoryRecord,
-  commonInvalidTestCases,
-} from "../shared.js";
+import { expectApiError, verifyCharacterState, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
