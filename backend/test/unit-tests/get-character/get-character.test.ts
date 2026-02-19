@@ -120,6 +120,7 @@ describe("Valid requests", () => {
       expect(result.statusCode).toBe(_case.expectedStatusCode);
 
       const parsedBody = getCharacterResponseSchema.parse(JSON.parse(result.body));
+      expect(parsedBody).toStrictEqual(fakeCharacterResponse.Item);
       expect(parsedBody.userId).toBe(fakeUserId);
       expect(parsedBody.characterId).toBe(_case.request.pathParameters["character-id"]);
     });
