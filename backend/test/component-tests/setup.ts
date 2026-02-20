@@ -1,6 +1,5 @@
 import { beforeAll } from "vitest";
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { createHmac } from "crypto";
 import { deleteCharacterResponseSchema, getCharacterResponseSchema, postCharacterCloneResponseSchema } from "api-spec";
 import { getTestContext, setTestContext } from "./test-context.js";
 import { ApiClient, ApiError } from "./api-client.js";
@@ -81,10 +80,6 @@ export async function deleteCharacter(characterId: string): Promise<void> {
   }
 }
 
-function createSecretHash(username: string, clientId: string, clientSecret: string): string {
-  return createHmac("sha256", clientSecret).update(`${username}${clientId}`).digest("base64");
-}
-
 function extractUserIdFromToken(idToken: string): string {
   const tokenParts = idToken.split(".");
   const payload = JSON.parse(Buffer.from(tokenParts[1], "base64").toString());
@@ -94,24 +89,14 @@ function extractUserIdFromToken(idToken: string): string {
 async function authenticate(secrets: TestSecrets): Promise<string> {
   const client = new CognitoIdentityProviderClient({ region: secrets.cognitoRegion });
 
-  const authParameters: Record<string, string> = {
-    USERNAME: secrets.cognitoUsername,
-    PASSWORD: secrets.cognitoPassword,
-  };
-
-  if (secrets.cognitoClientSecret) {
-    authParameters.SECRET_HASH = createSecretHash(
-      secrets.cognitoUsername,
-      secrets.cognitoClientId,
-      secrets.cognitoClientSecret,
-    );
-  }
-
   const response = await client.send(
     new InitiateAuthCommand({
       AuthFlow: "USER_PASSWORD_AUTH",
       ClientId: secrets.cognitoClientId,
-      AuthParameters: authParameters,
+      AuthParameters: {
+        USERNAME: secrets.cognitoUsername,
+        PASSWORD: secrets.cognitoPassword,
+      },
     }),
   );
 
