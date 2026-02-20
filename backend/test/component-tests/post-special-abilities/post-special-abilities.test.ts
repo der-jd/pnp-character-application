@@ -10,7 +10,7 @@ export function makeUniqueName(prefix: string): string {
   return `${prefix}-${getTestContext().character?.characterId}-${randomUUID().slice(0, 8)}`;
 }
 
-describe("add-special-ability component tests", () => {
+describe("post-special-abilities component tests", () => {
   beforeAll(async () => {
     await setupTestContext();
   });

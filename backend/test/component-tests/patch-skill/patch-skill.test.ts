@@ -13,7 +13,7 @@ import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
-describe("update-skill component tests", () => {
+describe("patch-skill component tests", () => {
   beforeAll(async () => {
     await setupTestContext();
   });
@@ -427,11 +427,11 @@ describe("update-skill component tests", () => {
 
   /**
    * =============================
-   * Update skill
+   * Patch skill
    * =============================
    */
 
-  describe("Update skill", () => {
+  describe("Patch skill", () => {
     const updateTestCases = [
       {
         name: "activate skill (cost category: FREE)",

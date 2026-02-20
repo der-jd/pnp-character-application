@@ -5,7 +5,7 @@ import { apiClient, setupTestContext, cleanUpTestContext, deleteCharacter } from
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
-describe("clone-character component tests", () => {
+describe("post-character-clone component tests", () => {
   beforeAll(async () => {
     await setupTestContext();
   });

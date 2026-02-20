@@ -6,7 +6,7 @@ import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 import { INVALID_UUID } from "../shared.js";
 
-describe("set-history-comment component tests", () => {
+describe("patch-history-record component tests", () => {
   beforeAll(async () => {
     await setupTestContext();
   });
@@ -87,11 +87,11 @@ describe("set-history-comment component tests", () => {
 
   /**
    * =============================
-   * Set history comment
+   * Patch history record
    * =============================
    */
 
-  describe("Set history comment", () => {
+  describe("Patch history record", () => {
     const testCases = [
       {
         name: "set comment for latest history block",

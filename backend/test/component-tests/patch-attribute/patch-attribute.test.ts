@@ -15,7 +15,7 @@ import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
-describe("update-attribute component tests", () => {
+describe("patch-attribute component tests", () => {
   beforeAll(async () => {
     await setupTestContext();
   });
@@ -257,11 +257,11 @@ describe("update-attribute component tests", () => {
 
   /**
    * =============================
-   * Update attribute
+   * Patch attribute
    * =============================
    */
 
-  describe("Update attribute", () => {
+  describe("Patch attribute", () => {
     const updateTestCases = [
       {
         name: "update start attribute value",
