@@ -55,6 +55,7 @@ module "add_special_ability_lambda" {
 module "clone_character_lambda" {
   source        = "./modules/lambda_function"
   function_name = "clone-character"
+  timeout       = 10
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
     TABLE_NAME_HISTORY    = local.history_table_name
