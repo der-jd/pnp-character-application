@@ -7,7 +7,7 @@ variable "handler" {
 }
 variable "runtime" {
   type    = string
-  default = "nodejs24.x"
+  default = "nodejs20.x"
 }
 variable "environment_vars" {
   type = map(string)
