@@ -10,3 +10,7 @@ build/
 dist/
 
 .npmrc
+
+# Environment variables
+.env
+.env.*
