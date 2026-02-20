@@ -50,9 +50,13 @@ export async function setupTestContext(): Promise<void> {
     throw new Error("Failed to fetch cloned character");
   }
 
-  const { latestRecord } = await getLatestHistoryRecord(clonedCharacterId);
+  const { latestBlock, latestRecord } = await getLatestHistoryRecord(clonedCharacterId);
 
-  setTestContext({ character: clonedCharacter, lastHistoryRecord: latestRecord });
+  setTestContext({
+    character: clonedCharacter,
+    lastHistoryRecord: latestRecord,
+    latestHistoryBlockNumber: latestBlock.blockNumber,
+  });
   console.log(`Cloned character ${_seedCharacterId} -> ${clonedCharacterId}`);
 }
 
