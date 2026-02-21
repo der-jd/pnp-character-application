@@ -7,7 +7,7 @@ import {
   BatchWriteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
-import { Record, HistoryBlock, historyBlockSchema } from "api-spec";
+import { HistoryRecord, HistoryBlock, historyBlockSchema } from "api-spec";
 import { HttpError } from "./errors.js";
 import { dynamoDBDocClient } from "./dynamodb_client.js";
 
@@ -142,11 +142,11 @@ export async function deleteBatchHistoryItems(historyItems: HistoryBlock[]): Pro
   console.log("Successfully deleted history items in DynamoDB");
 }
 
-export async function addHistoryRecord(record: Record, block: HistoryBlock): Promise<void> {
+export async function addHistoryRecord(record: HistoryRecord, block: HistoryBlock): Promise<void> {
   console.log(
     `Add record to history block #${block.blockNumber}, id ${block.blockId} of character ${block.characterId} in DynamoDB`,
   );
-  console.log("Record:", record);
+  console.log("History record:", record);
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
   const command = new UpdateCommand({

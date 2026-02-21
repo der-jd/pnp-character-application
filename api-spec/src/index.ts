@@ -58,9 +58,9 @@ export {
   CombatSection,
 } from "./character-schemas.js";
 export {
-  recordSchema,
-  RecordType,
-  Record,
+  historyRecordSchema,
+  HistoryRecordType,
+  HistoryRecord,
   historyBlockSchema,
   HistoryBlock,
   integerSchema,

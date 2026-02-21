@@ -24,7 +24,7 @@ import {
 } from "./general-schemas.js";
 import { levelSchema, levelUpProgressSchema } from "./level-up-schemas.js";
 
-export enum RecordType {
+export enum HistoryRecordType {
   CHARACTER_CREATED = 0,
   LEVEL_UP_APPLIED = 1,
   CALCULATION_POINTS_CHANGED = 2,
@@ -35,9 +35,9 @@ export enum RecordType {
   COMBAT_STATS_CHANGED = 7,
 }
 
-export const recordSchema = z
+export const historyRecordSchema = z
   .object({
-    type: z.enum(RecordType),
+    type: z.enum(HistoryRecordType),
     name: z.string().max(MAX_STRING_LENGTH_DEFAULT),
     number: z.number().int().min(1).max(MAX_HISTORY_RECORDS),
     id: z.uuid(),
@@ -71,7 +71,7 @@ export const recordSchema = z
   })
   .strict();
 
-export type Record = z.infer<typeof recordSchema>;
+export type HistoryRecord = z.infer<typeof historyRecordSchema>;
 
 export const historyBlockSchema = z
   .object({
@@ -84,7 +84,7 @@ export const historyBlockSchema = z
      * add history records already limits the maximum size of a history block.
      * Nevertheless, the max array size is an additional safety measure here.
      */
-    changes: z.array(recordSchema).max(MAX_ARRAY_SIZE),
+    changes: z.array(historyRecordSchema).max(MAX_ARRAY_SIZE),
   })
   .strict();
 

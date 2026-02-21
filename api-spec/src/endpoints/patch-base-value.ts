@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { initialNewSchema, MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
-import { baseValueChangeSchema, recordSchema } from "../history-schemas.js";
+import { baseValueChangeSchema, historyRecordSchema } from "../history-schemas.js";
 
 export const patchBaseValuePathParamsSchema = z
   .object({
@@ -36,7 +36,7 @@ export const updateBaseValueResponseSchema = z
 
 export type UpdateBaseValueResponse = z.infer<typeof updateBaseValueResponseSchema>;
 
-export const patchBaseValueHistoryRecordSchema = recordSchema.extend({
+export const patchBaseValueHistoryRecordSchema = historyRecordSchema.extend({
   data: z
     .object({
       old: baseValueChangeSchema,

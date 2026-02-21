@@ -23,8 +23,8 @@ import {
   CostCategory,
   DisadvantagesNames,
   LearningMethodString,
-  Record as HistoryRecord,
-  RecordType,
+  HistoryRecord,
+  HistoryRecordType,
   Skill,
   SkillCategory,
   SkillName,
@@ -1312,25 +1312,25 @@ function buildHistoryRecords(
     };
 
     switch (recordType) {
-      case RecordType.CALCULATION_POINTS_CHANGED:
+      case HistoryRecordType.CALCULATION_POINTS_CHANGED:
         fillCalculationPointsRecord(record, entry, name, warnings);
         break;
-      case RecordType.BASE_VALUE_CHANGED:
+      case HistoryRecordType.BASE_VALUE_CHANGED:
         fillBaseValueRecord(record, name, oldValueText, newValueText, characterSheet, warnings);
         break;
-      case RecordType.LEVEL_UP_APPLIED:
+      case HistoryRecordType.LEVEL_UP_APPLIED:
         fillLevelUpRecord(record, oldValueText, newValueText);
         break;
-      case RecordType.ATTRIBUTE_CHANGED:
+      case HistoryRecordType.ATTRIBUTE_CHANGED:
         fillAttributeRecord(record, name, oldValueText, newValueText, characterSheet, warnings);
         break;
-      case RecordType.SKILL_CHANGED:
+      case HistoryRecordType.SKILL_CHANGED:
         fillSkillRecord(record, name, oldValueText, newValueText, comment, characterSheet, warnings);
         break;
-      case RecordType.COMBAT_STATS_CHANGED:
+      case HistoryRecordType.COMBAT_STATS_CHANGED:
         fillCombatStatsRecord(record, typeLabel, name, oldValueText, newValueText, characterSheet, warnings);
         break;
-      case RecordType.SPECIAL_ABILITIES_CHANGED:
+      case HistoryRecordType.SPECIAL_ABILITIES_CHANGED:
         fillSpecialAbilityRecord(record, typeLabel, name, oldValueText, newValueText);
         break;
       default:
@@ -1382,7 +1382,7 @@ function buildCharacterCreatedRecord(
   timestamp: string,
 ): HistoryRecord {
   return {
-    type: RecordType.CHARACTER_CREATED,
+    type: HistoryRecordType.CHARACTER_CREATED,
     name: characterSheet.generalInformation.name || "Character Created",
     number: 1,
     id: crypto.randomUUID(),
@@ -1494,36 +1494,36 @@ function buildLevelUpProgressFromHistory(entries: HistoryEntry[]): LevelUpProgre
   return progress;
 }
 
-function mapRecordType(typeLabel: string, warnings: string[]): RecordType {
+function mapRecordType(typeLabel: string, warnings: string[]): HistoryRecordType {
   const normalized = normalizeLabel(typeLabel);
   switch (normalized) {
     case normalizeLabel("Ereignis (Berechnungspunkte)"):
-      return RecordType.CALCULATION_POINTS_CHANGED;
+      return HistoryRecordType.CALCULATION_POINTS_CHANGED;
     case normalizeLabel("Ereignis (Basiswerte)"):
-      return RecordType.BASE_VALUE_CHANGED;
+      return HistoryRecordType.BASE_VALUE_CHANGED;
     case normalizeLabel("Ereignis (Level Up)"):
-      return RecordType.LEVEL_UP_APPLIED;
+      return HistoryRecordType.LEVEL_UP_APPLIED;
     case normalizeLabel("Eigenschaft gesteigert"):
-      return RecordType.ATTRIBUTE_CHANGED;
+      return HistoryRecordType.ATTRIBUTE_CHANGED;
     case normalizeLabel("Talent gesteigert"):
-      return RecordType.SKILL_CHANGED;
+      return HistoryRecordType.SKILL_CHANGED;
     case normalizeLabel("Kampftalent gesteigert"):
-      return RecordType.SKILL_CHANGED;
+      return HistoryRecordType.SKILL_CHANGED;
     case normalizeLabel("Talent aktiviert"):
-      return RecordType.SKILL_CHANGED;
+      return HistoryRecordType.SKILL_CHANGED;
     case normalizeLabel("AT/FK verteilt"):
-      return RecordType.COMBAT_STATS_CHANGED;
+      return HistoryRecordType.COMBAT_STATS_CHANGED;
     case normalizeLabel("PA verteilt"):
-      return RecordType.COMBAT_STATS_CHANGED;
+      return HistoryRecordType.COMBAT_STATS_CHANGED;
     case normalizeLabel("Vorteil ge\u00e4ndert"):
     case normalizeLabel("Nachteil ge\u00e4ndert"):
     case normalizeLabel("Beruf ge\u00e4ndert"):
     case normalizeLabel("Hobby ge\u00e4ndert"):
       // TODO this is actually CHARACTER_CREATED
-      return RecordType.SPECIAL_ABILITIES_CHANGED;
+      return HistoryRecordType.SPECIAL_ABILITIES_CHANGED;
     default:
       warnings.push(`Unknown history entry type '${typeLabel}', defaulting to SPECIAL_ABILITIES_CHANGED`);
-      return RecordType.SPECIAL_ABILITIES_CHANGED;
+      return HistoryRecordType.SPECIAL_ABILITIES_CHANGED;
   }
 }
 

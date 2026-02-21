@@ -1,11 +1,11 @@
-import { Character, Record } from "api-spec";
+import { Character, HistoryRecord } from "api-spec";
 
 export interface TestContext {
   apiBaseUrl: string;
   authorizationHeader: string;
   userName: string;
   character: Character;
-  lastHistoryRecord: Record;
+  lastHistoryRecord: HistoryRecord;
   latestHistoryBlockNumber: number;
 }
 

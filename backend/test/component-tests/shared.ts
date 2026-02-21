@@ -6,7 +6,7 @@ import {
   Character,
   CombatSection,
   CombatStats,
-  Record as HistoryRecord,
+  HistoryRecord,
   Skill,
   LEVEL_UP_DICE_EXPRESSION,
   PostLevelUpRequest,

@@ -2,8 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import {
   CostCategory,
   HistoryBlock,
-  RecordType,
-  Record,
+  HistoryRecordType,
+  HistoryRecord,
   LearningMethodString,
   PostCharactersHistoryRecord,
   PostLevelUpHistoryRecord,
@@ -18,7 +18,7 @@ import { fakeCharacter, fakeCharacterId } from "./character.js";
 
 export function addFakeHistoryRecord(
   block: HistoryBlock,
-  record: Record,
+  record: HistoryRecord,
   removePreviousRecords: boolean = false,
 ): void {
   if (removePreviousRecords) {
@@ -31,7 +31,7 @@ export function addFakeHistoryRecord(
 }
 
 export const characterCreatedChangedRecord: PostCharactersHistoryRecord = {
-  type: RecordType.CHARACTER_CREATED,
+  type: HistoryRecordType.CHARACTER_CREATED,
   name: "New Character",
   number: 1,
   id: "df6daaa8-d13c-47c0-b633-69c6396df4fd",
@@ -62,7 +62,7 @@ export const characterCreatedChangedRecord: PostCharactersHistoryRecord = {
 };
 
 export const levelChangedRecord: PostLevelUpHistoryRecord = {
-  type: RecordType.LEVEL_UP_APPLIED,
+  type: HistoryRecordType.LEVEL_UP_APPLIED,
   name: "Level 2",
   number: 2,
   id: "24f2aeb9-11a2-4b82-8307-f97fe30cfef2",
@@ -123,7 +123,7 @@ export const levelChangedRecord: PostLevelUpHistoryRecord = {
 };
 
 export const baseValueChangedRecord: PatchBaseValueHistoryRecord = {
-  type: RecordType.BASE_VALUE_CHANGED,
+  type: HistoryRecordType.BASE_VALUE_CHANGED,
   name: "healthPoints",
   number: 2,
   id: "abc2e95b-a1f6-47e0-84da-1eca56dbb192",
@@ -157,7 +157,7 @@ export const baseValueChangedRecord: PatchBaseValueHistoryRecord = {
 };
 
 export const attackBaseValueAndCombatStatsChangedRecord: PatchBaseValueHistoryRecord = {
-  type: RecordType.BASE_VALUE_CHANGED,
+  type: HistoryRecordType.BASE_VALUE_CHANGED,
   name: "attackBaseValue",
   number: 2,
   id: "47950d12-35c9-41a9-b8d6-5d5856eec9ee",
@@ -357,7 +357,7 @@ export const attackBaseValueAndCombatStatsChangedRecord: PatchBaseValueHistoryRe
 };
 
 export const rangedAttackBaseValueAndCombatStatsChangedRecord: PatchBaseValueHistoryRecord = {
-  type: RecordType.BASE_VALUE_CHANGED,
+  type: HistoryRecordType.BASE_VALUE_CHANGED,
   name: "rangedAttackBaseValue",
   number: 2,
   id: "f188dc2e-24da-473d-91c2-d9b8c847ebd5",
@@ -477,7 +477,7 @@ export const rangedAttackBaseValueAndCombatStatsChangedRecord: PatchBaseValueHis
 };
 
 export const calculationPointsChangedRecord: PatchCalculationPointsHistoryRecord = {
-  type: RecordType.CALCULATION_POINTS_CHANGED,
+  type: HistoryRecordType.CALCULATION_POINTS_CHANGED,
   name: "Calculation Points",
   number: 2,
   id: "ffdbc28b-f8ba-439d-bfc4-235f18811208",
@@ -539,7 +539,7 @@ export const calculationPointsChangedRecord: PatchCalculationPointsHistoryRecord
 };
 
 export const attributeAndBaseValuesChangedRecord: PatchAttributeHistoryRecord = {
-  type: RecordType.ATTRIBUTE_CHANGED,
+  type: HistoryRecordType.ATTRIBUTE_CHANGED,
   name: "mentalResilience",
   number: 2,
   id: "fc0a5a71-80ac-47bc-85c2-85fc4c9de99a",
@@ -598,7 +598,7 @@ export const attributeAndBaseValuesChangedRecord: PatchAttributeHistoryRecord = 
 };
 
 export const attributeAndBaseValuesAndCombatStatsChangedRecord: PatchAttributeHistoryRecord = {
-  type: RecordType.ATTRIBUTE_CHANGED,
+  type: HistoryRecordType.ATTRIBUTE_CHANGED,
   name: "strength",
   number: 2,
   id: "270853b6-0a7a-474b-917c-e4e091e4f98c",
@@ -947,7 +947,7 @@ export const attributeAndBaseValuesAndCombatStatsChangedRecord: PatchAttributeHi
 };
 
 export const attributeChangedRecord: PatchAttributeHistoryRecord = {
-  type: RecordType.ATTRIBUTE_CHANGED,
+  type: HistoryRecordType.ATTRIBUTE_CHANGED,
   name: "intelligence",
   number: 2,
   id: "3d95138c-058e-445c-b366-ecdb3cb938ae",
@@ -990,7 +990,7 @@ export const attributeChangedRecord: PatchAttributeHistoryRecord = {
 };
 
 export const skillChangedRecord: PatchSkillHistoryRecord = {
-  type: RecordType.SKILL_CHANGED,
+  type: HistoryRecordType.SKILL_CHANGED,
   name: "body/athletics",
   number: 3,
   id: "f18003ae-a678-4273-b6be-e0f9bb6b023a",
@@ -1037,7 +1037,7 @@ export const skillChangedRecord: PatchSkillHistoryRecord = {
 };
 
 export const combatSkillChangedRecord: PatchSkillHistoryRecord = {
-  type: RecordType.SKILL_CHANGED,
+  type: HistoryRecordType.SKILL_CHANGED,
   name: "combat/daggers",
   number: 3,
   id: "b51c5a79-2aa5-4649-916f-4d14ba47f702",
@@ -1100,7 +1100,7 @@ export const combatSkillChangedRecord: PatchSkillHistoryRecord = {
 };
 
 export const combatStatsChangedRecord: PatchCombatStatsHistoryRecord = {
-  type: RecordType.COMBAT_STATS_CHANGED,
+  type: HistoryRecordType.COMBAT_STATS_CHANGED,
   name: "melee/thrustingWeapons1h",
   number: 3,
   id: "0f6b98a5-33c3-416e-bf1f-fde4ef49b166",
@@ -1132,7 +1132,7 @@ export const combatStatsChangedRecord: PatchCombatStatsHistoryRecord = {
 };
 
 export const specialAbilitiesChangedRecord: PostSpecialAbilitiesHistoryRecord = {
-  type: RecordType.SPECIAL_ABILITIES_CHANGED,
+  type: HistoryRecordType.SPECIAL_ABILITIES_CHANGED,
   name: "Berserker Rage",
   number: 2,
   id: "9f654a4d-2086-47e2-905b-ad189000b17d",
@@ -1160,7 +1160,7 @@ export const fakeHistoryBlock1: HistoryBlock = {
   previousBlockId: null,
   changes: [
     {
-      type: RecordType.CHARACTER_CREATED,
+      type: HistoryRecordType.CHARACTER_CREATED,
       name: "New Character",
       number: 1,
       id: "5a17703e-c5fa-4fbb-bc6c-4d7f4ed50a67",
@@ -1209,11 +1209,11 @@ export const fakeBigHistoryBlock: HistoryBlock = {
   changes: generateLargeChangesList(500), // Enforce exceedance of maximum allowed size of a history block
 };
 
-function generateLargeChangesList(size: number): Record[] {
+function generateLargeChangesList(size: number): HistoryRecord[] {
   const largeChanges = [];
   for (let i = 0; i < size; i++) {
     largeChanges.push({
-      type: RecordType.SKILL_CHANGED,
+      type: HistoryRecordType.SKILL_CHANGED,
       name: `category/skill${i}`,
       number: i + 1,
       id: uuidv4(),

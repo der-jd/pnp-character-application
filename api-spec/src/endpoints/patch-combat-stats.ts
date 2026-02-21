@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { initialIncreasedSchema, MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
 import { combatStatsSchema } from "../character-schemas.js";
-import { recordSchema } from "../history-schemas.js";
+import { historyRecordSchema } from "../history-schemas.js";
 
 export const patchCombatStatsPathParamsSchema = z
   .object({
@@ -39,7 +39,7 @@ export const updateCombatStatsResponseSchema = z
 
 export type UpdateCombatStatsResponse = z.infer<typeof updateCombatStatsResponseSchema>;
 
-export const patchCombatStatsHistoryRecordSchema = recordSchema.extend({
+export const patchCombatStatsHistoryRecordSchema = historyRecordSchema.extend({
   data: z
     .object({
       old: combatStatsSchema,
