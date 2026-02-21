@@ -1,9 +1,36 @@
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { getCharacterResponseSchema, postCharacterCloneResponseSchema } from "api-spec";
-import { expectApiError, commonInvalidTestCases } from "../shared.js";
+import {
+  getCharacterResponseSchema,
+  getHistoryResponseSchema,
+  postCharacterCloneResponseSchema,
+  HistoryBlock,
+} from "api-spec";
+import { expectApiError, commonInvalidTestCases, verifyCharacterState } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext, deleteCharacter } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
+
+async function fetchAllHistoryBlocks(characterId: string): Promise<HistoryBlock[]> {
+  const allBlocks: HistoryBlock[] = [];
+  let currentBlockNumber: number | null = null;
+
+  do {
+    const response = getHistoryResponseSchema.parse(
+      await apiClient.get(
+        `characters/${characterId}/history`,
+        currentBlockNumber ? { "block-number": currentBlockNumber } : undefined,
+      ),
+    );
+
+    // Add blocks in reverse order (latest first)
+    allBlocks.push(...response.items);
+
+    // Set the next block number to fetch
+    currentBlockNumber = response.previousBlockNumber;
+  } while (currentBlockNumber !== null);
+
+  return allBlocks;
+}
 
 describe.sequential("post-character-clone component tests", () => {
   beforeAll(async () => {
@@ -64,12 +91,8 @@ describe.sequential("post-character-clone component tests", () => {
         expect(cloneResponse.name).toContain("Copy");
         expect(cloneResponse.level).toBe(getTestContext().character.characterSheet.generalInformation.level);
 
-        const cloned = getCharacterResponseSchema.parse(await apiClient.get(`characters/${cloneResponse.characterId}`));
-        expect(cloned.characterId).toBe(cloneResponse.characterId);
-        expect(cloned.characterSheet.generalInformation.name).toBe(cloneResponse.name);
-
         // Verify the cloned character is identical to the original except for the character id and name
-        const expectedSheet = {
+        const expectedCharacter = {
           userId: getTestContext().character.userId,
           characterId: cloneResponse.characterId,
           characterSheet: {
@@ -80,7 +103,23 @@ describe.sequential("post-character-clone component tests", () => {
             },
           },
         };
-        expect(cloned.characterSheet).toStrictEqual(expectedSheet);
+        await verifyCharacterState(cloneResponse.characterId, expectedCharacter);
+
+        // Verify the character history has been copied as well
+        const originalHistory = await fetchAllHistoryBlocks(getTestContext().character.characterId);
+        const clonedHistory = await fetchAllHistoryBlocks(cloneResponse.characterId);
+
+        expect(clonedHistory.length).toBe(originalHistory.length);
+
+        // Verify each history block is identical except for characterId
+        originalHistory.forEach((originalBlock: HistoryBlock, index: number) => {
+          const clonedBlock = clonedHistory[index];
+          expect(clonedBlock.blockNumber).toBe(originalBlock.blockNumber);
+          expect(clonedBlock.blockId).toBe(originalBlock.blockId);
+          expect(clonedBlock.previousBlockId).toBe(originalBlock.previousBlockId);
+          expect(clonedBlock.characterId).toBe(cloneResponse.characterId); // Should point to cloned character
+          expect(clonedBlock.changes).toStrictEqual(originalBlock.changes);
+        });
       } finally {
         await deleteCharacter(cloneResponse.characterId);
       }

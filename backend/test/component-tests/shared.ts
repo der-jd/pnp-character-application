@@ -12,7 +12,7 @@ import {
   PostLevelUpRequest,
   getHistoryResponseSchema,
   getLevelUpResponseSchema,
-  GetCharacterResponse,
+  getCharacterResponseSchema,
 } from "api-spec";
 import { ApiError } from "./api-client.js";
 import { apiClient } from "./setup.js";
@@ -232,8 +232,7 @@ export function toLevelUpEffect(option: LevelUpOption): PostLevelUpRequest["effe
  * Verifies that the character state on the backend matches the expected character state.
  */
 export async function verifyCharacterState(characterId: string, expectedCharacter: Character): Promise<void> {
-  const updatedCharacterResponse = (await apiClient.get(`characters/${characterId}`)) as { data: GetCharacterResponse };
-  const updatedCharacter = updatedCharacterResponse.data;
+  const updatedCharacter = getCharacterResponseSchema.parse(await apiClient.get(`characters/${characterId}`));
 
   expect(updatedCharacter).toStrictEqual(expectedCharacter);
 }
