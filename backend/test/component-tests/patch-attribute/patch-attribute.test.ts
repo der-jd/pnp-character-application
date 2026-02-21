@@ -130,7 +130,7 @@ describe.sequential("patch-attribute component tests", () => {
             },
           }),
         400,
-        "Increased points must be greater than 0",
+        "Invalid input values!",
       );
     });
 
@@ -146,7 +146,7 @@ describe.sequential("patch-attribute component tests", () => {
             },
           }),
         400,
-        "Increased points must be greater than 0",
+        "Invalid input values!",
       );
     });
   });

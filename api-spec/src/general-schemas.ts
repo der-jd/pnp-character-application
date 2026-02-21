@@ -32,7 +32,7 @@ export type InitialNew = z.infer<typeof initialNewSchema>;
 export const initialIncreasedSchema = z
   .object({
     initialValue: z.number().int().min(MIN_POINTS).max(MAX_POINTS),
-    increasedPoints: z.number().int().min(0).max(MAX_POINTS),
+    increasedPoints: z.number().int().min(1).max(MAX_POINTS),
   })
   .strict();
 

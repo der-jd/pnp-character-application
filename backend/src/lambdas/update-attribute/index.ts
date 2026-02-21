@@ -231,8 +231,11 @@ function updateCurrentValue(
     `Update current value of the attribute from ${currentValue.initialValue} to ${currentValue.initialValue + currentValue.increasedPoints}`,
   );
 
+  /**
+   * This case should never occur, because the schema validation should prevent it.
+   */
   if (currentValue.increasedPoints <= 0) {
-    throw new HttpError(400, "Points to increase are negative or null! The value must be greater than or equal 1.", {
+    throw new HttpError(400, "Points to increase are negative or 0! The value must be greater than 0.", {
       increasedPoints: currentValue.increasedPoints,
     });
   }
