@@ -7,7 +7,7 @@ export function decodeUserId(authorizationHeader: string | undefined): string {
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     console.error("No authorization token provided!");
-    throw new HttpError(401, "Unauthorized CUSTOM");
+    throw new HttpError(401, "Unauthorized");
   }
 
   const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
@@ -15,13 +15,13 @@ export function decodeUserId(authorizationHeader: string | undefined): string {
   const decoded = jwt.decode(token) as JwtPayload | null;
   if (!decoded) {
     console.error("Invalid authorization token!");
-    throw new HttpError(401, "Unauthorized CUSTOM");
+    throw new HttpError(401, "Unauthorized");
   }
 
   const userId = decoded.sub; // Cognito User ID
   if (!userId) {
     console.error("User ID not found in authorization token!");
-    throw new HttpError(401, "Unauthorized CUSTOM");
+    throw new HttpError(401, "Unauthorized");
   }
 
   return userId;
