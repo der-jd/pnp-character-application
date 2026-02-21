@@ -230,11 +230,37 @@ export function toLevelUpEffect(option: LevelUpOption): PostLevelUpRequest["effe
 
 /**
  * Verifies that the character state on the backend matches the expected character state.
+ * Handles special abilities comparison as Set to account for unordered storage.
  */
 export async function verifyCharacterState(characterId: string, expectedCharacter: Character): Promise<void> {
   const updatedCharacter = getCharacterResponseSchema.parse(await apiClient.get(`characters/${characterId}`));
 
-  expect(updatedCharacter).toStrictEqual(expectedCharacter);
+  // Compare specialAbilities as Sets (order not guaranteed due to Set storage)
+  if (expectedCharacter.characterSheet.specialAbilities || updatedCharacter.characterSheet.specialAbilities) {
+    expect(new Set(updatedCharacter.characterSheet.specialAbilities || [])).toEqual(
+      new Set(expectedCharacter.characterSheet.specialAbilities || [])
+    );
+  }
+
+  // Create copies without specialAbilities for strict comparison of other properties
+  const expectedCopy = {
+    ...expectedCharacter,
+    characterSheet: {
+      ...expectedCharacter.characterSheet,
+      specialAbilities: undefined,
+    },
+  };
+
+  const updatedCopy = {
+    ...updatedCharacter,
+    characterSheet: {
+      ...updatedCharacter.characterSheet,
+      specialAbilities: undefined,
+    },
+  };
+
+  // Strict comparison of all other properties
+  expect(updatedCopy).toStrictEqual(expectedCopy);
 }
 
 /**

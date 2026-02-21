@@ -118,9 +118,10 @@ describe.sequential("post-special-abilities component tests", () => {
       expect(response.data.specialAbilities.old.values).toEqual(character.characterSheet.specialAbilities);
       expect(response.data.specialAbilities.old.values).not.toContain(ability);
       expect(response.data.specialAbilities.new.values).toContain(ability);
-      // Verify the new special abilities array contains the old values plus the new one
-      const expectedNewAbilities = [...response.data.specialAbilities.old.values, ability];
-      expect(response.data.specialAbilities.new.values).toStrictEqual(expectedNewAbilities);
+      // Verify the new special abilities array contains the old values plus the new one (order doesn't matter due to Set storage)
+      const expectedNewAbilities = new Set([...response.data.specialAbilities.old.values, ability]);
+      const actualNewAbilities = new Set(response.data.specialAbilities.new.values);
+      expect(actualNewAbilities).toEqual(expectedNewAbilities);
       expect(response.historyRecord).not.toBeNull();
 
       // Update test context
