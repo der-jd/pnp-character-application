@@ -1,10 +1,5 @@
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import {
-  getCharacterResponseSchema,
-  getHistoryResponseSchema,
-  postCharacterCloneResponseSchema,
-  HistoryBlock,
-} from "api-spec";
+import { getHistoryResponseSchema, postCharacterCloneResponseSchema, HistoryBlock } from "api-spec";
 import { expectApiError, commonInvalidTestCases, verifyCharacterState } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext, deleteCharacter } from "../setup.js";
 import { getTestContext } from "../test-context.js";
