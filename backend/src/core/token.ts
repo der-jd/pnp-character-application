@@ -7,9 +7,11 @@ import { HttpError } from "./errors.js";
  * NOTICE:
  * The access to the API itself is already protected by
  * the Cognito authorizer in the API Gateway.
- * Therefore, this function does not verify the token.
- * It should actually never throw an error,
- * unless the code is called directly from within the AWS environment,
+ * Only authorized calls should reach this function and
+ * therefore, this function does not verify the token.
+ * It should actually never throw an error, unless the
+ * code is called directly from within the AWS environment
+ * with an invalid authorization header,
  * e.g. by calling the Lambda function directly.
  *
  * @param authorizationHeader The authorization header.
