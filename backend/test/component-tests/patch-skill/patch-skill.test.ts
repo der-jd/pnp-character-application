@@ -12,7 +12,7 @@ import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext, setTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
-describe("patch-skill component tests", () => {
+describe.sequential("patch-skill component tests", () => {
   beforeAll(async () => {
     await setupTestContext();
   });

@@ -52,9 +52,9 @@ export default defineConfig({
     setupFiles: ["./test/component-tests/setup.ts"],
     exclude: ["build/", "dist/", "**/node_modules/**", "test/unit-tests/**"],
     environment: "node",
-    testTimeout: 30000,
+    testTimeout: 15000, // Increased timeout to 15 seconds for endpoints that may take longer to execute
     sequence: {
-      concurrent: false, // This would lead to race conditions for the database
+      concurrent: true, // Allow parallel and therefore faster execution of test files
     },
   },
   resolve: {

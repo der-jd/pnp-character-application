@@ -6,7 +6,7 @@ import { getTestContext, setTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 import { INVALID_UUID } from "../shared.js";
 
-describe("patch-history-record component tests", () => {
+describe.sequential("patch-history-record component tests", () => {
   beforeAll(async () => {
     await setupTestContext();
   });

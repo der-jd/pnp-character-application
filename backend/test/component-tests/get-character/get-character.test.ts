@@ -5,7 +5,7 @@ import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
-describe("get-character component tests", () => {
+describe.sequential("get-character component tests", () => {
   beforeAll(async () => {
     await setupTestContext();
   });
