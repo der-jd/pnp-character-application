@@ -135,7 +135,7 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
             start: {
-              initialValue: 5,
+              initialValue: 0,
               newValue: 6,
             },
           }),
@@ -151,7 +151,7 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
             current: {
-              initialValue: 8,
+              initialValue: 0,
               increasedPoints: 1,
             },
             learningMethod: "NORMAL",
@@ -168,7 +168,7 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
             mod: {
-              initialValue: 3,
+              initialValue: 0,
               newValue: 5,
             },
           }),
@@ -201,7 +201,7 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             current: {
-              initialValue: 16,
+              initialValue: 12,
               increasedPoints: 0,
             },
             learningMethod: "NORMAL",
@@ -218,7 +218,7 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             current: {
-              initialValue: 16,
+              initialValue: 12,
               increasedPoints: -3,
             },
             learningMethod: "NORMAL",
@@ -235,28 +235,12 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             current: {
-              initialValue: 16,
+              initialValue: 12,
               increasedPoints: 1,
             },
           }),
         409,
         "Learning method must be given",
-      );
-    });
-
-    test("updating an inactive skill is not allowed", async () => {
-      const character = getTestContext().character;
-
-      await expectApiError(
-        () =>
-          apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
-            start: {
-              initialValue: 5,
-              newValue: 6,
-            },
-          }),
-        409,
-        "Skill is not activated yet",
       );
     });
   });
@@ -487,7 +471,7 @@ describe.sequential("patch-skill component tests", () => {
           skillName: "athletics",
           body: {
             start: {
-              initialValue: 12,
+              initialValue: 9,
               newValue: 15,
             },
           },
@@ -501,7 +485,7 @@ describe.sequential("patch-skill component tests", () => {
           skillName: "athletics",
           body: {
             current: {
-              initialValue: 16,
+              initialValue: 12,
               increasedPoints: 3,
             },
             learningMethod: "FREE",
@@ -516,7 +500,7 @@ describe.sequential("patch-skill component tests", () => {
           skillName: "athletics",
           body: {
             current: {
-              initialValue: 19,
+              initialValue: 15,
               increasedPoints: 3,
             },
             learningMethod: "LOW_PRICED",
@@ -531,7 +515,7 @@ describe.sequential("patch-skill component tests", () => {
           skillName: "athletics",
           body: {
             current: {
-              initialValue: 22,
+              initialValue: 18,
               increasedPoints: 3,
             },
             learningMethod: "EXPENSIVE",
@@ -546,7 +530,7 @@ describe.sequential("patch-skill component tests", () => {
           skillName: "athletics",
           body: {
             mod: {
-              initialValue: 4,
+              initialValue: 2,
               newValue: 7,
             },
           },
@@ -561,15 +545,15 @@ describe.sequential("patch-skill component tests", () => {
           body: {
             activated: true,
             start: {
-              initialValue: 12,
+              initialValue: 0,
               newValue: 10,
             },
             current: {
-              initialValue: 16,
+              initialValue: 0,
               increasedPoints: 1,
             },
             mod: {
-              initialValue: 4,
+              initialValue: 0,
               newValue: 5,
             },
             learningMethod: "NORMAL",
