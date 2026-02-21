@@ -8,6 +8,10 @@ parameters:
     description: If true, deletes the Terraform resources in AWS.
     type: boolean
     default: false
+  run-component-tests:
+    description: If true, runs backend component tests. Always runs on main branch.
+    type: boolean
+    default: false
 
 executors:
   node-medium-executor:
@@ -36,15 +40,27 @@ workflows:
             - build-backend
             - run-backend-unit-tests
             - lint-terraform-code
-      # TODO enable when component tests are ready
-      #- run-backend-component-tests:
-      #    requires:
-      #      - deploy-backend-and-infrastructure
+      # Run component tests only on main branch
+      - run-backend-component-tests:
+          requires:
+            - deploy-backend-and-infrastructure
+          filters:
+            branches:
+              only:
+                - main
       - build-and-deploy-frontend:
           requires:
             - check-format-files
             - lint-typescript-code
             - deploy-backend-and-infrastructure
+
+  component-tests:
+    when:
+      and:
+        - not: << pipeline.parameters.delete-services >>
+        - << pipeline.parameters.run-component-tests >>
+    jobs:
+      - run-backend-component-tests
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
