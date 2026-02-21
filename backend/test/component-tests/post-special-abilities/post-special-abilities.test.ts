@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { postSpecialAbilitiesResponseSchema, MAX_STRING_LENGTH_DEFAULT } from "api-spec";
 import { expectApiError, verifyCharacterState, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext } from "../test-context.js";
+import { getTestContext, setTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
 export function makeUniqueName(prefix: string): string {
@@ -68,31 +68,32 @@ describe("post-special-abilities component tests", () => {
   describe("Idempotent requests", () => {
     test("special ability already exists (idempotency)", async () => {
       const ability = getTestContext().character.characterSheet.specialAbilities[0];
+      const character = getTestContext().character;
 
       expect(ability).toBeDefined();
       expect(ability).not.toBe("");
 
       const response = postSpecialAbilitiesResponseSchema.parse(
-        await apiClient.post(`characters/${getTestContext().character.characterId}/special-abilities`, {
+        await apiClient.post(`characters/${character.characterId}/special-abilities`, {
           specialAbility: ability,
         }),
       );
 
-      expect(response.data.characterId).toBe(getTestContext().character.characterId);
-      expect(response.data.userId).toBe(getTestContext().character.userId);
+      expect(response.data.characterId).toBe(character.characterId);
+      expect(response.data.userId).toBe(character.userId);
       expect(response.data.specialAbilityName).toBe(ability);
       expect(response.data.specialAbilities.old.values).toEqual(
-        getTestContext().character.characterSheet.specialAbilities,
+        character.characterSheet.specialAbilities,
       );
       expect(response.data.specialAbilities.new).toStrictEqual(response.data.specialAbilities.old);
       expect(response.data.specialAbilities.new.values).toContain(ability);
       expect(response.historyRecord).toBeNull();
 
       // Character from the backend should be still identical to the one before the update
-      await verifyCharacterState(getTestContext().character.characterId, getTestContext().character);
+      await verifyCharacterState(character.characterId, character);
 
       // Latest history record should be the same as the one before the update
-      await verifyLatestHistoryRecord(getTestContext().character.characterId, getTestContext().lastHistoryRecord);
+      await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
     });
   });
 
@@ -105,18 +106,19 @@ describe("post-special-abilities component tests", () => {
   describe("Update requests", () => {
     test("add new special ability", async () => {
       const ability = makeUniqueName("ComponentAbility");
+      const character = getTestContext().character;
 
       const response = postSpecialAbilitiesResponseSchema.parse(
-        await apiClient.post(`characters/${getTestContext().character.characterId}/special-abilities`, {
+        await apiClient.post(`characters/${character.characterId}/special-abilities`, {
           specialAbility: ability,
         }),
       );
 
-      expect(response.data.characterId).toBe(getTestContext().character.characterId);
-      expect(response.data.userId).toBe(getTestContext().character.userId);
+      expect(response.data.characterId).toBe(character.characterId);
+      expect(response.data.userId).toBe(character.userId);
       expect(response.data.specialAbilityName).toBe(ability);
       expect(response.data.specialAbilities.old.values).toEqual(
-        getTestContext().character.characterSheet.specialAbilities,
+        character.characterSheet.specialAbilities,
       );
       expect(response.data.specialAbilities.old.values).not.toContain(ability);
       expect(response.data.specialAbilities.new.values).toContain(ability);
@@ -126,11 +128,15 @@ describe("post-special-abilities component tests", () => {
       expect(response.historyRecord).not.toBeNull();
 
       // Update test context
-      getTestContext().character.characterSheet.specialAbilities = response.data.specialAbilities.new.values;
-      getTestContext().lastHistoryRecord = response.historyRecord!;
+      character.characterSheet.specialAbilities = response.data.specialAbilities.new.values;
 
-      await verifyCharacterState(getTestContext().character.characterId, getTestContext().character);
-      await verifyLatestHistoryRecord(getTestContext().character.characterId, getTestContext().lastHistoryRecord);
+      setTestContext({
+        character,
+        lastHistoryRecord: response.historyRecord!
+      });
+
+      await verifyCharacterState(character.characterId, character);
+      await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
     });
   });
 });

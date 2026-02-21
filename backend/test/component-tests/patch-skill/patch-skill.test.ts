@@ -10,7 +10,7 @@ import {
 } from "api-spec";
 import { expectApiError, verifyCharacterState, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext } from "../test-context.js";
+import { getTestContext, setTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
 describe("patch-skill component tests", () => {
@@ -726,18 +726,19 @@ describe("patch-skill component tests", () => {
         expect(historyRecord.comment).toBeNull();
 
         // Update test context
-        (getTestContext().character.characterSheet.skills[_skillCategory][_skillName] as Skill) =
-          response.data.changes.new.skill;
+        (character.characterSheet.skills[_skillCategory][_skillName] as Skill) = response.data.changes.new.skill;
         if (response.data.combatCategory) {
           const _combatCategory = response.data.combatCategory as keyof CharacterSheet["combat"];
-          (getTestContext().character.characterSheet.combat[_combatCategory][_skillName] as CombatStats) =
-            response.data.changes.new.combatStats!;
+          (character.characterSheet.combat[_combatCategory][_skillName] as CombatStats) = response.data.changes.new.combatStats!;
         }
-        (getTestContext().character.characterSheet.calculationPoints.adventurePoints as CalculationPoints) =
-          response.data.adventurePoints.new;
-        getTestContext().lastHistoryRecord = response.historyRecord!;
+        character.characterSheet.calculationPoints.adventurePoints = response.data.adventurePoints.new;
 
-        await verifyCharacterState(character.characterId, getTestContext().character);
+        setTestContext({
+          character,
+          lastHistoryRecord: response.historyRecord!
+        });
+
+        await verifyCharacterState(character.characterId, character);
 
         await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
       });
