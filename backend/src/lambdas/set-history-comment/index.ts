@@ -66,8 +66,11 @@ export async function setHistoryComment(request: Request): Promise<APIGatewayPro
     let foundBlockNumber: number | undefined = undefined;
     let foundRecordIndex: number | undefined = undefined;
     for (const item of items) {
+      console.log(`Checking history block #${item.blockNumber} with ${item.changes.length} changes`);
       const index = item.changes.findIndex((change) => change.id === params.pathParams["record-id"]);
       if (index !== -1) {
+        console.log(`Found record at index ${index} in block #${item.blockNumber}`);
+        console.log(`Current comment: ${item.changes[index].comment}`);
         foundBlockNumber = item.blockNumber;
         foundRecordIndex = index;
         break;
