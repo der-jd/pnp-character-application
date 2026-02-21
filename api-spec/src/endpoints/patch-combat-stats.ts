@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { initialIncreasedSchema, MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
+import { initialIncreasedSchemaOptional, MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
 import { combatStatsSchema } from "../character-schemas.js";
 import { historyRecordSchema } from "../history-schemas.js";
 
@@ -15,8 +15,8 @@ export type PatchCombatStatsPathParams = z.infer<typeof patchCombatStatsPathPara
 
 export const patchCombatStatsRequestSchema = z
   .object({
-    skilledAttackValue: initialIncreasedSchema,
-    skilledParadeValue: initialIncreasedSchema,
+    skilledAttackValue: initialIncreasedSchemaOptional,
+    skilledParadeValue: initialIncreasedSchemaOptional,
   })
   .strict();
 

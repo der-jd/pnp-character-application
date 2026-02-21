@@ -82,6 +82,8 @@ export {
   InitialNew,
   initialIncreasedSchema,
   InitialIncreased,
+  initialIncreasedSchemaOptional,
+  InitialIncreasedSchemaOptional,
   userIdSchema,
   MAX_STRING_LENGTH_SHORT,
   MAX_STRING_LENGTH_DEFAULT,
