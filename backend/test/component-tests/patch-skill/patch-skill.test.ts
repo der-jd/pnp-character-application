@@ -206,8 +206,8 @@ describe.sequential("patch-skill component tests", () => {
             },
             learningMethod: "NORMAL",
           }),
-        409,
-        "Increased points must be greater than 0",
+        400,
+        "Points to increase skill value are negative or null! The value must be greater than or equal 1.",
       );
     });
 
@@ -223,8 +223,8 @@ describe.sequential("patch-skill component tests", () => {
             },
             learningMethod: "NORMAL",
           }),
-        409,
-        "Increased points must be greater than 0",
+        400,
+        "Points to increase skill value are negative or null! The value must be greater than or equal 1.",
       );
     });
 
