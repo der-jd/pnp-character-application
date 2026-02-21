@@ -13,7 +13,6 @@ const _testContext = {
   apiBaseUrl: "",
   authorizationHeader: "",
   userName: "",
-  userId: "",
   character: undefined,
   lastHistoryRecord: undefined,
   latestHistoryBlockNumber: undefined,
