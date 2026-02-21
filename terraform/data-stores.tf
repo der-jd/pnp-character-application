@@ -16,25 +16,34 @@ resource "aws_dynamodb_table" "characters" {
   }
 
   attribute {
-    name = "groupId"
-    type = "S"
-  }
-
-  attribute {
     name = "characterId"
     type = "S"
   }
 
-  # TODO obsolete and can be removed?!
-  global_secondary_index {
-    name            = "indexForCognitoGroup"
-    hash_key        = "groupId"
-    range_key       = "characterId"
-    projection_type = "ALL"
-  }
-
   lifecycle {
     prevent_destroy = true
+  }
+}
+
+# TODO obsolete and can be removed?!
+resource "aws_dynamodb_global_secondary_index" "indexForCognitoGroup" {
+  table_name = aws_dynamodb_table.characters.name
+  index_name = "indexForCognitoGroup"
+
+  key_schema {
+    attribute_name = "groupId"
+    attribute_type = "S"
+    key_type       = "HASH"
+  }
+
+  key_schema {
+    attribute_name = "characterId"
+    attribute_type = "S"
+    key_type       = "RANGE"
+  }
+
+  projection {
+    projection_type = "ALL"
   }
 }
 
