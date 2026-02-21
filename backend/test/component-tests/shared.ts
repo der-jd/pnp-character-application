@@ -238,7 +238,7 @@ export async function verifyCharacterState(characterId: string, expectedCharacte
   // Compare specialAbilities as Sets (order not guaranteed due to Set storage)
   if (expectedCharacter.characterSheet.specialAbilities || updatedCharacter.characterSheet.specialAbilities) {
     expect(new Set(updatedCharacter.characterSheet.specialAbilities || [])).toEqual(
-      new Set(expectedCharacter.characterSheet.specialAbilities || [])
+      new Set(expectedCharacter.characterSheet.specialAbilities || []),
     );
   }
 
