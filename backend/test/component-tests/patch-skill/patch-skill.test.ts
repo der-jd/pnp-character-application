@@ -184,8 +184,8 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/combat/slashingWeaponsSharp1h`, {
             current: {
-              initialValue: 120,
-              increasedPoints: 50,
+              initialValue: 1,
+              increasedPoints: 150,
             },
             learningMethod: "EXPENSIVE",
           }),
