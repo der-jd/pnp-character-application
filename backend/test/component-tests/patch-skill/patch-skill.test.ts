@@ -271,8 +271,8 @@ describe.sequential("patch-skill component tests", () => {
           skillName: "athletics",
           body: {
             start: {
-              initialValue: 9,
-              newValue: 12,
+              initialValue: 5,
+              newValue: 9,
             },
           },
         },
@@ -284,7 +284,7 @@ describe.sequential("patch-skill component tests", () => {
           skillName: "athletics",
           body: {
             current: {
-              initialValue: 12,
+              initialValue: 8,
               increasedPoints: 4,
             },
             learningMethod: "NORMAL",
@@ -298,7 +298,7 @@ describe.sequential("patch-skill component tests", () => {
           skillName: "slashingWeaponsBlunt2h",
           body: {
             current: {
-              initialValue: 14,
+              initialValue: 10,
               increasedPoints: 4,
             },
             learningMethod: "NORMAL",
@@ -312,8 +312,8 @@ describe.sequential("patch-skill component tests", () => {
           skillName: "athletics",
           body: {
             mod: {
-              initialValue: 2,
-              newValue: 4,
+              initialValue: 1,
+              newValue: 2,
             },
           },
         },
