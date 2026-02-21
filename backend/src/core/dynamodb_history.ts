@@ -70,7 +70,9 @@ export async function getHistoryItems(
 
   console.log("Successfully got DynamoDB items");
 
-  return z.array(historyBlockSchema).parse(response.Items);
+  const items = response.Items ?? [];
+
+  return z.array(historyBlockSchema).parse(items);
 }
 
 export async function createHistoryItem(historyItem: HistoryBlock): Promise<void> {
