@@ -19,13 +19,12 @@ beforeAll(async () => {
   _seedCharacterId = requireEnv("COMPONENT_TESTS_SEED_CHARACTER_ID");
 
   const secrets = getTestSecrets();
+  _userId = secrets.cognitoUsername;
   const idToken = await authenticate(secrets);
-  _userId = extractUserIdFromToken(idToken);
   const authorizationHeader = `Bearer ${idToken}`;
 
   console.log(`API Base URL: ${apiBaseUrl}`);
   console.log(`User name: ${secrets.cognitoUsername}`);
-  console.log(`User ID: ${_userId}`);
   console.log(`Seed character ID: ${_seedCharacterId}`);
 
   apiClient = new ApiClient(apiBaseUrl, authorizationHeader);
@@ -61,7 +60,6 @@ export async function setupTestContext(): Promise<void> {
 
 export async function cleanUpTestContext(): Promise<void> {
   await deleteCharacter(getTestContext().character.characterId);
-  console.log(`Deleted character ${getTestContext().character.characterId}`);
   setTestContext({ character: undefined });
 }
 
@@ -78,12 +76,6 @@ export async function deleteCharacter(characterId: string): Promise<void> {
     console.error("Failed to delete character", message);
     throw error;
   }
-}
-
-function extractUserIdFromToken(idToken: string): string {
-  const tokenParts = idToken.split(".");
-  const payload = JSON.parse(Buffer.from(tokenParts[1], "base64").toString());
-  return payload.sub || payload["cognito:username"];
 }
 
 async function authenticate(secrets: TestSecrets): Promise<string> {

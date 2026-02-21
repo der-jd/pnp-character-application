@@ -272,20 +272,8 @@ export const commonInvalidTestCases = [
     authorizationHeader: "Bearer 1234567890",
   },
   {
-    name: "character id is not an uuid",
-    expectedStatusCode: 400,
-    expectedErrorMessage: "Invalid input values",
-    characterId: INVALID_UUID,
-  },
-  {
-    name: "no character found for non-existing character id",
-    expectedStatusCode: 404,
-    expectedErrorMessage: "No character found",
-    characterId: NON_EXISTENT_UUID,
-  },
-  {
-    name: "no character found for non-existing user id",
-    expectedStatusCode: 404,
+    name: "unauthorized for non-existing user id",
+    expectedStatusCode: 401,
     expectedErrorMessage: "Unauthorized",
     /**
      * JWT token for non existing user id 'fbcc6196-6959-4a76-b647-efae2b78fdfa'
@@ -310,5 +298,17 @@ export const commonInvalidTestCases = [
       "eyJpc3MiOiJ0ZXN0IiwiaWF0IjoxNzQzOTQwNTgxLCJleHAiOjE3NzU0ODAxODEsImF1ZCI6Ind3dy50ZXN0LmNvbSIsInN1YiI6ImZiY2M2MTk2LTY5NTktNGE3Ni1iNjQ3LWVmYWUyYjc4ZmRmYSJ9." +
       "rdMLo75dttDhieMjnNt2k7_T2SW2LvDYTJe_jqafxkFfGKM74nwoEAg9Fr-r7TOgZ2kmPI3H5HGsK5eMedAiM1TzsbTYMq0EOgaFiit__hu7NS-AE6--TIRdFYw2b5oARbCmgJHD7uGR8n_terkUvo2Wk" +
       "t8TxIxR20W9bpUStpMk3aIRpkhtlGv0A0QuB76XM2l7kdKeXVJhzIVnHSB0HnRgp4eRc9l6x4xDLkvyycGbiuJ6LAEnkM_sT4iDobielbTcFCBUQFuZjRMbNYu18Ii6BOL-AdOmHFX8QweGSfbsGdhUpOQgHFfyq7n1ckaDA4hc1drbA7xG-i1DQUkbOxoR3MATb6LQF0NlaBoMatu9yux8eukSzgCM5mZYI-z-HaE5RICPs3p-hdJcgpbWo1zuKVe9GEzv80JqGFbCWVxWnNwKHytpqs82QjDLHqjZCi8sBFsmjJP6o9jtdAEN_HO6bfi_Eshfx4Hzn6uUuaPGevL1GJdjFb4F8W_ucKvc",
+  },
+  {
+    name: "character id is not an uuid",
+    expectedStatusCode: 400,
+    expectedErrorMessage: "Invalid input values",
+    characterId: INVALID_UUID,
+  },
+  {
+    name: "no character found for non-existing character id",
+    expectedStatusCode: 404,
+    expectedErrorMessage: "No character found",
+    characterId: NON_EXISTENT_UUID,
   },
 ];
