@@ -42,7 +42,7 @@ resource "aws_backup_selection" "selection" {
 
   # Limit selection to DynamoDB tables AND require them to have the defined tag
   resources = [
-    "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*"
+    "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*"
   ]
   condition {
     string_equals {
