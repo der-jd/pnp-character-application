@@ -82,9 +82,7 @@ describe("post-special-abilities component tests", () => {
       expect(response.data.characterId).toBe(character.characterId);
       expect(response.data.userId).toBe(character.userId);
       expect(response.data.specialAbilityName).toBe(ability);
-      expect(response.data.specialAbilities.old.values).toEqual(
-        character.characterSheet.specialAbilities,
-      );
+      expect(response.data.specialAbilities.old.values).toEqual(character.characterSheet.specialAbilities);
       expect(response.data.specialAbilities.new).toStrictEqual(response.data.specialAbilities.old);
       expect(response.data.specialAbilities.new.values).toContain(ability);
       expect(response.historyRecord).toBeNull();
@@ -117,9 +115,7 @@ describe("post-special-abilities component tests", () => {
       expect(response.data.characterId).toBe(character.characterId);
       expect(response.data.userId).toBe(character.userId);
       expect(response.data.specialAbilityName).toBe(ability);
-      expect(response.data.specialAbilities.old.values).toEqual(
-        character.characterSheet.specialAbilities,
-      );
+      expect(response.data.specialAbilities.old.values).toEqual(character.characterSheet.specialAbilities);
       expect(response.data.specialAbilities.old.values).not.toContain(ability);
       expect(response.data.specialAbilities.new.values).toContain(ability);
       // Verify the new special abilities array contains the old values plus the new one
@@ -132,7 +128,7 @@ describe("post-special-abilities component tests", () => {
 
       setTestContext({
         character,
-        lastHistoryRecord: response.historyRecord!
+        lastHistoryRecord: response.historyRecord!,
       });
 
       await verifyCharacterState(character.characterId, character);

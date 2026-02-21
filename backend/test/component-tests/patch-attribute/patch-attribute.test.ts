@@ -6,7 +6,6 @@ import {
   BaseValue,
   BaseValues,
   CombatStats,
-  CalculationPoints,
   HistoryRecordType,
   PatchAttributeHistoryRecord,
 } from "api-spec";
@@ -405,9 +404,8 @@ describe("patch-attribute component tests", () => {
         expect(historyRecord.comment).toBeNull();
 
         // Update test context
-        character.characterSheet.attributes[
-          _case.attributeName as keyof CharacterSheet["attributes"]
-        ] = response.data.changes.new.attribute;
+        character.characterSheet.attributes[_case.attributeName as keyof CharacterSheet["attributes"]] =
+          response.data.changes.new.attribute;
         character.characterSheet.calculationPoints.attributePoints = response.data.attributePoints.new;
 
         // Update base values if they changed
@@ -421,23 +419,21 @@ describe("patch-attribute component tests", () => {
         if (response.data.changes.new.combat) {
           if (response.data.changes.new.combat.melee) {
             for (const [skillName, combatStats] of Object.entries(response.data.changes.new.combat.melee)) {
-              character.characterSheet.combat.melee[
-                skillName as keyof CharacterSheet["combat"]["melee"]
-              ] = combatStats as CombatStats;
+              character.characterSheet.combat.melee[skillName as keyof CharacterSheet["combat"]["melee"]] =
+                combatStats as CombatStats;
             }
           }
           if (response.data.changes.new.combat.ranged) {
             for (const [skillName, combatStats] of Object.entries(response.data.changes.new.combat.ranged)) {
-              character.characterSheet.combat.ranged[
-                skillName as keyof CharacterSheet["combat"]["ranged"]
-              ] = combatStats as CombatStats;
+              character.characterSheet.combat.ranged[skillName as keyof CharacterSheet["combat"]["ranged"]] =
+                combatStats as CombatStats;
             }
           }
         }
 
         setTestContext({
           character,
-          lastHistoryRecord: response.historyRecord!
+          lastHistoryRecord: response.historyRecord!,
         });
 
         await verifyCharacterState(character.characterId, getTestContext().character);
@@ -693,9 +689,8 @@ describe("patch-attribute component tests", () => {
         expect(historyRecord.data.new.baseValues).toStrictEqual(response.data.changes.new.baseValues);
 
         // Update test context
-        character.characterSheet.attributes[
-          _case.attributeName as keyof CharacterSheet["attributes"]
-        ] = response.data.changes.new.attribute;
+        character.characterSheet.attributes[_case.attributeName as keyof CharacterSheet["attributes"]] =
+          response.data.changes.new.attribute;
         character.characterSheet.calculationPoints.attributePoints = response.data.attributePoints.new;
 
         // Update base values if they changed
@@ -707,7 +702,7 @@ describe("patch-attribute component tests", () => {
 
         setTestContext({
           character,
-          lastHistoryRecord: response.historyRecord!
+          lastHistoryRecord: response.historyRecord!,
         });
 
         await verifyCharacterState(character.characterId, getTestContext().character);
@@ -948,9 +943,8 @@ describe("patch-attribute component tests", () => {
         expect(historyRecord.data.new.combat).toStrictEqual(response.data.changes.new.combat);
 
         // Update test context
-        character.characterSheet.attributes[
-          _case.attributeName as keyof CharacterSheet["attributes"]
-        ] = response.data.changes.new.attribute;
+        character.characterSheet.attributes[_case.attributeName as keyof CharacterSheet["attributes"]] =
+          response.data.changes.new.attribute;
         character.characterSheet.calculationPoints.attributePoints = response.data.attributePoints.new;
 
         // Update base values if they changed
@@ -964,23 +958,21 @@ describe("patch-attribute component tests", () => {
         if (response.data.changes.new.combat) {
           if (response.data.changes.new.combat.melee) {
             for (const [skillName, combatStats] of Object.entries(response.data.changes.new.combat.melee)) {
-              character.characterSheet.combat.melee[
-                skillName as keyof CharacterSheet["combat"]["melee"]
-              ] = combatStats as CombatStats;
+              character.characterSheet.combat.melee[skillName as keyof CharacterSheet["combat"]["melee"]] =
+                combatStats as CombatStats;
             }
           }
           if (response.data.changes.new.combat.ranged) {
             for (const [skillName, combatStats] of Object.entries(response.data.changes.new.combat.ranged)) {
-              character.characterSheet.combat.ranged[
-                skillName as keyof CharacterSheet["combat"]["ranged"]
-              ] = combatStats as CombatStats;
+              character.characterSheet.combat.ranged[skillName as keyof CharacterSheet["combat"]["ranged"]] =
+                combatStats as CombatStats;
             }
           }
         }
 
         setTestContext({
           character,
-          lastHistoryRecord: response.historyRecord!
+          lastHistoryRecord: response.historyRecord!,
         });
 
         await verifyCharacterState(character.characterId, getTestContext().character);

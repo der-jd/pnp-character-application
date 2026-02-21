@@ -135,7 +135,7 @@ describe("patch-history-record component tests", () => {
 
         // Update test context - set the updated comment
         setTestContext({
-          lastHistoryRecord: { ...getTestContext().lastHistoryRecord, comment: response.comment }
+          lastHistoryRecord: { ...getTestContext().lastHistoryRecord, comment: response.comment },
         });
 
         await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
