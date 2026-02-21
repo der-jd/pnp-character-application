@@ -52,6 +52,9 @@ export default defineConfig({
     setupFiles: ["./test/unit-tests/setup.ts"],
     exclude: ["build/", "dist/", "**/node_modules/**", "test/component-tests/**"],
     environment: "node",
+    sequence: {
+      concurrent: false, // Sequential execution to avoid race conditions and wrong test setups
+    },
   },
   resolve: {
     alias: discoverPackages(),
