@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { MAX_STRING_LENGTH_VERY_LONG, patchHistoryRecordResponseSchema } from "api-spec";
 import { expectApiError, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext } from "../test-context.js";
+import { getTestContext, setTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 import { INVALID_UUID } from "../shared.js";
 
@@ -100,7 +100,7 @@ describe("patch-history-record component tests", () => {
       {
         name: "set comment with explicit block number",
         queryParams: {
-          "block-number": `${getTestContext().latestHistoryBlockNumber}`,
+          "block-number": "latest", // Will be replaced in test because the test context is not initialized yet
         },
       },
     ];
@@ -111,13 +111,19 @@ describe("patch-history-record component tests", () => {
         const latestRecord = getTestContext().lastHistoryRecord;
         const latestBlockNumber = getTestContext().latestHistoryBlockNumber;
 
+        // Replace "latest" with actual block number if needed
+        const queryParams =
+          _case.queryParams?.["block-number"] === "latest"
+            ? { "block-number": `${latestBlockNumber}` }
+            : _case.queryParams;
+
         const response = patchHistoryRecordResponseSchema.parse(
           await apiClient.patch(
             `characters/${character.characterId}/history/${latestRecord.id}`,
             {
               comment: "This is a test comment",
             },
-            _case.queryParams,
+            queryParams,
           ),
         );
 
@@ -128,7 +134,9 @@ describe("patch-history-record component tests", () => {
         expect(response.comment).toBe("This is a test comment");
 
         // Update test context - set the updated comment
-        getTestContext().lastHistoryRecord = { ...getTestContext().lastHistoryRecord, comment: response.comment };
+        setTestContext({
+          lastHistoryRecord: { ...getTestContext().lastHistoryRecord, comment: response.comment }
+        });
 
         await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
       });
