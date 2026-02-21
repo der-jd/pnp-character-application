@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { CostCategory, RecordType } from "api-spec";
+import { CostCategory, HistoryRecordType } from "api-spec";
 import { addRecordToHistory, AddHistoryRecordRequest, addHistoryRecordResponseSchema } from "add-history-record";
 import { fakeUserId } from "../test-data/request.js";
 import {
@@ -17,7 +17,7 @@ import { expectHttpError } from "../utils.js";
 
 const testBody: AddHistoryRecordRequest = {
   userId: fakeUserId,
-  type: RecordType.CALCULATION_POINTS_CHANGED,
+  type: HistoryRecordType.CALCULATION_POINTS_CHANGED,
   name: "Calculation Points",
   data: {
     old: {
@@ -135,7 +135,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.CHARACTER_CREATED,
+          type: HistoryRecordType.CHARACTER_CREATED,
           name: "New Character",
           data: {
             new: {
@@ -174,7 +174,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.CALCULATION_POINTS_CHANGED,
+          type: HistoryRecordType.CALCULATION_POINTS_CHANGED,
           name: "Calculation Points",
           data: {
             old: {
@@ -244,7 +244,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.LEVEL_UP_APPLIED,
+          type: HistoryRecordType.LEVEL_UP_APPLIED,
           name: "Level 2",
           data: {
             old: {
@@ -313,7 +313,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.BASE_VALUE_CHANGED,
+          type: HistoryRecordType.BASE_VALUE_CHANGED,
           name: "health points",
           data: {
             old: {
@@ -353,7 +353,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.BASE_VALUE_CHANGED,
+          type: HistoryRecordType.BASE_VALUE_CHANGED,
           name: "attackBaseValue",
           data: {
             old: {
@@ -561,7 +561,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.BASE_VALUE_CHANGED,
+          type: HistoryRecordType.BASE_VALUE_CHANGED,
           name: "rangedAttackBaseValue",
           data: {
             old: {
@@ -689,7 +689,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.SPECIAL_ABILITIES_CHANGED,
+          type: HistoryRecordType.SPECIAL_ABILITIES_CHANGED,
           name: "Berserker Rage",
           data: {
             old: {
@@ -719,7 +719,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.ATTRIBUTE_CHANGED,
+          type: HistoryRecordType.ATTRIBUTE_CHANGED,
           name: "charisma",
           data: {
             old: {
@@ -770,7 +770,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.ATTRIBUTE_CHANGED,
+          type: HistoryRecordType.ATTRIBUTE_CHANGED,
           name: "strength",
           data: {
             old: {
@@ -875,7 +875,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.ATTRIBUTE_CHANGED,
+          type: HistoryRecordType.ATTRIBUTE_CHANGED,
           name: "strength",
           data: {
             old: {
@@ -1232,7 +1232,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.SKILL_CHANGED,
+          type: HistoryRecordType.SKILL_CHANGED,
           name: "body/bodyControl",
           data: {
             old: {
@@ -1287,7 +1287,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.SKILL_CHANGED,
+          type: HistoryRecordType.SKILL_CHANGED,
           name: "combat/martialArts",
           data: {
             old: {
@@ -1358,7 +1358,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.COMBAT_STATS_CHANGED,
+          type: HistoryRecordType.COMBAT_STATS_CHANGED,
           name: "melee/slashingWeaponsSharp1h",
           data: {
             old: {
@@ -1481,7 +1481,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.CALCULATION_POINTS_CHANGED,
+          type: HistoryRecordType.CALCULATION_POINTS_CHANGED,
           name: "Calculation Points",
           data: {
             old: {
@@ -1581,7 +1581,7 @@ describe("Valid requests", () => {
         queryStringParameters: null,
         body: {
           userId: fakeUserId,
-          type: RecordType.CALCULATION_POINTS_CHANGED,
+          type: HistoryRecordType.CALCULATION_POINTS_CHANGED,
           name: "Calculation Points",
           data: {
             old: {

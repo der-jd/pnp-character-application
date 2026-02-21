@@ -5,7 +5,7 @@ import {
   Skill,
   CombatStats,
   CalculationPoints,
-  RecordType,
+  HistoryRecordType,
   PatchSkillHistoryRecord,
 } from "api-spec";
 import { expectApiError, verifyCharacterState, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
@@ -699,7 +699,7 @@ describe("patch-skill component tests", () => {
         const historyRecord = response.historyRecord as PatchSkillHistoryRecord;
 
         // Verify basic record properties
-        expect(historyRecord.type).toBe(RecordType.SKILL_CHANGED);
+        expect(historyRecord.type).toBe(HistoryRecordType.SKILL_CHANGED);
         expect(historyRecord.name).toBe(`${_skillCategory}/${_skillName}`);
         expect(historyRecord.number).toBeGreaterThan(0);
         expect(historyRecord.id).toBeDefined();

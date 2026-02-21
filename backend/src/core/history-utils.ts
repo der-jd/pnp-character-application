@@ -1,5 +1,5 @@
-import { RecordType } from "api-spec";
+import { HistoryRecordType } from "api-spec";
 
-export function parseRecordType(type: string): RecordType {
-  return RecordType[type.toUpperCase() as keyof typeof RecordType];
+export function parseRecordType(type: string): HistoryRecordType {
+  return HistoryRecordType[type.toUpperCase() as keyof typeof HistoryRecordType];
 }

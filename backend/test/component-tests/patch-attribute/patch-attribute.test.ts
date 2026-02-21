@@ -7,7 +7,7 @@ import {
   BaseValues,
   CombatStats,
   CalculationPoints,
-  RecordType,
+  HistoryRecordType,
   PatchAttributeHistoryRecord,
 } from "api-spec";
 import { expectApiError, verifyCharacterState, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
@@ -385,7 +385,7 @@ describe("patch-attribute component tests", () => {
         const historyRecord = response.historyRecord as PatchAttributeHistoryRecord;
 
         // Verify basic record properties
-        expect(historyRecord.type).toBe(RecordType.ATTRIBUTE_CHANGED);
+        expect(historyRecord.type).toBe(HistoryRecordType.ATTRIBUTE_CHANGED);
         expect(historyRecord.name).toBe(_case.attributeName);
         expect(historyRecord.number).toBeGreaterThan(0);
         expect(historyRecord.id).toBeDefined();
