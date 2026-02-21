@@ -4,7 +4,6 @@ import {
   CharacterSheet,
   Skill,
   CombatStats,
-  CalculationPoints,
   HistoryRecordType,
   PatchSkillHistoryRecord,
 } from "api-spec";
@@ -729,13 +728,14 @@ describe("patch-skill component tests", () => {
         (character.characterSheet.skills[_skillCategory][_skillName] as Skill) = response.data.changes.new.skill;
         if (response.data.combatCategory) {
           const _combatCategory = response.data.combatCategory as keyof CharacterSheet["combat"];
-          (character.characterSheet.combat[_combatCategory][_skillName] as CombatStats) = response.data.changes.new.combatStats!;
+          (character.characterSheet.combat[_combatCategory][_skillName] as CombatStats) =
+            response.data.changes.new.combatStats!;
         }
         character.characterSheet.calculationPoints.adventurePoints = response.data.adventurePoints.new;
 
         setTestContext({
           character,
-          lastHistoryRecord: response.historyRecord!
+          lastHistoryRecord: response.historyRecord!,
         });
 
         await verifyCharacterState(character.characterId, character);
