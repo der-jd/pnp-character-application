@@ -659,16 +659,14 @@ describe.sequential("patch-skill component tests", () => {
 
           const _oldCombatStats = character.characterSheet.combat.melee[_skillName] as CombatStats;
           expect(response.data.changes.old.combatStats).toStrictEqual(_oldCombatStats);
-          expect(response.data.changes.new.combatStats).toStrictEqual({
-            ..._oldCombatStats,
-            available: expect.any(Number),
-          });
-
           const availableCombatPointsNew =
             _oldCombatStats.availablePoints +
             (response.data.changes.new.skill.current - response.data.changes.old.skill.current) +
             (response.data.changes.new.skill.mod - response.data.changes.old.skill.mod);
-          expect(response.data.changes.new.combatStats!.availablePoints).toBe(availableCombatPointsNew);
+          expect(response.data.changes.new.combatStats).toStrictEqual({
+            ..._oldCombatStats,
+            availablePoints: availableCombatPointsNew,
+          });
         } else {
           // Verify no combat category/stats for non-combat skills
           expect(response.data.combatCategory).toBeUndefined();
