@@ -26,7 +26,9 @@ executors:
 workflows:
   build-deploy:
     when:
-      not: << pipeline.parameters.delete-services >>
+      and:
+        - not: << pipeline.parameters.delete-services >>
+        - not: << pipeline.parameters.run-component-tests >>
     jobs:
       - check-format-files
       - lint-typescript-code
