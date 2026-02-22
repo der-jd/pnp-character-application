@@ -6,26 +6,25 @@ import {
   HistoryRecord,
 } from "api-spec";
 import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
-import { setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 import { INVALID_UUID } from "../shared.js";
+import { TestContext, TestContextFactory } from "../test-context-factory.js";
 
 describe.sequential("patch-history-record component tests", () => {
+  let context: TestContext;
   let currentResponse: PatchHistoryRecordResponse | undefined;
-  let apiClient: ApiClient;
 
   beforeAll(async () => {
-    await setupTestContext();
-    apiClient = getTestContext().apiClient;
+    context = await TestContextFactory.createContext();
   });
 
   afterAll(async () => {
-    await cleanUpTestContext();
+    await TestContextFactory.cleanupContext(context);
   });
 
   afterEach(async () => {
     await updateAndVerifyTestContextAfterEachTest(
+      context,
       currentResponse,
       () => {
         // No character update necessary
@@ -46,14 +45,14 @@ describe.sequential("patch-history-record component tests", () => {
   describe("Invalid requests", () => {
     commonInvalidTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
-        const latestRecord = getTestContext().lastHistoryRecord;
+        const character = context.character;
+        const latestRecord = context.lastHistoryRecord;
 
-        const authorizationHeader = _case.authorizationHeader ?? getTestContext().authorizationHeader;
+        const authorizationHeader = _case.authorizationHeader ?? context.authorizationHeader;
         const path = _case.characterId
           ? `characters/${_case.characterId}/history/${latestRecord.id}`
           : `characters/${character.characterId}/history/${latestRecord.id}`;
-        const client = new ApiClient(getTestContext().apiBaseUrl, authorizationHeader);
+        const client = new ApiClient(context.apiBaseUrl, authorizationHeader);
 
         await expectApiError(
           () =>
@@ -67,11 +66,11 @@ describe.sequential("patch-history-record component tests", () => {
     });
 
     test("record id is not a uuid", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/history/${INVALID_UUID}`, {
+          context.apiClient.patch(`characters/${character.characterId}/history/${INVALID_UUID}`, {
             comment: "comment",
           }),
         400,
@@ -80,11 +79,11 @@ describe.sequential("patch-history-record component tests", () => {
     });
 
     test("record id not found", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/history/190b1c74-9dd9-4dee-b739-4c58dade9da8`, {
+          context.apiClient.patch(`characters/${character.characterId}/history/190b1c74-9dd9-4dee-b739-4c58dade9da8`, {
             comment: "comment",
           }),
         404,
@@ -93,12 +92,12 @@ describe.sequential("patch-history-record component tests", () => {
     });
 
     test("history comment exceeds maximum length", async () => {
-      const character = getTestContext().character;
-      const latestRecord = getTestContext().lastHistoryRecord;
+      const character = context.character;
+      const latestRecord = context.lastHistoryRecord;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/history/${latestRecord.id}`, {
+          context.apiClient.patch(`characters/${character.characterId}/history/${latestRecord.id}`, {
             comment: "x".repeat(MAX_STRING_LENGTH_VERY_LONG + 1),
           }),
         400,
@@ -115,16 +114,16 @@ describe.sequential("patch-history-record component tests", () => {
 
   describe("Idempotency", () => {
     test("same patch request multiple times produces identical result", async () => {
-      const character = getTestContext().character;
-      const latestRecord = getTestContext().lastHistoryRecord;
-      const latestBlockNumber = getTestContext().latestHistoryBlockNumber;
+      const character = context.character;
+      const latestRecord = context.lastHistoryRecord;
+      const latestBlockNumber = context.latestHistoryBlockNumber;
 
       const patchRequest = {
         comment: latestRecord.comment,
       };
 
       const response = patchHistoryRecordResponseSchema.parse(
-        await apiClient.patch(`characters/${character.characterId}/history/${latestRecord.id}`, patchRequest),
+        await context.apiClient.patch(`characters/${character.characterId}/history/${latestRecord.id}`, patchRequest),
       );
       /**
        * Notice: The response is not stored in the currentResponse variable
@@ -162,9 +161,9 @@ describe.sequential("patch-history-record component tests", () => {
 
     testCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
-        const latestRecord = getTestContext().lastHistoryRecord;
-        const latestBlockNumber = getTestContext().latestHistoryBlockNumber;
+        const character = context.character;
+        const latestRecord = context.lastHistoryRecord;
+        const latestBlockNumber = context.latestHistoryBlockNumber;
 
         // Replace "latest" with actual block number if needed
         const queryParams =
@@ -174,7 +173,7 @@ describe.sequential("patch-history-record component tests", () => {
         const _comment = `This is a component test comment - ${new Date().toISOString()}`;
 
         const response = patchHistoryRecordResponseSchema.parse(
-          await apiClient.patch(
+          await context.apiClient.patch(
             `characters/${character.characterId}/history/${latestRecord.id}`,
             {
               comment: _comment,

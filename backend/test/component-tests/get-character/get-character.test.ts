@@ -1,20 +1,18 @@
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { getCharacterResponseSchema } from "api-spec";
 import { expectApiError, commonInvalidTestCases } from "../shared.js";
-import { setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
+import { TestContext, TestContextFactory } from "../test-context-factory.js";
 
 describe.sequential("get-character component tests", () => {
-  let apiClient: ApiClient;
+  let context: TestContext;
 
   beforeAll(async () => {
-    await setupTestContext();
-    apiClient = getTestContext().apiClient;
+    context = await TestContextFactory.createContext();
   });
 
   afterAll(async () => {
-    await cleanUpTestContext();
+    await TestContextFactory.cleanupContext(context);
   });
 
   /**
@@ -26,11 +24,11 @@ describe.sequential("get-character component tests", () => {
   describe("Invalid requests", () => {
     commonInvalidTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
 
-        const authorizationHeader = _case.authorizationHeader ?? getTestContext().authorizationHeader;
+        const authorizationHeader = _case.authorizationHeader ?? context.authorizationHeader;
         const path = _case.characterId ? `characters/${_case.characterId}` : `characters/${character.characterId}`;
-        const client = new ApiClient(getTestContext().apiBaseUrl, authorizationHeader);
+        const client = new ApiClient(context.apiBaseUrl, authorizationHeader);
 
         await expectApiError(() => client.get(path), _case.expectedStatusCode, _case.expectedErrorMessage);
       });
@@ -52,9 +50,11 @@ describe.sequential("get-character component tests", () => {
 
     validTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
 
-        const response = getCharacterResponseSchema.parse(await apiClient.get(`characters/${character.characterId}`));
+        const response = getCharacterResponseSchema.parse(
+          await context.apiClient.get(`characters/${character.characterId}`),
+        );
 
         // Verify character data matches
         expect(response).toStrictEqual(character);

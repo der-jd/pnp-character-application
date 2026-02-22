@@ -1,20 +1,18 @@
 import { describe, expect, test, beforeAll, afterAll } from "vitest";
 import { getHistoryResponseSchema, HistoryBlock } from "api-spec";
 import { expectApiError, commonInvalidTestCases } from "../shared.js";
-import { setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
+import { TestContext, TestContextFactory } from "../test-context-factory.js";
 
 describe.sequential("get-history component tests", () => {
-  let apiClient: ApiClient;
+  let context: TestContext;
 
   beforeAll(async () => {
-    await setupTestContext();
-    apiClient = getTestContext().apiClient;
+    context = await TestContextFactory.createContext();
   });
 
   afterAll(async () => {
-    await cleanUpTestContext();
+    await TestContextFactory.cleanupContext(context);
   });
 
   /**
@@ -26,13 +24,13 @@ describe.sequential("get-history component tests", () => {
   describe("Invalid requests", () => {
     commonInvalidTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
 
-        const authorizationHeader = _case.authorizationHeader ?? getTestContext().authorizationHeader;
+        const authorizationHeader = _case.authorizationHeader ?? context.authorizationHeader;
         const path = _case.characterId
           ? `characters/${_case.characterId}/history`
           : `characters/${character.characterId}/history`;
-        const client = new ApiClient(getTestContext().apiBaseUrl, authorizationHeader);
+        const client = new ApiClient(context.apiBaseUrl, authorizationHeader);
 
         await expectApiError(() => client.get(path), _case.expectedStatusCode, _case.expectedErrorMessage);
       });
@@ -40,7 +38,7 @@ describe.sequential("get-history component tests", () => {
 
     test("invalid block number query - non-numeric", async () => {
       await expectApiError(
-        () => apiClient.get(`characters/${getTestContext().character.characterId}/history`, { "block-number": "abc" }),
+        () => context.apiClient.get(`characters/${context.character.characterId}/history`, { "block-number": "abc" }),
         400,
         "Invalid input values",
       );
@@ -48,7 +46,7 @@ describe.sequential("get-history component tests", () => {
 
     test("invalid block number query - negative", async () => {
       await expectApiError(
-        () => apiClient.get(`characters/${getTestContext().character.characterId}/history`, { "block-number": "-1" }),
+        () => context.apiClient.get(`characters/${context.character.characterId}/history`, { "block-number": "-1" }),
         400,
         "Invalid input values",
       );
@@ -56,7 +54,7 @@ describe.sequential("get-history component tests", () => {
 
     test("invalid block number query - zero", async () => {
       await expectApiError(
-        () => apiClient.get(`characters/${getTestContext().character.characterId}/history`, { "block-number": "0" }),
+        () => context.apiClient.get(`characters/${context.character.characterId}/history`, { "block-number": "0" }),
         400,
         "Invalid input values",
       );
@@ -65,7 +63,7 @@ describe.sequential("get-history component tests", () => {
     test("invalid block number query - too large", async () => {
       await expectApiError(
         () =>
-          apiClient.get(`characters/${getTestContext().character.characterId}/history`, { "block-number": "100001" }),
+          context.apiClient.get(`characters/${context.character.characterId}/history`, { "block-number": "100001" }),
         400,
         "Invalid input values",
       );
@@ -81,14 +79,14 @@ describe.sequential("get-history component tests", () => {
   describe("Valid requests", () => {
     test("successfully get latest history", async () => {
       const response = getHistoryResponseSchema.parse(
-        await apiClient.get(`characters/${getTestContext().character.characterId}/history`),
+        await context.apiClient.get(`characters/${context.character.characterId}/history`),
       );
 
       expect(response.items.length).toBeGreaterThan(0);
 
       // Check that all history items have the same character id as the input
       response.items.forEach((historyBlock: HistoryBlock) => {
-        expect(historyBlock.characterId).toBe(getTestContext().character.characterId);
+        expect(historyBlock.characterId).toBe(context.character.characterId);
       });
 
       // Initial history block has no previous block
@@ -104,19 +102,19 @@ describe.sequential("get-history component tests", () => {
 
     test("successfully get specific history block", async () => {
       const latest = getHistoryResponseSchema.parse(
-        await apiClient.get(`characters/${getTestContext().character.characterId}/history`),
+        await context.apiClient.get(`characters/${context.character.characterId}/history`),
       );
       const blockNumber = latest.items[0].blockNumber;
 
       const response = getHistoryResponseSchema.parse(
-        await apiClient.get(`characters/${getTestContext().character.characterId}/history`, {
+        await context.apiClient.get(`characters/${context.character.characterId}/history`, {
           "block-number": blockNumber,
         }),
       );
 
       expect(response.items.length).toBe(1);
       expect(response.items[0].blockNumber).toBe(blockNumber);
-      expect(response.items[0].characterId).toBe(getTestContext().character.characterId);
+      expect(response.items[0].characterId).toBe(context.character.characterId);
     });
   });
 });

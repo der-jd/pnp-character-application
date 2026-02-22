@@ -6,15 +6,13 @@ import {
   PostCharacterCloneResponse,
   Character,
 } from "api-spec";
-import { expectApiError, commonInvalidTestCases } from "../shared.js";
-import { setupTestContext, cleanUpTestContext, deleteCharacter } from "../setup.js";
-import { getTestContext, setTestContext } from "../test-context.js";
+import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
 import { ApiClient } from "../api-client.js";
-import { updateAndVerifyTestContextAfterEachTest } from "../shared.js";
+import { TestContext, TestContextFactory } from "../test-context-factory.js";
 
 describe.sequential("post-character-clone component tests", () => {
+  let context: TestContext;
   let currentResponse: PostCharacterCloneResponse | undefined;
-  let apiClient: ApiClient;
 
   async function fetchAllHistoryBlocks(characterId: string): Promise<HistoryBlock[]> {
     const allBlocks: HistoryBlock[] = [];
@@ -22,7 +20,7 @@ describe.sequential("post-character-clone component tests", () => {
 
     do {
       const response = getHistoryResponseSchema.parse(
-        await apiClient.get(
+        await context.apiClient.get(
           `characters/${characterId}/history`,
           currentBlockNumber ? { "block-number": currentBlockNumber } : undefined,
         ),
@@ -39,12 +37,11 @@ describe.sequential("post-character-clone component tests", () => {
   }
 
   beforeAll(async () => {
-    await setupTestContext();
-    apiClient = getTestContext().apiClient;
+    context = await TestContextFactory.createContext();
   });
 
   afterAll(async () => {
-    await cleanUpTestContext();
+    await TestContextFactory.cleanupContext(context);
   });
 
   /**
@@ -56,9 +53,10 @@ describe.sequential("post-character-clone component tests", () => {
    * from this test suite so that it is cleaned up in the afterAll hook.
    */
   afterEach(async () => {
-    const _characterFromTestSuite = getTestContext().character;
+    const _characterFromTestSuite = context.character;
 
     await updateAndVerifyTestContextAfterEachTest(
+      context,
       currentResponse,
       (response: PostCharacterCloneResponse, character: Character) => {
         character.characterId = response.characterId;
@@ -71,15 +69,13 @@ describe.sequential("post-character-clone component tests", () => {
 
     // Delete the cloned character from the test case
     if (currentResponse) {
-      await deleteCharacter(currentResponse.characterId);
+      await TestContextFactory.deleteCharacter(context.apiClient, currentResponse.characterId);
     }
 
     currentResponse = undefined;
 
     // Enable cleanup of the character from this test suite in the afterAll hook
-    setTestContext({
-      character: _characterFromTestSuite,
-    });
+    context.character = _characterFromTestSuite;
   });
 
   /**
@@ -91,13 +87,13 @@ describe.sequential("post-character-clone component tests", () => {
   describe("Invalid requests", () => {
     commonInvalidTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
 
-        const authorizationHeader = _case.authorizationHeader ?? getTestContext().authorizationHeader;
+        const authorizationHeader = _case.authorizationHeader ?? context.authorizationHeader;
         const path = _case.characterId
           ? `characters/${_case.characterId}/clone`
           : `characters/${character.characterId}/clone`;
-        const client = new ApiClient(getTestContext().apiBaseUrl, authorizationHeader);
+        const client = new ApiClient(context.apiBaseUrl, authorizationHeader);
 
         await expectApiError(
           () =>
@@ -120,20 +116,20 @@ describe.sequential("post-character-clone component tests", () => {
   describe("Valid requests", () => {
     test("successfully clone an own character", async () => {
       const response = postCharacterCloneResponseSchema.parse(
-        await apiClient.post(`characters/${getTestContext().character.characterId}/clone`, {
-          userIdOfCharacter: getTestContext().character.userId,
+        await context.apiClient.post(`characters/${context.character.characterId}/clone`, {
+          userIdOfCharacter: context.character.userId,
         }),
       );
       currentResponse = response;
 
-      expect(response.characterId).not.toBe(getTestContext().character.characterId);
-      expect(response.userId).toBe(getTestContext().character.userId);
-      expect(response.name).not.toBe(getTestContext().character.characterSheet.generalInformation.name);
+      expect(response.characterId).not.toBe(context.character.characterId);
+      expect(response.userId).toBe(context.character.userId);
+      expect(response.name).not.toBe(context.character.characterSheet.generalInformation.name);
       expect(response.name).toContain("Copy");
-      expect(response.level).toBe(getTestContext().character.characterSheet.generalInformation.level);
+      expect(response.level).toBe(context.character.characterSheet.generalInformation.level);
 
       // Verify the character history has been copied as well
-      const originalHistory = await fetchAllHistoryBlocks(getTestContext().character.characterId);
+      const originalHistory = await fetchAllHistoryBlocks(context.character.characterId);
       const clonedHistory = await fetchAllHistoryBlocks(response.characterId);
 
       expect(clonedHistory.length).toBe(originalHistory.length);

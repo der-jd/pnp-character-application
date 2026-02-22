@@ -13,25 +13,24 @@ import {
   HistoryRecord,
 } from "api-spec";
 import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
-import { setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
+import { TestContext, TestContextFactory } from "../test-context-factory.js";
 
 describe.sequential("patch-attribute component tests", () => {
+  let context: TestContext;
   let currentResponse: PatchAttributeResponse | undefined;
-  let apiClient: ApiClient;
 
   beforeAll(async () => {
-    await setupTestContext();
-    apiClient = getTestContext().apiClient;
+    context = await TestContextFactory.createContext();
   });
 
   afterAll(async () => {
-    await cleanUpTestContext();
+    await TestContextFactory.cleanupContext(context);
   });
 
   afterEach(async () => {
     await updateAndVerifyTestContextAfterEachTest(
+      context,
       currentResponse,
       (response: PatchAttributeResponse, character: Character) => {
         character.characterSheet.attributes[response.data.attributeName as keyof CharacterSheet["attributes"]] =
@@ -79,13 +78,13 @@ describe.sequential("patch-attribute component tests", () => {
   describe("Invalid requests", () => {
     commonInvalidTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
 
-        const authorizationHeader = _case.authorizationHeader ?? getTestContext().authorizationHeader;
+        const authorizationHeader = _case.authorizationHeader ?? context.authorizationHeader;
         const path = _case.characterId
           ? `characters/${_case.characterId}/attributes/endurance`
           : `characters/${character.characterId}/attributes/endurance`;
-        const client = new ApiClient(getTestContext().apiBaseUrl, authorizationHeader);
+        const client = new ApiClient(context.apiBaseUrl, authorizationHeader);
 
         await expectApiError(
           () =>
@@ -102,11 +101,11 @@ describe.sequential("patch-attribute component tests", () => {
     });
 
     test("passed initial start attribute value doesn't match the value in the backend", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
+          context.apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             start: {
               initialValue: character.characterSheet.attributes.endurance.start + 1,
               newValue: character.characterSheet.attributes.endurance.current + 2,
@@ -118,11 +117,11 @@ describe.sequential("patch-attribute component tests", () => {
     });
 
     test("passed initial current attribute value doesn't match the value in the backend", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
+          context.apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
               initialValue: character.characterSheet.attributes.endurance.current + 1,
               increasedPoints: 1,
@@ -134,11 +133,11 @@ describe.sequential("patch-attribute component tests", () => {
     });
 
     test("passed initial mod attribute value doesn't match the value in the backend", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
+          context.apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             mod: {
               initialValue: character.characterSheet.attributes.endurance.mod + 1,
               newValue: character.characterSheet.attributes.endurance.mod + 2,
@@ -150,11 +149,11 @@ describe.sequential("patch-attribute component tests", () => {
     });
 
     test("not enough attribute points", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
+          context.apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
               initialValue: character.characterSheet.attributes.endurance.current,
               increasedPoints: 60,
@@ -166,11 +165,11 @@ describe.sequential("patch-attribute component tests", () => {
     });
 
     test("increased points are 0", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
+          context.apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
               initialValue: character.characterSheet.attributes.endurance.current,
               increasedPoints: 0,
@@ -182,11 +181,11 @@ describe.sequential("patch-attribute component tests", () => {
     });
 
     test("increased points are negative", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
+          context.apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
               initialValue: character.characterSheet.attributes.endurance.current,
               increasedPoints: -1,
@@ -240,11 +239,11 @@ describe.sequential("patch-attribute component tests", () => {
 
     idempotentTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
         const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
+          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
         /**
          * Notice: The response is not stored in the currentResponse variable
@@ -377,11 +376,11 @@ describe.sequential("patch-attribute component tests", () => {
 
     updateTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
         const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
+          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
         currentResponse = response;
 
@@ -606,11 +605,11 @@ describe.sequential("patch-attribute component tests", () => {
 
     baseValuesTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
         const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
+          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
         currentResponse = response;
 
@@ -772,11 +771,11 @@ describe.sequential("patch-attribute component tests", () => {
 
     combatStatsTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
         const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
+          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
         currentResponse = response;
 

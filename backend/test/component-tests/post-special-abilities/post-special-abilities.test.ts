@@ -8,29 +8,24 @@ import {
   HistoryRecord,
 } from "api-spec";
 import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
-import { setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
-
-export function makeUniqueName(prefix: string): string {
-  return `${prefix}-${getTestContext().character?.characterId}-${randomUUID().slice(0, 8)}`;
-}
+import { TestContextFactory, TestContext } from "../test-context-factory.js";
 
 describe.sequential("post-special-abilities component tests", () => {
+  let context: TestContext;
   let currentResponse: PostSpecialAbilitiesResponse | undefined;
-  let apiClient: ApiClient;
 
   beforeAll(async () => {
-    await setupTestContext();
-    apiClient = getTestContext().apiClient;
+    context = await TestContextFactory.createContext();
   });
 
   afterAll(async () => {
-    await cleanUpTestContext();
+    await TestContextFactory.cleanupContext(context);
   });
 
   afterEach(async () => {
     await updateAndVerifyTestContextAfterEachTest(
+      context,
       currentResponse,
       (response: PostSpecialAbilitiesResponse, character: Character) => {
         character.characterSheet.specialAbilities = response.data.specialAbilities.new.values;
@@ -44,6 +39,10 @@ describe.sequential("post-special-abilities component tests", () => {
     currentResponse = undefined;
   });
 
+  function makeUniqueName(prefix: string): string {
+    return `${prefix}-${context.character?.characterId}-${randomUUID().slice(0, 8)}`;
+  }
+
   /**
    * =============================
    * Invalid requests
@@ -53,13 +52,13 @@ describe.sequential("post-special-abilities component tests", () => {
   describe("Invalid requests", () => {
     commonInvalidTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
 
-        const authorizationHeader = _case.authorizationHeader ?? getTestContext().authorizationHeader;
+        const authorizationHeader = _case.authorizationHeader ?? context.authorizationHeader;
         const path = _case.characterId
           ? `characters/${_case.characterId}/special-abilities`
           : `characters/${character.characterId}/special-abilities`;
-        const client = new ApiClient(getTestContext().apiBaseUrl, authorizationHeader);
+        const client = new ApiClient(context.apiBaseUrl, authorizationHeader);
 
         await expectApiError(
           () =>
@@ -75,7 +74,7 @@ describe.sequential("post-special-abilities component tests", () => {
     test("special ability name exceeds max length", async () => {
       await expectApiError(
         () =>
-          apiClient.post(`characters/${getTestContext().character.characterId}/special-abilities`, {
+          context.apiClient.post(`characters/${context.character.characterId}/special-abilities`, {
             specialAbility: "x".repeat(MAX_STRING_LENGTH_DEFAULT + 1),
           }),
         400,
@@ -92,14 +91,14 @@ describe.sequential("post-special-abilities component tests", () => {
 
   describe("Idempotent requests", () => {
     test("special ability already exists (idempotency)", async () => {
-      const ability = getTestContext().character.characterSheet.specialAbilities[0];
-      const character = getTestContext().character;
+      const ability = context.character.characterSheet.specialAbilities[0];
+      const character = context.character;
 
       expect(ability).toBeDefined();
       expect(ability).not.toBe("");
 
       const response = postSpecialAbilitiesResponseSchema.parse(
-        await apiClient.post(`characters/${character.characterId}/special-abilities`, {
+        await context.apiClient.post(`characters/${character.characterId}/special-abilities`, {
           specialAbility: ability,
         }),
       );
@@ -129,10 +128,10 @@ describe.sequential("post-special-abilities component tests", () => {
   describe("Update requests", () => {
     test("add new special ability", async () => {
       const ability = makeUniqueName("ComponentAbility");
-      const character = getTestContext().character;
+      const character = context.character;
 
       const response = postSpecialAbilitiesResponseSchema.parse(
-        await apiClient.post(`characters/${character.characterId}/special-abilities`, {
+        await context.apiClient.post(`characters/${character.characterId}/special-abilities`, {
           specialAbility: ability,
         }),
       );

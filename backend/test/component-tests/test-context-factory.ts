@@ -95,13 +95,17 @@ export class TestContextFactory {
   }
 
   static async cleanupContext(context: TestContext): Promise<void> {
+    this.deleteCharacter(context.apiClient, context.character.characterId);
+  }
+
+  static async deleteCharacter(apiClient: ApiClient, characterId: string) {
     try {
-      const response = await context.apiClient.delete(`characters/${context.character.characterId}`);
+      const response = await apiClient.delete(`characters/${characterId}`);
       deleteCharacterResponseSchema.parse(response);
-      console.log(`Deleted character ${context.character.characterId}`);
+      console.log(`Deleted character ${characterId}`);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`Failed to delete character ${context.character.characterId}`, message);
+      console.error(`Failed to delete character ${characterId}`, message);
       throw error;
     }
   }
