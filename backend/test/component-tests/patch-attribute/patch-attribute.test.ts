@@ -575,7 +575,7 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "courage",
         attributeEffects: {
           mentalHealth: 3,
-          initiativeBaseValue: 1,
+          initiativeBaseValue: 2,
           attackBaseValue: 6,
         },
         getBody: (character: Character) => ({
