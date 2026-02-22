@@ -9,7 +9,7 @@ import {
 } from "api-spec";
 import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext, setTestContext } from "../test-context.js";
+import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
 export function makeUniqueName(prefix: string): string {
@@ -35,7 +35,7 @@ describe.sequential("post-special-abilities component tests", () => {
       },
       (response: PostSpecialAbilitiesResponse, record: HistoryRecord) => {
         if (response.historyRecord) {
-          record = response.historyRecord;
+          Object.assign(record, response.historyRecord);
         }
       },
     );

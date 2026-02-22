@@ -7,7 +7,7 @@ import {
 } from "api-spec";
 import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext, setTestContext } from "../test-context.js";
+import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 import { INVALID_UUID } from "../shared.js";
 

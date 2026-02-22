@@ -43,7 +43,7 @@ describe.sequential("patch-skill component tests", () => {
       },
       (response: PatchSkillResponse, record: HistoryRecord) => {
         if (response.historyRecord) {
-          record = response.historyRecord;
+          Object.assign(record, response.historyRecord);
         }
       },
     );

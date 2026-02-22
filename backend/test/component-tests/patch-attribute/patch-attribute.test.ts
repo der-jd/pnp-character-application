@@ -61,7 +61,7 @@ describe.sequential("patch-attribute component tests", () => {
       },
       (response: PatchAttributeResponse, record: HistoryRecord) => {
         if (response.historyRecord) {
-          record = response.historyRecord;
+          Object.assign(record, response.historyRecord);
         }
       },
     );
