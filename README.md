@@ -19,6 +19,54 @@ Serverless web application for characters of a custom Pen & Paper game.
 - Run `terraform init` in the `/terraform` working directory to initialize Terraform
   - Rerun this command if a module or backend configuration for Terraform is set or changed. This will then reinitialize the working directory
 
+## API Schema Testing
+
+This project includes comprehensive multi-environment API schema testing to ensure API compatibility between frontend and backend across all deployment stages.
+
+### Quick Start
+
+```bash
+# Complete setup and run LocalStack tests
+npm run api-schema-tests
+```
+
+### Multi-Environment Testing
+
+```bash
+# Test against LocalStack (fast, local development)
+npm run api-schema-tests:localstack
+
+# Test against production backend (automatically reads terraform_output)
+npm run api-schema-tests:prod
+
+# Run full test suite: LocalStack
+npm run api-schema-tests:all
+```
+
+**CircleCI Integration**: The pipeline automatically runs API schema validation against LocalStack and production. Set `USER_TEST` and `CHARACTER_TEST` environment variables in CircleCI for production testing.
+
+### Individual Commands
+
+```bash
+# Setup LocalStack infrastructure
+npm run api-schema-tests:setup
+
+# Run basic LocalStack tests
+npm run api-schema-tests:run
+
+# Clean up LocalStack environment
+npm run api-schema-tests:clean
+```
+
+### Environment-Specific Testing
+
+```bash
+# Advanced usage with options
+./scripts/run-api-schema-tests-env.sh --env=prod --verbose
+```
+
+📚 **[Full API Schema Testing Guide →](API_SCHEMA_TESTING_GUIDE.md)**
+
 ## Tech stack
 
 - [Amazon Web Services (AWS)](https://aws.amazon.com/) as cloud provider for the infrastructure

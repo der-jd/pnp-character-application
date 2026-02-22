@@ -18,6 +18,7 @@ workflows:
       - lint-typescript-code
       - build-backend
       - run-backend-tests
+      - run-frontend-tests
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
           requires:
@@ -25,11 +26,15 @@ workflows:
             - lint-typescript-code
             - build-backend
             - run-backend-tests
+            - run-frontend-tests
             - lint-terraform-code
       - build-and-deploy-frontend:
           requires:
             - check-format-files
             - lint-typescript-code
+            - deploy-backend-and-infrastructure
+      - run-api-schema-tests:
+          requires:
             - deploy-backend-and-infrastructure
 
   delete-services:
@@ -40,10 +45,13 @@ workflows:
 jobs:
   check-format-files:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: small
     steps:
       - checkout
+      - run:
+          name: Clear npm cache
+          command: npm cache clean --force
       - run:
           name: Install dependencies
           command: npm ci
@@ -63,7 +71,7 @@ jobs:
 
   lint-typescript-code:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: small
     steps:
       - checkout
@@ -76,7 +84,7 @@ jobs:
 
   build-backend:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: medium
     steps:
       - checkout
@@ -100,7 +108,7 @@ jobs:
 
   run-backend-tests:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: medium
     steps:
       - checkout
@@ -118,9 +126,30 @@ jobs:
             cd backend
             npm run test
 
+  run-frontend-tests:
+    docker:
+      - image: cimg/node:22.12
+    resource_class: medium
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - run:
+          name: Build api-spec package
+          command: |
+            cd api-spec
+            npm run build
+
+      - run:
+          name: Run frontend tests
+          command: |
+            cd frontend
+            npm run test:run
+
   lint-terraform-code:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: small
     steps:
       - checkout
@@ -158,6 +187,12 @@ jobs:
             cd terraform
             terraform apply -auto-approve tfapply
       - run:
+          name: Add CircleCI OIDC token for API testing
+          command: |
+            cd terraform
+            # Use CircleCI OIDC token for API authentication (simpler than Cognito)
+            echo "export CIRCLECI_OIDC_TOKEN=\"$CIRCLE_OIDC_TOKEN\"" >> terraform_output
+      - run:
           name: Persist Terraform output for frontend
           command: |
             cd terraform
@@ -172,7 +207,7 @@ jobs:
 
   build-and-deploy-frontend:
     docker:
-      - image: cimg/node:22.10
+      - image: cimg/node:22.12
     resource_class: medium
     steps:
       - checkout
@@ -213,6 +248,34 @@ jobs:
           key: frontend-cache-{{ .Branch }}-{{ checksum "./commit" }}
           paths:
             - frontend/checksum.txt
+
+  run-api-schema-tests:
+    docker:
+      - image: cimg/node:22.12
+    resource_class: medium
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - run:
+          name: Run API schema tests
+          command: |
+            # Get Jwt for API tests
+            source ~/project/terraform/terraform_output
+
+            # Run production tests if config available
+            if [ -n "$USER_TEST" ] && [ -n "$CHARACTER_TEST" ]; then
+              echo "Running production API schema validation..."
+              npm run api-schema-tests:prod
+            else
+              exit 1
+            fi
+      - run:
+          name: Cleanup
+          command: npm run api-schema-tests:clean
 
   terraform-destroy:
     docker:

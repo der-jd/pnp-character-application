@@ -460,7 +460,7 @@ describe("Valid requests", () => {
 
       if (_case.request.body.current) {
         expect(parsedBody.changes.new.skill.current).toBe(
-          _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
+          _case.request.body.current.initialValue + _case.request.body.current.increasedPoints
         );
         expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
       }
@@ -781,7 +781,7 @@ describe("Valid requests", () => {
 
       if (_case.request.body.current) {
         expect(parsedBody.changes.new.skill.current).toBe(
-          _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
+          _case.request.body.current.initialValue + _case.request.body.current.increasedPoints
         );
         expect(parsedBody.learningMethod).toBe(_case.request.body.learningMethod);
 
@@ -838,7 +838,7 @@ describe("Valid requests", () => {
         const combatStatsOld = getCombatStats(
           fakeCharacterResponse.Item.characterSheet.combat,
           combatCategory,
-          skillName,
+          skillName
         );
         expect(parsedBody.changes.old.combatStats).toStrictEqual(combatStatsOld);
         expect(parsedBody.changes.new.combatStats.handling).toBe(combatStatsOld.handling);

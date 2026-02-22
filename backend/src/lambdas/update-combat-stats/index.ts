@@ -50,7 +50,7 @@ export async function _updateCombatStats(request: Request): Promise<APIGatewayPr
     console.log(
       `Update skilled attack/parade value of combat skill '${combatCategory}/${combatSkillName}' from ` +
         `${params.body.skilledAttackValue.initialValue}/${params.body.skilledParadeValue.initialValue} to ` +
-        `${params.body.skilledAttackValue.initialValue + params.body.skilledAttackValue.increasedPoints}/${params.body.skilledParadeValue.initialValue + params.body.skilledParadeValue.increasedPoints}`,
+        `${params.body.skilledAttackValue.initialValue + params.body.skilledAttackValue.increasedPoints}/${params.body.skilledParadeValue.initialValue + params.body.skilledParadeValue.increasedPoints}`
     );
 
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
@@ -71,7 +71,7 @@ export async function _updateCombatStats(request: Request): Promise<APIGatewayPr
         characterSheet.baseValues,
         combatStatsOld,
         params.body.skilledAttackValue.increasedPoints,
-        params.body.skilledParadeValue.increasedPoints,
+        params.body.skilledParadeValue.increasedPoints
       );
 
       if (!combatStatsChanged(combatStatsOld, combatStats)) {
@@ -83,7 +83,7 @@ export async function _updateCombatStats(request: Request): Promise<APIGatewayPr
         params.pathParams["character-id"],
         combatCategory,
         combatSkillName,
-        combatStats,
+        combatStats
       );
     }
 

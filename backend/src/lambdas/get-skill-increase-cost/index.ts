@@ -46,7 +46,7 @@ export async function getSkillCost(request: Request): Promise<APIGatewayProxyRes
     const skillCategory = params.pathParams["skill-category"] as SkillCategory;
 
     console.log(
-      `Get increase cost for skill '${skillCategory}/${skillName}' (learning method '${params.queryParams["learning-method"]}') of character ${params.pathParams["character-id"]} of user ${params.userId}`,
+      `Get increase cost for skill '${skillCategory}/${skillName}' (learning method '${params.queryParams["learning-method"]}') of character ${params.pathParams["character-id"]} of user ${params.userId}`
     );
 
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
@@ -55,7 +55,7 @@ export async function getSkillCost(request: Request): Promise<APIGatewayProxyRes
     const defaultCostCategory = getSkill(characterSheet.skills, skillCategory, skillName).defaultCostCategory;
     const adjustedCostCategory = adjustCostCategory(
       defaultCostCategory,
-      parseLearningMethod(params.queryParams["learning-method"]),
+      parseLearningMethod(params.queryParams["learning-method"])
     );
     const skillValue = getSkill(characterSheet.skills, skillCategory, skillName).current;
 

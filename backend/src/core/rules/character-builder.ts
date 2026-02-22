@@ -126,27 +126,27 @@ export class CharacterBuilder {
       skills: {
         combat: this.createSkillObjectsFromSkillNames(
           "combat",
-          combatSkills.map((skill) => getSkillCategoryAndName(skill).name),
+          combatSkills.map((skill) => getSkillCategoryAndName(skill).name)
         ) as CharacterSheet["skills"]["combat"],
         body: this.createSkillObjectsFromSkillNames(
           "body",
-          this.getBodySkillNames(),
+          this.getBodySkillNames()
         ) as CharacterSheet["skills"]["body"],
         social: this.createSkillObjectsFromSkillNames(
           "social",
-          this.getSocialSkillNames(),
+          this.getSocialSkillNames()
         ) as CharacterSheet["skills"]["social"],
         nature: this.createSkillObjectsFromSkillNames(
           "nature",
-          this.getNatureSkillNames(),
+          this.getNatureSkillNames()
         ) as CharacterSheet["skills"]["nature"],
         knowledge: this.createSkillObjectsFromSkillNames(
           "knowledge",
-          this.getKnowledgeSkillNames(),
+          this.getKnowledgeSkillNames()
         ) as CharacterSheet["skills"]["knowledge"],
         handcraft: this.createSkillObjectsFromSkillNames(
           "handcraft",
-          this.getHandcraftSkillNames(),
+          this.getHandcraftSkillNames()
         ) as CharacterSheet["skills"]["handcraft"],
       },
       combat: {
@@ -239,7 +239,7 @@ export class CharacterBuilder {
           this.characterSheet.baseValues,
           this.characterSheet.combat[combatCategory][
             combatSkillName as keyof CombatSection[typeof combatCategory]
-          ] as CombatStats,
+          ] as CombatStats
         );
     }
   }
@@ -248,7 +248,7 @@ export class CharacterBuilder {
     return Object.fromEntries(
       skillNames.map((skillName) => {
         return [skillName, this.zeroSkill(`${skillCategory}/${skillName}` as SkillNameWithCategory)];
-      }),
+      })
     );
   }
 
@@ -274,7 +274,7 @@ export class CharacterBuilder {
 
   private setAdvantages(advantages: Advantages): void {
     console.log(
-      `Set advantages ${advantages.map(([name, info, value]) => `[${advantagesEnumToString(name)}, ${info}, ${value}]`).join(", ")}`,
+      `Set advantages ${advantages.map(([name, info, value]) => `[${advantagesEnumToString(name)}, ${info}, ${value}]`).join(", ")}`
     );
 
     for (const advantage of advantages) {
@@ -373,7 +373,7 @@ export class CharacterBuilder {
           if (forbiddenSkills.includes(knowledgeSkillName)) {
             throw new HttpError(
               400,
-              `Skills ${forbiddenSkills.join(", ")} cannot be selected as a bonus for advantage 'COLLEGE_EDUCATION'. Passed skill name: ${knowledgeSkillName}`,
+              `Skills ${forbiddenSkills.join(", ")} cannot be selected as a bonus for advantage 'COLLEGE_EDUCATION'. Passed skill name: ${knowledgeSkillName}`
             );
           }
 
@@ -394,13 +394,13 @@ export class CharacterBuilder {
 
   private setDisadvantages(disadvantages: Disadvantages): void {
     console.log(
-      `Set disadvantages ${disadvantages.map(([name, info, value]) => `[${disadvantagesEnumToString(name)}, ${info}, ${value}]`).join(", ")}`,
+      `Set disadvantages ${disadvantages.map(([name, info, value]) => `[${disadvantagesEnumToString(name)}, ${info}, ${value}]`).join(", ")}`
     );
 
     for (const disadvantage of disadvantages) {
       const [name, , value] = disadvantage;
       const isInvalid = !DISADVANTAGES.some(
-        ([disadvName, , disadvValue]) => disadvName === name && disadvValue === value,
+        ([disadvName, , disadvValue]) => disadvName === name && disadvValue === value
       );
       if (isInvalid) {
         throw new HttpError(400, `Invalid disadvantage: [${name}, ${value}]`);
@@ -412,7 +412,7 @@ export class CharacterBuilder {
     if (this.generationPointsThroughDisadvantages > MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES) {
       throw new HttpError(
         400,
-        `Generation points through disadvantages exceed maximum allowed: ${MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES}`,
+        `Generation points through disadvantages exceed maximum allowed: ${MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES}`
       );
     }
 
@@ -456,7 +456,7 @@ export class CharacterBuilder {
             if (this.characterSheet.skills.knowledge[skillName].defaultCostCategory > MAX_COST_CATEGORY) {
               throw new HttpError(
                 500,
-                `Cost category for knowledge skill '${skillName}' exceeds maximum allowed: ${MAX_COST_CATEGORY}`,
+                `Cost category for knowledge skill '${skillName}' exceeds maximum allowed: ${MAX_COST_CATEGORY}`
               );
             }
           }
@@ -482,7 +482,7 @@ export class CharacterBuilder {
     if (spentAttributePoints !== ATTRIBUTE_POINTS_FOR_CREATION) {
       throw new HttpError(
         400,
-        `Expected ${ATTRIBUTE_POINTS_FOR_CREATION} distributed attribute points, but got ${spentAttributePoints} points.`,
+        `Expected ${ATTRIBUTE_POINTS_FOR_CREATION} distributed attribute points, but got ${spentAttributePoints} points.`
       );
     }
 
@@ -527,7 +527,7 @@ export class CharacterBuilder {
     if (this.spentGenerationPoints > this.totalGenerationPoints) {
       throw new HttpError(
         400,
-        `Generation points spent on advantages (${this.spentGenerationPoints}) exceed available generation points (${this.totalGenerationPoints}).`,
+        `Generation points spent on advantages (${this.spentGenerationPoints}) exceed available generation points (${this.totalGenerationPoints}).`
       );
     }
 
@@ -537,8 +537,6 @@ export class CharacterBuilder {
   }
 
   activateSkills(activatedSkills: ActivatedSkills): this {
-    console.log("Activate skills for free:", activatedSkills);
-
     for (const skill of activatedSkills) {
       try {
         const { category, name } = getSkillCategoryAndName(skill);
@@ -557,8 +555,6 @@ export class CharacterBuilder {
   }
 
   setStartValuesOfCombatSkills(combatSkills: CombatSkillsStartValues): this {
-    console.log("Set start values of combat skills");
-
     for (const [skillName, start] of Object.entries(combatSkills)) {
       this.characterSheet.skills.combat[skillName as CombatSkillName].start += start;
       this.characterSheet.skills.combat[skillName as CombatSkillName].current += start;

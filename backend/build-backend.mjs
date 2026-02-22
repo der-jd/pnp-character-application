@@ -48,7 +48,7 @@ async function buildLambdas() {
     // Build each Lambda function
     const buildPromises = lambdaNames.map(async (lambdaName) => {
       const entryPoint = join(lambdasSrcDir, lambdaName, "index.ts");
-      const outfile = join(lambdasBuildDir, lambdaName, "index.mjs");
+      const outfile = join(lambdasBuildDir, lambdaName, "index.js");
 
       console.log(`📦 Building ${lambdaName}...`);
 
@@ -58,7 +58,7 @@ async function buildLambdas() {
         bundle: true,
         platform: "node",
         target: "node20",
-        format: "esm",
+        format: "cjs",
         outfile: outfile,
         external: [
           // AWS SDK is provided by Lambda runtime
@@ -69,11 +69,14 @@ async function buildLambdas() {
         sourcemap: false, // needed for debugging
         resolveExtensions: [".ts", ".js", ".mjs"],
         // Handle the current import paths
-        conditions: ["import", "node"],
-        mainFields: ["module", "main"],
-        // Fix for dynamic require issue in ESM
+        conditions: ["require", "node"],
+        mainFields: ["main", "module"],
+        // Ensure proper CommonJS exports
         banner: {
-          js: 'import { createRequire } from "module"; const require = createRequire(import.meta.url);',
+          js: '"use strict";',
+        },
+        footer: {
+          js: 'if (typeof exports.handler === "undefined" && typeof handler !== "undefined") { exports.handler = handler; }',
         },
       });
 

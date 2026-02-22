@@ -1,6 +1,7 @@
 import { AllCharactersReply } from "../models/allCharacters/interface";
 import { Character } from "../models/Character/character";
-import { SkillIncreaseReply, SkillIncreaseRequest } from "../models/skills/interface";
+import { SkillIncreaseRequest } from "../models/skills/interface";
+import { PatchSkillResponse } from "api-spec";
 import { HistoryReply } from "../models/history/interface";
 import { AttributeIncreaseReply, AttributeIncreaseRequest } from "../models/attributes/interface";
 import { BaseValueIncreaseReply, BaseValueIncreaseRequest } from "../models/baseValues/interface";
@@ -18,7 +19,7 @@ export class ApiError extends Error {
   constructor(
     public message: string,
     public statusCode: string,
-    public body: string,
+    public body: string
   ) {
     super(message);
     this.name = "ApiError";
@@ -30,7 +31,7 @@ async function makeRequest<ReturnType, BodyType>(
   idToken: string,
   endpoint_url: string,
   method: HttpMethod,
-  body: BodyType,
+  body: BodyType
 ): Promise<ReturnType>;
 
 /**
@@ -44,7 +45,7 @@ async function makeRequest<ReturnType, BodyType>(
   idToken: string,
   endpoint_url: string,
   method: HttpMethod,
-  body?: BodyType,
+  body?: BodyType
 ): Promise<ReturnType> {
   const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/${endpoint_url}`;
   if (!idToken) {
@@ -122,10 +123,10 @@ export async function increaseSkill(
   charId: string,
   name: string,
   category: string,
-  body: SkillIncreaseRequest,
-): Promise<SkillIncreaseReply> {
+  body: SkillIncreaseRequest
+): Promise<PatchSkillResponse> {
   const endpoint_url = `characters/${charId}/skills/${category}/${name}`;
-  return await patch<SkillIncreaseReply, SkillIncreaseRequest>(idToken, endpoint_url, body);
+  return await patch<PatchSkillResponse, SkillIncreaseRequest>(idToken, endpoint_url, body);
 }
 
 /**
@@ -139,7 +140,7 @@ export async function increaseAttribute(
   idToken: string,
   charId: string,
   name: string,
-  body: AttributeIncreaseRequest,
+  body: AttributeIncreaseRequest
 ): Promise<AttributeIncreaseReply> {
   const endpoint_url = `characters/${charId}/attributes/${name}`;
   return await patch<AttributeIncreaseReply, AttributeIncreaseRequest>(idToken, endpoint_url, body);
@@ -156,7 +157,7 @@ export async function increaseBaseValue(
   idToken: string,
   charId: string,
   name: string,
-  body: BaseValueIncreaseRequest,
+  body: BaseValueIncreaseRequest
 ): Promise<BaseValueIncreaseReply> {
   const endpoint_url = `characters/${charId}/base-values/${name}`;
   return patch<BaseValueIncreaseReply, BaseValueIncreaseRequest>(idToken, endpoint_url, body);
@@ -167,7 +168,7 @@ export async function increaseCombatValue(
   charId: string,
   name: string,
   category: string,
-  body: CombatValueIncreaseRequest,
+  body: CombatValueIncreaseRequest
 ): Promise<CombatValueIncreaseReply> {
   const endpoint_url = `characters/${charId}/combat-values/${category}/${name}`;
   return patch<CombatValueIncreaseReply, CombatValueIncreaseRequest>(idToken, endpoint_url, body);
@@ -197,7 +198,7 @@ export async function getHistory(idToken: string, id: string): Promise<HistoryRe
  * @returns A History reply containing the requested block
  */
 export async function getHistoryBlock(idToken: string, id: string, blockNumber: number): Promise<HistoryReply> {
-  const endpoint_url = `characters/${id}/history?${blockNumber}`;
+  const endpoint_url = `characters/${id}/history?block-number=${blockNumber}`;
   return get<HistoryReply>(idToken, endpoint_url);
 }
 

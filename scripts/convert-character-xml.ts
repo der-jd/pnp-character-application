@@ -331,7 +331,7 @@ async function main(): Promise<void> {
   const computedAP = characterSheet.calculationPoints.adventurePoints.available;
   if (lastAPFromHistory !== null && lastAPFromHistory !== computedAP) {
     warnings.push(
-      `Adventure points mismatch: computed from totalCost = ${computedAP}, last history entry = ${lastAPFromHistory}`,
+      `Adventure points mismatch: computed from totalCost = ${computedAP}, last history entry = ${lastAPFromHistory}`
     );
   }
   characterSheet.generalInformation.levelUpProgress = buildLevelUpProgressFromHistory(historyEntries);
@@ -358,7 +358,7 @@ async function main(): Promise<void> {
   flushInfoBlocks();
 
   warnings.push(
-    "Please compare the converted character sheet and history against the original source data; conversion may contain errors and requires manual verification.",
+    "Please compare the converted character sheet and history against the original source data; conversion may contain errors and requires manual verification."
   );
 
   console.log(`Character JSON written to ${characterOutPath}`);
@@ -527,7 +527,7 @@ function aggregateCombatSkillModEntries(entries: HistoryEntry[], warnings: strin
     const fallbackNewValue = asText(state.lastEntry.new_value);
     if (state.oldValue === null || state.newValue === null) {
       warnings.push(
-        `Incomplete Gewürfelte Begabung history data for combat skill '${state.displayName}', using available values`,
+        `Incomplete Gewürfelte Begabung history data for combat skill '${state.displayName}', using available values`
       );
     }
     const replacement: HistoryEntry = {
@@ -607,7 +607,7 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
   const professionSkill = mapGeneralInformationSkill(professionSkillName);
   if (!professionSkill) {
     warnings.push(
-      `Unknown profession skill '${professionSkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`,
+      `Unknown profession skill '${professionSkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`
     );
   }
   const resolvedProfessionSkill: SkillNameWithCategory = professionSkill ?? DEFAULT_GENERAL_INFORMATION_SKILL;
@@ -746,7 +746,7 @@ function extractActivatedSkills(sheet: XmlCharacterSheet, warnings: string[]): S
 
   if (activatedSkills.length > NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION) {
     warnings.push(
-      `Activated skills exceed maximum (${NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION}), truncating additional entries`,
+      `Activated skills exceed maximum (${NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION}), truncating additional entries`
     );
     return activatedSkills.slice(0, NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION);
   }
@@ -788,14 +788,14 @@ function createEmptyCharacterSheet(): CharacterSheet {
       const names = Object.keys(characterSheetSchema.shape.skills.shape[category].shape) as SkillName[];
       const skillEntries = names.map((name) => [name, zeroSkill(`${category}/${name}` as SkillNameWithCategory)]);
       return [category, Object.fromEntries(skillEntries)];
-    }),
+    })
   ) as CharacterSheet["skills"];
 
   const combatZero = Object.fromEntries(
     Object.keys(COMBAT_SKILL_HANDLING).map((skill) => {
       const name = skill as CombatSkillName;
       return [name, zeroCombatStats(name)];
-    }),
+    })
   ) as Record<CombatSkillName, CombatStats>;
 
   return {
@@ -1008,7 +1008,7 @@ function applyCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSh
         stats,
         category,
         characterSheet.skills.combat[skillName as CombatSkillName],
-        baseValues,
+        baseValues
       );
     }
   }
@@ -1021,13 +1021,13 @@ function applyCombatSkillEntry(
   category: CombatCategory,
   characterSheet: CharacterSheet,
   baseValues: BaseValues,
-  warnings: string[],
+  warnings: string[]
 ): number {
   const name = normalizeLabel(asText(entry.name));
   const combatSkillName = COMBAT_SKILL_MAP[name];
   if (!combatSkillName) {
     warnings.push(
-      `Unknown combat skill '${name}', skipping. Please update COMBAT_SKILL_MAP in the script to include this entry`,
+      `Unknown combat skill '${name}', skipping. Please update COMBAT_SKILL_MAP in the script to include this entry`
     );
     return 0;
   }
@@ -1058,7 +1058,7 @@ function applyCombatSkillEntry(
     },
     category,
     characterSheet.skills.combat[combatSkillName],
-    baseValues,
+    baseValues
   );
 
   combatCategory[combatSkillName] = updatedCombatStats;
@@ -1069,7 +1069,7 @@ function recalculateCombatStats(
   stats: CombatStats,
   category: CombatCategory,
   skill: Skill,
-  baseValues: BaseValues,
+  baseValues: BaseValues
 ): CombatStats {
   const availablePoints =
     stats.handling + (skill.current + skill.mod) - (stats.skilledAttackValue + stats.skilledParadeValue);
@@ -1122,7 +1122,7 @@ function applyProfessionOrHobbyBonus(
   characterSheet: CharacterSheet,
   skillName: SkillNameWithCategory,
   bonus: number,
-  warnings: string[],
+  warnings: string[]
 ): void {
   const { category, name } = splitSkill(skillName);
   if (category === "combat") {
@@ -1151,7 +1151,7 @@ function getSkillCategorySection(skills: CharacterSheet["skills"], category: Ski
 
 function getCombatCategorySection(
   combat: CharacterSheet["combat"],
-  category: CombatCategory,
+  category: CombatCategory
 ): Record<string, CombatStats> {
   return combat[category] as Record<string, CombatStats>;
 }
@@ -1201,7 +1201,7 @@ function mapDisadvantages(disadvantages: string[], warnings: string[]): Characte
     const infoOverride = enumValue === DisadvantagesNames.FEAR_OF ? rawName : info;
     if (enumValue === DisadvantagesNames.FEAR_OF) {
       warnings.push(
-        `FEAR_OF disadvantage detected ('${rawName}'). Please manually enter the specific matter of fear in the resulting character JSON.`,
+        `FEAR_OF disadvantage detected ('${rawName}'). Please manually enter the specific matter of fear in the resulting character JSON.`
       );
     }
     result.push([enumValue, infoOverride, value]);
@@ -1230,7 +1230,7 @@ function extractCollegeSkillName(entries: HistoryEntry[]): string | null {
 function patchCollegeEducationSkillName(
   characterSheet: CharacterSheet,
   collegeSkillName: string | null,
-  warnings: string[],
+  warnings: string[]
 ): void {
   const index = characterSheet.advantages.findIndex(([name]) => name === AdvantagesNames.COLLEGE_EDUCATION);
   if (index === -1) {
@@ -1238,7 +1238,7 @@ function patchCollegeEducationSkillName(
   }
   if (!collegeSkillName) {
     warnings.push(
-      `COLLEGE_EDUCATION advantage detected but no skill name found in history. Please manually enter the skill name in the resulting character JSON.`,
+      `COLLEGE_EDUCATION advantage detected but no skill name found in history. Please manually enter the skill name in the resulting character JSON.`
     );
     return;
   }
@@ -1246,7 +1246,7 @@ function patchCollegeEducationSkillName(
   const mappedSkillName = mappedSkill?.startsWith("knowledge/") ? mappedSkill.replace("knowledge/", "") : null;
   if (!mappedSkillName) {
     warnings.push(
-      `COLLEGE_EDUCATION: unknown knowledge skill '${collegeSkillName}', using raw value. Please manually correct the skill name in the resulting character JSON.`,
+      `COLLEGE_EDUCATION: unknown knowledge skill '${collegeSkillName}', using raw value. Please manually correct the skill name in the resulting character JSON.`
     );
   }
   const [enumValue, , value] = characterSheet.advantages[index];
@@ -1270,7 +1270,7 @@ function buildHistoryRecords(
   entries: HistoryEntry[],
   characterSheet: CharacterSheet,
   warnings: string[],
-  startingNumber = 1,
+  startingNumber = 1
 ): HistoryRecord[] {
   const records: HistoryRecord[] = [];
   let number = startingNumber;
@@ -1379,7 +1379,7 @@ function getEarliestHistoryTimestamp(entries: HistoryEntry[]): string {
 function buildCharacterCreatedRecord(
   characterSheet: CharacterSheet,
   activatedSkills: SkillNameWithCategory[],
-  timestamp: string,
+  timestamp: string
 ): HistoryRecord {
   return {
     type: RecordType.CHARACTER_CREATED,
@@ -1551,7 +1551,7 @@ function fillCalculationPointsRecord(
   record: HistoryRecord,
   entry: HistoryEntry,
   name: string,
-  warnings: string[],
+  warnings: string[]
 ): void {
   const oldAvailable = toInt(entry.old_calculation_points_available);
   const newAvailable = toInt(entry.new_calculation_points_available);
@@ -1581,7 +1581,7 @@ function fillBaseValueRecord(
   oldValueText: string,
   newValueText: string,
   characterSheet: CharacterSheet,
-  warnings: string[],
+  warnings: string[]
 ): void {
   const key = BASE_VALUE_MAP[normalizeLabel(name)];
   if (!key) {
@@ -1615,7 +1615,7 @@ function fillAttributeRecord(
   oldValueText: string,
   newValueText: string,
   characterSheet: CharacterSheet,
-  warnings: string[],
+  warnings: string[]
 ): void {
   const key = ATTRIBUTE_MAP[normalizeLabel(name)];
   if (!key) {
@@ -1642,7 +1642,7 @@ function fillSkillRecord(
   newValueText: string,
   comment: string | null,
   characterSheet: CharacterSheet,
-  warnings: string[],
+  warnings: string[]
 ): void {
   const normalizedName = normalizeLabel(name);
   const mappedNonCombat = mapNonCombatSkill(normalizedName);
@@ -1693,7 +1693,7 @@ function fillCombatStatsRecord(
   oldValueText: string,
   newValueText: string,
   characterSheet: CharacterSheet,
-  warnings: string[],
+  warnings: string[]
 ): void {
   const combatSkillName = COMBAT_SKILL_MAP[normalizeLabel(name)];
   if (!combatSkillName) {
@@ -1730,7 +1730,7 @@ function fillCombatStatsRecord(
     },
     category,
     skill,
-    characterSheet.baseValues,
+    characterSheet.baseValues
   );
 
   const newStats = recalculateCombatStats(
@@ -1741,7 +1741,7 @@ function fillCombatStatsRecord(
     },
     category,
     skill,
-    characterSheet.baseValues,
+    characterSheet.baseValues
   );
 
   record.data.old = oldStats;
@@ -1753,7 +1753,7 @@ function fillSpecialAbilityRecord(
   typeLabel: string,
   name: string,
   oldValueText: string,
-  newValueText: string,
+  newValueText: string
 ): void {
   const normalizedType = normalizeLabel(typeLabel);
   let value = newValueText || name;
@@ -1802,7 +1802,7 @@ function estimateItemSize(item: unknown): number {
 
 function buildHistoryBlocks(
   records: HistoryRecord[],
-  characterId: string,
+  characterId: string
 ): Array<{
   blockNumber: number;
   blockId: string;

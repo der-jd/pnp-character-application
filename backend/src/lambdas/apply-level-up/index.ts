@@ -54,7 +54,7 @@ export async function _applyLevelUp(request: Request): Promise<APIGatewayProxyRe
     const characterSheet = character.characterSheet;
 
     console.log(
-      `Apply level-up to level ${params.body.initialLevel + 1} for character ${characterId} of user ${params.userId}`,
+      `Apply level-up to level ${params.body.initialLevel + 1} for character ${characterId} of user ${params.userId}`
     );
     console.log("Chosen effect:", params.body.effect.kind);
 
@@ -67,7 +67,7 @@ export async function _applyLevelUp(request: Request): Promise<APIGatewayProxyRe
 
     const options = computeLevelUpOptions(
       characterSheet.generalInformation.level + 1,
-      characterSheet.generalInformation.levelUpProgress,
+      characterSheet.generalInformation.levelUpProgress
     );
 
     if (invalidLevelUpOptions(params, options)) {

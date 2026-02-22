@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   combatStatsSchema,
   RecordType,
-  Record,
+  Record as HistoryRecord,
   historyBlockSchema,
   skillChangeSchema,
   attributeChangeSchema,
@@ -88,10 +88,10 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
     const items = await getHistoryItems(
       params.characterId,
       false, // Sort descending to get highest block number (latest item) first
-      1, // Only need the top result
+      1 // Only need the top result
     );
 
-    let record: Record;
+    let record: HistoryRecord;
     if (!items || items.length === 0) {
       console.log("No history found for the given character id");
 
@@ -139,7 +139,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       const recordSize = estimateItemSize(record);
       if (blockSize + recordSize > MAX_ITEM_SIZE) {
         console.log(
-          `Latest block with the new record (total size ~${blockSize + recordSize} bytes) would exceed the maximum allowed size of ${MAX_ITEM_SIZE} bytes/block`,
+          `Latest block with the new record (total size ~${blockSize + recordSize} bytes) would exceed the maximum allowed size of ${MAX_ITEM_SIZE} bytes/block`
         );
 
         const newBlock: HistoryBlock = {
@@ -237,13 +237,13 @@ async function validateRequest(request: Request): Promise<Parameters> {
   }
 }
 
-function estimateItemSize(item: any): number {
+function estimateItemSize(item: Record<string, unknown>): number {
   const marshalled = marshall(item);
   const json = JSON.stringify(marshalled);
   return Buffer.byteLength(json, "utf8");
 }
 
-function isDuplicate(record_1: Record, record_2: Record): boolean {
+function isDuplicate(record_1: HistoryRecord, record_2: HistoryRecord): boolean {
   const isDuplicate =
     record_1.type === record_2.type &&
     record_1.name === record_2.name &&

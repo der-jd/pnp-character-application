@@ -148,13 +148,12 @@ resource "aws_api_gateway_integration_response" "step_function" {
   response_parameters = var.integration_response_parameters
   response_templates = {
     "application/json" = <<EOT
-    ## --- Handle error case for step function ---
     #set($output = $util.parseJson($input.path('$.output')))
-    #if($output.errorMessage != "")
-        #set($errorJsonObject = $util.parseJson($output.errorMessage))
+    #set($errorJson = $output.errorMessage)
+    #if($errorJson != "")
+        #set($errorJsonObject = $util.parseJson($errorJson))
         #set($context.responseOverride.status = $errorJsonObject.statusCode)
-        $output.errorMessage
-    ## --- Handle success case for step function ---
+        $errorJson
     #else
         #set($context.responseOverride.status = $output.statusCode)
         $output.body

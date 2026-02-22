@@ -108,7 +108,7 @@ export function computeLevelUpOptionsHash(levelUpOptions: LevelUpOption[]): stri
 
 export function planApplyLevelUp(characterSheet: CharacterSheet, effect: EffectByLevelUp): LevelUpChange {
   console.log(
-    `Plan apply level-up with effect '${effect.kind}' to level ${characterSheet.generalInformation.level + 1}`,
+    `Plan apply level-up with effect '${effect.kind}' to level ${characterSheet.generalInformation.level + 1}`
   );
   const newBaseValues: Partial<BaseValues> = {};
   const baseValues = characterSheet.baseValues;

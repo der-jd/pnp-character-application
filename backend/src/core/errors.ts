@@ -37,9 +37,10 @@ export function isZodError(error: unknown): boolean {
 }
 
 export function logZodError(error: unknown): void {
-  const issues = (error as any).issues ?? (error as any).errors;
+  const errorObj = error as { issues?: unknown[]; errors?: unknown };
+  const issues = errorObj.issues ?? errorObj.errors;
   if (Array.isArray(issues)) {
-    issues.forEach((issue: any) => {
+    issues.forEach((issue: unknown) => {
       console.error("Zod validation error:", issue);
     });
   } else {

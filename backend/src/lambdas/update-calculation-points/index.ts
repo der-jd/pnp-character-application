@@ -148,7 +148,7 @@ function updateStartValue(calculationPoints: CalculationPoints, startValue: Init
 
 function updateTotalValue(calculationPoints: CalculationPoints, totalValue: InitialIncreased): CalculationPoints {
   console.log(
-    `Update total calculation points from ${totalValue.initialValue} to ${totalValue.initialValue + totalValue.increasedPoints}`,
+    `Update total calculation points from ${totalValue.initialValue} to ${totalValue.initialValue + totalValue.increasedPoints}`
   );
 
   if (

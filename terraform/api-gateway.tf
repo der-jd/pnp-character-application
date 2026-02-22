@@ -591,7 +591,9 @@ resource "aws_api_gateway_deployment" "api_deployment" {
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   triggers = {
-    redeployment = md5(file("api-gateway.tf")) // TODO changes in the tf modules are not detected and the required redeployment is not triggered
+    redeployment = md5(file("api-gateway.tf"))
+    # Force redeployment to pick up VTL template changes
+    module_update = md5(file("modules/apigw_stepfunction_integration/main.tf"))
   }
 
   lifecycle {
