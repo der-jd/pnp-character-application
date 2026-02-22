@@ -6,6 +6,7 @@ import {
   CombatStats,
   HistoryRecordType,
   PatchSkillHistoryRecord,
+  Character,
 } from "api-spec";
 import { expectApiError, verifyCharacterState, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
@@ -86,8 +87,8 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             start: {
-              initialValue: 5,
-              newValue: 8,
+              initialValue: character.characterSheet.skills.body.athletics.start + 2,
+              newValue: character.characterSheet.skills.body.athletics.start + 4,
             },
           }),
         409,
@@ -102,7 +103,7 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             current: {
-              initialValue: 10,
+              initialValue: character.characterSheet.skills.body.athletics.current + 3,
               increasedPoints: 15,
             },
             learningMethod: "NORMAL",
@@ -119,8 +120,8 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             mod: {
-              initialValue: 7,
-              newValue: 10,
+              initialValue: character.characterSheet.skills.body.athletics.mod + 1,
+              newValue: character.characterSheet.skills.body.athletics.mod + 4,
             },
           }),
         409,
@@ -135,8 +136,8 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
             start: {
-              initialValue: 0,
-              newValue: 6,
+              initialValue: character.characterSheet.skills.nature.fishing.start,
+              newValue: character.characterSheet.skills.nature.fishing.start + 1,
             },
           }),
         409,
@@ -151,7 +152,7 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
             current: {
-              initialValue: 0,
+              initialValue: character.characterSheet.skills.nature.fishing.current,
               increasedPoints: 1,
             },
             learningMethod: "NORMAL",
@@ -168,8 +169,8 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
             mod: {
-              initialValue: 0,
-              newValue: 5,
+              initialValue: character.characterSheet.skills.nature.fishing.mod,
+              newValue: character.characterSheet.skills.nature.fishing.mod + 1,
             },
           }),
         409,
@@ -184,7 +185,7 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/combat/slashingWeaponsSharp1h`, {
             current: {
-              initialValue: 1,
+              initialValue: character.characterSheet.skills.combat.slashingWeaponsSharp1h.current,
               increasedPoints: 300,
             },
             learningMethod: "EXPENSIVE",
@@ -201,7 +202,7 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             current: {
-              initialValue: 12,
+              initialValue: character.characterSheet.skills.body.athletics.current,
               increasedPoints: 0,
             },
             learningMethod: "NORMAL",
@@ -218,7 +219,7 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             current: {
-              initialValue: 12,
+              initialValue: character.characterSheet.skills.body.athletics.current,
               increasedPoints: -3,
             },
             learningMethod: "NORMAL",
@@ -235,7 +236,7 @@ describe.sequential("patch-skill component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             current: {
-              initialValue: 12,
+              initialValue: character.characterSheet.skills.body.athletics.current,
               increasedPoints: 1,
             },
           }),
@@ -255,117 +256,108 @@ describe.sequential("patch-skill component tests", () => {
     const idempotentTestCases = [
       {
         name: "skill already activated (idempotency)",
-        request: {
-          skillCategory: "body",
-          skillName: "athletics",
-          body: {
-            activated: true,
-            learningMethod: "NORMAL",
-          },
-        },
+        skillCategory: "body",
+        skillName: "athletics",
+        getBody: () => ({
+          activated: true,
+          learningMethod: "NORMAL",
+        }),
       },
       {
         name: "skill has already been updated to the target start value (idempotency)",
-        request: {
-          skillCategory: "body",
-          skillName: "athletics",
-          body: {
-            start: {
-              initialValue: 5,
-              newValue: 9,
-            },
+        skillCategory: "body",
+        skillName: "athletics",
+        getBody: (character: Character) => ({
+          start: {
+            initialValue: character.characterSheet.skills.body.athletics.start - 2,
+            newValue: character.characterSheet.skills.body.athletics.start,
           },
-        },
+        }),
       },
       {
         name: "skill has already been increased to the target current value (idempotency)",
-        request: {
-          skillCategory: "body",
-          skillName: "athletics",
-          body: {
-            current: {
-              initialValue: 8,
-              increasedPoints: 4,
-            },
-            learningMethod: "NORMAL",
+        skillCategory: "body",
+        skillName: "athletics",
+        getBody: (character: Character) => ({
+          current: {
+            initialValue: character.characterSheet.skills.body.athletics.current - 4,
+            increasedPoints: 4,
           },
-        },
+          learningMethod: "NORMAL",
+        }),
       },
       {
         name: "combat skill has already been increased to the target current value (idempotency)",
-        request: {
-          skillCategory: "combat",
-          skillName: "slashingWeaponsBlunt2h",
-          body: {
-            current: {
-              initialValue: 10,
-              increasedPoints: 4,
-            },
-            learningMethod: "NORMAL",
+        skillCategory: "combat",
+        skillName: "slashingWeaponsBlunt2h",
+        getBody: (character: Character) => ({
+          current: {
+            initialValue: character.characterSheet.skills.combat.slashingWeaponsBlunt2h.current - 4,
+            increasedPoints: 4,
           },
-        },
+          learningMethod: "NORMAL",
+        }),
       },
       {
         name: "skill has already been updated to the target mod value (idempotency)",
-        request: {
-          skillCategory: "body",
-          skillName: "athletics",
-          body: {
-            mod: {
-              initialValue: 1,
-              newValue: 2,
-            },
+        skillCategory: "body",
+        skillName: "athletics",
+        getBody: (character: Character) => ({
+          mod: {
+            initialValue: character.characterSheet.skills.body.athletics.mod - 1,
+            newValue: character.characterSheet.skills.body.athletics.mod,
           },
-        },
+        }),
       },
     ];
 
     idempotentTestCases.forEach((_case) => {
       test(_case.name, async () => {
         const character = getTestContext().character;
+        const body = _case.getBody(character);
 
         const response = patchSkillResponseSchema.parse(
           await apiClient.patch(
-            `characters/${character.characterId}/skills/${_case.request.skillCategory}/${_case.request.skillName}`,
-            _case.request.body,
+            `characters/${character.characterId}/skills/${_case.skillCategory}/${_case.skillName}`,
+            body,
           ),
         );
 
         // Verify response structure
         expect(response.data.userId).toBe(character.userId);
         expect(response.data.characterId).toBe(character.characterId);
-        expect(response.data.skillCategory).toBe(_case.request.skillCategory);
-        expect(response.data.skillName).toBe(_case.request.skillName);
+        expect(response.data.skillCategory).toBe(_case.skillCategory);
+        expect(response.data.skillName).toBe(_case.skillName);
 
         // Verify idempotency - no history record
         expect(response.historyRecord).toBeNull();
 
         // Verify learning method if present
-        if (_case.request.body.learningMethod) {
-          expect(response.data.learningMethod).toBe(_case.request.body.learningMethod);
+        if ("learningMethod" in body) {
+          expect(response.data.learningMethod).toBe(body.learningMethod);
         }
 
         // Verify skill value updates
-        if (_case.request.body.activated) {
-          expect(response.data.changes.new.skill.activated).toBe(_case.request.body.activated);
+        if ("activated" in body) {
+          expect(response.data.changes.new.skill.activated).toBe(body.activated);
         }
 
-        if (_case.request.body.start) {
-          expect(response.data.changes.new.skill.start).toBe(_case.request.body.start.newValue);
+        if ("start" in body) {
+          expect(response.data.changes.new.skill.start).toBe(body.start.newValue);
         }
 
-        if (_case.request.body.current) {
-          const expectedCurrent = _case.request.body.current.initialValue + _case.request.body.current.increasedPoints;
+        if ("current" in body) {
+          const expectedCurrent = body.current.initialValue + body.current.increasedPoints;
           expect(response.data.changes.new.skill.current).toBe(expectedCurrent);
         }
 
-        if (_case.request.body.mod) {
-          expect(response.data.changes.new.skill.mod).toBe(_case.request.body.mod.newValue);
+        if ("mod" in body) {
+          expect(response.data.changes.new.skill.mod).toBe(body.mod.newValue);
         }
 
         expect(response.data.changes.old.skill).toStrictEqual(
-          character.characterSheet.skills[_case.request.skillCategory as keyof CharacterSheet["skills"]][
-            _case.request.skillName as keyof CharacterSheet["skills"][keyof CharacterSheet["skills"]]
+          character.characterSheet.skills[_case.skillCategory as keyof CharacterSheet["skills"]][
+            _case.skillName as keyof CharacterSheet["skills"][keyof CharacterSheet["skills"]]
           ],
         );
         expect(response.data.changes.new.skill).toStrictEqual(response.data.changes.old.skill);
@@ -381,7 +373,7 @@ describe.sequential("patch-skill component tests", () => {
         expect(diffAvailableAdventurePoints).toBeCloseTo(diffSkillTotalCost);
 
         if (response.data.increaseCost) {
-          if (_case.request.skillCategory === "combat") {
+          if (_case.skillCategory === "combat") {
             // Below first cost threshold for combat skills
             expect(response.data.increaseCost).toBe(2);
           } else {
@@ -391,7 +383,7 @@ describe.sequential("patch-skill component tests", () => {
         }
 
         // Verify combat category/stats
-        if (_case.request.skillCategory === "combat") {
+        if (_case.skillCategory === "combat") {
           expect(response.data.combatCategory).toBe("melee"); // Our request data is a melee combat skill
         } else {
           expect(response.data.combatCategory).toBeUndefined();
@@ -418,166 +410,144 @@ describe.sequential("patch-skill component tests", () => {
     const updateTestCases = [
       {
         name: "activate skill (cost category: FREE)",
-        request: {
-          skillCategory: "nature",
-          skillName: "fishing",
-          body: {
-            activated: true,
-            learningMethod: "FREE",
-          },
-        },
+        skillCategory: "nature",
+        skillName: "fishing",
+        getBody: () => ({
+          activated: true,
+          learningMethod: "FREE",
+        }),
         expectedCosts: 0,
       },
       {
         name: "activate skill (cost category: LOW_PRICED)",
-        request: {
-          skillCategory: "nature",
-          skillName: "trapping",
-          body: {
-            activated: true,
-            learningMethod: "LOW_PRICED",
-          },
-        },
+        skillCategory: "nature",
+        skillName: "trapping",
+        getBody: () => ({
+          activated: true,
+          learningMethod: "LOW_PRICED",
+        }),
         expectedCosts: 40,
       },
       {
         name: "activate skill (cost category: NORMAL)",
-        request: {
-          skillCategory: "social",
-          skillName: "convincing",
-          body: {
-            activated: true,
-            learningMethod: "NORMAL",
-          },
-        },
+        skillCategory: "social",
+        skillName: "convincing",
+        getBody: () => ({
+          activated: true,
+          learningMethod: "NORMAL",
+        }),
         expectedCosts: 50,
       },
       {
         name: "activate skill (cost category: EXPENSIVE)",
-        request: {
-          skillCategory: "body",
-          skillName: "riding",
-          body: {
-            activated: true,
-            learningMethod: "EXPENSIVE",
-          },
-        },
+        skillCategory: "body",
+        skillName: "riding",
+        getBody: () => ({
+          activated: true,
+          learningMethod: "EXPENSIVE",
+        }),
         expectedCosts: 60,
       },
       {
         name: "update start skill value",
-        request: {
-          skillCategory: "body",
-          skillName: "athletics",
-          body: {
-            start: {
-              initialValue: 9,
-              newValue: 15,
-            },
+        skillCategory: "body",
+        skillName: "athletics",
+        getBody: (character: Character) => ({
+          start: {
+            initialValue: character.characterSheet.skills.body.athletics.start,
+            newValue: character.characterSheet.skills.body.athletics.start + 6,
           },
-        },
+        }),
         expectedCosts: 0,
       },
       {
         name: "increase current skill value by 3 points (cost category: FREE)",
-        request: {
-          skillCategory: "body",
-          skillName: "athletics",
-          body: {
-            current: {
-              initialValue: 12,
-              increasedPoints: 3,
-            },
-            learningMethod: "FREE",
+        skillCategory: "body",
+        skillName: "athletics",
+        getBody: (character: Character) => ({
+          current: {
+            initialValue: character.characterSheet.skills.body.athletics.current,
+            increasedPoints: 3,
           },
-        },
+          learningMethod: "FREE",
+        }),
         expectedCosts: 0,
       },
       {
         name: "increase current skill value by 3 points (cost category: LOW_PRICED)",
-        request: {
-          skillCategory: "body",
-          skillName: "athletics",
-          body: {
-            current: {
-              initialValue: 15,
-              increasedPoints: 3,
-            },
-            learningMethod: "LOW_PRICED",
+        skillCategory: "body",
+        skillName: "athletics",
+        getBody: (character: Character) => ({
+          current: {
+            initialValue: character.characterSheet.skills.body.athletics.current,
+            increasedPoints: 3,
           },
-        },
-        expectedCosts: 1.5,
+          learningMethod: "LOW_PRICED",
+        }),
+        expectedCosts: 1.5, // Assuming the skill is below the first cost threshold
       },
       {
         name: "increase current skill value by 3 points (cost category: EXPENSIVE)",
-        request: {
-          skillCategory: "body",
-          skillName: "athletics",
-          body: {
-            current: {
-              initialValue: 18,
-              increasedPoints: 3,
-            },
-            learningMethod: "EXPENSIVE",
+        skillCategory: "body",
+        skillName: "athletics",
+        getBody: (character: Character) => ({
+          current: {
+            initialValue: character.characterSheet.skills.body.athletics.current,
+            increasedPoints: 3,
           },
-        },
-        expectedCosts: 6,
+          learningMethod: "EXPENSIVE",
+        }),
+        expectedCosts: 6, // Assuming the skill is below the first cost threshold
       },
       {
         name: "update mod value",
-        request: {
-          skillCategory: "body",
-          skillName: "athletics",
-          body: {
-            mod: {
-              initialValue: 2,
-              newValue: 7,
-            },
+        skillCategory: "body",
+        skillName: "athletics",
+        getBody: (character: Character) => ({
+          mod: {
+            initialValue: character.characterSheet.skills.body.athletics.mod,
+            newValue: character.characterSheet.skills.body.athletics.mod + 5,
           },
-        },
+        }),
         expectedCosts: 0,
       },
       {
         name: "update all skill values (activated, start, current, mod)",
-        request: {
-          skillCategory: "body",
-          skillName: "juggleries",
-          body: {
-            activated: true,
-            start: {
-              initialValue: 0,
-              newValue: 10,
-            },
-            current: {
-              initialValue: 0,
-              increasedPoints: 1,
-            },
-            mod: {
-              initialValue: 0,
-              newValue: 5,
-            },
-            learningMethod: "NORMAL",
+        skillCategory: "body",
+        skillName: "juggleries",
+        getBody: (character: Character) => ({
+          activated: true,
+          start: {
+            initialValue: character.characterSheet.skills.body.juggleries.start,
+            newValue: character.characterSheet.skills.body.juggleries.start + 10,
           },
-        },
-        expectedCosts: 51,
+          current: {
+            initialValue: character.characterSheet.skills.body.juggleries.current,
+            increasedPoints: 1,
+          },
+          mod: {
+            initialValue: character.characterSheet.skills.body.juggleries.mod,
+            newValue: character.characterSheet.skills.body.juggleries.mod + 5,
+          },
+          learningMethod: "NORMAL",
+        }),
+        expectedCosts: 51, // Assuming the skill is below the first cost threshold
       },
       {
         name: "update combat skill values",
-        request: {
-          skillCategory: "combat",
-          skillName: "daggers",
-          body: {
-            current: {
-              initialValue: 18,
-              increasedPoints: 10,
-            },
-            mod: {
-              initialValue: 8,
-              newValue: 10,
-            },
-            learningMethod: "FREE",
+        skillCategory: "combat",
+        skillName: "daggers",
+        getBody: (character: Character) => ({
+          current: {
+            initialValue: character.characterSheet.skills.combat.daggers.current,
+            increasedPoints: 10,
           },
-        },
+          mod: {
+            initialValue: character.characterSheet.skills.combat.daggers.mod,
+            newValue: character.characterSheet.skills.combat.daggers.mod + 2,
+          },
+          learningMethod: "FREE",
+        }),
         expectedCosts: 0,
       },
     ];
@@ -585,46 +555,42 @@ describe.sequential("patch-skill component tests", () => {
     updateTestCases.forEach((_case) => {
       test(_case.name, async () => {
         const character = getTestContext().character;
+        const body = _case.getBody(character);
 
         const response = patchSkillResponseSchema.parse(
           await apiClient.patch(
-            `characters/${character.characterId}/skills/${_case.request.skillCategory}/${_case.request.skillName}`,
-            _case.request.body,
+            `characters/${character.characterId}/skills/${_case.skillCategory}/${_case.skillName}`,
+            body,
           ),
         );
 
         // Verify response structure
         expect(response.data.userId).toBe(character.userId);
         expect(response.data.characterId).toBe(character.characterId);
-        expect(response.data.skillCategory).toBe(_case.request.skillCategory);
-        expect(response.data.skillName).toBe(_case.request.skillName);
+        expect(response.data.skillCategory).toBe(_case.skillCategory);
+        expect(response.data.skillName).toBe(_case.skillName);
 
         // Verify learning method if present
-        if (_case.request.body.learningMethod) {
-          expect(response.data.learningMethod).toBe(_case.request.body.learningMethod);
+        if ("learningMethod" in body) {
+          expect(response.data.learningMethod).toBe(body.learningMethod);
         }
 
         // Verify skill activation if present
-        if (_case.request.body.activated) {
-          expect(response.data.changes.new.skill.activated).toBe(_case.request.body.activated);
+        if ("activated" in body) {
+          expect(response.data.changes.new.skill.activated).toBe(body.activated);
         }
 
-        // Verify skill value updates
-        if (_case.request.body.activated) {
-          expect(response.data.changes.new.skill.activated).toBe(_case.request.body.activated);
+        if ("start" in body) {
+          expect(response.data.changes.new.skill.start).toBe(body.start.newValue);
         }
 
-        if (_case.request.body.start) {
-          expect(response.data.changes.new.skill.start).toBe(_case.request.body.start.newValue);
-        }
-
-        if (_case.request.body.current) {
-          const expectedCurrent = _case.request.body.current.initialValue + _case.request.body.current.increasedPoints;
+        if ("current" in body) {
+          const expectedCurrent = body.current.initialValue + body.current.increasedPoints;
           expect(response.data.changes.new.skill.current).toBe(expectedCurrent);
         }
 
-        if (_case.request.body.mod) {
-          expect(response.data.changes.new.skill.mod).toBe(_case.request.body.mod.newValue);
+        if ("mod" in body) {
+          expect(response.data.changes.new.skill.mod).toBe(body.mod.newValue);
         }
 
         // Verify adventure points were spent correctly
@@ -691,8 +657,8 @@ describe.sequential("patch-skill component tests", () => {
         expect(historyRecord.data.new).toStrictEqual(response.data.changes.new);
 
         // Verify learning method if present in request
-        if (_case.request.body.learningMethod) {
-          expect(historyRecord.learningMethod).toBe(_case.request.body.learningMethod);
+        if ("learningMethod" in body) {
+          expect(historyRecord.learningMethod).toBe(body.learningMethod);
         } else {
           expect(historyRecord.learningMethod).toBeNull();
         }
