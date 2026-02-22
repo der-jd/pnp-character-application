@@ -696,11 +696,17 @@ describe.sequential("patch-attribute component tests", () => {
 
         const historyRecord = response.historyRecord as PatchAttributeHistoryRecord;
 
+        // Verify record data matches response changes
+        expect(historyRecord.data.old).toStrictEqual(response.data.changes.old);
+        expect(historyRecord.data.new).toStrictEqual(response.data.changes.new);
+
         // Verify base values changes
-        expect(historyRecord.data.old.baseValues).toBeDefined();
-        expect(historyRecord.data.new.baseValues).toBeDefined();
-        expect(historyRecord.data.old.baseValues).toStrictEqual(response.data.changes.old.baseValues);
-        expect(historyRecord.data.new.baseValues).toStrictEqual(response.data.changes.new.baseValues);
+        if (Object.keys(_case.attributeEffects).length > 0) {
+          expect(historyRecord.data.old.baseValues).toBeDefined();
+          expect(historyRecord.data.new.baseValues).toBeDefined();
+          expect(historyRecord.data.old.baseValues).toStrictEqual(response.data.changes.old.baseValues);
+          expect(historyRecord.data.new.baseValues).toStrictEqual(response.data.changes.new.baseValues);
+        }
       });
     });
   });
@@ -932,7 +938,11 @@ describe.sequential("patch-attribute component tests", () => {
 
         const historyRecord = response.historyRecord as PatchAttributeHistoryRecord;
 
-        // Verify base values changes
+        // Verify record data matches response changes
+        expect(historyRecord.data.old).toStrictEqual(response.data.changes.old);
+        expect(historyRecord.data.new).toStrictEqual(response.data.changes.new);
+
+        // Verify combat stats changes
         expect(historyRecord.data.old.combat).toBeDefined();
         expect(historyRecord.data.new.combat).toBeDefined();
         expect(historyRecord.data.old.combat).toStrictEqual(response.data.changes.old.combat);
