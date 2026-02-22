@@ -525,6 +525,7 @@ describe("Valid requests", () => {
       expect(parsedBody.changes.new.baseValue.byFormula).toBe(baseValueOld.byFormula);
       expect(parsedBody.changes.new.baseValue.current).toBe(baseValueOld.current);
       expect(parsedBody.changes.new.baseValue.byLvlUp).toBe(baseValueOld.byLvlUp);
+      // No byLvlUp for combat base values allowed
       expect(parsedBody.changes.new.baseValue.byLvlUp).toBeUndefined();
 
       if (_case.request.body.start) {
