@@ -14,7 +14,7 @@ parameters:
     default: false
 
 terraform_version: &terraform_version "1.14.5"
-terraform_docker_version: &terraform_docker_version "1.14"
+terraform_docker_image: &terraform_docker_image "hashicorp/terraform:1.14"
 
 executors:
   node-medium-executor:
@@ -186,7 +186,7 @@ jobs:
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
     docker:
-      - image: hashicorp/terraform:*terraform_docker_version
+      - image: *terraform_docker_image
     resource_class: medium
     steps:
       - checkout
@@ -267,7 +267,7 @@ jobs:
 
   terraform-destroy:
     docker:
-      - image: hashicorp/terraform:*terraform_docker_version
+      - image: *terraform_docker_image
     resource_class: small
     steps:
       - checkout
