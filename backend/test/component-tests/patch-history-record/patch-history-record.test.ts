@@ -26,7 +26,7 @@ describe.sequential("patch-history-record component tests", () => {
     await updateAndVerifyTestContextAfterEachTest(
       currentResponse,
       () => {
-        // No character update available
+        // No character update necessary
       },
       (response: PatchHistoryRecordResponse, record: HistoryRecord) => {
         record.comment = response.comment;
