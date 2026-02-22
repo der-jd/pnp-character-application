@@ -13,6 +13,9 @@ parameters:
     type: boolean
     default: false
 
+terraform_version: &terraform_version "1.14.5"
+terraform_docker_version: &terraform_docker_version "1.14"
+
 executors:
   node-medium-executor:
     docker:
@@ -77,16 +80,7 @@ jobs:
       - run:
           name: Install dependencies
           command: npm ci
-      - run:
-          name: Install Terraform
-          command: |
-            TER_VER=1.14.5
-            curl --fail --location --output terraform.zip https://releases.hashicorp.com/terraform/${TER_VER}/terraform_${TER_VER}_linux_amd64.zip
-            rm -rf terraform # Remove any leftover file/directory from previous run
-            unzip terraform.zip
-            sudo mv terraform /usr/local/bin/
-            terraform -version
-            rm terraform.zip
+      - install-terraform
       - run:
           name: Check file formatting
           command: npm run check-format
@@ -159,16 +153,27 @@ jobs:
     resource_class: medium
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/project
+      - aws-cli/setup:
+          role_arn: "$AWS_ROLE_ARN"
       - run:
           name: Install dependencies
           command: npm ci
+      - install-terraform
       - run:
           name: Build api-spec package
           command: |
             cd api-spec
             npm run build
+      - run:
+          name: Set environment variables for component tests
+          command: |
+            cd terraform
+            terraform init -input=false
+
+            # Create environment file for component tests
+            echo "export COMPONENT_TESTS_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
+            echo "export COMPONENT_TESTS_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
+            echo "export COMPONENT_TESTS_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output
       - run:
           name: Run component tests
           command: |
@@ -181,7 +186,7 @@ jobs:
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
     docker:
-      - image: hashicorp/terraform:1.14
+      - image: hashicorp/terraform:*terraform_docker_version
     resource_class: medium
     steps:
       - checkout
@@ -213,10 +218,6 @@ jobs:
             echo "export NEXT_PUBLIC_COGNITO_USER_POOL_ID=$(terraform output cognito_user_pool_id)" >> terraform_output
             echo "export NEXT_PUBLIC_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
             echo "export NEXT_PUBLIC_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output
-
-            echo "export COMPONENT_TESTS_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
-            echo "export COMPONENT_TESTS_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
-            echo "export COMPONENT_TESTS_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output
       - persist_to_workspace:
           root: ~/project
           paths:
@@ -266,7 +267,7 @@ jobs:
 
   terraform-destroy:
     docker:
-      - image: hashicorp/terraform:1.9
+      - image: hashicorp/terraform:*terraform_docker_version
     resource_class: small
     steps:
       - checkout
@@ -287,3 +288,22 @@ jobs:
           command: |
             cd terraform
             terraform apply -auto-approve tfdestroy
+
+commands:
+  install-terraform:
+    description: Install Terraform using the version specified in terraform_version anchor
+    parameters:
+      version:
+        type: string
+        default: *terraform_version
+    steps:
+      - run:
+          name: Install Terraform
+          command: |
+            TF_VER=<< parameters.version >>
+            curl --fail --location --output terraform.zip https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip
+            rm -rf terraform # Remove any leftover file/directory from previous run
+            unzip terraform.zip
+            sudo mv terraform /usr/local/bin/
+            terraform -version
+            rm terraform.zip
