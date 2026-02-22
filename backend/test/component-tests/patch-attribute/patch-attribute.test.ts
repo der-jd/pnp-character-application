@@ -16,10 +16,7 @@ import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext, setTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
-function updateTestContextCharacter(
-  character: Character,
-  response: PatchAttributeResponse,
-): void {
+function updateTestContextCharacter(character: Character, response: PatchAttributeResponse): void {
   character.characterSheet.attributes[response.data.attributeName as keyof CharacterSheet["attributes"]] =
     response.data.changes.new.attribute;
   character.characterSheet.calculationPoints.attributePoints = response.data.attributePoints.new;
@@ -381,16 +378,16 @@ describe.sequential("patch-attribute component tests", () => {
         expect(response.data.attributeName).toBe(_case.attributeName);
 
         // Verify attribute value updates
-        if ('start' in body) {
+        if ("start" in body) {
           expect(response.data.changes.new.attribute.start).toBe(body.start.newValue);
         }
 
-        if ('current' in body) {
+        if ("current" in body) {
           const expectedCurrent = body.current.initialValue + body.current.increasedPoints;
           expect(response.data.changes.new.attribute.current).toBe(expectedCurrent);
         }
 
-        if ('mod' in body) {
+        if ("mod" in body) {
           expect(response.data.changes.new.attribute.mod).toBe(body.mod.newValue);
         }
 
