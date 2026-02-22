@@ -1,18 +1,38 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { MAX_STRING_LENGTH_VERY_LONG, patchHistoryRecordResponseSchema } from "api-spec";
-import { expectApiError, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
+import {
+  MAX_STRING_LENGTH_VERY_LONG,
+  patchHistoryRecordResponseSchema,
+  PatchHistoryRecordResponse,
+  HistoryRecord,
+} from "api-spec";
+import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext, setTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 import { INVALID_UUID } from "../shared.js";
 
 describe.sequential("patch-history-record component tests", () => {
+  let currentResponse: PatchHistoryRecordResponse | undefined;
+
   beforeAll(async () => {
     await setupTestContext();
   });
 
   afterAll(async () => {
     await cleanUpTestContext();
+  });
+
+  afterEach(async () => {
+    await updateAndVerifyTestContextAfterEachTest(
+      currentResponse,
+      () => {
+        // No character update available
+      },
+      (response: PatchHistoryRecordResponse, record: HistoryRecord) => {
+        record.comment = response.comment;
+      },
+    );
+    currentResponse = undefined;
   });
 
   /**
@@ -87,6 +107,39 @@ describe.sequential("patch-history-record component tests", () => {
 
   /**
    * =============================
+   * Idempotency tests
+   * =============================
+   */
+
+  describe("Idempotency", () => {
+    test("same patch request multiple times produces identical result", async () => {
+      const character = getTestContext().character;
+      const latestRecord = getTestContext().lastHistoryRecord;
+      const latestBlockNumber = getTestContext().latestHistoryBlockNumber;
+
+      const patchRequest = {
+        comment: latestRecord.comment,
+      };
+
+      const response = patchHistoryRecordResponseSchema.parse(
+        await apiClient.patch(`characters/${character.characterId}/history/${latestRecord.id}`, patchRequest),
+      );
+      /**
+       * Notice: The response is not stored in the currentResponse variable
+       * because we explicitly do not want to update the local test context.
+       * This is because we want to verify that the local test context is
+       * still identical to the backend character after the update (idempotency).
+       */
+
+      expect(response.characterId).toBe(character.characterId);
+      expect(response.blockNumber).toBe(latestBlockNumber);
+      expect(response.recordId).toBe(latestRecord.id);
+      expect(response.comment).toBe(patchRequest.comment);
+    });
+  });
+
+  /**
+   * =============================
    * Patch history record
    * =============================
    */
@@ -116,29 +169,24 @@ describe.sequential("patch-history-record component tests", () => {
           _case.queryParams?.["block-number"] === "latest"
             ? { "block-number": `${latestBlockNumber}` }
             : _case.queryParams;
+        const _comment = `This is a component test comment - ${new Date().toISOString()}`;
 
         const response = patchHistoryRecordResponseSchema.parse(
           await apiClient.patch(
             `characters/${character.characterId}/history/${latestRecord.id}`,
             {
-              comment: "This is a test comment",
+              comment: _comment,
             },
             queryParams,
           ),
         );
+        currentResponse = response;
 
         // Verify response structure
         expect(response.characterId).toBe(character.characterId);
         expect(response.blockNumber).toBe(latestBlockNumber);
         expect(response.recordId).toBe(latestRecord.id);
-        expect(response.comment).toBe("This is a test comment");
-
-        // Update test context - set the updated comment
-        setTestContext({
-          lastHistoryRecord: { ...getTestContext().lastHistoryRecord, comment: response.comment },
-        });
-
-        await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
+        expect(response.comment).toBe(_comment);
       });
     });
   });

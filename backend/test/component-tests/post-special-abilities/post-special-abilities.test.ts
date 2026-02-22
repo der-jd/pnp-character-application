@@ -1,7 +1,13 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import { randomUUID } from "crypto";
-import { postSpecialAbilitiesResponseSchema, MAX_STRING_LENGTH_DEFAULT } from "api-spec";
-import { expectApiError, verifyCharacterState, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
+import {
+  postSpecialAbilitiesResponseSchema,
+  MAX_STRING_LENGTH_DEFAULT,
+  PostSpecialAbilitiesResponse,
+  Character,
+  HistoryRecord,
+} from "api-spec";
+import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext, setTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
@@ -11,12 +17,29 @@ export function makeUniqueName(prefix: string): string {
 }
 
 describe.sequential("post-special-abilities component tests", () => {
+  let currentResponse: PostSpecialAbilitiesResponse | undefined;
+
   beforeAll(async () => {
     await setupTestContext();
   });
 
   afterAll(async () => {
     await cleanUpTestContext();
+  });
+
+  afterEach(async () => {
+    await updateAndVerifyTestContextAfterEachTest(
+      currentResponse,
+      (response: PostSpecialAbilitiesResponse, character: Character) => {
+        character.characterSheet.specialAbilities = response.data.specialAbilities.new.values;
+      },
+      (response: PostSpecialAbilitiesResponse, record: HistoryRecord) => {
+        if (response.historyRecord) {
+          record = response.historyRecord;
+        }
+      },
+    );
+    currentResponse = undefined;
   });
 
   /**
@@ -78,6 +101,12 @@ describe.sequential("post-special-abilities component tests", () => {
           specialAbility: ability,
         }),
       );
+      /**
+       * Notice: The response is not stored in the currentResponse variable
+       * because we explicitly do not want to update the local test context.
+       * This is because we want to verify that the local test context is
+       * still identical to the backend character after the update (idempotency).
+       */
 
       expect(response.data.characterId).toBe(character.characterId);
       expect(response.data.userId).toBe(character.userId);
@@ -86,12 +115,6 @@ describe.sequential("post-special-abilities component tests", () => {
       expect(response.data.specialAbilities.new).toStrictEqual(response.data.specialAbilities.old);
       expect(response.data.specialAbilities.new.values).toContain(ability);
       expect(response.historyRecord).toBeNull();
-
-      // Character from the backend should be still identical to the one before the update
-      await verifyCharacterState(character.characterId, character);
-
-      // Latest history record should be the same as the one before the update
-      await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
     });
   });
 
@@ -111,6 +134,7 @@ describe.sequential("post-special-abilities component tests", () => {
           specialAbility: ability,
         }),
       );
+      currentResponse = response;
 
       expect(response.data.characterId).toBe(character.characterId);
       expect(response.data.userId).toBe(character.userId);
@@ -123,17 +147,6 @@ describe.sequential("post-special-abilities component tests", () => {
       const actualNewAbilities = new Set(response.data.specialAbilities.new.values);
       expect(actualNewAbilities).toEqual(expectedNewAbilities);
       expect(response.historyRecord).not.toBeNull();
-
-      // Update test context
-      character.characterSheet.specialAbilities = response.data.specialAbilities.new.values;
-
-      setTestContext({
-        character,
-        lastHistoryRecord: response.historyRecord!,
-      });
-
-      await verifyCharacterState(character.characterId, character);
-      await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
     });
   });
 });

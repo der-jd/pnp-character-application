@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import {
   patchSkillResponseSchema,
   CharacterSheet,
@@ -7,19 +7,47 @@ import {
   HistoryRecordType,
   PatchSkillHistoryRecord,
   Character,
+  PatchSkillResponse,
+  HistoryRecord,
 } from "api-spec";
-import { expectApiError, verifyCharacterState, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
+import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext, setTestContext } from "../test-context.js";
+import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
 describe.sequential("patch-skill component tests", () => {
+  let currentResponse: PatchSkillResponse | undefined;
+
   beforeAll(async () => {
     await setupTestContext();
   });
 
   afterAll(async () => {
     await cleanUpTestContext();
+  });
+
+  afterEach(async () => {
+    await updateAndVerifyTestContextAfterEachTest(
+      currentResponse,
+      (response: PatchSkillResponse, character: Character) => {
+        const _skillCategory = response.data.skillCategory as keyof CharacterSheet["skills"];
+        const _skillName = response.data.skillName as keyof CharacterSheet["skills"][typeof _skillCategory];
+
+        (character.characterSheet.skills[_skillCategory][_skillName] as Skill) = response.data.changes.new.skill;
+        if (response.data.combatCategory) {
+          const _combatCategory = response.data.combatCategory as keyof CharacterSheet["combat"];
+          (character.characterSheet.combat[_combatCategory][_skillName] as CombatStats) =
+            response.data.changes.new.combatStats!;
+        }
+        character.characterSheet.calculationPoints.adventurePoints = response.data.adventurePoints.new;
+      },
+      (response: PatchSkillResponse, record: HistoryRecord) => {
+        if (response.historyRecord) {
+          record = response.historyRecord;
+        }
+      },
+    );
+    currentResponse = undefined;
   });
 
   /**
@@ -322,6 +350,12 @@ describe.sequential("patch-skill component tests", () => {
             body,
           ),
         );
+        /**
+         * Notice: The response is not stored in the currentResponse variable
+         * because we explicitly do not want to update the local test context.
+         * This is because we want to verify that the local test context is
+         * still identical to the backend character after the update (idempotency).
+         */
 
         // Verify response structure
         expect(response.data.userId).toBe(character.userId);
@@ -390,12 +424,6 @@ describe.sequential("patch-skill component tests", () => {
         }
         expect(response.data.changes.old.combatStats).toBeUndefined();
         expect(response.data.changes.new.combatStats).toBeUndefined();
-
-        // Character from the backend should be still identical to the one before the update
-        await verifyCharacterState(character.characterId, getTestContext().character);
-
-        // Latest history record should be the same as the one before the update
-        await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
       });
     });
   });
@@ -563,6 +591,7 @@ describe.sequential("patch-skill component tests", () => {
             body,
           ),
         );
+        currentResponse = response;
 
         // Verify response structure
         expect(response.data.userId).toBe(character.userId);
@@ -671,24 +700,6 @@ describe.sequential("patch-skill component tests", () => {
 
         // Verify comment is null (not set in this operation)
         expect(historyRecord.comment).toBeNull();
-
-        // Update test context
-        (character.characterSheet.skills[_skillCategory][_skillName] as Skill) = response.data.changes.new.skill;
-        if (response.data.combatCategory) {
-          const _combatCategory = response.data.combatCategory as keyof CharacterSheet["combat"];
-          (character.characterSheet.combat[_combatCategory][_skillName] as CombatStats) =
-            response.data.changes.new.combatStats!;
-        }
-        character.characterSheet.calculationPoints.adventurePoints = response.data.adventurePoints.new;
-
-        setTestContext({
-          character,
-          lastHistoryRecord: response.historyRecord!,
-        });
-
-        await verifyCharacterState(character.characterId, character);
-
-        await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
       });
     });
   });

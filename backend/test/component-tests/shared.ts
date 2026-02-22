@@ -17,6 +17,7 @@ import {
 import { ApiError } from "./api-client.js";
 import { apiClient } from "./setup.js";
 import { expect } from "vitest";
+import { getTestContext, setTestContext } from "./test-context.js";
 
 export const NON_EXISTENT_UUID = "26c5d41d-cef1-455f-a341-b15d8a5b3967";
 export const INVALID_UUID = "not-a-uuid";
@@ -229,49 +230,39 @@ export function toLevelUpEffect(option: LevelUpOption): PostLevelUpRequest["effe
 }
 
 /**
- * Verifies that the character state on the backend matches the expected character state.
- * Handles special abilities comparison as Set to account for unordered storage.
+ * Updates the local test context after each test to keep it synchronized with the backend.
+ *
+ * All tests in a file share the same test character, so they depend on each other's state.
+ * If one test fails and the context isn't updated, subsequent tests will fail due to
+ * stale local data that doesn't match the actual backend character state.
+ *
+ * @param response - The current endpoint response to process. If undefined, no update is performed
+ *                   (e.g. when the test was idempotent and the local test context should already be up to date)
+ * @param updateCharacter - Function that updates the local character state based on the response
+ * @param updateLastHistoryRecord - Function that updates the local last history record state based on the response
  */
-export async function verifyCharacterState(characterId: string, expectedCharacter: Character): Promise<void> {
-  const updatedCharacter = getCharacterResponseSchema.parse(await apiClient.get(`characters/${characterId}`));
+export async function updateAndVerifyTestContextAfterEachTest<T>(
+  response: T | undefined,
+  updateCharacter: (response: T, character: Character) => void,
+  updateLastHistoryRecord: (response: T, record: HistoryRecord) => void,
+): Promise<void> {
+  const character = getTestContext().character;
+  const lastHistoryRecord = getTestContext().lastHistoryRecord;
 
-  // Compare specialAbilities as Sets (order not guaranteed due to Set storage)
-  if (expectedCharacter.characterSheet.specialAbilities || updatedCharacter.characterSheet.specialAbilities) {
-    expect(new Set(updatedCharacter.characterSheet.specialAbilities || [])).toEqual(
-      new Set(expectedCharacter.characterSheet.specialAbilities || []),
-    );
+  if (response) {
+    updateCharacter(response, character);
+    updateLastHistoryRecord(response, lastHistoryRecord);
+
+    setTestContext({
+      character,
+      lastHistoryRecord,
+    });
+  } else {
+    console.log("No current endpoint response set, skipping update of local test context.");
   }
 
-  // Create copies without specialAbilities for strict comparison of other properties
-  const expectedCopy = {
-    ...expectedCharacter,
-    characterSheet: {
-      ...expectedCharacter.characterSheet,
-      specialAbilities: undefined,
-    },
-  };
-
-  const updatedCopy = {
-    ...updatedCharacter,
-    characterSheet: {
-      ...updatedCharacter.characterSheet,
-      specialAbilities: undefined,
-    },
-  };
-
-  // Strict comparison of all other properties
-  expect(updatedCopy).toStrictEqual(expectedCopy);
-}
-
-/**
- * Verifies that the latest history record on the backend matches the expected history record.
- */
-export async function verifyLatestHistoryRecord<T extends HistoryRecord>(
-  characterId: string,
-  expectedHistoryRecord: T,
-): Promise<void> {
-  const { latestRecord } = await getLatestHistoryRecord(characterId);
-  expect(latestRecord).toStrictEqual(expectedHistoryRecord);
+  await verifyCharacterState(character.characterId, getTestContext().character);
+  await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
 }
 
 /**
@@ -337,3 +328,46 @@ export const commonInvalidTestCases = [
     characterId: NON_EXISTENT_UUID,
   },
 ];
+
+/**
+ * Verifies that the character state on the backend matches the expected character state.
+ * Handles special abilities comparison as Set to account for unordered storage.
+ */
+async function verifyCharacterState(characterId: string, expectedCharacter: Character): Promise<void> {
+  const updatedCharacter = getCharacterResponseSchema.parse(await apiClient.get(`characters/${characterId}`));
+
+  // Compare specialAbilities as Sets (order not guaranteed due to Set storage)
+  if (expectedCharacter.characterSheet.specialAbilities || updatedCharacter.characterSheet.specialAbilities) {
+    expect(new Set(updatedCharacter.characterSheet.specialAbilities || [])).toEqual(
+      new Set(expectedCharacter.characterSheet.specialAbilities || []),
+    );
+  }
+
+  // Create copies without specialAbilities for strict comparison of other properties
+  const expectedCopy = {
+    ...expectedCharacter,
+    characterSheet: {
+      ...expectedCharacter.characterSheet,
+      specialAbilities: undefined,
+    },
+  };
+
+  const updatedCopy = {
+    ...updatedCharacter,
+    characterSheet: {
+      ...updatedCharacter.characterSheet,
+      specialAbilities: undefined,
+    },
+  };
+
+  // Strict comparison of all other properties
+  expect(updatedCopy).toStrictEqual(expectedCopy);
+}
+
+/**
+ * Verifies that the latest history record on the backend matches the expected history record.
+ */
+async function verifyLatestHistoryRecord(characterId: string, expectedHistoryRecord: HistoryRecord): Promise<void> {
+  const { latestRecord } = await getLatestHistoryRecord(characterId);
+  expect(latestRecord).toStrictEqual(expectedHistoryRecord);
+}
