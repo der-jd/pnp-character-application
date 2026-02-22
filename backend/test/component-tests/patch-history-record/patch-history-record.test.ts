@@ -6,16 +6,18 @@ import {
   HistoryRecord,
 } from "api-spec";
 import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
-import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
+import { setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 import { INVALID_UUID } from "../shared.js";
 
 describe.sequential("patch-history-record component tests", () => {
   let currentResponse: PatchHistoryRecordResponse | undefined;
+  let apiClient: ApiClient;
 
   beforeAll(async () => {
     await setupTestContext();
+    apiClient = getTestContext().apiClient;
   });
 
   afterAll(async () => {

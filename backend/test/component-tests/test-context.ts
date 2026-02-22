@@ -1,21 +1,27 @@
 import { Character, HistoryRecord } from "api-spec";
+import { ApiClient } from "./api-client.js";
 
 export interface TestContext {
   apiBaseUrl: string;
   authorizationHeader: string;
-  userName: string;
+  userId: string;
+  seedCharacterId: string;
   character: Character;
   lastHistoryRecord: HistoryRecord;
   latestHistoryBlockNumber: number;
+  apiClient: ApiClient;
 }
 
+// TODO global variables raise issues with parallel test execution
 const _testContext = {
   apiBaseUrl: "",
   authorizationHeader: "",
-  userName: "",
+  userId: "",
+  seedCharacterId: "",
   character: undefined,
   lastHistoryRecord: undefined,
   latestHistoryBlockNumber: undefined,
+  apiClient: undefined,
 };
 
 export function setTestContext(context: Partial<TestContext>): void {
@@ -35,12 +41,18 @@ export function getTestContext(): TestContext {
     throw new Error("Test context not initialized - latestHistoryBlockNumber not set");
   }
 
+  if (!_testContext.apiClient) {
+    throw new Error("Test context not initialized - apiClient not set");
+  }
+
   return {
     apiBaseUrl: _testContext.apiBaseUrl,
     authorizationHeader: _testContext.authorizationHeader,
-    userName: _testContext.userName,
+    userId: _testContext.userId,
+    seedCharacterId: _testContext.seedCharacterId,
     character: _testContext.character,
     lastHistoryRecord: _testContext.lastHistoryRecord,
     latestHistoryBlockNumber: _testContext.latestHistoryBlockNumber,
+    apiClient: _testContext.apiClient,
   };
 }

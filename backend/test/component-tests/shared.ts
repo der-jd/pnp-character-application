@@ -15,7 +15,6 @@ import {
   getCharacterResponseSchema,
 } from "api-spec";
 import { ApiError } from "./api-client.js";
-import { apiClient } from "./setup.js";
 import { expect } from "vitest";
 import { getTestContext, setTestContext } from "./test-context.js";
 
@@ -192,7 +191,9 @@ export function pickCombatSkill(
 }
 
 export async function getLatestHistoryRecord(characterId: string) {
-  const history = getHistoryResponseSchema.parse(await apiClient.get(`characters/${characterId}/history`));
+  const history = getHistoryResponseSchema.parse(
+    await getTestContext().apiClient.get(`characters/${characterId}/history`),
+  );
 
   expect(history.items.length).toBeGreaterThanOrEqual(1);
 
@@ -334,7 +335,9 @@ export const commonInvalidTestCases = [
  * Handles special abilities comparison as Set to account for unordered storage.
  */
 async function verifyCharacterState(characterId: string, expectedCharacter: Character): Promise<void> {
-  const updatedCharacter = getCharacterResponseSchema.parse(await apiClient.get(`characters/${characterId}`));
+  const updatedCharacter = getCharacterResponseSchema.parse(
+    await getTestContext().apiClient.get(`characters/${characterId}`),
+  );
 
   // Compare specialAbilities as Sets (order not guaranteed due to Set storage)
   if (expectedCharacter.characterSheet.specialAbilities || updatedCharacter.characterSheet.specialAbilities) {

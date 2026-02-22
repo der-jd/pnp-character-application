@@ -1,13 +1,16 @@
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { getCharacterResponseSchema } from "api-spec";
 import { expectApiError, commonInvalidTestCases } from "../shared.js";
-import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
+import { setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
 describe.sequential("get-character component tests", () => {
+  let apiClient: ApiClient;
+
   beforeAll(async () => {
     await setupTestContext();
+    apiClient = getTestContext().apiClient;
   });
 
   afterAll(async () => {

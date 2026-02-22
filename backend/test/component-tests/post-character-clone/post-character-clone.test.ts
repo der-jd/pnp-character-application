@@ -5,41 +5,42 @@ import {
   HistoryBlock,
   PostCharacterCloneResponse,
   Character,
-  HistoryRecord,
 } from "api-spec";
 import { expectApiError, commonInvalidTestCases } from "../shared.js";
-import { apiClient, setupTestContext, cleanUpTestContext, deleteCharacter } from "../setup.js";
+import { setupTestContext, cleanUpTestContext, deleteCharacter } from "../setup.js";
 import { getTestContext, setTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 import { updateAndVerifyTestContextAfterEachTest } from "../shared.js";
 
-async function fetchAllHistoryBlocks(characterId: string): Promise<HistoryBlock[]> {
-  const allBlocks: HistoryBlock[] = [];
-  let currentBlockNumber: number | null = null;
-
-  do {
-    const response = getHistoryResponseSchema.parse(
-      await apiClient.get(
-        `characters/${characterId}/history`,
-        currentBlockNumber ? { "block-number": currentBlockNumber } : undefined,
-      ),
-    );
-
-    // Add blocks in reverse order (latest first)
-    allBlocks.push(...response.items);
-
-    // Set the next block number to fetch
-    currentBlockNumber = response.previousBlockNumber;
-  } while (currentBlockNumber !== null);
-
-  return allBlocks;
-}
-
 describe.sequential("post-character-clone component tests", () => {
   let currentResponse: PostCharacterCloneResponse | undefined;
+  let apiClient: ApiClient;
+
+  async function fetchAllHistoryBlocks(characterId: string): Promise<HistoryBlock[]> {
+    const allBlocks: HistoryBlock[] = [];
+    let currentBlockNumber: number | null = null;
+
+    do {
+      const response = getHistoryResponseSchema.parse(
+        await apiClient.get(
+          `characters/${characterId}/history`,
+          currentBlockNumber ? { "block-number": currentBlockNumber } : undefined,
+        ),
+      );
+
+      // Add blocks in reverse order (latest first)
+      allBlocks.push(...response.items);
+
+      // Set the next block number to fetch
+      currentBlockNumber = response.previousBlockNumber;
+    } while (currentBlockNumber !== null);
+
+    return allBlocks;
+  }
 
   beforeAll(async () => {
     await setupTestContext();
+    apiClient = getTestContext().apiClient;
   });
 
   afterAll(async () => {

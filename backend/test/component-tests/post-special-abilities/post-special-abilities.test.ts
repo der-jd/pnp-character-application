@@ -8,7 +8,7 @@ import {
   HistoryRecord,
 } from "api-spec";
 import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
-import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
+import { setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
@@ -18,9 +18,11 @@ export function makeUniqueName(prefix: string): string {
 
 describe.sequential("post-special-abilities component tests", () => {
   let currentResponse: PostSpecialAbilitiesResponse | undefined;
+  let apiClient: ApiClient;
 
   beforeAll(async () => {
     await setupTestContext();
+    apiClient = getTestContext().apiClient;
   });
 
   afterAll(async () => {

@@ -11,15 +11,17 @@ import {
   HistoryRecord,
 } from "api-spec";
 import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
-import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
+import { setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
 
 describe.sequential("patch-skill component tests", () => {
   let currentResponse: PatchSkillResponse | undefined;
+  let apiClient: ApiClient;
 
   beforeAll(async () => {
     await setupTestContext();
+    apiClient = getTestContext().apiClient;
   });
 
   afterAll(async () => {

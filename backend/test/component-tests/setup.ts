@@ -6,44 +6,41 @@ import { ApiClient, ApiError } from "./api-client.js";
 import { getTestSecrets, TestSecrets } from "./test-secrets.js";
 import { getLatestHistoryRecord, requireEnv } from "./shared.js";
 
-export let apiClient: ApiClient;
-
-let _seedCharacterId: string = "";
-let _userId: string = "";
-
 beforeAll(async () => {
   console.log("Setting up component tests...");
 
   // Environment variables from CircleCI
   const apiBaseUrl = requireEnv("COMPONENT_TESTS_API_BASE_URL");
-  _seedCharacterId = requireEnv("COMPONENT_TESTS_SEED_CHARACTER_ID");
+  const seedCharacterId = requireEnv("COMPONENT_TESTS_SEED_CHARACTER_ID");
 
   const secrets = getTestSecrets();
-  _userId = secrets.cognitoUsername;
+  const userId = secrets.cognitoUsername;
   const idToken = await authenticate(secrets);
   const authorizationHeader = `Bearer ${idToken}`;
 
   console.log(`API Base URL: ${apiBaseUrl}`);
   console.log(`User name: ${secrets.cognitoUsername}`);
-  console.log(`Seed character ID: ${_seedCharacterId}`);
-
-  apiClient = new ApiClient(apiBaseUrl, authorizationHeader);
+  console.log(`Seed character ID: ${seedCharacterId}`);
 
   setTestContext({
     apiBaseUrl,
     authorizationHeader,
-    userName: secrets.cognitoUsername,
+    userId,
+    seedCharacterId: seedCharacterId,
+    apiClient: new ApiClient(apiBaseUrl, authorizationHeader),
   });
 });
 
 export async function setupTestContext(): Promise<void> {
-  const cloneResponse = await apiClient.post(`characters/${_seedCharacterId}/clone`, {
-    userIdOfCharacter: _userId,
+  const cloneResponse = await getTestContext().apiClient.post(`characters/${getTestContext().seedCharacterId}/clone`, {
+    userIdOfCharacter: getTestContext().userId,
   });
   const parsedClone = postCharacterCloneResponseSchema.parse(cloneResponse);
   const clonedCharacterId = parsedClone.characterId;
 
-  const clonedCharacter = getCharacterResponseSchema.parse(await apiClient.get(`characters/${clonedCharacterId}`));
+  const clonedCharacter = getCharacterResponseSchema.parse(
+    await getTestContext().apiClient.get(`characters/${clonedCharacterId}`),
+  );
   if (clonedCharacter.characterId !== clonedCharacterId) {
     throw new Error("Failed to fetch cloned character");
   }
@@ -55,17 +52,18 @@ export async function setupTestContext(): Promise<void> {
     lastHistoryRecord: latestRecord,
     latestHistoryBlockNumber: latestBlock.blockNumber,
   });
-  console.log(`Cloned character ${_seedCharacterId} -> ${clonedCharacterId}`);
+  console.log(`Cloned character ${getTestContext().seedCharacterId} -> ${clonedCharacterId}`);
 }
 
 export async function cleanUpTestContext(): Promise<void> {
   await deleteCharacter(getTestContext().character.characterId);
-  setTestContext({ character: undefined });
+  setTestContext({ character: undefined, lastHistoryRecord: undefined, latestHistoryBlockNumber: undefined });
 }
 
+// TODO remove export
 export async function deleteCharacter(characterId: string): Promise<void> {
   try {
-    const response = await apiClient.delete(`characters/${characterId}`);
+    const response = await getTestContext().apiClient.delete(`characters/${characterId}`);
     deleteCharacterResponseSchema.parse(response);
     console.log(`Deleted character ${characterId}`);
   } catch (error) {
