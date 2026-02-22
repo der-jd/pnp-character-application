@@ -80,7 +80,7 @@ describe.sequential("patch-attribute component tests", () => {
           () =>
             client.patch(path, {
               current: {
-                initialValue: 18,
+                initialValue: character.characterSheet.attributes.endurance.current,
                 increasedPoints: 1,
               },
             }),
@@ -97,8 +97,8 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             start: {
-              initialValue: 6,
-              newValue: 7,
+              initialValue: character.characterSheet.attributes.endurance.start + 1,
+              newValue: character.characterSheet.attributes.endurance.current + 2,
             },
           }),
         409,
@@ -113,7 +113,7 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
-              initialValue: 6,
+              initialValue: character.characterSheet.attributes.endurance.current + 1,
               increasedPoints: 1,
             },
           }),
@@ -129,8 +129,8 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             mod: {
-              initialValue: 1,
-              newValue: 3,
+              initialValue: character.characterSheet.attributes.endurance.mod + 1,
+              newValue: character.characterSheet.attributes.endurance.mod + 2,
             },
           }),
         409,
@@ -145,7 +145,7 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
-              initialValue: 5,
+              initialValue: character.characterSheet.attributes.endurance.current,
               increasedPoints: 60,
             },
           }),
@@ -161,7 +161,7 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
-              initialValue: 5,
+              initialValue: character.characterSheet.attributes.endurance.current,
               increasedPoints: 0,
             },
           }),
@@ -177,7 +177,7 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
-              initialValue: 5,
+              initialValue: character.characterSheet.attributes.endurance.current,
               increasedPoints: -1,
             },
           }),
@@ -198,41 +198,42 @@ describe.sequential("patch-attribute component tests", () => {
       {
         name: "attribute has already been updated to the target start value (idempotency)",
         attributeName: "endurance",
-        body: {
+        getBody: (character: Character) => ({
           start: {
-            initialValue: 3,
-            newValue: 5,
+            initialValue: character.characterSheet.attributes.endurance.start - 2,
+            newValue: character.characterSheet.attributes.endurance.start,
           },
-        },
+        }),
       },
       {
         name: "attribute has already been increased to the target current value (idempotency)",
         attributeName: "endurance",
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 2,
+            initialValue: character.characterSheet.attributes.endurance.current - 3,
             increasedPoints: 3,
           },
-        },
+        }),
       },
       {
         name: "attribute has already been updated to the target mod value (idempotency)",
         attributeName: "endurance",
-        body: {
+        getBody: (character: Character) => ({
           mod: {
-            initialValue: 2,
-            newValue: 0,
+            initialValue: character.characterSheet.attributes.endurance.mod + 2,
+            newValue: character.characterSheet.attributes.endurance.mod,
           },
-        },
+        }),
       },
     ];
 
     idempotentTestCases.forEach((_case) => {
       test(_case.name, async () => {
         const character = getTestContext().character;
+        const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, _case.body),
+          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
 
         // Verify response structure
@@ -244,17 +245,17 @@ describe.sequential("patch-attribute component tests", () => {
         expect(response.historyRecord).toBeNull();
 
         // Verify attribute value updates
-        if (_case.body.start) {
-          expect(response.data.changes.new.attribute.start).toBe(_case.body.start.newValue);
+        if ("start" in body) {
+          expect(response.data.changes.new.attribute.start).toBe(body.start.newValue);
         }
 
-        if (_case.body.current) {
-          const expectedCurrent = _case.body.current.initialValue + _case.body.current.increasedPoints;
+        if ("current" in body) {
+          const expectedCurrent = body.current.initialValue + body.current.increasedPoints;
           expect(response.data.changes.new.attribute.current).toBe(expectedCurrent);
         }
 
-        if (_case.body.mod) {
-          expect(response.data.changes.new.attribute.mod).toBe(_case.body.mod.newValue);
+        if ("mod" in body) {
+          expect(response.data.changes.new.attribute.mod).toBe(body.mod.newValue);
         }
 
         expect(response.data.changes.old.attribute).toStrictEqual(
