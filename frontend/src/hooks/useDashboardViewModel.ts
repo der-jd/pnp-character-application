@@ -2,6 +2,7 @@ import { useMemo, useSyncExternalStore } from "react";
 import { DashboardViewModel } from "@/src/lib/presentation/viewmodels/DashboardViewModel";
 import { LoadAllCharactersUseCase } from "@/src/lib/application/use-cases/LoadAllCharactersUseCase";
 import { CharacterService } from "@/src/lib/services/characterService";
+import { ApiClient } from "@/src/lib/services/apiClient";
 
 /**
  * React hook for DashboardViewModel
@@ -15,7 +16,8 @@ import { CharacterService } from "@/src/lib/services/characterService";
 export function useDashboardViewModel() {
   // Create ViewModel instance with dependencies (singleton per component)
   const viewModel = useMemo(() => {
-    const characterService = new CharacterService();
+    const apiClient = new ApiClient();
+    const characterService = new CharacterService(apiClient);
     const loadAllCharactersUseCase = new LoadAllCharactersUseCase(characterService);
     return new DashboardViewModel(loadAllCharactersUseCase);
   }, []);

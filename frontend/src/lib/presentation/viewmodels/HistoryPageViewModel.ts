@@ -14,7 +14,7 @@
  */
 
 import { DeleteHistoryEntryUseCase } from "../../application/use-cases/DeleteHistoryEntryUseCase";
-import { HistoryService } from "../../services/historyService";
+import { HistoryService } from "../../services/HistoryService";
 import { GetHistoryResponse, Record as ApiHistoryRecord } from "api-spec";
 import { RecordEntry } from "../../api/models/history/interface";
 import { featureLogger } from "../../utils/featureLogger";

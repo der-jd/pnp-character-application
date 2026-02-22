@@ -26,9 +26,9 @@ import {
   LoadHistoryOutput,
   DeleteHistoryEntryInput,
   DeleteHistoryEntryOutput,
-} from "../use-cases";
-import { CharacterService, HistoryService, AuthService } from "../../services";
-import { Result } from "../../types/result";
+} from "../application/use-cases";
+import { CharacterService, HistoryService, AuthService } from "./index";
+import { Result } from "../types/result";
 
 /**
  * Character Application Service

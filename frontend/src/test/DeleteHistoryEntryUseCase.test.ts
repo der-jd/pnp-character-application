@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { DeleteHistoryEntryUseCase } from "../lib/application/use-cases/DeleteHistoryEntryUseCase";
-import { HistoryService } from "../lib/services/historyService";
+import { HistoryService } from "../lib/services/HistoryService";
 import { CharacterService } from "../lib/services/characterService";
 import { createSuccessResult, createErrorResult, TEST_SCENARIOS } from "./test-utils";
 
 // Mock the services
-vi.mock("../lib/services/historyService");
+vi.mock("../lib/services/HistoryService");
 vi.mock("../lib/services/characterService");
 
 describe("DeleteHistoryEntryUseCase", () => {

@@ -2,7 +2,6 @@
 //
 // This layer contains:
 // - Use Cases: Business logic implementation
-// - Application Services: Coordination and cross-cutting concerns
 // - Interfaces: Contracts for presentation layer
 //
 // Following coding guidelines:
@@ -13,6 +12,3 @@
 
 // Use Cases
 export * from "./use-cases";
-
-// Application Services
-export * from "./services";

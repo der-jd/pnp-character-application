@@ -13,7 +13,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { HistoryPageViewModel, HistoryPageViewModelState } from "../lib/presentation/viewmodels/HistoryPageViewModel";
 import { DeleteHistoryEntryUseCase } from "../lib/application/use-cases/DeleteHistoryEntryUseCase";
-import { HistoryService } from "../lib/services/historyService";
+import { HistoryService } from "../lib/services/HistoryService";
 import { CharacterService } from "../lib/services/characterService";
 import { ApiClient } from "../lib/services/apiClient";
 import { featureLogger } from "../lib/utils/featureLogger";

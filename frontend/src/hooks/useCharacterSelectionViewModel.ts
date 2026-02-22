@@ -3,6 +3,7 @@ import { CharacterSelectionViewModel } from "@/src/lib/presentation/viewmodels/C
 import { LoadAllCharactersUseCase } from "@/src/lib/application/use-cases/LoadAllCharactersUseCase";
 import { LoadCharacterUseCase } from "@/src/lib/application/use-cases/LoadCharacterUseCase";
 import { CharacterService } from "@/src/lib/services/characterService";
+import { ApiClient } from "@/src/lib/services/apiClient";
 
 /**
  * React hook for CharacterSelectionViewModel
@@ -26,7 +27,8 @@ import { CharacterService } from "@/src/lib/services/characterService";
 export function useCharacterSelectionViewModel() {
   // Create ViewModel instance with dependencies (singleton per component)
   const viewModel = useMemo(() => {
-    const characterService = new CharacterService();
+    const apiClient = new ApiClient();
+    const characterService = new CharacterService(apiClient);
     const loadAllCharactersUseCase = new LoadAllCharactersUseCase(characterService);
     const loadCharacterUseCase = new LoadCharacterUseCase(characterService);
     return new CharacterSelectionViewModel(loadAllCharactersUseCase, loadCharacterUseCase);

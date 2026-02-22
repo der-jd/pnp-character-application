@@ -1,6 +1,6 @@
 import { UseCase, LoadHistoryInput, LoadHistoryOutput } from "./interfaces";
 import { Result, ResultSuccess, ResultError } from "../../types/result";
-import { HistoryService } from "../../services/historyService";
+import { HistoryService } from "../../services/HistoryService";
 import { GetHistoryResponse } from "api-spec";
 
 /**

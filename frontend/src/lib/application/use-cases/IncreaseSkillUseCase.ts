@@ -2,6 +2,34 @@ import { UseCase, IncreaseSkillInput, IncreaseSkillOutput } from "./interfaces";
 import { Result, ResultSuccess, ResultError } from "../../types/result";
 import { CharacterService } from "../../services/characterService";
 import { featureLogger } from "../../utils/featureLogger";
+import { CostCategory, LearningMethodString } from "api-spec";
+
+/**
+ * Helper to convert CostCategory enum to LearningMethodString
+ */
+function convertCostCategoryToLearningMethod(costCategory: CostCategory | string): LearningMethodString {
+  if (typeof costCategory === "string") {
+    const upper = costCategory.toUpperCase();
+    if (["FREE", "LOW_PRICED", "NORMAL", "EXPENSIVE"].includes(upper)) {
+      return upper as LearningMethodString;
+    }
+    return "NORMAL";
+  }
+
+  // Map numeric enum values
+  switch (costCategory) {
+    case CostCategory.FREE:
+      return "FREE";
+    case CostCategory.LOW_PRICED:
+      return "LOW_PRICED";
+    case CostCategory.NORMAL:
+      return "NORMAL";
+    case CostCategory.EXPENSIVE:
+      return "EXPENSIVE";
+    default:
+      return "NORMAL";
+  }
+}
 
 /**
  * Use Case for increasing a character's skill
@@ -72,8 +100,9 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
         {
           current: {
             initialValue: currentValue,
-            increasedPoints: 1,
+            increasedPoints: input.points,
           },
+          learningMethod: convertCostCategoryToLearningMethod(input.learningMethod),
         },
         input.idToken
       );

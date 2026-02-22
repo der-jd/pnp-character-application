@@ -24,11 +24,8 @@ describe("CharacterService", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
-    // Make the mocked constructor return our mock
-    vi.mocked(ApiClient).mockImplementation(() => mockApiClient);
-
-    // Create service instance
-    characterService = new CharacterService();
+    // Create service instance with explicit API client
+    characterService = new CharacterService(mockApiClient);
   });
 
   describe("getCharacter", () => {

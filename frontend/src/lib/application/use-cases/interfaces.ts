@@ -34,6 +34,8 @@ export interface LoadAllCharactersInput {
 export interface IncreaseSkillInput {
   characterId: string;
   skillName: string;
+  points: number;
+  learningMethod: string;
   idToken: string;
 }
 

@@ -1,6 +1,6 @@
 import { UseCase, DeleteHistoryEntryInput, DeleteHistoryEntryOutput } from "./interfaces";
 import { Result, ResultSuccess, ResultError } from "../../types/result";
-import { HistoryService } from "../../services/historyService";
+import { HistoryService } from "../../services/HistoryService";
 import { CharacterService } from "../../services/characterService";
 import { featureLogger } from "../../utils/featureLogger";
 

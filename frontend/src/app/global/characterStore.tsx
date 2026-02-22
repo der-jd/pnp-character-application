@@ -1,8 +1,8 @@
 import { CharacterSheet } from "@/src/lib/api/models/Character/character";
 import { CombatStats } from "api-spec";
 import { AllCharactersCharacter } from "@/src/lib/api/models/allCharacters/interface";
-import { CharacterService, AuthService, HistoryService } from "@/src/lib/services";
-import { CharacterApplicationService } from "@/src/lib/application";
+import { CharacterService, AuthService, HistoryService, CharacterApplicationService } from "@/src/lib/services";
+import { ApiClient } from "@/src/lib/services/apiClient";
 import { featureLogger } from "@/src/lib/utils/featureLogger";
 
 import { create } from "zustand";
@@ -13,10 +13,10 @@ function asPath(path: (string | number | symbol)[]): (string | number)[] {
   return path.map((key) => key.toString()); // or key as string
 }
 
-// Initialize Application Services following clean architecture
-const characterService = new CharacterService();
+const apiClient = new ApiClient();
+const characterService = new CharacterService(apiClient);
 const authService = new AuthService();
-const historyService = new HistoryService();
+const historyService = new HistoryService(apiClient);
 const characterApplicationService = new CharacterApplicationService(characterService, historyService, authService);
 
 export interface CharacterStore {
@@ -46,7 +46,13 @@ export interface CharacterStore {
   updateOpenHistoryEntries: (newEntries: RecordEntry[]) => void;
 
   // New Application Service methods
-  increaseSkill: (characterId: string, skillName: string, idToken: string) => Promise<boolean>;
+  increaseSkill: (
+    characterId: string,
+    skillName: string,
+    points: number,
+    learningMethod: string,
+    idToken: string
+  ) => Promise<boolean>;
 }
 
 /**
@@ -205,13 +211,23 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
    * Updates the character store with the new data
    *
    * @param characterId The character ID
-   * @param skillName The skill name (format: "category.skillName" or just "skillName")
+   * @param skillName The skill name (format: "category.skillName")
+   * @param points The number of points to increase the skill by
+   * @param learningMethod The learning method for this skill increase
    * @param idToken The authentication token
    */
-  increaseSkill: async (characterId: string, skillName: string, idToken: string): Promise<boolean> => {
+  increaseSkill: async (
+    characterId: string,
+    skillName: string,
+    points: number,
+    learningMethod: string,
+    idToken: string
+  ): Promise<boolean> => {
     const result = await characterApplicationService.increaseSkill({
       characterId,
       skillName,
+      points,
+      learningMethod,
       idToken,
     });
 
@@ -223,7 +239,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       }));
 
       console.log(
-        `[Character store] Skill '${skillName}' increased successfully. Cost: ${result.data.costCalculation.cost} points`
+        `[Character store] Skill '${skillName}' increased by ${points} points. Cost: ${result.data.costCalculation.cost} points`
       );
       return true;
     } else {

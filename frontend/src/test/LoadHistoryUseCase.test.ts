@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { LoadHistoryUseCase } from "../lib/application/use-cases/LoadHistoryUseCase";
-import { HistoryService } from "../lib/services/historyService";
+import { HistoryService } from "../lib/services/HistoryService";
 import { createErrorResult, createSuccessResult, TEST_SCENARIOS } from "./test-utils";
 
 // Mock the HistoryService
-vi.mock("../lib/services/historyService");
+vi.mock("../lib/services/HistoryService");
 
 describe("LoadHistoryUseCase", () => {
   let useCase: LoadHistoryUseCase;

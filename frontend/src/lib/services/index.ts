@@ -3,6 +3,7 @@ export { ApiClient } from "./apiClient";
 export { CharacterService } from "./characterService";
 export { HistoryService } from "./HistoryService";
 export { AuthService } from "./authService";
+export { CharacterApplicationService } from "./CharacterApplicationService";
 
 // Type Exports
 export type { ApiRequestConfig } from "./apiClient";
