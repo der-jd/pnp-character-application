@@ -39,8 +39,9 @@ export class TestContextFactory {
 
     console.log("Initializing base test setup...");
 
-    // Environment variables from CircleCI
+    // Environment variables from Terraform via CircleCI
     const apiBaseUrl = requireEnv("COMPONENT_TESTS_API_BASE_URL");
+    // Environment variables from CircleCI
     const seedCharacterId = requireEnv("COMPONENT_TESTS_SEED_CHARACTER_ID");
 
     const secrets = getTestSecrets();
@@ -146,9 +147,10 @@ interface TestSecrets {
 
 function getTestSecrets(): TestSecrets {
   return {
-    // Environment variables from CircleCI
+    // Environment variables from Terraform via CircleCI
     cognitoRegion: requireEnv("COMPONENT_TESTS_COGNITO_REGION"),
     cognitoClientId: requireEnv("COMPONENT_TESTS_COGNITO_APP_CLIENT_ID"),
+    // Environment variables from CircleCI
     cognitoUsername: requireEnv("COMPONENT_TESTS_COGNITO_USERNAME"),
     cognitoPassword: requireEnv("COMPONENT_TESTS_COGNITO_PASSWORD"),
   };
