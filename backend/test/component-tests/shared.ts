@@ -1,3 +1,4 @@
+import { expect } from "vitest";
 import {
   Attribute,
   Attributes,
@@ -10,13 +11,11 @@ import {
   Skill,
   LEVEL_UP_DICE_EXPRESSION,
   PostLevelUpRequest,
-  getHistoryResponseSchema,
   getLevelUpResponseSchema,
   getCharacterResponseSchema,
 } from "api-spec";
 import { ApiError } from "./api-client.js";
-import { expect } from "vitest";
-import { getTestContext, setTestContext } from "./test-context.js";
+import { TestContext, TestContextFactory } from "./test-context-factory.js";
 
 export const NON_EXISTENT_UUID = "26c5d41d-cef1-455f-a341-b15d8a5b3967";
 export const INVALID_UUID = "not-a-uuid";
@@ -29,14 +28,6 @@ export type ErrorBody = {
 
 export type SkillCategory = keyof Character["characterSheet"]["skills"];
 export type LevelUpOption = ReturnType<typeof getLevelUpResponseSchema.parse>["options"][number];
-
-export function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object";
@@ -190,20 +181,6 @@ export function pickCombatSkill(
   return { category, name: entries[0][0], value: entries[0][1] };
 }
 
-export async function getLatestHistoryRecord(characterId: string) {
-  const history = getHistoryResponseSchema.parse(
-    await getTestContext().apiClient.get(`characters/${characterId}/history`),
-  );
-
-  expect(history.items.length).toBeGreaterThanOrEqual(1);
-
-  const latestBlock = history.items[0];
-  expect(latestBlock.changes.length).toBeGreaterThanOrEqual(1);
-
-  const latestRecord = latestBlock.changes[latestBlock.changes.length - 1];
-  return { history, latestBlock, latestRecord };
-}
-
 export function toLevelUpEffect(option: LevelUpOption): PostLevelUpRequest["effect"] {
   switch (option.kind) {
     case "hpRoll":
@@ -243,27 +220,20 @@ export function toLevelUpEffect(option: LevelUpOption): PostLevelUpRequest["effe
  * @param updateLastHistoryRecord - Function that updates the local last history record state based on the response
  */
 export async function updateAndVerifyTestContextAfterEachTest<T>(
+  context: TestContext,
   response: T | undefined,
   updateCharacter: (response: T, character: Character) => void,
   updateLastHistoryRecord: (response: T, record: HistoryRecord) => void,
 ): Promise<void> {
-  const character = getTestContext().character;
-  const lastHistoryRecord = getTestContext().lastHistoryRecord;
-
   if (response) {
-    updateCharacter(response, character);
-    updateLastHistoryRecord(response, lastHistoryRecord);
-
-    setTestContext({
-      character,
-      lastHistoryRecord,
-    });
+    updateCharacter(response, context.character);
+    updateLastHistoryRecord(response, context.lastHistoryRecord);
   } else {
-    console.log("No current endpoint response set, skipping update of local test context.");
+    console.log("No current endpoint response set, skipping update of test context.");
   }
 
-  await verifyCharacterState(character.characterId, getTestContext().character);
-  await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
+  await verifyCharacterState(context);
+  await verifyLatestHistoryRecord(context);
 }
 
 /**
@@ -334,23 +304,23 @@ export const commonInvalidTestCases = [
  * Verifies that the character state on the backend matches the expected character state.
  * Handles special abilities comparison as Set to account for unordered storage.
  */
-async function verifyCharacterState(characterId: string, expectedCharacter: Character): Promise<void> {
+async function verifyCharacterState(context: TestContext): Promise<void> {
   const updatedCharacter = getCharacterResponseSchema.parse(
-    await getTestContext().apiClient.get(`characters/${characterId}`),
+    await context.apiClient.get(`characters/${context.character.characterId}`),
   );
 
   // Compare specialAbilities as Sets (order not guaranteed due to Set storage)
-  if (expectedCharacter.characterSheet.specialAbilities || updatedCharacter.characterSheet.specialAbilities) {
+  if (context.character.characterSheet.specialAbilities || updatedCharacter.characterSheet.specialAbilities) {
     expect(new Set(updatedCharacter.characterSheet.specialAbilities || [])).toEqual(
-      new Set(expectedCharacter.characterSheet.specialAbilities || []),
+      new Set(context.character.characterSheet.specialAbilities || []),
     );
   }
 
   // Create copies without specialAbilities for strict comparison of other properties
   const expectedCopy = {
-    ...expectedCharacter,
+    ...context.character,
     characterSheet: {
-      ...expectedCharacter.characterSheet,
+      ...context.character.characterSheet,
       specialAbilities: undefined,
     },
   };
@@ -370,7 +340,7 @@ async function verifyCharacterState(characterId: string, expectedCharacter: Char
 /**
  * Verifies that the latest history record on the backend matches the expected history record.
  */
-async function verifyLatestHistoryRecord(characterId: string, expectedHistoryRecord: HistoryRecord): Promise<void> {
-  const { latestRecord } = await getLatestHistoryRecord(characterId);
-  expect(latestRecord).toStrictEqual(expectedHistoryRecord);
+async function verifyLatestHistoryRecord(context: TestContext): Promise<void> {
+  const { latestRecord } = await TestContextFactory.getLatestHistoryRecord(context.character.characterId);
+  expect(latestRecord).toStrictEqual(context.lastHistoryRecord);
 }

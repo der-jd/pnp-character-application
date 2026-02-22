@@ -11,25 +11,24 @@ import {
   HistoryRecord,
 } from "api-spec";
 import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
-import { setupTestContext, cleanUpTestContext } from "../setup.js";
-import { getTestContext } from "../test-context.js";
+import { TestContextFactory, TestContext } from "../test-context-factory.js";
 import { ApiClient } from "../api-client.js";
 
 describe.sequential("patch-skill component tests", () => {
+  let context: TestContext;
   let currentResponse: PatchSkillResponse | undefined;
-  let apiClient: ApiClient;
 
   beforeAll(async () => {
-    await setupTestContext();
-    apiClient = getTestContext().apiClient;
+    context = await TestContextFactory.createContext();
   });
 
   afterAll(async () => {
-    await cleanUpTestContext();
+    await TestContextFactory.cleanupContext(context);
   });
 
   afterEach(async () => {
     await updateAndVerifyTestContextAfterEachTest(
+      context,
       currentResponse,
       (response: PatchSkillResponse, character: Character) => {
         const _skillCategory = response.data.skillCategory as keyof CharacterSheet["skills"];
@@ -61,13 +60,13 @@ describe.sequential("patch-skill component tests", () => {
   describe("Invalid requests", () => {
     commonInvalidTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
 
-        const authorizationHeader = _case.authorizationHeader ?? getTestContext().authorizationHeader;
+        const authorizationHeader = _case.authorizationHeader ?? context.authorizationHeader;
         const path = _case.characterId
           ? `characters/${_case.characterId}/skills/body/athletics`
           : `characters/${character.characterId}/skills/body/athletics`;
-        const client = new ApiClient(getTestContext().apiBaseUrl, authorizationHeader);
+        const client = new ApiClient(context.apiBaseUrl, authorizationHeader);
 
         await expectApiError(
           () =>
@@ -85,11 +84,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("activating a skill without learning method", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
             activated: true,
           }),
         409,
@@ -98,11 +97,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("deactivating a skill is not allowed", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             activated: false,
           }),
         409,
@@ -111,11 +110,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("passed initial start skill value doesn't match the value in the backend", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             start: {
               initialValue: character.characterSheet.skills.body.athletics.start + 2,
               newValue: character.characterSheet.skills.body.athletics.start + 4,
@@ -127,11 +126,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("passed initial current skill value doesn't match the value in the backend", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             current: {
               initialValue: character.characterSheet.skills.body.athletics.current + 3,
               increasedPoints: 15,
@@ -144,11 +143,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("passed initial mod value doesn't match the value in the backend", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             mod: {
               initialValue: character.characterSheet.skills.body.athletics.mod + 1,
               newValue: character.characterSheet.skills.body.athletics.mod + 4,
@@ -160,11 +159,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("skill is not activated (start value updated)", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
             start: {
               initialValue: character.characterSheet.skills.nature.fishing.start,
               newValue: character.characterSheet.skills.nature.fishing.start + 1,
@@ -176,11 +175,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("skill is not activated (current value updated)", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
             current: {
               initialValue: character.characterSheet.skills.nature.fishing.current,
               increasedPoints: 1,
@@ -193,11 +192,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("skill is not activated (mod value updated)", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/nature/fishing`, {
             mod: {
               initialValue: character.characterSheet.skills.nature.fishing.mod,
               newValue: character.characterSheet.skills.nature.fishing.mod + 1,
@@ -209,11 +208,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("not enough adventure points", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/combat/slashingWeaponsSharp1h`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/combat/slashingWeaponsSharp1h`, {
             current: {
               initialValue: character.characterSheet.skills.combat.slashingWeaponsSharp1h.current,
               increasedPoints: 300,
@@ -226,11 +225,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("increased points are 0", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             current: {
               initialValue: character.characterSheet.skills.body.athletics.current,
               increasedPoints: 0,
@@ -243,11 +242,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("increased points are negative", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             current: {
               initialValue: character.characterSheet.skills.body.athletics.current,
               increasedPoints: -3,
@@ -260,11 +259,11 @@ describe.sequential("patch-skill component tests", () => {
     });
 
     test("increasing a skill without learning method", async () => {
-      const character = getTestContext().character;
+      const character = context.character;
 
       await expectApiError(
         () =>
-          apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
+          context.apiClient.patch(`characters/${character.characterId}/skills/body/athletics`, {
             current: {
               initialValue: character.characterSheet.skills.body.athletics.current,
               increasedPoints: 1,
@@ -343,11 +342,11 @@ describe.sequential("patch-skill component tests", () => {
 
     idempotentTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
         const body = _case.getBody(character);
 
         const response = patchSkillResponseSchema.parse(
-          await apiClient.patch(
+          await context.apiClient.patch(
             `characters/${character.characterId}/skills/${_case.skillCategory}/${_case.skillName}`,
             body,
           ),
@@ -584,11 +583,11 @@ describe.sequential("patch-skill component tests", () => {
 
     updateTestCases.forEach((_case) => {
       test(_case.name, async () => {
-        const character = getTestContext().character;
+        const character = context.character;
         const body = _case.getBody(character);
 
         const response = patchSkillResponseSchema.parse(
-          await apiClient.patch(
+          await context.apiClient.patch(
             `characters/${character.characterId}/skills/${_case.skillCategory}/${_case.skillName}`,
             body,
           ),
