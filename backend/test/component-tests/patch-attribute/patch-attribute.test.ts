@@ -2,17 +2,56 @@ import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import {
   patchAttributeResponseSchema,
   CharacterSheet,
+  Character,
   Attribute,
   BaseValue,
   BaseValues,
   CombatStats,
   HistoryRecordType,
   PatchAttributeHistoryRecord,
+  PatchAttributeResponse,
 } from "api-spec";
 import { expectApiError, verifyCharacterState, verifyLatestHistoryRecord, commonInvalidTestCases } from "../shared.js";
 import { apiClient, setupTestContext, cleanUpTestContext } from "../setup.js";
 import { getTestContext, setTestContext } from "../test-context.js";
 import { ApiClient } from "../api-client.js";
+
+function updateTestContextCharacter(
+  character: Character,
+  response: PatchAttributeResponse,
+): void {
+  character.characterSheet.attributes[response.data.attributeName as keyof CharacterSheet["attributes"]] =
+    response.data.changes.new.attribute;
+  character.characterSheet.calculationPoints.attributePoints = response.data.attributePoints.new;
+
+  // Update base values if they changed
+  if (response.data.changes.new.baseValues) {
+    for (const [baseValueName, baseValue] of Object.entries(response.data.changes.new.baseValues)) {
+      character.characterSheet.baseValues[baseValueName as keyof BaseValues] = baseValue as BaseValue;
+    }
+  }
+
+  // Update combat stats if they changed
+  if (response.data.changes.new.combat) {
+    if (response.data.changes.new.combat.melee) {
+      for (const [skillName, combatStats] of Object.entries(response.data.changes.new.combat.melee)) {
+        character.characterSheet.combat.melee[skillName as keyof CharacterSheet["combat"]["melee"]] =
+          combatStats as CombatStats;
+      }
+    }
+    if (response.data.changes.new.combat.ranged) {
+      for (const [skillName, combatStats] of Object.entries(response.data.changes.new.combat.ranged)) {
+        character.characterSheet.combat.ranged[skillName as keyof CharacterSheet["combat"]["ranged"]] =
+          combatStats as CombatStats;
+      }
+    }
+  }
+
+  setTestContext({
+    character,
+    lastHistoryRecord: response.historyRecord!,
+  });
+}
 
 describe.sequential("patch-attribute component tests", () => {
   beforeAll(async () => {
@@ -61,8 +100,8 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             start: {
-              initialValue: 10,
-              newValue: 12,
+              initialValue: 6,
+              newValue: 7,
             },
           }),
         409,
@@ -77,7 +116,7 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
-              initialValue: 10,
+              initialValue: 6,
               increasedPoints: 1,
             },
           }),
@@ -93,8 +132,8 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             mod: {
-              initialValue: 5,
-              newValue: 10,
+              initialValue: 1,
+              newValue: 3,
             },
           }),
         409,
@@ -109,7 +148,7 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
-              initialValue: 18,
+              initialValue: 5,
               increasedPoints: 60,
             },
           }),
@@ -125,7 +164,7 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
-              initialValue: 18,
+              initialValue: 5,
               increasedPoints: 0,
             },
           }),
@@ -141,7 +180,7 @@ describe.sequential("patch-attribute component tests", () => {
         () =>
           apiClient.patch(`characters/${character.characterId}/attributes/endurance`, {
             current: {
-              initialValue: 18,
+              initialValue: 5,
               increasedPoints: -1,
             },
           }),
@@ -164,8 +203,8 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "endurance",
         body: {
           start: {
-            initialValue: 15,
-            newValue: 17,
+            initialValue: 3,
+            newValue: 5,
           },
         },
       },
@@ -174,8 +213,8 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "endurance",
         body: {
           current: {
-            initialValue: 17,
-            increasedPoints: 1,
+            initialValue: 2,
+            increasedPoints: 3,
           },
         },
       },
@@ -184,8 +223,8 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "endurance",
         body: {
           mod: {
-            initialValue: 0,
-            newValue: 1,
+            initialValue: 2,
+            newValue: 0,
           },
         },
       },
@@ -267,8 +306,8 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "endurance",
         body: {
           start: {
-            initialValue: 17,
-            newValue: 15,
+            initialValue: 5,
+            newValue: 6,
           },
         },
         expectedCosts: 0,
@@ -278,7 +317,7 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "endurance",
         body: {
           current: {
-            initialValue: 18,
+            initialValue: 5,
             increasedPoints: 1,
           },
         },
@@ -289,7 +328,7 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "endurance",
         body: {
           current: {
-            initialValue: 19,
+            initialValue: 6,
             increasedPoints: 3,
           },
         },
@@ -300,8 +339,8 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "endurance",
         body: {
           mod: {
-            initialValue: 1,
-            newValue: 5,
+            initialValue: 0,
+            newValue: 2,
           },
         },
         expectedCosts: 0,
@@ -311,16 +350,16 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "endurance",
         body: {
           start: {
-            initialValue: 15,
-            newValue: 10,
+            initialValue: 6,
+            newValue: 3,
           },
           current: {
-            initialValue: 22,
+            initialValue: 9,
             increasedPoints: 1,
           },
           mod: {
-            initialValue: 5,
-            newValue: 6,
+            initialValue: 2,
+            newValue: 3,
           },
         },
         expectedCosts: 1,
@@ -403,38 +442,7 @@ describe.sequential("patch-attribute component tests", () => {
         // Verify comment is null (not set in this operation)
         expect(historyRecord.comment).toBeNull();
 
-        // Update test context
-        character.characterSheet.attributes[_case.attributeName as keyof CharacterSheet["attributes"]] =
-          response.data.changes.new.attribute;
-        character.characterSheet.calculationPoints.attributePoints = response.data.attributePoints.new;
-
-        // Update base values if they changed
-        if (response.data.changes.new.baseValues) {
-          for (const [baseValueName, baseValue] of Object.entries(response.data.changes.new.baseValues)) {
-            character.characterSheet.baseValues[baseValueName as keyof BaseValues] = baseValue as BaseValue;
-          }
-        }
-
-        // Update combat stats if they changed
-        if (response.data.changes.new.combat) {
-          if (response.data.changes.new.combat.melee) {
-            for (const [skillName, combatStats] of Object.entries(response.data.changes.new.combat.melee)) {
-              character.characterSheet.combat.melee[skillName as keyof CharacterSheet["combat"]["melee"]] =
-                combatStats as CombatStats;
-            }
-          }
-          if (response.data.changes.new.combat.ranged) {
-            for (const [skillName, combatStats] of Object.entries(response.data.changes.new.combat.ranged)) {
-              character.characterSheet.combat.ranged[skillName as keyof CharacterSheet["combat"]["ranged"]] =
-                combatStats as CombatStats;
-            }
-          }
-        }
-
-        setTestContext({
-          character,
-          lastHistoryRecord: response.historyRecord!,
-        });
+        updateTestContextCharacter(character, response);
 
         await verifyCharacterState(character.characterId, getTestContext().character);
 
@@ -457,8 +465,8 @@ describe.sequential("patch-attribute component tests", () => {
         attributeEffects: {},
         body: {
           start: {
-            initialValue: 17,
-            newValue: 20,
+            initialValue: 6,
+            newValue: 7,
           },
         },
       },
@@ -468,8 +476,8 @@ describe.sequential("patch-attribute component tests", () => {
         attributeEffects: {},
         body: {
           current: {
-            initialValue: 12,
-            increasedPoints: 5,
+            initialValue: 4,
+            increasedPoints: 1,
           },
         },
       },
@@ -479,8 +487,8 @@ describe.sequential("patch-attribute component tests", () => {
         attributeEffects: {},
         body: {
           current: {
-            initialValue: 13,
-            increasedPoints: 2,
+            initialValue: 5,
+            increasedPoints: 1,
           },
         },
       },
@@ -492,7 +500,7 @@ describe.sequential("patch-attribute component tests", () => {
         },
         body: {
           current: {
-            initialValue: 10,
+            initialValue: 6,
             increasedPoints: 5,
           },
         },
@@ -505,8 +513,8 @@ describe.sequential("patch-attribute component tests", () => {
         },
         body: {
           mod: {
-            initialValue: 2,
-            newValue: 7,
+            initialValue: 0,
+            newValue: 5,
           },
         },
       },
@@ -520,12 +528,12 @@ describe.sequential("patch-attribute component tests", () => {
         },
         body: {
           current: {
-            initialValue: 18,
+            initialValue: 10,
             increasedPoints: 3,
           },
           mod: {
-            initialValue: 1,
-            newValue: 3,
+            initialValue: 3,
+            newValue: 5,
           },
         },
       },
@@ -540,7 +548,7 @@ describe.sequential("patch-attribute component tests", () => {
         },
         body: {
           current: {
-            initialValue: 16,
+            initialValue: 5,
             increasedPoints: 5,
           },
         },
@@ -553,7 +561,7 @@ describe.sequential("patch-attribute component tests", () => {
         },
         body: {
           current: {
-            initialValue: 14,
+            initialValue: 4,
             increasedPoints: 1,
           },
         },
@@ -568,7 +576,7 @@ describe.sequential("patch-attribute component tests", () => {
         },
         body: {
           current: {
-            initialValue: 15,
+            initialValue: 7,
             increasedPoints: 3,
           },
         },
@@ -584,7 +592,7 @@ describe.sequential("patch-attribute component tests", () => {
         },
         body: {
           current: {
-            initialValue: 18,
+            initialValue: 6,
             increasedPoints: 1,
           },
         },
@@ -688,22 +696,7 @@ describe.sequential("patch-attribute component tests", () => {
         expect(historyRecord.data.old.baseValues).toStrictEqual(response.data.changes.old.baseValues);
         expect(historyRecord.data.new.baseValues).toStrictEqual(response.data.changes.new.baseValues);
 
-        // Update test context
-        character.characterSheet.attributes[_case.attributeName as keyof CharacterSheet["attributes"]] =
-          response.data.changes.new.attribute;
-        character.characterSheet.calculationPoints.attributePoints = response.data.attributePoints.new;
-
-        // Update base values if they changed
-        if (response.data.changes.new.baseValues) {
-          for (const [baseValueName, baseValue] of Object.entries(response.data.changes.new.baseValues)) {
-            character.characterSheet.baseValues[baseValueName as keyof BaseValues] = baseValue as BaseValue;
-          }
-        }
-
-        setTestContext({
-          character,
-          lastHistoryRecord: response.historyRecord!,
-        });
+        updateTestContextCharacter(character, response);
 
         await verifyCharacterState(character.characterId, getTestContext().character);
         await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
@@ -724,12 +717,12 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "endurance",
         body: {
           current: {
-            initialValue: 18,
+            initialValue: 13,
             increasedPoints: 3,
           },
           mod: {
-            initialValue: 1,
-            newValue: 3,
+            initialValue: 5,
+            newValue: 7,
           },
         },
       },
@@ -738,7 +731,7 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "dexterity",
         body: {
           current: {
-            initialValue: 16,
+            initialValue: 10,
             increasedPoints: 5,
           },
         },
@@ -748,7 +741,7 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "concentration",
         body: {
           current: {
-            initialValue: 14,
+            initialValue: 5,
             increasedPoints: 1,
           },
         },
@@ -758,7 +751,7 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "courage",
         body: {
           current: {
-            initialValue: 15,
+            initialValue: 10,
             increasedPoints: 3,
           },
         },
@@ -768,7 +761,7 @@ describe.sequential("patch-attribute component tests", () => {
         attributeName: "strength",
         body: {
           current: {
-            initialValue: 18,
+            initialValue: 7,
             increasedPoints: 1,
           },
         },
@@ -942,38 +935,7 @@ describe.sequential("patch-attribute component tests", () => {
         expect(historyRecord.data.old.combat).toStrictEqual(response.data.changes.old.combat);
         expect(historyRecord.data.new.combat).toStrictEqual(response.data.changes.new.combat);
 
-        // Update test context
-        character.characterSheet.attributes[_case.attributeName as keyof CharacterSheet["attributes"]] =
-          response.data.changes.new.attribute;
-        character.characterSheet.calculationPoints.attributePoints = response.data.attributePoints.new;
-
-        // Update base values if they changed
-        if (response.data.changes.new.baseValues) {
-          for (const [baseValueName, baseValue] of Object.entries(response.data.changes.new.baseValues)) {
-            character.characterSheet.baseValues[baseValueName as keyof BaseValues] = baseValue as BaseValue;
-          }
-        }
-
-        // Update combat stats if they changed
-        if (response.data.changes.new.combat) {
-          if (response.data.changes.new.combat.melee) {
-            for (const [skillName, combatStats] of Object.entries(response.data.changes.new.combat.melee)) {
-              character.characterSheet.combat.melee[skillName as keyof CharacterSheet["combat"]["melee"]] =
-                combatStats as CombatStats;
-            }
-          }
-          if (response.data.changes.new.combat.ranged) {
-            for (const [skillName, combatStats] of Object.entries(response.data.changes.new.combat.ranged)) {
-              character.characterSheet.combat.ranged[skillName as keyof CharacterSheet["combat"]["ranged"]] =
-                combatStats as CombatStats;
-            }
-          }
-        }
-
-        setTestContext({
-          character,
-          lastHistoryRecord: response.historyRecord!,
-        });
+        updateTestContextCharacter(character, response);
 
         await verifyCharacterState(character.characterId, getTestContext().character);
         await verifyLatestHistoryRecord(character.characterId, getTestContext().lastHistoryRecord);
