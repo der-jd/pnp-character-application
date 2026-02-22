@@ -23,7 +23,7 @@ describe.sequential("get-characters component tests", () => {
 
   describe("Invalid requests", () => {
     // Test cases with characterId are not applicable for this endpoint
-    const testCasesWithoutCharacterId = commonInvalidTestCases.filter(_case => !_case.characterId);
+    const testCasesWithoutCharacterId = commonInvalidTestCases.filter((_case) => !_case.characterId);
 
     testCasesWithoutCharacterId.forEach((_case) => {
       test(_case.name, async () => {
