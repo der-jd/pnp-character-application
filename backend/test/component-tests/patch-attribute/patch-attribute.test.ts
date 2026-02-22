@@ -304,64 +304,64 @@ describe.sequential("patch-attribute component tests", () => {
       {
         name: "update start attribute value",
         attributeName: "endurance",
-        body: {
+        getBody: (character: Character) => ({
           start: {
-            initialValue: 5,
-            newValue: 6,
+            initialValue: character.characterSheet.attributes.endurance.start,
+            newValue: character.characterSheet.attributes.endurance.start + 1,
           },
-        },
+        }),
         expectedCosts: 0,
       },
       {
         name: "increase current attribute value by 1 point",
         attributeName: "endurance",
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 5,
+            initialValue: character.characterSheet.attributes.endurance.current,
             increasedPoints: 1,
           },
-        },
+        }),
         expectedCosts: 1,
       },
       {
         name: "increase current attribute value by 3 points",
         attributeName: "endurance",
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 6,
+            initialValue: character.characterSheet.attributes.endurance.current,
             increasedPoints: 3,
           },
-        },
+        }),
         expectedCosts: 3,
       },
       {
         name: "update mod value",
         attributeName: "endurance",
-        body: {
+        getBody: (character: Character) => ({
           mod: {
-            initialValue: 0,
-            newValue: 2,
+            initialValue: character.characterSheet.attributes.endurance.mod,
+            newValue: character.characterSheet.attributes.endurance.mod + 2,
           },
-        },
+        }),
         expectedCosts: 0,
       },
       {
         name: "update all attribute values (start, current, mod)",
         attributeName: "endurance",
-        body: {
+        getBody: (character: Character) => ({
           start: {
-            initialValue: 6,
-            newValue: 3,
+            initialValue: character.characterSheet.attributes.endurance.start,
+            newValue: character.characterSheet.attributes.endurance.start - 3,
           },
           current: {
-            initialValue: 9,
+            initialValue: character.characterSheet.attributes.endurance.current,
             increasedPoints: 1,
           },
           mod: {
-            initialValue: 2,
-            newValue: 3,
+            initialValue: character.characterSheet.attributes.endurance.mod,
+            newValue: character.characterSheet.attributes.endurance.mod + 1,
           },
-        },
+        }),
         expectedCosts: 1,
       },
     ];
@@ -369,9 +369,10 @@ describe.sequential("patch-attribute component tests", () => {
     updateTestCases.forEach((_case) => {
       test(_case.name, async () => {
         const character = getTestContext().character;
+        const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, _case.body),
+          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
 
         // Verify response structure
@@ -380,17 +381,17 @@ describe.sequential("patch-attribute component tests", () => {
         expect(response.data.attributeName).toBe(_case.attributeName);
 
         // Verify attribute value updates
-        if (_case.body.start) {
-          expect(response.data.changes.new.attribute.start).toBe(_case.body.start.newValue);
+        if ('start' in body) {
+          expect(response.data.changes.new.attribute.start).toBe(body.start.newValue);
         }
 
-        if (_case.body.current) {
-          const expectedCurrent = _case.body.current.initialValue + _case.body.current.increasedPoints;
+        if ('current' in body) {
+          const expectedCurrent = body.current.initialValue + body.current.increasedPoints;
           expect(response.data.changes.new.attribute.current).toBe(expectedCurrent);
         }
 
-        if (_case.body.mod) {
-          expect(response.data.changes.new.attribute.mod).toBe(_case.body.mod.newValue);
+        if ('mod' in body) {
+          expect(response.data.changes.new.attribute.mod).toBe(body.mod.newValue);
         }
 
         // Verify attribute points were spent correctly
@@ -463,34 +464,34 @@ describe.sequential("patch-attribute component tests", () => {
         name: "update start value of attribute 'strength' -> unchanged base values",
         attributeName: "strength",
         attributeEffects: {},
-        body: {
+        getBody: (character: Character) => ({
           start: {
-            initialValue: 6,
-            newValue: 7,
+            initialValue: character.characterSheet.attributes.strength.start,
+            newValue: character.characterSheet.attributes.strength.start + 1,
           },
-        },
+        }),
       },
       {
         name: "increase current value of attribute 'intelligence' -> unchanged base values",
         attributeName: "intelligence",
         attributeEffects: {},
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 4,
+            initialValue: character.characterSheet.attributes.intelligence.current,
             increasedPoints: 1,
           },
-        },
+        }),
       },
       {
         name: "update current value of attribute 'charisma' -> unchanged base values",
         attributeName: "charisma",
         attributeEffects: {},
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 5,
+            initialValue: character.characterSheet.attributes.charisma.current,
             increasedPoints: 1,
           },
-        },
+        }),
       },
       {
         name: "update current value of attribute 'mental resilience' -> changed base values",
@@ -498,12 +499,12 @@ describe.sequential("patch-attribute component tests", () => {
         attributeEffects: {
           mentalHealth: 10,
         },
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 6,
+            initialValue: character.characterSheet.attributes.mentalResilience.current,
             increasedPoints: 5,
           },
-        },
+        }),
       },
       {
         name: "update mod value of attribute 'mental resilience' -> changed base values",
@@ -511,12 +512,12 @@ describe.sequential("patch-attribute component tests", () => {
         attributeEffects: {
           mentalHealth: 10,
         },
-        body: {
+        getBody: (character: Character) => ({
           mod: {
-            initialValue: 0,
-            newValue: 5,
+            initialValue: character.characterSheet.attributes.mentalResilience.mod,
+            newValue: character.characterSheet.attributes.mentalResilience.mod + 5,
           },
-        },
+        }),
       },
       {
         name: "update current and mod value of attribute 'endurance' -> changed base values",
@@ -526,16 +527,16 @@ describe.sequential("patch-attribute component tests", () => {
           initiativeBaseValue: 1,
           paradeBaseValue: 10,
         },
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 10,
+            initialValue: character.characterSheet.attributes.endurance.current,
             increasedPoints: 3,
           },
           mod: {
-            initialValue: 3,
-            newValue: 5,
+            initialValue: character.characterSheet.attributes.endurance.mod,
+            newValue: character.characterSheet.attributes.endurance.mod + 2,
           },
-        },
+        }),
       },
       {
         name: "update current value of attribute 'dexterity' -> changed base values",
@@ -546,12 +547,12 @@ describe.sequential("patch-attribute component tests", () => {
           paradeBaseValue: 10,
           rangedAttackBaseValue: 10,
         },
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 5,
+            initialValue: character.characterSheet.attributes.dexterity.current,
             increasedPoints: 5,
           },
-        },
+        }),
       },
       {
         name: "update current value of attribute 'concentration' -> changed base values",
@@ -559,12 +560,12 @@ describe.sequential("patch-attribute component tests", () => {
         attributeEffects: {
           rangedAttackBaseValue: 2,
         },
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 4,
+            initialValue: character.characterSheet.attributes.concentration.current,
             increasedPoints: 1,
           },
-        },
+        }),
       },
       {
         name: "update current value of attribute 'courage' -> changed base values",
@@ -574,12 +575,12 @@ describe.sequential("patch-attribute component tests", () => {
           initiativeBaseValue: 1,
           attackBaseValue: 6,
         },
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 7,
+            initialValue: character.characterSheet.attributes.courage.current,
             increasedPoints: 3,
           },
-        },
+        }),
       },
       {
         name: "update current value of attribute 'strength' -> changed base values",
@@ -590,21 +591,22 @@ describe.sequential("patch-attribute component tests", () => {
           paradeBaseValue: 2,
           rangedAttackBaseValue: 2,
         },
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 6,
+            initialValue: character.characterSheet.attributes.strength.current,
             increasedPoints: 1,
           },
-        },
+        }),
       },
     ];
 
     baseValuesTestCases.forEach((_case) => {
       test(_case.name, async () => {
         const character = getTestContext().character;
+        const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, _case.body),
+          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
 
         // Verify response structure
@@ -715,65 +717,66 @@ describe.sequential("patch-attribute component tests", () => {
       {
         name: "update current and mod value of attribute 'endurance' -> changed combat stats",
         attributeName: "endurance",
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 13,
+            initialValue: character.characterSheet.attributes.endurance.current,
             increasedPoints: 3,
           },
           mod: {
-            initialValue: 5,
-            newValue: 7,
+            initialValue: character.characterSheet.attributes.endurance.mod,
+            newValue: character.characterSheet.attributes.endurance.mod + 2,
           },
-        },
+        }),
       },
       {
         name: "update current value of attribute 'dexterity' -> changed combat stats",
         attributeName: "dexterity",
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 10,
+            initialValue: character.characterSheet.attributes.dexterity.current,
             increasedPoints: 5,
           },
-        },
+        }),
       },
       {
         name: "update current value of attribute 'concentration' -> changed combat stats",
         attributeName: "concentration",
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 5,
+            initialValue: character.characterSheet.attributes.concentration.current,
             increasedPoints: 1,
           },
-        },
+        }),
       },
       {
         name: "update current value of attribute 'courage' -> changed combat stats",
         attributeName: "courage",
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 10,
+            initialValue: character.characterSheet.attributes.courage.current,
             increasedPoints: 3,
           },
-        },
+        }),
       },
       {
         name: "update current value of attribute 'strength' -> changed combat stats",
         attributeName: "strength",
-        body: {
+        getBody: (character: Character) => ({
           current: {
-            initialValue: 7,
+            initialValue: character.characterSheet.attributes.strength.current,
             increasedPoints: 1,
           },
-        },
+        }),
       },
     ];
 
     combatStatsTestCases.forEach((_case) => {
       test(_case.name, async () => {
         const character = getTestContext().character;
+        const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, _case.body),
+          await apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
 
         // Verify response structure
