@@ -51,7 +51,7 @@ export default function SignIn() {
     if (error) {
       clearError();
     }
-  }, [email, password]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [email, password]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

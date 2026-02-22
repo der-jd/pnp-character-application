@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { BaseValues } from "../character-schemas.js";
 import { initialNewSchema, MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
 import { baseValueChangeSchema, recordSchema } from "../history-schemas.js";
 
@@ -15,7 +14,6 @@ export type PatchBaseValuePathParams = z.infer<typeof patchBaseValuePathParamsSc
 export const patchBaseValueRequestSchema = z
   .object({
     start: initialNewSchema.optional(),
-    byLvlUp: initialNewSchema.optional(),
     mod: initialNewSchema.optional(),
   })
   .strict();
@@ -57,12 +55,3 @@ export const patchBaseValueResponseSchema = z
   .strict();
 
 export type PatchBaseValueResponse = z.infer<typeof patchBaseValueResponseSchema>;
-
-export const baseValuesUpdatableByLvlUp: (keyof BaseValues)[] = [
-  "healthPoints",
-  "armorLevel",
-  "initiativeBaseValue",
-  "luckPoints",
-  "bonusActionsPerCombatRound",
-  "legendaryActions",
-];

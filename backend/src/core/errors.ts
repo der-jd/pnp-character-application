@@ -7,7 +7,7 @@ export function logAndEnsureHttpError(value: unknown): HttpError {
   if (value instanceof Error) {
     console.error(value);
   } else {
-    let stringified = "";
+    let stringified: string;
     try {
       stringified = JSON.stringify(value);
     } catch {

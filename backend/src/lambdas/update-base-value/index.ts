@@ -7,9 +7,7 @@ import {
   UpdateBaseValueResponse,
   headersSchema,
   BaseValue,
-  CharacterSheet,
   InitialNew,
-  baseValuesUpdatableByLvlUp,
   CombatSection,
 } from "api-spec";
 import {
@@ -56,10 +54,6 @@ export async function _updateBaseValue(request: Request): Promise<APIGatewayProx
 
     if (params.body.start) {
       baseValue = updateStartValue(baseValue, params.body.start);
-    }
-
-    if (params.body.byLvlUp) {
-      baseValue = updateByLvlUpValue(params.pathParams["base-value-name"], baseValue, params.body.byLvlUp);
     }
 
     if (params.body.mod) {
@@ -156,37 +150,6 @@ function updateStartValue(baseValue: BaseValue, startValue: InitialNew): BaseVal
     return baseValue;
   } else {
     baseValue.start = startValue.newValue;
-    return baseValue;
-  }
-}
-
-function updateByLvlUpValue(
-  baseValueName: keyof CharacterSheet["baseValues"] | string,
-  baseValue: BaseValue,
-  byLvlUp: InitialNew
-): BaseValue {
-  console.log(`Update byLvlUp value of the base value from ${byLvlUp.initialValue} to ${byLvlUp.newValue}`);
-
-  if (!baseValuesUpdatableByLvlUp.includes(baseValueName as keyof CharacterSheet["baseValues"])) {
-    throw new HttpError(400, "'By level up' changes are not allowed for this base value!", {
-      baseValueName: baseValueName,
-    });
-  }
-
-  if (byLvlUp.initialValue !== baseValue.byLvlUp && byLvlUp.newValue !== baseValue.byLvlUp) {
-    throw new HttpError(409, "The passed byLvlUp value doesn't match the value in the backend!", {
-      passedByLvlUpValue: byLvlUp.initialValue,
-      backendByLvlUpValue: baseValue.byLvlUp,
-    });
-  }
-
-  if (byLvlUp.newValue === baseValue.byLvlUp) {
-    console.log("Base value byLvlUp value already updated to target value. Nothing to do.");
-    return baseValue;
-  } else {
-    baseValue.byLvlUp = byLvlUp.newValue;
-    const diffByLvlUp = byLvlUp.newValue - byLvlUp.initialValue;
-    baseValue.current += diffByLvlUp;
     return baseValue;
   }
 }

@@ -7,8 +7,6 @@ import {
   MAX_POINTS,
   MAX_COST,
   MAX_ARRAY_SIZE,
-  MIN_LEVEL,
-  MAX_LEVEL,
   MAX_ATTRIBUTE_VALUE,
   MIN_ATTRIBUTE_VALUE,
   userIdSchema,
@@ -16,6 +14,7 @@ import {
   MIN_COMBAT_STAT,
   MIN_POINTS,
 } from "./general-schemas.js";
+import { levelSchema, levelUpProgressSchema } from "./level-up-schemas.js";
 
 export const combinedSkillCategoryAndNameSchema = z
   .string()
@@ -32,16 +31,13 @@ export const professionHobbySchema = z
 
 export type ProfessionHobby = z.infer<typeof professionHobbySchema>;
 
-export const levelSchema = z.number().int().min(MIN_LEVEL).max(MAX_LEVEL);
-
-export type Level = z.infer<typeof levelSchema>;
-
 export const characterNameSchema = z.string().max(MAX_STRING_LENGTH_DEFAULT);
 
 export const generalInformationSchema = z
   .object({
     name: characterNameSchema,
     level: levelSchema,
+    levelUpProgress: levelUpProgressSchema,
     sex: z.string().max(MAX_STRING_LENGTH_SHORT),
     profession: professionHobbySchema,
     hobby: professionHobbySchema,

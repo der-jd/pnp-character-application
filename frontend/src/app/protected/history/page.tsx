@@ -50,6 +50,7 @@ export default function HistoryPage() {
             variant: "destructive",
           });
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast({
           title: "Error",
@@ -62,7 +63,6 @@ export default function HistoryPage() {
     };
 
     loadHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCharacterId, tokens?.idToken]);
 
   // Handle revert action
@@ -96,6 +96,7 @@ export default function HistoryPage() {
             variant: "destructive",
           });
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast({
           title: "Error",

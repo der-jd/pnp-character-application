@@ -24,8 +24,14 @@ resource "aws_iam_role_policy" "api_gateway_policy" {
         Effect = "Allow",
         Action = "states:StartSyncExecution",
         Resource = [
+          aws_sfn_state_machine.create_character_state_machine.arn,
           aws_sfn_state_machine.update_skill_state_machine.arn,
-          aws_sfn_state_machine.update_attribute_state_machine.arn
+          aws_sfn_state_machine.update_attribute_state_machine.arn,
+          aws_sfn_state_machine.update_base_value_state_machine.arn,
+          aws_sfn_state_machine.update_calculation_points_state_machine.arn,
+          aws_sfn_state_machine.apply_level_up_state_machine.arn,
+          aws_sfn_state_machine.update_combat_stats_state_machine.arn,
+          aws_sfn_state_machine.add_special_ability_state_machine.arn
         ]
       }
     ]
@@ -37,7 +43,7 @@ resource "aws_api_gateway_rest_api" "pnp_rest_api" {
   name        = "pnp-app-api"
   description = "REST API for the PnP character application"
   endpoint_configuration {
-    // Distribute the regional API only via our own CloudFront distribution.
+    // Using Regional API endpoint for direct access without CloudFront distribution.
     // See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-endpoint-types.html#api-gateway-api-endpoint-types-regional
     types = ["REGIONAL"]
   }
@@ -274,20 +280,34 @@ module "calculation_points_options" {
   resource_id = aws_api_gateway_resource.calculation_points.id
 }
 
-// ================== /characters/{character-id}/level ==================
+// ================== /characters/{character-id}/level-up ==================
 
-resource "aws_api_gateway_resource" "level" {
+resource "aws_api_gateway_resource" "level_up" {
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   parent_id   = aws_api_gateway_resource.character_id.id
-  path_part   = "level" // .../characters/{character-id}/level
+  path_part   = "level-up" // .../characters/{character-id}/level-up
 }
 
-// ================== POST /characters/{character-id}/level ==================
+// ================== GET /characters/{character-id}/level-up ==================
 
-module "level_post" {
+module "level_up_get" {
+  source        = "./modules/apigw_lambda_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.level_up.id
+  http_method   = "GET"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  lambda_uri = module.get_level_up_lambda.lambda_function.invoke_arn
+}
+
+// ================== POST /characters/{character-id}/level-up ==================
+
+module "level_up_post" {
   source        = "./modules/apigw_stepfunction_integration"
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.level.id
+  resource_id   = aws_api_gateway_resource.level_up.id
   http_method   = "POST"
   authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
@@ -295,15 +315,15 @@ module "level_post" {
   }
   aws_region        = data.aws_region.current.name
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.update_level_state_machine.arn
+  state_machine_arn = aws_sfn_state_machine.apply_level_up_state_machine.arn
 }
 
-// ================== OPTIONS /characters/{character-id}/level ==================
+// ================== OPTIONS /characters/{character-id}/level-up ==================
 
-module "level_options" {
+module "level_up_options" {
   source      = "./modules/apigw_options_method"
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.level.id
+  resource_id = aws_api_gateway_resource.level_up.id
 }
 
 // ================== /characters/{character-id}/skills ==================
@@ -552,8 +572,9 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     module.character_id_options,
     module.character_id_clone_post,
     module.character_id_clone_options,
-    module.level_post,
-    module.level_options,
+    module.level_up_get,
+    module.level_up_post,
+    module.level_up_options,
     module.special_abilities_post,
     module.special_abilities_options,
     module.skill_name_get,
@@ -580,13 +601,53 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   }
 }
 
-resource "aws_api_gateway_stage" "prod" {
+resource "aws_api_gateway_stage" "api_stage" {
   rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
   deployment_id = aws_api_gateway_deployment.api_deployment.id
-  stage_name    = "prod"
+  stage_name    = var.env
 }
 
-output "api_gateway_url" {
-  value     = "https://${aws_api_gateway_rest_api.pnp_rest_api.id}.execute-api.${data.aws_region.current.name}.amazonaws.com/${aws_api_gateway_stage.prod.stage_name}"
-  sensitive = true
+# ================== Custom Domain Configuration ==================
+
+# Read API version from package.json
+data "local_file" "api_spec_package" {
+  filename = "${path.root}/../api-spec/package.json"
+}
+
+locals {
+  # Extract major version from package.json (e.g., "1.0.0" -> "v1")
+  api_version_parts = split(".", jsondecode(data.local_file.api_spec_package.content).version)
+  api_major_version = "v${local.api_version_parts[0]}"
+}
+
+# API Gateway custom domain name
+resource "aws_api_gateway_domain_name" "api_domain" {
+  domain_name              = var.api_domain_name
+  regional_certificate_arn = aws_acm_certificate_validation.api_cert_validation.certificate_arn
+  security_policy          = "TLS_1_2"
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+
+  depends_on = [aws_acm_certificate_validation.api_cert_validation]
+}
+
+# Base path mapping for API Gateway
+resource "aws_api_gateway_base_path_mapping" "api_mapping" {
+  api_id     = aws_api_gateway_rest_api.pnp_rest_api.id
+  stage_name = aws_api_gateway_stage.api_stage.stage_name
+
+  domain_name = aws_api_gateway_domain_name.api_domain.domain_name
+  base_path   = local.api_major_version
+}
+
+output "api_versioned_url" {
+  value     = "${aws_api_gateway_domain_name.api_domain.regional_domain_name}/${local.api_major_version}"
+  sensitive = false
+}
+
+output "api_version" {
+  value     = local.api_major_version
+  sensitive = false
 }

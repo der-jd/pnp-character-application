@@ -41,6 +41,7 @@ export default function SkillsPage() {
       show();
       try {
         await tryIncrease(skill, points);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast({
           title: "Error",

@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { characterNameSchema, characterSchema, levelSchema } from "../character-schemas.js";
+import { characterNameSchema, characterSchema } from "../character-schemas.js";
 import { userIdSchema, MAX_ARRAY_SIZE } from "../general-schemas.js";
+import { levelSchema } from "../level-up-schemas.js";
 
 export const getCharactersQueryParamsSchema = z
   .object({

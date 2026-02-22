@@ -14,7 +14,6 @@ import {
   START_SKILLS,
   GENERATION_POINTS,
   SkillCategory,
-  baseValuesUpdatableByLvlUp,
   BaseValues,
   ATTRIBUTE_POINTS_FOR_CREATION,
   CombatSkillName,
@@ -55,6 +54,10 @@ const characterCreationRequest: PostCharactersRequest = {
     appearance: "Tall and strong",
     specialCharacteristics: "None",
     level: 1,
+    levelUpProgress: {
+      effectsByLevel: {},
+      effects: {},
+    },
   },
   attributes: {
     courage: {
@@ -687,12 +690,8 @@ describe("Valid requests", () => {
           }
 
           expect(baseValue.current).toBe(baseValue.start);
-
-          if (baseValuesUpdatableByLvlUp.includes(baseValueName as keyof BaseValues)) {
-            expect(baseValue.byLvlUp).toBe(0);
-          } else {
-            expect(baseValue.byLvlUp).toBeUndefined();
-          }
+          // byLvlUp is managed by the level-up flow and should be undefined on creation
+          expect((baseValue as any).byLvlUp).toBeUndefined();
         }
       );
 

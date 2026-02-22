@@ -14,7 +14,7 @@ import {
   recordSchema,
   userIdSchema,
   characterCreationSchema,
-  levelChangeSchema,
+  levelUpChangeSchema,
   specialAbilitiesChangeSchema,
   baseValueChangeSchema,
 } from "api-spec";
@@ -107,7 +107,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       record = {
         number: 1,
         id: uuidv4(),
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString(), // Always store time in UTC
         ...bodyWithoutUserId,
       };
       await addHistoryRecord(record, newBlock);
@@ -121,7 +121,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       record = {
         number: latestRecord.number + 1,
         id: uuidv4(),
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString(), // Always store time in UTC
         ...bodyWithoutUserId,
       };
 
@@ -191,9 +191,9 @@ async function validateRequest(request: Request): Promise<Parameters> {
         // There is no "old" data for character creation
         characterCreationSchema.parse(body.data.new);
         break;
-      case RecordType.LEVEL_CHANGED:
-        levelChangeSchema.parse(body.data.old);
-        levelChangeSchema.parse(body.data.new);
+      case RecordType.LEVEL_UP_APPLIED:
+        levelUpChangeSchema.parse(body.data.old);
+        levelUpChangeSchema.parse(body.data.new);
         break;
       case RecordType.CALCULATION_POINTS_CHANGED:
         calculationPointsChangeSchema.parse(body.data.old);
