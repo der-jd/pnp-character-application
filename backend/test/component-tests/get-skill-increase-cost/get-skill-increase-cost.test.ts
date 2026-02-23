@@ -12,7 +12,9 @@ describe.sequential("get-skill-increase-cost component tests", () => {
   });
 
   afterAll(async () => {
-    await TestContextFactory.cleanupContext(context);
+    if (context) {
+      await TestContextFactory.cleanupContext(context);
+    }
   });
 
   /**
