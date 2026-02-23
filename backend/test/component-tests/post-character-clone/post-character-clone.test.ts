@@ -48,12 +48,12 @@ describe.sequential("post-character-clone component tests", () => {
    * In this test suite we create two cloned characters:
    * - one for the test suite itself (default test setup)
    * - one for the clone test
-   * After each test we explicitly delete the cloned character
-   * from the test case and reset the context to the original character
-   * from this test suite so that it is cleaned up in the afterAll hook.
+   * After each test we explicitly delete the test case character.
+   * Then we reset the context character ID to the original test suite
+   * character so that it is cleaned up in the afterAll hook as well.
    */
   afterEach(async () => {
-    const _characterFromTestSuite = context.character;
+    const _characterIdFromTestSuite = context.character.characterId;
 
     await updateAndVerifyTestContextAfterEachTest(
       context,
@@ -75,8 +75,8 @@ describe.sequential("post-character-clone component tests", () => {
 
     currentResponse = undefined;
 
-    // Enable cleanup of the character from this test suite in the afterAll hook
-    context.character = _characterFromTestSuite;
+    // Enable cleanup of the test suite character in the afterAll hook
+    context.character.characterId = _characterIdFromTestSuite;
   });
 
   /**
