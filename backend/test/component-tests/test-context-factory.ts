@@ -96,10 +96,6 @@ export class TestContextFactory {
   }
 
   static async cleanupContext(context: TestContext): Promise<void> {
-    if (!context || !context.apiClient || !context.character) {
-      console.warn("Context is not properly initialized, skipping cleanup");
-      return;
-    }
     this.deleteCharacter(context.apiClient, context.character.characterId);
   }
 
