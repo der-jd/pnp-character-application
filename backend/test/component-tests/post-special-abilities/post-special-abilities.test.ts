@@ -159,7 +159,7 @@ describe.sequential("post-special-abilities component tests", () => {
       expect(historyRecord.timestamp).toBeDefined();
       expect(historyRecord.type).toBe(HistoryRecordType.SPECIAL_ABILITIES_CHANGED);
       expect(historyRecord.id).toBeDefined();
-      expect(historyRecord.learningMethod).toBeUndefined();
+      expect(historyRecord.learningMethod).toBeNull();
 
       // Verify record data matches response changes
       expect(historyRecord.data.old).toStrictEqual(response.data.specialAbilities.old);

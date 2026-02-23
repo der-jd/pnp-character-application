@@ -310,6 +310,7 @@ describe.sequential("patch-base-value component tests", () => {
         expect(historyRecord.number).toBeGreaterThan(0);
         expect(historyRecord.id).toBeDefined();
         expect(historyRecord.timestamp).toBeDefined();
+        expect(historyRecord.learningMethod).toBeNull();
 
         // Verify record data matches response changes
         expect(historyRecord.data.old).toStrictEqual(response.data.changes.old);
