@@ -96,7 +96,7 @@ export class TestContextFactory {
   }
 
   static async cleanupContext(context: TestContext): Promise<void> {
-    this.deleteCharacter(context.apiClient, context.character.characterId);
+    await this.deleteCharacter(context.apiClient, context.character.characterId);
   }
 
   static async deleteCharacter(apiClient: ApiClient, characterId: string) {
