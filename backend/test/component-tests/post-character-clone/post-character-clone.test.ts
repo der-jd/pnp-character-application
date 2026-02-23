@@ -53,7 +53,7 @@ describe.sequential("post-character-clone component tests", () => {
    * character so that it is cleaned up in the afterAll hook as well.
    */
   afterEach(async () => {
-    const _characterIdFromTestSuite = context.character.characterId;
+    const _characterFromTestSuite = structuredClone(context.character);
 
     await updateAndVerifyTestContextAfterEachTest(
       context,
@@ -76,7 +76,7 @@ describe.sequential("post-character-clone component tests", () => {
     currentResponse = undefined;
 
     // Enable cleanup of the test suite character in the afterAll hook
-    context.character.characterId = _characterIdFromTestSuite;
+    context.character = _characterFromTestSuite;
   });
 
   /**
