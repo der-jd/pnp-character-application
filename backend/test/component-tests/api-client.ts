@@ -66,7 +66,11 @@ export class ApiClient {
     const parsedBody = await parseBody(response);
 
     if (!response.ok) {
-      throw new ApiError(`Request failed: ${method} ${url} (${response.status} - ${response.statusText})`, response.status, parsedBody);
+      throw new ApiError(
+        `Request failed: ${method} ${url} (${response.status} - ${response.statusText})`,
+        response.status,
+        parsedBody,
+      );
     }
 
     return parsedBody as T;
