@@ -122,6 +122,7 @@ describe.sequential("post-character-clone component tests", () => {
         }),
       );
       currentResponse = response;
+      console.log(`Cloned character ${context.character.characterId} to ${response.characterId} for test case.`);
 
       expect(response.characterId).not.toBe(context.character.characterId);
       expect(response.userId).toBe(context.character.userId);
