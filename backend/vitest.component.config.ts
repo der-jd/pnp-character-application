@@ -57,6 +57,7 @@ export default defineConfig({
     sequence: {
       concurrent: true, // Allow parallel and therefore faster execution of test files
     },
+    maxWorkers: 3, // Limited to 3 to avoid throttling by AWS Lambda
   },
   resolve: {
     alias: discoverPackages(),
