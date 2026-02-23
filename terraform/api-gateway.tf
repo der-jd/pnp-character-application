@@ -641,7 +641,7 @@ resource "aws_api_gateway_base_path_mapping" "api_mapping" {
 }
 
 output "api_versioned_url" {
-  value     = aws_api_gateway_base_path_mapping.api_mapping.invoke_url
+  value     = "https://${aws_api_gateway_domain_name.api_domain.domain_name}/${aws_api_gateway_base_path_mapping.api_mapping.base_path}"
   sensitive = false
 }
 
