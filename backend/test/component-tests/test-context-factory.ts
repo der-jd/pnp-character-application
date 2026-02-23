@@ -31,12 +31,26 @@ export class TestContextFactory {
         apiClient: ApiClient;
       }
     | undefined;
+  private static initializingPromise: Promise<void> | undefined;
 
   static async initializeBaseSetup(): Promise<void> {
+    // If already initialized, return immediately
     if (this.baseSetup) {
-      return; // Already initialized
+      return;
     }
 
+    // If currently initializing, wait for that to complete
+    if (this.initializingPromise) {
+      await this.initializingPromise;
+      return;
+    }
+
+    // Start initialization and store the promise
+    this.initializingPromise = this.doInitializeBaseSetup();
+    await this.initializingPromise;
+  }
+
+  private static async doInitializeBaseSetup(): Promise<void> {
     console.log("Initializing base test setup...");
 
     // Environment variables from Terraform via CircleCI
@@ -60,6 +74,9 @@ export class TestContextFactory {
       seedCharacterId,
       apiClient: new ApiClient(apiBaseUrl, authorizationHeader),
     };
+
+    // Clear the initializing promise once done
+    this.initializingPromise = undefined;
   }
 
   static async createContext(): Promise<TestContext> {
@@ -96,10 +113,6 @@ export class TestContextFactory {
   }
 
   static async cleanupContext(context: TestContext): Promise<void> {
-    if (!context || !context.apiClient || !context.character) {
-      console.warn("Context is not properly initialized, skipping cleanup");
-      return;
-    }
     this.deleteCharacter(context.apiClient, context.character.characterId);
   }
 

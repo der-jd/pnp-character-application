@@ -12,9 +12,7 @@ describe.sequential("get-character component tests", () => {
   });
 
   afterAll(async () => {
-    if (context) {
-      await TestContextFactory.cleanupContext(context);
-    }
+    await TestContextFactory.cleanupContext(context);
   });
 
   /**

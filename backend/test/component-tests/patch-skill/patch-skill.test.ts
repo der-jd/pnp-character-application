@@ -23,9 +23,7 @@ describe.sequential("patch-skill component tests", () => {
   });
 
   afterAll(async () => {
-    if (context) {
-      await TestContextFactory.cleanupContext(context);
-    }
+    await TestContextFactory.cleanupContext(context);
   });
 
   afterEach(async () => {
