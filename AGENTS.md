@@ -66,11 +66,11 @@ Use these anchors to locate code before making changes.
 | API spec lint            | `npm run lint --workspace api-spec`                                | Keeps shared types consistent.                        |
 | Terraform lint           | `npm run install-lint-terraform` (once) + `npm run lint:terraform` | Enforce infra best practices.                         |
 
-Always run `npm run format` from the root before committing.
-Always run `npm run lint` from the root before committing.
-Always run `npm run lint:terraform` from the root before committing.
-Always run `npm run build` from the root before committing.
-Always run `npm run test` from the root before committing.
+Always run `npm run format` from the root after changes.
+Always run `npm run lint` from the root after changes.
+Always run `npm run lint:terraform` from the root after changes.
+Always run `npm run build` from the root after changes.
+Always run `npm run test:unit` from the root after changes.
 
 Always update or add tests when touching core leveling logic, history records, or character value rules. Tests should be easy to understand and maintain for human users. Therefore a limited redundancy is acceptable if it improves clarity.
 
@@ -86,7 +86,7 @@ Always update or add tests when touching core leveling logic, history records, o
 3. **Infrastructure Caution**: Never commit Terraform state or secrets. If you add modules, update `terraform/.terraform.lock.hcl` only via `terraform init`.
 4. **Testing Discipline**: Add regression tests for bug fixes.
 5. **Communication**: Document non-obvious decisions inline with short comments and reference this guide in PR summaries when relevant.
-6. **Code Quality**: Run `npm run format`, `npm run lint`, `npm run lint:terraform`, `npm run build` and `npm run test` from the root before committing.
+6. **Code Quality**: Run `npm run format`, `npm run lint`, `npm run lint:terraform`, `npm run build` and `npm run test` from the root after changes.
 7. **Clean Code**: Follow the SOLID principles and keep functions small and focused. Avoid code duplication and comments that state the obvious. Code should be self-documenting and self-explanatory, comments are only to be used to explain why something is done if it's not immediately obvious.
 8. **Documentation**: Update this guide when new patterns or conventions are established.
 9. **Consistency**: Follow the existing code style and patterns in the codebase.
