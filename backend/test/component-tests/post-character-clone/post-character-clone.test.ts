@@ -70,6 +70,7 @@ describe.sequential("post-character-clone component tests", () => {
     // Delete the cloned character from the test case
     if (currentResponse) {
       await TestContextFactory.deleteCharacter(context.apiClient, currentResponse.characterId);
+      console.log(`Deleted cloned character ${currentResponse.characterId} from test case.`);
     }
 
     currentResponse = undefined;

@@ -73,6 +73,9 @@ export class TestContextFactory {
         userIdOfCharacter: this.baseSetup.userId,
       }),
     );
+    console.log(
+      `Cloned seed character '${this.baseSetup.seedCharacterId}' to '${cloneResponse.characterId}' for test suite.`,
+    );
 
     const clonedCharacter = getCharacterResponseSchema.parse(
       await this.baseSetup.apiClient.get(`characters/${cloneResponse.characterId}`),
@@ -103,10 +106,10 @@ export class TestContextFactory {
     try {
       const response = await apiClient.delete(`characters/${characterId}`);
       deleteCharacterResponseSchema.parse(response);
-      console.log(`Deleted character ${characterId}`);
+      console.log(`Deleted character ${characterId} from test suite.`);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`Failed to delete character ${characterId}`, message);
+      console.error(`Failed to delete character ${characterId} from test suite.`, message);
       throw error;
     }
   }
