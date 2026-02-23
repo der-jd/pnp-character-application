@@ -103,7 +103,7 @@ describe.sequential("patch-combat-stats component tests", () => {
       const character = context.character;
       const stats = character.characterSheet.combat.melee.thrustingWeapons1h;
 
-      const error = await expectApiError(
+      await expectApiError(
         () =>
           context.apiClient.patch(`characters/${character.characterId}/combat/melee/thrustingWeapons1h`, {
             skilledAttackValue: {
