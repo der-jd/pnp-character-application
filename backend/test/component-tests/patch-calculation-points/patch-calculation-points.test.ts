@@ -372,8 +372,7 @@ describe.sequential("patch-calculation-points component tests", () => {
               response.data.calculationPoints.old.adventurePoints!.total;
             expect(diffAvailable).toBe(diffTotal);
           }
-        }
-        else {
+        } else {
           expect(response.data.calculationPoints.new.adventurePoints).toBeUndefined();
           expect(response.data.calculationPoints.old.adventurePoints).toBeUndefined();
         }
@@ -398,8 +397,7 @@ describe.sequential("patch-calculation-points component tests", () => {
               response.data.calculationPoints.old.attributePoints!.total;
             expect(diffAvailable).toBe(diffTotal);
           }
-        }
-        else {
+        } else {
           expect(response.data.calculationPoints.new.attributePoints).toBeUndefined();
           expect(response.data.calculationPoints.old.attributePoints).toBeUndefined();
         }
