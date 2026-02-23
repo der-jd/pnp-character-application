@@ -55,9 +55,13 @@ export default defineConfig({
     testTimeout: 15000, // Increased timeout to 15 seconds for endpoints that may take longer to execute
     hookTimeout: 15000, // Increased hook timeout to 15 seconds for setup that may take longer
     sequence: {
-      concurrent: true, // Allow parallel and therefore faster execution of test files
+      // TODO revert after test
+      //concurrent: true, // Allow parallel and therefore faster execution of test files
+      concurrent: false,
     },
-    maxWorkers: 3, // Limited to 3 to avoid throttling by AWS Lambda
+    // TODO revert after test
+    // maxWorkers: 3, // Limited to 3 to avoid throttling by AWS Lambda
+    maxWorkers: 1,
   },
   resolve: {
     alias: discoverPackages(),
