@@ -641,7 +641,7 @@ resource "aws_api_gateway_base_path_mapping" "api_mapping" {
 }
 
 output "api_versioned_url" {
-  value     = "${aws_api_gateway_domain_name.api_domain.regional_domain_name}/${local.api_major_version}"
+  value     = aws_api_gateway_base_path_mapping.api_mapping.invoke_url
   sensitive = false
 }
 
