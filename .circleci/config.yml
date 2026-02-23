@@ -301,9 +301,9 @@ commands:
           name: Install Terraform
           command: |
             TF_VER=<< parameters.version >>
-            curl --fail --location --output terraform.zip https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip
-            rm -rf terraform # Remove any leftover file/directory from previous run
-            unzip terraform.zip
-            sudo mv terraform /usr/local/bin/
+            curl --fail --location --output terraform_cli.zip https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip
+            rm -rf terraform_cli # Remove any leftover file/directory from previous run
+            unzip terraform_cli.zip
+            sudo mv terraform_cli /usr/local/bin/terraform # Move and rename to terraform
             terraform -version
-            rm terraform.zip
+            rm terraform_cli.zip
