@@ -108,6 +108,36 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 404,
     },
+    {
+      name: "Learning method query is missing",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "social",
+          "skill-name": "knowledgeOfHumanNature",
+        },
+        queryStringParameters: {},
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Learning method query is invalid",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "skill-category": "social",
+          "skill-name": "knowledgeOfHumanNature",
+        },
+        queryStringParameters: {
+          "learning-method": "INVALID_METHOD",
+        },
+        body: null,
+      },
+      expectedStatusCode: 400,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {
