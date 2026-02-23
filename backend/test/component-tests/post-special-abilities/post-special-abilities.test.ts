@@ -4,8 +4,10 @@ import {
   postSpecialAbilitiesResponseSchema,
   MAX_STRING_LENGTH_DEFAULT,
   PostSpecialAbilitiesResponse,
+  PostSpecialAbilitiesHistoryRecord,
   Character,
   HistoryRecord,
+  HistoryRecordType,
 } from "api-spec";
 import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
 import { ApiClient } from "../api-client.js";
@@ -148,6 +150,27 @@ describe.sequential("post-special-abilities component tests", () => {
       const actualNewAbilities = new Set(response.data.specialAbilities.new.values);
       expect(actualNewAbilities).toEqual(expectedNewAbilities);
       expect(response.historyRecord).not.toBeNull();
+
+      const historyRecord = response.historyRecord as PostSpecialAbilitiesHistoryRecord;
+
+      // Verify basic record properties
+      expect(historyRecord.name).toBeDefined();
+      expect(historyRecord.number).toBeGreaterThan(0);
+      expect(historyRecord.timestamp).toBeDefined();
+      expect(historyRecord.type).toBe(HistoryRecordType.SPECIAL_ABILITIES_CHANGED);
+      expect(historyRecord.id).toBeDefined();
+      expect(historyRecord.learningMethod).toBeUndefined();
+
+      // Verify record data matches response changes
+      expect(historyRecord.data.old).toStrictEqual(response.data.specialAbilities.old);
+      expect(historyRecord.data.new).toStrictEqual(response.data.specialAbilities.new);
+
+      // Verify calculation points changes in history
+      expect(historyRecord.calculationPoints).toBeDefined();
+      expect(historyRecord.calculationPoints.adventurePoints).toBeNull();
+      expect(historyRecord.calculationPoints.attributePoints).toBeNull();
+
+      expect(historyRecord.comment).toBeNull();
     });
   });
 });
