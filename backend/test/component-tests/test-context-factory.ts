@@ -9,6 +9,7 @@ import {
   postCharacterCloneResponseSchema,
 } from "api-spec";
 import { ApiClient } from "./api-client.js";
+import { readFileSync } from "fs";
 
 export interface TestContext {
   apiBaseUrl: string;
@@ -39,10 +40,10 @@ export class TestContextFactory {
 
     console.log("Initializing base test setup...");
 
-    // Environment variables from Terraform via CircleCI
+    // Environment variable from Terraform via CircleCI
     const apiBaseUrl = requireEnv("COMPONENT_TESTS_API_BASE_URL");
-    // Environment variables from CircleCI
-    const seedCharacterId = requireEnv("COMPONENT_TESTS_SEED_CHARACTER_ID");
+
+    const seedCharacterId = this.loadCharacterIdFromTestData("./test-data/default-character.dynamodb.json");
 
     const secrets = getTestSecrets();
     const userId = secrets.cognitoUsername;
@@ -62,9 +63,14 @@ export class TestContextFactory {
     };
   }
 
-  static async createContext(): Promise<TestContext> {
+  static async createContext(seedCharacterId?: string): Promise<TestContext> {
     if (!this.baseSetup) {
       throw new Error("Base setup not initialized. Call initializeBaseSetup() first.");
+    }
+
+    if (seedCharacterId) {
+      console.log(`Using new seed character ID: ${seedCharacterId}`);
+      this.baseSetup.seedCharacterId = seedCharacterId;
     }
 
     // Clone the seed character to get a fresh character for testing
@@ -100,6 +106,15 @@ export class TestContextFactory {
 
   static async cleanupContext(context: TestContext): Promise<void> {
     await this.deleteCharacter(context.apiClient, context.character.characterId);
+  }
+
+  static loadCharacterIdFromTestData(relativePath: string): string {
+    const characterData = JSON.parse(readFileSync(relativePath, "utf8"));
+    const characterId = characterData.characterId.S;
+    if (!characterId) {
+      throw new Error(`Character ID not found in test data file: ${relativePath}`);
+    }
+    return characterId;
   }
 
   static async deleteCharacter(apiClient: ApiClient, characterId: string) {
