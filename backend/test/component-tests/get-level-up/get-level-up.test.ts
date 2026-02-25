@@ -188,7 +188,7 @@ describe.sequential("get-level-up component tests", () => {
 
     beforeAll(async () => {
       const characterId = TestContextFactory.loadCharacterIdFromTestData(
-        "./test-data/character-with-unavailable-level-ups.dynamodb.json",
+        "test-data/character-with-unavailable-level-ups.dynamodb.json",
       );
       context = await TestContextFactory.createContext(characterId);
     });
@@ -209,12 +209,12 @@ describe.sequential("get-level-up component tests", () => {
           cooldownLevels: 0,
           reasonIfDenied: undefined,
           diceExpression: "1d4+2",
-          firstChosenLevel: 3,
+          firstChosenLevel: 4,
           lastChosenLevel: 29,
         },
       },
       {
-        name: "Max selection count reached (1/1)",
+        name: "rerollUnlock: Max selection count reached (1/1)",
         kind: "rerollUnlock",
         expectedValues: {
           allowed: false,
@@ -222,14 +222,14 @@ describe.sequential("get-level-up component tests", () => {
           selectionCount: 1,
           maxSelectionCount: 1,
           cooldownLevels: MAX_LEVEL,
-          reasonIfDenied: "Maximum of 1 reached.",
+          reasonIfDenied: "Next available at level 1003. Maximum of 1 reached.",
           diceExpression: undefined,
           firstChosenLevel: 2,
           lastChosenLevel: 2,
         },
       },
       {
-        name: "Max selection count reached (3/3)",
+        name: "luckPlusOne: Max selection count reached (3/3)",
         kind: "luckPlusOne",
         expectedValues: {
           allowed: false,
@@ -244,7 +244,7 @@ describe.sequential("get-level-up component tests", () => {
         },
       },
       {
-        name: "Max selection count reached (3/3)",
+        name: "bonusActionPlusOne: Max selection count reached (3/3)",
         kind: "bonusActionPlusOne",
         expectedValues: {
           allowed: false,
@@ -252,14 +252,14 @@ describe.sequential("get-level-up component tests", () => {
           selectionCount: 3,
           maxSelectionCount: 3,
           cooldownLevels: 9,
-          reasonIfDenied: "Maximum of 3 reached.",
+          reasonIfDenied: "Next available at level 40. Maximum of 3 reached.",
           diceExpression: undefined,
           firstChosenLevel: 10,
           lastChosenLevel: 30,
         },
       },
       {
-        name: "Max selection count reached (3/3)",
+        name: "legendaryActionPlusOne: Max selection count reached (3/3)",
         kind: "legendaryActionPlusOne",
         expectedValues: {
           allowed: false,
@@ -267,37 +267,37 @@ describe.sequential("get-level-up component tests", () => {
           selectionCount: 3,
           maxSelectionCount: 3,
           cooldownLevels: 9,
-          reasonIfDenied: "Maximum of 3 reached.",
+          reasonIfDenied: "Next available at level 41. Maximum of 3 reached.",
           diceExpression: undefined,
           firstChosenLevel: 11,
           lastChosenLevel: 31,
         },
       },
       {
-        name: "Cooldown active (chosen at level 32, current level 33)",
+        name: "armorLevelRoll: Cooldown active (chosen at level 32, current level 33)",
         kind: "armorLevelRoll",
         expectedValues: {
           allowed: false,
           firstLevel: 2,
           selectionCount: 1,
-          maxSelectionCount: 1,
+          maxSelectionCount: MAX_LEVEL - 1,
           cooldownLevels: 2,
           reasonIfDenied: "Next available at level 35.",
-          diceExpression: undefined,
+          diceExpression: "1d4+2",
           firstChosenLevel: 32,
           lastChosenLevel: 32,
         },
       },
       {
-        name: "Cooldown active (chosen at level 33, current level 33)",
+        name: "initiativePlusOne: Cooldown active (chosen at level 33, current level 33)",
         kind: "initiativePlusOne",
         expectedValues: {
           allowed: false,
           firstLevel: 2,
           selectionCount: 1,
-          maxSelectionCount: 1,
+          maxSelectionCount: MAX_LEVEL - 1,
           cooldownLevels: 1,
-          reasonIfDenied: "Next available at level 34.",
+          reasonIfDenied: "Next available at level 35.",
           diceExpression: undefined,
           firstChosenLevel: 33,
           lastChosenLevel: 33,
