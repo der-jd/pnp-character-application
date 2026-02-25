@@ -115,6 +115,7 @@ describe("Valid requests", () => {
   test("returns all level-up options together with the options hash", async () => {
     const parsed = await executeGetLevelUp(fakeCharacter);
 
+    expect(parsed.userId).toBe(fakeCharacter.userId);
     expect(parsed.characterId).toBe(fakeCharacterId);
     expect(parsed.nextLevel).toBe(fakeCharacter.characterSheet.generalInformation.level + 1);
     expect(parsed.options.length).toBeGreaterThan(0);
