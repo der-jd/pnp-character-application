@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { UpdateCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { CostCategory, HistoryRecordType } from "api-spec";
 import { addRecordToHistory, AddHistoryRecordRequest, addHistoryRecordResponseSchema } from "add-history-record";
-import { fakeUserId } from "../test-data/request.js";
+import { fakeUserId } from "./test-data/request.js";
 import {
   fakeHistoryBlockListResponse,
   fakeBigHistoryBlockListResponse,
@@ -10,10 +10,10 @@ import {
   fakeEmptyListResponse,
   mockDynamoDBGetCharacterResponse,
   mockDynamoDBQueryHistoryResponse,
-} from "../test-data/response.js";
-import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
-import { fakeBigHistoryBlock, fakeHistoryBlock2 } from "../test-data/history.js";
-import { expectHttpError } from "../utils.js";
+} from "./test-data/response.js";
+import { fakeCharacter, fakeCharacterId } from "./test-data/character.js";
+import { fakeBigHistoryBlock, fakeHistoryBlock2 } from "./test-data/history.js";
+import { expectHttpError } from "./utils.js";
 
 const testBody: AddHistoryRecordRequest = {
   userId: fakeUserId,

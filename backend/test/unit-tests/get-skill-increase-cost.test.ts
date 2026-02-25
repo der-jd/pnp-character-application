@@ -1,10 +1,10 @@
 import { describe, expect, test } from "vitest";
-import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
-import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeHeaders, dummyHeaders } from "./test-data/request.js";
+import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "./test-data/response.js";
+import { fakeCharacterId } from "./test-data/character.js";
 import { getSkillResponseSchema } from "api-spec";
 import { getSkillCost } from "get-skill-increase-cost";
-import { expectHttpError } from "../utils.js";
+import { expectHttpError } from "./utils.js";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [

@@ -1,15 +1,15 @@
 import { describe, expect, test } from "vitest";
-import { fakeHeaders, dummyHeaders, fakeUserId, dummyUserId } from "../test-data/request.js";
+import { fakeHeaders, dummyHeaders, fakeUserId, dummyUserId } from "./test-data/request.js";
 import {
   fakeCharacterResponse,
   fakeHistoryBlockListResponse,
   mockDynamoDBGetCharacterResponse,
   mockDynamoDBQueryHistoryResponse,
-} from "../test-data/response.js";
-import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
+} from "./test-data/response.js";
+import { fakeCharacter, fakeCharacterId } from "./test-data/character.js";
 import { postCharacterCloneResponseSchema } from "api-spec";
 import { cloneCharacter } from "clone-character";
-import { expectHttpError } from "../utils.js";
+import { expectHttpError } from "./utils.js";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
 describe("Invalid requests", () => {

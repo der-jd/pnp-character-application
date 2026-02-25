@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
-import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
-import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
+import { fakeHeaders, dummyHeaders } from "./test-data/request.js";
+import { fakeCharacter, fakeCharacterId } from "./test-data/character.js";
+import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "./test-data/response.js";
 import {
   applyLevelUpResponseSchema,
   BaseValues,
@@ -11,7 +11,7 @@ import {
   type PostLevelUpRequest,
 } from "api-spec";
 import { _applyLevelUp } from "apply-level-up";
-import { expectHttpError } from "../utils.js";
+import { expectHttpError } from "./utils.js";
 import { computeLevelUpOptions, computeLevelUpOptionsHash } from "core";
 
 const optionsHash = computeLevelUpOptionsHash(

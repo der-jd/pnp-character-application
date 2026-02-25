@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
-import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
-import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
-import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
+import { fakeHeaders, dummyHeaders } from "./test-data/request.js";
+import { fakeCharacter, fakeCharacterId } from "./test-data/character.js";
+import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "./test-data/response.js";
 import {
   Character,
   getLevelUpResponseSchema,
@@ -12,7 +12,7 @@ import {
   MAX_LEVEL,
 } from "api-spec";
 import { _getLevelUp } from "get-level-up";
-import { expectHttpError } from "../utils.js";
+import { expectHttpError } from "./utils.js";
 import { computeLevelUpOptionsHash } from "core";
 
 describe("Invalid requests", () => {

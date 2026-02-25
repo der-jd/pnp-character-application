@@ -1,11 +1,11 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { fakeHeaders, dummyHeaders, fakeUserId } from "../test-data/request.js";
-import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "../test-data/response.js";
-import { fakeCharacter, fakeCharacterId } from "../test-data/character.js";
+import { fakeHeaders, dummyHeaders, fakeUserId } from "./test-data/request.js";
+import { fakeCharacterResponse, mockDynamoDBGetCharacterResponse } from "./test-data/response.js";
+import { fakeCharacter, fakeCharacterId } from "./test-data/character.js";
 import { getCombatSkillHandling, getCombatStats } from "core";
 import { CombatSection, CombatSkillName, SkillName, updateCombatStatsResponseSchema } from "api-spec";
-import { expectHttpError } from "../utils.js";
+import { expectHttpError } from "./utils.js";
 import { _updateCombatStats } from "update-combat-stats";
 
 describe("Invalid requests", () => {

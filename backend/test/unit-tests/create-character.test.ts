@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { fakeHeaders, fakeUserId } from "../test-data/request.js";
+import { fakeHeaders, fakeUserId } from "./test-data/request.js";
 import {
   AdvantagesNames,
   Attributes,
@@ -22,7 +22,7 @@ import {
   CombatSection,
 } from "api-spec";
 import { _createCharacter } from "create-character";
-import { expectHttpError } from "../utils.js";
+import { expectHttpError } from "./utils.js";
 import {
   getSkill,
   getSkillCategoryAndName,

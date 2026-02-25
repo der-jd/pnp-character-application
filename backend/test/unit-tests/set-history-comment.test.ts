@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { dummyHeaders, fakeHeaders } from "../test-data/request.js";
+import { dummyHeaders, fakeHeaders } from "./test-data/request.js";
 import {
   fakeHistoryBlockListResponse,
   mockDynamoDBQueryHistoryResponse,
@@ -8,9 +8,9 @@ import {
   mockDynamoDBGetCharacterResponse,
   fakeCharacterResponse,
   mockDynamoDBGetCharacterAndHistoryResponse,
-} from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
-import { expectHttpError } from "../utils.js";
+} from "./test-data/response.js";
+import { fakeCharacterId } from "./test-data/character.js";
+import { expectHttpError } from "./utils.js";
 import { setHistoryComment } from "set-history-comment";
 import { MAX_STRING_LENGTH_VERY_LONG, patchHistoryRecordResponseSchema } from "api-spec";
 

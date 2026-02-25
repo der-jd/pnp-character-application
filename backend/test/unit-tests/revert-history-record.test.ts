@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest";
 import { UpdateCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 import { deleteHistoryRecordResponseSchema } from "api-spec";
-import { fakeHeaders } from "../test-data/request.js";
-import { fakeHistoryBlockListResponse, mockDynamoDBQueryHistoryResponse } from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
+import { fakeHeaders } from "./test-data/request.js";
+import { fakeHistoryBlockListResponse, mockDynamoDBQueryHistoryResponse } from "./test-data/response.js";
+import { fakeCharacterId } from "./test-data/character.js";
 import {
   addFakeHistoryRecord,
   attributeAndBaseValuesChangedRecord,
@@ -19,8 +19,8 @@ import {
   specialAbilitiesChangedRecord,
   attackBaseValueAndCombatStatsChangedRecord,
   rangedAttackBaseValueAndCombatStatsChangedRecord,
-} from "../test-data/history.js";
-import { expectHttpError } from "../utils.js";
+} from "./test-data/history.js";
+import { expectHttpError } from "./utils.js";
 import { revertRecordFromHistory } from "revert-history-record";
 
 const lastBlock = fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1];

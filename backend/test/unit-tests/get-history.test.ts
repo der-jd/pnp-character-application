@@ -6,12 +6,12 @@ import {
   mockDynamoDBQueryHistoryResponse,
   mockDynamoDBGetCharacterResponse,
   mockDynamoDBGetCharacterAndHistoryResponse,
-} from "../test-data/response.js";
-import { fakeCharacterId } from "../test-data/character.js";
-import { fakeHeaders, dummyHeaders } from "../test-data/request.js";
+} from "./test-data/response.js";
+import { fakeCharacterId } from "./test-data/character.js";
+import { fakeHeaders, dummyHeaders } from "./test-data/request.js";
 import { getHistory } from "get-history";
 import { HistoryBlock, getHistoryResponseSchema } from "api-spec";
-import { expectHttpError } from "../utils.js";
+import { expectHttpError } from "./utils.js";
 
 describe("Invalid requests", () => {
   const invalidTestCases = [
