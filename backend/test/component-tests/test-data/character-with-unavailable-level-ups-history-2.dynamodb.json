@@ -1,0 +1,5233 @@
+{
+  "characterId": {
+    "S": "49b78652-c1c8-4482-9522-e4ecd2e7836c"
+  },
+  "blockNumber": {
+    "N": "2"
+  },
+  "blockId": {
+    "S": "17d59373-171e-4c17-b9d5-0908118f1b91"
+  },
+  "changes": {
+    "L": [
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "108"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "110"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "S": "This is a NEW test comment 123"
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "54"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "4"
+                      },
+                      "start": {
+                        "N": "12"
+                      },
+                      "totalCost": {
+                        "N": "82"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "53"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "4"
+                      },
+                      "start": {
+                        "N": "12"
+                      },
+                      "totalCost": {
+                        "N": "80"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "fbb8683b-16f3-4fc0-a3b0-6bb942d70e82"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "body/athletics"
+          },
+          "number": {
+            "N": "7"
+          },
+          "timestamp": {
+            "S": "2025-05-29T14:47:39.780Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "NULL": true
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "attackValue": {
+                    "N": "15"
+                  },
+                  "availablePoints": {
+                    "N": "5"
+                  },
+                  "paradeValue": {
+                    "N": "16"
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "attackValue": {
+                    "N": "10"
+                  },
+                  "availablePoints": {
+                    "N": "18"
+                  },
+                  "paradeValue": {
+                    "N": "8"
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "017de098-967b-4891-bdf6-a1baab945f37"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "melee/chainWeapons"
+          },
+          "number": {
+            "N": "8"
+          },
+          "timestamp": {
+            "S": "2025-06-07T14:36:41.670Z"
+          },
+          "type": {
+            "N": "7"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "NULL": true
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "attackValue": {
+                    "N": "16"
+                  },
+                  "availablePoints": {
+                    "N": "4"
+                  },
+                  "paradeValue": {
+                    "N": "16"
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "attackValue": {
+                    "N": "15"
+                  },
+                  "availablePoints": {
+                    "N": "5"
+                  },
+                  "paradeValue": {
+                    "N": "16"
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "486888de-ecc5-4466-a47e-5ea246e748a6"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "melee/chainWeapons"
+          },
+          "number": {
+            "N": "9"
+          },
+          "timestamp": {
+            "S": "2025-06-07T14:38:52.748Z"
+          },
+          "type": {
+            "N": "7"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "108"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "110"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "55"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "4"
+                      },
+                      "start": {
+                        "N": "12"
+                      },
+                      "totalCost": {
+                        "N": "84"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "54"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "4"
+                      },
+                      "start": {
+                        "N": "12"
+                      },
+                      "totalCost": {
+                        "N": "82"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "d2269fae-4551-4f5a-a40b-0f5b181a9d74"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "body/athletics"
+          },
+          "number": {
+            "N": "10"
+          },
+          "timestamp": {
+            "S": "2025-06-07T16:43:53.037Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "108"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "108"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "55"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "2"
+                      },
+                      "start": {
+                        "N": "6"
+                      },
+                      "totalCost": {
+                        "N": "84"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "55"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "4"
+                      },
+                      "start": {
+                        "N": "12"
+                      },
+                      "totalCost": {
+                        "N": "84"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "da6f1709-02da-4a11-ad3e-d2645f27fb0c"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "body/athletics"
+          },
+          "number": {
+            "N": "11"
+          },
+          "timestamp": {
+            "S": "2025-06-07T16:50:30.126Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "108"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "108"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "S": "THis is a special super comment"
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "55"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "99"
+                      },
+                      "start": {
+                        "N": "99"
+                      },
+                      "totalCost": {
+                        "N": "84"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "55"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "2"
+                      },
+                      "start": {
+                        "N": "6"
+                      },
+                      "totalCost": {
+                        "N": "84"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "63ac4f9f-70ba-4114-9f89-1245186142ba"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "body/athletics"
+          },
+          "number": {
+            "N": "12"
+          },
+          "timestamp": {
+            "S": "2025-06-07T16:52:34.405Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "108"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "108"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "55"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "99"
+                      },
+                      "start": {
+                        "N": "12"
+                      },
+                      "totalCost": {
+                        "N": "84"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "55"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "99"
+                      },
+                      "start": {
+                        "N": "99"
+                      },
+                      "totalCost": {
+                        "N": "84"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "f9367e57-e24b-4bb1-a741-f48734a8588a"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "body/athletics"
+          },
+          "number": {
+            "N": "13"
+          },
+          "timestamp": {
+            "S": "2025-06-07T16:53:30.725Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "108"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "108"
+                      },
+                      "start": {
+                        "N": "100"
+                      },
+                      "total": {
+                        "N": "300"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "55"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "6"
+                      },
+                      "start": {
+                        "N": "12"
+                      },
+                      "totalCost": {
+                        "N": "84"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skillValues": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "55"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "99"
+                      },
+                      "start": {
+                        "N": "12"
+                      },
+                      "totalCost": {
+                        "N": "84"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "8236c738-90b6-4647-9513-20d64fa2d9d4"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "body/athletics"
+          },
+          "number": {
+            "N": "14"
+          },
+          "timestamp": {
+            "S": "2025-06-07T16:54:07.426Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "NULL": true
+              },
+              "attributePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "40"
+                      },
+                      "start": {
+                        "N": "10"
+                      },
+                      "total": {
+                        "N": "50"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "40"
+                      },
+                      "start": {
+                        "N": "10"
+                      },
+                      "total": {
+                        "N": "50"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "current": {
+                    "N": "21"
+                  },
+                  "mod": {
+                    "N": "1"
+                  },
+                  "start": {
+                    "N": "20"
+                  },
+                  "totalCost": {
+                    "N": "18"
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "current": {
+                    "N": "21"
+                  },
+                  "mod": {
+                    "N": "1"
+                  },
+                  "start": {
+                    "N": "17"
+                  },
+                  "totalCost": {
+                    "N": "18"
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "e8d61801-e9d5-400c-a8c5-7082a599b860"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "endurance"
+          },
+          "number": {
+            "N": "15"
+          },
+          "timestamp": {
+            "S": "2025-06-08T09:57:12.862Z"
+          },
+          "type": {
+            "N": "5"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "NULL": true
+              },
+              "attributePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "4"
+                      },
+                      "start": {
+                        "N": "10"
+                      },
+                      "total": {
+                        "N": "50"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "4"
+                      },
+                      "start": {
+                        "N": "10"
+                      },
+                      "total": {
+                        "N": "50"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "attribute": {
+                    "M": {
+                      "current": {
+                        "N": "21"
+                      },
+                      "mod": {
+                        "N": "2"
+                      },
+                      "start": {
+                        "N": "18"
+                      },
+                      "totalCost": {
+                        "N": "16"
+                      }
+                    }
+                  },
+                  "baseValues": {
+                    "M": {
+                      "attackBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "118"
+                          },
+                          "current": {
+                            "N": "130"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "18"
+                          }
+                        }
+                      },
+                      "healthPoints": {
+                        "M": {
+                          "byFormula": {
+                            "N": "81"
+                          },
+                          "byLvlUp": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "201"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "120"
+                          }
+                        }
+                      },
+                      "initiativeBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "15"
+                          },
+                          "byLvlUp": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "20"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "13"
+                          }
+                        }
+                      },
+                      "mentalHealth": {
+                        "M": {
+                          "byFormula": {
+                            "N": "50"
+                          },
+                          "current": {
+                            "N": "125"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "90"
+                          }
+                        }
+                      },
+                      "paradeBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "120"
+                          },
+                          "current": {
+                            "N": "130"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "15"
+                          }
+                        }
+                      },
+                      "rangedAttackBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "116"
+                          },
+                          "current": {
+                            "N": "120"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "12"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "attribute": {
+                    "M": {
+                      "current": {
+                        "N": "21"
+                      },
+                      "mod": {
+                        "N": "2"
+                      },
+                      "start": {
+                        "N": "18"
+                      },
+                      "totalCost": {
+                        "N": "16"
+                      }
+                    }
+                  },
+                  "baseValues": {
+                    "M": {
+                      "attackBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "22"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "18"
+                          }
+                        }
+                      },
+                      "healthPoints": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "byLvlUp": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "130"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "120"
+                          }
+                        }
+                      },
+                      "initiativeBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "byLvlUp": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "15"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "13"
+                          }
+                        }
+                      },
+                      "mentalHealth": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "85"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "90"
+                          }
+                        }
+                      },
+                      "paradeBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "20"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "15"
+                          }
+                        }
+                      },
+                      "rangedAttackBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "14"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "12"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "d74060b3-f16b-4585-8193-133c22ff3a1d"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "strength"
+          },
+          "number": {
+            "N": "16"
+          },
+          "timestamp": {
+            "S": "2025-06-11T20:12:32.114Z"
+          },
+          "type": {
+            "N": "5"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "NULL": true
+              },
+              "attributePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "4"
+                      },
+                      "start": {
+                        "N": "10"
+                      },
+                      "total": {
+                        "N": "50"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "4"
+                      },
+                      "start": {
+                        "N": "10"
+                      },
+                      "total": {
+                        "N": "50"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "attribute": {
+                    "M": {
+                      "current": {
+                        "N": "21"
+                      },
+                      "mod": {
+                        "N": "2"
+                      },
+                      "start": {
+                        "N": "18"
+                      },
+                      "totalCost": {
+                        "N": "16"
+                      }
+                    }
+                  },
+                  "baseValues": {
+                    "M": {
+                      "attackBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "118"
+                          },
+                          "current": {
+                            "N": "130"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "18"
+                          }
+                        }
+                      },
+                      "healthPoints": {
+                        "M": {
+                          "byFormula": {
+                            "N": "81"
+                          },
+                          "byLvlUp": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "201"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "120"
+                          }
+                        }
+                      },
+                      "initiativeBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "15"
+                          },
+                          "byLvlUp": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "20"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "13"
+                          }
+                        }
+                      },
+                      "mentalHealth": {
+                        "M": {
+                          "byFormula": {
+                            "N": "50"
+                          },
+                          "current": {
+                            "N": "125"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "90"
+                          }
+                        }
+                      },
+                      "paradeBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "120"
+                          },
+                          "current": {
+                            "N": "130"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "15"
+                          }
+                        }
+                      },
+                      "rangedAttackBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "116"
+                          },
+                          "current": {
+                            "N": "120"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "12"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "attribute": {
+                    "M": {
+                      "current": {
+                        "N": "21"
+                      },
+                      "mod": {
+                        "N": "2"
+                      },
+                      "start": {
+                        "N": "18"
+                      },
+                      "totalCost": {
+                        "N": "16"
+                      }
+                    }
+                  },
+                  "baseValues": {
+                    "M": {
+                      "attackBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "22"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "18"
+                          }
+                        }
+                      },
+                      "healthPoints": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "byLvlUp": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "130"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "120"
+                          }
+                        }
+                      },
+                      "initiativeBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "byLvlUp": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "15"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "13"
+                          }
+                        }
+                      },
+                      "mentalHealth": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "85"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "90"
+                          }
+                        }
+                      },
+                      "paradeBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "20"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "15"
+                          }
+                        }
+                      },
+                      "rangedAttackBaseValue": {
+                        "M": {
+                          "byFormula": {
+                            "N": "10"
+                          },
+                          "current": {
+                            "N": "14"
+                          },
+                          "mod": {
+                            "N": "10"
+                          },
+                          "start": {
+                            "N": "12"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "b31cd8ca-56e9-4f5f-9648-115de490ea48"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "strength"
+          },
+          "number": {
+            "N": "17"
+          },
+          "timestamp": {
+            "S": "2025-06-11T20:18:37.383Z"
+          },
+          "type": {
+            "N": "5"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "NULL": true
+              },
+              "attributePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "4"
+                      },
+                      "start": {
+                        "N": "10"
+                      },
+                      "total": {
+                        "N": "50"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "4"
+                      },
+                      "start": {
+                        "N": "10"
+                      },
+                      "total": {
+                        "N": "50"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "attribute": {
+                    "M": {
+                      "current": {
+                        "N": "21"
+                      },
+                      "mod": {
+                        "N": "2"
+                      },
+                      "start": {
+                        "N": "25"
+                      },
+                      "totalCost": {
+                        "N": "16"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "attribute": {
+                    "M": {
+                      "current": {
+                        "N": "21"
+                      },
+                      "mod": {
+                        "N": "2"
+                      },
+                      "start": {
+                        "N": "18"
+                      },
+                      "totalCost": {
+                        "N": "16"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "e6574361-cf70-40cb-b8c2-a0463345ece6"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "strength"
+          },
+          "number": {
+            "N": "18"
+          },
+          "timestamp": {
+            "S": "2025-06-12T19:41:35.771Z"
+          },
+          "type": {
+            "N": "5"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "NULL": true
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "byFormula": {
+                    "N": "118"
+                  },
+                  "current": {
+                    "N": "130"
+                  },
+                  "mod": {
+                    "N": "10"
+                  },
+                  "start": {
+                    "N": "30"
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "byFormula": {
+                    "N": "118"
+                  },
+                  "current": {
+                    "N": "130"
+                  },
+                  "mod": {
+                    "N": "10"
+                  },
+                  "start": {
+                    "N": "18"
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "3c51cd12-10bc-45a3-be6d-eb1b160304db"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "attackBaseValue"
+          },
+          "number": {
+            "N": "19"
+          },
+          "timestamp": {
+            "S": "2025-06-16T15:48:36.782Z"
+          },
+          "type": {
+            "N": "3"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "999"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "1000"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "1"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "1"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "0"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "61e1307c-9fe8-4884-9434-d6323b4c0389"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "20"
+          },
+          "timestamp": {
+            "S": "2026-01-17T10:23:51.434Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "998"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "999"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "2"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "2"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "1"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "1"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "da68aae6-c6a7-41d9-b65d-06a2758e9aed"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "21"
+          },
+          "timestamp": {
+            "S": "2026-01-17T10:30:19.854Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "997"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "998"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "3"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "3"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "2"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "2"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "f53b1688-5f54-41f7-9c0e-83da1c5b0003"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "22"
+          },
+          "timestamp": {
+            "S": "2026-01-17T10:39:19.355Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "996"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "997"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "4"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "4"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "3"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "3"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "30f32acc-effd-43b5-9a3c-c961c62de0ef"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "23"
+          },
+          "timestamp": {
+            "S": "2026-02-07T09:00:51.368Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "995"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "996"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "5"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "5"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "4"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "4"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "bebe5b36-fbba-4615-9e3b-91db00a38354"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "24"
+          },
+          "timestamp": {
+            "S": "2026-02-07T09:27:36.832Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "994"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "995"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "6"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "6"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "5"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "5"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "d6b4b78b-53d8-4fd8-96e1-5cc6421167b4"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "25"
+          },
+          "timestamp": {
+            "S": "2026-02-07T09:29:40.413Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "993"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "994"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "1"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "1"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "0"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "b593b7b4-d881-4532-8a57-7a2f598adc8a"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/zoology"
+          },
+          "number": {
+            "N": "26"
+          },
+          "timestamp": {
+            "S": "2026-02-07T09:37:12.076Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "992"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "993"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "7"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "7"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "6"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "6"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "8e1d5a1a-13e7-429c-90fa-6843a8f92357"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "27"
+          },
+          "timestamp": {
+            "S": "2026-02-07T10:04:01.828Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "990"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "992"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "combatStats": {
+                    "M": {
+                      "attackValue": {
+                        "N": "30"
+                      },
+                      "availablePoints": {
+                        "N": "17"
+                      },
+                      "handling": {
+                        "N": "15"
+                      },
+                      "paradeValue": {
+                        "N": "30"
+                      },
+                      "skilledAttackValue": {
+                        "N": "0"
+                      },
+                      "skilledParadeValue": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "2"
+                      },
+                      "defaultCostCategory": {
+                        "N": "3"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "1"
+                      },
+                      "totalCost": {
+                        "N": "2"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "combatStats": {
+                    "M": {
+                      "attackValue": {
+                        "N": "30"
+                      },
+                      "availablePoints": {
+                        "N": "16"
+                      },
+                      "handling": {
+                        "N": "15"
+                      },
+                      "paradeValue": {
+                        "N": "30"
+                      },
+                      "skilledAttackValue": {
+                        "N": "0"
+                      },
+                      "skilledParadeValue": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "1"
+                      },
+                      "defaultCostCategory": {
+                        "N": "3"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "1"
+                      },
+                      "totalCost": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "4ddebdf7-3fff-4160-a552-a05c2800c7b6"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "combat/thrustingWeapons2h"
+          },
+          "number": {
+            "N": "28"
+          },
+          "timestamp": {
+            "S": "2026-02-07T10:39:52.943Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "989"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "990"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "8"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "8"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "7"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "7"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "f567f0de-7b77-4474-aeca-4b591a900e66"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "29"
+          },
+          "timestamp": {
+            "S": "2026-02-07T11:15:52.229Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "988"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "989"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "9"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "9"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "8"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "8"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "2529258b-fd73-4825-be83-0f5429e9fd66"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "30"
+          },
+          "timestamp": {
+            "S": "2026-02-07T11:20:22.516Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "987"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "988"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "10"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "10"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "9"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "9"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "1046f006-915b-4c9f-af73-cc2e3cab6fde"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "31"
+          },
+          "timestamp": {
+            "S": "2026-02-07T11:24:36.460Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "986"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "987"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "11"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "11"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "10"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "10"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "3241130a-8212-401e-ad44-cb55e6f408f9"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "32"
+          },
+          "timestamp": {
+            "S": "2026-02-07T11:53:02.595Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "985"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "986"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "12"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "12"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "11"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "11"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "6964c357-1152-46a2-ba76-354aaebd77b2"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "33"
+          },
+          "timestamp": {
+            "S": "2026-02-07T13:04:57.791Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "984"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "985"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "13"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "13"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "12"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "12"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "b652ead5-de7e-41dd-8fe6-1943b45bc7ea"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "34"
+          },
+          "timestamp": {
+            "S": "2026-02-07T13:20:54.753Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "983"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "984"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "14"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "14"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "13"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "13"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "10c4a3c5-1eaf-4df2-8652-2edc07358df9"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "35"
+          },
+          "timestamp": {
+            "S": "2026-02-07T13:39:17.786Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "982"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "983"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "15"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "15"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "14"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "14"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "fd9c2c82-5b08-4db0-a8e7-3c89704bbd60"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "36"
+          },
+          "timestamp": {
+            "S": "2026-02-07T13:49:08.860Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "981"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "982"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "16"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "16"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "15"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "15"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "23d49e63-c2eb-4c1d-85b5-8e91b7bfd92c"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "37"
+          },
+          "timestamp": {
+            "S": "2026-02-07T13:49:15.460Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "980"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "981"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "17"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "17"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "16"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "16"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "0578367d-a498-4027-a300-b62fd1835d54"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "38"
+          },
+          "timestamp": {
+            "S": "2026-02-07T13:49:18.159Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "979"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "980"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "18"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "18"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "17"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "17"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "55c0a719-6c1e-4d16-9f9f-22228d031cc5"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "39"
+          },
+          "timestamp": {
+            "S": "2026-02-08T07:51:21.171Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "978"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "979"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "19"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "19"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "18"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "18"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "c0aceb80-bf4b-4a79-910e-4ae3c205106b"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "40"
+          },
+          "timestamp": {
+            "S": "2026-02-08T07:51:23.170Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "977"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "978"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "20"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "20"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "19"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "19"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "dc5c696e-2b50-4259-a312-06c9e3358d26"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "41"
+          },
+          "timestamp": {
+            "S": "2026-02-15T08:25:35.176Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "976"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "977"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "21"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "21"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "20"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "20"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "5dfbdc45-2f88-4d68-a53e-eb6c6c8a9281"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "42"
+          },
+          "timestamp": {
+            "S": "2026-02-15T08:25:37.475Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "975"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "976"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "22"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "22"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "21"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "21"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "51fbec78-a5ea-4912-9da2-f5ee8c499798"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "43"
+          },
+          "timestamp": {
+            "S": "2026-02-15T08:33:05.850Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "974"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "975"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "23"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "23"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "22"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "22"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "8f0ac30c-158c-430e-b04c-04506e71123d"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "44"
+          },
+          "timestamp": {
+            "S": "2026-02-15T08:33:07.892Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "973"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "974"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "24"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "24"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "23"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "23"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "1afeffe9-d077-4544-8b70-62cac06b29a0"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "45"
+          },
+          "timestamp": {
+            "S": "2026-02-15T09:24:05.680Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "968"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "973"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "29"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "29"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "24"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "24"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "9386d9b0-154f-421e-9bb4-467daa02c637"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "46"
+          },
+          "timestamp": {
+            "S": "2026-02-15T09:24:09.661Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "958"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "968"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "39"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "39"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "29"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "29"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "183aa406-4043-4fe0-94c3-1bbf9c0e5359"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "47"
+          },
+          "timestamp": {
+            "S": "2026-02-15T09:24:13.321Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "M": {
+                  "new": {
+                    "M": {
+                      "available": {
+                        "N": "948"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  },
+                  "old": {
+                    "M": {
+                      "available": {
+                        "N": "958"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "total": {
+                        "N": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "S": "This is a test comment"
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "49"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "49"
+                      }
+                    }
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "skill": {
+                    "M": {
+                      "activated": {
+                        "BOOL": true
+                      },
+                      "current": {
+                        "N": "39"
+                      },
+                      "defaultCostCategory": {
+                        "N": "2"
+                      },
+                      "mod": {
+                        "N": "0"
+                      },
+                      "start": {
+                        "N": "0"
+                      },
+                      "totalCost": {
+                        "N": "39"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "a5bb818b-aced-486c-b222-f9a57ba53abb"
+          },
+          "learningMethod": {
+            "S": "NORMAL"
+          },
+          "name": {
+            "S": "knowledge/mathematics"
+          },
+          "number": {
+            "N": "48"
+          },
+          "timestamp": {
+            "S": "2026-02-15T09:24:18.880Z"
+          },
+          "type": {
+            "N": "6"
+          }
+        }
+      }
+    ]
+  },
+  "previousBlockId": {
+    "S": "1281e5da-2f7f-462d-a1f2-d301851d8f5a"
+  }
+}

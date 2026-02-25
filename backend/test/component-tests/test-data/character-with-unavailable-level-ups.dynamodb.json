@@ -1374,7 +1374,7 @@
             "S": "185 cm"
           },
           "specialCharacteristics": {
-            "S": "None"
+            "S": "ATTENTION: The values in this character may not be consistent! They are deliberately set to test various scenarios during component testing."
           },
           "weight": {
             "S": "90 kg"
