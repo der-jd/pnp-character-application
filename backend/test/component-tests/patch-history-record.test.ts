@@ -5,10 +5,14 @@ import {
   PatchHistoryRecordResponse,
   HistoryRecord,
 } from "api-spec";
-import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
-import { ApiClient } from "../api-client.js";
-import { INVALID_UUID } from "../shared.js";
-import { TestContext, TestContextFactory } from "../test-context-factory.js";
+import {
+  expectApiError,
+  commonInvalidTestCases,
+  updateAndVerifyTestContextAfterEachTest,
+  INVALID_UUID,
+} from "./shared.js";
+import { ApiClient } from "./api-client.js";
+import { TestContext, TestContextFactory } from "./test-context-factory.js";
 
 describe.sequential("patch-history-record component tests", () => {
   let context: TestContext;

@@ -9,9 +9,9 @@ import {
   HistoryRecord,
   HistoryRecordType,
 } from "api-spec";
-import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
-import { ApiClient } from "../api-client.js";
-import { TestContextFactory, TestContext } from "../test-context-factory.js";
+import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "./shared.js";
+import { ApiClient } from "./api-client.js";
+import { TestContextFactory, TestContext } from "./test-context-factory.js";
 
 describe.sequential("post-special-abilities component tests", () => {
   let context: TestContext;

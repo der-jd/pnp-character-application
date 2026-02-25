@@ -12,9 +12,9 @@ import {
   BaseValue,
   PatchBaseValueRequest,
 } from "api-spec";
-import { commonInvalidTestCases, expectApiError, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
-import { TestContext, TestContextFactory } from "../test-context-factory.js";
-import { ApiClient } from "../api-client.js";
+import { commonInvalidTestCases, expectApiError, updateAndVerifyTestContextAfterEachTest } from "./shared.js";
+import { TestContext, TestContextFactory } from "./test-context-factory.js";
+import { ApiClient } from "./api-client.js";
 
 describe.sequential("patch-base-value component tests", () => {
   let context: TestContext;

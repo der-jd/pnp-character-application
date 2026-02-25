@@ -10,9 +10,9 @@ import {
   PatchSkillResponse,
   HistoryRecord,
 } from "api-spec";
-import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "../shared.js";
-import { TestContextFactory, TestContext } from "../test-context-factory.js";
-import { ApiClient } from "../api-client.js";
+import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfterEachTest } from "./shared.js";
+import { TestContextFactory, TestContext } from "./test-context-factory.js";
+import { ApiClient } from "./api-client.js";
 
 describe.sequential("patch-skill component tests", () => {
   let context: TestContext;

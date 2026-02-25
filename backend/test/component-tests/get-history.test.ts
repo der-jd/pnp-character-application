@@ -1,8 +1,8 @@
 import { describe, expect, test, beforeAll, afterAll } from "vitest";
 import { getHistoryResponseSchema, HistoryBlock } from "api-spec";
-import { expectApiError, commonInvalidTestCases } from "../shared.js";
-import { ApiClient } from "../api-client.js";
-import { TestContext, TestContextFactory } from "../test-context-factory.js";
+import { expectApiError, commonInvalidTestCases } from "./shared.js";
+import { ApiClient } from "./api-client.js";
+import { TestContext, TestContextFactory } from "./test-context-factory.js";
 
 describe.sequential("get-history component tests", () => {
   let context: TestContext;
