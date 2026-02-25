@@ -10,6 +10,8 @@ import {
 } from "api-spec";
 import { ApiClient } from "./api-client.js";
 import { readFileSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 
 export interface TestContext {
   apiBaseUrl: string;
@@ -43,7 +45,7 @@ export class TestContextFactory {
     // Environment variable from Terraform via CircleCI
     const apiBaseUrl = requireEnv("COMPONENT_TESTS_API_BASE_URL");
 
-    const seedCharacterId = this.loadCharacterIdFromTestData("./test-data/default-character.dynamodb.json");
+    const seedCharacterId = this.loadCharacterIdFromTestData("test-data/default-character.dynamodb.json");
 
     const secrets = getTestSecrets();
     const userId = secrets.cognitoUsername;
@@ -109,7 +111,10 @@ export class TestContextFactory {
   }
 
   static loadCharacterIdFromTestData(relativePath: string): string {
-    const characterData = JSON.parse(readFileSync(relativePath, "utf8"));
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const absolutePath = join(__dirname, relativePath);
+    const characterData = JSON.parse(readFileSync(absolutePath, "utf8"));
     const characterId = characterData.characterId.S;
     if (!characterId) {
       throw new Error(`Character ID not found in test data file: ${relativePath}`);
