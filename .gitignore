@@ -8,3 +8,5 @@ terraform.tfstate.*
 node_modules/
 build/
 dist/
+
+.npmrc
