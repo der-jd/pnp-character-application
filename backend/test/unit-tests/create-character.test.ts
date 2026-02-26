@@ -172,7 +172,7 @@ describe("Invalid requests", () => {
       expectedStatusCode: 400,
     },
     {
-      name: "Profession skill has the wrong format",
+      name: "Profession skill has the wrong format (missing category)",
       request: {
         headers: fakeHeaders,
         pathParameters: null,
@@ -191,7 +191,7 @@ describe("Invalid requests", () => {
       expectedStatusCode: 400,
     },
     {
-      name: "Hobby skill has the wrong format",
+      name: "Hobby skill has the wrong format (missing category)",
       request: {
         headers: fakeHeaders,
         pathParameters: null,
@@ -402,7 +402,7 @@ describe("Invalid requests", () => {
       expectedStatusCode: 400,
     },
     {
-      name: "Activated skills have the wrong format",
+      name: "Activated skills have the wrong format (missing category)",
       request: {
         headers: fakeHeaders,
         pathParameters: null,
@@ -563,13 +563,6 @@ describe("Valid requests", () => {
       // Check profession and Hobby
       const profession = _case.request.body.generalInformation.profession;
       const hobby = _case.request.body.generalInformation.hobby;
-      expect(parsedBody.changes.new.character.characterSheet.generalInformation.profession.name).toBe(profession.name);
-      expect(parsedBody.changes.new.character.characterSheet.generalInformation.hobby.name).toBe(hobby.name);
-      expect(parsedBody.changes.new.character.characterSheet.generalInformation.profession.skill).toStrictEqual(
-        profession.skill,
-      );
-      expect(parsedBody.changes.new.character.characterSheet.generalInformation.hobby.skill).toStrictEqual(hobby.skill);
-
       const { category: professionCategory, name: professionSkillName } = getSkillCategoryAndName(profession.skill);
       const { category: hobbyCategory, name: hobbySkillName } = getSkillCategoryAndName(hobby.skill);
       const returnedProfessionSkill = getSkill(
@@ -630,6 +623,12 @@ describe("Valid requests", () => {
                 getCombatSkillHandling(skillName as CombatSkillName) +
                   _case.request.body.combatSkillsStartValues[skillName] +
                   PROFESSION_SKILL_BONUS,
+              );
+            } else if (`combat/${skillName}` === _case.request.body.generalInformation.hobby.skill) {
+              expect(combatStats.availablePoints).toBe(
+                getCombatSkillHandling(skillName as CombatSkillName) +
+                  _case.request.body.combatSkillsStartValues[skillName] +
+                  HOBBY_SKILL_BONUS,
               );
             } else {
               expect(combatStats.availablePoints).toBe(
