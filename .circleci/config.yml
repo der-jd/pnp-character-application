@@ -4,12 +4,12 @@ orbs:
   aws-cli: circleci/aws-cli@5
 
 parameters:
-  delete-services:
-    description: If true, deletes the Terraform resources in AWS.
-    type: boolean
-    default: false
   run-component-tests:
     description: If true, runs backend component tests. Always runs on main branch.
+    type: boolean
+    default: false
+  delete-services:
+    description: If true, deletes the Terraform resources in AWS.
     type: boolean
     default: false
 
