@@ -24,16 +24,16 @@ export interface TestContext {
   latestHistoryBlockNumber: number;
 }
 
+export interface BaseSetup {
+  apiBaseUrl: string;
+  authorizationHeader: string;
+  userId: string;
+  seedCharacterId: string;
+  apiClient: ApiClient;
+}
+
 export class TestContextFactory {
-  private static baseSetup:
-    | {
-        apiBaseUrl: string;
-        authorizationHeader: string;
-        userId: string;
-        seedCharacterId: string;
-        apiClient: ApiClient;
-      }
-    | undefined;
+  private static baseSetup: BaseSetup | undefined;
 
   static async initializeBaseSetup(): Promise<void> {
     if (this.baseSetup) {
@@ -63,6 +63,13 @@ export class TestContextFactory {
       seedCharacterId,
       apiClient: new ApiClient(apiBaseUrl, authorizationHeader),
     };
+  }
+
+  static getBaseSetup(): BaseSetup {
+    if (!this.baseSetup) {
+      throw new Error("Base setup not initialized. Call initializeBaseSetup() first.");
+    }
+    return this.baseSetup;
   }
 
   static async createContext(seedCharacterId?: string): Promise<TestContext> {
