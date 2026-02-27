@@ -130,12 +130,14 @@ async function revertChange(userId: string, characterId: string, record: History
     switch (record.type) {
       case HistoryRecordType.CHARACTER_CREATED:
         throw new HttpError(400, "Reverting character creation is not allowed! Delete the character instead.");
+
       case HistoryRecordType.CALCULATION_POINTS_CHANGED: {
         const oldData = calculationPointsChangeSchema.parse(record.data.old);
         await updateAdventurePointsIfExists(userId, characterId, oldData.adventurePoints);
         await updateAttributePointsIfExists(userId, characterId, oldData.attributePoints);
         break;
       }
+
       case HistoryRecordType.LEVEL_UP_APPLIED: {
         const oldData = levelUpChangeSchema.parse(record.data.old);
 
@@ -164,6 +166,7 @@ async function revertChange(userId: string, characterId: string, record: History
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
       }
+
       case HistoryRecordType.BASE_VALUE_CHANGED: {
         const oldData = baseValueChangeSchema.parse(record.data.old);
         await updateBaseValue(userId, characterId, record.name, oldData.baseValue);
@@ -187,6 +190,7 @@ async function revertChange(userId: string, characterId: string, record: History
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
       }
+
       case HistoryRecordType.SPECIAL_ABILITIES_CHANGED: {
         const oldSpecialAbilities = specialAbilitiesChangeSchema.parse(record.data.old).values;
         await setSpecialAbilities(userId, characterId, oldSpecialAbilities);
@@ -194,6 +198,7 @@ async function revertChange(userId: string, characterId: string, record: History
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
       }
+
       case HistoryRecordType.ATTRIBUTE_CHANGED: {
         const oldData = attributeChangeSchema.parse(record.data.old);
 
@@ -237,6 +242,7 @@ async function revertChange(userId: string, characterId: string, record: History
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
       }
+
       case HistoryRecordType.SKILL_CHANGED: {
         const oldData = skillChangeSchema.parse(record.data.old);
 
@@ -258,6 +264,7 @@ async function revertChange(userId: string, characterId: string, record: History
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         break;
       }
+
       case HistoryRecordType.COMBAT_STATS_CHANGED: {
         const oldCombatStats = combatStatsSchema.parse(record.data.old);
         const [combatCategory, combatSkillName] = record.name.split("/");
@@ -266,6 +273,7 @@ async function revertChange(userId: string, characterId: string, record: History
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
         break;
       }
+
       default:
         throw new HttpError(500, "Unknown history record type!");
     }
