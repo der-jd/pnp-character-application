@@ -59,18 +59,19 @@ describe.sequential("patch-calculation-points component tests", () => {
 
         const authorizationHeader = _case.authorizationHeader ?? context.authorizationHeader;
         const path = _case.characterId
-          ? `characters/${_case.characterId}/skills/body/athletics`
-          : `characters/${character.characterId}/skills/body/athletics`;
+          ? `characters/${_case.characterId}/calculation-points`
+          : `characters/${character.characterId}/calculation-points`;
         const client = new ApiClient(context.apiBaseUrl, authorizationHeader);
 
         await expectApiError(
           () =>
             client.patch(path, {
-              current: {
-                initialValue: 16,
-                increasedPoints: 1,
+              adventurePoints: {
+                total: {
+                  initialValue: character.characterSheet.calculationPoints.adventurePoints.total,
+                  increasedPoints: 10,
+                },
               },
-              learningMethod: "NORMAL",
             }),
           _case.expectedStatusCode,
           _case.expectedErrorMessage,
