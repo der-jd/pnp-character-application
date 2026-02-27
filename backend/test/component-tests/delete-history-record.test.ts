@@ -66,7 +66,7 @@ describe.sequential("delete-history-record component tests", () => {
     const testCases = commonInvalidTestCases.map((testCase) =>
       testCase.name === "no character found for non-existing character id"
         ? { ...testCase, expectedErrorMessage: "No history found for the given character id" }
-        : testCase
+        : testCase,
     );
 
     testCases.forEach((_case) => {
