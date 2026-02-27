@@ -10,3 +10,10 @@ build/
 dist/
 
 .npmrc
+
+# Environment variables
+.env
+.env.*
+
+# Mac
+.DS_Store

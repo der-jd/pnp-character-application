@@ -13,7 +13,7 @@ export type PostCharacterClonePathParams = z.infer<typeof postCharacterClonePath
 
 export const postCharacterCloneRequestSchema = z
   .object({
-    userIdOfCharacter: z.uuid(),
+    userIdOfCharacter: userIdSchema,
   })
   .strict();
 

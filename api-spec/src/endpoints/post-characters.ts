@@ -9,7 +9,7 @@ import {
   combatSkillsSchema,
 } from "../character-schemas.js";
 import { userIdSchema, MIN_LEVEL } from "../general-schemas.js";
-import { activatedSkillsSchema, characterCreationSchema, recordSchema } from "../history-schemas.js";
+import { activatedSkillsSchema, characterCreationSchema, historyRecordSchema } from "../history-schemas.js";
 
 export const GENERATION_POINTS = 5;
 export const MAX_GENERATION_POINTS_THROUGH_DISADVANTAGES = 15;
@@ -83,7 +83,7 @@ export const createCharacterResponseSchema = z
 
 export type CreateCharacterResponse = z.infer<typeof createCharacterResponseSchema>;
 
-export const postCharactersHistoryRecordSchema = recordSchema.extend({
+export const postCharactersHistoryRecordSchema = historyRecordSchema.extend({
   data: z
     .object({
       new: characterCreationSchema,

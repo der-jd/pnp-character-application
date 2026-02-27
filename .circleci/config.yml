@@ -4,10 +4,17 @@ orbs:
   aws-cli: circleci/aws-cli@5
 
 parameters:
+  run-component-tests:
+    description: If true, runs backend component tests. Always runs on main branch.
+    type: boolean
+    default: false
   delete-services:
     description: If true, deletes the Terraform resources in AWS.
     type: boolean
     default: false
+
+terraform_version: &terraform_version "1.14.5"
+terraform_docker_image: &terraform_docker_image "hashicorp/terraform:1.14"
 
 executors:
   node-medium-executor:
@@ -22,25 +29,43 @@ executors:
 workflows:
   build-deploy:
     when:
-      not: << pipeline.parameters.delete-services >>
+      and:
+        - not: << pipeline.parameters.delete-services >>
+        - not: << pipeline.parameters.run-component-tests >>
     jobs:
       - check-format-files
       - lint-typescript-code
       - build-backend
-      - run-backend-tests
+      - run-backend-unit-tests
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
           requires:
             - check-format-files
             - lint-typescript-code
             - build-backend
-            - run-backend-tests
+            - run-backend-unit-tests
             - lint-terraform-code
+      # Run component tests only on main branch
+      - run-backend-component-tests:
+          requires:
+            - deploy-backend-and-infrastructure
+          filters:
+            branches:
+              only:
+                - main
       - build-and-deploy-frontend:
           requires:
             - check-format-files
             - lint-typescript-code
             - deploy-backend-and-infrastructure
+
+  component-tests:
+    when:
+      and:
+        - not: << pipeline.parameters.delete-services >>
+        - << pipeline.parameters.run-component-tests >>
+    jobs:
+      - run-backend-component-tests
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
@@ -55,16 +80,7 @@ jobs:
       - run:
           name: Install dependencies
           command: npm ci
-      - run:
-          name: Install Terraform
-          command: |
-            TER_VER=1.14.5
-            curl --fail --location --output terraform.zip https://releases.hashicorp.com/terraform/${TER_VER}/terraform_${TER_VER}_linux_amd64.zip
-            rm -rf terraform # Remove any leftover file/directory from previous run
-            unzip terraform.zip
-            sudo mv terraform /usr/local/bin/
-            terraform -version
-            rm terraform.zip
+      - install-terraform
       - run:
           name: Check file formatting
           command: npm run check-format
@@ -102,7 +118,7 @@ jobs:
           paths:
             - backend/build
 
-  run-backend-tests:
+  run-backend-unit-tests:
     executor: node-medium-executor
     steps:
       - checkout
@@ -115,10 +131,10 @@ jobs:
             cd api-spec
             npm run build
       - run:
-          name: Run tests
+          name: Run unit tests
           command: |
             cd backend
-            npm run test
+            npm run test:unit
 
   lint-terraform-code:
     executor: node-small-executor
@@ -131,10 +147,46 @@ jobs:
           name: Lint Terraform code
           command: npm run lint:terraform
 
+  run-backend-component-tests:
+    docker:
+      - image: cimg/node:22.10
+    resource_class: medium
+    steps:
+      - checkout
+      - aws-cli/setup:
+          role_arn: "$AWS_ROLE_ARN"
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - install-terraform
+      - run:
+          name: Build api-spec package
+          command: |
+            cd api-spec
+            npm run build
+      - run:
+          name: Set environment variables for component tests
+          command: |
+            cd terraform
+            terraform init -input=false
+
+            # Create environment file for component tests
+            echo "export COMPONENT_TESTS_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
+            echo "export COMPONENT_TESTS_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
+            echo "export COMPONENT_TESTS_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output
+      - run:
+          name: Run component tests
+          command: |
+            # Set environment variables for tests
+            source ~/project/terraform/terraform_output
+
+            cd backend
+            npm run test:component
+
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
     docker:
-      - image: hashicorp/terraform:1.14
+      - image: *terraform_docker_image
     resource_class: medium
     steps:
       - checkout
@@ -161,6 +213,7 @@ jobs:
           name: Persist Terraform output for frontend
           command: |
             cd terraform
+
             echo "export NEXT_PUBLIC_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
             echo "export NEXT_PUBLIC_COGNITO_USER_POOL_ID=$(terraform output cognito_user_pool_id)" >> terraform_output
             echo "export NEXT_PUBLIC_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
@@ -214,7 +267,7 @@ jobs:
 
   terraform-destroy:
     docker:
-      - image: hashicorp/terraform:1.9
+      - image: *terraform_docker_image
     resource_class: small
     steps:
       - checkout
@@ -235,3 +288,22 @@ jobs:
           command: |
             cd terraform
             terraform apply -auto-approve tfdestroy
+
+commands:
+  install-terraform:
+    description: Install Terraform using the version specified in terraform_version anchor
+    parameters:
+      version:
+        type: string
+        default: *terraform_version
+    steps:
+      - run:
+          name: Install Terraform
+          command: |
+            TF_VER=<< parameters.version >>
+            TEMP_DIR=$(mktemp -d)
+            curl --fail --location --output ${TEMP_DIR}/terraform.zip https://releases.hashicorp.com/terraform/${TF_VER}/terraform_${TF_VER}_linux_amd64.zip
+            unzip ${TEMP_DIR}/terraform.zip -d ${TEMP_DIR}
+            sudo mv ${TEMP_DIR}/terraform /usr/local/bin/
+            terraform -version
+            rm -rf ${TEMP_DIR}

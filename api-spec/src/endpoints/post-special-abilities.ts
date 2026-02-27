@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { userIdSchema } from "../general-schemas.js";
 import { specialAbilitySchema } from "../character-schemas.js";
-import { recordSchema, specialAbilitiesChangeSchema } from "../history-schemas.js";
+import { historyRecordSchema, specialAbilitiesChangeSchema } from "../history-schemas.js";
 
 export const postSpecialAbilitiesPathParamsSchema = z
   .object({
@@ -35,7 +35,7 @@ export const addSpecialAbilityResponseSchema = z
 
 export type AddSpecialAbilityResponse = z.infer<typeof addSpecialAbilityResponseSchema>;
 
-export const postSpecialAbilitiesHistoryRecordSchema = recordSchema.extend({
+export const postSpecialAbilitiesHistoryRecordSchema = historyRecordSchema.extend({
   data: z
     .object({
       old: specialAbilitiesChangeSchema,

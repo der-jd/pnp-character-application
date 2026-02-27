@@ -16,20 +16,28 @@ resource "aws_dynamodb_table" "characters" {
   }
 
   attribute {
-    name = "groupId"
+    name = "characterId"
     type = "S"
   }
 
   attribute {
-    name = "characterId"
+    name = "groupId"
     type = "S"
   }
 
   # TODO obsolete and can be removed?!
   global_secondary_index {
-    name            = "indexForCognitoGroup"
-    hash_key        = "groupId"
-    range_key       = "characterId"
+    name = "indexForCognitoGroup"
+    key_schema {
+      attribute_name = "groupId"
+      key_type       = "HASH"
+    }
+
+    key_schema {
+      attribute_name = "characterId"
+      key_type       = "RANGE"
+    }
+
     projection_type = "ALL"
   }
 

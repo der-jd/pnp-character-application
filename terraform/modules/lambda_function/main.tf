@@ -7,7 +7,7 @@ variable "handler" {
 }
 variable "runtime" {
   type    = string
-  default = "nodejs20.x"
+  default = "nodejs24.x"
 }
 variable "environment_vars" {
   type = map(string)
@@ -21,6 +21,10 @@ variable "role_arn" {
 }
 variable "api_gateway_arn" {
   type = string
+}
+variable "timeout" {
+  type    = number
+  default = 5
 }
 
 locals {
@@ -41,6 +45,7 @@ resource "aws_lambda_function" "lambda_function" {
   filename         = local.lambda_zip_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   layers           = var.layers
+  timeout          = var.timeout
   environment {
     variables = var.environment_vars
   }

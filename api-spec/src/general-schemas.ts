@@ -32,11 +32,20 @@ export type InitialNew = z.infer<typeof initialNewSchema>;
 export const initialIncreasedSchema = z
   .object({
     initialValue: z.number().int().min(MIN_POINTS).max(MAX_POINTS),
-    increasedPoints: z.number().int().min(0).max(MAX_POINTS),
+    increasedPoints: z.number().int().min(1).max(MAX_POINTS),
   })
   .strict();
 
 export type InitialIncreased = z.infer<typeof initialIncreasedSchema>;
+
+export const initialIncreasedSchemaOptional = z
+  .object({
+    initialValue: z.number().int().min(MIN_POINTS).max(MAX_POINTS),
+    increasedPoints: z.number().int().min(0).max(MAX_POINTS),
+  })
+  .strict();
+
+export type InitialIncreasedSchemaOptional = z.infer<typeof initialIncreasedSchemaOptional>;
 
 /**
  * An user ID is not necessarily an UUID (36 characters), but a string with a certain length.

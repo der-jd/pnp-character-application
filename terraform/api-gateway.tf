@@ -65,7 +65,7 @@ module "characters_post" {
   resource_id       = aws_api_gateway_resource.characters.id
   http_method       = "POST"
   authorizer_id     = aws_api_gateway_authorizer.cognito_authorizer.id
-  aws_region        = data.aws_region.current.name
+  aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
   state_machine_arn = aws_sfn_state_machine.create_character_state_machine.arn
 }
@@ -194,7 +194,7 @@ module "attribute_name_patch" {
     "method.request.path.character-id"   = true
     "method.request.path.attribute-name" = true
   }
-  aws_region        = data.aws_region.current.name
+  aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
   state_machine_arn = aws_sfn_state_machine.update_attribute_state_machine.arn
 }
@@ -235,7 +235,7 @@ module "base_value_name_patch" {
     "method.request.path.character-id"    = true
     "method.request.path.base-value-name" = true
   }
-  aws_region        = data.aws_region.current.name
+  aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
   state_machine_arn = aws_sfn_state_machine.update_base_value_state_machine.arn
 }
@@ -267,7 +267,7 @@ module "calculation_points_patch" {
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
-  aws_region        = data.aws_region.current.name
+  aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
   state_machine_arn = aws_sfn_state_machine.update_calculation_points_state_machine.arn
 }
@@ -313,7 +313,7 @@ module "level_up_post" {
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
-  aws_region        = data.aws_region.current.name
+  aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
   state_machine_arn = aws_sfn_state_machine.apply_level_up_state_machine.arn
 }
@@ -380,7 +380,7 @@ module "skill_name_patch" {
     "method.request.path.skill-category" = true
     "method.request.path.skill-name"     = true
   }
-  aws_region        = data.aws_region.current.name
+  aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
   state_machine_arn = aws_sfn_state_machine.update_skill_state_machine.arn
 }
@@ -412,7 +412,7 @@ module "special_abilities_post" {
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
-  aws_region        = data.aws_region.current.name
+  aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
   state_machine_arn = aws_sfn_state_machine.add_special_ability_state_machine.arn
 }
@@ -462,7 +462,7 @@ module "combat_skill_name_patch" {
     "method.request.path.combat-category"   = true
     "method.request.path.combat-skill-name" = true
   }
-  aws_region        = data.aws_region.current.name
+  aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
   state_machine_arn = aws_sfn_state_machine.update_combat_stats_state_machine.arn
 }
@@ -641,7 +641,7 @@ resource "aws_api_gateway_base_path_mapping" "api_mapping" {
 }
 
 output "api_versioned_url" {
-  value     = "${aws_api_gateway_domain_name.api_domain.regional_domain_name}/${local.api_major_version}"
+  value     = "https://${aws_api_gateway_domain_name.api_domain.domain_name}/${aws_api_gateway_base_path_mapping.api_mapping.base_path}"
   sensitive = false
 }
 

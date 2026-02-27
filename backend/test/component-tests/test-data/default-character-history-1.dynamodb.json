@@ -1,0 +1,2827 @@
+{
+  "characterId": {
+    "S": "5074d49e-55b1-4f51-8827-f8c07969b849"
+  },
+  "blockNumber": {
+    "N": "1"
+  },
+  "blockId": {
+    "S": "1b4bc902-6ff6-4df2-bd49-1dedbf278405"
+  },
+  "changes": {
+    "L": [
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "NULL": true
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "activatedSkills": {
+                    "L": [
+                      {
+                        "S": "handcraft/makingMusic"
+                      },
+                      {
+                        "S": "handcraft/alcoholProduction"
+                      },
+                      {
+                        "S": "handcraft/fineMechanics"
+                      },
+                      {
+                        "S": "social/convincing"
+                      },
+                      {
+                        "S": "nature/trapping"
+                      }
+                    ]
+                  },
+                  "character": {
+                    "M": {
+                      "characterId": {
+                        "S": "5074d49e-55b1-4f51-8827-f8c07969b849"
+                      },
+                      "characterSheet": {
+                        "M": {
+                          "advantages": {
+                            "L": [
+                              {
+                                "L": [
+                                  {
+                                    "N": "11"
+                                  },
+                                  {
+                                    "S": ""
+                                  },
+                                  {
+                                    "N": "2"
+                                  }
+                                ]
+                              },
+                              {
+                                "L": [
+                                  {
+                                    "N": "12"
+                                  },
+                                  {
+                                    "S": ""
+                                  },
+                                  {
+                                    "N": "4"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "attributes": {
+                            "M": {
+                              "charisma": {
+                                "M": {
+                                  "current": {
+                                    "N": "5"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "5"
+                                  },
+                                  "totalCost": {
+                                    "N": "5"
+                                  }
+                                }
+                              },
+                              "concentration": {
+                                "M": {
+                                  "current": {
+                                    "N": "5"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "5"
+                                  },
+                                  "totalCost": {
+                                    "N": "5"
+                                  }
+                                }
+                              },
+                              "courage": {
+                                "M": {
+                                  "current": {
+                                    "N": "5"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "5"
+                                  },
+                                  "totalCost": {
+                                    "N": "5"
+                                  }
+                                }
+                              },
+                              "dexterity": {
+                                "M": {
+                                  "current": {
+                                    "N": "5"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "5"
+                                  },
+                                  "totalCost": {
+                                    "N": "5"
+                                  }
+                                }
+                              },
+                              "endurance": {
+                                "M": {
+                                  "current": {
+                                    "N": "5"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "5"
+                                  },
+                                  "totalCost": {
+                                    "N": "5"
+                                  }
+                                }
+                              },
+                              "intelligence": {
+                                "M": {
+                                  "current": {
+                                    "N": "5"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "5"
+                                  },
+                                  "totalCost": {
+                                    "N": "5"
+                                  }
+                                }
+                              },
+                              "mentalResilience": {
+                                "M": {
+                                  "current": {
+                                    "N": "5"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "5"
+                                  },
+                                  "totalCost": {
+                                    "N": "5"
+                                  }
+                                }
+                              },
+                              "strength": {
+                                "M": {
+                                  "current": {
+                                    "N": "5"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "5"
+                                  },
+                                  "totalCost": {
+                                    "N": "5"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "baseValues": {
+                            "M": {
+                              "armorLevel": {
+                                "M": {
+                                  "byLvlUp": {
+                                    "N": "0"
+                                  },
+                                  "current": {
+                                    "N": "0"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "0"
+                                  }
+                                }
+                              },
+                              "attackBaseValue": {
+                                "M": {
+                                  "byFormula": {
+                                    "N": "30"
+                                  },
+                                  "current": {
+                                    "N": "30"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "30"
+                                  }
+                                }
+                              },
+                              "bonusActionsPerCombatRound": {
+                                "M": {
+                                  "byLvlUp": {
+                                    "N": "0"
+                                  },
+                                  "current": {
+                                    "N": "0"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "0"
+                                  }
+                                }
+                              },
+                              "healthPoints": {
+                                "M": {
+                                  "byFormula": {
+                                    "N": "35"
+                                  },
+                                  "byLvlUp": {
+                                    "N": "0"
+                                  },
+                                  "current": {
+                                    "N": "35"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "35"
+                                  }
+                                }
+                              },
+                              "initiativeBaseValue": {
+                                "M": {
+                                  "byFormula": {
+                                    "N": "4"
+                                  },
+                                  "byLvlUp": {
+                                    "N": "0"
+                                  },
+                                  "current": {
+                                    "N": "4"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "4"
+                                  }
+                                }
+                              },
+                              "legendaryActions": {
+                                "M": {
+                                  "byLvlUp": {
+                                    "N": "0"
+                                  },
+                                  "current": {
+                                    "N": "0"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "0"
+                                  }
+                                }
+                              },
+                              "luckPoints": {
+                                "M": {
+                                  "byLvlUp": {
+                                    "N": "0"
+                                  },
+                                  "current": {
+                                    "N": "0"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "0"
+                                  }
+                                }
+                              },
+                              "mentalHealth": {
+                                "M": {
+                                  "byFormula": {
+                                    "N": "23"
+                                  },
+                                  "current": {
+                                    "N": "23"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "23"
+                                  }
+                                }
+                              },
+                              "naturalArmor": {
+                                "M": {
+                                  "current": {
+                                    "N": "0"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "0"
+                                  }
+                                }
+                              },
+                              "paradeBaseValue": {
+                                "M": {
+                                  "byFormula": {
+                                    "N": "30"
+                                  },
+                                  "current": {
+                                    "N": "30"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "30"
+                                  }
+                                }
+                              },
+                              "rangedAttackBaseValue": {
+                                "M": {
+                                  "byFormula": {
+                                    "N": "30"
+                                  },
+                                  "current": {
+                                    "N": "30"
+                                  },
+                                  "mod": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "30"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "calculationPoints": {
+                            "M": {
+                              "adventurePoints": {
+                                "M": {
+                                  "available": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "0"
+                                  },
+                                  "total": {
+                                    "N": "0"
+                                  }
+                                }
+                              },
+                              "attributePoints": {
+                                "M": {
+                                  "available": {
+                                    "N": "0"
+                                  },
+                                  "start": {
+                                    "N": "40"
+                                  },
+                                  "total": {
+                                    "N": "40"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "combat": {
+                            "M": {
+                              "melee": {
+                                "M": {
+                                  "barehanded": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "26"
+                                      },
+                                      "handling": {
+                                        "N": "25"
+                                      },
+                                      "paradeValue": {
+                                        "N": "30"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "chainWeapons": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "16"
+                                      },
+                                      "handling": {
+                                        "N": "15"
+                                      },
+                                      "paradeValue": {
+                                        "N": "30"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "daggers": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "26"
+                                      },
+                                      "handling": {
+                                        "N": "25"
+                                      },
+                                      "paradeValue": {
+                                        "N": "30"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "martialArts": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "26"
+                                      },
+                                      "handling": {
+                                        "N": "25"
+                                      },
+                                      "paradeValue": {
+                                        "N": "30"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "slashingWeaponsBlunt1h": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "26"
+                                      },
+                                      "handling": {
+                                        "N": "25"
+                                      },
+                                      "paradeValue": {
+                                        "N": "30"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "slashingWeaponsBlunt2h": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "66"
+                                      },
+                                      "handling": {
+                                        "N": "15"
+                                      },
+                                      "paradeValue": {
+                                        "N": "30"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "slashingWeaponsSharp1h": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "26"
+                                      },
+                                      "handling": {
+                                        "N": "25"
+                                      },
+                                      "paradeValue": {
+                                        "N": "30"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "slashingWeaponsSharp2h": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "16"
+                                      },
+                                      "handling": {
+                                        "N": "15"
+                                      },
+                                      "paradeValue": {
+                                        "N": "30"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "thrustingWeapons1h": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "21"
+                                      },
+                                      "handling": {
+                                        "N": "20"
+                                      },
+                                      "paradeValue": {
+                                        "N": "30"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "thrustingWeapons2h": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "16"
+                                      },
+                                      "handling": {
+                                        "N": "15"
+                                      },
+                                      "paradeValue": {
+                                        "N": "30"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "ranged": {
+                                "M": {
+                                  "firearmComplex": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "11"
+                                      },
+                                      "handling": {
+                                        "N": "10"
+                                      },
+                                      "paradeValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "firearmMedium": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "21"
+                                      },
+                                      "handling": {
+                                        "N": "20"
+                                      },
+                                      "paradeValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "firearmSimple": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "31"
+                                      },
+                                      "handling": {
+                                        "N": "30"
+                                      },
+                                      "paradeValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "heavyWeapons": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "6"
+                                      },
+                                      "handling": {
+                                        "N": "5"
+                                      },
+                                      "paradeValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "missile": {
+                                    "M": {
+                                      "attackValue": {
+                                        "N": "30"
+                                      },
+                                      "availablePoints": {
+                                        "N": "16"
+                                      },
+                                      "handling": {
+                                        "N": "15"
+                                      },
+                                      "paradeValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledAttackValue": {
+                                        "N": "0"
+                                      },
+                                      "skilledParadeValue": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "disadvantages": {
+                            "L": [
+                              {
+                                "L": [
+                                  {
+                                    "N": "14"
+                                  },
+                                  {
+                                    "S": ""
+                                  },
+                                  {
+                                    "N": "2"
+                                  }
+                                ]
+                              },
+                              {
+                                "L": [
+                                  {
+                                    "N": "8"
+                                  },
+                                  {
+                                    "S": "Heights"
+                                  },
+                                  {
+                                    "N": "2"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "generalInformation": {
+                            "M": {
+                              "appearance": {
+                                "S": "Tall and strong"
+                              },
+                              "birthday": {
+                                "S": "1990-01-01"
+                              },
+                              "birthplace": {
+                                "S": "Durotar"
+                              },
+                              "eyeColor": {
+                                "S": "Blue"
+                              },
+                              "hairColor": {
+                                "S": "Brown"
+                              },
+                              "hobby": {
+                                "M": {
+                                  "name": {
+                                    "S": "Fishing"
+                                  },
+                                  "skill": {
+                                    "S": "nature/fishing"
+                                  }
+                                }
+                              },
+                              "level": {
+                                "N": "1"
+                              },
+                              "name": {
+                                "S": "Test Character"
+                              },
+                              "profession": {
+                                "M": {
+                                  "name": {
+                                    "S": "Warrior"
+                                  },
+                                  "skill": {
+                                    "S": "combat/slashingWeaponsBlunt2h"
+                                  }
+                                }
+                              },
+                              "residence": {
+                                "S": "Orgrimmar City"
+                              },
+                              "sex": {
+                                "S": "male"
+                              },
+                              "size": {
+                                "S": "185 cm"
+                              },
+                              "specialCharacteristics": {
+                                "S": "None"
+                              },
+                              "weight": {
+                                "S": "90 kg"
+                              }
+                            }
+                          },
+                          "skills": {
+                            "M": {
+                              "body": {
+                                "M": {
+                                  "athletics": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "10"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "bodyControl": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "10"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "climbing": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "10"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "dancing": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "10"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "hiding": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "juggleries": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "pickpocketing": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "quaffing": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "riding": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "selfControl": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "sharpnessOfSenses": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "singing": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "sneaking": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "swimming": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "10"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "combat": {
+                                "M": {
+                                  "barehanded": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "chainWeapons": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "daggers": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "firearmComplex": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "firearmMedium": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "firearmSimple": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "heavyWeapons": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "martialArts": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "missile": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "slashingWeaponsBlunt1h": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "slashingWeaponsBlunt2h": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "50"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "slashingWeaponsSharp1h": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "slashingWeaponsSharp2h": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "thrustingWeapons1h": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "thrustingWeapons2h": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "1"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "3"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "1"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "handcraft": {
+                                "M": {
+                                  "alcoholProduction": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "calmingSbDown": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "cheating": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "drawingAndPainting": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "fabricProcessing": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "fineMechanics": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "firstAid": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "foodProcessing": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "leatherProcessing": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "lockpicking": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "makingMusic": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "metalwork": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "steeringVehicles": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "stonework": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "training": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "woodwork": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "knowledge": {
+                                "M": {
+                                  "anatomy": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "architecture": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "astronomy": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "botany": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "chemistry": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "estimating": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "geography": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "history": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "itSkills": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "knowledgeOfTheLaw": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "mathematics": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "mechanics": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "petrology": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "philosophy": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "technology": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "warfare": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "zoology": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "nature": {
+                                "M": {
+                                  "fishing": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "25"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "knottingSkills": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "orientation": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "tracking": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "trapping": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "wildernessLife": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "social": {
+                                "M": {
+                                  "acting": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "bargaining": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "convincing": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "etiquette": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "knowledgeOfHumanNature": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "persuading": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": true
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "seduction": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "streetKnowledge": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "teaching": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  },
+                                  "writtenExpression": {
+                                    "M": {
+                                      "activated": {
+                                        "BOOL": false
+                                      },
+                                      "current": {
+                                        "N": "0"
+                                      },
+                                      "defaultCostCategory": {
+                                        "N": "2"
+                                      },
+                                      "mod": {
+                                        "N": "0"
+                                      },
+                                      "start": {
+                                        "N": "0"
+                                      },
+                                      "totalCost": {
+                                        "N": "0"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "specialAbilities": {
+                            "L": []
+                          }
+                        }
+                      },
+                      "userId": {
+                        "S": "b3149882-e041-709e-1392-d6d720f316b8"
+                      }
+                    }
+                  },
+                  "generationPoints": {
+                    "M": {
+                      "spent": {
+                        "N": "6"
+                      },
+                      "throughDisadvantages": {
+                        "N": "4"
+                      },
+                      "total": {
+                        "N": "9"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "ecea0b58-48d7-486c-9879-2d141c326422"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "Test Character"
+          },
+          "number": {
+            "N": "1"
+          },
+          "timestamp": {
+            "S": "2025-09-21T14:29:57.324Z"
+          },
+          "type": {
+            "N": "0"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "NULL": true
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "attackValue": {
+                    "N": "31"
+                  },
+                  "availablePoints": {
+                    "N": "25"
+                  },
+                  "handling": {
+                    "N": "25"
+                  },
+                  "paradeValue": {
+                    "N": "30"
+                  },
+                  "skilledAttackValue": {
+                    "N": "1"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "attackValue": {
+                    "N": "30"
+                  },
+                  "availablePoints": {
+                    "N": "26"
+                  },
+                  "handling": {
+                    "N": "25"
+                  },
+                  "paradeValue": {
+                    "N": "30"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "a5f1c7a0-42b3-46a1-9985-9abdd5928210"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "melee/martialArts"
+          },
+          "number": {
+            "N": "2"
+          },
+          "timestamp": {
+            "S": "2025-09-23T04:31:43.823Z"
+          },
+          "type": {
+            "N": "7"
+          }
+        }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "NULL": true
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "new": {
+                "M": {
+                  "attackValue": {
+                    "N": "41"
+                  },
+                  "availablePoints": {
+                    "N": "15"
+                  },
+                  "handling": {
+                    "N": "25"
+                  },
+                  "paradeValue": {
+                    "N": "30"
+                  },
+                  "skilledAttackValue": {
+                    "N": "11"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "old": {
+                "M": {
+                  "attackValue": {
+                    "N": "31"
+                  },
+                  "availablePoints": {
+                    "N": "25"
+                  },
+                  "handling": {
+                    "N": "25"
+                  },
+                  "paradeValue": {
+                    "N": "30"
+                  },
+                  "skilledAttackValue": {
+                    "N": "1"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "fbaf9e99-1e50-4073-9fb4-5ade6da8756b"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "melee/martialArts"
+          },
+          "number": {
+            "N": "3"
+          },
+          "timestamp": {
+            "S": "2025-09-23T04:59:35.456Z"
+          },
+          "type": {
+            "N": "7"
+          }
+        }
+      }
+    ]
+  },
+  "previousBlockId": {
+    "NULL": true
+  }
+}

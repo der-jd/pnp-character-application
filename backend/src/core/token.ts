@@ -1,23 +1,42 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { HttpError } from "./errors.js";
 
+/**
+ * Decodes the user ID from the authorization header.
+ *
+ * NOTICE:
+ * The access to the API itself is already protected by
+ * the Cognito authorizer in the API Gateway.
+ * Only authorized calls should reach this function and
+ * therefore, this function does not verify the token.
+ * It should actually never throw an error, unless the
+ * code is called directly from within the AWS environment
+ * with an invalid authorization header,
+ * e.g. by calling the Lambda function directly.
+ *
+ * @param authorizationHeader The authorization header.
+ * @returns The user ID.
+ */
 export function decodeUserId(authorizationHeader: string | undefined): string {
   // Trim the authorization header as it could contain spaces at the beginning
   const authHeader = authorizationHeader?.trim();
+
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new HttpError(401, "Unauthorized: No token provided!");
+    console.error("No authorization token provided!");
+    throw new HttpError(401, "Unauthorized");
   }
 
   const token = authHeader.split(" ")[1]; // Remove "Bearer " prefix
-  // Decode the token without verification (the access to the API itself is already protected by the authorizer)
   const decoded = jwt.decode(token) as JwtPayload | null;
   if (!decoded) {
-    throw new HttpError(401, "Unauthorized: Invalid token!");
+    console.error("Invalid authorization token!");
+    throw new HttpError(401, "Unauthorized");
   }
 
   const userId = decoded.sub; // Cognito User ID
   if (!userId) {
-    throw new HttpError(401, "Unauthorized: User ID not found in token!");
+    console.error("User ID not found in authorization token!");
+    throw new HttpError(401, "Unauthorized");
   }
 
   return userId;
