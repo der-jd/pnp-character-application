@@ -72,7 +72,7 @@ describe.sequential("patch-skill component tests", () => {
           () =>
             client.patch(path, {
               current: {
-                initialValue: 16,
+                initialValue: character.characterSheet.skills.body.athletics.current,
                 increasedPoints: 1,
               },
               learningMethod: "NORMAL",
