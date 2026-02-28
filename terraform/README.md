@@ -68,4 +68,4 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 
 ### Deployment
 
-See [CircleCI README](../.circleci/README.MD)
+See [CircleCI README](../.circleci/README.md)

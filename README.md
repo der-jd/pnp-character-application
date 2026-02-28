@@ -40,7 +40,7 @@ npm run dev --workspace frontend
 
 ## 🚀 Deployment
 
-**Continuous deployment** via CircleCI, see [CircleCI Configuration](./.circleci/README.MD) for details.
+**Continuous deployment** via CircleCI, see [CircleCI Configuration](./.circleci/README.md) for details.
 
 ## 📁 Repository Structure
 
@@ -68,5 +68,5 @@ pnp-character-application/
 
 - **[🧪 Backend - Unit Tests](./backend/test/unit-tests/README.md)**
 - **[🧪 Backend - Component Tests](./backend/test/component-tests/README.md)**
-- **[🚀 CI/CD Pipeline](./.circleci/README.MD)**
+- **[🚀 CI/CD Pipeline](./.circleci/README.md)**
 - **[🤖 AI Agent Guide](./AGENTS.md)**
