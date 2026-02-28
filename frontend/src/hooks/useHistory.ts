@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "../app/global/AuthContext";
+import { useAuthState } from "../app/global/AuthContext";
 import { useCharacterStore } from "../app/global/characterStore";
-import { ApiError, deleteHistoryEntry, getHistory, getHistoryBlock } from "../lib/api/utils/api_calls";
+import { ApiError, deleteHistoryEntry, getHistory, getHistoryBlock, getCharacter } from "../lib/api/utils/api_calls";
 import { useToast } from "./use-toast";
-import { RecordType } from "../lib/api/utils/historyEventType";
-import { CharacterSheet, CombatValues } from "../lib/api/models/Character/character";
 import { RecordEntry } from "../lib/api/models/history/interface";
 
 /**
@@ -16,17 +14,12 @@ import { RecordEntry } from "../lib/api/models/history/interface";
 export function useHistory() {
   const toast = useToast();
   const selectedChar = useCharacterStore((state) => state.selectedCharacterId);
-  const setHistory = useCharacterStore((state) => state.setHistoryEntries);
-  const updateHistoryEntries = useCharacterStore((state) => state.updateHistoryEntries);
-  const setOpenHistoryEntries = useCharacterStore((state) => state.setOpenHistoryEntries);
-  const updateValue = useCharacterStore((state) => state.updateValue);
-  const updateCombatValue = useCharacterStore((state) => state.updateCombatValue);
   const openHistoryEntries = useCharacterStore((state) => state.openHistoryEntries);
-  const { idToken } = useAuth();
+  const { tokens } = useAuthState();
 
   const [isLoading, setLoading] = useState<boolean>(false);
 
-  function hasIdToken(idToken: string | null): idToken is string {
+  function hasIdToken(idToken: string | null | undefined): idToken is string {
     if (!idToken) {
       toast.toast({
         title: `[History Error] No Character!`,
@@ -51,7 +44,7 @@ export function useHistory() {
   }
 
   const validateRequest = (): boolean => {
-    return hasIdToken(idToken) && hasSelectedChar(selectedChar);
+    return hasIdToken(tokens?.idToken) && hasSelectedChar(selectedChar);
   };
 
   const updateHistory = async (isBlocking: boolean) => {
@@ -59,7 +52,7 @@ export function useHistory() {
       return;
     }
 
-    const token = idToken!;
+    const token = tokens!.idToken;
     const character = selectedChar!;
 
     const fetchHistory = async () => {
@@ -76,7 +69,7 @@ export function useHistory() {
           allChanges = [...allChanges, ...flattenHistory(response)];
         }
 
-        updateHistoryEntries(allChanges);
+        useCharacterStore.getState().updateHistoryEntries(allChanges);
       } catch (error) {
         if (error instanceof ApiError) {
           toast.toast({
@@ -104,7 +97,7 @@ export function useHistory() {
   };
 
   const resetHistory = () => {
-    setHistory([]);
+    useCharacterStore.getState().setHistoryEntries([]);
   };
 
   const revertHistoryEntry = async () => {
@@ -122,13 +115,35 @@ export function useHistory() {
       return false;
     }
 
-    const token = idToken!;
+    const token = tokens!.idToken;
     const character = selectedChar!;
+
+    console.log("[REVERT] Starting revert for entry:", lastEntry);
+    console.log("[REVERT] Character ID:", character);
 
     setLoading(true);
     try {
+      // Delete the history entry
+      console.log("[REVERT] Deleting history entry...");
       await deleteHistoryEntry(token, character, lastEntry.id);
+      console.log("[REVERT] History entry deleted successfully");
+
+      // Fetch the updated character from the backend
+      console.log("[REVERT] Fetching updated character...");
+      const updatedCharacter = await getCharacter(token, character);
+      console.log("[REVERT] Updated character received:", updatedCharacter);
+
+      // Update the character store with the fresh data
+      console.log("[REVERT] Setting character sheet in store...");
+      useCharacterStore.getState().setCharacterSheet(updatedCharacter.characterSheet);
+      console.log("[REVERT] Character sheet set. Current store state:", useCharacterStore.getState().characterSheet);
+
+      // Reload the history entries to reflect the change
+      console.log("[REVERT] Reloading history entries...");
+      await updateHistory(false);
+      console.log("[REVERT] History entries reloaded");
     } catch (error) {
+      console.error("[REVERT] Error during revert:", error);
       if (error instanceof ApiError) {
         toast.toast({
           title: `[History Error] ${error.statusCode}`,
@@ -147,51 +162,8 @@ export function useHistory() {
     }
 
     setLoading(false);
-    setOpenHistoryEntries(openHistoryEntries ?? []);
-
-    switch (lastEntry.type) {
-      case RecordType.ATTRIBUTE_CHANGED:
-        {
-          const path = ["attributes"] as (keyof CharacterSheet)[];
-          const name = lastEntry.name as keyof CharacterSheet;
-          updateValue(path, name, lastEntry.data.old.attribute.current);
-        }
-        break;
-
-      case RecordType.SKILL_CHANGED:
-        {
-          const path = ["skills", lastEntry.name.split("/")[0]] as (keyof CharacterSheet)[];
-          const name = lastEntry.name.split("/")[1] as keyof CharacterSheet;
-          updateValue(path, name, lastEntry.data.old.skill.current);
-        }
-        break;
-
-      case RecordType.EVENT_BASE_VALUE:
-        {
-          const path = ["baseValues"] as (keyof CharacterSheet)[];
-          const name = lastEntry.name as keyof CharacterSheet;
-          updateValue(path, name, lastEntry.data.old.current);
-        }
-        break;
-
-      case RecordType.EVENT_LEVEL_UP:
-        {
-          const path = ["generalInformation"] as (keyof CharacterSheet)[];
-          const name = "level" as keyof CharacterSheet;
-          console.log(lastEntry.data.old);
-          updateValue(path, name, lastEntry.data.old.value);
-        }
-        break;
-
-      case RecordType.COMBAT_VALUES_CHANGED: {
-        const path = [
-          "combatValues",
-          lastEntry.name.toLowerCase().includes("melee") ? "melee" : "ranged",
-        ] as (keyof CharacterSheet)[];
-        const name = lastEntry.name.split("/")[1] as keyof CharacterSheet;
-        updateCombatValue(path, name, lastEntry.data.old as CombatValues);
-      }
-    }
+    useCharacterStore.getState().setOpenHistoryEntries(openHistoryEntries ?? []);
+    console.log("[REVERT] Revert complete");
   };
 
   const discardUnsavedHistory = async () => {

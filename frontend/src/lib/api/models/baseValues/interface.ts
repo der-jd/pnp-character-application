@@ -1,6 +1,6 @@
 import { RecordEntry } from "../history/interface";
 import { IncreaseBaseValue, PointsAvailable } from "../common/increase";
-import { BaseValue } from "../Character/character";
+import type { BaseValue } from "api-spec";
 
 export interface BaseValueIncreaseData {
   characterId: string;
