@@ -10,6 +10,7 @@ export default [
       "out/",
       "dist/",
       "build/",
+      "src/test/",
       ".git/",
       "coverage/",
       "**/*.min.js",

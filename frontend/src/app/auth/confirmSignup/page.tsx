@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ConfirmSignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cognitoClient, cognitoConfig } from "@global/CognitoConfig";
-import { useAuth } from "@global/AuthContext";
+import { useAuthState } from "@global/AuthContext";
 
 export default function ConfirmSignUp() {
   const [code, setCode] = useState("");
@@ -13,7 +13,7 @@ export default function ConfirmSignUp() {
   const [error, setError] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthState();
 
   useEffect(() => {
     if (isAuthenticated) {
