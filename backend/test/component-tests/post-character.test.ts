@@ -128,7 +128,7 @@ describe.sequential("post-character component tests", () => {
         await expectApiError(
           () => client.post("characters", characterCreationRequest),
           _case.expectedStatusCode,
-          _case.expectedErrorMessage
+          _case.expectedErrorMessage,
         );
       });
     });
@@ -383,7 +383,7 @@ describe.sequential("post-character component tests", () => {
       const body = characterCreationRequest;
 
       const response: PostCharactersResponse = postCharactersResponseSchema.parse(
-        await baseSetup.apiClient.post("characters", body)
+        await baseSetup.apiClient.post("characters", body),
       );
       createdCharacterIds.push(response.data.characterId);
 
@@ -472,11 +472,11 @@ describe.sequential("post-character component tests", () => {
         Object.entries(combatStatsInCategory).forEach(([name, combatStats]) => {
           if (`combat/${name}` === body.generalInformation.profession.skill) {
             expect(combatStats.availablePoints).toBe(
-              combatStats.handling + body.combatSkillsStartValues[name] + PROFESSION_SKILL_BONUS
+              combatStats.handling + body.combatSkillsStartValues[name] + PROFESSION_SKILL_BONUS,
             );
           } else if (`combat/${name}` === body.generalInformation.hobby.skill) {
             expect(combatStats.availablePoints).toBe(
-              combatStats.handling + body.combatSkillsStartValues[name] + HOBBY_SKILL_BONUS
+              combatStats.handling + body.combatSkillsStartValues[name] + HOBBY_SKILL_BONUS,
             );
           } else {
             expect(combatStats.availablePoints).toBe(combatStats.handling + body.combatSkillsStartValues[name]);
@@ -509,11 +509,11 @@ describe.sequential("post-character component tests", () => {
 
       // Check attribute points
       expect(createdCharacter.characterSheet.calculationPoints.attributePoints.start).toBe(
-        ATTRIBUTE_POINTS_FOR_CREATION
+        ATTRIBUTE_POINTS_FOR_CREATION,
       );
       expect(createdCharacter.characterSheet.calculationPoints.attributePoints.available).toBe(0);
       expect(createdCharacter.characterSheet.calculationPoints.attributePoints.total).toBe(
-        ATTRIBUTE_POINTS_FOR_CREATION
+        ATTRIBUTE_POINTS_FOR_CREATION,
       );
 
       expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.start).toBe(0);
@@ -541,11 +541,11 @@ describe.sequential("post-character component tests", () => {
       const generationPointsThroughDisadvantages = body.disadvantages.reduce((sum, [, , value]) => sum + value, 0);
       const spentGenerationPoints = body.advantages.reduce((sum, [, , value]) => sum + value, 0);
       expect(response.data.changes.new.generationPoints.throughDisadvantages).toBe(
-        generationPointsThroughDisadvantages
+        generationPointsThroughDisadvantages,
       );
       expect(response.data.changes.new.generationPoints.spent).toBe(spentGenerationPoints);
       expect(response.data.changes.new.generationPoints.total).toBe(
-        GENERATION_POINTS + generationPointsThroughDisadvantages
+        GENERATION_POINTS + generationPointsThroughDisadvantages,
       );
 
       // Check history record

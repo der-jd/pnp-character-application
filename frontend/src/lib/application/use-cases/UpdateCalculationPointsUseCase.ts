@@ -108,7 +108,7 @@ export class UpdateCalculationPointsUseCase
   private async updateCalculationPointsViaService(
     characterId: string,
     updateData: Partial<PatchCalculationPointsRequest>,
-    idToken: string
+    idToken: string,
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const result = await this.characterService.updateCalculationPoints(characterId, updateData, idToken);

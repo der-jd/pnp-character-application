@@ -541,7 +541,7 @@ describe("Valid requests", () => {
       expect(parsedBody.changes.new.character.userId).toBe(fakeUserId);
 
       expect(parsedBody.changes.new.character.characterSheet.generalInformation).toStrictEqual(
-        _case.request.body.generalInformation
+        _case.request.body.generalInformation,
       );
 
       // Attributes should be set according to the request
@@ -557,7 +557,7 @@ describe("Valid requests", () => {
       // Advantages and Disadvantages should be copied
       expect(parsedBody.changes.new.character.characterSheet.advantages).toStrictEqual(_case.request.body.advantages);
       expect(parsedBody.changes.new.character.characterSheet.disadvantages).toStrictEqual(
-        _case.request.body.disadvantages
+        _case.request.body.disadvantages,
       );
 
       // Check profession and Hobby
@@ -568,12 +568,12 @@ describe("Valid requests", () => {
       const returnedProfessionSkill = getSkill(
         parsedBody.changes.new.character.characterSheet.skills,
         professionCategory,
-        professionSkillName
+        professionSkillName,
       );
       const returnedHobbySkill = getSkill(
         parsedBody.changes.new.character.characterSheet.skills,
         hobbyCategory,
-        hobbySkillName
+        hobbySkillName,
       );
       expect(returnedProfessionSkill.activated).toBe(true);
       expect(returnedHobbySkill.activated).toBe(true);
@@ -622,18 +622,18 @@ describe("Valid requests", () => {
               expect(combatStats.availablePoints).toBe(
                 getCombatSkillHandling(skillName as CombatSkillName) +
                   _case.request.body.combatSkillsStartValues[skillName] +
-                  PROFESSION_SKILL_BONUS
+                  PROFESSION_SKILL_BONUS,
               );
             } else if (`combat/${skillName}` === _case.request.body.generalInformation.hobby.skill) {
               expect(combatStats.availablePoints).toBe(
                 getCombatSkillHandling(skillName as CombatSkillName) +
                   _case.request.body.combatSkillsStartValues[skillName] +
-                  HOBBY_SKILL_BONUS
+                  HOBBY_SKILL_BONUS,
               );
             } else {
               expect(combatStats.availablePoints).toBe(
                 getCombatSkillHandling(skillName as CombatSkillName) +
-                  _case.request.body.combatSkillsStartValues[skillName]
+                  _case.request.body.combatSkillsStartValues[skillName],
               );
             }
 
@@ -658,16 +658,16 @@ describe("Valid requests", () => {
               expect(combatStats.paradeValue).toBe(combatStats.skilledParadeValue + paradeBaseValue);
             }
           });
-        }
+        },
       );
 
       // Check attribute points
       expect(parsedBody.changes.new.character.characterSheet.calculationPoints.attributePoints.start).toBe(
-        ATTRIBUTE_POINTS_FOR_CREATION
+        ATTRIBUTE_POINTS_FOR_CREATION,
       );
       expect(parsedBody.changes.new.character.characterSheet.calculationPoints.attributePoints.available).toBe(0);
       expect(parsedBody.changes.new.character.characterSheet.calculationPoints.attributePoints.total).toBe(
-        ATTRIBUTE_POINTS_FOR_CREATION
+        ATTRIBUTE_POINTS_FOR_CREATION,
       );
 
       // Check adventure points
@@ -691,19 +691,19 @@ describe("Valid requests", () => {
           expect(baseValue.current).toBe(baseValue.start);
           // byLvlUp is managed by the level-up flow and should be undefined on creation
           expect((baseValue as any).byLvlUp).toBeUndefined();
-        }
+        },
       );
 
       // Generation points should be calculated according to the input advantages and disadvantages
       const generationPointsThroughDisadvantages = _case.request.body.disadvantages.reduce(
         (sum, [, , value]) => sum + value,
-        0
+        0,
       );
       expect(parsedBody.changes.new.generationPoints.throughDisadvantages).toBe(generationPointsThroughDisadvantages);
       const spentGenerationPoints = _case.request.body.advantages.reduce((sum, [, , value]) => sum + value, 0);
       expect(parsedBody.changes.new.generationPoints.spent).toBe(spentGenerationPoints);
       expect(parsedBody.changes.new.generationPoints.total).toBe(
-        GENERATION_POINTS + generationPointsThroughDisadvantages
+        GENERATION_POINTS + generationPointsThroughDisadvantages,
       );
     });
   });

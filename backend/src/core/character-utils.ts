@@ -76,7 +76,7 @@ export function isCombatSkill(skillCategory: string): boolean {
 export function getCombatStats(
   combatSection: CombatSection,
   category: keyof CombatSection,
-  combatSkillName: SkillName
+  combatSkillName: SkillName,
 ): CombatStats {
   if (!(category in combatSection)) {
     throw new Error(`Category ${category} is not a valid combat category!`);
@@ -144,6 +144,6 @@ export function advantagesEnumToString(enumValue: AdvantagesNames): string | und
 
 export function disadvantagesEnumToString(enumValue: DisadvantagesNames): string | undefined {
   return Object.keys(DisadvantagesNames).find(
-    (key) => DisadvantagesNames[key as keyof typeof DisadvantagesNames] === enumValue
+    (key) => DisadvantagesNames[key as keyof typeof DisadvantagesNames] === enumValue,
   );
 }

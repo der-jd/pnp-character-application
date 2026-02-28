@@ -51,7 +51,7 @@ export class HistoryService {
   async revertHistoryEntry(
     characterId: string,
     entryId: string,
-    token: string
+    token: string,
   ): Promise<ServiceResult<DeleteHistoryRecordResponse>> {
     try {
       const response = await fetch(`${this.baseUrl}/characters/${characterId}/history/${entryId}`, {
@@ -88,7 +88,7 @@ export class HistoryService {
     characterId: string,
     entryId: string,
     comment: string,
-    token: string
+    token: string,
   ): Promise<ServiceResult<PatchHistoryRecordResponse>> {
     try {
       const response = await fetch(`${this.baseUrl}/characters/${characterId}/history/${entryId}`, {

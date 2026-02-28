@@ -151,7 +151,7 @@ describe.sequential("get-level-up component tests", () => {
           const character = context.character;
 
           const response = getLevelUpResponseSchema.parse(
-            await context.apiClient.get(`characters/${character.characterId}/level-up`)
+            await context.apiClient.get(`characters/${character.characterId}/level-up`),
           );
 
           expect(response.userId).toBe(character.userId);
@@ -188,7 +188,7 @@ describe.sequential("get-level-up component tests", () => {
 
     beforeAll(async () => {
       const characterId = TestContextFactory.loadCharacterIdFromTestData(
-        "test-data/character-with-unavailable-level-ups.dynamodb.json"
+        "test-data/character-with-unavailable-level-ups.dynamodb.json",
       );
       context = await TestContextFactory.createContext(characterId);
     });
@@ -310,7 +310,7 @@ describe.sequential("get-level-up component tests", () => {
         const character = context.character;
 
         const response = getLevelUpResponseSchema.parse(
-          await context.apiClient.get(`characters/${character.characterId}/level-up`)
+          await context.apiClient.get(`characters/${character.characterId}/level-up`),
         );
 
         expect(response.userId).toBe(character.userId);

@@ -191,7 +191,7 @@ describe("IncreaseSkillUseCase", () => {
             },
           },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any) as any
+        } as any) as any,
       );
 
       const input = {
@@ -216,7 +216,7 @@ describe("IncreaseSkillUseCase", () => {
         "combat",
         "swords",
         expect.any(Object),
-        TEST_SCENARIOS.VALID_ID_TOKEN
+        TEST_SCENARIOS.VALID_ID_TOKEN,
       );
     });
 
@@ -255,7 +255,7 @@ describe("IncreaseSkillUseCase", () => {
             },
           },
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any) as any
+        } as any) as any,
       );
 
       const input = {

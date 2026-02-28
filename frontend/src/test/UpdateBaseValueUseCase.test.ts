@@ -114,7 +114,7 @@ describe("UpdateBaseValueUseCase", () => {
       vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
       vi.mocked(mockCharacterService.updateBaseValue).mockResolvedValue(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        createSuccessResult(mockUpdatedCharacter as any)
+        createSuccessResult(mockUpdatedCharacter as any),
       );
 
       const input = {
@@ -133,7 +133,7 @@ describe("UpdateBaseValueUseCase", () => {
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         "healthPoints",
         { start: { initialValue: undefined, newValue: 35 } },
-        TEST_SCENARIOS.VALID_ID_TOKEN
+        TEST_SCENARIOS.VALID_ID_TOKEN,
       );
     });
 

@@ -36,7 +36,7 @@ describe.sequential("post-special-abilities component tests", () => {
         if (response.historyRecord) {
           Object.assign(record, response.historyRecord);
         }
-      }
+      },
     );
     currentResponse = undefined;
   });
@@ -68,7 +68,7 @@ describe.sequential("post-special-abilities component tests", () => {
               specialAbility: "Iron Will",
             }),
           _case.expectedStatusCode,
-          _case.expectedErrorMessage
+          _case.expectedErrorMessage,
         );
       });
     });
@@ -80,7 +80,7 @@ describe.sequential("post-special-abilities component tests", () => {
             specialAbility: "x".repeat(MAX_STRING_LENGTH_DEFAULT + 1),
           }),
         400,
-        "Invalid input values"
+        "Invalid input values",
       );
     });
   });
@@ -102,7 +102,7 @@ describe.sequential("post-special-abilities component tests", () => {
       const response = postSpecialAbilitiesResponseSchema.parse(
         await context.apiClient.post(`characters/${character.characterId}/special-abilities`, {
           specialAbility: ability,
-        })
+        }),
       );
       /**
        * Notice: The response is not stored in the currentResponse variable
@@ -135,7 +135,7 @@ describe.sequential("post-special-abilities component tests", () => {
       const response = postSpecialAbilitiesResponseSchema.parse(
         await context.apiClient.post(`characters/${character.characterId}/special-abilities`, {
           specialAbility: ability,
-        })
+        }),
       );
       currentResponse = response;
 

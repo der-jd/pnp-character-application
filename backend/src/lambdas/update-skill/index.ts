@@ -73,7 +73,7 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
     if (params.body.activated || params.body.current) {
       adjustedCostCategory = adjustCostCategory(
         skill.defaultCostCategory,
-        parseLearningMethod(params.body.learningMethod!) // Learning method is checked in validateRequest
+        parseLearningMethod(params.body.learningMethod!), // Learning method is checked in validateRequest
       );
     }
 
@@ -105,7 +105,7 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
       skillCategory,
       skillName,
       skill,
-      adventurePoints
+      adventurePoints,
     );
 
     let combatStatsChange:
@@ -134,7 +134,7 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
           params.pathParams["character-id"],
           combatCategory,
           skillName,
-          combatStats
+          combatStats,
         );
       }
     }
@@ -183,7 +183,7 @@ function validateRequest(request: Request): Parameters {
     if ((body.activated || body.current) && !body.learningMethod) {
       throw new HttpError(
         409,
-        "Learning method must be given if skill should be activated or the current value should be increased!"
+        "Learning method must be given if skill should be activated or the current value should be increased!",
       );
     }
 
@@ -219,7 +219,7 @@ function activateSkill(
   skill: Skill,
   activated: boolean,
   adjustedCostCategory: CostCategory,
-  adventurePoints: CalculationPoints
+  adventurePoints: CalculationPoints,
 ): { skill: Skill; adventurePoints: CalculationPoints } {
   if (skill.activated && activated) {
     console.log("Skill already activated. Nothing to do.");
@@ -273,10 +273,10 @@ function updateCurrentValue(
   skill: Skill,
   currentValue: InitialIncreased,
   adjustedCostCategory: CostCategory,
-  adventurePoints: CalculationPoints
+  adventurePoints: CalculationPoints,
 ): { skill: Skill; adventurePoints: CalculationPoints } {
   console.log(
-    `Update current value of the skill from ${currentValue.initialValue} to ${currentValue.initialValue + currentValue.increasedPoints}`
+    `Update current value of the skill from ${currentValue.initialValue} to ${currentValue.initialValue + currentValue.increasedPoints}`,
   );
 
   if (!skill.activated) {

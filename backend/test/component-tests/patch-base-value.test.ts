@@ -56,7 +56,7 @@ describe.sequential("patch-base-value component tests", () => {
         if (response.historyRecord) {
           Object.assign(record, response.historyRecord);
         }
-      }
+      },
     );
     currentResponse = undefined;
   });
@@ -87,7 +87,7 @@ describe.sequential("patch-base-value component tests", () => {
               },
             }),
           _case.expectedStatusCode,
-          _case.expectedErrorMessage
+          _case.expectedErrorMessage,
         );
       });
     });
@@ -104,7 +104,7 @@ describe.sequential("patch-base-value component tests", () => {
             },
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
     });
 
@@ -120,7 +120,7 @@ describe.sequential("patch-base-value component tests", () => {
             },
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
 
       expect(error.context?.backendModValue).toBe(character.characterSheet.baseValues.healthPoints.mod);
@@ -163,7 +163,7 @@ describe.sequential("patch-base-value component tests", () => {
         const body = _case.getBody(character);
 
         const response = patchBaseValueResponseSchema.parse(
-          await context.apiClient.patch(`characters/${character.characterId}/base-values/${_case.baseValueName}`, body)
+          await context.apiClient.patch(`characters/${character.characterId}/base-values/${_case.baseValueName}`, body),
         );
         /**
          * Notice: The response is not stored in the currentResponse variable
@@ -190,7 +190,7 @@ describe.sequential("patch-base-value component tests", () => {
         }
 
         expect(response.data.changes.old.baseValue).toStrictEqual(
-          character.characterSheet.baseValues[_case.baseValueName as keyof BaseValues]
+          character.characterSheet.baseValues[_case.baseValueName as keyof BaseValues],
         );
         expect(response.data.changes.new.baseValue).toStrictEqual(response.data.changes.old.baseValue);
 
@@ -271,7 +271,7 @@ describe.sequential("patch-base-value component tests", () => {
         const body = _case.getBody(character);
 
         const response = patchBaseValueResponseSchema.parse(
-          await context.apiClient.patch(`characters/${character.characterId}/base-values/${_case.baseValueName}`, body)
+          await context.apiClient.patch(`characters/${character.characterId}/base-values/${_case.baseValueName}`, body),
         );
         currentResponse = response;
 
@@ -418,7 +418,7 @@ describe.sequential("patch-base-value component tests", () => {
         const body: PatchBaseValueRequest = _case.getBody(character);
 
         const response = patchBaseValueResponseSchema.parse(
-          await context.apiClient.patch(`characters/${character.characterId}/base-values/${_case.baseValueName}`, body)
+          await context.apiClient.patch(`characters/${character.characterId}/base-values/${_case.baseValueName}`, body),
         );
         currentResponse = response;
 

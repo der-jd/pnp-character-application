@@ -60,7 +60,7 @@ describe.sequential("get-characters component tests", () => {
 
     test("successfully get characters in short form", async () => {
       const response = getCharactersResponseSchema.parse(
-        await context.apiClient.get("characters", { "character-short": true })
+        await context.apiClient.get("characters", { "character-short": true }),
       );
 
       expect(response.characters.length).toBeGreaterThan(0);

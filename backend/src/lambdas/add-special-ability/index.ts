@@ -39,7 +39,7 @@ export async function _addSpecialAbility(request: Request): Promise<APIGatewayPr
     const params = validateRequest(request);
 
     console.log(
-      `Add special ability '${params.body.specialAbility}' to character ${params.pathParams["character-id"]} of user ${params.userId}`
+      `Add special ability '${params.body.specialAbility}' to character ${params.pathParams["character-id"]} of user ${params.userId}`,
     );
 
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);

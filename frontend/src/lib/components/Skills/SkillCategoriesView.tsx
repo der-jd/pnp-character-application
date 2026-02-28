@@ -32,7 +32,7 @@ export function SkillCategoriesView({
         acc[category].push(skill);
         return acc;
       },
-      {} as Record<string, SkillViewModel[]>
+      {} as Record<string, SkillViewModel[]>,
     );
   }, [skills]);
 

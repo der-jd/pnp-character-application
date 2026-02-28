@@ -35,7 +35,7 @@ describe.sequential("patch-history-record component tests", () => {
       },
       (response: PatchHistoryRecordResponse, record: HistoryRecord) => {
         record.comment = response.comment;
-      }
+      },
     );
     currentResponse = undefined;
   });
@@ -64,7 +64,7 @@ describe.sequential("patch-history-record component tests", () => {
               comment: "comment",
             }),
           _case.expectedStatusCode,
-          _case.expectedErrorMessage
+          _case.expectedErrorMessage,
         );
       });
     });
@@ -78,7 +78,7 @@ describe.sequential("patch-history-record component tests", () => {
             comment: "comment",
           }),
         400,
-        "Invalid input values"
+        "Invalid input values",
       );
     });
 
@@ -91,7 +91,7 @@ describe.sequential("patch-history-record component tests", () => {
             comment: "comment",
           }),
         404,
-        "not found"
+        "not found",
       );
     });
 
@@ -105,7 +105,7 @@ describe.sequential("patch-history-record component tests", () => {
             comment: "x".repeat(MAX_STRING_LENGTH_VERY_LONG + 1),
           }),
         400,
-        "Invalid input values"
+        "Invalid input values",
       );
     });
   });
@@ -127,7 +127,7 @@ describe.sequential("patch-history-record component tests", () => {
       };
 
       const response = patchHistoryRecordResponseSchema.parse(
-        await context.apiClient.patch(`characters/${character.characterId}/history/${latestRecord.id}`, patchRequest)
+        await context.apiClient.patch(`characters/${character.characterId}/history/${latestRecord.id}`, patchRequest),
       );
       /**
        * Notice: The response is not stored in the currentResponse variable
@@ -182,8 +182,8 @@ describe.sequential("patch-history-record component tests", () => {
             {
               comment: _comment,
             },
-            queryParams
-          )
+            queryParams,
+          ),
         );
         currentResponse = response;
 

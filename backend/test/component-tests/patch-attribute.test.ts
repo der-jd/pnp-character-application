@@ -64,7 +64,7 @@ describe.sequential("patch-attribute component tests", () => {
         if (response.historyRecord) {
           Object.assign(record, response.historyRecord);
         }
-      }
+      },
     );
     currentResponse = undefined;
   });
@@ -95,7 +95,7 @@ describe.sequential("patch-attribute component tests", () => {
               },
             }),
           _case.expectedStatusCode,
-          _case.expectedErrorMessage
+          _case.expectedErrorMessage,
         );
       });
     });
@@ -112,7 +112,7 @@ describe.sequential("patch-attribute component tests", () => {
             },
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
     });
 
@@ -128,7 +128,7 @@ describe.sequential("patch-attribute component tests", () => {
             },
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
     });
 
@@ -144,7 +144,7 @@ describe.sequential("patch-attribute component tests", () => {
             },
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
     });
 
@@ -160,7 +160,7 @@ describe.sequential("patch-attribute component tests", () => {
             },
           }),
         400,
-        "Not enough attribute points"
+        "Not enough attribute points",
       );
     });
 
@@ -176,7 +176,7 @@ describe.sequential("patch-attribute component tests", () => {
             },
           }),
         400,
-        "Invalid input values!"
+        "Invalid input values!",
       );
     });
 
@@ -192,7 +192,7 @@ describe.sequential("patch-attribute component tests", () => {
             },
           }),
         400,
-        "Invalid input values!"
+        "Invalid input values!",
       );
     });
   });
@@ -243,7 +243,7 @@ describe.sequential("patch-attribute component tests", () => {
         const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body)
+          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
         /**
          * Notice: The response is not stored in the currentResponse variable
@@ -275,7 +275,7 @@ describe.sequential("patch-attribute component tests", () => {
         }
 
         expect(response.data.changes.old.attribute).toStrictEqual(
-          character.characterSheet.attributes[_case.attributeName as keyof CharacterSheet["attributes"]]
+          character.characterSheet.attributes[_case.attributeName as keyof CharacterSheet["attributes"]],
         );
         expect(response.data.changes.new.attribute).toStrictEqual(response.data.changes.old.attribute);
 
@@ -380,7 +380,7 @@ describe.sequential("patch-attribute component tests", () => {
         const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body)
+          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
         currentResponse = response;
 
@@ -409,7 +409,7 @@ describe.sequential("patch-attribute component tests", () => {
         const diffAvailableAttributePoints = oldAvailableAttributePoints - response.data.attributePoints.new.available;
         expect(diffAvailableAttributePoints).toBe(_case.expectedCosts);
         expect(diffAvailableAttributePoints).toBe(
-          response.data.attributePoints.old.available - response.data.attributePoints.new.available
+          response.data.attributePoints.old.available - response.data.attributePoints.new.available,
         );
         expect(response.data.attributePoints.old).toStrictEqual(oldAttributePoints);
         expect(response.data.attributePoints.new).toStrictEqual({
@@ -610,7 +610,7 @@ describe.sequential("patch-attribute component tests", () => {
         const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body)
+          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
         currentResponse = response;
 
@@ -782,7 +782,7 @@ describe.sequential("patch-attribute component tests", () => {
         const body = _case.getBody(character);
 
         const response = patchAttributeResponseSchema.parse(
-          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body)
+          await context.apiClient.patch(`characters/${character.characterId}/attributes/${_case.attributeName}`, body),
         );
         currentResponse = response;
 
@@ -814,7 +814,7 @@ describe.sequential("patch-attribute component tests", () => {
             (response.data.changes.old.baseValues.attackBaseValue &&
               response.data.changes.new.baseValues.attackBaseValue) ||
               (response.data.changes.old.baseValues.paradeBaseValue &&
-                response.data.changes.new.baseValues.paradeBaseValue)
+                response.data.changes.new.baseValues.paradeBaseValue),
           ).toBeTruthy();
           if (
             !response.data.changes.old.baseValues.attackBaseValue &&

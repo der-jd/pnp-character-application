@@ -52,7 +52,7 @@ export async function getHistory(request: Request): Promise<APIGatewayProxyResul
       items = await getHistoryItems(
         params.pathParams["character-id"],
         false, // Sort descending to get highest block number (latest item) first
-        1 // Only get the last item
+        1, // Only get the last item
       );
     }
 

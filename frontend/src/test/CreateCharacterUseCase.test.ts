@@ -158,7 +158,7 @@ describe("CreateCharacterUseCase", () => {
 
       vi.mocked(mockCharacterService.createCharacter).mockResolvedValue(
         // createSuccessResult is not exported here; use plain success shape
-        { success: true, data: createdCharacter } as any
+        { success: true, data: createdCharacter } as any,
       );
 
       const result = await useCase.execute({

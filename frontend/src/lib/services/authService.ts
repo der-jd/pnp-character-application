@@ -108,7 +108,7 @@ export class AuthService {
 
       if (!response.AuthenticationResult) {
         return ResultError(
-          createApiError("Authentication failed - no authentication result", 401, "auth/signin", "POST")
+          createApiError("Authentication failed - no authentication result", 401, "auth/signin", "POST"),
         );
       }
 
@@ -140,7 +140,7 @@ export class AuthService {
     } catch (error) {
       featureLogger.error("AuthService", "Sign in error:", error);
       return ResultError(
-        createApiError(error instanceof Error ? error.message : "Sign in failed", 401, "auth/signin", "POST")
+        createApiError(error instanceof Error ? error.message : "Sign in failed", 401, "auth/signin", "POST"),
       );
     }
   }
@@ -187,7 +187,7 @@ export class AuthService {
     } catch (error) {
       featureLogger.error("AuthService", "Sign up error:", error);
       return ResultError(
-        createApiError(error instanceof Error ? error.message : "Sign up failed", 400, "auth/signup", "POST")
+        createApiError(error instanceof Error ? error.message : "Sign up failed", 400, "auth/signup", "POST"),
       );
     }
   }
@@ -213,7 +213,7 @@ export class AuthService {
     } catch (error) {
       featureLogger.error("AuthService", "Confirm sign up error:", error);
       return ResultError(
-        createApiError(error instanceof Error ? error.message : "Confirmation failed", 400, "auth/confirm", "POST")
+        createApiError(error instanceof Error ? error.message : "Confirmation failed", 400, "auth/confirm", "POST"),
       );
     }
   }
@@ -245,7 +245,7 @@ export class AuthService {
       // Still clear local data even if API call fails
       this.clearAuthData();
       return ResultError(
-        createApiError(error instanceof Error ? error.message : "Sign out failed", 500, "auth/signout", "POST")
+        createApiError(error instanceof Error ? error.message : "Sign out failed", 500, "auth/signout", "POST"),
       );
     }
   }
@@ -292,7 +292,7 @@ export class AuthService {
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
             expiresAt: tokens.expiresAt.toISOString(),
-          })
+          }),
         );
 
         localStorage.setItem(AuthService.USER_STORAGE_KEY, JSON.stringify(user));
@@ -344,7 +344,7 @@ export class AuthService {
 
     if (!idToken) {
       return ResultError(
-        createApiError("No valid authentication token available", 401, "auth/token-validation", "GET")
+        createApiError("No valid authentication token available", 401, "auth/token-validation", "GET"),
       );
     }
 
@@ -439,7 +439,7 @@ export class AuthService {
       });
     } catch (error) {
       return ResultError(
-        createApiError(error instanceof Error ? error.message : "Failed to get user info", 500, "auth/userinfo", "GET")
+        createApiError(error instanceof Error ? error.message : "Failed to get user info", 500, "auth/userinfo", "GET"),
       );
     }
   }

@@ -90,7 +90,7 @@ describe("UpdateCalculationPointsUseCase", () => {
     vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockChar as any));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(mockCharacterService.updateCalculationPoints).mockResolvedValue(
-      createErrorResult("update failed") as any
+      createErrorResult("update failed") as any,
     );
 
     const result = await useCase.execute({
@@ -135,7 +135,7 @@ describe("UpdateCalculationPointsUseCase", () => {
     // After update, reload returns updated char
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(
-      createSuccessResult({ ...mockChar, characterId: TEST_SCENARIOS.VALID_CHARACTER_ID } as any)
+      createSuccessResult({ ...mockChar, characterId: TEST_SCENARIOS.VALID_CHARACTER_ID } as any),
     );
 
     const result = await useCase.execute({

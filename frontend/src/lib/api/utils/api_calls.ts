@@ -19,7 +19,7 @@ export class ApiError extends Error {
   constructor(
     public message: string,
     public statusCode: string,
-    public body: string
+    public body: string,
   ) {
     super(message);
     this.name = "ApiError";
@@ -31,7 +31,7 @@ async function makeRequest<ReturnType, BodyType>(
   idToken: string,
   endpoint_url: string,
   method: HttpMethod,
-  body: BodyType
+  body: BodyType,
 ): Promise<ReturnType>;
 
 /**
@@ -45,7 +45,7 @@ async function makeRequest<ReturnType, BodyType>(
   idToken: string,
   endpoint_url: string,
   method: HttpMethod,
-  body?: BodyType
+  body?: BodyType,
 ): Promise<ReturnType> {
   const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/${endpoint_url}`;
   if (!idToken) {
@@ -123,7 +123,7 @@ export async function increaseSkill(
   charId: string,
   name: string,
   category: string,
-  body: SkillIncreaseRequest
+  body: SkillIncreaseRequest,
 ): Promise<PatchSkillResponse> {
   const endpoint_url = `characters/${charId}/skills/${category}/${name}`;
   return await patch<PatchSkillResponse, SkillIncreaseRequest>(idToken, endpoint_url, body);
@@ -140,7 +140,7 @@ export async function increaseAttribute(
   idToken: string,
   charId: string,
   name: string,
-  body: AttributeIncreaseRequest
+  body: AttributeIncreaseRequest,
 ): Promise<AttributeIncreaseReply> {
   const endpoint_url = `characters/${charId}/attributes/${name}`;
   return await patch<AttributeIncreaseReply, AttributeIncreaseRequest>(idToken, endpoint_url, body);
@@ -157,7 +157,7 @@ export async function increaseBaseValue(
   idToken: string,
   charId: string,
   name: string,
-  body: BaseValueIncreaseRequest
+  body: BaseValueIncreaseRequest,
 ): Promise<BaseValueIncreaseReply> {
   const endpoint_url = `characters/${charId}/base-values/${name}`;
   return patch<BaseValueIncreaseReply, BaseValueIncreaseRequest>(idToken, endpoint_url, body);
@@ -168,7 +168,7 @@ export async function increaseCombatValue(
   charId: string,
   name: string,
   category: string,
-  body: CombatValueIncreaseRequest
+  body: CombatValueIncreaseRequest,
 ): Promise<CombatValueIncreaseReply> {
   const endpoint_url = `characters/${charId}/combat-values/${category}/${name}`;
   return patch<CombatValueIncreaseReply, CombatValueIncreaseRequest>(idToken, endpoint_url, body);

@@ -356,7 +356,7 @@ export type SkillNameWithCategory = {
 const combatSkillCategory: SkillCategory = "combat";
 
 export const combatSkills = Object.keys(combatSkillsSchema.shape).map(
-  (skill) => `${combatSkillCategory}/${skill}` as SkillNameWithCategory
+  (skill) => `${combatSkillCategory}/${skill}` as SkillNameWithCategory,
 );
 
 export const START_SKILLS: SkillNameWithCategory[] = [
@@ -385,7 +385,7 @@ export const START_SKILLS: SkillNameWithCategory[] = [
   "handcraft/calmingSbDown",
   "handcraft/drawingAndPainting",
   ...(Object.keys(combatSkillsSchema.shape) as Array<keyof CharacterSheet["skills"]["combat"]>).map(
-    (skill) => `${combatSkillCategory}/${skill}` as SkillNameWithCategory
+    (skill) => `${combatSkillCategory}/${skill}` as SkillNameWithCategory,
   ),
 ];
 
@@ -547,5 +547,5 @@ export type Character = z.infer<typeof characterSchema>;
 
 export const skillCategories = Object.keys(characterSheetSchema.shape.skills.shape) as SkillCategory[];
 export const skillNames = Object.values(characterSheetSchema.shape.skills.shape).flatMap(
-  (category) => category.keyof().options
+  (category) => category.keyof().options,
 );

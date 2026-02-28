@@ -38,7 +38,7 @@ export function useCharacterSelectionViewModel() {
   const state = useSyncExternalStore(
     (callback) => viewModel.subscribe(callback),
     () => viewModel.getState(),
-    () => viewModel.getState()
+    () => viewModel.getState(),
   );
 
   // Return state and operations

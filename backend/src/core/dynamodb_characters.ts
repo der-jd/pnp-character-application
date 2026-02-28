@@ -16,10 +16,10 @@ import { dynamoDBDocClient } from "./dynamodb_client.js";
 export async function setSpecialAbilities(
   userId: string,
   characterId: string,
-  specialAbilities: string[]
+  specialAbilities: string[],
 ): Promise<void> {
   console.log(
-    `Set special abilities '${specialAbilities.join(", ")}' to character ${characterId} of user ${userId} in DynamoDB`
+    `Set special abilities '${specialAbilities.join(", ")}' to character ${characterId} of user ${userId} in DynamoDB`,
   );
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
@@ -48,7 +48,7 @@ export async function setLevelUp(
   userId: string,
   characterId: string,
   level: number,
-  levelUpProgress: LevelUpProgress
+  levelUpProgress: LevelUpProgress,
 ): Promise<void> {
   console.log(`Set level up of character ${characterId} (user ${userId}) for level ${level} in DynamoDB`);
 
@@ -186,7 +186,7 @@ enum CalculationPointsType {
 export async function updateAdventurePoints(
   userId: string,
   characterId: string,
-  adventurePoints: CalculationPoints
+  adventurePoints: CalculationPoints,
 ): Promise<void> {
   await updateCalculationPoints(userId, characterId, adventurePoints, CalculationPointsType.ADVENTURE_POINTS);
 }
@@ -194,7 +194,7 @@ export async function updateAdventurePoints(
 export async function updateAttributePoints(
   userId: string,
   characterId: string,
-  attributePoints: CalculationPoints
+  attributePoints: CalculationPoints,
 ): Promise<void> {
   await updateCalculationPoints(userId, characterId, attributePoints, CalculationPointsType.ATTRIBUTE_POINTS);
 }
@@ -203,7 +203,7 @@ async function updateCalculationPoints(
   userId: string,
   characterId: string,
   calculationPoints: CalculationPoints,
-  type: CalculationPointsType
+  type: CalculationPointsType,
 ): Promise<void> {
   if (!Object.values(CalculationPointsType).includes(type)) {
     throw new HttpError(400, `Invalid calculation points type: ${type}`);
@@ -238,7 +238,7 @@ export async function updateAttribute(
   characterId: string,
   attributeName: string,
   attribute: Attribute,
-  attributePoints: CalculationPoints
+  attributePoints: CalculationPoints,
 ): Promise<void> {
   console.log(`Update attribute '${attributeName}' of character ${characterId} (user ${userId}) in DynamoDB`);
 
@@ -274,7 +274,7 @@ export async function updateBaseValue(
   userId: string,
   characterId: string,
   baseValueName: string,
-  baseValue: BaseValue
+  baseValue: BaseValue,
 ): Promise<void> {
   console.log(`Update base value '${baseValueName}' of character ${characterId} (user ${userId}) in DynamoDB`);
 
@@ -307,7 +307,7 @@ export async function updateSkill(
   skillCategory: string,
   skillName: string,
   skill: Skill,
-  adventurePoints: CalculationPoints
+  adventurePoints: CalculationPoints,
 ): Promise<void> {
   console.log(`Update skill '${skillName}' of character ${characterId} (user ${userId}) in DynamoDB`);
 
@@ -345,10 +345,10 @@ export async function updateCombatStats(
   characterId: string,
   combatCategory: string,
   combatSkillName: string,
-  combatStats: CombatStats
+  combatStats: CombatStats,
 ): Promise<void> {
   console.log(
-    `Update combat stats of combat skill '${combatSkillName}' of character ${characterId} (user ${userId}) in DynamoDB`
+    `Update combat stats of combat skill '${combatSkillName}' of character ${characterId} (user ${userId}) in DynamoDB`,
   );
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js

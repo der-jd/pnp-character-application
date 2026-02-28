@@ -46,7 +46,7 @@ describe.sequential("patch-skill component tests", () => {
         if (response.historyRecord) {
           Object.assign(record, response.historyRecord);
         }
-      }
+      },
     );
     currentResponse = undefined;
   });
@@ -78,7 +78,7 @@ describe.sequential("patch-skill component tests", () => {
               learningMethod: "NORMAL",
             }),
           _case.expectedStatusCode,
-          _case.expectedErrorMessage
+          _case.expectedErrorMessage,
         );
       });
     });
@@ -92,7 +92,7 @@ describe.sequential("patch-skill component tests", () => {
             activated: true,
           }),
         409,
-        "Learning method must be given"
+        "Learning method must be given",
       );
     });
 
@@ -105,7 +105,7 @@ describe.sequential("patch-skill component tests", () => {
             activated: false,
           }),
         409,
-        "Deactivating a skill is not allowed"
+        "Deactivating a skill is not allowed",
       );
     });
 
@@ -121,7 +121,7 @@ describe.sequential("patch-skill component tests", () => {
             },
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
     });
 
@@ -138,7 +138,7 @@ describe.sequential("patch-skill component tests", () => {
             learningMethod: "NORMAL",
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
     });
 
@@ -154,7 +154,7 @@ describe.sequential("patch-skill component tests", () => {
             },
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
     });
 
@@ -170,7 +170,7 @@ describe.sequential("patch-skill component tests", () => {
             },
           }),
         409,
-        "Skill is not activated yet"
+        "Skill is not activated yet",
       );
     });
 
@@ -187,7 +187,7 @@ describe.sequential("patch-skill component tests", () => {
             learningMethod: "NORMAL",
           }),
         409,
-        "Skill is not activated yet"
+        "Skill is not activated yet",
       );
     });
 
@@ -203,7 +203,7 @@ describe.sequential("patch-skill component tests", () => {
             },
           }),
         409,
-        "Skill is not activated yet"
+        "Skill is not activated yet",
       );
     });
 
@@ -220,7 +220,7 @@ describe.sequential("patch-skill component tests", () => {
             learningMethod: "EXPENSIVE",
           }),
         400,
-        "Not enough adventure points"
+        "Not enough adventure points",
       );
     });
 
@@ -237,7 +237,7 @@ describe.sequential("patch-skill component tests", () => {
             learningMethod: "NORMAL",
           }),
         400,
-        "Invalid input values!"
+        "Invalid input values!",
       );
     });
 
@@ -254,7 +254,7 @@ describe.sequential("patch-skill component tests", () => {
             learningMethod: "NORMAL",
           }),
         400,
-        "Invalid input values!"
+        "Invalid input values!",
       );
     });
 
@@ -270,7 +270,7 @@ describe.sequential("patch-skill component tests", () => {
             },
           }),
         409,
-        "Learning method must be given"
+        "Learning method must be given",
       );
     });
   });
@@ -348,8 +348,8 @@ describe.sequential("patch-skill component tests", () => {
         const response = patchSkillResponseSchema.parse(
           await context.apiClient.patch(
             `characters/${character.characterId}/skills/${_case.skillCategory}/${_case.skillName}`,
-            body
-          )
+            body,
+          ),
         );
         /**
          * Notice: The response is not stored in the currentResponse variable
@@ -393,7 +393,7 @@ describe.sequential("patch-skill component tests", () => {
         expect(response.data.changes.old.skill).toStrictEqual(
           character.characterSheet.skills[_case.skillCategory as keyof CharacterSheet["skills"]][
             _case.skillName as keyof CharacterSheet["skills"][keyof CharacterSheet["skills"]]
-          ]
+          ],
         );
         expect(response.data.changes.new.skill).toStrictEqual(response.data.changes.old.skill);
 
@@ -589,8 +589,8 @@ describe.sequential("patch-skill component tests", () => {
         const response = patchSkillResponseSchema.parse(
           await context.apiClient.patch(
             `characters/${character.characterId}/skills/${_case.skillCategory}/${_case.skillName}`,
-            body
-          )
+            body,
+          ),
         );
         currentResponse = response;
 
@@ -629,7 +629,7 @@ describe.sequential("patch-skill component tests", () => {
         const diffAvailableAdventurePoints = oldAvailableAdventurePoints - response.data.adventurePoints.new.available;
         expect(diffAvailableAdventurePoints).toBeCloseTo(_case.expectedCosts);
         expect(diffAvailableAdventurePoints).toBeCloseTo(
-          response.data.adventurePoints.old.available - response.data.adventurePoints.new.available
+          response.data.adventurePoints.old.available - response.data.adventurePoints.new.available,
         );
         expect(response.data.adventurePoints.old).toStrictEqual(oldAdventurePoints);
         expect(response.data.adventurePoints.new).toStrictEqual({

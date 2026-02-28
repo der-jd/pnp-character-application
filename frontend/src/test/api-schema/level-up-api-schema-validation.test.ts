@@ -72,12 +72,12 @@ describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
         console.log("[PASS] Schema correctly rejects invalid request");
         console.log(
           "Validation errors:",
-          result.error.issues.map((i) => i.message)
+          result.error.issues.map((i) => i.message),
         );
 
         // Verify specific validation error for missing initialLevel
         expect(
-          result.error.issues.some((issue) => issue.path.includes("initialLevel") && issue.code === "invalid_type")
+          result.error.issues.some((issue) => issue.path.includes("initialLevel") && issue.code === "invalid_type"),
         ).toBe(true);
       }
     });
@@ -97,7 +97,7 @@ describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
         console.log("[PASS] Schema catches attribute name changes");
         console.log(
           "Errors:",
-          result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`)
+          result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
         );
       }
     });
@@ -122,7 +122,7 @@ describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
         console.log("[INVALID] Response validation failed - this is contract breaking!");
         console.log(
           "Errors:",
-          result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`)
+          result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
         );
         console.log("Response data:", JSON.stringify(expectedBackendResponse, null, 2));
       }
@@ -152,7 +152,7 @@ describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
         console.log("[PASS] Schema catches response structure changes");
         console.log(
           "Missing fields:",
-          result.error.issues.map((i) => i.path.join("."))
+          result.error.issues.map((i) => i.path.join(".")),
         );
       }
     });
@@ -178,7 +178,7 @@ describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
         const userIdErrors = result.error.issues.filter((i) => i.path.includes("userId"));
         console.log(
           "UserId validation errors:",
-          userIdErrors.map((e) => e.message)
+          userIdErrors.map((e) => e.message),
         );
 
         // Verify it caught the length requirement
@@ -207,7 +207,7 @@ describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
         const levelErrors = result.error.issues.filter((i) => i.path.some((p) => p.toString().includes("level")));
         console.log(
           "Level-related errors:",
-          levelErrors.map((e) => `${e.path.join(".")}: ${e.message}`)
+          levelErrors.map((e) => `${e.path.join(".")}: ${e.message}`),
         );
       }
     });
@@ -264,7 +264,7 @@ describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
         }
       } catch (error) {
         throw new Error(
-          `LocalStack is not accessible: ${error instanceof Error ? error.message : String(error)}. Run 'npm run contract-tests:setup' first.`
+          `LocalStack is not accessible: ${error instanceof Error ? error.message : String(error)}. Run 'npm run contract-tests:setup' first.`,
         );
       }
     };
@@ -342,7 +342,7 @@ describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
             console.log("[INVALID] Real API response violates api-spec contract!");
             console.log(
               "Schema errors:",
-              schemaValidation.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`)
+              schemaValidation.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
             );
 
             // This is exactly what contract testing should catch!
@@ -371,7 +371,7 @@ describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
             // Fail if we get unexpected errors from LocalStack
             if (response.status >= 500 && response.status !== 502) {
               throw new Error(
-                `LocalStack API Gateway returned server error ${response.status}: ${errorData}. Check Lambda function deployment.`
+                `LocalStack API Gateway returned server error ${response.status}: ${errorData}. Check Lambda function deployment.`,
               );
             }
           }
@@ -386,7 +386,7 @@ describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
 
         // FAIL the test - LocalStack integration is required for contract testing
         throw new Error(
-          `LocalStack integration test failed: ${error instanceof Error ? error.message : String(error)}. Run 'npm run contract-tests:setup' to fix.`
+          `LocalStack integration test failed: ${error instanceof Error ? error.message : String(error)}. Run 'npm run contract-tests:setup' to fix.`,
         );
       }
     });
@@ -454,12 +454,12 @@ describe("Level-Up Endpoint: API-Spec Schema Validation", () => {
       } catch (error) {
         console.log(
           "[WARNING]  Could not test contract violation:",
-          error instanceof Error ? error.message : String(error)
+          error instanceof Error ? error.message : String(error),
         );
 
         // FAIL the test - LocalStack integration is required for contract testing
         throw new Error(
-          `LocalStack contract violation test failed: ${error instanceof Error ? error.message : String(error)}. Run 'npm run contract-tests:setup' to fix.`
+          `LocalStack contract violation test failed: ${error instanceof Error ? error.message : String(error)}. Run 'npm run contract-tests:setup' to fix.`,
         );
       }
     });

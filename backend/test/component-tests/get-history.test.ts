@@ -40,7 +40,7 @@ describe.sequential("get-history component tests", () => {
       await expectApiError(
         () => context.apiClient.get(`characters/${context.character.characterId}/history`, { "block-number": "abc" }),
         400,
-        "Invalid input values"
+        "Invalid input values",
       );
     });
 
@@ -48,7 +48,7 @@ describe.sequential("get-history component tests", () => {
       await expectApiError(
         () => context.apiClient.get(`characters/${context.character.characterId}/history`, { "block-number": "-1" }),
         400,
-        "Invalid input values"
+        "Invalid input values",
       );
     });
 
@@ -56,7 +56,7 @@ describe.sequential("get-history component tests", () => {
       await expectApiError(
         () => context.apiClient.get(`characters/${context.character.characterId}/history`, { "block-number": "0" }),
         400,
-        "Invalid input values"
+        "Invalid input values",
       );
     });
 
@@ -65,7 +65,7 @@ describe.sequential("get-history component tests", () => {
         () =>
           context.apiClient.get(`characters/${context.character.characterId}/history`, { "block-number": "100001" }),
         400,
-        "Invalid input values"
+        "Invalid input values",
       );
     });
   });
@@ -79,7 +79,7 @@ describe.sequential("get-history component tests", () => {
   describe("Valid requests", () => {
     test("successfully get latest history", async () => {
       const response = getHistoryResponseSchema.parse(
-        await context.apiClient.get(`characters/${context.character.characterId}/history`)
+        await context.apiClient.get(`characters/${context.character.characterId}/history`),
       );
 
       expect(response.items.length).toBeGreaterThan(0);
@@ -102,14 +102,14 @@ describe.sequential("get-history component tests", () => {
 
     test("successfully get specific history block", async () => {
       const latest = getHistoryResponseSchema.parse(
-        await context.apiClient.get(`characters/${context.character.characterId}/history`)
+        await context.apiClient.get(`characters/${context.character.characterId}/history`),
       );
       const blockNumber = latest.items[0].blockNumber;
 
       const response = getHistoryResponseSchema.parse(
         await context.apiClient.get(`characters/${context.character.characterId}/history`, {
           "block-number": blockNumber,
-        })
+        }),
       );
 
       expect(response.items.length).toBe(1);

@@ -112,7 +112,7 @@ describe("UpdateAttributeUseCase", () => {
       vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
       vi.mocked(mockCharacterService.updateAttribute).mockResolvedValue(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        createSuccessResult(mockUpdatedCharacter as any)
+        createSuccessResult(mockUpdatedCharacter as any),
       );
 
       // Act
@@ -129,7 +129,7 @@ describe("UpdateAttributeUseCase", () => {
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         "strength",
         { current: { increasedPoints: 2, initialValue: 10 } },
-        TEST_SCENARIOS.VALID_ID_TOKEN
+        TEST_SCENARIOS.VALID_ID_TOKEN,
       );
     });
 
@@ -169,7 +169,7 @@ describe("UpdateAttributeUseCase", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
       vi.mocked(mockCharacterService.updateAttribute).mockResolvedValue(
-        createErrorResult("Insufficient attribute points")
+        createErrorResult("Insufficient attribute points"),
       );
 
       // Act

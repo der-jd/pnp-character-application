@@ -35,7 +35,7 @@ describe.sequential("get-skill-increase-cost component tests", () => {
         await expectApiError(
           () => client.get(path, { "learning-method": "NORMAL" }),
           _case.expectedStatusCode,
-          _case.expectedErrorMessage
+          _case.expectedErrorMessage,
         );
       });
     });
@@ -46,7 +46,7 @@ describe.sequential("get-skill-increase-cost component tests", () => {
       await expectApiError(
         () => context.apiClient.get(`characters/${character.characterId}/skills/social/knowledgeOfHumanNature`),
         400,
-        "Invalid input values"
+        "Invalid input values",
       );
     });
 
@@ -59,7 +59,7 @@ describe.sequential("get-skill-increase-cost component tests", () => {
             "learning-method": "INVALID_METHOD",
           }),
         400,
-        "Invalid input values"
+        "Invalid input values",
       );
     });
   });
@@ -180,8 +180,8 @@ describe.sequential("get-skill-increase-cost component tests", () => {
               `characters/${character.characterId}/skills/${_case.skillCategory}/${_case.skillName}`,
               {
                 "learning-method": expectedResult.learningMethod,
-              }
-            )
+              },
+            ),
           );
 
           // Verify response structure
@@ -309,8 +309,8 @@ describe.sequential("get-skill-increase-cost component tests", () => {
               `characters/${character.characterId}/skills/${_case.skillCategory}/${_case.skillName}`,
               {
                 "learning-method": expectedResult.learningMethod,
-              }
-            )
+              },
+            ),
           );
 
           // Verify response structure
@@ -366,8 +366,8 @@ describe.sequential("get-skill-increase-cost component tests", () => {
               `characters/${character.characterId}/skills/${_case.skillCategory}/${_case.skillName}`,
               {
                 "learning-method": expectedResult.learningMethod,
-              }
-            )
+              },
+            ),
           );
 
           // Verify response structure
@@ -397,7 +397,7 @@ describe.sequential("get-skill-increase-cost component tests", () => {
         const response = getSkillResponseSchema.parse(
           await context.apiClient.get(`characters/${character.characterId}/skills/${skillCategory}/${skillName}`, {
             "learning-method": method,
-          })
+          }),
         );
 
         expect(response.characterId).toBe(character.characterId);

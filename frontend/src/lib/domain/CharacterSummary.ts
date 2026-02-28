@@ -18,7 +18,7 @@ export class CharacterSummary {
     public readonly userId: string,
     public readonly characterId: string,
     public readonly name: string,
-    public readonly level: number
+    public readonly level: number,
   ) {}
 
   /**

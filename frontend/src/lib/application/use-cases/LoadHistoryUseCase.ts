@@ -71,7 +71,7 @@ export class LoadHistoryUseCase implements UseCase<LoadHistoryInput, LoadHistory
       (block.changes || []).map((change) => ({
         change,
         characterId: block.characterId,
-      }))
+      })),
     );
 
     return entries.map((item, index: number) => ({

@@ -49,7 +49,7 @@ export class SkillCollection {
   getByCategory(category: keyof CharacterSheet["skills"]): SkillViewModel[] {
     const categorySkills = this.skills[category];
     return Object.entries(categorySkills).map(([skillName, skill]) =>
-      this.createSkillViewModel(skillName, category, skill)
+      this.createSkillViewModel(skillName, category, skill),
     );
   }
 

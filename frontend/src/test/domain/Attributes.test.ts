@@ -226,7 +226,7 @@ describe("AttributeCollection Domain Model", () => {
           custom.strength.totalCost +
           custom.mentalResilience.totalCost +
           custom.endurance.totalCost +
-          custom.charisma.totalCost
+          custom.charisma.totalCost,
       );
     });
   });

@@ -106,7 +106,7 @@ describe("AddSpecialAbilityUseCase", () => {
         .mockResolvedValueOnce(createErrorResult("Failed to reload"));
 
       vi.mocked(mockCharacterService.addSpecialAbility).mockResolvedValue(
-        createSuccessResult({ data: { characterId: "test-char-123" } } as any)
+        createSuccessResult({ data: { characterId: "test-char-123" } } as any),
       );
 
       const input = {
@@ -191,7 +191,7 @@ describe("AddSpecialAbilityUseCase", () => {
             },
           },
           historyRecord: null,
-        })
+        }),
       );
 
       const input = {
@@ -208,7 +208,7 @@ describe("AddSpecialAbilityUseCase", () => {
       expect(mockCharacterService.addSpecialAbility).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         { specialAbility: "Special Ability" },
-        TEST_SCENARIOS.VALID_ID_TOKEN
+        TEST_SCENARIOS.VALID_ID_TOKEN,
       );
     });
 
@@ -225,7 +225,7 @@ describe("AddSpecialAbilityUseCase", () => {
 
       // Mock addSpecialAbility failure
       vi.mocked(mockCharacterService.addSpecialAbility).mockResolvedValue(
-        createErrorResult("Special ability not found")
+        createErrorResult("Special ability not found"),
       );
 
       const input = {
@@ -299,7 +299,7 @@ describe("AddSpecialAbilityUseCase", () => {
             characterId: "test-char-123",
             specialAbilityName: "Combat Reflexes",
           },
-        } as any)
+        } as any),
       );
 
       const input = {
@@ -322,7 +322,7 @@ describe("AddSpecialAbilityUseCase", () => {
       expect(mockCharacterService.addSpecialAbility).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         { specialAbility: "Combat Reflexes" },
-        TEST_SCENARIOS.VALID_ID_TOKEN
+        TEST_SCENARIOS.VALID_ID_TOKEN,
       );
 
       // Verify character was loaded twice (initial + reload)
@@ -343,7 +343,7 @@ describe("AddSpecialAbilityUseCase", () => {
       vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
 
       vi.mocked(mockCharacterService.addSpecialAbility).mockResolvedValue(
-        createSuccessResult({ data: { characterId: "test-char-123" } } as any)
+        createSuccessResult({ data: { characterId: "test-char-123" } } as any),
       );
 
       const input = {
@@ -374,7 +374,7 @@ describe("AddSpecialAbilityUseCase", () => {
       vi.mocked(mockCharacterService.getCharacter).mockResolvedValue(createSuccessResult(mockCharacter as any));
 
       vi.mocked(mockCharacterService.addSpecialAbility).mockResolvedValue(
-        createSuccessResult({ data: { characterId: "test-char-123" } } as any)
+        createSuccessResult({ data: { characterId: "test-char-123" } } as any),
       );
 
       const longAbilityName = "A".repeat(100); // Very long ability name

@@ -51,7 +51,7 @@ describe.sequential("delete-history-record component tests", () => {
          * as before the update and the following revert request
          * in the test cases.
          */
-      }
+      },
     );
   });
 
@@ -66,7 +66,7 @@ describe.sequential("delete-history-record component tests", () => {
     const testCases = commonInvalidTestCases.map((testCase) =>
       testCase.name === "no character found for non-existing character id"
         ? { ...testCase, expectedErrorMessage: "No history found for the given character id" }
-        : testCase
+        : testCase,
     );
 
     testCases.forEach((_case) => {
@@ -89,7 +89,7 @@ describe.sequential("delete-history-record component tests", () => {
       await expectApiError(
         () => context.apiClient.delete(`characters/${character.characterId}/history/${INVALID_UUID}`),
         400,
-        "Invalid input values"
+        "Invalid input values",
       );
     });
 
@@ -99,7 +99,7 @@ describe.sequential("delete-history-record component tests", () => {
       await expectApiError(
         () => context.apiClient.delete(`characters/${character.characterId}/history/${NON_EXISTENT_UUID}`),
         404,
-        "The latest record does not match the given id"
+        "The latest record does not match the given id",
       );
     });
   });
@@ -117,7 +117,7 @@ describe.sequential("delete-history-record component tests", () => {
 
       // Post a level up
       const optionsHash = getLevelUpResponseSchema.parse(
-        await client.get(`characters/${character.characterId}/level-up`)
+        await client.get(`characters/${character.characterId}/level-up`),
       ).optionsHash;
       const body = {
         initialLevel: character.characterSheet.generalInformation.level,
@@ -125,18 +125,18 @@ describe.sequential("delete-history-record component tests", () => {
         optionsHash: optionsHash,
       };
       const updateResponse = postLevelUpResponseSchema.parse(
-        await client.post(`characters/${character.characterId}/level-up`, body)
+        await client.post(`characters/${character.characterId}/level-up`, body),
       );
 
       // Check if the character has been actually updated
       expect(updateResponse.data.changes.new.levelUpProgress).not.toStrictEqual(
-        character.characterSheet.generalInformation.levelUpProgress
+        character.characterSheet.generalInformation.levelUpProgress,
       );
       expect(updateResponse.historyRecord).toBeDefined();
 
       // Revert the level up
       deleteHistoryRecordResponseSchema.parse(
-        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`)
+        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`),
       );
     });
 
@@ -168,12 +168,12 @@ describe.sequential("delete-history-record component tests", () => {
         },
       };
       const updateResponse = patchBaseValueResponseSchema.parse(
-        await client.patch(`characters/${character.characterId}/base-values/${baseValue}`, body)
+        await client.patch(`characters/${character.characterId}/base-values/${baseValue}`, body),
       );
 
       // Check if the character has been actually updated
       expect(updateResponse.data.changes.new.baseValue).not.toStrictEqual(
-        character.characterSheet.baseValues[baseValue]
+        character.characterSheet.baseValues[baseValue],
       );
 
       if (expectedCombatStats === "melee") {
@@ -186,7 +186,7 @@ describe.sequential("delete-history-record component tests", () => {
 
       // Revert the base value update
       deleteHistoryRecordResponseSchema.parse(
-        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`)
+        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`),
       );
     });
 
@@ -204,18 +204,18 @@ describe.sequential("delete-history-record component tests", () => {
         },
       };
       const updateResponse = patchCalculationPointsResponseSchema.parse(
-        await client.patch(`characters/${character.characterId}/calculation-points`, body)
+        await client.patch(`characters/${character.characterId}/calculation-points`, body),
       );
 
       // Check if the character has been actually updated
       expect(updateResponse.data.calculationPoints.new.adventurePoints).not.toStrictEqual(
-        character.characterSheet.calculationPoints.adventurePoints
+        character.characterSheet.calculationPoints.adventurePoints,
       );
       expect(updateResponse.historyRecord).toBeDefined();
 
       // Revert the calculation points update
       deleteHistoryRecordResponseSchema.parse(
-        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`)
+        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`),
       );
     });
 
@@ -253,12 +253,12 @@ describe.sequential("delete-history-record component tests", () => {
           },
         };
         const updateResponse = patchAttributeResponseSchema.parse(
-          await client.patch(`characters/${character.characterId}/attributes/${attribute}`, body)
+          await client.patch(`characters/${character.characterId}/attributes/${attribute}`, body),
         );
 
         // Check if the character has been actually updated
         expect(updateResponse.data.changes.new.attribute).not.toStrictEqual(
-          character.characterSheet.attributes[attribute]
+          character.characterSheet.attributes[attribute],
         );
 
         if (expectedBaseValues) {
@@ -273,9 +273,9 @@ describe.sequential("delete-history-record component tests", () => {
 
         // Revert the attribute update
         deleteHistoryRecordResponseSchema.parse(
-          await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`)
+          await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`),
         );
-      }
+      },
     );
 
     test.each([
@@ -307,7 +307,7 @@ describe.sequential("delete-history-record component tests", () => {
         learningMethod: "NORMAL",
       };
       const updateResponse = patchSkillResponseSchema.parse(
-        await client.patch(`characters/${character.characterId}/skills/${skillPath}`, body)
+        await client.patch(`characters/${character.characterId}/skills/${skillPath}`, body),
       );
 
       // Check if the character has been actually updated
@@ -321,7 +321,7 @@ describe.sequential("delete-history-record component tests", () => {
 
       // Revert the skill update
       deleteHistoryRecordResponseSchema.parse(
-        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`)
+        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`),
       );
     });
 
@@ -341,7 +341,7 @@ describe.sequential("delete-history-record component tests", () => {
         },
       };
       const updateResponse = patchCombatStatsResponseSchema.parse(
-        await client.patch(`characters/${character.characterId}/combat/melee/daggers`, body)
+        await client.patch(`characters/${character.characterId}/combat/melee/daggers`, body),
       );
 
       // Check if the character has been actually updated
@@ -350,7 +350,7 @@ describe.sequential("delete-history-record component tests", () => {
 
       // Revert the combat stats update
       deleteHistoryRecordResponseSchema.parse(
-        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`)
+        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`),
       );
     });
 
@@ -363,18 +363,18 @@ describe.sequential("delete-history-record component tests", () => {
         specialAbility: "Spellcasting",
       };
       const updateResponse = postSpecialAbilitiesResponseSchema.parse(
-        await client.post(`characters/${character.characterId}/special-abilities`, body)
+        await client.post(`characters/${character.characterId}/special-abilities`, body),
       );
 
       // Check if the character has been actually updated
       expect(updateResponse.data.specialAbilities.new.values).not.toStrictEqual(
-        character.characterSheet.specialAbilities
+        character.characterSheet.specialAbilities,
       );
       expect(updateResponse.historyRecord).toBeDefined();
 
       // Revert the special ability addition
       deleteHistoryRecordResponseSchema.parse(
-        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`)
+        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`),
       );
     });
   });

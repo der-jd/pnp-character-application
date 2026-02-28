@@ -37,7 +37,7 @@ describe.sequential("patch-combat-stats component tests", () => {
         if (response.historyRecord) {
           Object.assign(record, response.historyRecord);
         }
-      }
+      },
     );
     currentResponse = undefined;
   });
@@ -73,7 +73,7 @@ describe.sequential("patch-combat-stats component tests", () => {
               },
             }),
           _case.expectedStatusCode,
-          _case.expectedErrorMessage
+          _case.expectedErrorMessage,
         );
       });
     });
@@ -95,7 +95,7 @@ describe.sequential("patch-combat-stats component tests", () => {
             },
           }),
         400,
-        "Parade value for a ranged combat skill must be 0"
+        "Parade value for a ranged combat skill must be 0",
       );
     });
 
@@ -116,7 +116,7 @@ describe.sequential("patch-combat-stats component tests", () => {
             },
           }),
         409,
-        "don't match"
+        "don't match",
       );
     });
 
@@ -137,7 +137,7 @@ describe.sequential("patch-combat-stats component tests", () => {
             },
           }),
         400,
-        "Not enough points"
+        "Not enough points",
       );
     });
   });
@@ -190,8 +190,8 @@ describe.sequential("patch-combat-stats component tests", () => {
         const response = patchCombatStatsResponseSchema.parse(
           await context.apiClient.patch(
             `characters/${character.characterId}/combat/${_case.combatCategory}/${_case.combatSkillName}`,
-            body
-          )
+            body,
+          ),
         );
         /**
          * Notice: The response is not stored in the currentResponse variable
@@ -218,10 +218,10 @@ describe.sequential("patch-combat-stats component tests", () => {
 
         // Verify calculated values match expectations
         expect(response.data.combatStats.new.skilledAttackValue).toBe(
-          body.skilledAttackValue.initialValue + body.skilledAttackValue.increasedPoints
+          body.skilledAttackValue.initialValue + body.skilledAttackValue.increasedPoints,
         );
         expect(response.data.combatStats.new.skilledParadeValue).toBe(
-          body.skilledParadeValue.initialValue + body.skilledParadeValue.increasedPoints
+          body.skilledParadeValue.initialValue + body.skilledParadeValue.increasedPoints,
         );
 
         // For ranged combat, parade values should be 0
@@ -315,8 +315,8 @@ describe.sequential("patch-combat-stats component tests", () => {
         const response = patchCombatStatsResponseSchema.parse(
           await context.apiClient.patch(
             `characters/${character.characterId}/combat/${_case.combatCategory}/${_case.combatSkillName}`,
-            body
-          )
+            body,
+          ),
         );
         currentResponse = response;
 
@@ -334,10 +334,10 @@ describe.sequential("patch-combat-stats component tests", () => {
 
         // Verify skilled values were increased correctly
         expect(response.data.combatStats.new.skilledAttackValue).toBe(
-          body.skilledAttackValue.initialValue + body.skilledAttackValue.increasedPoints
+          body.skilledAttackValue.initialValue + body.skilledAttackValue.increasedPoints,
         );
         expect(response.data.combatStats.new.skilledParadeValue).toBe(
-          body.skilledParadeValue.initialValue + body.skilledParadeValue.increasedPoints
+          body.skilledParadeValue.initialValue + body.skilledParadeValue.increasedPoints,
         );
 
         // Verify total attack and parade values include base values
@@ -346,7 +346,7 @@ describe.sequential("patch-combat-stats component tests", () => {
             character.characterSheet.baseValues.rangedAttackBaseValue.current +
             character.characterSheet.baseValues.rangedAttackBaseValue.mod;
           expect(response.data.combatStats.new.attackValue).toBe(
-            response.data.combatStats.new.skilledAttackValue + rangedAttackBaseValue
+            response.data.combatStats.new.skilledAttackValue + rangedAttackBaseValue,
           );
           expect(response.data.combatStats.new.skilledParadeValue).toBe(0);
           expect(response.data.combatStats.new.paradeValue).toBe(0);
@@ -355,13 +355,13 @@ describe.sequential("patch-combat-stats component tests", () => {
             character.characterSheet.baseValues.attackBaseValue.current +
             character.characterSheet.baseValues.attackBaseValue.mod;
           expect(response.data.combatStats.new.attackValue).toBe(
-            response.data.combatStats.new.skilledAttackValue + attackBaseValue
+            response.data.combatStats.new.skilledAttackValue + attackBaseValue,
           );
           const paradeBaseValue =
             character.characterSheet.baseValues.paradeBaseValue.current +
             character.characterSheet.baseValues.paradeBaseValue.mod;
           expect(response.data.combatStats.new.paradeValue).toBe(
-            response.data.combatStats.new.skilledParadeValue + paradeBaseValue
+            response.data.combatStats.new.skilledParadeValue + paradeBaseValue,
           );
         }
 

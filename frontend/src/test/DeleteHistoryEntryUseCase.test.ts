@@ -106,7 +106,7 @@ describe("DeleteHistoryEntryUseCase", () => {
       // Mock deleteHistoryRecord
       vi.mocked(mockHistoryService.deleteHistoryRecord).mockResolvedValue(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        createSuccessResult({ success: true } as any)
+        createSuccessResult({ success: true } as any),
       );
 
       const input = {
@@ -123,7 +123,7 @@ describe("DeleteHistoryEntryUseCase", () => {
       expect(mockHistoryService.deleteHistoryRecord).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         "history-123",
-        TEST_SCENARIOS.VALID_ID_TOKEN
+        TEST_SCENARIOS.VALID_ID_TOKEN,
       );
     });
 

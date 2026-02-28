@@ -107,7 +107,7 @@ export default function HistoryPage() {
         hide();
       }
     },
-    [selectedCharacterId, tokens?.idToken, show, hide, toast, updateCharacter]
+    [selectedCharacterId, tokens?.idToken, show, hide, toast, updateCharacter],
   );
 
   // Check if character is loaded

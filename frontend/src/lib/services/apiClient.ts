@@ -86,8 +86,8 @@ export class ApiClient {
           error instanceof Error ? error.message : "Network request failed",
           0,
           config.endpoint,
-          config.method
-        )
+          config.method,
+        ),
       );
     }
   }

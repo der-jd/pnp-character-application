@@ -41,7 +41,7 @@ describe.sequential("patch-calculation-points component tests", () => {
         if (response.historyRecord) {
           Object.assign(record, response.historyRecord);
         }
-      }
+      },
     );
     currentResponse = undefined;
   });
@@ -74,7 +74,7 @@ describe.sequential("patch-calculation-points component tests", () => {
               },
             }),
           _case.expectedStatusCode,
-          _case.expectedErrorMessage
+          _case.expectedErrorMessage,
         );
       });
     });
@@ -94,7 +94,7 @@ describe.sequential("patch-calculation-points component tests", () => {
             },
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
     });
 
@@ -113,7 +113,7 @@ describe.sequential("patch-calculation-points component tests", () => {
             },
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
     });
 
@@ -132,7 +132,7 @@ describe.sequential("patch-calculation-points component tests", () => {
             },
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
     });
 
@@ -151,7 +151,7 @@ describe.sequential("patch-calculation-points component tests", () => {
             },
           }),
         409,
-        "doesn't match"
+        "doesn't match",
       );
     });
   });
@@ -216,7 +216,7 @@ describe.sequential("patch-calculation-points component tests", () => {
         const body = _case.getBody(character);
 
         const response = patchCalculationPointsResponseSchema.parse(
-          await context.apiClient.patch(`characters/${character.characterId}/calculation-points`, body)
+          await context.apiClient.patch(`characters/${character.characterId}/calculation-points`, body),
         );
         /**
          * Notice: The response is not stored in the currentResponse variable
@@ -236,12 +236,12 @@ describe.sequential("patch-calculation-points component tests", () => {
         expect(response.data.calculationPoints.new).toStrictEqual(response.data.calculationPoints.old);
         if (response.data.calculationPoints.old.adventurePoints) {
           expect(response.data.calculationPoints.old.adventurePoints).toStrictEqual(
-            character.characterSheet.calculationPoints.adventurePoints
+            character.characterSheet.calculationPoints.adventurePoints,
           );
         }
         if (response.data.calculationPoints.old.attributePoints) {
           expect(response.data.calculationPoints.old.attributePoints).toStrictEqual(
-            character.characterSheet.calculationPoints.attributePoints
+            character.characterSheet.calculationPoints.attributePoints,
           );
         }
       });
@@ -333,7 +333,7 @@ describe.sequential("patch-calculation-points component tests", () => {
         const body = _case.getBody(character);
 
         const response = patchCalculationPointsResponseSchema.parse(
-          await context.apiClient.patch(`characters/${character.characterId}/calculation-points`, body)
+          await context.apiClient.patch(`characters/${character.characterId}/calculation-points`, body),
         );
         currentResponse = response;
 
@@ -344,12 +344,12 @@ describe.sequential("patch-calculation-points component tests", () => {
         // Verify old calculation points match character for updated points only
         if (response.data.calculationPoints.old.adventurePoints) {
           expect(response.data.calculationPoints.old.adventurePoints).toStrictEqual(
-            character.characterSheet.calculationPoints.adventurePoints
+            character.characterSheet.calculationPoints.adventurePoints,
           );
         }
         if (response.data.calculationPoints.old.attributePoints) {
           expect(response.data.calculationPoints.old.attributePoints).toStrictEqual(
-            character.characterSheet.calculationPoints.attributePoints
+            character.characterSheet.calculationPoints.attributePoints,
           );
         }
 
@@ -357,7 +357,7 @@ describe.sequential("patch-calculation-points component tests", () => {
         if ("adventurePoints" in body && body.adventurePoints) {
           if ("start" in body.adventurePoints && body.adventurePoints.start) {
             expect(response.data.calculationPoints.new.adventurePoints?.start).toBe(
-              body.adventurePoints.start.newValue
+              body.adventurePoints.start.newValue,
             );
           }
 
@@ -382,7 +382,7 @@ describe.sequential("patch-calculation-points component tests", () => {
         if ("attributePoints" in body && body.attributePoints) {
           if ("start" in body.attributePoints && body.attributePoints.start) {
             expect(response.data.calculationPoints.new.attributePoints?.start).toBe(
-              body.attributePoints.start.newValue
+              body.attributePoints.start.newValue,
             );
           }
 
@@ -424,18 +424,18 @@ describe.sequential("patch-calculation-points component tests", () => {
         expect(historyRecord.calculationPoints).toBeDefined();
         if (historyRecord.calculationPoints?.adventurePoints) {
           expect(historyRecord.calculationPoints.adventurePoints.old).toStrictEqual(
-            response.data.calculationPoints.old.adventurePoints
+            response.data.calculationPoints.old.adventurePoints,
           );
           expect(historyRecord.calculationPoints.adventurePoints.new).toStrictEqual(
-            response.data.calculationPoints.new.adventurePoints
+            response.data.calculationPoints.new.adventurePoints,
           );
         }
         if (historyRecord.calculationPoints?.attributePoints) {
           expect(historyRecord.calculationPoints.attributePoints.old).toStrictEqual(
-            response.data.calculationPoints.old.attributePoints
+            response.data.calculationPoints.old.attributePoints,
           );
           expect(historyRecord.calculationPoints.attributePoints.new).toStrictEqual(
-            response.data.calculationPoints.new.attributePoints
+            response.data.calculationPoints.new.attributePoints,
           );
         }
 

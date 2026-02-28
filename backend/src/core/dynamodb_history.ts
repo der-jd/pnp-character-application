@@ -50,7 +50,7 @@ export async function getHistoryItem(characterId: string, blockNumber: number): 
 export async function getHistoryItems(
   characterId: string,
   scanIndexForward: boolean,
-  limit?: number
+  limit?: number,
 ): Promise<HistoryBlock[]> {
   console.log(`Get history items of character ${characterId} from DynamoDB`);
 
@@ -144,7 +144,7 @@ export async function deleteBatchHistoryItems(historyItems: HistoryBlock[]): Pro
 
 export async function addHistoryRecord(record: HistoryRecord, block: HistoryBlock): Promise<void> {
   console.log(
-    `Add record to history block #${block.blockNumber}, id ${block.blockId} of character ${block.characterId} in DynamoDB`
+    `Add record to history block #${block.blockNumber}, id ${block.blockId} of character ${block.characterId} in DynamoDB`,
   );
   console.log("History record:", record);
 
@@ -173,10 +173,10 @@ export async function setRecordComment(
   characterId: string,
   blockNumber: number,
   recordIndex: number,
-  comment: string
+  comment: string,
 ): Promise<void> {
   console.log(
-    `Set comment for record (index: ${recordIndex}) in history block #${blockNumber} of character ${characterId} in DynamoDB`
+    `Set comment for record (index: ${recordIndex}) in history block #${blockNumber} of character ${characterId} in DynamoDB`,
   );
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js
@@ -203,7 +203,7 @@ export async function setRecordComment(
 
 export async function deleteHistoryItem(block: HistoryBlock): Promise<void> {
   console.log(
-    `Delete history item #${block.blockNumber}, id ${block.blockId} of character ${block.characterId} in DynamoDB`
+    `Delete history item #${block.blockNumber}, id ${block.blockId} of character ${block.characterId} in DynamoDB`,
   );
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/delete.js
@@ -224,7 +224,7 @@ export async function deleteLatestHistoryRecord(block: HistoryBlock): Promise<vo
   const latestRecordIndex: number = block.changes.length - 1;
   const latestRecordId: string = block.changes[latestRecordIndex].id;
   console.log(
-    `Delete latest record ${latestRecordId} from history block #${block.blockNumber}, id ${block.blockId} of character ${block.characterId} in DynamoDB`
+    `Delete latest record ${latestRecordId} from history block #${block.blockNumber}, id ${block.blockId} of character ${block.characterId} in DynamoDB`,
   );
 
   // https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javascriptv3/example_code/dynamodb/actions/document-client/update.js

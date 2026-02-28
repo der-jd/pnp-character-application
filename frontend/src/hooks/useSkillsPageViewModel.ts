@@ -35,7 +35,7 @@ export function useSkillsPageViewModel() {
   const state = useSyncExternalStore(
     (callback) => viewModel.subscribe(callback),
     () => viewModel.getState(),
-    () => viewModel.getState()
+    () => viewModel.getState(),
   );
 
   // Toggle edit mode - sync both ViewModel and Store

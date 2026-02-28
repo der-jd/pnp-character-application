@@ -5,7 +5,7 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
-    public body: unknown
+    public body: unknown,
   ) {
     super(message);
     this.name = "ApiError";
@@ -69,7 +69,7 @@ export class ApiClient {
       throw new ApiError(
         `Request failed: ${method} ${url} (${response.status} - ${response.statusText}): ${JSON.stringify(parsedBody)}`,
         response.status,
-        parsedBody
+        parsedBody,
       );
     }
 

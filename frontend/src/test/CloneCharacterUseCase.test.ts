@@ -101,7 +101,7 @@ describe("CloneCharacterUseCase", () => {
       expect(mockCharacterService.cloneCharacter).toHaveBeenCalledWith(
         TEST_SCENARIOS.VALID_CHARACTER_ID,
         { userIdOfCharacter: "user-123" },
-        TEST_SCENARIOS.VALID_ID_TOKEN
+        TEST_SCENARIOS.VALID_ID_TOKEN,
       );
     });
 

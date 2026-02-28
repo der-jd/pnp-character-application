@@ -33,7 +33,7 @@ export interface HistoryPageViewModelActions {
 export class HistoryPageViewModel extends BaseViewModel<HistoryPageViewModelState> {
   constructor(
     private readonly deleteHistoryEntryUseCase: DeleteHistoryEntryUseCase,
-    private readonly historyService: HistoryService
+    private readonly historyService: HistoryService,
   ) {
     super({
       historyEntries: [],

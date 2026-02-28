@@ -59,6 +59,6 @@ export const useAuthState = () => {
       user: null,
       tokens: null,
       isInitialized: false,
-    }) // getServerSnapshot - return safe default for SSR
+    }), // getServerSnapshot - return safe default for SSR
   );
 };

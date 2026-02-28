@@ -142,7 +142,7 @@ export function SkillCategoryTable({
         },
       },
     ],
-    [onSkillIncrease, onSkillActivate]
+    [onSkillIncrease, onSkillActivate],
   );
 
   const table = useReactTable({

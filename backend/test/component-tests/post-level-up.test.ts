@@ -54,7 +54,7 @@ describe.sequential("post-level-up component tests", () => {
         if (response.historyRecord) {
           Object.assign(record, response.historyRecord);
         }
-      }
+      },
     );
     currentResponse = undefined;
   });
@@ -101,7 +101,7 @@ describe.sequential("post-level-up component tests", () => {
             effect: { kind: "hpRoll", roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 4 } },
           }),
         409,
-        "initial level"
+        "initial level",
       );
     });
 
@@ -116,7 +116,7 @@ describe.sequential("post-level-up component tests", () => {
             effect: { kind: "hpRoll", roll: { dice: LEVEL_UP_DICE_EXPRESSION, value: 4 } },
           }),
         409,
-        "Options have changed"
+        "Options have changed",
       );
     });
 
@@ -131,7 +131,7 @@ describe.sequential("post-level-up component tests", () => {
             optionsHash,
             effect: { kind: "hpRoll", roll: { dice: "1d4+2", value: 7 } },
           }),
-        400
+        400,
       );
     });
 
@@ -146,7 +146,7 @@ describe.sequential("post-level-up component tests", () => {
             optionsHash,
             effect: { kind: "hpRoll", roll: { dice: "1d4+2", value: 2 } },
           }),
-        400
+        400,
       );
     });
 
@@ -161,7 +161,7 @@ describe.sequential("post-level-up component tests", () => {
             optionsHash,
             effect: { kind: "hpRoll", roll: { dice: "1d6+1", value: 3 } },
           }),
-        400
+        400,
       );
     });
 
@@ -176,7 +176,7 @@ describe.sequential("post-level-up component tests", () => {
             optionsHash,
             effect: { kind: "armorLevelRoll", roll: { dice: "1d4+2", value: 7 } },
           }),
-        400
+        400,
       );
     });
 
@@ -191,7 +191,7 @@ describe.sequential("post-level-up component tests", () => {
             optionsHash,
             effect: { kind: "armorLevelRoll", roll: { dice: "1d4+2", value: 2 } },
           }),
-        400
+        400,
       );
     });
 
@@ -206,7 +206,7 @@ describe.sequential("post-level-up component tests", () => {
             optionsHash,
             effect: { kind: "armorLevelRoll", roll: { dice: "1d6+1", value: 3 } },
           }),
-        400
+        400,
       );
     });
 
@@ -235,14 +235,14 @@ describe.sequential("post-level-up component tests", () => {
       };
 
       const response = postLevelUpResponseSchema.parse(
-        await context.apiClient.post(`characters/${character.characterId}/level-up`, body)
+        await context.apiClient.post(`characters/${character.characterId}/level-up`, body),
       );
       currentResponse = response;
 
       await expectApiError(
         () => context.apiClient.post(`characters/${character.characterId}/level-up`, body),
         409,
-        "initial level"
+        "initial level",
       );
     });
   });
@@ -318,7 +318,7 @@ describe.sequential("post-level-up component tests", () => {
         };
 
         const response = postLevelUpResponseSchema.parse(
-          await context.apiClient.post(`characters/${character.characterId}/level-up`, body)
+          await context.apiClient.post(`characters/${character.characterId}/level-up`, body),
         );
         currentResponse = response;
 
@@ -338,10 +338,10 @@ describe.sequential("post-level-up component tests", () => {
         });
         expect(newProgress.effects[_case.effect.kind]).toBeDefined();
         expect(newProgress.effects[_case.effect.kind]!.selectionCount).toBe(
-          (oldProgress.effects[_case.effect.kind]?.selectionCount ?? 0) + 1
+          (oldProgress.effects[_case.effect.kind]?.selectionCount ?? 0) + 1,
         );
         expect(newProgress.effects[_case.effect.kind]!.firstChosenLevel).toBe(
-          oldProgress.effects[_case.effect.kind]?.firstChosenLevel ?? nextLevel
+          oldProgress.effects[_case.effect.kind]?.firstChosenLevel ?? nextLevel,
         );
         expect(newProgress.effects[_case.effect.kind]!.lastChosenLevel).toBe(nextLevel);
 

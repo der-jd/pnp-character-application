@@ -59,7 +59,7 @@ describe.sequential("delete-character component tests", () => {
       const character = context.character;
 
       const response = deleteCharacterResponseSchema.parse(
-        await context.apiClient.delete(`characters/${character.characterId}`)
+        await context.apiClient.delete(`characters/${character.characterId}`),
       );
 
       // Verify response structure
@@ -70,14 +70,14 @@ describe.sequential("delete-character component tests", () => {
       await expectApiError(
         () => context.apiClient.get(`characters/${character.characterId}`),
         404,
-        "No character found"
+        "No character found",
       );
 
       // Verify history is also deleted
       await expectApiError(
         () => context.apiClient.get(`characters/${character.characterId}/history`),
         404,
-        "No character found"
+        "No character found",
       );
     });
   });

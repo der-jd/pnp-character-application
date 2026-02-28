@@ -86,14 +86,14 @@ export class TestContextFactory {
     const cloneResponse = postCharacterCloneResponseSchema.parse(
       await this.baseSetup.apiClient.post(`characters/${this.baseSetup.seedCharacterId}/clone`, {
         userIdOfCharacter: this.baseSetup.userId,
-      })
+      }),
     );
     console.log(
-      `Cloned seed character '${this.baseSetup.seedCharacterId}' to '${cloneResponse.characterId}' for test suite.`
+      `Cloned seed character '${this.baseSetup.seedCharacterId}' to '${cloneResponse.characterId}' for test suite.`,
     );
 
     const clonedCharacter = getCharacterResponseSchema.parse(
-      await this.baseSetup.apiClient.get(`characters/${cloneResponse.characterId}`)
+      await this.baseSetup.apiClient.get(`characters/${cloneResponse.characterId}`),
     );
     if (clonedCharacter.characterId !== cloneResponse.characterId) {
       throw new Error("Failed to fetch cloned character");
@@ -147,7 +147,7 @@ export class TestContextFactory {
     }
 
     const history = getHistoryResponseSchema.parse(
-      await this.baseSetup.apiClient.get(`characters/${characterId}/history`)
+      await this.baseSetup.apiClient.get(`characters/${characterId}/history`),
     );
 
     expect(history.items.length).toBeGreaterThanOrEqual(1);

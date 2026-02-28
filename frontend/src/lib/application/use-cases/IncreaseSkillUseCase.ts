@@ -104,7 +104,7 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
           },
           learningMethod: convertCostCategoryToLearningMethod(input.learningMethod),
         },
-        input.idToken
+        input.idToken,
       );
 
       if (!updateResult.success) {
@@ -131,7 +131,7 @@ export class IncreaseSkillUseCase implements UseCase<IncreaseSkillInput, Increas
       featureLogger.info(
         "usecase",
         "IncreaseSkillUseCase",
-        `Skill increased: ${input.skillName} (${currentValue} → ${newValue}, cost: ${cost})`
+        `Skill increased: ${input.skillName} (${currentValue} → ${newValue}, cost: ${cost})`,
       );
 
       // Return application-layer result with proper cost calculation from backend

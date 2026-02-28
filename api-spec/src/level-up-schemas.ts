@@ -74,7 +74,7 @@ export const levelUpEffectProgressSchema = z
 export type LevelUpEffectProgress = z.infer<typeof levelUpEffectProgressSchema>;
 
 const effectProgressShape = Object.fromEntries(
-  levelUpEffectKindSchema.options.map((kind) => [kind, levelUpEffectProgressSchema])
+  levelUpEffectKindSchema.options.map((kind) => [kind, levelUpEffectProgressSchema]),
 ) as Record<LevelUpEffectKind, typeof levelUpEffectProgressSchema>;
 
 export const levelUpProgressSchema = z

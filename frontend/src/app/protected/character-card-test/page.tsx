@@ -422,7 +422,7 @@ export default function CharacterCardTestPage() {
 
                 const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
                 const activeSkills = Object.entries(skills as Record<string, unknown>).filter(
-                  ([, skill]) => (skill as { activated?: boolean }).activated === true
+                  ([, skill]) => (skill as { activated?: boolean }).activated === true,
                 );
 
                 if (activeSkills.length === 0) return null;

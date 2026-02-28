@@ -22,8 +22,8 @@ describe.sequential("post-character-clone component tests", () => {
       const response = getHistoryResponseSchema.parse(
         await context.apiClient.get(
           `characters/${characterId}/history`,
-          currentBlockNumber ? { "block-number": currentBlockNumber } : undefined
-        )
+          currentBlockNumber ? { "block-number": currentBlockNumber } : undefined,
+        ),
       );
 
       // Add blocks in reverse order (latest first)
@@ -64,7 +64,7 @@ describe.sequential("post-character-clone component tests", () => {
       },
       () => {
         // No history record update necessary
-      }
+      },
     );
 
     // Delete the cloned character from the test case
@@ -102,7 +102,7 @@ describe.sequential("post-character-clone component tests", () => {
               userIdOfCharacter: character.userId,
             }),
           _case.expectedStatusCode,
-          _case.expectedErrorMessage
+          _case.expectedErrorMessage,
         );
       });
     });
@@ -119,7 +119,7 @@ describe.sequential("post-character-clone component tests", () => {
       const response = postCharacterCloneResponseSchema.parse(
         await context.apiClient.post(`characters/${context.character.characterId}/clone`, {
           userIdOfCharacter: context.character.userId,
-        })
+        }),
       );
       currentResponse = response;
       console.log(`Cloned character ${context.character.characterId} to ${response.characterId} for test case.`);

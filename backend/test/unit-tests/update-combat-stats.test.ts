@@ -301,16 +301,16 @@ describe("Valid requests", () => {
       const oldCombatStats = getCombatStats(
         fakeCharacterResponse.Item.characterSheet.combat,
         combatCategory,
-        skillName
+        skillName,
       );
       expect(parsedBody.combatStats.old).toStrictEqual(oldCombatStats);
       expect(parsedBody.combatStats.new).toStrictEqual(parsedBody.combatStats.old);
 
       expect(parsedBody.combatStats.new.skilledAttackValue).toBe(
-        _case.request.body.skilledAttackValue.initialValue + _case.request.body.skilledAttackValue.increasedPoints
+        _case.request.body.skilledAttackValue.initialValue + _case.request.body.skilledAttackValue.increasedPoints,
       );
       expect(parsedBody.combatStats.new.skilledParadeValue).toBe(
-        _case.request.body.skilledParadeValue.initialValue + _case.request.body.skilledParadeValue.increasedPoints
+        _case.request.body.skilledParadeValue.initialValue + _case.request.body.skilledParadeValue.increasedPoints,
       );
 
       const rangedCombatCategory: keyof CombatSection = "ranged";
@@ -437,12 +437,12 @@ describe("Valid requests", () => {
       const oldCombatStats = getCombatStats(
         fakeCharacterResponse.Item.characterSheet.combat,
         combatCategory,
-        skillName
+        skillName,
       );
       expect(parsedBody.combatStats.old).toStrictEqual(oldCombatStats);
 
       expect(parsedBody.combatStats.new.skilledAttackValue).toBe(
-        _case.request.body.skilledAttackValue.initialValue + _case.request.body.skilledAttackValue.increasedPoints
+        _case.request.body.skilledAttackValue.initialValue + _case.request.body.skilledAttackValue.increasedPoints,
       );
 
       const rangedCombatCategory: keyof CombatSection = "ranged";
@@ -451,7 +451,7 @@ describe("Valid requests", () => {
           fakeCharacterResponse.Item.characterSheet.baseValues.rangedAttackBaseValue.current +
           fakeCharacterResponse.Item.characterSheet.baseValues.rangedAttackBaseValue.mod;
         expect(parsedBody.combatStats.new.attackValue).toBe(
-          parsedBody.combatStats.new.skilledAttackValue + rangedAttackBaseValue
+          parsedBody.combatStats.new.skilledAttackValue + rangedAttackBaseValue,
         );
 
         expect(parsedBody.combatStats.new.skilledParadeValue).toBe(0);
@@ -461,17 +461,17 @@ describe("Valid requests", () => {
           fakeCharacterResponse.Item.characterSheet.baseValues.attackBaseValue.current +
           fakeCharacterResponse.Item.characterSheet.baseValues.attackBaseValue.mod;
         expect(parsedBody.combatStats.new.attackValue).toBe(
-          parsedBody.combatStats.new.skilledAttackValue + attackBaseValue
+          parsedBody.combatStats.new.skilledAttackValue + attackBaseValue,
         );
 
         expect(parsedBody.combatStats.new.skilledParadeValue).toBe(
-          _case.request.body.skilledParadeValue.initialValue + _case.request.body.skilledParadeValue.increasedPoints
+          _case.request.body.skilledParadeValue.initialValue + _case.request.body.skilledParadeValue.increasedPoints,
         );
         const paradeBaseValue =
           fakeCharacterResponse.Item.characterSheet.baseValues.paradeBaseValue.current +
           fakeCharacterResponse.Item.characterSheet.baseValues.paradeBaseValue.mod;
         expect(parsedBody.combatStats.new.paradeValue).toBe(
-          parsedBody.combatStats.new.skilledParadeValue + paradeBaseValue
+          parsedBody.combatStats.new.skilledParadeValue + paradeBaseValue,
         );
       }
 

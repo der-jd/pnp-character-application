@@ -53,7 +53,7 @@ describe.sequential("get-character component tests", () => {
         const character = context.character;
 
         const response = getCharacterResponseSchema.parse(
-          await context.apiClient.get(`characters/${character.characterId}`)
+          await context.apiClient.get(`characters/${character.characterId}`),
         );
 
         // Verify character data matches

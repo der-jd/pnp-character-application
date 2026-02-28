@@ -37,7 +37,7 @@ export async function _getLevelUp(request: Request): Promise<APIGatewayProxyResu
     const nextLevel = character.characterSheet.generalInformation.level + 1;
     const levelUpOptions = computeLevelUpOptions(
       nextLevel,
-      character.characterSheet.generalInformation.levelUpProgress
+      character.characterSheet.generalInformation.levelUpProgress,
     );
 
     const responseBody: GetLevelUpResponse = {

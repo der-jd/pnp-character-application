@@ -78,7 +78,7 @@ export function mockDynamoDBGetHistoryResponse(response: FakeHistoryBlockRespons
 
 export function mockDynamoDBGetCharacterAndHistoryResponse(
   characterResponse: FakeCharacterResponse,
-  historyResponse: FakeHistoryBlockResponse
+  historyResponse: FakeHistoryBlockResponse,
 ) {
   (globalThis as any).dynamoDBMock.on(GetCommand).callsFake((command: { Key: any }) => {
     const key = command.Key;
@@ -139,6 +139,6 @@ export function mockDynamoDBQueryHistoryResponse(response: FakeHistoryBlockListR
             return Promise.resolve({ Items: [] });
           }
         }
-      }
+      },
     );
 }

@@ -318,7 +318,7 @@ describe("Valid requests", () => {
 
       if (_case.request.body.current) {
         expect(parsedBody.changes.new.attribute.current).toBe(
-          _case.request.body.current.initialValue + _case.request.body.current.increasedPoints
+          _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
         );
       }
 
@@ -473,7 +473,7 @@ describe("Valid requests", () => {
 
       if (_case.request.body.current) {
         expect(parsedBody.changes.new.attribute.current).toBe(
-          _case.request.body.current.initialValue + _case.request.body.current.increasedPoints
+          _case.request.body.current.initialValue + _case.request.body.current.increasedPoints,
         );
 
         switch (_case.request.body.current.increasedPoints) {
@@ -980,7 +980,7 @@ describe("Valid requests", () => {
       if (meleeCombatStatsChanged) {
         expect(
           (parsedBody.changes.old.baseValues.attackBaseValue && parsedBody.changes.new.baseValues.attackBaseValue) ||
-            (parsedBody.changes.old.baseValues.paradeBaseValue && parsedBody.changes.new.baseValues.paradeBaseValue)
+            (parsedBody.changes.old.baseValues.paradeBaseValue && parsedBody.changes.new.baseValues.paradeBaseValue),
         ).toBeTruthy();
         if (
           !parsedBody.changes.old.baseValues.attackBaseValue &&
@@ -998,7 +998,7 @@ describe("Valid requests", () => {
         }
 
         expect(parsedBody.changes.old.combat.melee).toStrictEqual(
-          fakeCharacterResponse.Item.characterSheet.combat.melee
+          fakeCharacterResponse.Item.characterSheet.combat.melee,
         );
 
         for (const skillName of Object.keys(parsedBody.changes.old.combat.melee)) {
@@ -1063,7 +1063,7 @@ describe("Valid requests", () => {
         }
 
         expect(parsedBody.changes.old.combat.ranged).toStrictEqual(
-          fakeCharacterResponse.Item.characterSheet.combat.ranged
+          fakeCharacterResponse.Item.characterSheet.combat.ranged,
         );
 
         for (const skillName of Object.keys(parsedBody.changes.old.combat.ranged)) {

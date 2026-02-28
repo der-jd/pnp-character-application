@@ -41,7 +41,7 @@ function tryParseJson(value: string): unknown {
 export async function expectApiError(
   request: () => Promise<unknown>,
   expectedStatus: number,
-  expectedMessage?: string | RegExp
+  expectedMessage?: string | RegExp,
 ): Promise<ErrorBody> {
   let error: ApiError;
 
@@ -88,7 +88,7 @@ export async function updateAndVerifyTestContextAfterEachTest<T>(
   context: TestContext,
   response: T | undefined,
   updateCharacter: (response: T, character: Character) => void,
-  updateLastHistoryRecord: (response: T, record: HistoryRecord) => void
+  updateLastHistoryRecord: (response: T, record: HistoryRecord) => void,
 ): Promise<void> {
   if (response) {
     updateCharacter(response, context.character);
@@ -171,13 +171,13 @@ export const commonInvalidTestCases = [
  */
 async function verifyCharacterState(context: TestContext): Promise<void> {
   const updatedCharacter = getCharacterResponseSchema.parse(
-    await context.apiClient.get(`characters/${context.character.characterId}`)
+    await context.apiClient.get(`characters/${context.character.characterId}`),
   );
 
   // Compare specialAbilities as Sets (order not guaranteed due to Set storage)
   if (context.character.characterSheet.specialAbilities || updatedCharacter.characterSheet.specialAbilities) {
     expect(new Set(updatedCharacter.characterSheet.specialAbilities || [])).toEqual(
-      new Set(context.character.characterSheet.specialAbilities || [])
+      new Set(context.character.characterSheet.specialAbilities || []),
     );
   }
 

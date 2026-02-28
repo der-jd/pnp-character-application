@@ -94,7 +94,7 @@ describe("LoadAllCharactersUseCase", () => {
     it("should handle service errors gracefully", async () => {
       // Arrange
       vi.mocked(mockCharacterService.getAllCharacters).mockResolvedValue(
-        createErrorResult("Failed to fetch characters")
+        createErrorResult("Failed to fetch characters"),
       );
 
       // Act

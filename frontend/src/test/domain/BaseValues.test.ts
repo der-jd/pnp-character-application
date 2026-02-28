@@ -118,7 +118,7 @@ describe("BaseValueCollection Domain Model", () => {
       expect(healthPoints?.byFormula).toBe(healthPoints?.startValue);
       expect(healthPoints?.byLvlUp).toBeGreaterThan(0);
       expect(healthPoints?.currentValue).toBe(
-        (healthPoints?.byFormula || 0) + (healthPoints?.byLvlUp || 0) + (healthPoints?.modifier || 0)
+        (healthPoints?.byFormula || 0) + (healthPoints?.byLvlUp || 0) + (healthPoints?.modifier || 0),
       );
     });
 
@@ -131,7 +131,7 @@ describe("BaseValueCollection Domain Model", () => {
       expect(initiativeBaseValue?.currentValue).toBe(
         (initiativeBaseValue?.byFormula || 0) +
           (initiativeBaseValue?.byLvlUp || 0) +
-          (initiativeBaseValue?.modifier || 0)
+          (initiativeBaseValue?.modifier || 0),
       );
     });
   });

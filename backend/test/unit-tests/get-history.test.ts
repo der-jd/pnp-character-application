@@ -214,7 +214,7 @@ describe("Valid requests", () => {
       // Otherwise, check that the block number of the first item is equal to the block number of the last item in the fakeHistoryBlockListResponse
       else {
         expect(parsedBody.items[0].blockNumber).toBe(
-          fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1].blockNumber
+          fakeHistoryBlockListResponse.Items[fakeHistoryBlockListResponse.Items.length - 1].blockNumber,
         );
       }
 

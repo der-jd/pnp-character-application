@@ -249,7 +249,7 @@ describe("CharacterService", () => {
       expect(mockApiClient.patch).toHaveBeenCalledWith(
         "characters/char123/skills/combat/attack",
         updateData,
-        "token123"
+        "token123",
       );
     });
   });

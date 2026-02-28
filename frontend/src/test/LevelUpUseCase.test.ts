@@ -146,7 +146,7 @@ describe("LevelUpUseCase", () => {
 
       // successful levelUp response
       vi.mocked(mockCharacterService.levelUp).mockResolvedValue(
-        createSuccessResult({ data: { level: { new: { value: 2 } } } }) as any
+        createSuccessResult({ data: { level: { new: { value: 2 } } } }) as any,
       );
 
       // reload fails
@@ -174,7 +174,7 @@ describe("LevelUpUseCase", () => {
 
       // levelUp success
       vi.mocked(mockCharacterService.levelUp).mockResolvedValue(
-        createSuccessResult({ data: { level: { new: { value: 2 } } } }) as any
+        createSuccessResult({ data: { level: { new: { value: 2 } } } }) as any,
       );
 
       // reload success returns updated character

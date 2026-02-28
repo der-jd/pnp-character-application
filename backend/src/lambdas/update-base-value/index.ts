@@ -64,14 +64,14 @@ export async function _updateBaseValue(request: Request): Promise<APIGatewayProx
       params.userId,
       params.pathParams["character-id"],
       params.pathParams["base-value-name"],
-      baseValue
+      baseValue,
     );
 
     const combatBaseValueChanged: boolean = combatBaseValuesChangedAffectingCombatStats(
       { [params.pathParams["base-value-name"]]: baseValueOld },
       {
         [params.pathParams["base-value-name"]]: baseValue,
-      }
+      },
     );
     let changedCombatSection: Partial<CombatSection> = {};
     if (combatBaseValueChanged) {
@@ -82,7 +82,7 @@ export async function _updateBaseValue(request: Request): Promise<APIGatewayProx
         {
           ...characterSheet.baseValues,
           [params.pathParams["base-value-name"]]: baseValue,
-        }
+        },
       );
     }
 

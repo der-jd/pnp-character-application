@@ -65,7 +65,7 @@ export function useSkillUpdater() {
           skillIdentifier,
           points,
           String(skill.defaultCostCategory), // learningMethod/costCategory
-          tokens.idToken
+          tokens.idToken,
         );
         if (success) {
           toast.toast({
@@ -90,7 +90,7 @@ export function useSkillUpdater() {
         setLoading(false);
       }
     },
-    [selectedChar, tokens, toast]
+    [selectedChar, tokens, toast],
   );
 
   /**
@@ -134,7 +134,7 @@ export function useSkillUpdater() {
         setLoading(false);
       }
     },
-    [selectedChar, tokens, toast]
+    [selectedChar, tokens, toast],
   );
 
   return { tryIncrease, lvlUp, loading };

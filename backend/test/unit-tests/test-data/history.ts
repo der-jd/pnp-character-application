@@ -19,7 +19,7 @@ import { fakeCharacter, fakeCharacterId } from "./character.js";
 export function addFakeHistoryRecord(
   block: HistoryBlock,
   record: HistoryRecord,
-  removePreviousRecords: boolean = false
+  removePreviousRecords: boolean = false,
 ): void {
   if (removePreviousRecords) {
     record.number = block.changes[block.changes.length - 1].number;

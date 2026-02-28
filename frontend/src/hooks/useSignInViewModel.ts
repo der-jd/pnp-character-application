@@ -46,7 +46,7 @@ export function useSignInViewModel() {
     async (formData: SignInFormData) => {
       await viewModel.signIn(formData);
     },
-    [viewModel]
+    [viewModel],
   );
 
   const clearError = useCallback(() => {
@@ -57,7 +57,7 @@ export function useSignInViewModel() {
     (callback: (data: SignInSuccessData) => void) => {
       viewModel.onSuccess(callback);
     },
-    [viewModel]
+    [viewModel],
   );
 
   return {

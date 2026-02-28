@@ -51,7 +51,7 @@ export interface CharacterStore {
     skillName: string,
     points: number,
     learningMethod: string,
-    idToken: string
+    idToken: string,
   ) => Promise<boolean>;
 }
 
@@ -221,7 +221,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
     skillName: string,
     points: number,
     learningMethod: string,
-    idToken: string
+    idToken: string,
   ): Promise<boolean> => {
     const result = await characterApplicationService.increaseSkill({
       characterId,
@@ -239,7 +239,7 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
       }));
 
       console.log(
-        `[Character store] Skill '${skillName}' increased by ${points} points. Cost: ${result.data.costCalculation.cost} points`
+        `[Character store] Skill '${skillName}' increased by ${points} points. Cost: ${result.data.costCalculation.cost} points`,
       );
       return true;
     } else {

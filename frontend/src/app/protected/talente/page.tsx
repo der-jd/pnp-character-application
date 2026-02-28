@@ -52,7 +52,7 @@ export default function SkillsPage() {
         hide();
       }
     },
-    [show, hide, tryIncrease, toast]
+    [show, hide, tryIncrease, toast],
   );
 
   // Handle skill activation (if needed in future)

@@ -310,12 +310,12 @@ describe("Valid requests", () => {
 
       if (_case.request.body.adventurePoints) {
         expect(parsedBody.calculationPoints.old.adventurePoints).toStrictEqual(
-          fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints
+          fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints,
         );
 
         if (_case.request.body.adventurePoints.start) {
           expect(parsedBody.calculationPoints.new.adventurePoints?.start).toBe(
-            _case.request.body.adventurePoints.start.newValue
+            _case.request.body.adventurePoints.start.newValue,
           );
         }
 
@@ -329,19 +329,19 @@ describe("Valid requests", () => {
           expect(diffAvailable).toBe(diffTotal);
           expect(parsedBody.calculationPoints.new.adventurePoints?.total).toBe(
             _case.request.body.adventurePoints.total.initialValue +
-              _case.request.body.adventurePoints.total.increasedPoints
+              _case.request.body.adventurePoints.total.increasedPoints,
           );
         }
       }
 
       if (_case.request.body.attributePoints) {
         expect(parsedBody.calculationPoints.old.attributePoints).toStrictEqual(
-          fakeCharacterResponse.Item.characterSheet.calculationPoints.attributePoints
+          fakeCharacterResponse.Item.characterSheet.calculationPoints.attributePoints,
         );
 
         if (_case.request.body.attributePoints.start) {
           expect(parsedBody.calculationPoints.new.attributePoints?.start).toBe(
-            _case.request.body.attributePoints.start.newValue
+            _case.request.body.attributePoints.start.newValue,
           );
         }
 
@@ -355,7 +355,7 @@ describe("Valid requests", () => {
           expect(diffAvailable).toBe(diffTotal);
           expect(parsedBody.calculationPoints.new.attributePoints?.total).toBe(
             _case.request.body.attributePoints.total.initialValue +
-              _case.request.body.attributePoints.total.increasedPoints
+              _case.request.body.attributePoints.total.increasedPoints,
           );
         }
       }
@@ -488,12 +488,12 @@ describe("Valid requests", () => {
 
       if (_case.request.body.adventurePoints) {
         expect(parsedBody.calculationPoints.old.adventurePoints).toStrictEqual(
-          fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints
+          fakeCharacterResponse.Item.characterSheet.calculationPoints.adventurePoints,
         );
 
         if (_case.request.body.adventurePoints.start) {
           expect(parsedBody.calculationPoints.new.adventurePoints?.start).toBe(
-            _case.request.body.adventurePoints.start.newValue
+            _case.request.body.adventurePoints.start.newValue,
           );
         }
 
@@ -507,19 +507,19 @@ describe("Valid requests", () => {
           expect(diffAvailable).toBe(diffTotal);
           expect(parsedBody.calculationPoints.new.adventurePoints?.total).toBe(
             _case.request.body.adventurePoints.total.initialValue +
-              _case.request.body.adventurePoints.total.increasedPoints
+              _case.request.body.adventurePoints.total.increasedPoints,
           );
         }
       }
 
       if (_case.request.body.attributePoints) {
         expect(parsedBody.calculationPoints.old.attributePoints).toStrictEqual(
-          fakeCharacterResponse.Item.characterSheet.calculationPoints.attributePoints
+          fakeCharacterResponse.Item.characterSheet.calculationPoints.attributePoints,
         );
 
         if (_case.request.body.attributePoints.start) {
           expect(parsedBody.calculationPoints.new.attributePoints?.start).toBe(
-            _case.request.body.attributePoints.start.newValue
+            _case.request.body.attributePoints.start.newValue,
           );
         }
 
@@ -533,7 +533,7 @@ describe("Valid requests", () => {
           expect(diffAvailable).toBe(diffTotal);
           expect(parsedBody.calculationPoints.new.attributePoints?.total).toBe(
             _case.request.body.attributePoints.total.initialValue +
-              _case.request.body.attributePoints.total.increasedPoints
+              _case.request.body.attributePoints.total.increasedPoints,
           );
         }
       }

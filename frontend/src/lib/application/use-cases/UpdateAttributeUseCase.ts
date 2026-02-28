@@ -70,7 +70,7 @@ export class UpdateAttributeUseCase implements UseCase<UpdateAttributeInput, Upd
             increasedPoints: pointsToIncrease,
           },
         },
-        input.idToken
+        input.idToken,
       );
 
       if (!updateResult.success) {

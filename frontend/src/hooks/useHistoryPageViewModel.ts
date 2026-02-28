@@ -53,14 +53,14 @@ export function useHistoryPageViewModel() {
     async (characterId: string, idToken: string) => {
       await viewModel.loadHistory(characterId, idToken);
     },
-    [viewModel]
+    [viewModel],
   );
 
   const deleteHistoryEntry = useCallback(
     async (characterId: string, idToken: string, entryId: string) => {
       return await viewModel.deleteHistoryEntry(characterId, idToken, entryId);
     },
-    [viewModel]
+    [viewModel],
   );
 
   const clearError = useCallback(() => {

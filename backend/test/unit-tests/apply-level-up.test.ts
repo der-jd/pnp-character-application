@@ -17,8 +17,8 @@ import { computeLevelUpOptions, computeLevelUpOptionsHash } from "core";
 const optionsHash = computeLevelUpOptionsHash(
   computeLevelUpOptions(
     fakeCharacter.characterSheet.generalInformation.level + 1,
-    fakeCharacter.characterSheet.generalInformation.levelUpProgress
-  )
+    fakeCharacter.characterSheet.generalInformation.levelUpProgress,
+  ),
 );
 
 describe("Invalid requests", () => {
@@ -427,12 +427,12 @@ describe("Valid requests", () => {
       // Remove rerollUnlock as chosen effect. It is only available once
       prepareCharacter: (character) => {
         character.characterSheet.specialAbilities = character.characterSheet.specialAbilities.filter(
-          (ability) => ability !== "Reroll"
+          (ability) => ability !== "Reroll",
         );
 
         const { levelUpProgress } = character.characterSheet.generalInformation;
         levelUpProgress.effectsByLevel = Object.fromEntries(
-          Object.entries(levelUpProgress.effectsByLevel).filter(([, value]) => value.kind !== "rerollUnlock")
+          Object.entries(levelUpProgress.effectsByLevel).filter(([, value]) => value.kind !== "rerollUnlock"),
         );
         delete levelUpProgress.effects.rerollUnlock;
       },
@@ -483,10 +483,10 @@ describe("Valid requests", () => {
       });
       expect(newProgress.effects[effect.kind]).toBeDefined();
       expect(newProgress.effects[effect.kind]!.selectionCount).toBe(
-        (oldProgress.effects[effect.kind]?.selectionCount ?? 0) + 1
+        (oldProgress.effects[effect.kind]?.selectionCount ?? 0) + 1,
       );
       expect(newProgress.effects[effect.kind]!.firstChosenLevel).toBe(
-        oldProgress.effects[effect.kind]?.firstChosenLevel ?? nextLevel
+        oldProgress.effects[effect.kind]?.firstChosenLevel ?? nextLevel,
       );
       expect(newProgress.effects[effect.kind]!.lastChosenLevel).toBe(nextLevel);
       // Except for the effect that was just chosen, all other effects should be the same
@@ -524,28 +524,28 @@ describe("Valid requests", () => {
       expect(updateCalls.length).toBeGreaterThanOrEqual(1);
 
       const levelUpdateCall = updateCalls.find((call: any) =>
-        call.args[0].input.UpdateExpression.includes("#generalInformation.#level")
+        call.args[0].input.UpdateExpression.includes("#generalInformation.#level"),
       );
       expect(levelUpdateCall).toBeDefined();
       expect(levelUpdateCall.args[0].input.ExpressionAttributeValues[":level"]).toBe(nextLevel);
       expect(levelUpdateCall.args[0].input.ExpressionAttributeValues[":progress"]).toStrictEqual(
-        parsed.changes.new.levelUpProgress
+        parsed.changes.new.levelUpProgress,
       );
 
       if (testCase.baseValueKey) {
         const baseValueCall = updateCalls.find((call: any) =>
-          call.args[0].input.UpdateExpression.includes("#characterSheet.#baseValues")
+          call.args[0].input.UpdateExpression.includes("#characterSheet.#baseValues"),
         );
         expect(baseValueCall).toBeDefined();
         expect(baseValueCall.args[0].input.ExpressionAttributeNames["#baseValueName"]).toBe(testCase.baseValueKey);
         expect(baseValueCall.args[0].input.ExpressionAttributeValues[":baseValue"]).toStrictEqual(
-          parsed.changes.new.baseValues![testCase.baseValueKey]
+          parsed.changes.new.baseValues![testCase.baseValueKey],
         );
       }
 
       if (testCase.expectSpecialAbilities) {
         const specialAbilitiesCall = updateCalls.find((call: any) =>
-          call.args[0].input.UpdateExpression.includes("#specialAbilities")
+          call.args[0].input.UpdateExpression.includes("#specialAbilities"),
         );
         expect(specialAbilitiesCall).toBeDefined();
       }

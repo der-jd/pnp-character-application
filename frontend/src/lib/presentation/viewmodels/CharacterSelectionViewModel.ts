@@ -32,7 +32,7 @@ export interface CharacterSelectionViewModelState {
 export class CharacterSelectionViewModel extends BaseViewModel<CharacterSelectionViewModelState> {
   constructor(
     private readonly loadAllCharactersUseCase: LoadAllCharactersUseCase,
-    private readonly loadCharacterUseCase: LoadCharacterUseCase
+    private readonly loadCharacterUseCase: LoadCharacterUseCase,
   ) {
     super({
       availableCharacters: [],
