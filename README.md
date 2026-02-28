@@ -27,16 +27,30 @@ npm run dev --workspace frontend
 ### Tech Stack
 
 - **Cloud**: [Amazon Web Services (AWS)](https://aws.amazon.com/)
-- **Frontend**: Static website with [Next.js](https://nextjs.org/), hosted with [AWS S3](https://aws.amazon.com/s3/) and [AWS CloudFront](https://aws.amazon.com/cloudfront/)
+- **CDN**: [AWS CloudFront](https://aws.amazon.com/cloudfront/)
+- **Frontend**: Static website with [Next.js](https://nextjs.org/), hosted with [AWS S3](https://aws.amazon.com/s3/)
+- **API schema**: Definitions and validations with [Zod](https://zod.dev/)
 - **Backend REST API**: exposed via [AWS API Gateway](https://aws.amazon.com/api-gateway/)
 - **Backend**: [Node.js](https://nodejs.org/) AWS Lambda functions and Step Functions
-- **Infrastructure**: [Terraform](https://www.terraform.io/) + [HCP Terraform Cloud](https://developer.hashicorp.com/terraform/cloud-docs)
+- **Infrastructure as Code**: [Terraform](https://www.terraform.io/) + [HCP Terraform Cloud](https://developer.hashicorp.com/terraform/cloud-docs)
 - **CI/CD**: [CircleCI](https://circleci.com/)
-- **Database**: [DynamoDB](https://aws.amazon.com/dynamodb/)
+- **NoSQL Database**: [DynamoDB](https://aws.amazon.com/dynamodb/)
 - **Authentication**: [AWS Cognito](https://aws.amazon.com/cognito/)
-- **API schema**: Definitions and validations with [Zod](https://zod.dev/)
+- **DNS & Domain management**: [AWS Route53](https://aws.amazon.com/route53/)
+- **Data Backup**: [AWS Backup](https://aws.amazon.com/backup/)
 - **Testing**: [Vitest](https://vitest.dev/)
-- **Logging**: [AWS CloudWatch](https://aws.amazon.com/cloudwatch/)
+- **Monitoring & Logging**: [AWS CloudWatch](https://aws.amazon.com/cloudwatch/)
+- **Alerting**: [AWS SNS](https://aws.amazon.com/sns/)
+
+## 💾 Data Backup Strategy
+
+The application implements a backup strategy using **AWS Backup** to ensure data durability and recovery capabilities:
+
+- **Automated Backup Schedule**: Daily backups and monthly backups
+- **Retention Policy**: Daily backups retained for 90 days, monthly backups retained for 730 days (24 months)
+- **Backup Monitoring**: CloudWatch alarms alert on failed or expired backup jobs via SNS notifications
+
+Backup configurations are managed through Terraform in the `terraform/backup.tf` module.
 
 ## 🚀 Deployment
 
