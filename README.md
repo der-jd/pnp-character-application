@@ -28,36 +28,40 @@ graph TB
     User[fa:fa-user Users] --> WebApp[fa:fa-globe Web Application]
 
     %% Content Delivery
-    WebApp --> CloudFront[AWS::CloudFront::Distribution CloudFront CDN]
-    CloudFront --> S3[AWS::S3::Bucket S3 Hosting]
+    WebApp --> CloudFront[fa:fa-cloud CloudFront CDN]
+    CloudFront --> S3[fa:fa-database S3 Hosting]
 
     %% Authentication & Security
-    WebApp --> |fa:fa-lock Auth| Cognito[AWS::Cognito::UserPool Amazon Cognito]
+    WebApp --> |fa:fa-lock Auth| Cognito[fa:fa-shield-alt Amazon Cognito]
     Cognito --> |fa:fa-ticket JWT| WebApp
 
     %% API Layer
-    WebApp --> |fa:fa-signal API Calls| APIGW[AWS::ApiGateway::RestApi API Gateway]
+    WebApp --> |fa:fa-signal API Calls| APIGW[fa:fa-server API Gateway]
     APIGW --> |fa:fa-shield Validate| Cognito
 
     %% Compute Layer
-    APIGW --> |fa:fa-book Read| Lambda[AWS::Lambda::Function AWS Lambda]
-    APIGW --> |fa:fa-edit Write| StepFunctions[AWS::StepFunctions::StateMachine AWS Step Functions]
+    APIGW --> |fa:fa-book Read| Lambda[fa:fa-code AWS Lambda]
+    APIGW --> |fa:fa-edit Write| StepFunctions[fa:fa-project-diagram AWS Step Functions]
 
     %% Data Layer
-    Lambda --> |fa:fa-database Data| DynamoDB[AWS::DynamoDB::Table DynamoDB]
+    Lambda --> |fa:fa-database Data| DynamoDB[fa:fa-database DynamoDB]
     StepFunctions --> |fa:fa-database Data| DynamoDB
 
     %% Styling
-    classDef frontend fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef compute fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef data fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-    classDef infra fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    classDef security fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef frontend fill:#ffffff,stroke:#333333,stroke-width:2px,color:#333333
+    classDef compute fill:#FF9900,stroke:#FF9900,stroke-width:2px,color:#000000
+    classDef data fill:#146EB4,stroke:#146EB4,stroke-width:2px,color:#ffffff
+    classDef storage fill:#569A31,stroke:#569A31,stroke-width:2px,color:#ffffff
+    classDef api fill:#9B59B6,stroke:#9B59B6,stroke-width:2px,color:#ffffff
+    classDef workflow fill:#E91563,stroke:#E91563,stroke-width:2px,color:#ffffff
+    classDef security fill:#DD344C,stroke:#DD344C,stroke-width:2px,color:#ffffff
 
     class User,WebApp frontend
-    class Lambda,StepFunctions compute
+    class Lambda compute
+    class StepFunctions workflow
     class DynamoDB data
-    class CloudFront,S3,APIGW infra
+    class S3 storage
+    class CloudFront,APIGW api
     class Cognito security
 ```
 
