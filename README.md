@@ -38,11 +38,6 @@ npm run dev --workspace frontend
 - **Testing**: [Vitest](https://vitest.dev/)
 - **Logging**: [AWS CloudWatch](https://aws.amazon.com/cloudwatch/)
 
-## 📋 API Versioning
-
-- **API Version**: extracted from `api-spec/package.json` version
-- **URL Format**: `https://{api_domain_name}/v1/{endpoint}`
-
 ## 🚀 Deployment
 
 **Continuous deployment** via CircleCI, see [CircleCI Configuration](./.circleci/README.MD) for details.
@@ -64,6 +59,7 @@ pnp-character-application/
 
 ### 📁 **Component Guides**
 
+- **[📜 API Spec](./api-spec/README.md)** - API types and schemas
 - **[🔧 Backend](./backend/README.md)** - Lambda functions and business logic
 - **[🎨 Frontend](./frontend/README.md)** - Next.js client application
 - **[🏗️ Infrastructure](./terraform/README.md)** - AWS resources and deployment
