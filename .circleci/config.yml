@@ -139,8 +139,7 @@ jobs:
             npm run test:unit
 
   run-frontend-tests:
-    docker:
-      - image: cimg/node:22.12
+    executor: node-medium-executor
     steps:
       - checkout
       - run:
