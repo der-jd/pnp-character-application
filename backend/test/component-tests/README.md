@@ -15,12 +15,13 @@ Each test file follows a consistent structure (except for some special cases):
 
 - **`beforeAll`**: Clones the seed character and history items -> each file has its own, temporary character and history that is shared for all tests in the file
 - **`afterAll`**: Cleans up the local test context by deleting the cloned test character and history items.
-- **`afterEach`**: Updates local test context to keep it synchronized with backend state (for tests that modify data) and compares the local state with the backend state.
+- **`afterEach`**: Updates local test context to keep it synchronized with backend state (for tests that modify data) and compares the local state with the backend state. Without this, the next test would fail because the local state would not match the backend state anymore.
 - **`describe.sequential`**: Ensures tests within a file run sequentially to maintain state consistency and avoid race conditions because each test case modifies the same character.
+- Functions like `getBody` in the test params (arrays) are used to dynamically generate the request body according to the current, local state of the test context. Otherwise, the params (local variables) would be initialized before the test file is run. This would cause the tests to fail because the params would not reflect the current state of the context during runtime.
 
 ### Test Context Management
 
-Tests share a single, temporary character per file to ensure isolation between test files but reduce the amount of data that needs to be cloned and deleted for each test case.
+Tests share a single, temporary character per file to ensure isolation **between** test files. At the same time the sharing **within** a file reduces the amount of endpoint calls, DynamoDB operations and data that needs to be cloned and deleted for each test case.
 
 **Seed characters and history items**: permanently persisted in DynamoDB. Never used directly by tests.
 
