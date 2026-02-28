@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { recordSchema } from "../history-schemas.js";
+import { historyRecordSchema } from "../history-schemas.js";
 
 export const deleteHistoryRecordPathParamsSchema = z
   .object({
@@ -10,6 +10,6 @@ export const deleteHistoryRecordPathParamsSchema = z
 
 export type DeleteHistoryRecordPathParams = z.infer<typeof deleteHistoryRecordPathParamsSchema>;
 
-export const deleteHistoryRecordResponseSchema = recordSchema;
+export const deleteHistoryRecordResponseSchema = historyRecordSchema;
 
 export type DeleteHistoryRecordResponse = z.infer<typeof deleteHistoryRecordResponseSchema>;

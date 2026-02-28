@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { initialNewSchema, initialIncreasedSchema, userIdSchema } from "../general-schemas.js";
-import { calculationPointsChangeSchema, recordSchema } from "../history-schemas.js";
+import { calculationPointsChangeSchema, historyRecordSchema } from "../history-schemas.js";
 
 export const patchCalculationPointsPathParamsSchema = z
   .object({
@@ -46,7 +46,7 @@ export const updateCalculationPointsResponseSchema = z
 
 export type UpdateCalculationPointsResponse = z.infer<typeof updateCalculationPointsResponseSchema>;
 
-export const patchCalculationPointsHistoryRecordSchema = recordSchema.extend({
+export const patchCalculationPointsHistoryRecordSchema = historyRecordSchema.extend({
   data: z
     .object({
       old: calculationPointsChangeSchema,

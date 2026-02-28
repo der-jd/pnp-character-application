@@ -187,14 +187,13 @@ function validateRequest(request: Request): Parameters {
       );
     }
 
+    /**
+     * This case should never occur, because the schema validation should prevent it.
+     */
     if (body.current && body.current.increasedPoints <= 0) {
-      throw new HttpError(
-        400,
-        "Points to increase skill value are negative or null! The value must be greater than or equal 1.",
-        {
-          increasedPoints: body.current.increasedPoints,
-        }
-      );
+      throw new HttpError(400, "Points to increase skill value are negative or 0! The value must be greater than 0.", {
+        increasedPoints: body.current.increasedPoints,
+      });
     }
 
     if (body.activated !== undefined && body.activated === false) {

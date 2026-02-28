@@ -4,14 +4,14 @@ import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import {
   combatStatsSchema,
-  RecordType,
-  Record,
+  HistoryRecordType,
+  HistoryRecord,
   historyBlockSchema,
   skillChangeSchema,
   attributeChangeSchema,
   HistoryBlock,
   calculationPointsChangeSchema,
-  recordSchema,
+  historyRecordSchema,
   userIdSchema,
   characterCreationSchema,
   levelUpChangeSchema,
@@ -47,7 +47,7 @@ export const addHistoryRecordPathParamsSchema = z
 
 export type AddHistoryRecordPathParams = z.infer<typeof addHistoryRecordPathParamsSchema>;
 
-export const addHistoryRecordRequestSchema = recordSchema
+export const addHistoryRecordRequestSchema = historyRecordSchema
   .omit({
     number: true,
     id: true,
@@ -60,7 +60,7 @@ export const addHistoryRecordRequestSchema = recordSchema
 
 export type AddHistoryRecordRequest = z.infer<typeof addHistoryRecordRequestSchema>;
 
-export const addHistoryRecordResponseSchema = recordSchema;
+export const addHistoryRecordResponseSchema = historyRecordSchema;
 
 export type AddHistoryRecordResponse = z.infer<typeof addHistoryRecordResponseSchema>;
 
@@ -91,7 +91,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       1 // Only need the top result
     );
 
-    let record: Record;
+    let record: HistoryRecord;
     if (!items || items.length === 0) {
       console.log("No history found for the given character id");
 
@@ -187,35 +187,35 @@ async function validateRequest(request: Request): Promise<Parameters> {
     //await getCharacterItem(body.userId, characterId);
 
     switch (body.type) {
-      case RecordType.CHARACTER_CREATED:
+      case HistoryRecordType.CHARACTER_CREATED:
         // There is no "old" data for character creation
         characterCreationSchema.parse(body.data.new);
         break;
-      case RecordType.LEVEL_UP_APPLIED:
+      case HistoryRecordType.LEVEL_UP_APPLIED:
         levelUpChangeSchema.parse(body.data.old);
         levelUpChangeSchema.parse(body.data.new);
         break;
-      case RecordType.CALCULATION_POINTS_CHANGED:
+      case HistoryRecordType.CALCULATION_POINTS_CHANGED:
         calculationPointsChangeSchema.parse(body.data.old);
         calculationPointsChangeSchema.parse(body.data.new);
         break;
-      case RecordType.BASE_VALUE_CHANGED:
+      case HistoryRecordType.BASE_VALUE_CHANGED:
         baseValueChangeSchema.parse(body.data.old);
         baseValueChangeSchema.parse(body.data.new);
         break;
-      case RecordType.SPECIAL_ABILITIES_CHANGED:
+      case HistoryRecordType.SPECIAL_ABILITIES_CHANGED:
         specialAbilitiesChangeSchema.parse(body.data.old);
         specialAbilitiesChangeSchema.parse(body.data.new);
         break;
-      case RecordType.ATTRIBUTE_CHANGED:
+      case HistoryRecordType.ATTRIBUTE_CHANGED:
         attributeChangeSchema.parse(body.data.old);
         attributeChangeSchema.parse(body.data.new);
         break;
-      case RecordType.SKILL_CHANGED:
+      case HistoryRecordType.SKILL_CHANGED:
         skillChangeSchema.parse(body.data.old);
         skillChangeSchema.parse(body.data.new);
         break;
-      case RecordType.COMBAT_STATS_CHANGED:
+      case HistoryRecordType.COMBAT_STATS_CHANGED:
         combatStatsSchema.parse(body.data.old);
         combatStatsSchema.parse(body.data.new);
         break;
@@ -243,7 +243,7 @@ function estimateItemSize(item: any): number {
   return Buffer.byteLength(json, "utf8");
 }
 
-function isDuplicate(record_1: Record, record_2: Record): boolean {
+function isDuplicate(record_1: HistoryRecord, record_2: HistoryRecord): boolean {
   const isDuplicate =
     record_1.type === record_2.type &&
     record_1.name === record_2.name &&

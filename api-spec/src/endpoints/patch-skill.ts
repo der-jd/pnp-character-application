@@ -7,7 +7,7 @@ import {
   MAX_COST,
 } from "../general-schemas.js";
 import { calculationPointsSchema, learningMethodSchema } from "../character-schemas.js";
-import { recordSchema, skillChangeSchema } from "../history-schemas.js";
+import { historyRecordSchema, skillChangeSchema } from "../history-schemas.js";
 
 export const patchSkillPathParamsSchema = z
   .object({
@@ -57,7 +57,7 @@ export const updateSkillResponseSchema = z
 
 export type UpdateSkillResponse = z.infer<typeof updateSkillResponseSchema>;
 
-export const patchSkillHistoryRecordSchema = recordSchema.extend({
+export const patchSkillHistoryRecordSchema = historyRecordSchema.extend({
   data: z
     .object({
       old: skillChangeSchema,

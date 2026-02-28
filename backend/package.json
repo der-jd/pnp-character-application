@@ -6,8 +6,10 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "build": "npm run type-check && node build-backend.mjs",
-    "test": "vitest --run",
-    "test:watch": "vitest --watch",
+    "test:unit": "vitest --run --config vitest.unit.config.ts",
+    "test:unit:watch": "vitest --config vitest.unit.config.ts --watch",
+    "test:component": "vitest --run --config vitest.component.config.ts",
+    "test": "npm run test:unit && npm run test:component",
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage"
   },

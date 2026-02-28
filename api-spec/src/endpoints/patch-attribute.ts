@@ -6,7 +6,7 @@ import {
   MAX_STRING_LENGTH_DEFAULT,
   userIdSchema,
 } from "../general-schemas.js";
-import { attributeChangeSchema, recordSchema } from "../history-schemas.js";
+import { attributeChangeSchema, historyRecordSchema } from "../history-schemas.js";
 
 export const patchAttributePathParamsSchema = z
   .object({
@@ -49,7 +49,7 @@ export const updateAttributeResponseSchema = z
 
 export type UpdateAttributeResponse = z.infer<typeof updateAttributeResponseSchema>;
 
-export const patchAttributeHistoryRecordSchema = recordSchema.extend({
+export const patchAttributeHistoryRecordSchema = historyRecordSchema.extend({
   data: z
     .object({
       old: attributeChangeSchema,

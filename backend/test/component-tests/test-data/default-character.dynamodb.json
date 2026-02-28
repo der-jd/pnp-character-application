@@ -1,0 +1,2916 @@
+{
+  "userId": {
+    "S": "c314f862-a001-707e-7254-5572e9500c88"
+  },
+  "characterId": {
+    "S": "5074d49e-55b1-4f51-8827-f8c07969b849"
+  },
+  "characterSheet": {
+    "M": {
+      "advantages": {
+        "L": [
+          {
+            "L": [
+              {
+                "N": "11"
+              },
+              {
+                "S": ""
+              },
+              {
+                "N": "2"
+              }
+            ]
+          },
+          {
+            "L": [
+              {
+                "N": "12"
+              },
+              {
+                "S": ""
+              },
+              {
+                "N": "4"
+              }
+            ]
+          }
+        ]
+      },
+      "attributes": {
+        "M": {
+          "charisma": {
+            "M": {
+              "current": {
+                "N": "5"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "5"
+              },
+              "totalCost": {
+                "N": "5"
+              }
+            }
+          },
+          "concentration": {
+            "M": {
+              "current": {
+                "N": "4"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "4"
+              },
+              "totalCost": {
+                "N": "4"
+              }
+            }
+          },
+          "courage": {
+            "M": {
+              "current": {
+                "N": "7"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "7"
+              },
+              "totalCost": {
+                "N": "7"
+              }
+            }
+          },
+          "dexterity": {
+            "M": {
+              "current": {
+                "N": "5"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "5"
+              },
+              "totalCost": {
+                "N": "5"
+              }
+            }
+          },
+          "endurance": {
+            "M": {
+              "current": {
+                "N": "5"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "5"
+              },
+              "totalCost": {
+                "N": "5"
+              }
+            }
+          },
+          "intelligence": {
+            "M": {
+              "current": {
+                "N": "4"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "4"
+              },
+              "totalCost": {
+                "N": "4"
+              }
+            }
+          },
+          "mentalResilience": {
+            "M": {
+              "current": {
+                "N": "6"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "6"
+              },
+              "totalCost": {
+                "N": "6"
+              }
+            }
+          },
+          "strength": {
+            "M": {
+              "current": {
+                "N": "6"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "6"
+              },
+              "totalCost": {
+                "N": "6"
+              }
+            }
+          }
+        }
+      },
+      "baseValues": {
+        "M": {
+          "armorLevel": {
+            "M": {
+              "byLvlUp": {
+                "N": "16"
+              },
+              "current": {
+                "N": "16"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "0"
+              }
+            }
+          },
+          "attackBaseValue": {
+            "M": {
+              "byFormula": {
+                "N": "36"
+              },
+              "current": {
+                "N": "36"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "30"
+              }
+            }
+          },
+          "bonusActionsPerCombatRound": {
+            "M": {
+              "byLvlUp": {
+                "N": "1"
+              },
+              "current": {
+                "N": "1"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "0"
+              }
+            }
+          },
+          "healthPoints": {
+            "M": {
+              "byFormula": {
+                "N": "36"
+              },
+              "byLvlUp": {
+                "N": "24"
+              },
+              "current": {
+                "N": "60"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "36"
+              }
+            }
+          },
+          "initiativeBaseValue": {
+            "M": {
+              "byFormula": {
+                "N": "5"
+              },
+              "byLvlUp": {
+                "N": "5"
+              },
+              "current": {
+                "N": "10"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "0"
+              }
+            }
+          },
+          "legendaryActions": {
+            "M": {
+              "byLvlUp": {
+                "N": "1"
+              },
+              "current": {
+                "N": "2"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "1"
+              }
+            }
+          },
+          "luckPoints": {
+            "M": {
+              "byLvlUp": {
+                "N": "2"
+              },
+              "current": {
+                "N": "2"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "0"
+              }
+            }
+          },
+          "mentalHealth": {
+            "M": {
+              "byFormula": {
+                "N": "27"
+              },
+              "current": {
+                "N": "27"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "27"
+              }
+            }
+          },
+          "naturalArmor": {
+            "M": {
+              "current": {
+                "N": "0"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "0"
+              }
+            }
+          },
+          "paradeBaseValue": {
+            "M": {
+              "byFormula": {
+                "N": "32"
+              },
+              "current": {
+                "N": "32"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "30"
+              }
+            }
+          },
+          "rangedAttackBaseValue": {
+            "M": {
+              "byFormula": {
+                "N": "30"
+              },
+              "current": {
+                "N": "30"
+              },
+              "mod": {
+                "N": "0"
+              },
+              "start": {
+                "N": "30"
+              }
+            }
+          }
+        }
+      },
+      "calculationPoints": {
+        "M": {
+          "adventurePoints": {
+            "M": {
+              "available": {
+                "N": "250"
+              },
+              "start": {
+                "N": "0"
+              },
+              "total": {
+                "N": "250"
+              }
+            }
+          },
+          "attributePoints": {
+            "M": {
+              "available": {
+                "N": "50"
+              },
+              "start": {
+                "N": "40"
+              },
+              "total": {
+                "N": "90"
+              }
+            }
+          }
+        }
+      },
+      "combat": {
+        "M": {
+          "melee": {
+            "M": {
+              "barehanded": {
+                "M": {
+                  "attackValue": {
+                    "N": "36"
+                  },
+                  "availablePoints": {
+                    "N": "25"
+                  },
+                  "handling": {
+                    "N": "25"
+                  },
+                  "paradeValue": {
+                    "N": "32"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "chainWeapons": {
+                "M": {
+                  "attackValue": {
+                    "N": "36"
+                  },
+                  "availablePoints": {
+                    "N": "15"
+                  },
+                  "handling": {
+                    "N": "15"
+                  },
+                  "paradeValue": {
+                    "N": "32"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "daggers": {
+                "M": {
+                  "attackValue": {
+                    "N": "36"
+                  },
+                  "availablePoints": {
+                    "N": "25"
+                  },
+                  "handling": {
+                    "N": "25"
+                  },
+                  "paradeValue": {
+                    "N": "32"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "martialArts": {
+                "M": {
+                  "attackValue": {
+                    "N": "47"
+                  },
+                  "availablePoints": {
+                    "N": "15"
+                  },
+                  "handling": {
+                    "N": "25"
+                  },
+                  "paradeValue": {
+                    "N": "32"
+                  },
+                  "skilledAttackValue": {
+                    "N": "11"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "slashingWeaponsBlunt1h": {
+                "M": {
+                  "attackValue": {
+                    "N": "36"
+                  },
+                  "availablePoints": {
+                    "N": "25"
+                  },
+                  "handling": {
+                    "N": "25"
+                  },
+                  "paradeValue": {
+                    "N": "32"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "slashingWeaponsBlunt2h": {
+                "M": {
+                  "attackValue": {
+                    "N": "36"
+                  },
+                  "availablePoints": {
+                    "N": "66"
+                  },
+                  "handling": {
+                    "N": "15"
+                  },
+                  "paradeValue": {
+                    "N": "32"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "slashingWeaponsSharp1h": {
+                "M": {
+                  "attackValue": {
+                    "N": "36"
+                  },
+                  "availablePoints": {
+                    "N": "26"
+                  },
+                  "handling": {
+                    "N": "25"
+                  },
+                  "paradeValue": {
+                    "N": "32"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "slashingWeaponsSharp2h": {
+                "M": {
+                  "attackValue": {
+                    "N": "36"
+                  },
+                  "availablePoints": {
+                    "N": "16"
+                  },
+                  "handling": {
+                    "N": "15"
+                  },
+                  "paradeValue": {
+                    "N": "32"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "thrustingWeapons1h": {
+                "M": {
+                  "attackValue": {
+                    "N": "36"
+                  },
+                  "availablePoints": {
+                    "N": "21"
+                  },
+                  "handling": {
+                    "N": "20"
+                  },
+                  "paradeValue": {
+                    "N": "32"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "thrustingWeapons2h": {
+                "M": {
+                  "attackValue": {
+                    "N": "36"
+                  },
+                  "availablePoints": {
+                    "N": "17"
+                  },
+                  "handling": {
+                    "N": "15"
+                  },
+                  "paradeValue": {
+                    "N": "32"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              }
+            }
+          },
+          "ranged": {
+            "M": {
+              "firearmComplex": {
+                "M": {
+                  "attackValue": {
+                    "N": "30"
+                  },
+                  "availablePoints": {
+                    "N": "11"
+                  },
+                  "handling": {
+                    "N": "10"
+                  },
+                  "paradeValue": {
+                    "N": "0"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "firearmMedium": {
+                "M": {
+                  "attackValue": {
+                    "N": "30"
+                  },
+                  "availablePoints": {
+                    "N": "21"
+                  },
+                  "handling": {
+                    "N": "20"
+                  },
+                  "paradeValue": {
+                    "N": "0"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "firearmSimple": {
+                "M": {
+                  "attackValue": {
+                    "N": "30"
+                  },
+                  "availablePoints": {
+                    "N": "31"
+                  },
+                  "handling": {
+                    "N": "30"
+                  },
+                  "paradeValue": {
+                    "N": "0"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "heavyWeapons": {
+                "M": {
+                  "attackValue": {
+                    "N": "30"
+                  },
+                  "availablePoints": {
+                    "N": "6"
+                  },
+                  "handling": {
+                    "N": "5"
+                  },
+                  "paradeValue": {
+                    "N": "0"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              },
+              "missile": {
+                "M": {
+                  "attackValue": {
+                    "N": "30"
+                  },
+                  "availablePoints": {
+                    "N": "16"
+                  },
+                  "handling": {
+                    "N": "15"
+                  },
+                  "paradeValue": {
+                    "N": "0"
+                  },
+                  "skilledAttackValue": {
+                    "N": "0"
+                  },
+                  "skilledParadeValue": {
+                    "N": "0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "disadvantages": {
+        "L": [
+          {
+            "L": [
+              {
+                "N": "14"
+              },
+              {
+                "S": ""
+              },
+              {
+                "N": "2"
+              }
+            ]
+          },
+          {
+            "L": [
+              {
+                "N": "8"
+              },
+              {
+                "S": "Heights"
+              },
+              {
+                "N": "2"
+              }
+            ]
+          }
+        ]
+      },
+      "generalInformation": {
+        "M": {
+          "appearance": {
+            "S": "Tall and strong"
+          },
+          "birthday": {
+            "S": "2000-01-01"
+          },
+          "birthplace": {
+            "S": "Durotar"
+          },
+          "eyeColor": {
+            "S": "Blue"
+          },
+          "hairColor": {
+            "S": "Brown"
+          },
+          "hobby": {
+            "M": {
+              "name": {
+                "S": "Fishing"
+              },
+              "skill": {
+                "S": "nature/fishing"
+              }
+            }
+          },
+          "level": {
+            "N": "20"
+          },
+          "levelUpProgress": {
+            "M": {
+              "effectsByLevel": {
+                "M": {
+                  "2": {
+                    "M": {
+                      "kind": {
+                        "S": "luckPlusOne"
+                      },
+                      "delta": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "3": {
+                    "M": {
+                      "kind": {
+                        "S": "hpRoll"
+                      },
+                      "roll": {
+                        "M": {
+                          "dice": {
+                            "S": "1d4+2"
+                          },
+                          "value": {
+                            "N": "4"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "4": {
+                    "M": {
+                      "kind": {
+                        "S": "initiativePlusOne"
+                      },
+                      "delta": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "5": {
+                    "M": {
+                      "kind": {
+                        "S": "armorLevelRoll"
+                      },
+                      "roll": {
+                        "M": {
+                          "dice": {
+                            "S": "1d4+2"
+                          },
+                          "value": {
+                            "N": "4"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "6": {
+                    "M": {
+                      "kind": {
+                        "S": "bonusActionPlusOne"
+                      },
+                      "delta": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "7": {
+                    "M": {
+                      "kind": {
+                        "S": "hpRoll"
+                      },
+                      "roll": {
+                        "M": {
+                          "dice": {
+                            "S": "1d4+2"
+                          },
+                          "value": {
+                            "N": "4"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "8": {
+                    "M": {
+                      "kind": {
+                        "S": "initiativePlusOne"
+                      },
+                      "delta": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "9": {
+                    "M": {
+                      "kind": {
+                        "S": "armorLevelRoll"
+                      },
+                      "roll": {
+                        "M": {
+                          "dice": {
+                            "S": "1d4+2"
+                          },
+                          "value": {
+                            "N": "4"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "10": {
+                    "M": {
+                      "kind": {
+                        "S": "luckPlusOne"
+                      },
+                      "delta": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "11": {
+                    "M": {
+                      "kind": {
+                        "S": "legendaryActionPlusOne"
+                      },
+                      "delta": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "12": {
+                    "M": {
+                      "kind": {
+                        "S": "hpRoll"
+                      },
+                      "roll": {
+                        "M": {
+                          "dice": {
+                            "S": "1d4+2"
+                          },
+                          "value": {
+                            "N": "4"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "13": {
+                    "M": {
+                      "kind": {
+                        "S": "initiativePlusOne"
+                      },
+                      "delta": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "14": {
+                    "M": {
+                      "kind": {
+                        "S": "armorLevelRoll"
+                      },
+                      "roll": {
+                        "M": {
+                          "dice": {
+                            "S": "1d4+2"
+                          },
+                          "value": {
+                            "N": "4"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "15": {
+                    "M": {
+                      "kind": {
+                        "S": "hpRoll"
+                      },
+                      "roll": {
+                        "M": {
+                          "dice": {
+                            "S": "1d4+2"
+                          },
+                          "value": {
+                            "N": "4"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "16": {
+                    "M": {
+                      "kind": {
+                        "S": "initiativePlusOne"
+                      },
+                      "delta": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "17": {
+                    "M": {
+                      "kind": {
+                        "S": "armorLevelRoll"
+                      },
+                      "roll": {
+                        "M": {
+                          "dice": {
+                            "S": "1d4+2"
+                          },
+                          "value": {
+                            "N": "4"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "18": {
+                    "M": {
+                      "kind": {
+                        "S": "hpRoll"
+                      },
+                      "roll": {
+                        "M": {
+                          "dice": {
+                            "S": "1d4+2"
+                          },
+                          "value": {
+                            "N": "4"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "19": {
+                    "M": {
+                      "kind": {
+                        "S": "initiativePlusOne"
+                      },
+                      "delta": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "20": {
+                    "M": {
+                      "kind": {
+                        "S": "hpRoll"
+                      },
+                      "roll": {
+                        "M": {
+                          "dice": {
+                            "S": "1d4+2"
+                          },
+                          "value": {
+                            "N": "4"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "effects": {
+                "M": {
+                  "hpRoll": {
+                    "M": {
+                      "selectionCount": {
+                        "N": "6"
+                      },
+                      "firstChosenLevel": {
+                        "N": "3"
+                      },
+                      "lastChosenLevel": {
+                        "N": "20"
+                      }
+                    }
+                  },
+                  "armorLevelRoll": {
+                    "M": {
+                      "selectionCount": {
+                        "N": "4"
+                      },
+                      "firstChosenLevel": {
+                        "N": "5"
+                      },
+                      "lastChosenLevel": {
+                        "N": "17"
+                      }
+                    }
+                  },
+                  "initiativePlusOne": {
+                    "M": {
+                      "selectionCount": {
+                        "N": "5"
+                      },
+                      "firstChosenLevel": {
+                        "N": "4"
+                      },
+                      "lastChosenLevel": {
+                        "N": "19"
+                      }
+                    }
+                  },
+                  "luckPlusOne": {
+                    "M": {
+                      "selectionCount": {
+                        "N": "2"
+                      },
+                      "firstChosenLevel": {
+                        "N": "2"
+                      },
+                      "lastChosenLevel": {
+                        "N": "10"
+                      }
+                    }
+                  },
+                  "bonusActionPlusOne": {
+                    "M": {
+                      "selectionCount": {
+                        "N": "1"
+                      },
+                      "firstChosenLevel": {
+                        "N": "6"
+                      },
+                      "lastChosenLevel": {
+                        "N": "6"
+                      }
+                    }
+                  },
+                  "legendaryActionPlusOne": {
+                    "M": {
+                      "selectionCount": {
+                        "N": "1"
+                      },
+                      "firstChosenLevel": {
+                        "N": "11"
+                      },
+                      "lastChosenLevel": {
+                        "N": "11"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "name": {
+            "S": "[DO NOT EDIT] Character used for component tests"
+          },
+          "profession": {
+            "M": {
+              "name": {
+                "S": "Warrior"
+              },
+              "skill": {
+                "S": "combat/slashingWeaponsBlunt2h"
+              }
+            }
+          },
+          "residence": {
+            "S": "Orgrimmar City"
+          },
+          "sex": {
+            "S": "male"
+          },
+          "size": {
+            "S": "185 cm"
+          },
+          "specialCharacteristics": {
+            "S": "ATTENTION: The values in this character may not be consistent! They are deliberately set to test various scenarios during component testing."
+          },
+          "weight": {
+            "S": "90 kg"
+          }
+        }
+      },
+      "skills": {
+        "M": {
+          "body": {
+            "M": {
+              "athletics": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "12"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "2"
+                  },
+                  "start": {
+                    "N": "9"
+                  },
+                  "totalCost": {
+                    "N": "12"
+                  }
+                }
+              },
+              "bodyControl": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "10"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "climbing": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "10"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "dancing": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "10"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "hiding": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "juggleries": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "pickpocketing": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "quaffing": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "riding": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "selfControl": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "sharpnessOfSenses": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "singing": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "sneaking": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "swimming": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "10"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              }
+            }
+          },
+          "combat": {
+            "M": {
+              "barehanded": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "50"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "100"
+                  }
+                }
+              },
+              "chainWeapons": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "1"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "daggers": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "74"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "8"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "172"
+                  }
+                }
+              },
+              "firearmComplex": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "1"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "firearmMedium": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "1"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "firearmSimple": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "1"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "heavyWeapons": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "1"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "martialArts": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "1"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "missile": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "1"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "slashingWeaponsBlunt1h": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "75"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "175"
+                  }
+                }
+              },
+              "slashingWeaponsBlunt2h": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "14"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "50"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "slashingWeaponsSharp1h": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "1"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "slashingWeaponsSharp2h": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "1"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "thrustingWeapons1h": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "1"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "thrustingWeapons2h": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "49"
+                  },
+                  "defaultCostCategory": {
+                    "N": "3"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "1"
+                  },
+                  "totalCost": {
+                    "N": "98"
+                  }
+                }
+              }
+            }
+          },
+          "handcraft": {
+            "M": {
+              "alcoholProduction": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "calmingSbDown": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "cheating": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "drawingAndPainting": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "fabricProcessing": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "fineMechanics": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "firstAid": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "foodProcessing": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "leatherProcessing": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "lockpicking": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "makingMusic": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "metalwork": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "steeringVehicles": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "stonework": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "training": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "woodwork": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              }
+            }
+          },
+          "knowledge": {
+            "M": {
+              "anatomy": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "architecture": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "astronomy": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "botany": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "chemistry": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "estimating": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "geography": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "history": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "itSkills": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "knowledgeOfTheLaw": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "mathematics": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "49"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "49"
+                  }
+                }
+              },
+              "mechanics": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "petrology": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "philosophy": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "technology": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "warfare": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "zoology": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "1"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "1"
+                  }
+                }
+              }
+            }
+          },
+          "nature": {
+            "M": {
+              "fishing": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "knottingSkills": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "orientation": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "tracking": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "trapping": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "wildernessLife": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              }
+            }
+          },
+          "social": {
+            "M": {
+              "acting": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "bargaining": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "50"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "50"
+                  }
+                }
+              },
+              "convincing": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "etiquette": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "74"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "98"
+                  }
+                }
+              },
+              "knowledgeOfHumanNature": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "49"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "49"
+                  }
+                }
+              },
+              "persuading": {
+                "M": {
+                  "activated": {
+                    "BOOL": true
+                  },
+                  "current": {
+                    "N": "75"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "100"
+                  }
+                }
+              },
+              "seduction": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "streetKnowledge": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "teaching": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              },
+              "writtenExpression": {
+                "M": {
+                  "activated": {
+                    "BOOL": false
+                  },
+                  "current": {
+                    "N": "0"
+                  },
+                  "defaultCostCategory": {
+                    "N": "2"
+                  },
+                  "mod": {
+                    "N": "0"
+                  },
+                  "start": {
+                    "N": "0"
+                  },
+                  "totalCost": {
+                    "N": "0"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "specialAbilities": {
+        "SS": ["test ability for component test"]
+      }
+    }
+  }
+}
