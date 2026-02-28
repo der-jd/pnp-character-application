@@ -1,28 +1,76 @@
-# pnp-character-application
+# PnP Character Application "World Hoppers"
 
 [![CircleCI](https://circleci.com/gh/der-jd/pnp-character-application.svg?style=shield&circle-token=d13a30ac2283a67c44f5efd1d88fbc07372bacf9)](https://circleci.com/gh/der-jd/pnp-character-application)
 
-Serverless web application for characters of a custom Pen & Paper game.
+Serverless web application for characters of a custom Pen & Paper game called "World Hoppers".
 
-## Architecture
+## 🎯 Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Install linter for terraform
+npm install-lint-terraform
+
+# Initialize Terraform
+cd terraform && terraform init
+
+# Start frontend development
+npm run dev --workspace frontend
+```
+
+## 🏗️ Architecture
 
 ![Architecture](aws_architecture.png "Architecture")
 
-## Local development setup
+### Tech Stack
 
-- Run `npm install` in the root folder to install dependencies for all packages via `npm workspaces`
-- Install the following tools
-  - [Terraform](https://developer.hashicorp.com/terraform/install)
-  - [tflint](https://github.com/terraform-linters/tflint) --> run `npm run install-lint-terraform`
-  - [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) (optional; only necessary for local AWS commands)
-- Run `terraform login` to generate an API key for the backend
-- Run `terraform init` in the `/terraform` working directory to initialize Terraform
-  - Rerun this command if a module or backend configuration for Terraform is set or changed. This will then reinitialize the working directory
+- **Cloud**: [Amazon Web Services (AWS)](https://aws.amazon.com/)
+- **Frontend**: Static website with [Next.js](https://nextjs.org/), hosted with [AWS S3](https://aws.amazon.com/s3/) and [AWS CloudFront](https://aws.amazon.com/cloudfront/)
+- **Backend REST API**: exposed via [AWS API Gateway](https://aws.amazon.com/api-gateway/)
+- **Backend**: [Node.js](https://nodejs.org/) AWS Lambda functions and Step Functions
+- **Infrastructure**: [Terraform](https://www.terraform.io/) + [HCP Terraform Cloud](https://developer.hashicorp.com/terraform/cloud-docs)
+- **CI/CD**: [CircleCI](https://circleci.com/)
+- **Database**: [DynamoDB](https://aws.amazon.com/dynamodb/)
+- **Authentication**: [AWS Cognito](https://aws.amazon.com/cognito/)
+- **API schema**: Definitions and validations with [Zod](https://zod.dev/)
+- **Testing**: [Vitest](https://vitest.dev/)
+- **Logging**: [AWS CloudWatch](https://aws.amazon.com/cloudwatch/)
 
-## Tech stack
+## 📋 API Versioning
 
-- [Amazon Web Services (AWS)](https://aws.amazon.com/) as cloud provider for the infrastructure
-- [Next.js](https://nextjs.org/) for the frontend
-- [Node.js](https://nodejs.org/) for the backend
-- [CircleCI](https://circleci.com/) for the CI/CD pipeline
-- [HCP Terraform Cloud](https://app.terraform.io) for infrastructure as code
+- **API Version**: extracted from `api-spec/package.json` version
+- **URL Format**: `https://{api_domain_name}/v1/{endpoint}`
+
+## 🚀 Deployment
+
+**Continuous deployment** via CircleCI, see [CircleCI Configuration](./.circleci/README.MD) for details.
+
+## 📁 Repository Structure
+
+```
+pnp-character-application/
+├── .circleci/          # CI/CD configuration
+├── api-spec/           # Shared API types and schemas
+├── backend/            # Node.js Lambda functions and Step Functions
+├── frontend/           # Next.js client application
+├── scripts/            # Utility CLI tools
+├── terraform/          # AWS infrastructure
+└── package.json        # Workspace configuration
+```
+
+## Navigation
+
+### 📁 **Component Guides**
+
+- **[🔧 Backend](./backend/README.md)** - Lambda functions and business logic
+- **[🎨 Frontend](./frontend/README.md)** - Next.js client application
+- **[🏗️ Infrastructure](./terraform/README.md)** - AWS resources and deployment
+
+### 📚 **Specialized Topics**
+
+- **[🧪 Backend - Unit Tests](./backend/test/unit-tests/README.md)**
+- **[🧪 Backend - Component Tests](./backend/test/component-tests/README.md)**
+- **[🚀 CI/CD Pipeline](./.circleci/README.MD)**
+- **[🤖 AI Agent Guide](./AGENTS.md)**
