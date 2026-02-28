@@ -22,7 +22,44 @@ npm run dev --workspace frontend
 
 ## 🏗️ Architecture
 
-![Architecture](aws_architecture.png "Architecture")
+```mermaid
+graph TB
+    %% User Interface Layer
+    User[fa:fa-user Users] --> WebApp[fa:fa-globe Web Application]
+
+    %% Content Delivery
+    WebApp --> CloudFront[AWS::CloudFront::Distribution CloudFront CDN]
+    CloudFront --> S3[AWS::S3::Bucket S3 Hosting]
+
+    %% Authentication & Security
+    WebApp --> |fa:fa-lock Auth| Cognito[AWS::Cognito::UserPool Amazon Cognito]
+    Cognito --> |fa:fa-ticket JWT| WebApp
+
+    %% API Layer
+    WebApp --> |fa:fa-signal API Calls| APIGW[AWS::ApiGateway::RestApi API Gateway]
+    APIGW --> |fa:fa-shield Validate| Cognito
+
+    %% Compute Layer
+    APIGW --> |fa:fa-book Read| Lambda[AWS::Lambda::Function AWS Lambda]
+    APIGW --> |fa:fa-edit Write| StepFunctions[AWS::StepFunctions::StateMachine AWS Step Functions]
+
+    %% Data Layer
+    Lambda --> |fa:fa-database Data| DynamoDB[AWS::DynamoDB::Table DynamoDB]
+    StepFunctions --> |fa:fa-database Data| DynamoDB
+
+    %% Styling
+    classDef frontend fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef compute fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef data fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef infra fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef security fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+
+    class User,WebApp frontend
+    class Lambda,StepFunctions compute
+    class DynamoDB data
+    class CloudFront,S3,APIGW infra
+    class Cognito security
+```
 
 ### Tech Stack
 
