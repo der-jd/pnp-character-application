@@ -67,7 +67,7 @@ export class ApiClient {
 
     if (!response.ok) {
       throw new ApiError(
-        `Request failed: ${method} ${url} (${response.status} - ${response.statusText})`,
+        `Request failed: ${method} ${url} (${response.status} - ${response.statusText}): ${JSON.stringify(parsedBody)}`,
         response.status,
         parsedBody,
       );
