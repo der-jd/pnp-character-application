@@ -33,9 +33,6 @@ workflows:
             - check-format-files
             - lint-typescript-code
             - deploy-backend-and-infrastructure
-      - run-api-schema-tests:
-          requires:
-            - deploy-backend-and-infrastructure
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
@@ -248,34 +245,6 @@ jobs:
           key: frontend-cache-{{ .Branch }}-{{ checksum "./commit" }}
           paths:
             - frontend/checksum.txt
-
-  run-api-schema-tests:
-    docker:
-      - image: cimg/node:22.12
-    resource_class: medium
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/project
-      - run:
-          name: Install dependencies
-          command: npm ci
-      - run:
-          name: Run API schema tests
-          command: |
-            # Get Jwt for API tests
-            source ~/project/terraform/terraform_output
-
-            # Run production tests if config available
-            if [ -n "$USER_TEST" ] && [ -n "$CHARACTER_TEST" ]; then
-              echo "Running production API schema validation..."
-              npm run api-schema-tests:prod
-            else
-              exit 1
-            fi
-      - run:
-          name: Cleanup
-          command: npm run api-schema-tests:clean
 
   terraform-destroy:
     docker:

@@ -107,10 +107,8 @@ export class UpdateCombatValueUseCase implements UseCase<UpdateCombatValueInput,
 **UpdateCalculationPointsUseCase.ts**
 
 ```typescript
-export class UpdateCalculationPointsUseCase implements UseCase<
-  UpdateCalculationPointsInput,
-  UpdateCalculationPointsOutput
-> {
+export class UpdateCalculationPointsUseCase
+  implements UseCase<UpdateCalculationPointsInput, UpdateCalculationPointsOutput> {
   // Manages character point calculations
   // Handles point redistribution
 }

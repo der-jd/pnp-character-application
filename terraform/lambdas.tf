@@ -118,8 +118,7 @@ module "get_history_lambda" {
   source        = "./modules/lambda_function"
   function_name = "get-history"
   environment_vars = {
-    TABLE_NAME_CHARACTERS = local.characters_table_name
-    TABLE_NAME_HISTORY    = local.history_table_name
+    TABLE_NAME_HISTORY = local.history_table_name
   }
   role_arn        = aws_iam_role.lambda_exec_role.arn
   api_gateway_arn = aws_api_gateway_rest_api.pnp_rest_api.execution_arn

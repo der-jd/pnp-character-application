@@ -103,12 +103,6 @@ export async function getCharacterItem(userId: string, characterId: string): Pro
   if (item?.characterSheet?.specialAbilities) {
     item.characterSheet.specialAbilities = Array.from(item.characterSheet.specialAbilities);
   }
-  if (item?.characterSheet?.advantages) {
-    item.characterSheet.advantages = Array.from(item.characterSheet.advantages);
-  }
-  if (item?.characterSheet?.disadvantages) {
-    item.characterSheet.disadvantages = Array.from(item.characterSheet.disadvantages);
-  }
 
   return characterSchema.parse(item);
 }
@@ -139,13 +133,6 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
     if (item?.characterSheet?.specialAbilities) {
       item.characterSheet.specialAbilities = Array.from(item.characterSheet.specialAbilities);
     }
-    if (item?.characterSheet?.advantages) {
-      item.characterSheet.advantages = Array.from(item.characterSheet.advantages);
-    }
-    if (item?.characterSheet?.disadvantages) {
-      item.characterSheet.disadvantages = Array.from(item.characterSheet.disadvantages);
-    }
-
     return item;
   });
 

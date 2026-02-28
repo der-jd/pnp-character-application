@@ -17,10 +17,9 @@ import { PatchCalculationPointsRequest } from "api-spec";
  * - Domain services handle complex operations
  * - All types from api-spec for consistency
  */
-export class UpdateCalculationPointsUseCase implements UseCase<
-  UpdateCalculationPointsInput,
-  UpdateCalculationPointsOutput
-> {
+export class UpdateCalculationPointsUseCase
+  implements UseCase<UpdateCalculationPointsInput, UpdateCalculationPointsOutput>
+{
   constructor(private readonly characterService: CharacterService) {}
 
   async execute(input: UpdateCalculationPointsInput): Promise<Result<UpdateCalculationPointsOutput, Error>> {

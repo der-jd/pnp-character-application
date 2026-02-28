@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   combatStatsSchema,
   RecordType,
-  Record as HistoryRecord,
+  Record,
   historyBlockSchema,
   skillChangeSchema,
   attributeChangeSchema,
@@ -91,7 +91,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
       1 // Only need the top result
     );
 
-    let record: HistoryRecord;
+    let record: Record;
     if (!items || items.length === 0) {
       console.log("No history found for the given character id");
 
@@ -237,13 +237,13 @@ async function validateRequest(request: Request): Promise<Parameters> {
   }
 }
 
-function estimateItemSize(item: Record<string, unknown>): number {
+function estimateItemSize(item: any): number {
   const marshalled = marshall(item);
   const json = JSON.stringify(marshalled);
   return Buffer.byteLength(json, "utf8");
 }
 
-function isDuplicate(record_1: HistoryRecord, record_2: HistoryRecord): boolean {
+function isDuplicate(record_1: Record, record_2: Record): boolean {
   const isDuplicate =
     record_1.type === record_2.type &&
     record_1.name === record_2.name &&
