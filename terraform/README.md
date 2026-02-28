@@ -18,16 +18,18 @@ The application uses a serverless AWS architecture deployed via Terraform Cloud,
 
 - Regional REST API endpoint for direct application access
 - Integrates with multiple character management state machines (Step Functions)
+- Authentication and authorization via AWS Cognito
 
 #### Compute Layer
 
 Single Lambda function or Step Function for each API endpoint.
 Endpoints that mutate data use Step Functions to combine the update of the character data and the creation of a history record.
 
-#### Authentication
+#### Authentication & Authorization
 
 - AWS Cognito user pool for user management
 - Admin-only user creation with email verification
+- JWT token validation in API Gateway
 
 #### Data Storage
 
@@ -68,4 +70,4 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 
 ### Deployment
 
-See [CircleCI README](../.circleci/README.md)
+See [CircleCI configuration](../.circleci/README.md)
