@@ -44,7 +44,7 @@ module "update_skill_state_machine" {
 
   main_state_name = "UpdateSkill"
 
-  main_operation_history_record_skip_condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}"
+  main_operation_history_record_condition = "{% $parse($states.input.body).changes.old != $parse($states.input.body).changes.new %}"
   main_operation_history_record_request = {
     userId_expression           = "{% $parse($states.input.body).userId %}"
     type                        = "6" // SKILL_CHANGED
@@ -53,7 +53,7 @@ module "update_skill_state_machine" {
     learning_method_expression  = "{% $parse($states.input.body).learningMethod ? $parse($states.input.body).learningMethod : null %}"
     adventure_points_expression = "{% $parse($states.input.body).adventurePoints %}"
   }
-  version_update_history_record_skip_condition = "{% $exists($parse($states.input.body).versionUpdate) = false %}"
+  version_update_history_record_condition = "{% $exists($parse($states.input.body).versionUpdate) %}"
 }
 
 module "update_attribute_state_machine" {
@@ -66,7 +66,7 @@ module "update_attribute_state_machine" {
 
   main_state_name = "UpdateAttribute"
 
-  main_operation_history_record_skip_condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}"
+  main_operation_history_record_condition = "{% $parse($states.input.body).changes.old != $parse($states.input.body).changes.new %}"
   main_operation_history_record_request = {
     userId_expression           = "{% $parse($states.input.body).userId %}"
     type                        = "5" // ATTRIBUTE_CHANGED
@@ -75,7 +75,7 @@ module "update_attribute_state_machine" {
     attribute_points_expression = "{% $parse($states.input.body).attributePoints %}"
   }
 
-  version_update_history_record_skip_condition = "{% $exists($parse($states.input.body).versionUpdate) = false %}"
+  version_update_history_record_condition = "{% $exists($parse($states.input.body).versionUpdate) %}"
 }
 
 module "update_base_value_state_machine" {
@@ -88,7 +88,7 @@ module "update_base_value_state_machine" {
 
   main_state_name = "UpdateBaseValue"
 
-  main_operation_history_record_skip_condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}"
+  main_operation_history_record_condition = "{% $parse($states.input.body).changes.old != $parse($states.input.body).changes.new %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($states.input.body).userId %}"
     type              = "3" // BASE_VALUE_CHANGED
@@ -96,7 +96,7 @@ module "update_base_value_state_machine" {
     data_expression   = "{% $parse($states.input.body).changes %}"
   }
 
-  version_update_history_record_skip_condition = "{% $exists($parse($states.input.body).versionUpdate) = false %}"
+  version_update_history_record_condition = "{% $exists($parse($states.input.body).versionUpdate) %}"
 }
 
 module "add_special_ability_state_machine" {
@@ -109,7 +109,7 @@ module "add_special_ability_state_machine" {
 
   main_state_name = "AddSpecialAbility"
 
-  main_operation_history_record_skip_condition = "{% $parse($states.input.body).specialAbilities.old = $parse($states.input.body).specialAbilities.new %}"
+  main_operation_history_record_condition = "{% $parse($states.input.body).specialAbilities.old != $parse($states.input.body).specialAbilities.new %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($states.input.body).userId %}"
     type              = "4" // SPECIAL_ABILITIES_CHANGED
@@ -117,7 +117,7 @@ module "add_special_ability_state_machine" {
     data_expression   = "{% $parse($states.input.body).specialAbilities %}"
   }
 
-  version_update_history_record_skip_condition = "{% $exists($parse($states.input.body).versionUpdate) = false %}"
+  version_update_history_record_condition = "{% $exists($parse($states.input.body).versionUpdate) %}"
 }
 
 module "update_calculation_points_state_machine" {
@@ -130,7 +130,7 @@ module "update_calculation_points_state_machine" {
 
   main_state_name = "UpdateCalculationPoints"
 
-  main_operation_history_record_skip_condition = "{% $parse($states.input.body).calculationPoints.old = $parse($states.input.body).calculationPoints.new %}"
+  main_operation_history_record_condition = "{% $parse($states.input.body).calculationPoints.old != $parse($states.input.body).calculationPoints.new %}"
   main_operation_history_record_request = {
     userId_expression           = "{% $parse($states.input.body).userId %}"
     type                        = "2" // CALCULATION_POINTS_CHANGED
@@ -140,7 +140,7 @@ module "update_calculation_points_state_machine" {
     attribute_points_expression = "{% $parse($states.input.body).calculationPoints.old.attributePoints ? {'old': $parse($states.input.body).calculationPoints.old.attributePoints,'new': $parse($states.input.body).calculationPoints.new.attributePoints} : null %}"
   }
 
-  version_update_history_record_skip_condition = "{% $exists($parse($states.input.body).versionUpdate) = false %}"
+  version_update_history_record_condition = "{% $exists($parse($states.input.body).versionUpdate) %}"
 }
 
 module "update_combat_stats_state_machine" {
@@ -153,7 +153,7 @@ module "update_combat_stats_state_machine" {
 
   main_state_name = "UpdateCombatStats"
 
-  main_operation_history_record_skip_condition = "{% $parse($states.input.body).combatStats.old = $parse($states.input.body).combatStats.new %}"
+  main_operation_history_record_condition = "{% $parse($states.input.body).combatStats.old != $parse($states.input.body).combatStats.new %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($states.input.body).userId %}"
     type              = "7" // COMBAT_STATS_CHANGED
@@ -161,7 +161,7 @@ module "update_combat_stats_state_machine" {
     data_expression   = "{% $parse($states.input.body).combatStats %}"
   }
 
-  version_update_history_record_skip_condition = "{% $exists($parse($states.input.body).versionUpdate) = false %}"
+  version_update_history_record_condition = "{% $exists($parse($states.input.body).versionUpdate) %}"
 }
 
 module "apply_level_up_state_machine" {
@@ -174,7 +174,7 @@ module "apply_level_up_state_machine" {
 
   main_state_name = "ApplyLevelUp"
 
-  main_operation_history_record_skip_condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}"
+  main_operation_history_record_condition = "{% $parse($states.input.body).changes.old != $parse($states.input.body).changes.new %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($states.input.body).userId %}"
     type              = "1" // LEVEL_UP_APPLIED
@@ -182,7 +182,7 @@ module "apply_level_up_state_machine" {
     data_expression   = "{% $parse($states.input.body).changes %}"
   }
 
-  version_update_history_record_skip_condition = "{% $exists($parse($states.input.body).versionUpdate) = false %}"
+  version_update_history_record_condition = "{% $exists($parse($states.input.body).versionUpdate) %}"
 }
 
 module "create_character_state_machine" {
@@ -195,7 +195,7 @@ module "create_character_state_machine" {
 
   main_state_name = "CreateCharacter"
 
-  main_operation_history_record_skip_condition = "{% false %}"
+  main_operation_history_record_condition = "{% true %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($states.input.body).userId %}"
     type              = "0" // CHARACTER_CREATED
@@ -203,5 +203,5 @@ module "create_character_state_machine" {
     data_expression   = "{% $parse($states.input.body).changes %}"
   }
 
-  version_update_history_record_skip_condition = "{% true %}"
+  version_update_history_record_condition = "{% false %}"
 }

@@ -23,9 +23,9 @@ variable "main_state_name" {
   description = "Name of the main execution state"
 }
 
-variable "main_operation_history_record_skip_condition" {
+variable "main_operation_history_record_condition" {
   type        = string
-  description = "If this JSONata condition is true, skip the history record creation for main operations. Use '{% true %}' to always skip, '{% false %}' to never skip, or a conditional expression."
+  description = "If this JSONata condition is true, create a history record for main operations. Use '{% true %}' to always create, '{% false %}' to never create, or a conditional expression."
 }
 
 variable "main_operation_history_record_request" {
@@ -42,9 +42,9 @@ variable "main_operation_history_record_request" {
   description = "Request body for the history record creation of main operations"
 }
 
-variable "version_update_history_record_skip_condition" {
+variable "version_update_history_record_condition" {
   type        = string
-  description = "If this JSONata condition is true, skip the history record creation for version updates. Use '{% true %}' to always skip, '{% false %}' to never skip, or a conditional expression."
+  description = "If this JSONata condition is true, create a history record for version updates. Use '{% true %}' to always create, '{% false %}' to never create, or a conditional expression."
 }
 
 resource "aws_cloudwatch_log_group" "state_machine_log_group" {
@@ -119,11 +119,11 @@ resource "aws_sfn_state_machine" "state_machine" {
         QueryLanguage = "JSONata"
         Choices = [
           {
-            Condition = var.version_update_history_record_skip_condition
-            Next      = "IsMainOperationHistoryRecordNecessary"
+            Condition = var.version_update_history_record_condition
+            Next      = "AddVersionHistoryRecord"
           }
         ]
-        Default = "AddVersionHistoryRecord"
+        Default = "IsMainOperationHistoryRecordNecessary"
       },
       AddVersionHistoryRecord = {
         Type          = "Task"
@@ -162,11 +162,11 @@ resource "aws_sfn_state_machine" "state_machine" {
         QueryLanguage = "JSONata"
         Choices = [
           {
-            Condition = var.main_operation_history_record_skip_condition
-            Next      = "SuccessState"
+            Condition = var.main_operation_history_record_condition
+            Next      = "AddMainOperationHistoryRecord"
           }
         ]
-        Default = "AddMainOperationHistoryRecord"
+        Default = "SuccessState"
       },
       AddMainOperationHistoryRecord = {
         Type          = "Task"
