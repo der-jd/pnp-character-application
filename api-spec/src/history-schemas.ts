@@ -116,12 +116,6 @@ export const characterCreationSchema = z
 
 export type CharacterCreation = z.infer<typeof characterCreationSchema>;
 
-export const integerSchema = z
-  .object({
-    value: z.number().int().min(MIN_POINTS).max(MAX_POINTS),
-  })
-  .strict();
-
 export const levelUpChangeSchema = z
   .object({
     level: levelSchema,

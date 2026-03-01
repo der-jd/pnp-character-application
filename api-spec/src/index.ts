@@ -65,7 +65,6 @@ export {
   HistoryRecord,
   historyBlockSchema,
   HistoryBlock,
-  integerSchema,
   attributeChangeSchema,
   baseValueChangeSchema,
   levelUpChangeSchema,
