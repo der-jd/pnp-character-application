@@ -147,10 +147,10 @@ resource "aws_sfn_state_machine" "state_machine" {
             "character-id" = var.character_id_expression
           }
           "body" = {
-            "userId"         = "{% $parse($states.input.body).userId %}"
+            "userId"         = "{% $parse($mainOperationResult).userId %}"
             "type"           = "8" // RULESET_VERSION_UPDATED
-            "name"           = "{% 'Update to ruleset version ' & $parse($states.input.body).versionUpdate.new.value %}"
-            "data"           = "{% $states.input.body.versionUpdate %}"
+            "name"           = "{% 'Update to ruleset version ' & $parse($mainOperationResult).versionUpdate.new.value %}"
+            "data"           = "{% $parse($mainOperationResult).versionUpdate %}"
             "learningMethod" = null
             "calculationPoints" = {
               "adventurePoints" = null
