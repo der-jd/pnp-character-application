@@ -48,7 +48,7 @@ module "update_skill_state_machine" {
   main_operation_history_record_request = {
     userId_expression           = "{% $parse($states.input.body).userId %}"
     type                        = "6" // SKILL_CHANGED
-    name_expression             = "{% $parse($states.input.body).skillCategory & '/' & $parse($states.input.body).skillName %}"
+    name_expression             = "{% $parse($states.input.body).skillCategory & \"/\" & $parse($states.input.body).skillName %}"
     data_expression             = "{% $parse($states.input.body).changes %}"
     learning_method_expression  = "{% $parse($states.input.body).learningMethod ? $parse($states.input.body).learningMethod : null %}"
     adventure_points_expression = "{% $parse($states.input.body).adventurePoints %}"
@@ -136,8 +136,8 @@ module "update_calculation_points_state_machine" {
     type                        = "2" // CALCULATION_POINTS_CHANGED
     name_expression             = "Calculation Points"
     data_expression             = "{% $parse($states.input.body).calculationPoints %}"
-    adventure_points_expression = "{% $parse($states.input.body).calculationPoints.old.adventurePoints ? {'old': $parse($states.input.body).calculationPoints.old.adventurePoints,'new': $parse($states.input.body).calculationPoints.new.adventurePoints} : null %}"
-    attribute_points_expression = "{% $parse($states.input.body).calculationPoints.old.attributePoints ? {'old': $parse($states.input.body).calculationPoints.old.attributePoints,'new': $parse($states.input.body).calculationPoints.new.attributePoints} : null %}"
+    adventure_points_expression = "{% $parse($states.input.body).calculationPoints.old.adventurePoints ? {\"old\": $parse($states.input.body).calculationPoints.old.adventurePoints,\"new\": $parse($states.input.body).calculationPoints.new.adventurePoints} : null %}"
+    attribute_points_expression = "{% $parse($states.input.body).calculationPoints.old.attributePoints ? {\"old\": $parse($states.input.body).calculationPoints.old.attributePoints,\"new\": $parse($states.input.body).calculationPoints.new.attributePoints} : null %}"
   }
 
   version_update_history_record_condition = "{% $exists($parse($states.input.body).versionUpdate) %}"
@@ -157,7 +157,7 @@ module "update_combat_stats_state_machine" {
   main_operation_history_record_request = {
     userId_expression = "{% $parse($states.input.body).userId %}"
     type              = "7" // COMBAT_STATS_CHANGED
-    name_expression   = "{% $parse($states.input.body).combatCategory & '/' & $parse($states.input.body).combatSkillName %}"
+    name_expression   = "{% $parse($states.input.body).combatCategory & \"/\" & $parse($states.input.body).combatSkillName %}"
     data_expression   = "{% $parse($states.input.body).combatStats %}"
   }
 
@@ -178,7 +178,7 @@ module "apply_level_up_state_machine" {
   main_operation_history_record_request = {
     userId_expression = "{% $parse($states.input.body).userId %}"
     type              = "1" // LEVEL_UP_APPLIED
-    name_expression   = "{% 'Level ' & $string($parse($states.input.body).changes.new.level) %}"
+    name_expression   = "{% \"Level \" & $string($parse($states.input.body).changes.new.level) %}"
     data_expression   = "{% $parse($states.input.body).changes %}"
   }
 
