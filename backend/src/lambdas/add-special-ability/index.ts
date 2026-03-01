@@ -86,6 +86,14 @@ export async function _addSpecialAbility(request: Request): Promise<APIGatewayPr
 function validateRequest(request: Request): Parameters {
   try {
     console.log("Validate request. Body:", request.body);
+    // TODO delete after test
+    const pathParams = postSpecialAbilitiesPathParamsSchema.parse(request.pathParameters);
+    console.log("Path parameters:", pathParams);
+    console.log("debug =============");
+    const body = postSpecialAbilitiesRequestSchema.parse(request.body);
+    console.log("Body:", body);
+    console.log("debug =============");
+
     return {
       userId: decodeUserId(headersSchema.parse(request.headers).authorization as string | undefined),
       pathParams: postSpecialAbilitiesPathParamsSchema.parse(request.pathParameters),
