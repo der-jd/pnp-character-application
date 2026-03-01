@@ -96,9 +96,9 @@ describe.sequential("version-update component tests", () => {
       await expectApiError(
         () =>
           context.apiClient.patch(`characters/${characterId}/attributes/endurance`, {
-            current: {
-              initialValue: context.character.characterSheet.attributes.endurance.current,
-              increasedPoints: 1,
+            mod: {
+              initialValue: context.character.characterSheet.attributes.endurance.mod,
+              newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
         409,
@@ -113,9 +113,9 @@ describe.sequential("version-update component tests", () => {
       await expectApiError(
         () =>
           context.apiClient.patch(`characters/${characterId}/attributes/endurance`, {
-            current: {
-              initialValue: context.character.characterSheet.attributes.endurance.current,
-              increasedPoints: 1,
+            mod: {
+              initialValue: context.character.characterSheet.attributes.endurance.mod,
+              newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
         409,
@@ -132,9 +132,9 @@ describe.sequential("version-update component tests", () => {
       await expectApiError(
         () =>
           context.apiClient.patch(`characters/${characterId}/attributes/endurance`, {
-            current: {
-              initialValue: context.character.characterSheet.attributes.endurance.current,
-              increasedPoints: 1,
+            mod: {
+              initialValue: context.character.characterSheet.attributes.endurance.mod,
+              newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
         409,
@@ -151,9 +151,9 @@ describe.sequential("version-update component tests", () => {
       await expectApiError(
         () =>
           context.apiClient.patch(`characters/${characterId}/attributes/endurance`, {
-            current: {
-              initialValue: context.character.characterSheet.attributes.endurance.current,
-              increasedPoints: 1,
+            mod: {
+              initialValue: context.character.characterSheet.attributes.endurance.mod,
+              newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
         409,
@@ -180,8 +180,8 @@ describe.sequential("version-update component tests", () => {
       const response = patchAttributeResponseSchema.parse(
         await context.apiClient.patch(`characters/${characterId}/attributes/endurance`, {
           mod: {
-            initialValue: context.character.characterSheet.attributes.endurance.current,
-            newValue: context.character.characterSheet.attributes.endurance.current + 1,
+            initialValue: context.character.characterSheet.attributes.endurance.mod,
+            newValue: context.character.characterSheet.attributes.endurance.mod + 1,
           },
         }),
       );
@@ -220,8 +220,8 @@ describe.sequential("version-update component tests", () => {
         const response = patchAttributeResponseSchema.parse(
           await context.apiClient.patch(`characters/${context.character.characterId}/attributes/endurance`, {
             mod: {
-              initialValue: context.character.characterSheet.attributes.endurance.current,
-              newValue: context.character.characterSheet.attributes.endurance.current + 1,
+              initialValue: context.character.characterSheet.attributes.endurance.mod,
+              newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
         );
