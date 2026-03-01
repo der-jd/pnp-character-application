@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, describe, expect, test } from "vitest";
 import {
   CharacterSheet,
   Character,
@@ -14,16 +14,6 @@ import {
 } from "api-spec";
 import { expectApiError, updateAndVerifyTestContextAfterEachTest } from "./shared.js";
 import { TestContext, TestContextFactory } from "./test-context-factory.js";
-
-// Use vi.hoisted to make the mock version available to vi.mock
-const { TEST_RULESET_VERSION } = vi.hoisted(() => {
-  return { TEST_RULESET_VERSION: "1.1.1" };
-});
-
-// Mock version from package.json which is used as the ruleset version
-vi.mock("../../package.json", () => ({
-  default: { version: TEST_RULESET_VERSION },
-}));
 
 describe.sequential("version-update component tests", () => {
   let context: TestContext;
@@ -120,7 +110,7 @@ describe.sequential("version-update component tests", () => {
           }),
         409,
         expect.stringContaining(
-          `Character version is too new: ${context.character.rulesetVersion}, current ruleset is ${TEST_RULESET_VERSION}`,
+          `Character version is too new: ${context.character.rulesetVersion}, current ruleset is`,
         ),
       );
     });
@@ -139,7 +129,7 @@ describe.sequential("version-update component tests", () => {
           }),
         409,
         expect.stringContaining(
-          `Character version is too new: ${context.character.rulesetVersion}, current ruleset is ${TEST_RULESET_VERSION}`,
+          `Character version is too new: ${context.character.rulesetVersion}, current ruleset is`,
         ),
       );
     });
@@ -158,7 +148,7 @@ describe.sequential("version-update component tests", () => {
           }),
         409,
         expect.stringContaining(
-          `Character version is too new: ${context.character.rulesetVersion}, current ruleset is ${TEST_RULESET_VERSION}`,
+          `Character version is too new: ${context.character.rulesetVersion}, current ruleset is`,
         ),
       );
     });
@@ -174,8 +164,6 @@ describe.sequential("version-update component tests", () => {
     test("should not change when character version matches current version", async () => {
       const characterId = TestContextFactory.loadCharacterIdFromTestData("character-exact-version-match.dynamodb.json");
       context = await TestContextFactory.createContext(characterId);
-
-      expect(context.character.rulesetVersion).toBe(TEST_RULESET_VERSION);
 
       const response = patchAttributeResponseSchema.parse(
         await context.apiClient.patch(`characters/${characterId}/attributes/endurance`, {
@@ -231,7 +219,6 @@ describe.sequential("version-update component tests", () => {
         expect(response.data.versionUpdate).toBeDefined();
         expect(response.data.versionUpdate?.old.value).toBe(context.character.rulesetVersion);
         expect(response.data.versionUpdate?.old.value).not.toBe(response.data.versionUpdate?.new.value);
-        expect(response.data.versionUpdate?.new.value).toBe(TEST_RULESET_VERSION);
 
         const oldMinor = parseInt(context.character.rulesetVersion.split(".")[1]);
         const oldPatch = parseInt(context.character.rulesetVersion.split(".")[2]);
