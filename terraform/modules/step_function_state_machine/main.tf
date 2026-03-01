@@ -28,6 +28,12 @@ variable "main_operation_history_record_condition" {
   description = "If this JSONata condition is true, create a history record for main operations. Use '{% true %}' to always create, '{% false %}' to never create, or a conditional expression."
 }
 
+variable "character_id_expression" {
+  type        = string
+  description = "JSONata expression to extract character ID. All lambdas return characterId in response, so default is '{% $parse($mainOperationResult).characterId %}'."
+  default     = "{% $parse($mainOperationResult).characterId %}"
+}
+
 variable "main_operation_history_record_request" {
   type = object({
     userId_expression           = string
@@ -131,7 +137,7 @@ resource "aws_sfn_state_machine" "state_machine" {
         Resource      = var.history_lambda_arn
         Arguments = {
           "pathParameters" = {
-            "character-id" = "{% $parse($states.input.body).characterId %}"
+            "character-id" = var.character_id_expression
           }
           "body" = {
             "userId"         = "{% $parse($states.input.body).userId %}"
@@ -174,7 +180,7 @@ resource "aws_sfn_state_machine" "state_machine" {
         Resource      = var.history_lambda_arn
         Arguments = {
           "pathParameters" = {
-            "character-id" = "{% $parse($states.input.body).characterId %}"
+            "character-id" = var.character_id_expression
           }
           "body" = {
             "userId"         = var.main_operation_history_record_request.userId_expression
