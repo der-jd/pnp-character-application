@@ -188,7 +188,7 @@ describe.sequential("get-level-up component tests", () => {
 
     beforeAll(async () => {
       const characterId = TestContextFactory.loadCharacterIdFromTestData(
-        "test-data/characters/character-with-unavailable-level-ups.dynamodb.json",
+        "character-with-unavailable-level-ups.dynamodb.json",
       );
       context = await TestContextFactory.createContext(characterId);
     });
