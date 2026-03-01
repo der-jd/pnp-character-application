@@ -3129,5 +3129,8 @@
         "SS": ["test ability for component test", "Reroll"]
       }
     }
+  },
+  "rulesetVersion": {
+    "S": "1.0.0"
   }
 }

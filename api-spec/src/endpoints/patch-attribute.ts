@@ -6,7 +6,12 @@ import {
   MAX_STRING_LENGTH_DEFAULT,
   userIdSchema,
 } from "../general-schemas.js";
-import { attributeChangeSchema, historyRecordSchema } from "../history-schemas.js";
+import {
+  attributeChangeSchema,
+  historyRecordSchema,
+  rulesetVersionHistoryRecordSchema,
+  versionUpdateSchema,
+} from "../history-schemas.js";
 
 export const patchAttributePathParamsSchema = z
   .object({
@@ -44,6 +49,7 @@ export const updateAttributeResponseSchema = z
         new: calculationPointsSchema,
       })
       .strict(),
+    versionUpdate: versionUpdateSchema.optional(),
   })
   .strict();
 
@@ -64,6 +70,7 @@ export const patchAttributeResponseSchema = z
   .object({
     data: updateAttributeResponseSchema,
     historyRecord: patchAttributeHistoryRecordSchema.nullable(),
+    versionUpdateHistoryRecord: rulesetVersionHistoryRecordSchema.nullable(),
   })
   .strict();
 

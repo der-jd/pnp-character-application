@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
-import { levelUpChangeSchema, historyRecordSchema } from "../history-schemas.js";
+import {
+  levelUpChangeSchema,
+  historyRecordSchema,
+  rulesetVersionHistoryRecordSchema,
+  versionUpdateSchema,
+} from "../history-schemas.js";
 import { levelUpEffectKindSchema, levelSchema, effectByLevelUpSchema } from "../level-up-schemas.js";
 
 export const postLevelUpPathParamsSchema = z
@@ -32,6 +37,7 @@ export const applyLevelUpResponseSchema = z
         new: levelUpChangeSchema,
       })
       .strict(),
+    versionUpdate: versionUpdateSchema.optional(),
   })
   .strict();
 
@@ -52,6 +58,7 @@ export const postLevelUpResponseSchema = z
   .object({
     data: applyLevelUpResponseSchema,
     historyRecord: postLevelUpHistoryRecordSchema.nullable(),
+    versionUpdateHistoryRecord: rulesetVersionHistoryRecordSchema.nullable(),
   })
   .strict();
 

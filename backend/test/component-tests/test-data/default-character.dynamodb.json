@@ -2912,5 +2912,8 @@
         "SS": ["test ability for component test"]
       }
     }
+  },
+  "rulesetVersion": {
+    "S": "1.0.0"
   }
 }

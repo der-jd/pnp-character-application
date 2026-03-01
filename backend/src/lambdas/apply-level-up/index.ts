@@ -25,6 +25,8 @@ import {
   planApplyLevelUp,
   computeLevelUpOptions,
   setSpecialAbilities,
+  updateRulesetVersion,
+  getVersionUpdate,
 } from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -52,6 +54,11 @@ export async function _applyLevelUp(request: Request): Promise<APIGatewayProxyRe
     const characterId = params.pathParams["character-id"];
     const character = await getCharacterItem(params.userId, characterId);
     const characterSheet = character.characterSheet;
+
+    const versionUpdate = getVersionUpdate(character.rulesetVersion);
+    if (versionUpdate) {
+      await updateRulesetVersion(params.userId, characterId, versionUpdate.new.value);
+    }
 
     console.log(
       `Apply level-up to level ${params.body.initialLevel + 1} for character ${characterId} of user ${params.userId}`,
@@ -137,6 +144,7 @@ export async function _applyLevelUp(request: Request): Promise<APIGatewayProxyRe
           specialAbilities: plan.specialAbilities,
         },
       },
+      versionUpdate,
     };
 
     const response = {

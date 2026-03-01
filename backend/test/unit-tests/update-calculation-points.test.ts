@@ -359,6 +359,9 @@ describe("Valid requests", () => {
           );
         }
       }
+
+      // Character already at current version
+      expect(parsedBody.versionUpdate).toBeUndefined();
     });
   });
 
@@ -547,6 +550,9 @@ describe("Valid requests", () => {
         expect(parsedBody.calculationPoints.old.attributePoints).toBeUndefined();
         expect(parsedBody.calculationPoints.new.attributePoints).toBeUndefined();
       }
+
+      // Character already at current version
+      expect(parsedBody.versionUpdate).toBeUndefined();
 
       // Check for DynamoDB updates
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);

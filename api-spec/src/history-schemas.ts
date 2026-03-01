@@ -9,6 +9,7 @@ import {
   combatStatsSchema,
   combinedSkillCategoryAndNameSchema,
   learningMethodSchema,
+  rulesetVersionSchema,
   skillSchema,
   specialAbilitySchema,
 } from "./character-schemas.js";
@@ -33,6 +34,7 @@ export enum HistoryRecordType {
   ATTRIBUTE_CHANGED = 5,
   SKILL_CHANGED = 6,
   COMBAT_STATS_CHANGED = 7,
+  RULESET_VERSION_UPDATED = 8,
 }
 
 export const historyRecordSchema = z
@@ -165,3 +167,24 @@ export const skillChangeSchema = z
     combatStats: combatStatsSchema.optional(),
   })
   .strict();
+
+export const rulesetVersionChangeSchema = z
+  .object({
+    value: rulesetVersionSchema,
+  })
+  .strict();
+
+export const versionUpdateSchema = z
+  .object({
+    old: rulesetVersionChangeSchema,
+    new: rulesetVersionChangeSchema,
+  })
+  .strict();
+
+export type VersionUpdate = z.infer<typeof versionUpdateSchema>;
+
+export const rulesetVersionHistoryRecordSchema = historyRecordSchema.extend({
+  data: versionUpdateSchema,
+});
+
+export type RulesetVersionHistoryRecord = z.infer<typeof rulesetVersionHistoryRecordSchema>;

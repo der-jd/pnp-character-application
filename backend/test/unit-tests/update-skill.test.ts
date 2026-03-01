@@ -523,6 +523,9 @@ describe("Valid requests", () => {
       }
       expect(parsedBody.changes.old.combatStats).toBeUndefined();
       expect(parsedBody.changes.new.combatStats).toBeUndefined();
+
+      // Character already at current version
+      expect(parsedBody.versionUpdate).toBeUndefined();
     });
   });
 
@@ -854,6 +857,9 @@ describe("Valid requests", () => {
       expect(diffAvailableAdventurePoints).toBeCloseTo(diffSkillTotalCost);
 
       expect(parsedBody.changes.old.skill).toStrictEqual(skillOld);
+
+      // Character already at current version
+      expect(parsedBody.versionUpdate).toBeUndefined();
 
       // Check for DynamoDB updates
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);

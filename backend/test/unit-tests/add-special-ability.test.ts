@@ -158,6 +158,9 @@ describe("Valid requests", () => {
       expect(parsedBody.specialAbilities.old.values).toEqual(fakeCharacter.characterSheet.specialAbilities);
       expect(parsedBody.specialAbilities.new).toStrictEqual(parsedBody.specialAbilities.old);
       expect(parsedBody.specialAbilities.new.values).toContain(parsedBody.specialAbilityName);
+
+      // Character already at current version
+      expect(parsedBody.versionUpdate).toBeUndefined();
     });
   });
 
@@ -196,6 +199,9 @@ describe("Valid requests", () => {
       expect(parsedBody.specialAbilities.old.values).not.toContain(parsedBody.specialAbilityName);
       const newSpecialAbilities = [...parsedBody.specialAbilities.old.values, parsedBody.specialAbilityName];
       expect(parsedBody.specialAbilities.new.values).toStrictEqual(newSpecialAbilities);
+
+      // Character already at current version
+      expect(parsedBody.versionUpdate).toBeUndefined();
 
       // Check for DynamoDB updates
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);

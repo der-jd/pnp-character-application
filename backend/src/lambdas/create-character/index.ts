@@ -8,8 +8,8 @@ import {
   createCharacterItem,
   isZodError,
   logZodError,
+  CharacterBuilder,
 } from "core";
-import { CharacterBuilder } from "core";
 import { CreateCharacterResponse, headersSchema, PostCharactersRequest, postCharactersRequestSchema } from "api-spec";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {

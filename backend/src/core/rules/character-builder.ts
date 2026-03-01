@@ -55,6 +55,7 @@ import {
 import { HttpError, logAndEnsureHttpError } from "../errors.js";
 import { calculateBaseValues } from "./base-value-formulas.js";
 import { calculateCombatStats } from "./combat-stats.js";
+import { RULESET_VERSION } from "../version.js";
 
 export class CharacterBuilder {
   private attributesSet = false;
@@ -598,6 +599,7 @@ export class CharacterBuilder {
         userId: this.userId,
         characterId: uuidv4(),
         characterSheet: characterSheetSchema.parse(this.characterSheet),
+        rulesetVersion: RULESET_VERSION,
       },
       generationPoints: {
         throughDisadvantages: this.generationPointsThroughDisadvantages,

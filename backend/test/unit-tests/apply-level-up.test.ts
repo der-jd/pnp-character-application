@@ -549,6 +549,9 @@ describe("Valid requests", () => {
         );
         expect(specialAbilitiesCall).toBeDefined();
       }
+
+      // Character already at current version
+      expect(parsed.versionUpdate).toBeUndefined();
     });
   });
 });

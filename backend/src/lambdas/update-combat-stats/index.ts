@@ -1,12 +1,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import {
+  CombatStats,
   headersSchema,
   PatchCombatStatsPathParams,
   PatchCombatStatsRequest,
   UpdateCombatStatsResponse,
   patchCombatStatsPathParamsSchema,
   patchCombatStatsRequestSchema,
-  CombatStats,
   SkillName,
   CombatSection,
 } from "api-spec";
@@ -23,6 +23,8 @@ import {
   getCombatStats,
   calculateCombatStats,
   combatStatsChanged,
+  updateRulesetVersion,
+  getVersionUpdate,
 } from "core";
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -56,6 +58,12 @@ export async function _updateCombatStats(request: Request): Promise<APIGatewayPr
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
 
     const characterSheet = character.characterSheet;
+
+    const versionUpdate = getVersionUpdate(character.rulesetVersion);
+    if (versionUpdate) {
+      await updateRulesetVersion(params.userId, params.pathParams["character-id"], versionUpdate.new.value);
+    }
+
     const combatStatsOld = getCombatStats(characterSheet.combat, combatCategory, combatSkillName);
     let combatStats = combatStatsOld;
 
@@ -96,6 +104,7 @@ export async function _updateCombatStats(request: Request): Promise<APIGatewayPr
         old: combatStatsOld,
         new: combatStats,
       },
+      versionUpdate,
     };
     const response = {
       statusCode: 200,
