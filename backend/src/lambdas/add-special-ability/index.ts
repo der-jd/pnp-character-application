@@ -87,7 +87,6 @@ function validateRequest(request: Request): Parameters {
   try {
     console.log("Validate request. Body:", request.body);
     // TODO delete after test
-    console.log("Path parameters:", request.pathParameters);
     const pathParams = postSpecialAbilitiesPathParamsSchema.parse(request.pathParameters);
     console.log("Path parameters:", pathParams);
     console.log("debug =============");
