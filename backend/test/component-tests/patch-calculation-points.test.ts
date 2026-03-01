@@ -245,7 +245,8 @@ describe.sequential("patch-calculation-points component tests", () => {
           );
         }
 
-        // Verify version update history record is null (character already at current version)
+        // Verify missing version update (character already at current version)
+        expect(response.data.versionUpdate).toBeUndefined();
         expect(response.versionUpdateHistoryRecord).toBeNull();
       });
     });
@@ -406,7 +407,8 @@ describe.sequential("patch-calculation-points component tests", () => {
           expect(response.data.calculationPoints.old.attributePoints).toBeUndefined();
         }
 
-        // Verify version update history record is null (character already at current version)
+        // Verify missing version update (character already at current version)
+        expect(response.data.versionUpdate).toBeUndefined();
         expect(response.versionUpdateHistoryRecord).toBeNull();
 
         // Verify history record was created

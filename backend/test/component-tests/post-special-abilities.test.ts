@@ -118,7 +118,8 @@ describe.sequential("post-special-abilities component tests", () => {
       expect(response.data.specialAbilities.new).toStrictEqual(response.data.specialAbilities.old);
       expect(response.data.specialAbilities.new.values).toContain(ability);
 
-      // Verify version update history record is null (character already at current version)
+      // Verify missing version update (character already at current version)
+      expect(response.data.versionUpdate).toBeUndefined();
       expect(response.versionUpdateHistoryRecord).toBeNull();
 
       expect(response.historyRecord).toBeNull();
@@ -154,7 +155,8 @@ describe.sequential("post-special-abilities component tests", () => {
       const actualNewAbilities = new Set(response.data.specialAbilities.new.values);
       expect(actualNewAbilities).toEqual(expectedNewAbilities);
 
-      // Verify version update history record is null (character already at current version)
+      // Verify missing version update (character already at current version)
+      expect(response.data.versionUpdate).toBeUndefined();
       expect(response.versionUpdateHistoryRecord).toBeNull();
 
       expect(response.historyRecord).not.toBeNull();

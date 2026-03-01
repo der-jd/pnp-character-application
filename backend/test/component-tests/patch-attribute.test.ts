@@ -298,7 +298,8 @@ describe.sequential("patch-attribute component tests", () => {
         expect(response.data.changes.old.combat).toBeUndefined();
         expect(response.data.changes.new.combat).toBeUndefined();
 
-        // Verify version update history record is null (character already at current version)
+        // Verify missing version update (character already at current version)
+        expect(response.data.versionUpdate).toBeUndefined();
         expect(response.versionUpdateHistoryRecord).toBeNull();
       });
     });
@@ -430,7 +431,8 @@ describe.sequential("patch-attribute component tests", () => {
 
         expect(response.data.changes.old.attribute).toStrictEqual(attributeOld);
 
-        // Verify version update history record is null (character already at current version)
+        // Verify missing version update (character already at current version)
+        expect(response.data.versionUpdate).toBeUndefined();
         expect(response.versionUpdateHistoryRecord).toBeNull();
 
         // Verify history record was created
@@ -698,7 +700,8 @@ describe.sequential("patch-attribute component tests", () => {
           expect(response.data.changes.new.combat).toBeUndefined();
         }
 
-        // Verify version update history record is null (character already at current version)
+        // Verify missing version update (character already at current version)
+        expect(response.data.versionUpdate).toBeUndefined();
         expect(response.versionUpdateHistoryRecord).toBeNull();
 
         // Verify history record was created
@@ -943,7 +946,8 @@ describe.sequential("patch-attribute component tests", () => {
           throw new Error("No combat stats changed");
         }
 
-        // Verify version update history record is null (character already at current version)
+        // Verify missing version update (character already at current version)
+        expect(response.data.versionUpdate).toBeUndefined();
         expect(response.versionUpdateHistoryRecord).toBeNull();
 
         // Verify history record was created
