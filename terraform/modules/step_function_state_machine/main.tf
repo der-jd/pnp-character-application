@@ -40,10 +40,10 @@ variable "main_operation_history_record_request" {
     type                        = string
     name_expression             = string
     data_expression             = string
-    learning_method_expression  = optional(string, "null")
-    adventure_points_expression = optional(string, "null")
-    attribute_points_expression = optional(string, "null")
-    comment_expression          = optional(string, "null")
+    learning_method_expression  = optional(string, null)
+    adventure_points_expression = optional(string, null)
+    attribute_points_expression = optional(string, null)
+    comment_expression          = optional(string, null)
   })
   description = "Request body for the history record creation of main operations"
 }
