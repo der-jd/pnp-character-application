@@ -91,7 +91,7 @@ describe.sequential("version-update component tests", () => {
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
-        409
+        409,
       );
     });
 
@@ -107,7 +107,7 @@ describe.sequential("version-update component tests", () => {
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
-        409
+        409,
       );
     });
 
@@ -123,7 +123,7 @@ describe.sequential("version-update component tests", () => {
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
-        409
+        409,
       );
     });
 
@@ -139,7 +139,7 @@ describe.sequential("version-update component tests", () => {
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
-        409
+        409,
       );
     });
   });
