@@ -177,16 +177,16 @@ resource "aws_sfn_state_machine" "state_machine" {
             "character-id" = "{% $parse($states.input.body).characterId %}"
           }
           "body" = {
-            "userId"         = var.history_record_request.userId_expression
-            "type"           = var.history_record_request.type
-            "name"           = var.history_record_request.name_expression
-            "data"           = var.history_record_request.data_expression
-            "learningMethod" = var.history_record_request.learning_method_expression
+            "userId"         = var.main_operation_history_record_request.userId_expression
+            "type"           = var.main_operation_history_record_request.type
+            "name"           = var.main_operation_history_record_request.name_expression
+            "data"           = var.main_operation_history_record_request.data_expression
+            "learningMethod" = var.main_operation_history_record_request.learning_method_expression
             "calculationPoints" = {
-              "adventurePoints" = var.history_record_request.adventure_points_expression
-              "attributePoints" = var.history_record_request.attribute_points_expression
+              "adventurePoints" = var.main_operation_history_record_request.adventure_points_expression
+              "attributePoints" = var.main_operation_history_record_request.attribute_points_expression
             }
-            "comment" = var.history_record_request.comment_expression
+            "comment" = var.main_operation_history_record_request.comment_expression
           }
         }
         Assign = {
