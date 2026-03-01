@@ -98,19 +98,13 @@ export async function getCharacterItem(userId: string, characterId: string): Pro
 
   console.log(`Successfully got DynamoDB item for character ${characterId} of user ${userId}`);
 
-  // TODO delete after test
-  console.log("DynamoDB item:", response.Item);
-
   // Convert Sets to arrays before parsing since the schema expects arrays
   const item = response.Item;
   if (item?.characterSheet?.specialAbilities) {
     item.characterSheet.specialAbilities = Array.from(item.characterSheet.specialAbilities);
   }
 
-  const _item = characterSchema.parse(item);
-  // TODO delete after test
-  console.log("Parsed item:", _item);
-  return _item;
+  return characterSchema.parse(item);
 }
 
 export async function getCharacterItems(userId: string): Promise<Character[]> {
