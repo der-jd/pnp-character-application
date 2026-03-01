@@ -96,7 +96,7 @@ export async function getCharacterItem(userId: string, characterId: string): Pro
     throw new HttpError(404, "No character found for the given user and character id");
   }
 
-  console.log("Successfully got DynamoDB item");
+  console.log(`Successfully got DynamoDB item for character ${characterId} of user ${userId}`);
 
   // Convert Sets to arrays before parsing since the schema expects arrays
   const item = response.Item;
