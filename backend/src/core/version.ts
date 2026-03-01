@@ -12,7 +12,7 @@ export function getVersionUpdate(characterVersion: RulesetVersion): VersionUpdat
   const [currentMajor, currentMinor, currentPatch] = RULESET_VERSION.split(".").map(Number);
 
   if (charMajor !== currentMajor) {
-    throw new HttpError(409, `Character must be based on major version ${currentMajor}.x`, {
+    throw new HttpError(409, `Character must be based on major version ${currentMajor}.x. Please update your character.`, {
       characterVersion,
       currentVersion: RULESET_VERSION,
     });

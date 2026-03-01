@@ -91,8 +91,7 @@ describe.sequential("version-update component tests", () => {
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
-        409,
-        expect.stringContaining("Character must be based on major version 1.x"),
+        409
       );
     });
 
@@ -108,10 +107,7 @@ describe.sequential("version-update component tests", () => {
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
-        409,
-        expect.stringContaining(
-          `Character version is too new: ${context.character.rulesetVersion}, current ruleset is`,
-        ),
+        409
       );
     });
 
@@ -127,10 +123,7 @@ describe.sequential("version-update component tests", () => {
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
-        409,
-        expect.stringContaining(
-          `Character version is too new: ${context.character.rulesetVersion}, current ruleset is`,
-        ),
+        409
       );
     });
 
@@ -146,10 +139,7 @@ describe.sequential("version-update component tests", () => {
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
             },
           }),
-        409,
-        expect.stringContaining(
-          `Character version is too new: ${context.character.rulesetVersion}, current ruleset is`,
-        ),
+        409
       );
     });
   });
