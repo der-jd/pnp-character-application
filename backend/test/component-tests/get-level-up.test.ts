@@ -183,7 +183,7 @@ describe.sequential("get-level-up component tests", () => {
    * =============================
    */
 
-  describe("denies level-up options", () => {
+  describe("character with unavailable level-up options", () => {
     let context: TestContext;
 
     beforeAll(async () => {

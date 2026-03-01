@@ -376,6 +376,9 @@ describe.sequential("post-level-up component tests", () => {
           expect(response.data.changes.new.specialAbilities).toBeUndefined();
         }
 
+        // Verify version update history record is null (character already at current version)
+        expect(response.versionUpdateHistoryRecord).toBeNull();
+
         expect(response.historyRecord).not.toBeNull();
 
         const historyRecord = response.historyRecord as PostLevelUpHistoryRecord;

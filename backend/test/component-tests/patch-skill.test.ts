@@ -425,6 +425,9 @@ describe.sequential("patch-skill component tests", () => {
         }
         expect(response.data.changes.old.combatStats).toBeUndefined();
         expect(response.data.changes.new.combatStats).toBeUndefined();
+
+        // Verify version update history record is null (character already at current version)
+        expect(response.versionUpdateHistoryRecord).toBeNull();
       });
     });
   });
@@ -669,6 +672,9 @@ describe.sequential("patch-skill component tests", () => {
           expect(response.data.changes.old.combatStats).toBeUndefined();
           expect(response.data.changes.new.combatStats).toBeUndefined();
         }
+
+        // Verify version update history record is null (character already at current version)
+        expect(response.versionUpdateHistoryRecord).toBeNull();
 
         // Verify history record was created
         expect(response.historyRecord).not.toBeNull();

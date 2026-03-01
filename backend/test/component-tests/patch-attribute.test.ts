@@ -297,6 +297,9 @@ describe.sequential("patch-attribute component tests", () => {
         expect(response.data.changes.new.baseValues).toBeUndefined();
         expect(response.data.changes.old.combat).toBeUndefined();
         expect(response.data.changes.new.combat).toBeUndefined();
+
+        // Verify version update history record is null (character already at current version)
+        expect(response.versionUpdateHistoryRecord).toBeNull();
       });
     });
   });
@@ -426,6 +429,9 @@ describe.sequential("patch-attribute component tests", () => {
         expect(diffAvailableAttributePoints).toBe(diffAttributeTotalCost);
 
         expect(response.data.changes.old.attribute).toStrictEqual(attributeOld);
+
+        // Verify version update history record is null (character already at current version)
+        expect(response.versionUpdateHistoryRecord).toBeNull();
 
         // Verify history record was created
         expect(response.historyRecord).not.toBeNull();
@@ -692,6 +698,9 @@ describe.sequential("patch-attribute component tests", () => {
           expect(response.data.changes.new.combat).toBeUndefined();
         }
 
+        // Verify version update history record is null (character already at current version)
+        expect(response.versionUpdateHistoryRecord).toBeNull();
+
         // Verify history record was created
         expect(response.historyRecord).not.toBeNull();
 
@@ -933,6 +942,9 @@ describe.sequential("patch-attribute component tests", () => {
         if (!meleeCombatStatsChanged && !rangedCombatStatsChanged) {
           throw new Error("No combat stats changed");
         }
+
+        // Verify version update history record is null (character already at current version)
+        expect(response.versionUpdateHistoryRecord).toBeNull();
 
         // Verify history record was created
         expect(response.historyRecord).not.toBeNull();
