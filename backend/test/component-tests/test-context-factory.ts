@@ -45,7 +45,7 @@ export class TestContextFactory {
     // Environment variable from Terraform via CircleCI
     const apiBaseUrl = requireEnv("COMPONENT_TESTS_API_BASE_URL");
 
-    const seedCharacterId = this.loadCharacterIdFromTestData("test-data/default-character.dynamodb.json");
+    const seedCharacterId = this.loadCharacterIdFromTestData("test-data/characters/default-character.dynamodb.json");
 
     const secrets = getTestSecrets();
     const userId = secrets.cognitoUsername;
