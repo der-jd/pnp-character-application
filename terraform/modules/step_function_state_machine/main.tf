@@ -53,6 +53,13 @@ variable "version_update_history_record_condition" {
   description = "If this JSONata condition is true, create a history record for version updates. Use '{% true %}' to always create, '{% false %}' to never create, or a conditional expression."
 }
 
+// This variable is only used for the create character endpoint which has a different response structure than the other update endpoints.
+variable "include_version_history_record_in_response" {
+  type        = bool
+  description = "Whether to include versionUpdateHistoryRecord in the response. If true, the field is included (null when no record is created). If false, the field is completely omitted."
+  default     = true
+}
+
 resource "aws_cloudwatch_log_group" "state_machine_log_group" {
   name              = "/aws/vendedlogs/states/${var.state_machine_name}"
   retention_in_days = 0
@@ -227,7 +234,18 @@ resource "aws_sfn_state_machine" "state_machine" {
            * $parse() is used to parse the stringified JSON inside the variables temporarily back to a JSON object before the whole
            * content is stringified with $string() again.
            */
-          "body" = "{% $string({'data': $parse($mainOperationResult),'historyRecord': $addMainOperationHistoryRecordResult ? $parse($addMainOperationHistoryRecordResult) : null,'versionUpdateHistoryRecord': $addVersionHistoryRecordResult ? $parse($addVersionHistoryRecordResult) : null}) %}"
+          "body" = <<EOF
+{% $var.include_version_history_record_in_response ?
+  $string({
+    'data': $parse($mainOperationResult),
+    'historyRecord': $addMainOperationHistoryRecordResult ? $parse($addMainOperationHistoryRecordResult) : null,
+    'versionUpdateHistoryRecord': $addVersionHistoryRecordResult ? $parse($addVersionHistoryRecordResult) : null
+  }) :
+  $string({
+    'data': $parse($mainOperationResult),
+    'historyRecord': $addMainOperationHistoryRecordResult ? $parse($addMainOperationHistoryRecordResult) : null
+  }) %}
+EOF
         }
       }
     }

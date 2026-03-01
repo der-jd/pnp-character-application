@@ -203,5 +203,6 @@ module "create_character_state_machine" {
     data_expression   = "{% $parse($states.input.body).changes %}"
   }
 
-  version_update_history_record_condition = "{% false %}"
+  version_update_history_record_condition    = "{% false %}"
+  include_version_history_record_in_response = false
 }
