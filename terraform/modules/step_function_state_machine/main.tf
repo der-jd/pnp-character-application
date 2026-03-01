@@ -234,7 +234,7 @@ resource "aws_sfn_state_machine" "state_machine" {
            * $parse() is used to parse the stringified JSON inside the variables temporarily back to a JSON object before the whole
            * content is stringified with $string() again.
            */
-          "body" = "{% $var.include_version_history_record_in_response ? $string({'data': $parse($mainOperationResult), 'historyRecord': $addMainOperationHistoryRecordResult ? $parse($addMainOperationHistoryRecordResult) : null, 'versionUpdateHistoryRecord': $exists($addVersionHistoryRecordResult) ? $parse($addVersionHistoryRecordResult) : null}) : $string({'data': $parse($mainOperationResult), 'historyRecord': $addMainOperationHistoryRecordResult ? $parse($addMainOperationHistoryRecordResult) : null}) %}"
+          "body" = "{% $var.include_version_history_record_in_response ? $string({'data': $parse($mainOperationResult), 'historyRecord': $addMainOperationHistoryRecordResult ? $parse($addMainOperationHistoryRecordResult) : null, 'versionUpdateHistoryRecord': $addVersionHistoryRecordResult ? $parse($addVersionHistoryRecordResult) : null}) : $string({'data': $parse($mainOperationResult), 'historyRecord': $addMainOperationHistoryRecordResult ? $parse($addMainOperationHistoryRecordResult) : null}) %}"
         }
       }
     }
