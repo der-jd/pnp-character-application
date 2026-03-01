@@ -68,6 +68,7 @@ module "update_attribute_state_machine" {
 
   main_operation_history_record_skip_condition = "{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}"
   main_operation_history_record_request = {
+    userId_expression           = "{% $parse($states.input.body).userId %}"
     type                        = "5" // ATTRIBUTE_CHANGED
     name_expression             = "{% $parse($states.input.body).attributeName %}"
     data_expression             = "{% $parse($states.input.body).changes %}"

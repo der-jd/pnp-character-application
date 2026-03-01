@@ -24,14 +24,14 @@ resource "aws_iam_role_policy" "api_gateway_policy" {
         Effect = "Allow",
         Action = "states:StartSyncExecution",
         Resource = [
-          aws_sfn_state_machine.create_character_state_machine.arn,
-          aws_sfn_state_machine.update_skill_state_machine.arn,
-          aws_sfn_state_machine.update_attribute_state_machine.arn,
-          aws_sfn_state_machine.update_base_value_state_machine.arn,
-          aws_sfn_state_machine.update_calculation_points_state_machine.arn,
-          aws_sfn_state_machine.apply_level_up_state_machine.arn,
-          aws_sfn_state_machine.update_combat_stats_state_machine.arn,
-          aws_sfn_state_machine.add_special_ability_state_machine.arn
+          module.create_character_state_machine.state_machine_arn,
+          module.update_skill_state_machine.state_machine_arn,
+          module.update_attribute_state_machine.state_machine_arn,
+          module.update_base_value_state_machine.state_machine_arn,
+          module.update_calculation_points_state_machine.state_machine_arn,
+          module.apply_level_up_state_machine.state_machine_arn,
+          module.update_combat_stats_state_machine.state_machine_arn,
+          module.add_special_ability_state_machine.state_machine_arn
         ]
       }
     ]
@@ -67,7 +67,7 @@ module "characters_post" {
   authorizer_id     = aws_api_gateway_authorizer.cognito_authorizer.id
   aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.create_character_state_machine.arn
+  state_machine_arn = module.create_character_state_machine.state_machine_arn
 }
 
 // ================== GET /characters ==================
@@ -196,7 +196,7 @@ module "attribute_name_patch" {
   }
   aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.update_attribute_state_machine.arn
+  state_machine_arn = module.update_attribute_state_machine.state_machine_arn
 }
 
 // ================== OPTIONS /characters/{character-id}/attributes/{attribute-name} ==================
@@ -237,7 +237,7 @@ module "base_value_name_patch" {
   }
   aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.update_base_value_state_machine.arn
+  state_machine_arn = module.update_base_value_state_machine.state_machine_arn
 }
 
 // ================== OPTIONS /characters/{character-id}/base-values/{base-value-name} ==================
@@ -269,7 +269,7 @@ module "calculation_points_patch" {
   }
   aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.update_calculation_points_state_machine.arn
+  state_machine_arn = module.update_calculation_points_state_machine.state_machine_arn
 }
 
 // ================== OPTIONS /characters/{character-id}/calculation-points ==================
@@ -315,7 +315,7 @@ module "level_up_post" {
   }
   aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.apply_level_up_state_machine.arn
+  state_machine_arn = module.apply_level_up_state_machine.state_machine_arn
 }
 
 // ================== OPTIONS /characters/{character-id}/level-up ==================
@@ -382,7 +382,7 @@ module "skill_name_patch" {
   }
   aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.update_skill_state_machine.arn
+  state_machine_arn = module.update_skill_state_machine.state_machine_arn
 }
 
 // ================== OPTIONS /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
@@ -414,7 +414,7 @@ module "special_abilities_post" {
   }
   aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.add_special_ability_state_machine.arn
+  state_machine_arn = module.add_special_ability_state_machine.state_machine_arn
 }
 
 // ================== OPTIONS /characters/{character-id}/special-abilities ==================
@@ -464,7 +464,7 @@ module "combat_skill_name_patch" {
   }
   aws_region        = data.aws_region.current.region
   credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = aws_sfn_state_machine.update_combat_stats_state_machine.arn
+  state_machine_arn = module.update_combat_stats_state_machine.state_machine_arn
 }
 
 
