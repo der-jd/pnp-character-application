@@ -195,7 +195,7 @@ module "create_character_state_machine" {
 
   main_state_name = "CreateCharacter"
 
-  main_operation_history_record_skip_condition = "false"
+  main_operation_history_record_skip_condition = "{% false %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($states.input.body).userId %}"
     type              = "0" // CHARACTER_CREATED
@@ -203,5 +203,5 @@ module "create_character_state_machine" {
     data_expression   = "{% $parse($states.input.body).changes %}"
   }
 
-  version_update_history_record_skip_condition = "true"
+  version_update_history_record_skip_condition = "{% true %}"
 }

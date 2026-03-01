@@ -25,7 +25,7 @@ variable "main_state_name" {
 
 variable "main_operation_history_record_skip_condition" {
   type        = string
-  description = "If this JSONata condition is true, skip the history record creation for main operations. Use 'true' to always skip, 'false' to never skip, or a conditional expression."
+  description = "If this JSONata condition is true, skip the history record creation for main operations. Must be a JSONata expression wrapped in {% ... %}. Use '{% true %}' to always skip, '{% false %}' to never skip, or a conditional expression like '{% $parse($states.input.body).changes.old = $parse($states.input.body).changes.new %}'."
 }
 
 variable "main_operation_history_record_request" {
@@ -44,7 +44,7 @@ variable "main_operation_history_record_request" {
 
 variable "version_update_history_record_skip_condition" {
   type        = string
-  description = "If this JSONata condition is true, skip the history record creation for version updates. Use 'true' to always skip, 'false' to never skip, or a conditional expression."
+  description = "If this JSONata condition is true, skip the history record creation for version updates. Must be a JSONata expression wrapped in {% ... %}. Use '{% true %}' to always skip, '{% false %}' to never skip, or a conditional expression like '{% $exists($parse($states.input.body).versionUpdate) = false %}'."
 }
 
 resource "aws_cloudwatch_log_group" "state_machine_log_group" {
