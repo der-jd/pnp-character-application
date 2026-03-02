@@ -80,12 +80,13 @@ describe.sequential("version-update component tests", () => {
 
   describe("Version update failures", () => {
     test("should fail when character major version is older", async () => {
-      const characterId = TestContextFactory.loadCharacterIdFromTestData("character-major-version-older.dynamodb.json");
-      context = await TestContextFactory.createContext(characterId);
+      context = await TestContextFactory.createContext(
+        TestContextFactory.loadCharacterIdFromTestData("character-major-version-older.dynamodb.json"),
+      );
 
       await expectApiError(
         () =>
-          context.apiClient.patch(`characters/${characterId}/attributes/endurance`, {
+          context.apiClient.patch(`characters/${context.character.characterId}/attributes/endurance`, {
             mod: {
               initialValue: context.character.characterSheet.attributes.endurance.mod,
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
@@ -96,12 +97,13 @@ describe.sequential("version-update component tests", () => {
     });
 
     test("should fail when character major version is newer", async () => {
-      const characterId = TestContextFactory.loadCharacterIdFromTestData("character-major-version-newer.dynamodb.json");
-      context = await TestContextFactory.createContext(characterId);
+      context = await TestContextFactory.createContext(
+        TestContextFactory.loadCharacterIdFromTestData("character-major-version-newer.dynamodb.json"),
+      );
 
       await expectApiError(
         () =>
-          context.apiClient.patch(`characters/${characterId}/attributes/endurance`, {
+          context.apiClient.patch(`characters/${context.character.characterId}/attributes/endurance`, {
             mod: {
               initialValue: context.character.characterSheet.attributes.endurance.mod,
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
@@ -112,12 +114,13 @@ describe.sequential("version-update component tests", () => {
     });
 
     test("should fail when character minor version is newer", async () => {
-      const characterId = TestContextFactory.loadCharacterIdFromTestData("character-minor-version-newer.dynamodb.json");
-      context = await TestContextFactory.createContext(characterId);
+      context = await TestContextFactory.createContext(
+        TestContextFactory.loadCharacterIdFromTestData("character-minor-version-newer.dynamodb.json"),
+      );
 
       await expectApiError(
         () =>
-          context.apiClient.patch(`characters/${characterId}/attributes/endurance`, {
+          context.apiClient.patch(`characters/${context.character.characterId}/attributes/endurance`, {
             mod: {
               initialValue: context.character.characterSheet.attributes.endurance.mod,
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
@@ -128,12 +131,13 @@ describe.sequential("version-update component tests", () => {
     });
 
     test("should fail when character patch version is newer", async () => {
-      const characterId = TestContextFactory.loadCharacterIdFromTestData("character-patch-version-newer.dynamodb.json");
-      context = await TestContextFactory.createContext(characterId);
+      context = await TestContextFactory.createContext(
+        TestContextFactory.loadCharacterIdFromTestData("character-patch-version-newer.dynamodb.json"),
+      );
 
       await expectApiError(
         () =>
-          context.apiClient.patch(`characters/${characterId}/attributes/endurance`, {
+          context.apiClient.patch(`characters/${context.character.characterId}/attributes/endurance`, {
             mod: {
               initialValue: context.character.characterSheet.attributes.endurance.mod,
               newValue: context.character.characterSheet.attributes.endurance.mod + 1,
@@ -152,11 +156,13 @@ describe.sequential("version-update component tests", () => {
 
   describe("Version no change", () => {
     test("should not change when character version matches current version", async () => {
-      const characterId = TestContextFactory.loadCharacterIdFromTestData("character-exact-version-match.dynamodb.json");
-      context = await TestContextFactory.createContext(characterId);
+      context = await TestContextFactory.createContext(
+        TestContextFactory.loadCharacterIdFromTestData("character-exact-version-match.dynamodb.json"),
+      );
 
-      const response = patchAttributeResponseSchema.parse(
-        await context.apiClient.patch(`characters/${characterId}/attributes/endurance`, {
+      const response = patchAttributeResponseSchema.parse(await context.apiClient.patch(
+        `characters/${context.character.characterId}/attributes/endurance`,
+        {
           mod: {
             initialValue: context.character.characterSheet.attributes.endurance.mod,
             newValue: context.character.characterSheet.attributes.endurance.mod + 1,
@@ -181,19 +187,19 @@ describe.sequential("version-update component tests", () => {
     const updateTestCases = [
       {
         name: "should auto-update when character minor version is older",
-        characterId: TestContextFactory.loadCharacterIdFromTestData("character-minor-version-older.dynamodb.json"),
+        seedCharacterId: TestContextFactory.loadCharacterIdFromTestData("character-minor-version-older.dynamodb.json"),
         versionBump: "minor",
       },
       {
         name: "should auto-update when character patch version is older",
-        characterId: TestContextFactory.loadCharacterIdFromTestData("character-patch-version-older.dynamodb.json"),
+        seedCharacterId: TestContextFactory.loadCharacterIdFromTestData("character-patch-version-older.dynamodb.json"),
         versionBump: "patch",
       },
     ];
 
     updateTestCases.forEach((testCase) => {
       test(testCase.name, async () => {
-        context = await TestContextFactory.createContext(testCase.characterId);
+        context = await TestContextFactory.createContext(testCase.seedCharacterId);
 
         const response = patchAttributeResponseSchema.parse(
           await context.apiClient.patch(`characters/${context.character.characterId}/attributes/endurance`, {
