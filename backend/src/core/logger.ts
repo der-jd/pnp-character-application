@@ -10,8 +10,9 @@ export interface SafeEventLog {
   pathParameters: { [key: string]: string } | null;
   queryStringParameters: { [key: string]: string } | null;
   sourceIp: string;
-  userAgent: string;
-  bodySanitized: RequestBody | string | null;
+  cognitoIdentityId: string | null;
+  userAgent: string | null;
+  bodySanitized: RequestBody | null;
 }
 
 const logger = pino({
@@ -34,8 +35,9 @@ export function sanitizeEvent(event: APIGatewayProxyEvent): SafeEventLog {
     path: event.path,
     pathParameters: event.pathParameters as { [key: string]: string } | null,
     queryStringParameters: event.queryStringParameters as { [key: string]: string } | null,
-    sourceIp: event.requestContext.identity?.sourceIp || "unknown",
-    userAgent: event.requestContext.identity?.userAgent || "unknown",
+    sourceIp: event.requestContext.identity.sourceIp,
+    cognitoIdentityId: event.requestContext.identity.cognitoIdentityId,
+    userAgent: event.requestContext.identity.userAgent,
     bodySanitized: null,
   };
 
@@ -48,7 +50,7 @@ export function sanitizeEvent(event: APIGatewayProxyEvent): SafeEventLog {
 
 const SENSITIVE_FIELDS = ["password", "token", "secret", "key", "authorization", "auth", "credential", "pass", "pwd"];
 
-function sanitizeBody(body: string | null | undefined): RequestBody {
+function sanitizeBody(body: string | null | RequestBody): RequestBody | null {
   if (!body) return null;
 
   if (typeof body === "string") {
