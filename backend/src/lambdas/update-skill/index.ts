@@ -38,9 +38,15 @@ import {
   isCombatSkill,
   updateRulesetVersion,
   getVersionUpdate,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("update-skill");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return _updateSkill({
     headers: event.headers,
     pathParameters: event.pathParameters,

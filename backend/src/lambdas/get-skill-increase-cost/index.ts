@@ -22,9 +22,15 @@ import {
   logAndEnsureHttpError,
   logZodError,
   isZodError,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("get-skill-increase-cost");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return getSkillCost({
     headers: event.headers,
     pathParameters: event.pathParameters,

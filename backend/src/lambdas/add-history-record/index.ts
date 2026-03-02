@@ -29,7 +29,11 @@ import {
   logAndEnsureHttpError,
   isZodError,
   logZodError,
+  createLogger,
+  sanitizeEvent,
 } from "core";
+
+const logger = createLogger("add-history-record");
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
 
@@ -66,6 +70,8 @@ export const addHistoryRecordResponseSchema = historyRecordSchema;
 export type AddHistoryRecordResponse = z.infer<typeof addHistoryRecordResponseSchema>;
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return addRecordToHistory({
     headers: event.headers,
     pathParameters: event.pathParameters,

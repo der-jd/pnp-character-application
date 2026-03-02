@@ -25,9 +25,15 @@ import {
   recalculateAndUpdateCombatStats,
   updateRulesetVersion,
   getVersionUpdate,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("update-base-value");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return _updateBaseValue({
     headers: event.headers,
     pathParameters: event.pathParameters,

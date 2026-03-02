@@ -23,9 +23,15 @@ import {
   logZodError,
   updateRulesetVersion,
   getVersionUpdate,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("update-calculation-points");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return _updateCalculationPoints({
     headers: event.headers,
     pathParameters: event.pathParameters,

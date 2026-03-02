@@ -8,10 +8,16 @@ import {
   decodeUserId,
   isZodError,
   logZodError,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 import { getCharacterPathParamsSchema, GetCharacterResponse, GetCharacterPathParams, headersSchema } from "api-spec";
 
+const logger = createLogger("get-character");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return getCharacter({
     headers: event.headers,
     pathParameters: event.pathParameters,

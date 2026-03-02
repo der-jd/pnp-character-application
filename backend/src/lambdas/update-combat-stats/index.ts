@@ -25,9 +25,15 @@ import {
   combatStatsChanged,
   updateRulesetVersion,
   getVersionUpdate,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("update-combat-stats");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return _updateCombatStats({
     headers: event.headers,
     pathParameters: event.pathParameters,
