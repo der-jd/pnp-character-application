@@ -160,9 +160,8 @@ describe.sequential("version-update component tests", () => {
         TestContextFactory.loadCharacterIdFromTestData("character-exact-version-match.dynamodb.json"),
       );
 
-      const response = patchAttributeResponseSchema.parse(await context.apiClient.patch(
-        `characters/${context.character.characterId}/attributes/endurance`,
-        {
+      const response = patchAttributeResponseSchema.parse(
+        await context.apiClient.patch(`characters/${context.character.characterId}/attributes/endurance`, {
           mod: {
             initialValue: context.character.characterSheet.attributes.endurance.mod,
             newValue: context.character.characterSheet.attributes.endurance.mod + 1,
