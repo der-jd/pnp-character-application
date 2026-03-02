@@ -58,3 +58,4 @@ export {
 } from "./rules/combat-stats.js";
 export { computeLevelUpOptionsHash, planApplyLevelUp, computeLevelUpOptions } from "./rules/level-up.js";
 export { getVersionUpdate, RULESET_VERSION } from "./version.js";
+export { createLogger, SafeEventLog, sanitizeEvent } from "./logger.js";
