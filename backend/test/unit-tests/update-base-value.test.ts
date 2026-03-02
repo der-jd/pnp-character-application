@@ -236,6 +236,9 @@ describe("Valid requests", () => {
 
       expect(parsedBody.changes.old.combat).toBeUndefined();
       expect(parsedBody.changes.new.combat).toBeUndefined();
+
+      // Character already at current version
+      expect(parsedBody.versionUpdate).toBeUndefined();
     });
   });
 
@@ -366,6 +369,9 @@ describe("Valid requests", () => {
 
       expect(parsedBody.changes.old.combat).toBeUndefined();
       expect(parsedBody.changes.new.combat).toBeUndefined();
+
+      // Character already at current version
+      expect(parsedBody.versionUpdate).toBeUndefined();
 
       // Check for DynamoDB updates
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);
@@ -645,6 +651,9 @@ describe("Valid requests", () => {
       if (!meleeCombatStatsChanged && !rangedCombatStatsChanged) {
         throw new Error("No combat stats changed");
       }
+
+      // Character already at current version
+      expect(parsedBody.versionUpdate).toBeUndefined();
 
       // Check for DynamoDB updates
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);

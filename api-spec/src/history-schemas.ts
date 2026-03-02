@@ -9,6 +9,7 @@ import {
   combatStatsSchema,
   combinedSkillCategoryAndNameSchema,
   learningMethodSchema,
+  rulesetVersionSchema,
   skillSchema,
   specialAbilitySchema,
 } from "./character-schemas.js";
@@ -17,7 +18,6 @@ import {
   MAX_STRING_LENGTH_VERY_LONG,
   MAX_ARRAY_SIZE,
   MAX_POINTS,
-  MIN_POINTS,
   MAX_HISTORY_RECORDS,
   MAX_HISTORY_BLOCK_NUMBER,
   MIN_HISTORY_BLOCK_NUMBER,
@@ -33,6 +33,7 @@ export enum HistoryRecordType {
   ATTRIBUTE_CHANGED = 5,
   SKILL_CHANGED = 6,
   COMBAT_STATS_CHANGED = 7,
+  RULESET_VERSION_UPDATED = 8,
 }
 
 export const historyRecordSchema = z
@@ -114,12 +115,6 @@ export const characterCreationSchema = z
 
 export type CharacterCreation = z.infer<typeof characterCreationSchema>;
 
-export const integerSchema = z
-  .object({
-    value: z.number().int().min(MIN_POINTS).max(MAX_POINTS),
-  })
-  .strict();
-
 export const levelUpChangeSchema = z
   .object({
     level: levelSchema,
@@ -165,3 +160,24 @@ export const skillChangeSchema = z
     combatStats: combatStatsSchema.optional(),
   })
   .strict();
+
+export const rulesetVersionChangeSchema = z
+  .object({
+    value: rulesetVersionSchema,
+  })
+  .strict();
+
+export const versionUpdateSchema = z
+  .object({
+    old: rulesetVersionChangeSchema,
+    new: rulesetVersionChangeSchema,
+  })
+  .strict();
+
+export type VersionUpdate = z.infer<typeof versionUpdateSchema>;
+
+export const rulesetVersionHistoryRecordSchema = historyRecordSchema.extend({
+  data: versionUpdateSchema,
+});
+
+export type RulesetVersionHistoryRecord = z.infer<typeof rulesetVersionHistoryRecordSchema>;

@@ -7,7 +7,12 @@ import {
   MAX_COST,
 } from "../general-schemas.js";
 import { calculationPointsSchema, learningMethodSchema } from "../character-schemas.js";
-import { historyRecordSchema, skillChangeSchema } from "../history-schemas.js";
+import {
+  historyRecordSchema,
+  rulesetVersionHistoryRecordSchema,
+  skillChangeSchema,
+  versionUpdateSchema,
+} from "../history-schemas.js";
 
 export const patchSkillPathParamsSchema = z
   .object({
@@ -52,6 +57,7 @@ export const updateSkillResponseSchema = z
         new: calculationPointsSchema,
       })
       .strict(),
+    versionUpdate: versionUpdateSchema.optional(),
   })
   .strict();
 
@@ -72,6 +78,7 @@ export const patchSkillResponseSchema = z
   .object({
     data: updateSkillResponseSchema,
     historyRecord: patchSkillHistoryRecordSchema.nullable(),
+    versionUpdateHistoryRecord: rulesetVersionHistoryRecordSchema.nullable(),
   })
   .strict();
 

@@ -96,7 +96,7 @@ export async function getCharacterItem(userId: string, characterId: string): Pro
     throw new HttpError(404, "No character found for the given user and character id");
   }
 
-  console.log("Successfully got DynamoDB item");
+  console.log(`Successfully got DynamoDB item for character ${characterId} of user ${userId}`);
 
   // Convert Sets to arrays before parsing since the schema expects arrays
   const item = response.Item;
@@ -338,6 +338,31 @@ export async function updateSkill(
   await dynamoDBDocClient.send(command);
 
   console.log("Successfully updated DynamoDB item");
+}
+
+export async function updateRulesetVersion(userId: string, characterId: string, rulesetVersion: string): Promise<void> {
+  console.log(
+    `Update ruleset version to '${rulesetVersion}' for character ${characterId} (user ${userId}) in DynamoDB`,
+  );
+
+  const command = new UpdateCommand({
+    TableName: process.env.TABLE_NAME_CHARACTERS,
+    Key: {
+      userId: userId,
+      characterId: characterId,
+    },
+    UpdateExpression: "SET #rulesetVersion = :rulesetVersion",
+    ExpressionAttributeNames: {
+      "#rulesetVersion": "rulesetVersion",
+    },
+    ExpressionAttributeValues: {
+      ":rulesetVersion": rulesetVersion,
+    },
+  });
+
+  await dynamoDBDocClient.send(command);
+
+  console.log("Successfully updated ruleset version in DynamoDB");
 }
 
 export async function updateCombatStats(

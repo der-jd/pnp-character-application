@@ -229,6 +229,10 @@ describe.sequential("patch-combat-stats component tests", () => {
           expect(response.data.combatStats.new.skilledParadeValue).toBe(0);
           expect(response.data.combatStats.new.paradeValue).toBe(0);
         }
+
+        // Verify missing version update (character already at current version)
+        expect(response.data.versionUpdate).toBeUndefined();
+        expect(response.versionUpdateHistoryRecord).toBeNull();
       });
     });
   });
@@ -377,6 +381,10 @@ describe.sequential("patch-combat-stats component tests", () => {
 
         // Verify handling remains unchanged
         expect(response.data.combatStats.new.handling).toBe(oldCombatStats.handling);
+
+        // Verify missing version update (character already at current version)
+        expect(response.data.versionUpdate).toBeUndefined();
+        expect(response.versionUpdateHistoryRecord).toBeNull();
 
         // Verify history record was created
         expect(response.historyRecord).not.toBeNull();

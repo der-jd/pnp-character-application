@@ -17,6 +17,7 @@ import {
   levelUpChangeSchema,
   specialAbilitiesChangeSchema,
   baseValueChangeSchema,
+  rulesetVersionChangeSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -28,7 +29,11 @@ import {
   logAndEnsureHttpError,
   isZodError,
   logZodError,
+  createLogger,
+  sanitizeEvent,
 } from "core";
+
+const logger = createLogger("add-history-record");
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB
 
@@ -65,6 +70,8 @@ export const addHistoryRecordResponseSchema = historyRecordSchema;
 export type AddHistoryRecordResponse = z.infer<typeof addHistoryRecordResponseSchema>;
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return addRecordToHistory({
     headers: event.headers,
     pathParameters: event.pathParameters,
@@ -218,6 +225,10 @@ async function validateRequest(request: Request): Promise<Parameters> {
       case HistoryRecordType.COMBAT_STATS_CHANGED:
         combatStatsSchema.parse(body.data.old);
         combatStatsSchema.parse(body.data.new);
+        break;
+      case HistoryRecordType.RULESET_VERSION_UPDATED:
+        rulesetVersionChangeSchema.parse(body.data.old);
+        rulesetVersionChangeSchema.parse(body.data.new);
         break;
       default:
         throw new HttpError(400, "Invalid history record type!");

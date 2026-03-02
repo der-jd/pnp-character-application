@@ -1,5 +1,5 @@
 import { mockClient } from "aws-sdk-client-mock";
-import { beforeEach } from "vitest";
+import { beforeEach, vi } from "vitest";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 
 // Make the mock global
@@ -8,4 +8,5 @@ import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 // Reset mock before each test to ensure no state is shared between tests
 beforeEach(() => {
   (globalThis as any).dynamoDBMock.reset();
+  vi.restoreAllMocks();
 });

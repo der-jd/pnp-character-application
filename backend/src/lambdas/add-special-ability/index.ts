@@ -17,9 +17,17 @@ import {
   setSpecialAbilities,
   logZodError,
   isZodError,
+  updateRulesetVersion,
+  getVersionUpdate,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("add-special-ability");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return _addSpecialAbility({
     headers: event.headers,
     pathParameters: event.pathParameters,
@@ -43,6 +51,12 @@ export async function _addSpecialAbility(request: Request): Promise<APIGatewayPr
     );
 
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
+
+    const versionUpdate = getVersionUpdate(character.rulesetVersion);
+    if (versionUpdate) {
+      await updateRulesetVersion(params.userId, params.pathParams["character-id"], versionUpdate.new.value);
+    }
+
     const specialAbilitiesOld = character.characterSheet.specialAbilities;
     const specialAbilitiesNew = [...specialAbilitiesOld];
     if (!specialAbilitiesNew.includes(params.body.specialAbility)) {
@@ -62,6 +76,7 @@ export async function _addSpecialAbility(request: Request): Promise<APIGatewayPr
           values: specialAbilitiesNew,
         },
       },
+      versionUpdate,
     };
     const response = {
       statusCode: 200,

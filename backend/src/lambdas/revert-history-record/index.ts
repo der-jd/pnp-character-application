@@ -40,9 +40,15 @@ import {
   getSkillCategoryAndName,
   getCombatCategory,
   setLevelUp,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("revert-history-record");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return revertRecordFromHistory({
     headers: event.headers,
     pathParameters: event.pathParameters,

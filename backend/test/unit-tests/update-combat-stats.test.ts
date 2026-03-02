@@ -320,6 +320,9 @@ describe("Valid requests", () => {
       }
 
       expect(parsedBody.combatStats.new.handling).toBe(getCombatSkillHandling(skillName as CombatSkillName));
+
+      // Character already at current version
+      expect(parsedBody.versionUpdate).toBeUndefined();
     });
   });
 
@@ -485,6 +488,9 @@ describe("Valid requests", () => {
 
       expect(parsedBody.combatStats.new.handling).toBe(getCombatSkillHandling(skillName as CombatSkillName));
       expect(parsedBody.combatStats.new.handling).toBe(parsedBody.combatStats.old.handling);
+
+      // Character already at current version
+      expect(parsedBody.versionUpdate).toBeUndefined();
 
       // Check for DynamoDB updates
       const calls = (globalThis as any).dynamoDBMock.commandCalls(UpdateCommand);

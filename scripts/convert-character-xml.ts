@@ -322,6 +322,7 @@ async function main(): Promise<void> {
     userId,
     characterId,
     characterSheet,
+    rulesetVersion: "1.0.0",
   };
 
   characterSchema.parse(character);

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { initialIncreasedSchemaOptional, MAX_STRING_LENGTH_DEFAULT, userIdSchema } from "../general-schemas.js";
 import { combatStatsSchema } from "../character-schemas.js";
-import { historyRecordSchema } from "../history-schemas.js";
+import { historyRecordSchema, rulesetVersionHistoryRecordSchema, versionUpdateSchema } from "../history-schemas.js";
 
 export const patchCombatStatsPathParamsSchema = z
   .object({
@@ -34,6 +34,7 @@ export const updateCombatStatsResponseSchema = z
         new: combatStatsSchema,
       })
       .strict(),
+    versionUpdate: versionUpdateSchema.optional(),
   })
   .strict();
 
@@ -54,6 +55,7 @@ export const patchCombatStatsResponseSchema = z
   .object({
     data: updateCombatStatsResponseSchema,
     historyRecord: patchCombatStatsHistoryRecordSchema.nullable(),
+    versionUpdateHistoryRecord: rulesetVersionHistoryRecordSchema.nullable(),
   })
   .strict();
 

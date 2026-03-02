@@ -28,9 +28,17 @@ import {
   calculateBaseValues,
   recalculateAndUpdateCombatStats,
   combatBaseValuesChangedAffectingCombatStats,
+  updateRulesetVersion,
+  getVersionUpdate,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("update-attribute");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return _updateAttribute({
     headers: event.headers,
     pathParameters: event.pathParameters,
@@ -54,6 +62,12 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
 
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
     const characterSheet = character.characterSheet;
+
+    const versionUpdate = getVersionUpdate(character.rulesetVersion);
+    if (versionUpdate) {
+      await updateRulesetVersion(params.userId, params.pathParams["character-id"], versionUpdate.new.value);
+    }
+
     const attributePointsOld = characterSheet.calculationPoints.attributePoints;
     let attributePoints = structuredClone(attributePointsOld);
     const attributeOld = getAttribute(characterSheet.attributes, params.pathParams["attribute-name"]);
@@ -170,6 +184,7 @@ export async function _updateAttribute(request: Request): Promise<APIGatewayProx
         old: attributePointsOld,
         new: attributePoints,
       },
+      versionUpdate,
     };
     const response = {
       statusCode: 200,

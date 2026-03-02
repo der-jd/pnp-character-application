@@ -36,9 +36,17 @@ import {
   calculateCombatStats,
   combatStatsChanged,
   isCombatSkill,
+  updateRulesetVersion,
+  getVersionUpdate,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("update-skill");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return _updateSkill({
     headers: event.headers,
     pathParameters: event.pathParameters,
@@ -64,6 +72,12 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
 
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
     const characterSheet = character.characterSheet;
+
+    const versionUpdate = getVersionUpdate(character.rulesetVersion);
+    if (versionUpdate) {
+      await updateRulesetVersion(params.userId, params.pathParams["character-id"], versionUpdate.new.value);
+    }
+
     const skillOld = getSkill(characterSheet.skills, skillCategory, skillName);
     let skill = structuredClone(skillOld);
     const adventurePointsOld = characterSheet.calculationPoints.adventurePoints;
@@ -161,6 +175,7 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
         old: adventurePointsOld,
         new: adventurePoints,
       },
+      versionUpdate,
     };
     const response = {
       statusCode: 200,

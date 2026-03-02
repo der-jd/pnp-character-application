@@ -3,7 +3,7 @@
     "S": "c314f862-a001-707e-7254-5572e9500c88"
   },
   "characterId": {
-    "S": "49b78652-c1c8-4482-9522-e4ecd2e7836c"
+    "S": "707b4c44-2dee-49e9-8399-574292bcadd6"
   },
   "characterSheet": {
     "M": {
@@ -174,10 +174,10 @@
           "armorLevel": {
             "M": {
               "byLvlUp": {
-                "N": "4"
+                "N": "16"
               },
               "current": {
-                "N": "4"
+                "N": "16"
               },
               "mod": {
                 "N": "0"
@@ -206,10 +206,10 @@
           "bonusActionsPerCombatRound": {
             "M": {
               "byLvlUp": {
-                "N": "3"
+                "N": "1"
               },
               "current": {
-                "N": "3"
+                "N": "1"
               },
               "mod": {
                 "N": "0"
@@ -225,10 +225,10 @@
                 "N": "36"
               },
               "byLvlUp": {
-                "N": "80"
+                "N": "24"
               },
               "current": {
-                "N": "116"
+                "N": "60"
               },
               "mod": {
                 "N": "0"
@@ -244,10 +244,10 @@
                 "N": "5"
               },
               "byLvlUp": {
-                "N": "1"
+                "N": "5"
               },
               "current": {
-                "N": "6"
+                "N": "10"
               },
               "mod": {
                 "N": "0"
@@ -260,10 +260,10 @@
           "legendaryActions": {
             "M": {
               "byLvlUp": {
-                "N": "3"
+                "N": "1"
               },
               "current": {
-                "N": "4"
+                "N": "2"
               },
               "mod": {
                 "N": "0"
@@ -276,10 +276,10 @@
           "luckPoints": {
             "M": {
               "byLvlUp": {
-                "N": "3"
+                "N": "2"
               },
               "current": {
-                "N": "3"
+                "N": "2"
               },
               "mod": {
                 "N": "0"
@@ -760,7 +760,7 @@
             "S": "Tall and strong"
           },
           "birthday": {
-            "S": "1980-01-01"
+            "S": "2000-01-01"
           },
           "birthplace": {
             "S": "Durotar"
@@ -782,20 +782,13 @@
             }
           },
           "level": {
-            "N": "33"
+            "N": "20"
           },
           "levelUpProgress": {
             "M": {
               "effectsByLevel": {
                 "M": {
                   "2": {
-                    "M": {
-                      "kind": {
-                        "S": "rerollUnlock"
-                      }
-                    }
-                  },
-                  "3": {
                     "M": {
                       "kind": {
                         "S": "luckPlusOne"
@@ -805,7 +798,7 @@
                       }
                     }
                   },
-                  "4": {
+                  "3": {
                     "M": {
                       "kind": {
                         "S": "hpRoll"
@@ -822,10 +815,20 @@
                       }
                     }
                   },
+                  "4": {
+                    "M": {
+                      "kind": {
+                        "S": "initiativePlusOne"
+                      },
+                      "delta": {
+                        "N": "1"
+                      }
+                    }
+                  },
                   "5": {
                     "M": {
                       "kind": {
-                        "S": "hpRoll"
+                        "S": "armorLevelRoll"
                       },
                       "roll": {
                         "M": {
@@ -842,7 +845,7 @@
                   "6": {
                     "M": {
                       "kind": {
-                        "S": "luckPlusOne"
+                        "S": "bonusActionPlusOne"
                       },
                       "delta": {
                         "N": "1"
@@ -869,7 +872,17 @@
                   "8": {
                     "M": {
                       "kind": {
-                        "S": "hpRoll"
+                        "S": "initiativePlusOne"
+                      },
+                      "delta": {
+                        "N": "1"
+                      }
+                    }
+                  },
+                  "9": {
+                    "M": {
+                      "kind": {
+                        "S": "armorLevelRoll"
                       },
                       "roll": {
                         "M": {
@@ -883,20 +896,10 @@
                       }
                     }
                   },
-                  "9": {
-                    "M": {
-                      "kind": {
-                        "S": "luckPlusOne"
-                      },
-                      "delta": {
-                        "N": "1"
-                      }
-                    }
-                  },
                   "10": {
                     "M": {
                       "kind": {
-                        "S": "bonusActionPlusOne"
+                        "S": "luckPlusOne"
                       },
                       "delta": {
                         "N": "1"
@@ -933,24 +936,17 @@
                   "13": {
                     "M": {
                       "kind": {
-                        "S": "hpRoll"
+                        "S": "initiativePlusOne"
                       },
-                      "roll": {
-                        "M": {
-                          "dice": {
-                            "S": "1d4+2"
-                          },
-                          "value": {
-                            "N": "4"
-                          }
-                        }
+                      "delta": {
+                        "N": "1"
                       }
                     }
                   },
                   "14": {
                     "M": {
                       "kind": {
-                        "S": "hpRoll"
+                        "S": "armorLevelRoll"
                       },
                       "roll": {
                         "M": {
@@ -984,24 +980,17 @@
                   "16": {
                     "M": {
                       "kind": {
-                        "S": "hpRoll"
+                        "S": "initiativePlusOne"
                       },
-                      "roll": {
-                        "M": {
-                          "dice": {
-                            "S": "1d4+2"
-                          },
-                          "value": {
-                            "N": "4"
-                          }
-                        }
+                      "delta": {
+                        "N": "1"
                       }
                     }
                   },
                   "17": {
                     "M": {
                       "kind": {
-                        "S": "hpRoll"
+                        "S": "armorLevelRoll"
                       },
                       "roll": {
                         "M": {
@@ -1035,43 +1024,16 @@
                   "19": {
                     "M": {
                       "kind": {
-                        "S": "hpRoll"
+                        "S": "initiativePlusOne"
                       },
-                      "roll": {
-                        "M": {
-                          "dice": {
-                            "S": "1d4+2"
-                          },
-                          "value": {
-                            "N": "4"
-                          }
-                        }
+                      "delta": {
+                        "N": "1"
                       }
                     }
                   },
                   "20": {
                     "M": {
                       "kind": {
-                        "S": "bonusActionPlusOne"
-                      },
-                      "delta": {
-                        "N": "1"
-                      }
-                    }
-                  },
-                  "21": {
-                    "M": {
-                      "kind": {
-                        "S": "legendaryActionPlusOne"
-                      },
-                      "delta": {
-                        "N": "1"
-                      }
-                    }
-                  },
-                  "22": {
-                    "M": {
-                      "kind": {
                         "S": "hpRoll"
                       },
                       "roll": {
@@ -1083,172 +1045,6 @@
                             "N": "4"
                           }
                         }
-                      }
-                    }
-                  },
-                  "23": {
-                    "M": {
-                      "kind": {
-                        "S": "hpRoll"
-                      },
-                      "roll": {
-                        "M": {
-                          "dice": {
-                            "S": "1d4+2"
-                          },
-                          "value": {
-                            "N": "4"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "24": {
-                    "M": {
-                      "kind": {
-                        "S": "hpRoll"
-                      },
-                      "roll": {
-                        "M": {
-                          "dice": {
-                            "S": "1d4+2"
-                          },
-                          "value": {
-                            "N": "4"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "25": {
-                    "M": {
-                      "kind": {
-                        "S": "hpRoll"
-                      },
-                      "roll": {
-                        "M": {
-                          "dice": {
-                            "S": "1d4+2"
-                          },
-                          "value": {
-                            "N": "4"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "26": {
-                    "M": {
-                      "kind": {
-                        "S": "hpRoll"
-                      },
-                      "roll": {
-                        "M": {
-                          "dice": {
-                            "S": "1d4+2"
-                          },
-                          "value": {
-                            "N": "4"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "27": {
-                    "M": {
-                      "kind": {
-                        "S": "hpRoll"
-                      },
-                      "roll": {
-                        "M": {
-                          "dice": {
-                            "S": "1d4+2"
-                          },
-                          "value": {
-                            "N": "4"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "28": {
-                    "M": {
-                      "kind": {
-                        "S": "hpRoll"
-                      },
-                      "roll": {
-                        "M": {
-                          "dice": {
-                            "S": "1d4+2"
-                          },
-                          "value": {
-                            "N": "4"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "29": {
-                    "M": {
-                      "kind": {
-                        "S": "hpRoll"
-                      },
-                      "roll": {
-                        "M": {
-                          "dice": {
-                            "S": "1d4+2"
-                          },
-                          "value": {
-                            "N": "4"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "30": {
-                    "M": {
-                      "kind": {
-                        "S": "bonusActionPlusOne"
-                      },
-                      "delta": {
-                        "N": "1"
-                      }
-                    }
-                  },
-                  "31": {
-                    "M": {
-                      "kind": {
-                        "S": "legendaryActionPlusOne"
-                      },
-                      "delta": {
-                        "N": "1"
-                      }
-                    }
-                  },
-                  "32": {
-                    "M": {
-                      "kind": {
-                        "S": "armorLevelRoll"
-                      },
-                      "roll": {
-                        "M": {
-                          "dice": {
-                            "S": "1d4+2"
-                          },
-                          "value": {
-                            "N": "4"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "33": {
-                    "M": {
-                      "kind": {
-                        "S": "initiativePlusOne"
-                      },
-                      "delta": {
-                        "N": "1"
                       }
                     }
                   }
@@ -1256,94 +1052,81 @@
               },
               "effects": {
                 "M": {
-                  "rerollUnlock": {
-                    "M": {
-                      "selectionCount": {
-                        "N": "1"
-                      },
-                      "firstChosenLevel": {
-                        "N": "2"
-                      },
-                      "lastChosenLevel": {
-                        "N": "2"
-                      }
-                    }
-                  },
-                  "luckPlusOne": {
-                    "M": {
-                      "selectionCount": {
-                        "N": "3"
-                      },
-                      "firstChosenLevel": {
-                        "N": "3"
-                      },
-                      "lastChosenLevel": {
-                        "N": "9"
-                      }
-                    }
-                  },
                   "hpRoll": {
                     "M": {
                       "selectionCount": {
+                        "N": "6"
+                      },
+                      "firstChosenLevel": {
+                        "N": "3"
+                      },
+                      "lastChosenLevel": {
                         "N": "20"
-                      },
-                      "firstChosenLevel": {
-                        "N": "4"
-                      },
-                      "lastChosenLevel": {
-                        "N": "29"
-                      }
-                    }
-                  },
-                  "bonusActionPlusOne": {
-                    "M": {
-                      "selectionCount": {
-                        "N": "3"
-                      },
-                      "firstChosenLevel": {
-                        "N": "10"
-                      },
-                      "lastChosenLevel": {
-                        "N": "30"
-                      }
-                    }
-                  },
-                  "legendaryActionPlusOne": {
-                    "M": {
-                      "selectionCount": {
-                        "N": "3"
-                      },
-                      "firstChosenLevel": {
-                        "N": "11"
-                      },
-                      "lastChosenLevel": {
-                        "N": "31"
                       }
                     }
                   },
                   "armorLevelRoll": {
                     "M": {
                       "selectionCount": {
-                        "N": "1"
+                        "N": "4"
                       },
                       "firstChosenLevel": {
-                        "N": "32"
+                        "N": "5"
                       },
                       "lastChosenLevel": {
-                        "N": "32"
+                        "N": "17"
                       }
                     }
                   },
                   "initiativePlusOne": {
                     "M": {
                       "selectionCount": {
+                        "N": "5"
+                      },
+                      "firstChosenLevel": {
+                        "N": "4"
+                      },
+                      "lastChosenLevel": {
+                        "N": "19"
+                      }
+                    }
+                  },
+                  "luckPlusOne": {
+                    "M": {
+                      "selectionCount": {
+                        "N": "2"
+                      },
+                      "firstChosenLevel": {
+                        "N": "2"
+                      },
+                      "lastChosenLevel": {
+                        "N": "10"
+                      }
+                    }
+                  },
+                  "bonusActionPlusOne": {
+                    "M": {
+                      "selectionCount": {
                         "N": "1"
                       },
                       "firstChosenLevel": {
-                        "N": "33"
+                        "N": "6"
                       },
                       "lastChosenLevel": {
-                        "N": "33"
+                        "N": "6"
+                      }
+                    }
+                  },
+                  "legendaryActionPlusOne": {
+                    "M": {
+                      "selectionCount": {
+                        "N": "1"
+                      },
+                      "firstChosenLevel": {
+                        "N": "11"
+                      },
+                      "lastChosenLevel": {
+                        "N": "11"
                       }
                     }
                   }
@@ -1352,7 +1135,7 @@
             }
           },
           "name": {
-            "S": "[DO NOT EDIT] Character with unavailable level ups for component tests"
+            "S": "[DO NOT EDIT] Character used for component tests (exact version match)"
           },
           "profession": {
             "M": {
@@ -3126,8 +2909,11 @@
         }
       },
       "specialAbilities": {
-        "SS": ["test ability for component test", "Reroll"]
+        "SS": ["test ability for component test"]
       }
     }
+  },
+  "rulesetVersion": {
+    "S": "1.1.1"
   }
 }
