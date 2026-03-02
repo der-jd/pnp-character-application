@@ -4,7 +4,7 @@ import { RequestBody } from "./request.js";
 
 export interface SafeEventLog {
   timestamp: string;
-  requestId: string;
+  requestId: string | undefined;
   method: string;
   path: string;
   pathParameters: { [key: string]: string } | null;
