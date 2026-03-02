@@ -9,7 +9,7 @@ export interface SafeEventLog {
   path: string;
   pathParameters: { [key: string]: string } | null;
   queryStringParameters: { [key: string]: string } | null;
-  sourceIp: string;
+  sourceIp: string | undefined;
   cognitoIdentityId: string | null;
   userAgent: string | null;
   bodySanitized: RequestBody | null;
@@ -30,14 +30,14 @@ export function createLogger(component: string): Logger {
 export function sanitizeEvent(event: APIGatewayProxyEvent): SafeEventLog {
   const safeLog: SafeEventLog = {
     timestamp: new Date().toISOString(),
-    requestId: event.requestContext.requestId,
+    requestId: event.requestContext?.requestId,
     method: event.httpMethod,
     path: event.path,
     pathParameters: event.pathParameters as { [key: string]: string } | null,
     queryStringParameters: event.queryStringParameters as { [key: string]: string } | null,
-    sourceIp: event.requestContext.identity.sourceIp,
-    cognitoIdentityId: event.requestContext.identity.cognitoIdentityId,
-    userAgent: event.requestContext.identity.userAgent,
+    sourceIp: event.requestContext?.identity?.sourceIp,
+    cognitoIdentityId: event.requestContext?.identity?.cognitoIdentityId ?? null,
+    userAgent: event.requestContext?.identity?.userAgent ?? null,
     bodySanitized: null,
   };
 
