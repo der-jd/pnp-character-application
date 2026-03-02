@@ -54,8 +54,13 @@ function sanitizeBody(body: string | null | RequestBody): RequestBody | null {
   if (!body) return null;
 
   if (typeof body === "string") {
-    const parsed = JSON.parse(body);
-    return sanitizeObject(parsed);
+    try {
+      const parsed = JSON.parse(body);
+      return sanitizeObject(parsed);
+    } catch {
+      // If JSON parsing fails, return null to avoid breaking the request
+      return null;
+    }
   } else {
     return sanitizeObject(body);
   }
