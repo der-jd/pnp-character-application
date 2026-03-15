@@ -56,6 +56,8 @@ export {
   skillNames,
   combatSectionSchema,
   CombatSection,
+  rulesetVersionSchema,
+  RulesetVersion,
 } from "./character-schemas.js";
 export {
   historyRecordSchema,
@@ -63,7 +65,6 @@ export {
   HistoryRecord,
   historyBlockSchema,
   HistoryBlock,
-  integerSchema,
   attributeChangeSchema,
   baseValueChangeSchema,
   levelUpChangeSchema,
@@ -71,6 +72,11 @@ export {
   calculationPointsChangeSchema,
   skillChangeSchema,
   characterCreationSchema,
+  rulesetVersionChangeSchema,
+  rulesetVersionHistoryRecordSchema,
+  RulesetVersionHistoryRecord,
+  versionUpdateSchema,
+  VersionUpdate,
   CharacterCreation,
   NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION,
   activatedSkillsSchema,

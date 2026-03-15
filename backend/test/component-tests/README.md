@@ -31,7 +31,7 @@ Tests share a single, temporary character per file to ensure isolation **between
 
 - Create a test user in Cognito by running `scripts/create_user_for_cognito.sh`
 - Set the required [environment variables](../../../.circleci/README.md#component-test-secrets) in CircleCI
-- Create seed characters and history items: Manually copy the test data from `./test-data` to DynamoDB
+- Create seed characters and history items: Run `scripts/upload-component-test-data.sh -p <AWS_PROFILE>` to upload test data from `./test-data` to DynamoDB
 
 ## Running Tests
 

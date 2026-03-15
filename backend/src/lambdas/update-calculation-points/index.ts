@@ -21,9 +21,17 @@ import {
   updateAttributePoints,
   isZodError,
   logZodError,
+  updateRulesetVersion,
+  getVersionUpdate,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("update-calculation-points");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return _updateCalculationPoints({
     headers: event.headers,
     pathParameters: event.pathParameters,
@@ -47,6 +55,12 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
 
     const character = await getCharacterItem(params.userId, params.pathParams["character-id"]);
     const characterSheet = character.characterSheet;
+
+    const versionUpdate = getVersionUpdate(character.rulesetVersion);
+    if (versionUpdate) {
+      await updateRulesetVersion(params.userId, params.pathParams["character-id"], versionUpdate.new.value);
+    }
+
     const adventurePointsOld = characterSheet.calculationPoints.adventurePoints;
     const attributePointsOld = characterSheet.calculationPoints.attributePoints;
     let adventurePoints = structuredClone(adventurePointsOld);
@@ -96,6 +110,7 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
           attributePoints: params.body.attributePoints ? attributePoints : undefined,
         },
       },
+      versionUpdate,
     };
     const response = {
       statusCode: 200,

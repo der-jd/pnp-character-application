@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { userIdSchema } from "../general-schemas.js";
 import { specialAbilitySchema } from "../character-schemas.js";
-import { historyRecordSchema, specialAbilitiesChangeSchema } from "../history-schemas.js";
+import {
+  historyRecordSchema,
+  rulesetVersionHistoryRecordSchema,
+  specialAbilitiesChangeSchema,
+  versionUpdateSchema,
+} from "../history-schemas.js";
 
 export const postSpecialAbilitiesPathParamsSchema = z
   .object({
@@ -30,6 +35,7 @@ export const addSpecialAbilityResponseSchema = z
         new: specialAbilitiesChangeSchema,
       })
       .strict(),
+    versionUpdate: versionUpdateSchema.optional(),
   })
   .strict();
 
@@ -50,6 +56,7 @@ export const postSpecialAbilitiesResponseSchema = z
   .object({
     data: addSpecialAbilityResponseSchema,
     historyRecord: postSpecialAbilitiesHistoryRecordSchema.nullable(),
+    versionUpdateHistoryRecord: rulesetVersionHistoryRecordSchema.nullable(),
   })
   .strict();
 

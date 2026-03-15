@@ -22,9 +22,15 @@ import {
   logZodError,
   isZodError,
   getCharacterItem,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("set-history-comment");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return setHistoryComment({
     headers: event.headers,
     pathParameters: event.pathParameters,

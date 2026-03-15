@@ -1,5 +1,6 @@
 import { AdvantagesNames, Character, CostCategory, DisadvantagesNames } from "api-spec";
 import { fakeUserId } from "./request.js";
+import { RULESET_VERSION } from "core";
 
 export const fakeCharacterId = "9862f3c9-a065-4e0e-80b2-5bf085535cbe";
 
@@ -979,6 +980,7 @@ export const fakeCharacter: Character = {
       },
     },
   },
+  rulesetVersion: RULESET_VERSION,
 };
 
 export const fakeCharacter2Id = "66797988-4b56-4571-820b-e918a8647d01";
@@ -1964,4 +1966,5 @@ export const fakeCharacter2: Character = {
       },
     },
   },
+  rulesetVersion: RULESET_VERSION,
 };

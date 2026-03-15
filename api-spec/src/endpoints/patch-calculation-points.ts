@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { initialNewSchema, initialIncreasedSchema, userIdSchema } from "../general-schemas.js";
-import { calculationPointsChangeSchema, historyRecordSchema } from "../history-schemas.js";
+import {
+  calculationPointsChangeSchema,
+  historyRecordSchema,
+  rulesetVersionHistoryRecordSchema,
+  versionUpdateSchema,
+} from "../history-schemas.js";
 
 export const patchCalculationPointsPathParamsSchema = z
   .object({
@@ -41,6 +46,7 @@ export const updateCalculationPointsResponseSchema = z
         new: calculationPointsChangeSchema,
       })
       .strict(),
+    versionUpdate: versionUpdateSchema.optional(),
   })
   .strict();
 
@@ -61,6 +67,7 @@ export const patchCalculationPointsResponseSchema = z
   .object({
     data: updateCalculationPointsResponseSchema,
     historyRecord: patchCalculationPointsHistoryRecordSchema.nullable(),
+    versionUpdateHistoryRecord: rulesetVersionHistoryRecordSchema.nullable(),
   })
   .strict();
 

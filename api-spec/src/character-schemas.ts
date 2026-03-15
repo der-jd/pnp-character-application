@@ -33,6 +33,13 @@ export type ProfessionHobby = z.infer<typeof professionHobbySchema>;
 
 export const characterNameSchema = z.string().max(MAX_STRING_LENGTH_DEFAULT);
 
+export const rulesetVersionSchema = z
+  .string()
+  .regex(/^\d+\.\d+\.\d+$/, "Must be semantic version format")
+  .max(MAX_STRING_LENGTH_DEFAULT);
+
+export type RulesetVersion = z.infer<typeof rulesetVersionSchema>;
+
 export const generalInformationSchema = z
   .object({
     name: characterNameSchema,
@@ -540,6 +547,7 @@ export const characterSchema = z
     userId: userIdSchema,
     characterId: z.uuid(),
     characterSheet: characterSheetSchema,
+    rulesetVersion: rulesetVersionSchema,
   })
   .strict();
 

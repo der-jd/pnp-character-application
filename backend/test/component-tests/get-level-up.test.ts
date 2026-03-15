@@ -183,12 +183,12 @@ describe.sequential("get-level-up component tests", () => {
    * =============================
    */
 
-  describe("denies level-up options", () => {
+  describe("character with unavailable level-up options", () => {
     let context: TestContext;
 
     beforeAll(async () => {
       const characterId = TestContextFactory.loadCharacterIdFromTestData(
-        "test-data/character-with-unavailable-level-ups.dynamodb.json",
+        "character-with-unavailable-level-ups.dynamodb.json",
       );
       context = await TestContextFactory.createContext(characterId);
     });

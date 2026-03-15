@@ -19,9 +19,15 @@ import {
   decodeUserId,
   isZodError,
   logZodError,
+  createLogger,
+  sanitizeEvent,
 } from "core";
 
+const logger = createLogger("get-history");
+
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info(sanitizeEvent(event), "Incoming request");
+
   return getHistory({
     headers: event.headers,
     pathParameters: event.pathParameters,

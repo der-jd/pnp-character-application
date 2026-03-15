@@ -34,6 +34,7 @@ export interface BaseSetup {
 
 export class TestContextFactory {
   private static baseSetup: BaseSetup | undefined;
+  private static readonly TEST_DATA_BASE_PATH = "test-data/characters";
 
   static async initializeBaseSetup(): Promise<void> {
     if (this.baseSetup) {
@@ -45,7 +46,7 @@ export class TestContextFactory {
     // Environment variable from Terraform via CircleCI
     const apiBaseUrl = requireEnv("COMPONENT_TESTS_API_BASE_URL");
 
-    const seedCharacterId = this.loadCharacterIdFromTestData("test-data/default-character.dynamodb.json");
+    const seedCharacterId = this.loadCharacterIdFromTestData("default-character.dynamodb.json");
 
     const secrets = getTestSecrets();
     const userId = secrets.cognitoUsername;
@@ -120,7 +121,10 @@ export class TestContextFactory {
   static loadCharacterIdFromTestData(relativePath: string): string {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
-    const absolutePath = join(__dirname, relativePath);
+    const fullPath = relativePath.startsWith(this.TEST_DATA_BASE_PATH)
+      ? relativePath
+      : `${this.TEST_DATA_BASE_PATH}/${relativePath}`;
+    const absolutePath = join(__dirname, fullPath);
     const characterData = JSON.parse(readFileSync(absolutePath, "utf8"));
     const characterId = characterData.characterId.S;
     if (!characterId) {
