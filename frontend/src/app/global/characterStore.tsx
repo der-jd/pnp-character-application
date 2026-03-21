@@ -1,6 +1,10 @@
-import { CharacterSheet, CombatValues } from "@/src/lib/api/models/Character/character";
+import { CharacterSheet } from "@/src/lib/api/models/Character/character";
+import { CombatStats } from "api-spec";
 import { AllCharactersCharacter } from "@/src/lib/api/models/allCharacters/interface";
-import { getAllCharacters, getCharacter } from "@/src/lib/api/utils/api_calls";
+import { CharacterService, AuthService, HistoryService, CharacterApplicationService } from "@/src/lib/services";
+import { ApiClient } from "@/src/lib/services/apiClient";
+import { featureLogger } from "@/src/lib/utils/featureLogger";
+
 import { create } from "zustand";
 import * as R from "ramda";
 import { RecordEntry } from "@/src/lib/api/models/history/interface";
@@ -8,6 +12,12 @@ import { RecordEntry } from "@/src/lib/api/models/history/interface";
 function asPath(path: (string | number | symbol)[]): (string | number)[] {
   return path.map((key) => key.toString()); // or key as string
 }
+
+const apiClient = new ApiClient();
+const characterService = new CharacterService(apiClient);
+const authService = new AuthService();
+const historyService = new HistoryService(apiClient);
+const characterApplicationService = new CharacterApplicationService(characterService, historyService, authService);
 
 export interface CharacterStore {
   availableCharacters: Array<AllCharactersCharacter>;
@@ -26,7 +36,7 @@ export interface CharacterStore {
   setOpenHistoryEntries: (entries: Array<RecordEntry>) => void;
 
   updateValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: number) => void;
-  updateCombatValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, combatValue: CombatValues) => void;
+  updateCombatValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, combatValue: CombatStats) => void;
 
   toggleEdit: () => void;
 
@@ -34,6 +44,15 @@ export interface CharacterStore {
   updateCharacter: (idToken: string, charId: string) => void;
   updateHistoryEntries: (newEntries: RecordEntry[]) => void;
   updateOpenHistoryEntries: (newEntries: RecordEntry[]) => void;
+
+  // New Application Service methods
+  increaseSkill: (
+    characterId: string,
+    skillName: string,
+    points: number,
+    learningMethod: string,
+    idToken: string,
+  ) => Promise<boolean>;
 }
 
 /**
@@ -101,14 +120,13 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
    * @param name The name of the value to update
    * @param newValue The new value of the value to update
    */
-  updateCombatValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: CombatValues) => {
+  updateCombatValue: (path: (keyof CharacterSheet)[], name: keyof CharacterSheet, newValue: CombatStats) => {
     set((state) => {
       if (!state.characterSheet) {
         throw new Error(`No character sheet has been loaded yet, updating value ${String(name)} failed`);
       }
 
       const fullPath = [...path, name].map(String);
-      console.log(fullPath);
       return {
         characterSheet: R.modifyPath(fullPath, () => newValue, state.characterSheet),
       };
@@ -117,35 +135,52 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
 
   /**
    * Fetches all own and shared characters for the current user and updates the character store
+   * Now uses Application Service for proper clean architecture
    *
    * @param idToken The idToken of the user
    */
   updateAvailableCharacters: async (idToken: string) => {
-    try {
-      const characters = await getAllCharacters(idToken);
-      set(() => ({
-        availableCharacters: [...characters.characters],
+    // TODO: Use LoadAllCharactersUseCase when implemented
+    // For now, use service directly but through application service pattern
+    const result = await characterService.getAllCharacters(idToken);
+
+    if (result.success) {
+      // Convert domain characters back to interface format for compatibility
+      const characters = result.data.map((char) => ({
+        userId: char.userId,
+        characterId: char.characterId,
+        name: char.name,
+        level: char.level,
       }));
-    } catch {
-      console.log(`[Character store] Error while fetching available characters!`);
+
+      set(() => ({
+        availableCharacters: characters,
+      }));
+    } else {
+      featureLogger.error("CharacterStore", "Error fetching available characters:", result.error);
     }
   },
 
   /**
    * Fetches the specified character and updates the character store
+   * Now uses Application Service following clean architecture principles
    *
    * @param idToken The idToken provided by cognito
    * @param charId  The character to fetch
    */
   updateCharacter: async (idToken: string, charId: string) => {
-    try {
-      const character = await getCharacter(idToken, charId);
+    const result = await characterApplicationService.loadCharacter({
+      characterId: charId,
+      idToken: idToken,
+    });
 
+    if (result.success) {
+      const character = result.data.character;
       set(() => ({
-        characterSheet: { ...character.characterSheet },
+        characterSheet: character.toApiData().characterSheet,
       }));
-    } catch {
-      console.log(`[Character store] Error while fetching character data for ${charId}!`);
+    } else {
+      featureLogger.error("CharacterStore", `Error fetching character ${charId}:`, result.error);
     }
   },
 
@@ -168,5 +203,48 @@ export const useCharacterStore = create<CharacterStore>((set) => ({
    */
   selectCharacter: (charId: string) => {
     set(() => ({ selectedCharacterId: charId }));
+  },
+
+  /**
+   * Increases a character's skill using Application Service
+   * Returns true if successful, false otherwise
+   * Updates the character store with the new data
+   *
+   * @param characterId The character ID
+   * @param skillName The skill name (format: "category.skillName")
+   * @param points The number of points to increase the skill by
+   * @param learningMethod The learning method for this skill increase
+   * @param idToken The authentication token
+   */
+  increaseSkill: async (
+    characterId: string,
+    skillName: string,
+    points: number,
+    learningMethod: string,
+    idToken: string,
+  ): Promise<boolean> => {
+    const result = await characterApplicationService.increaseSkill({
+      characterId,
+      skillName,
+      points,
+      learningMethod,
+      idToken,
+    });
+
+    if (result.success) {
+      // Update the character sheet with the new data
+      const updatedCharacter = result.data.updatedCharacter;
+      set(() => ({
+        characterSheet: updatedCharacter.toApiData().characterSheet,
+      }));
+
+      console.log(
+        `[Character store] Skill '${skillName}' increased by ${points} points. Cost: ${result.data.costCalculation.cost} points`,
+      );
+      return true;
+    } else {
+      console.error(`[Character store] Error while increasing skill '${skillName}':`, result.error);
+      return false;
+    }
   },
 }));

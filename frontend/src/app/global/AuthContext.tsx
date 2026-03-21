@@ -1,71 +1,64 @@
 "use client";
 
-import React, { createContext, useState, useContext, useEffect } from "react";
-import { GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { cognitoClient } from "./CognitoConfig";
+import React, { createContext, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
+import { AuthViewModel } from "@/src/lib/presentation/viewmodels/AuthViewModel";
+import { AuthService } from "@/src/lib/services";
 
-interface AuthContextType {
-  isAuthenticated: boolean;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  loading: boolean;
-  logout: () => void;
-  accessToken: string | null;
-  setAccessToken: React.Dispatch<React.SetStateAction<string | null>>;
-  idToken: string | null;
-  setIdToken: React.Dispatch<React.SetStateAction<string | null>>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+/**
+ * AuthContext - React Context wrapper for AuthViewModel
+ *
+ * - Context is just a delivery mechanism (React-specific)
+ * - AuthViewModel contains all the business logic
+ * - Provides global authentication state to component tree
+ */
+const AuthContext = createContext<AuthViewModel | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [loading, setLoading] = useState(true);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [idToken, setIdToken] = useState<string | null>(null);
+  // Create singleton instances
+  const authViewModel = useMemo(() => {
+    const authService = new AuthService();
+    return new AuthViewModel(authService);
+  }, []);
 
+  // Initialize auth state on mount
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      if (accessToken) {
-        try {
-          const command = new GetUserCommand({
-            AccessToken: accessToken,
-          });
-          await cognitoClient.send(command);
-          setIsAuthenticated(true);
-        } catch (error) {
-          console.error("Error verifying token:", error);
-          setIsAuthenticated(false);
-          setAccessToken(null);
-          setIdToken(null);
-        }
-      } else {
-        setIsAuthenticated(false);
-      }
-      setLoading(false);
-    };
+    authViewModel.initialize();
+  }, [authViewModel]);
 
-    checkAuthStatus();
-  }, [accessToken]);
-
-  const logout = () => {
-    setAccessToken(null);
-    setIdToken(null);
-    setIsAuthenticated(false);
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{ isAuthenticated, setIsAuthenticated, loading, logout, accessToken, setAccessToken, idToken, setIdToken }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={authViewModel}>{children}</AuthContext.Provider>;
 };
 
+/**
+ * Hook to access AuthViewModel from any component
+ *
+ */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+};
+
+/**
+ * Hook to access auth state with automatic re-renders
+ *
+ * This uses useSyncExternalStore to subscribe to AuthViewModel state changes
+ * Components will re-render when authentication state changes
+ */
+export const useAuthState = () => {
+  const authViewModel = useAuth();
+
+  return useSyncExternalStore(
+    (callback) => authViewModel.subscribe(callback),
+    () => authViewModel.getState(),
+    () => ({
+      isLoading: false,
+      error: null,
+      isAuthenticated: false,
+      user: null,
+      tokens: null,
+      isInitialized: false,
+    }), // getServerSnapshot - return safe default for SSR
+  );
 };

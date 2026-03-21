@@ -4,66 +4,64 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { InitiateAuthCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { cognitoConfig, cognitoClient } from "@global/CognitoConfig";
-import { useAuth } from "@global/AuthContext";
+import { useSignInViewModel } from "@/src/hooks/useSignInViewModel";
+import { useAuth, useAuthState } from "@global/AuthContext";
 import { useCharacterStore } from "@global/characterStore";
-// import { RouletteSpinner } from "react-spinner-overlay";
+import { featureLogger } from "@/src/lib/utils/featureLogger";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const router = useRouter();
-  const { setIsAuthenticated, isAuthenticated, setAccessToken, setIdToken } = useAuth();
 
-  const updateAvailableCharacters = useCharacterStore((state) => state.updateAvailableCharacters);
+  // Get AuthViewModel instance and current auth state
+  const authViewModel = useAuth();
+  const { isAuthenticated } = useAuthState();
 
+  // Use SignInViewModel hook
+  const { isLoading, error, signIn, clearError, onSuccess } = useSignInViewModel();
+
+  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
+      featureLogger.debug("ui", "SignIn", "Already authenticated, redirecting to dashboard");
       router.push("/protected/dashboard");
     }
   }, [isAuthenticated, router]);
 
+  // Setup success callback
+  useEffect(() => {
+    onSuccess((data) => {
+      featureLogger.info("ui", "SignIn", "Sign in successful, updating auth state");
+      featureLogger.debug("ui", "SignIn", "User ID:", data.user.userId);
+
+      // Update AuthViewModel with authenticated state (data contains tokens and user)
+      authViewModel.setAuthState(data.tokens, data.user);
+
+      // Load characters
+      useCharacterStore.getState().updateAvailableCharacters(data.tokens.idToken);
+
+      // Navigate to dashboard
+      router.push("/protected/dashboard");
+    });
+  }, [onSuccess, authViewModel, router]);
+
+  // Clear error when user starts typing
+  useEffect(() => {
+    if (error) {
+      clearError();
+    }
+  }, [email, password]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    try {
-      const command = new InitiateAuthCommand({
-        AuthFlow: "USER_PASSWORD_AUTH",
-        ClientId: cognitoConfig.clientId,
-        AuthParameters: {
-          USERNAME: email,
-          PASSWORD: password,
-        },
-      });
+    featureLogger.debug("ui", "SignIn", "Form submitted, signing in:", email);
 
-      const response = await cognitoClient.send(command);
-
-      if (response.AuthenticationResult?.AccessToken) {
-        updateAvailableCharacters(response.AuthenticationResult.IdToken ?? "");
-        setAccessToken(response.AuthenticationResult.AccessToken);
-        setIdToken(response.AuthenticationResult.IdToken ?? null);
-        setIsAuthenticated(true);
-        router.push("/protected/dashboard");
-      } else {
-        throw new Error("Authentication failed");
-      }
-    } catch (error) {
-      setError("Failed to sign in. Please check your credentials.");
-      console.error("Error signing in:", error);
-    }
+    await signIn({
+      email,
+      password,
+    });
   };
-
-  // TODO activate and fix this to show spinner during initial character load
-  // TODO maybe change all characters lamba to by default return the character owned by this account
-  // if(!isAuthenticated && loading) {
-  //   return (
-  //     <div className="flex h-screen items-center justify-center">
-  //       <div className="m-auto"><RouletteSpinner/></div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="flex h-screen">
@@ -76,7 +74,9 @@ export default function SignIn() {
             <Image src="/images/logo.png" alt="Logo" width={100} height={100} />
           </div>
           <h1 className="text-2xl font-bold text-center text-gray-900">Sign In</h1>
-          {error && <p className="text-red-500 text-center">{error}</p>}
+
+          {error && <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">{error}</div>}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -87,7 +87,8 @@ export default function SignIn() {
                 name="email"
                 type="email"
                 required
-                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                disabled={isLoading}
+                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -101,7 +102,8 @@ export default function SignIn() {
                 name="password"
                 type="password"
                 required
-                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                disabled={isLoading}
+                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -109,15 +111,16 @@ export default function SignIn() {
             <div>
               <button
                 type="submit"
-                className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                disabled={isLoading}
+                className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-400 disabled:cursor-not-allowed"
               >
-                Sign In
+                {isLoading ? "Signing In..." : "Sign In"}
               </button>
             </div>
           </form>
           <div className="text-sm text-center">
             <Link href="/auth/signup" className="font-medium text-blue-600 hover:text-blue-500">
-              Don&apost have an account? Sign Up
+              Don&apos;t have an account? Sign Up
             </Link>
           </div>
         </div>

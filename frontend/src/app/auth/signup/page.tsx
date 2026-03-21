@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cognitoClient, cognitoConfig } from "../../global/CognitoConfig";
-import { useAuth } from "../../global/AuthContext";
+import { useAuthState } from "../../global/AuthContext";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
@@ -14,7 +14,7 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthState();
 
   useEffect(() => {
     if (isAuthenticated) {

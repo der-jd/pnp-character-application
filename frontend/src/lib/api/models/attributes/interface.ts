@@ -1,6 +1,24 @@
+// Import types from api-spec instead of defining our own
+import {
+  PatchAttributeRequest as AttributeIncreaseRequest,
+  PatchAttributePathParams,
+  UpdateAttributeResponse,
+  InitialNew,
+  InitialIncreased,
+  Attribute,
+} from "api-spec";
+
 import { RecordEntry } from "../history/interface";
-import { Increase, PointsAvailable } from "../common/increase";
-import { Attribute } from "../Character/character";
+import { PointsAvailable } from "../common/increase";
+
+// Re-export api-spec types for convenience
+export type {
+  AttributeIncreaseRequest,
+  PatchAttributePathParams,
+  UpdateAttributeResponse,
+  InitialNew,
+  InitialIncreased,
+};
 
 export interface AttributeIncreaseData {
   characterId: string;
@@ -20,8 +38,4 @@ export interface AttributeState {
 export interface AttributeIncreaseReply {
   data: AttributeIncreaseData;
   historyRecord?: RecordEntry;
-}
-
-export interface AttributeIncreaseRequest {
-  current: Increase;
 }

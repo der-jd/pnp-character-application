@@ -4,29 +4,28 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "./global/AuthContext";
-import { RouletteSpinner } from "react-spinner-overlay";
+import { useAuthState } from "@/src/app/global/AuthContext";
 
 export default function SplashScreen() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, isLoading, isInitialized } = useAuthState();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && isAuthenticated) {
+    if (isInitialized && !isLoading && isAuthenticated) {
       router.push("protected/dashboard");
     }
-  }, [isAuthenticated, loading, router]);
+  }, [isAuthenticated, isLoading, isInitialized, router]);
 
-  if (loading) {
+  // Show loading spinner while initializing auth state
+  if (!isInitialized || isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="m-auto">
-          <RouletteSpinner />
-        </div>
+        <div className="m-auto">Loading...</div>
       </div>
     );
   }
 
+  // Don't show splash screen if already authenticated (redirect in progress)
   if (isAuthenticated) {
     return null;
   }
