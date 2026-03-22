@@ -24,8 +24,8 @@ vi.mock("@/api/characters", () => ({
 import * as charactersApi from "@/api/characters";
 
 const mockCharacters = [
-  { characterId: "char-1", name: "Gandalf", level: 5, userId: "user-1" },
-  { characterId: "char-2", name: "Aragorn", level: 3, userId: "user-1" },
+  { characterId: "char-1", name: "Gandalf", level: 5, userId: "user-1", rulesetVersion: "1.0" },
+  { characterId: "char-2", name: "Aragorn", level: 3, userId: "user-1", rulesetVersion: "1.0" },
 ];
 
 describe("DashboardPage", () => {
