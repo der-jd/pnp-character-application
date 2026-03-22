@@ -32,7 +32,7 @@ export function SignInPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg-primary p-4">
+    <div className="fixed inset-0 bg-bg-primary p-4 flex items-center justify-center">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 text-center">
