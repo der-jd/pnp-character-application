@@ -1,33 +1,33 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg-primary: #0f1117;
-  --color-bg-secondary: #1a1d27;
-  --color-bg-tertiary: #232733;
-  --color-bg-hover: #2a2e3d;
-  --color-bg-active: #333849;
+  --color-bg-primary: #0f0f15;
+  --color-bg-secondary: #16161e;
+  --color-bg-tertiary: #1f1f2e;
+  --color-bg-hover: #282835;
+  --color-bg-active: #323244;
 
-  --color-border-primary: #2a2e3d;
-  --color-border-secondary: #3a3f52;
-  --color-border-focus: #6366f1;
+  --color-border-primary: #282835;
+  --color-border-secondary: #3a3a4a;
+  --color-border-focus: #f59e0b;
 
-  --color-text-primary: #e8eaed;
-  --color-text-secondary: #9ca3af;
-  --color-text-muted: #6b7280;
-  --color-text-inverse: #0f1117;
+  --color-text-primary: #f0f0f5;
+  --color-text-secondary: #a8b0c0;
+  --color-text-muted: #7a8295;
+  --color-text-inverse: #0f0f15;
 
-  --color-accent-primary: #6366f1;
-  --color-accent-primary-hover: #5457e5;
-  --color-accent-secondary: #818cf8;
+  --color-accent-primary: #f59e0b;
+  --color-accent-primary-hover: #d97706;
+  --color-accent-secondary: #06b6d4;
   --color-accent-success: #22c55e;
-  --color-accent-warning: #f59e0b;
+  --color-accent-warning: #fbbf24;
   --color-accent-danger: #ef4444;
   --color-accent-danger-hover: #dc2626;
-  --color-accent-info: #3b82f6;
+  --color-accent-info: #06b6d4;
 
-  --color-sidebar-bg: #13151f;
-  --color-sidebar-hover: #1e2030;
-  --color-sidebar-active: #272a3d;
+  --color-sidebar-bg: #0d0d13;
+  --color-sidebar-hover: #1a1a23;
+  --color-sidebar-active: #252535;
 
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
