@@ -1,4 +1,4 @@
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
 import { clsx } from "clsx";
 import {
   LayoutDashboard,
@@ -12,9 +12,12 @@ import {
   User,
   UserPlus,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { t } from "@/i18n";
 import { useAuth } from "@/auth/AuthProvider";
+import { fetchCharacters } from "@/api/characters";
 import { useState } from "react";
+import type { CharacterShort } from "api-spec";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   clsx(
@@ -27,7 +30,21 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 export function Sidebar() {
   const { signOut } = useAuth();
   const { characterId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+
+  const { data } = useQuery({ queryKey: ["characters"], queryFn: fetchCharacters });
+  const characters = (data?.characters ?? []) as CharacterShort[];
+
+  function handleCharacterSwitch(newId: string) {
+    if (!newId) return;
+    if (characterId) {
+      navigate(location.pathname.replace(`/characters/${characterId}`, `/characters/${newId}`));
+    } else {
+      navigate(`/characters/${newId}`);
+    }
+  }
 
   return (
     <aside
@@ -60,6 +77,27 @@ export function Sidebar() {
           <UserPlus size={18} className="shrink-0" />
           {!collapsed && <span>{t("createCharacter")}</span>}
         </NavLink>
+
+        {characters.length > 0 && !collapsed && (
+          <div className="px-3 pt-3 pb-1">
+            <select
+              value={characterId ?? ""}
+              onChange={(e) => handleCharacterSwitch(e.target.value)}
+              className="w-full rounded-md border border-border-primary bg-bg-secondary px-2 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus appearance-none cursor-pointer"
+            >
+              {!characterId && (
+                <option value="" disabled>
+                  {t("selectCharacter")}
+                </option>
+              )}
+              {characters.map((char) => (
+                <option key={char.characterId} value={char.characterId}>
+                  {char.name} (Level {char.level})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {characterId && (
           <>
