@@ -258,6 +258,11 @@ jobs:
           name: Install dependencies
           command: npm ci
       - run:
+          name: Build api-spec package
+          command: |
+            cd api-spec
+            npm run build
+      - run:
           name: Build frontend
           command: |
             source ~/project/terraform/terraform_output
