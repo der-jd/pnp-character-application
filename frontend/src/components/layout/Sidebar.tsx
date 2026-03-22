@@ -11,6 +11,7 @@ import {
   ChevronRight,
   User,
   UserPlus,
+  CalendarPlus,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@/i18n";
@@ -18,6 +19,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { fetchCharacters } from "@/api/characters";
 import { useState } from "react";
 import type { CharacterShort } from "api-spec";
+import { EventDialog } from "@/components/EventDialog";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   clsx(
@@ -33,6 +35,7 @@ export function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const [eventDialogOpen, setEventDialogOpen] = useState(false);
 
   const { data } = useQuery({ queryKey: ["characters"], queryFn: fetchCharacters });
   const characters = (data?.characters ?? []) as CharacterShort[];
@@ -128,6 +131,14 @@ export function Sidebar() {
               {!collapsed && <span>{t("navLevelUp")}</span>}
             </NavLink>
 
+            <button
+              onClick={() => setEventDialogOpen(true)}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-text-secondary hover:bg-sidebar-hover hover:text-text-primary cursor-pointer"
+            >
+              <CalendarPlus size={18} className="shrink-0" />
+              {!collapsed && <span>{t("navEvent")}</span>}
+            </button>
+
             <NavLink to={`/characters/${characterId}/history`} className={navLinkClass}>
               <History size={18} className="shrink-0" />
               {!collapsed && <span>{t("navHistory")}</span>}
@@ -153,6 +164,9 @@ export function Sidebar() {
           {!collapsed && <span>{t("signOut")}</span>}
         </button>
       </div>
+      {characterId && (
+        <EventDialog open={eventDialogOpen} onClose={() => setEventDialogOpen(false)} characterId={characterId} />
+      )}
     </aside>
   );
 }

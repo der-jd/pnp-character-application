@@ -151,20 +151,16 @@ function CalculationPointsSection({ character }: { character: Character }) {
 
   const [editing, setEditing] = useState(false);
   const [apStart, setApStart] = useState(cp.adventurePoints.start);
-  const [apTotal, setApTotal] = useState(cp.adventurePoints.total);
   const [atpStart, setAtpStart] = useState(cp.attributePoints.start);
-  const [atpTotal, setAtpTotal] = useState(cp.attributePoints.total);
 
   const mutation = useMutation({
     mutationFn: () =>
       updateCalculationPoints(character.characterId, {
         adventurePoints: {
           start: { initialValue: cp.adventurePoints.start, newValue: apStart },
-          total: { initialValue: cp.adventurePoints.total, increasedPoints: apTotal - cp.adventurePoints.total },
         },
         attributePoints: {
           start: { initialValue: cp.attributePoints.start, newValue: atpStart },
-          total: { initialValue: cp.attributePoints.total, increasedPoints: atpTotal - cp.attributePoints.total },
         },
       }),
     onSuccess: () => {
@@ -224,16 +220,7 @@ function CalculationPointsSection({ character }: { character: Character }) {
             </div>
             <div className="text-center">
               <p className="text-xs text-text-muted">{t("total")}</p>
-              {editing ? (
-                <input
-                  type="number"
-                  value={apTotal}
-                  onChange={(e) => setApTotal(Number(e.target.value))}
-                  className="w-full rounded border border-border-primary bg-bg-tertiary px-2 py-1 text-center text-sm font-mono"
-                />
-              ) : (
-                <p className="font-mono font-bold">{cp.adventurePoints.total}</p>
-              )}
+              <p className="font-mono font-bold">{cp.adventurePoints.total}</p>
             </div>
           </div>
         </div>
@@ -259,16 +246,7 @@ function CalculationPointsSection({ character }: { character: Character }) {
             </div>
             <div className="text-center">
               <p className="text-xs text-text-muted">{t("total")}</p>
-              {editing ? (
-                <input
-                  type="number"
-                  value={atpTotal}
-                  onChange={(e) => setAtpTotal(Number(e.target.value))}
-                  className="w-full rounded border border-border-primary bg-bg-tertiary px-2 py-1 text-center text-sm font-mono"
-                />
-              ) : (
-                <p className="font-mono font-bold">{cp.attributePoints.total}</p>
-              )}
+              <p className="font-mono font-bold">{cp.attributePoints.total}</p>
             </div>
           </div>
         </div>

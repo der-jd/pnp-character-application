@@ -61,7 +61,7 @@ const de = {
   wizardStepGeneral: "Allgemeines",
   wizardStepProfession: "Beruf & Hobby",
   wizardStepAdvantages: "Vor- & Nachteile",
-  wizardStepAttributes: "Attribute",
+  wizardStepAttributes: "Eigenschaften",
   wizardStepSkills: "Talente aktivieren",
   wizardStepCombat: "Kampfwerte",
   wizardStepReview: "Zusammenfassung",
@@ -103,7 +103,7 @@ const de = {
   specifyDetail: "Detail angeben",
 
   // Attributes
-  attributes: "Attribute",
+  attributes: "Eigenschaften",
   courage: "Mut",
   intelligence: "Intelligenz",
   concentration: "Konzentration",
@@ -121,7 +121,7 @@ const de = {
   generalInformation: "Allgemeine Informationen",
   calculationPoints: "Berechnungspunkte",
   adventurePoints: "Abenteuerpunkte",
-  attributePoints: "Attributpunkte",
+  attributePoints: "Eigenschaftspunkte",
   start: "Start",
   current: "Aktuell",
   mod: "Mod",
@@ -268,7 +268,7 @@ const de = {
   levelUpEffectLuckPlusOne: "Glück +1",
   levelUpEffectBonusActionPlusOne: "Bonusaktion +1",
   levelUpEffectLegendaryActionPlusOne: "Legendäre Aktion +1",
-  levelUpEffectRerollUnlock: "Neuwurf freischalten",
+  levelUpEffectRerollUnlock: "Reroll freischalten",
   levelUpDiceRoll: "Würfelergebnis ({0})",
   levelUpDiceRollHint: "Gib das Ergebnis deines Wurfs ein ({0}-{1})",
   levelUpNotAllowed: "Nicht verfügbar",
@@ -278,6 +278,18 @@ const de = {
   levelUpApply: "Level Up anwenden",
   levelUpSuccess: "Level Up erfolgreich durchgeführt!",
   levelUpNoOptions: "Keine Level Up verfügbar.",
+
+  // Event
+  navEvent: "Ereignis hinzufügen",
+  eventTitle: "Ereignis hinzufügen",
+  eventName: "Bezeichnung",
+  eventNamePlaceholder: "z.B. Kampf gegen den Drachen",
+  eventAdventurePoints: "Abenteuerpunkte",
+  eventAttributePoints: "Eigenschaftspunkte",
+  eventPointsHint: "Anzahl der Punkte, die hinzugefügt werden sollen",
+  eventApply: "Hinzufügen",
+  eventSuccess: "Ereignis erfolgreich hinzugefügt!",
+  eventNoChanges: "Bitte mindestens einen Punktewert angeben.",
 
   // History
   history: "Chronik",
@@ -295,7 +307,7 @@ const de = {
   historyTypeCalculationPoints: "Berechnungspunkte geändert",
   historyTypeBaseValue: "Basiswert geändert",
   historyTypeSpecialAbilities: "Sonderfertigkeiten geändert",
-  historyTypeAttribute: "Attribut geändert",
+  historyTypeAttribute: "Eigenschaft geändert",
   historyTypeSkill: "Talent geändert",
   historyTypeCombatStats: "Kampfwerte geändert",
   historyTypeRulesetVersion: "Regelwerk-Version aktualisiert",
