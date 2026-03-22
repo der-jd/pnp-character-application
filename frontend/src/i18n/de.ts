@@ -63,6 +63,9 @@ const de = {
   wizardStepSkills: "Talente aktivieren",
   wizardStepCombat: "Kampfwerte",
   wizardStepReview: "Zusammenfassung",
+  wizardErrorNameRequired: "Bitte gib einen Charakternamen ein.",
+  wizardErrorProfessionSkillRequired: "Bitte wähle ein Talent für den Beruf aus.",
+  wizardErrorHobbySkillRequired: "Bitte wähle ein Talent für das Hobby aus.",
 
   // General Information
   characterName: "Name",

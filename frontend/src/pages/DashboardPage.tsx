@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Copy, ChevronRight } from "lucide-react";
 import { t } from "@/i18n";
 import { fetchCharacters, deleteCharacter, cloneCharacter } from "@/api/characters";
+import { ApiError } from "@/api/client";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -32,8 +33,12 @@ export function DashboardPage() {
       toast("success", t("toastCharacterDeleted"));
       setDeleteTarget(null);
     },
-    onError: () => {
-      toast("error", t("toastDeleteError"));
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastDeleteError"));
+      }
     },
   });
 
@@ -44,8 +49,12 @@ export function DashboardPage() {
       toast("success", t("toastCharacterCloned"));
       setCloneTarget(null);
     },
-    onError: () => {
-      toast("error", t("toastSaveError"));
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastSaveError"));
+      }
     },
   });
 

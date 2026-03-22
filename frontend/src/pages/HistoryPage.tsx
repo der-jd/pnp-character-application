@@ -7,6 +7,7 @@ import { MessageSquare, Undo2 } from "lucide-react";
 import { HistoryRecordType, type HistoryRecord, type HistoryBlock } from "api-spec";
 import { t } from "@/i18n";
 import { fetchHistory, updateHistoryComment, revertHistoryRecord } from "@/api/history";
+import { ApiError } from "@/api/client";
 import { historyRecordTypeKeys } from "@/i18n/mappings";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -76,7 +77,13 @@ export function HistoryPage() {
       toast("success", t("toastHistoryReverted"));
       setRevertTarget(null);
     },
-    onError: () => toast("error", t("toastSaveError")),
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastSaveError"));
+      }
+    },
   });
 
   const commentMutation = useMutation({
@@ -87,7 +94,13 @@ export function HistoryPage() {
       toast("success", t("toastCommentSaved"));
       setCommentTarget(null);
     },
-    onError: () => toast("error", t("toastSaveError")),
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastSaveError"));
+      }
+    },
   });
 
   if (isLoading && initialLoad) return <FullPageSpinner />;

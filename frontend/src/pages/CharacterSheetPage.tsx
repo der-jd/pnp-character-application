@@ -6,6 +6,7 @@ import type { Character, Attribute, BaseValue } from "api-spec";
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
 import { updateAttribute, updateBaseValue, updateCalculationPoints, addSpecialAbility } from "@/api/character-edit";
+import { ApiError } from "@/api/client";
 import { attributeKeys, baseValueKeys, advantageNameKeys, disadvantageNameKeys } from "@/i18n/mappings";
 import { attributeIcons } from "@/lib/skillIcons";
 import { Card } from "@/components/ui/Card";
@@ -168,7 +169,13 @@ function CalculationPointsSection({ character }: { character: Character }) {
       toast("success", t("toastSaveSuccess"));
       setEditing(false);
     },
-    onError: () => toast("error", t("toastSaveError")),
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastSaveError"));
+      }
+    },
   });
 
   return (
@@ -287,7 +294,13 @@ function SpecialAbilitiesSection({
       setDialogOpen(false);
       setNewAbility("");
     },
-    onError: () => toast("error", t("toastSaveError")),
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastSaveError"));
+      }
+    },
   });
 
   return (
@@ -368,7 +381,13 @@ function AttributesSection({
       toast("success", t("toastSaveSuccess"));
       setEditing(null);
     },
-    onError: () => toast("error", t("toastSaveError")),
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastSaveError"));
+      }
+    },
   });
 
   function startEdit(name: string, attr: Attribute) {
@@ -497,7 +516,13 @@ function BaseValuesSection({
       toast("success", t("toastSaveSuccess"));
       setEditing(null);
     },
-    onError: () => toast("error", t("toastSaveError")),
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastSaveError"));
+      }
+    },
   });
 
   function startEdit(name: string, bv: BaseValue) {

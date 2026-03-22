@@ -8,9 +8,49 @@ export class ApiError extends Error {
     public statusText: string,
     public body: unknown,
   ) {
-    super(`API Error ${status}: ${statusText}`);
+    const message = extractErrorMessage(body, status, statusText);
+    super(message);
     this.name = "ApiError";
   }
+}
+
+function extractErrorMessage(body: unknown, status: number, statusText: string): string {
+  // Try to extract message from backend error format
+  if (body && typeof body === "object") {
+    const errorBody = body as Record<string, unknown>;
+
+    // Check for HttpError format: { message: string, statusCode: number, context?: any }
+    if (errorBody.message && typeof errorBody.message === "string") {
+      return errorBody.message;
+    }
+
+    // Check for other common error formats
+    if (errorBody.error && typeof errorBody.error === "string") {
+      return errorBody.error;
+    }
+
+    // Check for array of errors (like validation errors)
+    if (Array.isArray(errorBody.errors) && errorBody.errors.length > 0) {
+      const firstError = errorBody.errors[0];
+      if (typeof firstError === "string") return firstError;
+      if (
+        firstError &&
+        typeof firstError === "object" &&
+        (firstError as Record<string, unknown>).message &&
+        typeof (firstError as Record<string, unknown>).message === "string"
+      ) {
+        return (firstError as Record<string, unknown>).message as string;
+      }
+    }
+
+    // Check for validation errors format
+    if (errorBody.detail && typeof errorBody.detail === "string") {
+      return errorBody.detail;
+    }
+  }
+
+  // Fallback to HTTP status
+  return statusText || `HTTP ${status}`;
 }
 
 let getIdToken: (() => string | null) | null = null;

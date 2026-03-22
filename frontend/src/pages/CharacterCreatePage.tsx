@@ -18,6 +18,7 @@ import {
   DISADVANTAGES,
   START_SKILLS,
   MIN_LEVEL,
+  AdvantagesNames,
   type PostCharactersRequest,
   type Advantages,
   type Disadvantages,
@@ -25,6 +26,7 @@ import {
 } from "api-spec";
 import { t } from "@/i18n";
 import { createCharacter } from "@/api/characters";
+import { ApiError } from "@/api/client";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
@@ -71,8 +73,77 @@ const COMBAT_SKILL_NAMES = [
   "heavyWeapons",
 ] as const;
 
-// Filter START_SKILLS to only non-combat skills (combat skills are auto-activated)
-const ACTIVATABLE_SKILLS = START_SKILLS.filter((s) => !s.startsWith("combat/"));
+// All non-combat skills available in the game (manually constructed from schema)
+const ALL_NON_COMBAT_SKILLS: SkillNameWithCategory[] = [
+  // Body skills
+  "body/athletics",
+  "body/juggleries",
+  "body/climbing",
+  "body/bodyControl",
+  "body/riding",
+  "body/sneaking",
+  "body/swimming",
+  "body/selfControl",
+  "body/hiding",
+  "body/singing",
+  "body/sharpnessOfSenses",
+  "body/dancing",
+  "body/quaffing",
+  "body/pickpocketing",
+  // Social skills
+  "social/seduction",
+  "social/etiquette",
+  "social/teaching",
+  "social/acting",
+  "social/writtenExpression",
+  "social/streetKnowledge",
+  "social/knowledgeOfHumanNature",
+  "social/persuading",
+  "social/convincing",
+  "social/bargaining",
+  // Nature skills
+  "nature/tracking",
+  "nature/knottingSkills",
+  "nature/trapping",
+  "nature/fishing",
+  "nature/orientation",
+  "nature/wildernessLife",
+  // Knowledge skills
+  "knowledge/anatomy",
+  "knowledge/architecture",
+  "knowledge/geography",
+  "knowledge/history",
+  "knowledge/petrology",
+  "knowledge/botany",
+  "knowledge/philosophy",
+  "knowledge/astronomy",
+  "knowledge/mathematics",
+  "knowledge/knowledgeOfTheLaw",
+  "knowledge/estimating",
+  "knowledge/zoology",
+  "knowledge/technology",
+  "knowledge/chemistry",
+  "knowledge/warfare",
+  "knowledge/itSkills",
+  "knowledge/mechanics",
+  // Handcraft skills
+  "handcraft/training",
+  "handcraft/woodwork",
+  "handcraft/foodProcessing",
+  "handcraft/leatherProcessing",
+  "handcraft/metalwork",
+  "handcraft/stonework",
+  "handcraft/fabricProcessing",
+  "handcraft/alcoholProduction",
+  "handcraft/steeringVehicles",
+  "handcraft/fineMechanics",
+  "handcraft/cheating",
+  "handcraft/firstAid",
+  "handcraft/calmingSbDown",
+  "handcraft/drawingAndPainting",
+  "handcraft/makingMusic",
+  "handcraft/lockpicking",
+];
 
 interface WizardState {
   // Step 1 - General
@@ -147,12 +218,29 @@ export function CharacterCreatePage() {
       toast("success", t("toastCharacterCreated"));
       navigate(`/characters/${result.data.characterId}`);
     },
-    onError: () => {
-      toast("error", t("toastSaveError"));
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastSaveError"));
+      }
     },
   });
 
   function handleSubmit() {
+    if (!state.name.trim()) {
+      toast("error", t("wizardErrorNameRequired"));
+      return;
+    }
+    if (!state.professionSkill) {
+      toast("error", t("wizardErrorProfessionSkillRequired"));
+      return;
+    }
+    if (!state.hobbySkill) {
+      toast("error", t("wizardErrorHobbySkillRequired"));
+      return;
+    }
+
     const attributes = Object.fromEntries(ATTRIBUTE_NAMES.map((a) => [a, { current: state.attributes[a]! }]));
     const request: PostCharactersRequest = {
       generalInformation: {
@@ -184,6 +272,23 @@ export function CharacterCreatePage() {
   const update = (partial: Partial<WizardState>) => setState((prev) => ({ ...prev, ...partial }));
   const canGoBack = step > 0;
   const isLastStep = step === STEPS.length - 1;
+
+  function canProceedFromStep(currentStep: number): boolean {
+    switch (currentStep) {
+      case 0:
+        return state.name.trim().length > 0;
+      case 1:
+        return state.professionSkill.length > 0 && state.hobbySkill.length > 0;
+      case 3: {
+        const totalUsed = Object.values(state.attributes).reduce((s, v) => s + v, 0);
+        return totalUsed === ATTRIBUTE_POINTS_FOR_CREATION;
+      }
+      case 4:
+        return state.activatedSkills.length === NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION;
+      default:
+        return true;
+    }
+  }
 
   return (
     <div>
@@ -231,7 +336,9 @@ export function CharacterCreatePage() {
             {t("submit")}
           </Button>
         ) : (
-          <Button onClick={() => setStep(step + 1)}>{t("next")}</Button>
+          <Button onClick={() => setStep(step + 1)} disabled={!canProceedFromStep(step)}>
+            {t("next")}
+          </Button>
         )}
       </div>
     </div>
@@ -525,6 +632,30 @@ function StepSkills({ state, update }: StepProps) {
   const selected = state.activatedSkills;
   const count = selected.length;
 
+  const alreadyActivatedSkills = new Set<SkillNameWithCategory>([
+    ...START_SKILLS.filter((s) => !s.startsWith("combat/")),
+  ]);
+
+  if (state.professionSkill) {
+    alreadyActivatedSkills.add(state.professionSkill as SkillNameWithCategory);
+  }
+  if (state.hobbySkill) {
+    alreadyActivatedSkills.add(state.hobbySkill as SkillNameWithCategory);
+  }
+
+  for (const advantage of state.selectedAdvantages) {
+    const [advantageType] = advantage;
+    if (advantageType === AdvantagesNames.HIGH_SCHOOL_DEGREE || advantageType === AdvantagesNames.COLLEGE_EDUCATION) {
+      alreadyActivatedSkills.add("knowledge/anatomy");
+      alreadyActivatedSkills.add("knowledge/chemistry");
+      alreadyActivatedSkills.add("knowledge/geography");
+      alreadyActivatedSkills.add("knowledge/history");
+      alreadyActivatedSkills.add("knowledge/botany");
+    }
+  }
+
+  const availableSkills = ALL_NON_COMBAT_SKILLS.filter((skill) => !alreadyActivatedSkills.has(skill));
+
   function toggle(skill: SkillNameWithCategory) {
     if (selected.includes(skill)) {
       update({ activatedSkills: selected.filter((s) => s !== skill) });
@@ -541,7 +672,7 @@ function StepSkills({ state, update }: StepProps) {
         </Badge>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        {ACTIVATABLE_SKILLS.map((skill) => {
+        {availableSkills.map((skill) => {
           const [cat, name] = skill.split("/") as [string, string];
           const isSelected = selected.includes(skill);
           return (

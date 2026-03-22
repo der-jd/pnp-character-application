@@ -12,6 +12,7 @@ import {
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
 import { fetchLevelUpOptions, applyLevelUp } from "@/api/level-up";
+import { ApiError } from "@/api/client";
 import { levelUpEffectKeys } from "@/i18n/mappings";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -77,7 +78,13 @@ export function LevelUpPage() {
       setSelectedOption(null);
       refetch();
     },
-    onError: () => toast("error", t("toastSaveError")),
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastSaveError"));
+      }
+    },
   });
 
   if (isLoading) return <FullPageSpinner />;

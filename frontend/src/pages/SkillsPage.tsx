@@ -7,6 +7,7 @@ import { skillCategories } from "api-spec";
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
 import { updateSkill, getSkillIncreaseCost } from "@/api/character-edit";
+import { ApiError } from "@/api/client";
 import { skillNameKeys, skillCategoryKeys, learningMethodKeys } from "@/i18n/mappings";
 import { getSkillIcon, skillCategoryIcons } from "@/lib/skillIcons";
 import { Card } from "@/components/ui/Card";
@@ -65,7 +66,13 @@ export function SkillsPage() {
       toast("success", t("toastSaveSuccess"));
       setEditingSkill(null);
     },
-    onError: () => toast("error", t("toastSaveError")),
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastSaveError"));
+      }
+    },
   });
 
   async function fetchCost(category: string, name: string, method: LearningMethodString) {

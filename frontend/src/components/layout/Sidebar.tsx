@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
   User,
+  UserPlus,
 } from "lucide-react";
 import { t } from "@/i18n";
 import { useAuth } from "@/auth/AuthProvider";
@@ -53,6 +54,11 @@ export function Sidebar() {
         <NavLink to="/dashboard" className={navLinkClass}>
           <LayoutDashboard size={18} className="shrink-0" />
           {!collapsed && <span>{t("navDashboard")}</span>}
+        </NavLink>
+
+        <NavLink to="/characters/new" className={navLinkClass}>
+          <UserPlus size={18} className="shrink-0" />
+          {!collapsed && <span>{t("createCharacter")}</span>}
         </NavLink>
 
         {characterId && (
