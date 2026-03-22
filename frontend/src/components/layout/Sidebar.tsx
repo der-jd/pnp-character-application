@@ -40,7 +40,8 @@ export function Sidebar() {
   function handleCharacterSwitch(newId: string) {
     if (!newId) return;
     if (characterId) {
-      navigate(location.pathname.replace(`/characters/${characterId}`, `/characters/${newId}`));
+      const suffix = location.pathname.split(`/characters/${characterId}`)[1] ?? "";
+      navigate(`/characters/${newId}${suffix}`);
     } else {
       navigate(`/characters/${newId}`);
     }
