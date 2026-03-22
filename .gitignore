@@ -17,3 +17,6 @@ dist/
 
 # Mac
 .DS_Store
+
+# Folder for temporary (AI generated) files that should not be committed
+.temp/
