@@ -99,9 +99,14 @@ export function DashboardPage() {
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-text-primary truncate">{char.name}</p>
-                <Badge variant="info">
-                  {t("level")} {char.level}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="info">
+                    {t("level")} {char.level}
+                  </Badge>
+                  <Badge variant="default">
+                    {t("rulesetVersion")} {char.rulesetVersion}
+                  </Badge>
+                </div>
               </div>
 
               {/* Actions */}

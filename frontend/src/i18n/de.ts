@@ -28,6 +28,7 @@ const de = {
   noCharacters: "Du hast noch keine Charaktere.",
   noCharactersHint: "Erstelle deinen ersten Charakter, um loszulegen!",
   level: "Stufe",
+  rulesetVersion: "Regelwerk-Version",
   deleteCharacter: "Charakter löschen",
   cloneCharacter: "Charakter klonen",
   openCharacter: "Charakter öffnen",

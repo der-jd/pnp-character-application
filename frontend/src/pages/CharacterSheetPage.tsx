@@ -50,6 +50,9 @@ export function CharacterSheetPage() {
               {t("level")} {gi.level}
             </Badge>
             <Badge>{gi.sex}</Badge>
+            <Badge variant="default">
+              {t("rulesetVersion")} {character.rulesetVersion}
+            </Badge>
           </div>
         </div>
       </div>
