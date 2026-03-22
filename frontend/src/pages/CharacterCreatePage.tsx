@@ -18,6 +18,7 @@ import {
   DISADVANTAGES,
   START_SKILLS,
   MIN_LEVEL,
+  combatSkills,
   AdvantagesNames,
   type PostCharactersRequest,
   type Advantages,
@@ -397,9 +398,14 @@ function StepGeneral({ state, update }: StepProps) {
   );
 }
 
+// Get all skills (combat and non-combat) for profession and hobby selection
+function getAllSkills(): SkillNameWithCategory[] {
+  return [...ALL_NON_COMBAT_SKILLS, ...combatSkills];
+}
+
 function StepProfession({ state, update }: StepProps) {
-  const allSkills = START_SKILLS.filter((s) => !s.startsWith("combat/"));
-  const skillOptions = allSkills.map((s) => {
+  const allSkills = getAllSkills();
+  const skillOptions = allSkills.map((s: SkillNameWithCategory) => {
     const [cat, name] = s.split("/") as [string, string];
     return { value: s, label: `${t(skillCategoryKeys[cat]!)} — ${t(skillNameKeys[name]!)}` };
   });
@@ -424,7 +430,7 @@ function StepProfession({ state, update }: StepProps) {
               onChange={(e) => update({ professionSkill: e.target.value })}
             >
               <option value="">{t("select")}</option>
-              {skillOptions.map((o) => (
+              {skillOptions.map((o: { value: string; label: string }) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
@@ -451,7 +457,7 @@ function StepProfession({ state, update }: StepProps) {
               onChange={(e) => update({ hobbySkill: e.target.value })}
             >
               <option value="">{t("select")}</option>
-              {skillOptions.map((o) => (
+              {skillOptions.map((o: { value: string; label: string }) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
