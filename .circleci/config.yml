@@ -37,7 +37,6 @@ workflows:
       - lint-typescript-code
       - build-backend
       - run-backend-unit-tests
-      - build-frontend
       - run-frontend-tests
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
@@ -55,6 +54,9 @@ workflows:
             branches:
               only:
                 - main
+      - build-frontend:
+          requires:
+            - deploy-backend-and-infrastructure
       - deploy-frontend:
           requires:
             - check-format-files
