@@ -135,8 +135,9 @@ export function HistoryPage() {
 
   if (isLoading && initialLoad) return <FullPageSpinner />;
 
-  const allRecords = blocks.flatMap((block) =>
-    block.changes.map((record) => ({ ...record, blockNumber: block.blockNumber })),
+  // Flatten blocks and reverse within each block to show most recent first
+  const allRecords = blocks.flatMap(
+    (block) => block.changes.map((record) => ({ ...record, blockNumber: block.blockNumber })).reverse(), // Reverse changes within each block (oldest first → newest first)
   );
 
   return (
