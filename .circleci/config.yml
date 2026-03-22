@@ -54,12 +54,15 @@ workflows:
             branches:
               only:
                 - main
-      - build-and-deploy-frontend:
+      - build-frontend:
           requires:
             - run-frontend-tests
             - check-format-files
             - lint-typescript-code
             - deploy-backend-and-infrastructure
+      - deploy-frontend:
+          requires:
+            - build-frontend
 
   component-tests:
     when:
@@ -234,56 +237,48 @@ jobs:
           command: |
             cd terraform
 
-            echo "export NEXT_PUBLIC_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
-            echo "export NEXT_PUBLIC_COGNITO_USER_POOL_ID=$(terraform output cognito_user_pool_id)" >> terraform_output
-            echo "export NEXT_PUBLIC_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
-            echo "export NEXT_PUBLIC_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output
+            echo "export VITE_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
+            echo "export VITE_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
+            echo "export VITE_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output
+            echo "export FRONTEND_BUCKET_NAME=$(terraform output frontend_bucket_name)" >> terraform_output
+            echo "export FRONTEND_BUCKET_REGION=$(terraform output aws_region)" >> terraform_output
       - persist_to_workspace:
           root: ~/project
           paths:
             - terraform/terraform_output
 
-  build-and-deploy-frontend:
+  build-frontend:
     executor: node-medium-executor
     steps:
       - checkout
       - attach_workspace:
           at: ~/project
-      - aws-cli/setup:
-          role_arn: "$AWS_ROLE_ARN"
       - run:
           name: Install dependencies
           command: npm ci
       - run:
-          name: Prepare cache restoring
+          name: Build frontend
           command: |
-            cd ~/project
-            PREVIOUS_COMMIT=$(git rev-parse HEAD^)
-            echo "Saving previous commit hash:"
-            echo "$PREVIOUS_COMMIT" | tee cachekey
-            echo "Saving current commit hash:"
-            echo "$CIRCLE_SHA1" | tee current_commit
-      - restore_cache:
-          keys:
-            - frontend-cache-{{ .Branch }}-{{ checksum "./current_commit" }}
-            - frontend-cache-{{ .Branch }}-{{ checksum "./cachekey" }}
-            - frontend-cache-main-{{ checksum "./cachekey" }}
-      - run:
-          name: Build and deploy
-          command: |
-            cd frontend
-
-            # Set env variables for frontend build
             source ~/project/terraform/terraform_output
-
-            ./build_on_change.sh ~/project/terraform/terraform_output
-
-            echo "Saving current commit hash:"
-            echo $CIRCLE_SHA1 | tee ../commit
-      - save_cache:
-          key: frontend-cache-{{ .Branch }}-{{ checksum "./commit" }}
+            cd frontend
+            npm run build
+      - persist_to_workspace:
+          root: ~/project
           paths:
-            - frontend/checksum.txt
+            - frontend/dist
+
+  deploy-frontend:
+    executor: node-small-executor
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - aws-cli/setup:
+          role_arn: "$AWS_ROLE_ARN"
+      - run:
+          name: Deploy frontend to S3
+          command: |
+            source ~/project/terraform/terraform_output
+            aws s3 sync ~/project/frontend/dist s3://$FRONTEND_BUCKET_NAME --delete --region $FRONTEND_BUCKET_REGION
 
   terraform-destroy:
     docker:
