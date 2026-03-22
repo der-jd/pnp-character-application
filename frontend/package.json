@@ -8,8 +8,10 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "test:unit": "vitest run --reporter=verbose src/__tests__/unit-tests",
+    "test:unit:watch": "vitest src/__tests__/unit-tests",
+    "test:component": "vitest run --reporter=verbose src/__tests__/component-tests",
+    "test": "npm run test:unit && npm run test:component",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {

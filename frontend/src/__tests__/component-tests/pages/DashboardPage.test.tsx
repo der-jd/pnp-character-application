@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DashboardPage } from "@/pages/DashboardPage";
-import { createWrapper } from "../helpers";
+import { createWrapper } from "../../helpers";
 
 // Mock navigate
 const mockNavigate = vi.fn();
