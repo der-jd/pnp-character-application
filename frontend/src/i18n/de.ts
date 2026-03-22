@@ -1,7 +1,7 @@
 const de = {
   // App
   appName: "World Hoppers",
-  appSubtitle: "Charakterverwaltung",
+  appSubtitle: "Pen & Paper Game",
 
   // Auth
   signIn: "Anmelden",
@@ -15,11 +15,12 @@ const de = {
 
   // Navigation
   navDashboard: "Dashboard",
+  selectCharacter: "Charakter wählen",
   navCharacterSheet: "Charakterbogen",
   navSkills: "Talente",
   navCombat: "Kampf",
   navHistory: "Chronik",
-  navLevelUp: "Stufenaufstieg",
+  navLevelUp: "Level Up",
 
   // Dashboard
   dashboardTitle: "Meine Charaktere",
@@ -143,7 +144,7 @@ const de = {
   bonusActionsPerCombatRound: "Bonusaktionen pro Kampfrunde",
   legendaryActions: "Legendäre Aktionen",
   byFormula: "Formel",
-  byLvlUp: "Stufenaufstieg",
+  byLvlUp: "Level Up",
 
   // Skills
   skills: "Talente",
@@ -255,8 +256,8 @@ const de = {
   skilledParadeValue: "Geübter Paradewert",
 
   // Level Up
-  levelUp: "Stufenaufstieg",
-  levelUpTitle: "Stufenaufstieg durchführen",
+  levelUp: "Level Up",
+  levelUpTitle: "Level Up durchführen",
   levelUpCurrentLevel: "Aktuelle Stufe",
   levelUpNextLevel: "Nächste Stufe",
   levelUpSelectEffect: "Wähle einen Effekt",
@@ -270,12 +271,12 @@ const de = {
   levelUpDiceRoll: "Würfelergebnis ({0})",
   levelUpDiceRollHint: "Gib das Ergebnis deines Wurfs ein ({0}-{1})",
   levelUpNotAllowed: "Nicht verfügbar",
-  levelUpCooldown: "Abklingzeit: {0} Stufen",
+  levelUpCooldown: "Abklingzeit: {0} Level",
   levelUpSelections: "Gewählt: {0}x",
   levelUpMaxSelections: "Max. Auswahl: {0}",
-  levelUpApply: "Stufenaufstieg anwenden",
-  levelUpSuccess: "Stufenaufstieg erfolgreich durchgeführt!",
-  levelUpNoOptions: "Keine Stufenaufstiege verfügbar.",
+  levelUpApply: "Level Up anwenden",
+  levelUpSuccess: "Level Up erfolgreich durchgeführt!",
+  levelUpNoOptions: "Keine Level Up verfügbar.",
 
   // History
   history: "Chronik",
@@ -289,7 +290,7 @@ const de = {
   historyEditComment: "Kommentar bearbeiten",
   historySaveComment: "Kommentar speichern",
   historyTypeCharacterCreated: "Charakter erstellt",
-  historyTypeLevelUp: "Stufenaufstieg",
+  historyTypeLevelUp: "Level Up",
   historyTypeCalculationPoints: "Berechnungspunkte geändert",
   historyTypeBaseValue: "Basiswert geändert",
   historyTypeSpecialAbilities: "Sonderfertigkeiten geändert",
