@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ToastProvider, useToast } from "@/components/ui/Toast";
 
@@ -17,10 +17,11 @@ function TestTrigger() {
 describe("Toast system", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it("shows a success toast when triggered", async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     render(
       <ToastProvider>
         <TestTrigger />
@@ -32,7 +33,7 @@ describe("Toast system", () => {
   });
 
   it("shows an error toast when triggered", async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     render(
       <ToastProvider>
         <TestTrigger />
@@ -43,9 +44,8 @@ describe("Toast system", () => {
     expect(screen.getByText("Failed!")).toBeInTheDocument();
   });
 
-  it("auto-dismisses toast after 4 seconds", async () => {
+  it("auto-dismisses toast after 4 seconds", () => {
     vi.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
@@ -53,7 +53,10 @@ describe("Toast system", () => {
       </ToastProvider>,
     );
 
-    await user.click(screen.getByText("Show Success"));
+    // Use fireEvent (synchronous) instead of userEvent so fake timers don't block
+    act(() => {
+      fireEvent.click(screen.getByText("Show Success"));
+    });
     expect(screen.getByText("Saved!")).toBeInTheDocument();
 
     act(() => {
@@ -61,12 +64,10 @@ describe("Toast system", () => {
     });
 
     expect(screen.queryByText("Saved!")).not.toBeInTheDocument();
-
-    vi.useRealTimers();
   });
 
   it("can show multiple toasts simultaneously", async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     render(
       <ToastProvider>
         <TestTrigger />

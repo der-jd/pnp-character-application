@@ -5,25 +5,29 @@ import React from "react";
 // Extend vitest's expect with jest-dom matchers
 expect.extend(matchers);
 
-// Mock lucide-react icons — jsdom cannot render SVG components from lucide
-vi.mock("lucide-react", () => {
-  const handler: ProxyHandler<Record<string, unknown>> = {
-    get(_target, name: string) {
-      if (name === "__esModule") return true;
-      if (name === "default") return {};
-      // Return a forwardRef component for each icon name
-      return React.forwardRef<HTMLSpanElement, Record<string, unknown>>(function MockIcon(props, ref) {
+// Mock lucide-react icons — jsdom cannot render SVG components from lucide.
+// Use importOriginal so vitest knows all named exports exist, then replace each
+// icon with a lightweight span element.
+vi.mock("lucide-react", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("lucide-react")>();
+  const mocked: Record<string, unknown> = {};
+  for (const [name, value] of Object.entries(actual)) {
+    if (typeof value === "function") {
+      const iconName = name;
+      mocked[name] = React.forwardRef<HTMLSpanElement, Record<string, unknown>>(function MockIcon(props, ref) {
         const { size: _size, strokeWidth: _sw, absoluteStrokeWidth: _asw, color: _c, ...rest } = props;
         return React.createElement("span", {
           ref,
-          "data-testid": `icon-${name}`,
+          "data-testid": `icon-${iconName}`,
           "aria-hidden": "true",
           ...rest,
         });
       });
-    },
-  };
-  return new Proxy({}, handler);
+    } else {
+      mocked[name] = value;
+    }
+  }
+  return mocked;
 });
 
 // Mock HTMLDialogElement methods not available in jsdom
