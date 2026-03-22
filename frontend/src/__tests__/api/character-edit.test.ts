@@ -79,7 +79,10 @@ describe("character-edit API", () => {
   describe("updateCombatStats", () => {
     it("calls PATCH with combat category and skill in path", async () => {
       vi.mocked(client.patch).mockResolvedValue({});
-      const data = { skilledAttackValue: { initialValue: 5, newValue: 7 } };
+      const data = {
+        skilledAttackValue: { initialValue: 5, increasedPoints: 2 },
+        skilledParadeValue: { initialValue: 4, increasedPoints: 1 },
+      };
       await updateCombatStats("char-1", "melee", "daggers", data);
       expect(client.patch).toHaveBeenCalledWith("/characters/char-1/combat/melee/daggers", expect.any(Object), data);
     });

@@ -27,7 +27,7 @@ describe("level-up API", () => {
     it("calls POST with the level-up data", async () => {
       vi.mocked(client.post).mockResolvedValue({});
       const data = { effectKind: "hpRoll", diceResult: 4, optionsHash: "abc123" };
-      await applyLevelUp("char-1", data as Parameters<typeof applyLevelUp>[1]);
+      await applyLevelUp("char-1", data as unknown as Parameters<typeof applyLevelUp>[1]);
       expect(client.post).toHaveBeenCalledWith("/characters/char-1/level-up", expect.any(Object), data);
     });
   });

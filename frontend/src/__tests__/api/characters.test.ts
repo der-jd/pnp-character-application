@@ -43,7 +43,7 @@ describe("characters API", () => {
 
   describe("createCharacter", () => {
     it("calls POST with character data", async () => {
-      const data = { name: "Test Hero" } as Parameters<typeof createCharacter>[0];
+      const data = { name: "Test Hero" } as unknown as Parameters<typeof createCharacter>[0];
       vi.mocked(client.post).mockResolvedValue({ characterId: "new-123" });
       await createCharacter(data);
       expect(client.post).toHaveBeenCalledWith("/characters", expect.any(Object), data);
