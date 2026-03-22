@@ -1,15 +1,14 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
-import { MessageSquare, Undo2 } from "lucide-react";
+import { MessageSquare, Undo2, ChevronRight, ChevronDown, Loader2 } from "lucide-react";
 import { HistoryRecordType, type HistoryRecord, type HistoryBlock } from "api-spec";
 import { t } from "@/i18n";
 import { fetchHistory, updateHistoryComment, revertHistoryRecord } from "@/api/history";
 import { ApiError } from "@/api/client";
 import { historyRecordTypeKeys } from "@/i18n/mappings";
-import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { FullPageSpinner } from "@/components/ui/Spinner";
@@ -36,6 +35,8 @@ export function HistoryPage() {
   const [blocks, setBlocks] = useState<HistoryBlock[]>([]);
   const [previousBlockNumber, setPreviousBlockNumber] = useState<number | null>(null);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const { isLoading } = useQuery({
     queryKey: ["history", characterId],
@@ -49,21 +50,50 @@ export function HistoryPage() {
     enabled: !!characterId,
   });
 
-  const [loadingMore, setLoadingMore] = useState(false);
+  // Auto-load remaining blocks in the background
+  const loadingRef = useRef(false);
+  useEffect(() => {
+    if (previousBlockNumber === null || loadingRef.current || initialLoad) return;
 
-  const loadMore = useCallback(async () => {
-    if (previousBlockNumber === null) return;
+    let cancelled = false;
+    loadingRef.current = true;
     setLoadingMore(true);
-    try {
-      const res = await fetchHistory(characterId!, previousBlockNumber);
-      setBlocks((prev) => [...prev, ...res.items]);
-      setPreviousBlockNumber(res.previousBlockNumber ?? null);
-    } catch {
-      toast("error", t("toastLoadError"));
-    } finally {
-      setLoadingMore(false);
+
+    async function loadRemaining(blockNum: number) {
+      let nextBlock: number | null = blockNum;
+      while (nextBlock !== null && !cancelled) {
+        try {
+          const res = await fetchHistory(characterId!, nextBlock);
+          if (cancelled) return;
+          setBlocks((prev) => [...prev, ...res.items]);
+          nextBlock = res.previousBlockNumber ?? null;
+          setPreviousBlockNumber(nextBlock);
+        } catch {
+          if (!cancelled) toast("error", t("toastLoadError"));
+          break;
+        }
+      }
+      if (!cancelled) {
+        setLoadingMore(false);
+        loadingRef.current = false;
+      }
     }
-  }, [characterId, previousBlockNumber, toast]);
+
+    loadRemaining(previousBlockNumber);
+    return () => {
+      cancelled = true;
+      loadingRef.current = false;
+    };
+  }, [previousBlockNumber, initialLoad, characterId, toast]);
+
+  const toggleExpand = useCallback((id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   const [revertTarget, setRevertTarget] = useState<HistoryRecord | null>(null);
   const [commentTarget, setCommentTarget] = useState<{ record: HistoryRecord; blockNumber: number } | null>(null);
@@ -113,83 +143,150 @@ export function HistoryPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{t("historyTitle")}</h1>
 
-      {allRecords.length === 0 ? (
-        <Card>
+      {allRecords.length === 0 && !loadingMore ? (
+        <div className="rounded-lg border border-border-primary bg-bg-secondary">
           <p className="text-text-muted text-center py-8">{t("historyEmpty")}</p>
-        </Card>
+        </div>
       ) : (
-        <div className="space-y-2">
-          {allRecords.map((record) => (
-            <div key={record.id} className="rounded-lg border border-border-primary bg-bg-secondary px-4 py-3">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <Badge variant={TYPE_BADGE_VARIANTS[record.type] ?? "default"}>
-                      {t(historyRecordTypeKeys[record.type]!)}
-                    </Badge>
-                    {record.name && <span className="text-sm font-medium text-text-primary">{record.name}</span>}
-                    {record.learningMethod && <Badge variant="default">{record.learningMethod}</Badge>}
-                  </div>
+        <div className="rounded-lg border border-border-primary overflow-hidden">
+          {/* Header */}
+          <div className="hidden sm:grid sm:grid-cols-[2rem_4rem_minmax(6rem,1fr)_minmax(6rem,1.5fr)_minmax(5rem,8rem)_minmax(4rem,1fr)_4.5rem] gap-2 px-4 py-2 bg-bg-tertiary border-b border-border-primary text-xs font-semibold text-text-muted uppercase tracking-wider">
+            <span />
+            <span>{t("historyColumnNumber")}</span>
+            <span>{t("historyColumnType")}</span>
+            <span>{t("historyColumnName")}</span>
+            <span>{t("historyColumnTimestamp")}</span>
+            <span>{t("historyColumnComment")}</span>
+            <span>{t("historyColumnActions")}</span>
+          </div>
 
-                  {/* Data changes */}
-                  <div className="text-xs text-text-muted mt-1 space-y-0.5">
-                    {record.data.old && (
-                      <div className="flex gap-4">
-                        <span className="text-accent-danger">
-                          {t("oldValue")}: {JSON.stringify(record.data.old)}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex gap-4">
-                      <span className="text-accent-success">
-                        {t("newValue")}: {JSON.stringify(record.data.new)}
-                      </span>
+          {/* Rows */}
+          <div className="divide-y divide-border-primary">
+            {allRecords.map((record) => {
+              const isExpanded = expandedIds.has(record.id);
+              return (
+                <div key={record.id} className="bg-bg-secondary">
+                  {/* Main row */}
+                  <div
+                    className="grid grid-cols-[2rem_1fr_4.5rem] sm:grid-cols-[2rem_4rem_minmax(6rem,1fr)_minmax(6rem,1.5fr)_minmax(5rem,8rem)_minmax(4rem,1fr)_4.5rem] gap-2 px-4 py-2.5 items-center cursor-pointer hover:bg-bg-hover transition-colors"
+                    onClick={() => toggleExpand(record.id)}
+                  >
+                    {/* Expand chevron */}
+                    <span className="text-text-muted">
+                      {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                    </span>
+
+                    {/* Number */}
+                    <span className="hidden sm:block text-xs text-text-muted font-mono">{record.number}</span>
+
+                    {/* Type badge */}
+                    <span>
+                      <Badge variant={TYPE_BADGE_VARIANTS[record.type] ?? "default"}>
+                        {t(historyRecordTypeKeys[record.type]!)}
+                      </Badge>
+                    </span>
+
+                    {/* Name */}
+                    <span className="hidden sm:block text-sm text-text-primary truncate">
+                      {record.name || "—"}
+                    </span>
+
+                    {/* Timestamp */}
+                    <span className="hidden sm:block text-xs text-text-muted whitespace-nowrap">
+                      {formatTimestamp(record.timestamp)}
+                    </span>
+
+                    {/* Comment preview */}
+                    <span className="hidden sm:block text-xs text-text-secondary truncate italic">
+                      {record.comment || "—"}
+                    </span>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-0.5" onClick={(e) => e.stopPropagation()}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setCommentTarget({ record, blockNumber: record.blockNumber });
+                          setCommentText(record.comment ?? "");
+                        }}
+                        title={t("historyAddComment")}
+                      >
+                        <MessageSquare size={14} />
+                      </Button>
+                      {record.type !== HistoryRecordType.CHARACTER_CREATED && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setRevertTarget(record)}
+                          title={t("historyRevert")}
+                          className="hover:text-accent-danger"
+                        >
+                          <Undo2 size={14} />
+                        </Button>
+                      )}
                     </div>
                   </div>
 
-                  {/* Comment */}
-                  {record.comment && <p className="text-xs text-text-secondary mt-1 italic">💬 {record.comment}</p>}
+                  {/* Mobile: show name + timestamp below on small screens */}
+                  {!isExpanded && (
+                    <div className="sm:hidden px-4 pb-2 -mt-1 flex items-center gap-2 text-xs text-text-muted">
+                      <span className="font-mono">#{record.number}</span>
+                      <span className="truncate">{record.name}</span>
+                      <span className="ml-auto whitespace-nowrap">{formatTimestamp(record.timestamp)}</span>
+                    </div>
+                  )}
 
-                  {/* Timestamp */}
-                  <p className="text-[10px] text-text-muted mt-1">{formatTimestamp(record.timestamp)}</p>
-                </div>
+                  {/* Expanded detail: tree view */}
+                  {isExpanded && (
+                    <div className="px-4 pb-3 sm:pl-14">
+                      {/* Mobile extras */}
+                      <div className="sm:hidden mb-2 text-xs text-text-muted space-y-0.5">
+                        <div>
+                          <span className="font-mono">#{record.number}</span> · {record.name} · {formatTimestamp(record.timestamp)}
+                        </div>
+                        {record.comment && <div className="italic">{record.comment}</div>}
+                      </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-1 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setCommentTarget({ record, blockNumber: record.blockNumber });
-                      setCommentText(record.comment ?? "");
-                    }}
-                    title={t("historyAddComment")}
-                  >
-                    <MessageSquare size={14} />
-                  </Button>
-                  {record.type !== HistoryRecordType.CHARACTER_CREATED && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setRevertTarget(record)}
-                      title={t("historyRevert")}
-                      className="hover:text-accent-danger"
-                    >
-                      <Undo2 size={14} />
-                    </Button>
+                      <div className="text-xs space-y-1.5">
+                        {record.learningMethod && (
+                          <TreeRow label={t("learningMethod")} value={record.learningMethod} />
+                        )}
+                        {record.calculationPoints.adventurePoints && (
+                          <TreeNode label={t("adventurePoints")}>
+                            <TreeRow label={t("oldValue")} value={JSON.stringify(record.calculationPoints.adventurePoints.old)} />
+                            <TreeRow label={t("newValue")} value={JSON.stringify(record.calculationPoints.adventurePoints.new)} />
+                          </TreeNode>
+                        )}
+                        {record.calculationPoints.attributePoints && (
+                          <TreeNode label={t("attributePoints")}>
+                            <TreeRow label={t("oldValue")} value={JSON.stringify(record.calculationPoints.attributePoints.old)} />
+                            <TreeRow label={t("newValue")} value={JSON.stringify(record.calculationPoints.attributePoints.new)} />
+                          </TreeNode>
+                        )}
+                        {record.data.old && (
+                          <TreeNode label={t("oldValue")}>
+                            <JsonTree data={record.data.old} />
+                          </TreeNode>
+                        )}
+                        <TreeNode label={t("newValue")}>
+                          <JsonTree data={record.data.new} />
+                        </TreeNode>
+                      </div>
+                    </div>
                   )}
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+              );
+            })}
+          </div>
 
-      {previousBlockNumber !== null && (
-        <div className="flex justify-center">
-          <Button variant="secondary" onClick={loadMore} loading={loadingMore}>
-            {t("historyLoadMore")}
-          </Button>
+          {/* Loading indicator */}
+          {loadingMore && (
+            <div className="flex items-center justify-center gap-2 py-3 border-t border-border-primary text-xs text-text-muted">
+              <Loader2 size={14} className="animate-spin" />
+              {t("historyLoadingMore")}
+            </div>
+          )}
         </div>
       )}
 
@@ -235,6 +332,56 @@ export function HistoryPage() {
           />
         </Dialog>
       )}
+    </div>
+  );
+}
+
+function TreeNode({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="font-medium text-text-secondary">{label}</div>
+      <div className="ml-4 border-l border-border-primary pl-3 mt-0.5 space-y-0.5">{children}</div>
+    </div>
+  );
+}
+
+function TreeRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex gap-2">
+      <span className="text-text-muted shrink-0">{label}:</span>
+      <span className="text-text-primary break-all">{value}</span>
+    </div>
+  );
+}
+
+function JsonTree({ data }: { data: Record<string, unknown> }) {
+  return (
+    <div className="space-y-0.5">
+      {Object.entries(data).map(([key, value]) => {
+        if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+          return (
+            <TreeNode key={key} label={key}>
+              <JsonTree data={value as Record<string, unknown>} />
+            </TreeNode>
+          );
+        }
+        if (Array.isArray(value)) {
+          return (
+            <TreeNode key={key} label={`${key} (${value.length})`}>
+              {value.map((item, i) =>
+                typeof item === "object" && item !== null ? (
+                  <TreeNode key={i} label={`[${i}]`}>
+                    <JsonTree data={item as Record<string, unknown>} />
+                  </TreeNode>
+                ) : (
+                  <TreeRow key={i} label={`[${i}]`} value={String(item)} />
+                ),
+              )}
+            </TreeNode>
+          );
+        }
+        return <TreeRow key={key} label={key} value={String(value ?? "—")} />;
+      })}
     </div>
   );
 }
