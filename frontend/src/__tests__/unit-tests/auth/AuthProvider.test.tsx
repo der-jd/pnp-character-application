@@ -12,7 +12,6 @@ vi.mock("@/auth/cognito", () => ({
 import * as cognito from "@/auth/cognito";
 
 const REFRESH_TOKEN_KEY = "wh_auth_refresh";
-const OLD_STORAGE_KEY = "wh_auth_tokens";
 
 function AuthDisplay() {
   const { isAuthenticated, isLoading, idToken, signIn, signOut } = useAuth();
@@ -155,28 +154,6 @@ describe("AuthProvider", () => {
     });
 
     expect(localStorage.getItem(REFRESH_TOKEN_KEY)).toBeNull();
-  });
-
-  it("migrates away from old token storage format on mount", async () => {
-    const oldTokens = {
-      idToken: "old-id",
-      accessToken: "old-access",
-      refreshToken: "old-refresh",
-      expiresAt: Date.now() + 3600_000,
-    };
-    localStorage.setItem(OLD_STORAGE_KEY, JSON.stringify(oldTokens));
-
-    render(
-      <AuthProvider>
-        <AuthDisplay />
-      </AuthProvider>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId("loading")).toHaveTextContent("ready");
-    });
-
-    expect(localStorage.getItem(OLD_STORAGE_KEY)).toBeNull();
   });
 
   it("throws when useAuth is used outside AuthProvider", () => {

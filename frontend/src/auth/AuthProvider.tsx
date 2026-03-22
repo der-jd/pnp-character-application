@@ -38,9 +38,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Attempt to restore session on mount using stored refresh token
   useEffect(() => {
-    // Migration: remove old storage format that stored all tokens including id/access
-    localStorage.removeItem("wh_auth_tokens");
-
     const refreshToken = loadRefreshToken();
     if (!refreshToken) {
       setIsLoading(false);
