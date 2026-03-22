@@ -37,7 +37,7 @@ export function Dialog({ open, onClose, title, children, actions }: DialogProps)
   return (
     <dialog
       ref={dialogRef}
-      className="backdrop:bg-black/60 bg-bg-secondary rounded-xl border border-border-primary shadow-2xl p-0 w-full max-w-md text-text-primary"
+      className="backdrop:bg-black/60 bg-bg-secondary rounded-xl border border-border-primary shadow-2xl p-0 w-full max-w-md text-text-primary fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
       onClick={(e) => {
         if (e.target === dialogRef.current) onClose();
       }}
