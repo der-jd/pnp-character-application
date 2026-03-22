@@ -23,7 +23,7 @@ npm install
 npm run dev --workspace frontend
 ```
 
-The dev server connects to the live backend API. You need a `.env.local` file in `frontend/` with:
+The dev server connects to the live backend API. You need a `.env.local` file in the root folder with:
 
 ```
 VITE_API_BASE_URL=https://api.worldhoppers.de/v1
