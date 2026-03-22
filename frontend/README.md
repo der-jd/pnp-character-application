@@ -47,34 +47,20 @@ Run via `npm run <command> --workspace frontend`.
 ```
 src/
 ├── api/            # Typed HTTP client and endpoint modules
-│   ├── client.ts           # Base HTTP client with Zod response validation
-│   ├── characters.ts       # Character CRUD endpoints
-│   ├── character-edit.ts   # Character modification endpoints
-│   ├── level-up.ts         # Level-up system endpoints
-│   └── history.ts          # History/changelog endpoints
+│   └── ...
 ├── auth/           # AWS Cognito authentication
-│   ├── AuthProvider.tsx    # React context provider for auth state
-│   └── cognito.ts          # Cognito SDK integration
+│   └── ...
 ├── components/
 │   ├── ui/         # Base UI primitives (Button, Input, Card, Dialog, Badge, Select, Spinner, Toast)
 │   └── layout/     # AppLayout, Sidebar
 ├── pages/          # Route-level page components
-│   ├── SignInPage.tsx
-│   ├── DashboardPage.tsx
-│   ├── CharacterCreatePage.tsx
-│   ├── CharacterSheetPage.tsx
-│   ├── SkillsPage.tsx
-│   ├── CombatPage.tsx
-│   ├── LevelUpPage.tsx
-│   └── HistoryPage.tsx
+│   └── ...
 ├── stores/         # Zustand stores
-│   └── characterStore.ts   # Selected character ID
+│   └── ...
 ├── i18n/           # Internationalization
-│   ├── de.ts               # German translations (all UI strings)
-│   ├── index.ts            # t() helper function
-│   └── mappings.ts         # Character/attribute display name mappings
-├── styles/
-│   └── index.css           # Tailwind config with custom dark theme tokens
+│   └── ...
+├── styles/         # Tailwind CSS configuration
+│   └── ...
 ├── App.tsx         # Root component with routing
 └── main.tsx        # Entry point
 ```
@@ -107,17 +93,6 @@ All user-facing text is in German and centralized in `src/i18n/de.ts`. Component
 ### Styling
 
 The app uses a custom dark theme built on Tailwind CSS v4. Theme tokens (colors, spacing) are defined in `src/styles/index.css` via Tailwind's `@theme` directive. The path alias `@/` maps to `src/` for clean imports.
-
-## Features
-
-- **Sign-in** — Cognito-based authentication with automatic token refresh
-- **Dashboard** — Character list with create, clone, and delete actions
-- **Character creation wizard** — 7-step guided flow (general info, profession/hobby, advantages/disadvantages, attributes, skills, combat values, review)
-- **Character sheet** — Comprehensive view of all character data
-- **Inline editing** — Edit attributes, base values, skills, combat stats, calculation points, and special abilities
-- **Level-up** — Dice roll and increment effects with cost previews
-- **History** — Paginated changelog with comments and revert capability
-- **Toast notifications** — Success/error feedback for all operations
 
 ## Build Output
 
