@@ -187,9 +187,7 @@ export function HistoryPage() {
                     </span>
 
                     {/* Name */}
-                    <span className="hidden sm:block text-sm text-text-primary truncate">
-                      {record.name || "—"}
-                    </span>
+                    <span className="hidden sm:block text-sm text-text-primary truncate">{record.name || "—"}</span>
 
                     {/* Timestamp */}
                     <span className="hidden sm:block text-xs text-text-muted whitespace-nowrap">
@@ -243,25 +241,36 @@ export function HistoryPage() {
                       {/* Mobile extras */}
                       <div className="sm:hidden mb-2 text-xs text-text-muted space-y-0.5">
                         <div>
-                          <span className="font-mono">#{record.number}</span> · {record.name} · {formatTimestamp(record.timestamp)}
+                          <span className="font-mono">#{record.number}</span> · {record.name} ·{" "}
+                          {formatTimestamp(record.timestamp)}
                         </div>
                         {record.comment && <div className="italic">{record.comment}</div>}
                       </div>
 
                       <div className="text-xs space-y-1.5">
-                        {record.learningMethod && (
-                          <TreeRow label={t("learningMethod")} value={record.learningMethod} />
-                        )}
+                        {record.learningMethod && <TreeRow label={t("learningMethod")} value={record.learningMethod} />}
                         {record.calculationPoints.adventurePoints && (
                           <TreeNode label={t("adventurePoints")}>
-                            <TreeRow label={t("oldValue")} value={JSON.stringify(record.calculationPoints.adventurePoints.old)} />
-                            <TreeRow label={t("newValue")} value={JSON.stringify(record.calculationPoints.adventurePoints.new)} />
+                            <TreeRow
+                              label={t("oldValue")}
+                              value={JSON.stringify(record.calculationPoints.adventurePoints.old)}
+                            />
+                            <TreeRow
+                              label={t("newValue")}
+                              value={JSON.stringify(record.calculationPoints.adventurePoints.new)}
+                            />
                           </TreeNode>
                         )}
                         {record.calculationPoints.attributePoints && (
                           <TreeNode label={t("attributePoints")}>
-                            <TreeRow label={t("oldValue")} value={JSON.stringify(record.calculationPoints.attributePoints.old)} />
-                            <TreeRow label={t("newValue")} value={JSON.stringify(record.calculationPoints.attributePoints.new)} />
+                            <TreeRow
+                              label={t("oldValue")}
+                              value={JSON.stringify(record.calculationPoints.attributePoints.old)}
+                            />
+                            <TreeRow
+                              label={t("newValue")}
+                              value={JSON.stringify(record.calculationPoints.attributePoints.new)}
+                            />
                           </TreeNode>
                         )}
                         {record.data.old && (
