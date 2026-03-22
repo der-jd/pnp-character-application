@@ -32,48 +32,62 @@ export function HistoryPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [blocks, setBlocks] = useState<HistoryBlock[]>([]);
-  const [previousBlockNumber, setPreviousBlockNumber] = useState<number | null>(null);
-  const [initialLoad, setInitialLoad] = useState(true);
+  const [additionalBlocks, setAdditionalBlocks] = useState<HistoryBlock[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
-  const { isLoading } = useQuery({
+  useEffect(() => {
+    setAdditionalBlocks([]);
+    setLoadingMore(false);
+    setExpandedIds(new Set());
+  }, [characterId]);
+
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ["history", characterId],
     queryFn: async () => {
-      const res = await fetchHistory(characterId!);
-      setBlocks(res.items);
-      setPreviousBlockNumber(res.previousBlockNumber ?? null);
-      setInitialLoad(false);
-      return res;
+      return await fetchHistory(characterId!);
     },
     enabled: !!characterId,
+    staleTime: 0,
   });
+
+  const initialBlocks = data?.items ?? [];
+  const previousBlockNumber = data?.previousBlockNumber ?? null;
 
   // Auto-load remaining blocks in the background
   const loadingRef = useRef(false);
+  const lastCharacterIdRef = useRef<string | undefined>(undefined);
+
   useEffect(() => {
-    if (previousBlockNumber === null || loadingRef.current || initialLoad) return;
+    if (characterId !== lastCharacterIdRef.current) {
+      lastCharacterIdRef.current = characterId;
+      loadingRef.current = false;
+    }
+  }, [characterId]);
+
+  useEffect(() => {
+    if (previousBlockNumber === null || loadingRef.current || !data) return;
 
     let cancelled = false;
     loadingRef.current = true;
     setLoadingMore(true);
 
     async function loadRemaining(blockNum: number) {
+      const blocks: HistoryBlock[] = [];
       let nextBlock: number | null = blockNum;
       while (nextBlock !== null && !cancelled) {
         try {
           const res = await fetchHistory(characterId!, nextBlock);
           if (cancelled) return;
-          setBlocks((prev) => [...prev, ...res.items]);
+          blocks.push(...res.items);
           nextBlock = res.previousBlockNumber ?? null;
-          setPreviousBlockNumber(nextBlock);
         } catch {
           if (!cancelled) toast("error", t("toastLoadError"));
           break;
         }
       }
       if (!cancelled) {
+        setAdditionalBlocks(blocks);
         setLoadingMore(false);
         loadingRef.current = false;
       }
@@ -84,7 +98,7 @@ export function HistoryPage() {
       cancelled = true;
       loadingRef.current = false;
     };
-  }, [previousBlockNumber, initialLoad, characterId, toast]);
+  }, [previousBlockNumber, data, characterId, toast]);
 
   const toggleExpand = useCallback((id: string) => {
     setExpandedIds((prev) => {
@@ -133,10 +147,11 @@ export function HistoryPage() {
     },
   });
 
-  if (isLoading && initialLoad) return <FullPageSpinner />;
+  if (isLoading || (isFetching && initialBlocks.length === 0)) return <FullPageSpinner />;
 
   // Flatten blocks and reverse within each block to show most recent first
-  const allRecords = blocks.flatMap(
+  const allBlocks = [...initialBlocks, ...additionalBlocks];
+  const allRecords = allBlocks.flatMap(
     (block) => block.changes.map((record) => ({ ...record, blockNumber: block.blockNumber })).reverse(), // Reverse changes within each block (oldest first → newest first)
   );
 
