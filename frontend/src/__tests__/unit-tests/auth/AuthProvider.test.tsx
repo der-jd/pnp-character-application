@@ -11,7 +11,8 @@ vi.mock("@/auth/cognito", () => ({
 
 import * as cognito from "@/auth/cognito";
 
-const STORAGE_KEY = "wh_auth_tokens";
+const REFRESH_TOKEN_KEY = "wh_auth_refresh";
+const OLD_STORAGE_KEY = "wh_auth_tokens";
 
 function AuthDisplay() {
   const { isAuthenticated, isLoading, idToken, signIn, signOut } = useAuth();
@@ -47,41 +48,13 @@ describe("AuthProvider", () => {
     expect(screen.getByTestId("token")).toHaveTextContent("null");
   });
 
-  it("restores session from localStorage when token is still valid", async () => {
-    const storedTokens = {
-      idToken: "stored-id-token",
-      accessToken: "stored-access-token",
-      refreshToken: "stored-refresh-token",
-      expiresAt: Date.now() + 3600_000, // 1 hour from now
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storedTokens));
-
-    render(
-      <AuthProvider>
-        <AuthDisplay />
-      </AuthProvider>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId("loading")).toHaveTextContent("ready");
-      expect(screen.getByTestId("authed")).toHaveTextContent("yes");
-      expect(screen.getByTestId("token")).toHaveTextContent("stored-id-token");
-    });
-  });
-
-  it("attempts token refresh when stored token is near expiry", async () => {
-    const storedTokens = {
-      idToken: "old-token",
-      accessToken: "old-access",
-      refreshToken: "refresh-token",
-      expiresAt: Date.now() + 30_000, // 30s from now (within 60s buffer)
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storedTokens));
+  it("restores session from localStorage using stored refresh token", async () => {
+    localStorage.setItem(REFRESH_TOKEN_KEY, "stored-refresh-token");
 
     const refreshedTokens = {
-      idToken: "refreshed-id-token",
-      accessToken: "refreshed-access",
-      refreshToken: "refresh-token",
+      idToken: "restored-id-token",
+      accessToken: "restored-access-token",
+      refreshToken: "stored-refresh-token",
       expiresAt: Date.now() + 3600_000,
     };
     vi.mocked(cognito.refreshSession).mockResolvedValue(refreshedTokens);
@@ -95,20 +68,14 @@ describe("AuthProvider", () => {
     await waitFor(() => {
       expect(screen.getByTestId("loading")).toHaveTextContent("ready");
       expect(screen.getByTestId("authed")).toHaveTextContent("yes");
-      expect(screen.getByTestId("token")).toHaveTextContent("refreshed-id-token");
+      expect(screen.getByTestId("token")).toHaveTextContent("restored-id-token");
     });
 
-    expect(cognito.refreshSession).toHaveBeenCalledWith("refresh-token");
+    expect(cognito.refreshSession).toHaveBeenCalledWith("stored-refresh-token");
   });
 
-  it("clears stored tokens when refresh fails", async () => {
-    const storedTokens = {
-      idToken: "old-token",
-      accessToken: "old-access",
-      refreshToken: "bad-refresh",
-      expiresAt: Date.now() + 30_000,
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storedTokens));
+  it("clears stored refresh token when session restore fails", async () => {
+    localStorage.setItem(REFRESH_TOKEN_KEY, "bad-refresh");
 
     vi.mocked(cognito.refreshSession).mockRejectedValue(new Error("Refresh failed"));
 
@@ -123,10 +90,10 @@ describe("AuthProvider", () => {
       expect(screen.getByTestId("authed")).toHaveTextContent("no");
     });
 
-    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    expect(localStorage.getItem(REFRESH_TOKEN_KEY)).toBeNull();
   });
 
-  it("signs in successfully and stores tokens", async () => {
+  it("signs in successfully and stores only the refresh token", async () => {
     const newTokens = {
       idToken: "new-id-token",
       accessToken: "new-access",
@@ -153,19 +120,21 @@ describe("AuthProvider", () => {
       expect(screen.getByTestId("token")).toHaveTextContent("new-id-token");
     });
 
-    // Verify tokens are stored
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
-    expect(stored.idToken).toBe("new-id-token");
+    // Only the refresh token is persisted; id/access tokens are in memory only
+    expect(localStorage.getItem(REFRESH_TOKEN_KEY)).toBe("new-refresh");
+    expect(localStorage.getItem(REFRESH_TOKEN_KEY)).not.toContain("new-id-token");
+    expect(localStorage.getItem(REFRESH_TOKEN_KEY)).not.toContain("new-access");
   });
 
-  it("signs out and clears tokens", async () => {
-    const tokens = {
+  it("signs out and clears stored refresh token", async () => {
+    localStorage.setItem(REFRESH_TOKEN_KEY, "refresh-token");
+
+    vi.mocked(cognito.refreshSession).mockResolvedValue({
       idToken: "id-token",
       accessToken: "access",
-      refreshToken: "refresh",
+      refreshToken: "refresh-token",
       expiresAt: Date.now() + 3600_000,
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
+    });
 
     const user = userEvent.setup();
     render(
@@ -185,20 +154,17 @@ describe("AuthProvider", () => {
       expect(screen.getByTestId("token")).toHaveTextContent("null");
     });
 
-    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    expect(localStorage.getItem(REFRESH_TOKEN_KEY)).toBeNull();
   });
 
-  it("throws when useAuth is used outside AuthProvider", () => {
-    function Orphan() {
-      useAuth();
-      return null;
-    }
-
-    expect(() => render(<Orphan />)).toThrow("useAuth must be used within AuthProvider");
-  });
-
-  it("handles corrupted localStorage gracefully", async () => {
-    localStorage.setItem(STORAGE_KEY, "not valid json{{{");
+  it("migrates away from old token storage format on mount", async () => {
+    const oldTokens = {
+      idToken: "old-id",
+      accessToken: "old-access",
+      refreshToken: "old-refresh",
+      expiresAt: Date.now() + 3600_000,
+    };
+    localStorage.setItem(OLD_STORAGE_KEY, JSON.stringify(oldTokens));
 
     render(
       <AuthProvider>
@@ -208,7 +174,17 @@ describe("AuthProvider", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("loading")).toHaveTextContent("ready");
-      expect(screen.getByTestId("authed")).toHaveTextContent("no");
     });
+
+    expect(localStorage.getItem(OLD_STORAGE_KEY)).toBeNull();
+  });
+
+  it("throws when useAuth is used outside AuthProvider", () => {
+    function Orphan() {
+      useAuth();
+      return null;
+    }
+
+    expect(() => render(<Orphan />)).toThrow("useAuth must be used within AuthProvider");
   });
 });

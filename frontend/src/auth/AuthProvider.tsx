@@ -1,7 +1,9 @@
 import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from "react";
 import { signIn as cognitoSignIn, refreshSession, type AuthTokens } from "./cognito";
 
-const STORAGE_KEY = "wh_auth_tokens";
+// Only the refresh token is persisted to localStorage.
+// Short-lived id/access tokens are kept in memory only to limit XSS exposure.
+const REFRESH_TOKEN_KEY = "wh_auth_refresh";
 
 interface AuthContextValue {
   isAuthenticated: boolean;
@@ -13,58 +15,51 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function loadStoredTokens(): AuthTokens | null {
+function loadRefreshToken(): string | null {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return null;
-    return JSON.parse(stored) as AuthTokens;
+    const stored = localStorage.getItem(REFRESH_TOKEN_KEY);
+    return stored ?? null;
   } catch {
     return null;
   }
 }
 
-function storeTokens(tokens: AuthTokens): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
+function storeRefreshToken(refreshToken: string): void {
+  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 }
 
-function clearStoredTokens(): void {
-  localStorage.removeItem(STORAGE_KEY);
+function clearRefreshToken(): void {
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [tokens, setTokens] = useState<AuthTokens | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Attempt to restore session on mount
+  // Attempt to restore session on mount using stored refresh token
   useEffect(() => {
-    const stored = loadStoredTokens();
-    if (!stored) {
+    // Migration: remove old storage format that stored all tokens including id/access
+    localStorage.removeItem("wh_auth_tokens");
+
+    const refreshToken = loadRefreshToken();
+    if (!refreshToken) {
       setIsLoading(false);
       return;
     }
 
-    // If token is still valid (with 60s buffer), use it directly
-    if (stored.expiresAt > Date.now() + 60_000) {
-      setTokens(stored);
-      setIsLoading(false);
-      return;
-    }
-
-    // Try to refresh
-    refreshSession(stored.refreshToken)
+    refreshSession(refreshToken)
       .then((newTokens) => {
-        storeTokens(newTokens);
         setTokens(newTokens);
       })
       .catch(() => {
-        clearStoredTokens();
+        clearRefreshToken();
       })
       .finally(() => {
         setIsLoading(false);
       });
   }, []);
 
-  // Auto-refresh token before expiry
+  // Auto-refresh id/access tokens before expiry
   useEffect(() => {
     if (!tokens) return;
 
@@ -74,11 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const timer = setTimeout(() => {
       refreshSession(tokens.refreshToken)
         .then((newTokens) => {
-          storeTokens(newTokens);
           setTokens(newTokens);
         })
         .catch(() => {
-          clearStoredTokens();
+          clearRefreshToken();
           setTokens(null);
         });
     }, msUntilRefresh);
@@ -88,12 +82,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleSignIn = useCallback(async (username: string, password: string) => {
     const newTokens = await cognitoSignIn(username, password);
-    storeTokens(newTokens);
-    setTokens(newTokens);
+    storeRefreshToken(newTokens.refreshToken); // only refresh token persisted
+    setTokens(newTokens); // id/access tokens in memory only
   }, []);
 
   const handleSignOut = useCallback(() => {
-    clearStoredTokens();
+    clearRefreshToken();
     setTokens(null);
   }, []);
 
