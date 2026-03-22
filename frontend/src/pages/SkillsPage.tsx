@@ -8,6 +8,7 @@ import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
 import { updateSkill, getSkillIncreaseCost } from "@/api/character-edit";
 import { skillNameKeys, skillCategoryKeys, learningMethodKeys } from "@/i18n/mappings";
+import { getSkillIcon, skillCategoryIcons } from "@/lib/skillIcons";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -99,11 +100,20 @@ export function SkillsPage() {
       {skillCategories.map((category) => {
         const categorySkills = skills[category as SkillCategory] as Record<string, Skill>;
         return (
-          <Card key={category} title={t(skillCategoryKeys[category]!)}>
+          <Card
+            key={category}
+            title={
+              <span className="flex items-center gap-2">
+                <span className="text-accent-primary">{skillCategoryIcons[category]}</span>
+                {t(skillCategoryKeys[category]!)}
+              </span>
+            }
+          >
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border-primary text-text-muted text-xs">
+                    <th className="text-left py-2 pr-4 font-medium w-6"></th>
                     <th className="text-left py-2 pr-4 font-medium">{t("skills")}</th>
                     <th className="text-center py-2 px-2 font-medium">{t("activated")}</th>
                     <th className="text-center py-2 px-2 font-medium">{t("start")}</th>
@@ -117,6 +127,7 @@ export function SkillsPage() {
                 <tbody>
                   {Object.entries(categorySkills).map(([name, skill]) => (
                     <tr key={name} className="border-b border-border-primary/50 hover:bg-bg-hover/30">
+                      <td className="py-2 text-text-muted">{getSkillIcon(name)}</td>
                       <td className="py-2 pr-4 font-medium">{t(skillNameKeys[name]!)}</td>
                       <td className="text-center py-2 px-2">
                         <span

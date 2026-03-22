@@ -7,6 +7,7 @@ import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
 import { updateAttribute, updateBaseValue, updateCalculationPoints, addSpecialAbility } from "@/api/character-edit";
 import { attributeKeys, baseValueKeys, advantageNameKeys, disadvantageNameKeys } from "@/i18n/mappings";
+import { attributeIcons } from "@/lib/skillIcons";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -394,6 +395,7 @@ function AttributesSection({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border-primary text-text-muted text-xs">
+              <th className="py-2 w-6"></th>
               <th className="text-left py-2 pr-4 font-medium">{t("attributes")}</th>
               <th className="text-center py-2 px-2 font-medium">{t("start")}</th>
               <th className="text-center py-2 px-2 font-medium">{t("current")}</th>
@@ -405,6 +407,7 @@ function AttributesSection({
           <tbody>
             {Object.entries(attributes).map(([name, attr]) => (
               <tr key={name} className="border-b border-border-primary/50 hover:bg-bg-hover/30">
+                <td className="py-2 text-accent-primary">{attributeIcons[name]}</td>
                 <td className="py-2 pr-4 font-medium">{t(attributeKeys[name]!)}</td>
                 <td className="text-center py-2 px-2">
                   {editing === name ? (

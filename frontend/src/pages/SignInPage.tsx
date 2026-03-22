@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/Button";
 export function SignInPage() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState(import.meta.env.VITE_TEST_USER_EMAIL || "");
+  const [password, setPassword] = useState(import.meta.env.VITE_TEST_USER_PASSWORD || "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
