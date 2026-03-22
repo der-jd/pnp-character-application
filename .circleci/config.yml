@@ -150,12 +150,11 @@ jobs:
           command: |
             cd api-spec
             npm run build
-
       - run:
           name: Run frontend tests
           command: |
             cd frontend
-            npm run test:run
+            npm run test
 
   lint-terraform-code:
     executor: node-small-executor
