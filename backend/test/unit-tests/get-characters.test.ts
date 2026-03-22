@@ -130,6 +130,7 @@ describe("Valid requests", () => {
     if ("name" in foundCharacter!) {
       expect(foundCharacter!.name).toBe(firstFakeCharacter.characterSheet.generalInformation.name);
       expect(foundCharacter!.level).toBe(firstFakeCharacter.characterSheet.generalInformation.level);
+      expect(foundCharacter!.rulesetVersion).toBe(firstFakeCharacter.rulesetVersion);
     } else {
       throw new Error("Expected character short form but got full character form");
     }
