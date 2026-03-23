@@ -35,7 +35,6 @@ export function LevelUpPage() {
     data: levelUpData,
     isLoading,
     error,
-    refetch,
   } = useQuery({
     queryKey: ["level-up", characterId],
     queryFn: () => fetchLevelUpOptions(characterId!),
@@ -76,7 +75,6 @@ export function LevelUpPage() {
       queryClient.invalidateQueries({ queryKey: ["level-up", characterId] });
       toast("success", t("levelUpSuccess"));
       setSelectedOption(null);
-      refetch();
     },
     onError: (error) => {
       if (error instanceof ApiError) {
