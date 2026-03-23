@@ -12,14 +12,18 @@ import {
   User,
   UserPlus,
   CalendarPlus,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@/i18n";
 import { useAuth } from "@/auth/AuthProvider";
+import { useTheme } from "@/hooks/useTheme";
 import { fetchCharacters } from "@/api/characters";
 import { useState } from "react";
 import type { CharacterShort } from "api-spec";
 import { EventDialog } from "@/components/EventDialog";
+import { Toggle } from "@/components/ui/Toggle";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   clsx(
@@ -31,6 +35,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function Sidebar() {
   const { signOut, username, email } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const { characterId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -160,6 +165,29 @@ export function Sidebar() {
           <div className="flex justify-center py-2" title={`${username}${email ? `\n${email}` : ""}`}>
             <User size={18} className="text-text-muted" />
           </div>
+        )}
+        {!collapsed && (
+          <div className="px-3 py-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
+              <span className="text-sm text-text-secondary">{theme === "dark" ? t("themeDark") : t("themeLight")}</span>
+            </div>
+            <Toggle
+              checked={theme === "light"}
+              onChange={toggleTheme}
+              title={theme === "dark" ? t("themeLight") : t("themeDark")}
+            />
+          </div>
+        )}
+        {collapsed && (
+          <button
+            onClick={toggleTheme}
+            className="flex w-full justify-center items-center gap-3 rounded-lg px-3 py-2 text-text-muted hover:bg-sidebar-hover hover:text-text-primary transition-colors cursor-pointer"
+            title={theme === "dark" ? t("themeLight") : t("themeDark")}
+            aria-label={theme === "dark" ? t("themeLight") : t("themeDark")}
+          >
+            {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
