@@ -185,13 +185,15 @@ export function LevelUpPage() {
         </div>
       )}
 
-      {selectedOption && (
-        <div className="flex justify-end">
-          <Button onClick={() => mutation.mutate()} loading={mutation.isPending}>
-            {t("levelUpApply")}
-          </Button>
-        </div>
-      )}
+      <div className="flex justify-end">
+        <Button
+          onClick={() => mutation.mutate()}
+          loading={mutation.isPending}
+          disabled={!selectedOption || mutation.isPending}
+        >
+          {t("levelUpApply")}
+        </Button>
+      </div>
     </div>
   );
 }
