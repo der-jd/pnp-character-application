@@ -81,8 +81,13 @@ export function SkillsPage() {
     try {
       const res = await getSkillIncreaseCost(characterId!, category, name, method);
       setCostPreview(res.increaseCost);
-    } catch {
+    } catch (error) {
       setCostPreview(null);
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastLoadError"));
+      }
     } finally {
       setLoadingCost(false);
     }
