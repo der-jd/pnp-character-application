@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { clsx } from "clsx";
@@ -270,7 +270,7 @@ export function CharacterCreatePage() {
     mutation.mutate(request);
   }
 
-  const update = (partial: Partial<WizardState>) => setState((prev) => ({ ...prev, ...partial }));
+  const update = useCallback((partial: Partial<WizardState>) => setState((prev) => ({ ...prev, ...partial })), []);
   const canGoBack = step > 0;
   const isLastStep = step === STEPS.length - 1;
 
@@ -404,11 +404,13 @@ function getAllSkills(): SkillNameWithCategory[] {
 }
 
 function StepProfession({ state, update }: StepProps) {
-  const allSkills = getAllSkills();
-  const skillOptions = allSkills.map((s: SkillNameWithCategory) => {
-    const [cat, name] = s.split("/") as [string, string];
-    return { value: s, label: `${t(skillCategoryKeys[cat]!)} — ${t(skillNameKeys[name]!)}` };
-  });
+  const skillOptions = useMemo(() => {
+    const allSkills = getAllSkills();
+    return allSkills.map((s: SkillNameWithCategory) => {
+      const [cat, name] = s.split("/") as [string, string];
+      return { value: s, label: `${t(skillCategoryKeys[cat]!)} — ${t(skillNameKeys[name]!)}` };
+    });
+  }, []);
 
   return (
     <div className="space-y-6">
