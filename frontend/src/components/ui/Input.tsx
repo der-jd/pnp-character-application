@@ -18,6 +18,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({ label, error, c
       <input
         ref={ref}
         id={inputId}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${inputId}-error` : undefined}
         className={clsx(
           "w-full rounded-md border bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder-text-muted transition-colors",
           "focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-border-focus",
@@ -27,7 +29,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({ label, error, c
         )}
         {...props}
       />
-      {error && <p className="text-xs text-accent-danger">{error}</p>}
+      {error && (
+        <p id={`${inputId}-error`} className="text-xs text-accent-danger">
+          {error}
+        </p>
+      )}
     </div>
   );
 });

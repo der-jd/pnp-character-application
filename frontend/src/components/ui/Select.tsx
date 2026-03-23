@@ -21,6 +21,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           id={selectId}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${selectId}-error` : undefined}
           className={clsx(
             "w-full rounded-md border bg-bg-secondary px-3 py-2 text-sm text-text-primary transition-colors appearance-none",
             "focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-border-focus",
@@ -41,7 +43,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             </option>
           ))}
         </select>
-        {error && <p className="text-xs text-accent-danger">{error}</p>}
+        {error && (
+          <p id={`${selectId}-error`} className="text-xs text-accent-danger">
+            {error}
+          </p>
+        )}
       </div>
     );
   },

@@ -52,6 +52,7 @@ export function Sidebar() {
 
   return (
     <aside
+      aria-label={t("navCharacterSheet")}
       className={clsx(
         "flex flex-col border-r border-border-primary bg-sidebar-bg transition-all duration-200",
         collapsed ? "w-16" : "w-60",
@@ -71,7 +72,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-2 py-3 space-y-1 overflow-y-auto">
+      <nav aria-label={t("navDashboard")} className="flex-1 px-2 py-3 space-y-1 overflow-y-auto">
         <NavLink to="/dashboard" className={navLinkClass}>
           <LayoutDashboard size={18} className="shrink-0" />
           {!collapsed && <span>{t("navDashboard")}</span>}

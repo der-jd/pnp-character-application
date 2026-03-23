@@ -37,14 +37,21 @@ export function Dialog({ open, onClose, title, children, actions }: DialogProps)
   return (
     <dialog
       ref={dialogRef}
+      aria-labelledby="dialog-title"
       className="backdrop:bg-black/60 bg-bg-secondary rounded-xl border border-border-primary shadow-2xl p-0 w-full max-w-md text-text-primary fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
       onClick={(e) => {
         if (e.target === dialogRef.current) onClose();
       }}
     >
       <div className="flex items-center justify-between border-b border-border-primary px-5 py-4">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors cursor-pointer">
+        <h2 id="dialog-title" className="text-lg font-semibold">
+          {title}
+        </h2>
+        <button
+          onClick={onClose}
+          aria-label={t("close")}
+          className="text-text-muted hover:text-text-primary transition-colors cursor-pointer"
+        >
           <X size={18} />
         </button>
       </div>
