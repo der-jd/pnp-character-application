@@ -12,8 +12,8 @@ export function AppLayout() {
       <main className="flex-1 overflow-y-auto">
         <div className="relative w-full h-52 overflow-hidden">
           <img src="/banner.png" alt="World Hoppers" className="w-full h-full object-cover object-center" />
-          {/* Fade bottom into page background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-bg-primary" />
+          {/* Fade bottom into page background — only covers the lower third */}
+          <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-b from-transparent to-bg-primary" />
           {/* Subtle side fades */}
           {isDark && (
             <>
