@@ -353,7 +353,7 @@ interface StepProps {
 
 function StepGeneral({ state, update }: StepProps) {
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <Input
         label={t("characterName")}
         value={state.name}
@@ -418,7 +418,7 @@ function StepProfession({ state, update }: StepProps) {
         <h3 className="text-sm font-semibold mb-3">
           {t("profession")} <Badge variant="info">{t("professionBonus", PROFESSION_SKILL_BONUS)}</Badge>
         </h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label={t("professionName")}
             value={state.professionName}
@@ -495,7 +495,7 @@ function StepAdvantages({ state, update }: StepProps) {
         </Badge>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Advantages */}
         <div>
           <h3 className="text-sm font-semibold mb-3">{t("advantages")}</h3>
@@ -607,7 +607,7 @@ function StepAttributes({ state, update }: StepProps) {
         <Badge variant="default">{t("pointsTotal", totalUsed, ATTRIBUTE_POINTS_FOR_CREATION)}</Badge>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {ATTRIBUTE_NAMES.map((attr) => (
           <div
             key={attr}
@@ -679,7 +679,7 @@ function StepSkills({ state, update }: StepProps) {
           {count}/{NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION} {t("activated")}
         </Badge>
       </div>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         {availableSkills.map((skill) => {
           const [cat, name] = skill.split("/") as [string, string];
           const isSelected = selected.includes(skill);
@@ -718,7 +718,7 @@ function StepCombat({ state, update }: StepProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {COMBAT_SKILL_NAMES.map((name) => (
         <div key={name} className="flex items-center justify-between rounded-lg border border-border-primary px-4 py-3">
           <span className="text-sm">{t(skillNameKeys[name]!)}</span>
@@ -742,7 +742,7 @@ function StepReview({ state }: { state: WizardState }) {
       {/* General */}
       <div>
         <h3 className="text-sm font-semibold text-text-secondary mb-2">{t("wizardStepGeneral")}</h3>
-        <div className="grid grid-cols-3 gap-2 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
           <div>
             <span className="text-text-muted">{t("characterName")}:</span> {state.name}
           </div>
@@ -771,7 +771,7 @@ function StepReview({ state }: { state: WizardState }) {
       {/* Attributes */}
       <div>
         <h3 className="text-sm font-semibold text-text-secondary mb-2">{t("wizardStepAttributes")}</h3>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {ATTRIBUTE_NAMES.map((attr) => (
             <div key={attr} className="flex justify-between text-sm rounded border border-border-primary px-2 py-1">
               <span className="text-text-muted">{t(attr as keyof typeof import("@/i18n/de").default)}</span>

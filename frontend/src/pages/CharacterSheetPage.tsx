@@ -63,7 +63,7 @@ export function CharacterSheetPage() {
 
       {/* General Information */}
       <Card title={t("generalInformation")}>
-        <div className="grid grid-cols-3 gap-4 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
           <InfoField label={t("profession")} value={gi.profession.name} />
           <InfoField label={t("hobby")} value={gi.hobby.name} />
           <InfoField label={t("birthday")} value={gi.birthday} />
@@ -90,7 +90,7 @@ export function CharacterSheetPage() {
       <CalculationPointsSection character={character} />
 
       {/* Advantages & Disadvantages */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card title={t("advantages")}>
           {sheet.advantages.length === 0 ? (
             <p className="text-sm text-text-muted">—</p>
