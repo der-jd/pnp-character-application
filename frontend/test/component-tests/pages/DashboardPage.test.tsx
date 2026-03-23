@@ -63,8 +63,8 @@ describe("DashboardPage", () => {
     });
 
     // Check level badges
-    expect(screen.getByText(/Stufe 5/)).toBeInTheDocument();
-    expect(screen.getByText(/Stufe 3/)).toBeInTheDocument();
+    expect(screen.getByText(/Level 5/)).toBeInTheDocument();
+    expect(screen.getByText(/Level 3/)).toBeInTheDocument();
   });
 
   it("displays the dashboard title", async () => {
