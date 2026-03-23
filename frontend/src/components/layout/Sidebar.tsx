@@ -30,7 +30,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   );
 
 export function Sidebar() {
-  const { signOut } = useAuth();
+  const { signOut, username, email } = useAuth();
   const { characterId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -149,6 +149,17 @@ export function Sidebar() {
 
       {/* Bottom */}
       <div className="border-t border-border-primary px-2 py-3 space-y-1">
+        {username && !collapsed && (
+          <div className="px-3 py-2">
+            {email && <p className="text-sm text-text-secondary truncate">{email}</p>}
+            <p className="text-[10px] text-text-muted break-all">{username}</p>
+          </div>
+        )}
+        {username && collapsed && (
+          <div className="flex justify-center py-2" title={`${username}${email ? `\n${email}` : ""}`}>
+            <User size={18} className="text-text-muted" />
+          </div>
+        )}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-muted hover:bg-sidebar-hover hover:text-text-primary transition-colors cursor-pointer"

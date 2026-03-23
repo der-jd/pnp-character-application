@@ -9,8 +9,31 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   idToken: string | null;
+  username: string | null;
+  email: string | null;
   signIn: (username: string, password: string) => Promise<void>;
   signOut: () => void;
+}
+
+function decodeTokenPayload(idToken: string | null): Record<string, unknown> | null {
+  if (!idToken) return null;
+  try {
+    const parts = idToken.split(".");
+    if (!parts[1]) return null;
+    return JSON.parse(atob(parts[1]));
+  } catch {
+    return null;
+  }
+}
+
+function extractUsername(payload: Record<string, unknown> | null): string | null {
+  if (!payload) return null;
+  return (payload["cognito:username"] ?? payload["preferred_username"] ?? payload["email"] ?? null) as string | null;
+}
+
+function extractEmail(payload: Record<string, unknown> | null): string | null {
+  if (!payload) return null;
+  return (payload["email"] ?? null) as string | null;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -94,6 +117,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: tokens !== null,
         isLoading,
         idToken: tokens?.idToken ?? null,
+        username: extractUsername(decodeTokenPayload(tokens?.idToken ?? null)),
+        email: extractEmail(decodeTokenPayload(tokens?.idToken ?? null)),
         signIn: handleSignIn,
         signOut: handleSignOut,
       }}
