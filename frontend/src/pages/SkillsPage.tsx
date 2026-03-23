@@ -36,7 +36,7 @@ export function SkillsPage() {
     skill: Skill;
   } | null>(null);
 
-  const [editValues, setEditValues] = useState({ start: 0, current: 0, mod: 0 });
+  const [editValues, setEditValues] = useState({ start: 0, current: 0, mod: 0, activated: false });
   const [learningMethod, setLearningMethod] = useState<LearningMethodString>("NORMAL");
   const [costPreview, setCostPreview] = useState<number | null>(null);
   const [loadingCost, setLoadingCost] = useState(false);
@@ -44,6 +44,7 @@ export function SkillsPage() {
   const skillMutation = useMutation({
     mutationFn: ({ category, name }: { category: string; name: string }) =>
       updateSkill(characterId!, category, name, {
+        activated: editValues.activated !== editingSkill?.skill.activated ? editValues.activated : undefined,
         start:
           editValues.start !== editingSkill?.skill.start
             ? { initialValue: editingSkill!.skill.start, newValue: editValues.start }
@@ -89,7 +90,7 @@ export function SkillsPage() {
 
   function openEdit(category: string, name: string, skill: Skill) {
     setEditingSkill({ category, name, skill });
-    setEditValues({ start: skill.start, current: skill.current, mod: skill.mod });
+    setEditValues({ start: skill.start, current: skill.current, mod: skill.mod, activated: skill.activated });
     setLearningMethod("NORMAL");
     setCostPreview(null);
     fetchCost(category, name, "NORMAL");
@@ -133,7 +134,13 @@ export function SkillsPage() {
                 </thead>
                 <tbody>
                   {Object.entries(categorySkills).map(([name, skill]) => (
-                    <tr key={name} className="border-b border-border-primary/50 hover:bg-bg-hover/30">
+                    <tr
+                      key={name}
+                      className={clsx(
+                        "border-b border-border-primary/50 hover:bg-bg-hover/30",
+                        !skill.activated && "opacity-40",
+                      )}
+                    >
                       <td className="py-2 text-text-muted">{getSkillIcon(name)}</td>
                       <td className="py-2 pr-4 font-medium">{t(skillNameKeys[name]!)}</td>
                       <td className="text-center py-2 px-2">
@@ -149,7 +156,7 @@ export function SkillsPage() {
                       <td className="text-center py-2 px-2 font-mono">{skill.mod}</td>
                       <td className="text-center py-2 px-2 font-mono text-text-muted">{skill.totalCost}</td>
                       <td className="text-center py-2 px-2">
-                        <Badge>{skill.defaultCostCategory}</Badge>
+                        <Badge>{`${t("costCategoryAbbr")} ${skill.defaultCostCategory}`}</Badge>
                       </td>
                       <td className="py-2 text-right">
                         <Button variant="ghost" size="sm" onClick={() => openEdit(category, name, skill)}>
@@ -186,6 +193,24 @@ export function SkillsPage() {
           }
         >
           <div className="space-y-4">
+            <div>
+              <label
+                className={clsx(
+                  "flex items-center gap-2",
+                  editingSkill?.skill.activated ? "cursor-not-allowed opacity-50" : "cursor-pointer",
+                )}
+              >
+                <input
+                  type="checkbox"
+                  checked={editValues.activated}
+                  onChange={(e) => setEditValues((v) => ({ ...v, activated: e.target.checked }))}
+                  disabled={editingSkill?.skill.activated}
+                  className="h-4 w-4 rounded border-border-primary bg-bg-tertiary text-accent-primary focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 focus:ring-offset-bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                <span className="text-sm font-medium">{t("skillActivated")}</span>
+              </label>
+            </div>
+
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="text-xs text-text-muted block mb-1">{t("start")}</label>

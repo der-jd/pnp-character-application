@@ -156,7 +156,9 @@ const de = {
   skillCategoryKnowledge: "Wissen",
   skillCategoryHandcraft: "Handwerk",
   activated: "Aktiviert",
+  skillActivated: "Talent aktiviert",
   costCategory: "Kostenkategorie",
+  costCategoryAbbr: "Kat",
   learningMethod: "Lernmethode",
   learningMethodFree: "Kostenlos",
   learningMethodLowPriced: "Günstig",
@@ -252,9 +254,9 @@ const de = {
   availablePoints: "Verfügbare Punkte",
   handling: "Handhabung",
   attackValue: "Angriffswert",
-  skilledAttackValue: "Geübter Angriffswert",
+  skilledAttackValue: "Gesamter Angriffswert",
   paradeValue: "Paradewert",
-  skilledParadeValue: "Geübter Paradewert",
+  skilledParadeValue: "Gesamter Paradewert",
 
   // Level Up
   levelUp: "Level Up",
