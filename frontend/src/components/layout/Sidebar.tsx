@@ -23,6 +23,7 @@ import { fetchCharacters } from "@/api/characters";
 import { useState } from "react";
 import type { CharacterShort } from "api-spec";
 import { EventDialog } from "@/components/EventDialog";
+import { Toggle } from "@/components/ui/Toggle";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   clsx(
@@ -165,14 +166,29 @@ export function Sidebar() {
             <User size={18} className="text-text-muted" />
           </div>
         )}
-        <button
-          onClick={toggleTheme}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-muted hover:bg-sidebar-hover hover:text-text-primary transition-colors cursor-pointer"
-          title={theme === "dark" ? t("themeLight") : t("themeDark")}
-        >
-          {theme === "dark" ? <Sun size={18} className="shrink-0" /> : <Moon size={18} className="shrink-0" />}
-          {!collapsed && <span>{theme === "dark" ? t("themeLight") : t("themeDark")}</span>}
-        </button>
+        {!collapsed && (
+          <div className="px-3 py-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
+              <span className="text-sm text-text-secondary">{theme === "dark" ? t("themeDark") : t("themeLight")}</span>
+            </div>
+            <Toggle
+              checked={theme === "light"}
+              onChange={toggleTheme}
+              className="scale-75"
+              title={theme === "dark" ? t("themeLight") : t("themeDark")}
+            />
+          </div>
+        )}
+        {collapsed && (
+          <button
+            onClick={toggleTheme}
+            className="flex w-full justify-center items-center gap-3 rounded-lg px-3 py-2 text-text-muted hover:bg-sidebar-hover hover:text-text-primary transition-colors cursor-pointer"
+            title={theme === "dark" ? t("themeLight") : t("themeDark")}
+          >
+            {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
+        )}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-muted hover:bg-sidebar-hover hover:text-text-primary transition-colors cursor-pointer"
