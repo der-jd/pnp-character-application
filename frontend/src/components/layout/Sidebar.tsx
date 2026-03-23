@@ -175,7 +175,6 @@ export function Sidebar() {
             <Toggle
               checked={theme === "light"}
               onChange={toggleTheme}
-              className="scale-75"
               title={theme === "dark" ? t("themeLight") : t("themeDark")}
             />
           </div>
@@ -185,6 +184,7 @@ export function Sidebar() {
             onClick={toggleTheme}
             className="flex w-full justify-center items-center gap-3 rounded-lg px-3 py-2 text-text-muted hover:bg-sidebar-hover hover:text-text-primary transition-colors cursor-pointer"
             title={theme === "dark" ? t("themeLight") : t("themeDark")}
+            aria-label={theme === "dark" ? t("themeLight") : t("themeDark")}
           >
             {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
