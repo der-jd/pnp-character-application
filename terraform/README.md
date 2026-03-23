@@ -65,6 +65,7 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 - `api_version` - API version number
 - `cognito_user_pool_id` - Cognito user pool ID (sensitive)
 - `cognito_app_client_id` - Cognito app client ID (sensitive)
+- `frontend_bucket_name` - S3 bucket name for frontend static assets
 - `route53_nameservers` - Route53 nameservers for DNS delegation
 - `route53_zone_id` - Route53 hosted zone ID
 

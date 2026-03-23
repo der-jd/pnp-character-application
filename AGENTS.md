@@ -31,3 +31,4 @@ Always run from root after changes:
 
 - **Backend Changes**: Any code change in `backend/` requires a version bump in `backend/package.json` according to SemVer rules (see backend README)
 - **API Spec Changes**: Any code change in `api-spec/` requires a version bump in `api-spec/package.json` according to SemVer rules (see api-spec README)
+- **Frontend**: The frontend is a static React + Vite + Tailwind CSS application. It imports types and Zod schemas from the `api-spec` workspace package. All user-facing strings are centralized in `frontend/src/i18n/de.ts` — do not hardcode German strings in components

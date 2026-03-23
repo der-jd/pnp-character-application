@@ -3,6 +3,10 @@ resource "aws_s3_bucket" "frontend_bucket" {
   force_destroy = true
 }
 
+output "frontend_bucket_name" {
+  value = aws_s3_bucket.frontend_bucket.bucket
+}
+
 resource "aws_s3_bucket_public_access_block" "frontend_bucket_access" {
   bucket                  = aws_s3_bucket.frontend_bucket.id
   block_public_acls       = true

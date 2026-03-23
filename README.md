@@ -69,7 +69,7 @@ graph TB
 
 - **Cloud**: [Amazon Web Services (AWS)](https://aws.amazon.com/)
 - **CDN**: [AWS CloudFront](https://aws.amazon.com/cloudfront/)
-- **Frontend**: Static website with [Next.js](https://nextjs.org/), hosted with [AWS S3](https://aws.amazon.com/s3/)
+- **Frontend**: Static website with [React](https://react.dev/) + [Vite](https://vite.dev/) + [Tailwind CSS](https://tailwindcss.com/), hosted with [AWS S3](https://aws.amazon.com/s3/)
 - **API schema**: Definitions and validations with [Zod](https://zod.dev/)
 - **Backend REST API**: exposed via [AWS API Gateway](https://aws.amazon.com/api-gateway/)
 - **Backend**: [Node.js](https://nodejs.org/) AWS Lambda functions and Step Functions
@@ -104,7 +104,7 @@ pnp-character-application/
 ├── .circleci/          # CI/CD configuration
 ├── api-spec/           # Shared API types and schemas
 ├── backend/            # Node.js Lambda functions and Step Functions
-├── frontend/           # Next.js client application
+├── frontend/           # React + Vite client application
 ├── scripts/            # Utility CLI tools
 ├── terraform/          # AWS infrastructure
 └── package.json        # Workspace configuration
@@ -116,7 +116,7 @@ pnp-character-application/
 
 - **[📜 API Spec](./api-spec/README.md)** - API types and schemas
 - **[🔧 Backend](./backend/README.md)** - Lambda functions and business logic
-- **[🎨 Frontend](./frontend/README.md)** - Next.js client application
+- **[🎨 Frontend](./frontend/README.md)** - React + Vite client application
 - **[🏗️ Infrastructure](./terraform/README.md)** - AWS resources and deployment
 
 ### 📚 **Specialized Topics**

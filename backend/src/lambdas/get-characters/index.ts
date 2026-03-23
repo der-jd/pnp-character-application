@@ -52,6 +52,7 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
           characterId: item.characterId,
           name: item.characterSheet.generalInformation.name,
           level: item.characterSheet.generalInformation.level,
+          rulesetVersion: item.rulesetVersion,
         };
         characters.push(characterShort);
       }
