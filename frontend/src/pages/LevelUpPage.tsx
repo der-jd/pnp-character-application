@@ -12,11 +12,13 @@ import {
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
 import { fetchLevelUpOptions, applyLevelUp } from "@/api/level-up";
+import { updateHistoryComment } from "@/api/history";
 import { ApiError } from "@/api/client";
 import { levelUpEffectKeys } from "@/i18n/mappings";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { FullPageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { useToast } from "@/components/ui/Toast";
@@ -45,9 +47,10 @@ export function LevelUpPage() {
 
   const [selectedOption, setSelectedOption] = useState<LevelUpOption | null>(null);
   const [diceRoll, setDiceRoll] = useState(LEVEL_UP_DICE_MIN_TOTAL);
+  const [historyComment, setHistoryComment] = useState("");
 
   const mutation = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       if (!selectedOption || !levelUpData) throw new Error("No option selected");
       const isDice = selectedOption.kind === "hpRoll" || selectedOption.kind === "armorLevelRoll";
       const effect: EffectByLevelUp = isDice
@@ -66,17 +69,26 @@ export function LevelUpPage() {
               delta: 1,
             };
 
-      return applyLevelUp(characterId!, {
+      const result = await applyLevelUp(characterId!, {
         initialLevel: character!.characterSheet.generalInformation.level,
         effect,
         optionsHash: levelUpData.optionsHash,
       });
+
+      // Update history comment if provided
+      if (historyComment.trim() && result.historyRecord) {
+        await updateHistoryComment(characterId!, result.historyRecord.id, historyComment.trim());
+      }
+
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["character", characterId] });
       queryClient.invalidateQueries({ queryKey: ["level-up", characterId] });
+      queryClient.invalidateQueries({ queryKey: ["history", characterId] });
       toast("success", t("levelUpSuccess"));
       setSelectedOption(null);
+      setHistoryComment("");
     },
     onError: (error) => {
       if (error instanceof ApiError) {
@@ -184,6 +196,16 @@ export function LevelUpPage() {
           })}
         </div>
       )}
+
+      {/* History Comment Input */}
+      <Card>
+        <Input
+          label={t("historyComment")}
+          placeholder={t("historyAddComment")}
+          value={historyComment}
+          onChange={(e) => setHistoryComment(e.target.value)}
+        />
+      </Card>
 
       <div className="flex justify-end">
         <Button
