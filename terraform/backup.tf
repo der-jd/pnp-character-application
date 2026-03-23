@@ -42,7 +42,7 @@ resource "aws_backup_selection" "selection" {
 
   # Limit selection to DynamoDB tables AND require them to have the defined tag
   resources = [
-    "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*"
+    "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*"
   ]
   condition {
     string_equals {
@@ -83,9 +83,11 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
   period              = 3600 # seconds (1 hour)
   statistic           = "Sum"
   threshold           = 0
+  treat_missing_data  = "notBreaching"
 
   alarm_description = "Alerts when an AWS Backup job for the PnP Character Application fails"
-  alarm_actions     = [aws_sns_topic.backup_alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
@@ -97,17 +99,19 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
   period              = 3600 # seconds (1 hour)
   statistic           = "Sum"
   threshold           = 0
+  treat_missing_data  = "notBreaching"
 
   alarm_description = "Alerts when an AWS Backup job expires (misses completion window) for the PnP Character Application"
-  alarm_actions     = [aws_sns_topic.backup_alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
-resource "aws_sns_topic" "backup_alerts" {
-  name = "pnp-app-backup-alerts-topic"
+resource "aws_sns_topic" "alerts" {
+  name = "pnp-app-alerts-topic"
 }
 
-resource "aws_sns_topic_subscription" "email" {
-  topic_arn = aws_sns_topic.backup_alerts.arn
+resource "aws_sns_topic_subscription" "alerts_email" {
+  topic_arn = aws_sns_topic.alerts.arn
   protocol  = "email"
   endpoint  = var.alert_email_address
 }

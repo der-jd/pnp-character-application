@@ -1,15 +1,3 @@
-// --- SNS Topic for backend monitoring alerts ---
-
-resource "aws_sns_topic" "monitoring_alerts" {
-  name = "pnp-app-monitoring-alerts-topic"
-}
-
-resource "aws_sns_topic_subscription" "monitoring_email" {
-  topic_arn = aws_sns_topic.monitoring_alerts.arn
-  protocol  = "email"
-  endpoint  = var.alert_email_address
-}
-
 // --- CloudWatch Alarms ---
 
 locals {
@@ -51,6 +39,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   threshold           = 0
+  treat_missing_data  = "notBreaching"
 
   metric_query {
     id          = "errors"
@@ -76,8 +65,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   }
 
   alarm_description = "Alerts when any Lambda function produces errors"
-  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn]
-  ok_actions        = [aws_sns_topic.monitoring_alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
@@ -85,6 +74,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   threshold           = 0
+  treat_missing_data  = "notBreaching"
 
   metric_query {
     id          = "throttles"
@@ -110,8 +100,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
   }
 
   alarm_description = "Alerts when any Lambda function is being throttled"
-  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn]
-  ok_actions        = [aws_sns_topic.monitoring_alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
@@ -123,14 +113,15 @@ resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
   period              = 300
   statistic           = "Sum"
   threshold           = 0
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     ApiName = aws_api_gateway_rest_api.pnp_rest_api.name
   }
 
   alarm_description = "Alerts when the API returns 5xx server errors"
-  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn]
-  ok_actions        = [aws_sns_topic.monitoring_alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
@@ -142,14 +133,15 @@ resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
   period              = 300
   statistic           = "Sum"
   threshold           = 5
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     ApiName = aws_api_gateway_rest_api.pnp_rest_api.name
   }
 
   alarm_description = "Alerts when the API returns more than 5 client errors in 5 minutes, which may indicate auth issues or abuse"
-  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn]
-  ok_actions        = [aws_sns_topic.monitoring_alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "api_latency" {
@@ -161,14 +153,15 @@ resource "aws_cloudwatch_metric_alarm" "api_latency" {
   period              = 300
   extended_statistic  = "p99"
   threshold           = 3000
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     ApiName = aws_api_gateway_rest_api.pnp_rest_api.name
   }
 
   alarm_description = "Alerts when API p99 latency exceeds 3 seconds"
-  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn]
-  ok_actions        = [aws_sns_topic.monitoring_alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "dynamodb_characters_errors" {
@@ -180,14 +173,15 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_characters_errors" {
   period              = 300
   statistic           = "Sum"
   threshold           = 0
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     TableName = aws_dynamodb_table.characters.name
   }
 
   alarm_description = "Alerts when DynamoDB system errors occur on the characters table"
-  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn]
-  ok_actions        = [aws_sns_topic.monitoring_alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "dynamodb_history_errors" {
@@ -199,14 +193,15 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_history_errors" {
   period              = 300
   statistic           = "Sum"
   threshold           = 0
+  treat_missing_data  = "notBreaching"
 
   dimensions = {
     TableName = aws_dynamodb_table.characters_history.name
   }
 
   alarm_description = "Alerts when DynamoDB system errors occur on the history table"
-  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn]
-  ok_actions        = [aws_sns_topic.monitoring_alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
@@ -214,6 +209,7 @@ resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   threshold           = 0
+  treat_missing_data  = "notBreaching"
 
   metric_query {
     id          = "failures"
@@ -239,6 +235,6 @@ resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
   }
 
   alarm_description = "Alerts when any Step Functions state machine execution fails"
-  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn]
-  ok_actions        = [aws_sns_topic.monitoring_alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
