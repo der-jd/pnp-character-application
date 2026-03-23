@@ -22,6 +22,8 @@ const de = {
   navHistory: "Chronik",
   navLevelUp: "Level Up",
   navCollapse: "Einklappen",
+  themeDark: "Dunkel",
+  themeLight: "Hell",
 
   // Dashboard
   dashboardTitle: "Meine Charaktere",

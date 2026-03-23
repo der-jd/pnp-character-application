@@ -12,10 +12,13 @@ import {
   User,
   UserPlus,
   CalendarPlus,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@/i18n";
 import { useAuth } from "@/auth/AuthProvider";
+import { useTheme } from "@/hooks/useTheme";
 import { fetchCharacters } from "@/api/characters";
 import { useState } from "react";
 import type { CharacterShort } from "api-spec";
@@ -31,6 +34,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function Sidebar() {
   const { signOut, username, email } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const { characterId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -161,6 +165,14 @@ export function Sidebar() {
             <User size={18} className="text-text-muted" />
           </div>
         )}
+        <button
+          onClick={toggleTheme}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-muted hover:bg-sidebar-hover hover:text-text-primary transition-colors cursor-pointer"
+          title={theme === "dark" ? t("themeLight") : t("themeDark")}
+        >
+          {theme === "dark" ? <Sun size={18} className="shrink-0" /> : <Moon size={18} className="shrink-0" />}
+          {!collapsed && <span>{theme === "dark" ? t("themeLight") : t("themeDark")}</span>}
+        </button>
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-muted hover:bg-sidebar-hover hover:text-text-primary transition-colors cursor-pointer"
