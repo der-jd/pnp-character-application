@@ -59,6 +59,8 @@ export function setTokenGetter(getter: () => string | null): void {
   getIdToken = getter;
 }
 
+const REQUEST_TIMEOUT_MS = 15_000;
+
 async function request<T>(method: string, path: string, schema: z.ZodType<T>, body?: unknown): Promise<T> {
   const token = getIdToken?.();
   if (!token) throw new Error("Not authenticated");
@@ -68,11 +70,20 @@ async function request<T>(method: string, path: string, schema: z.ZodType<T>, bo
     "Content-Type": "application/json",
   };
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => null);
