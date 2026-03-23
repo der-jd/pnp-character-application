@@ -246,6 +246,7 @@ export {
   PatchGeneralInformationResponse,
   patchGeneralInformationHistoryRecordSchema,
   PatchGeneralInformationHistoryRecord,
+  generalInformationChangeSchema,
 } from "./endpoints/patch-general-information.js";
 export {
   getHistoryPathParamsSchema,

@@ -18,6 +18,7 @@ import {
   specialAbilitiesChangeSchema,
   baseValueChangeSchema,
   rulesetVersionChangeSchema,
+  generalInformationChangeSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -229,6 +230,10 @@ async function validateRequest(request: Request): Promise<Parameters> {
       case HistoryRecordType.RULESET_VERSION_UPDATED:
         rulesetVersionChangeSchema.parse(body.data.old);
         rulesetVersionChangeSchema.parse(body.data.new);
+        break;
+      case HistoryRecordType.GENERAL_INFORMATION_CHANGED:
+        generalInformationChangeSchema.parse(body.data.old);
+        generalInformationChangeSchema.parse(body.data.new);
         break;
       default:
         throw new HttpError(400, "Invalid history record type!");

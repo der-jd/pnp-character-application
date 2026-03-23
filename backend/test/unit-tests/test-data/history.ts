@@ -13,6 +13,7 @@ import {
   PatchSkillHistoryRecord,
   PatchCombatStatsHistoryRecord,
   PostSpecialAbilitiesHistoryRecord,
+  PatchGeneralInformationHistoryRecord,
 } from "api-spec";
 import { fakeCharacter, fakeCharacterId } from "./character.js";
 
@@ -1142,6 +1143,33 @@ export const specialAbilitiesChangedRecord: PostSpecialAbilitiesHistoryRecord = 
     },
     new: {
       values: ["Iron Will", "Berserker Rage"],
+    },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const generalInformationChangedRecord: PatchGeneralInformationHistoryRecord = {
+  type: HistoryRecordType.GENERAL_INFORMATION_CHANGED,
+  name: "General Information",
+  number: 2,
+  id: "c8b4e2f1-3a9d-4e7b-b5c6-1d2f3a4b5c6d",
+  data: {
+    old: {
+      generalInformation: fakeCharacter.characterSheet.generalInformation,
+    },
+    new: {
+      generalInformation: {
+        ...fakeCharacter.characterSheet.generalInformation,
+        name: "Updated Name",
+        birthplace: "Updated Birthplace",
+        eyeColor: "Green",
+      },
     },
   },
   learningMethod: null,
