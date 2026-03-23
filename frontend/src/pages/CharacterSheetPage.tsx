@@ -44,7 +44,10 @@ export function CharacterSheetPage() {
           {gi.name.charAt(0).toUpperCase()}
         </div>
         <div>
-          <h1 className="text-2xl font-bold">{gi.name}</h1>
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-2xl font-bold">{gi.name}</h1>
+            <span className="text-xs text-text-muted font-mono">{character.characterId}</span>
+          </div>
           <div className="flex items-center gap-2 mt-1">
             <Badge variant="info">
               {t("level")} {gi.level}

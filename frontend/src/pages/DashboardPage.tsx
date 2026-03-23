@@ -107,6 +107,7 @@ export function DashboardPage() {
                     {t("rulesetVersion")} {char.rulesetVersion}
                   </Badge>
                 </div>
+                <p className="text-[10px] text-text-muted font-mono mt-1">{char.characterId}</p>
               </div>
 
               {/* Actions */}
