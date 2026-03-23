@@ -211,7 +211,10 @@ export function HistoryPage() {
                     </span>
 
                     {/* Comment preview */}
-                    <span className="hidden sm:block text-xs text-text-secondary truncate italic">
+                    <span
+                      className="hidden sm:block text-xs text-text-secondary truncate italic"
+                      title={record.comment ?? undefined}
+                    >
                       {record.comment || "—"}
                     </span>
 
@@ -260,8 +263,18 @@ export function HistoryPage() {
                           <span className="font-mono">#{record.number}</span> · {record.name} ·{" "}
                           {formatTimestamp(record.timestamp)}
                         </div>
-                        {record.comment && <div className="italic">{record.comment}</div>}
                       </div>
+
+                      {record.comment && (
+                        <div className="mb-3 rounded-md border border-border-primary bg-bg-tertiary px-3 py-2">
+                          <div className="mb-1 text-[11px] font-medium uppercase tracking-wider text-text-muted">
+                            {t("historyComment")}
+                          </div>
+                          <p className="text-sm text-text-primary whitespace-pre-wrap break-words italic">
+                            {record.comment}
+                          </p>
+                        </div>
+                      )}
 
                       <div className="text-xs space-y-1.5">
                         {record.learningMethod && <TreeRow label={t("learningMethod")} value={record.learningMethod} />}
