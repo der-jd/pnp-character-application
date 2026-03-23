@@ -10,19 +10,24 @@ import { skillNameKeys } from "@/i18n/mappings";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { FullPageSpinner } from "@/components/ui/Spinner";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { useToast } from "@/components/ui/Toast";
 
 export function CombatPage() {
   const { characterId } = useParams<{ characterId: string }>();
 
-  const { data: character, isLoading } = useQuery({
+  const {
+    data: character,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["character", characterId],
     queryFn: () => fetchCharacter(characterId!),
     enabled: !!characterId,
   });
 
   if (isLoading) return <FullPageSpinner />;
-  if (!character) return <div className="text-accent-danger p-4">{t("toastLoadError")}</div>;
+  if (!character) return <ErrorState onRetry={() => refetch()} />;
 
   const combat = character.characterSheet.combat;
 

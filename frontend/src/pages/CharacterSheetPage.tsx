@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Dialog } from "@/components/ui/Dialog";
 import { FullPageSpinner } from "@/components/ui/Spinner";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { useToast } from "@/components/ui/Toast";
 
 export function CharacterSheetPage() {
@@ -25,6 +26,7 @@ export function CharacterSheetPage() {
     data: character,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["character", characterId],
     queryFn: () => fetchCharacter(characterId!),
@@ -32,7 +34,7 @@ export function CharacterSheetPage() {
   });
 
   if (isLoading) return <FullPageSpinner />;
-  if (error || !character) return <div className="text-accent-danger p-4">{t("toastLoadError")}</div>;
+  if (error || !character) return <ErrorState onRetry={() => refetch()} />;
 
   const sheet = character.characterSheet;
   const gi = sheet.generalInformation;

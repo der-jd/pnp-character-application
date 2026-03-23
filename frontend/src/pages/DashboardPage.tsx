@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { ConfirmDialog } from "@/components/ui/Dialog";
 import { FullPageSpinner } from "@/components/ui/Spinner";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { useToast } from "@/components/ui/Toast";
 import type { CharacterShort } from "api-spec";
 
@@ -18,7 +19,7 @@ export function DashboardPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["characters"],
     queryFn: fetchCharacters,
   });
@@ -60,11 +61,7 @@ export function DashboardPage() {
 
   if (isLoading) return <FullPageSpinner />;
   if (error) {
-    return (
-      <div className="text-center py-20">
-        <p className="text-accent-danger">{t("toastLoadError")}</p>
-      </div>
-    );
+    return <ErrorState onRetry={() => refetch()} />;
   }
 
   const characters = (data?.characters ?? []) as CharacterShort[];

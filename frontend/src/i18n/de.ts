@@ -56,6 +56,7 @@ const de = {
   select: "Auswählen",
   search: "Suchen",
   reset: "Zurücksetzen",
+  retry: "Erneut versuchen",
 
   // Character Creation Wizard
   wizardTitle: "Charakter erstellen",

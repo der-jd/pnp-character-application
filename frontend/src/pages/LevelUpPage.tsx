@@ -18,6 +18,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { FullPageSpinner } from "@/components/ui/Spinner";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { useToast } from "@/components/ui/Toast";
 
 export function LevelUpPage() {
@@ -35,6 +36,7 @@ export function LevelUpPage() {
     data: levelUpData,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["level-up", characterId],
     queryFn: () => fetchLevelUpOptions(characterId!),
@@ -86,7 +88,7 @@ export function LevelUpPage() {
   });
 
   if (isLoading) return <FullPageSpinner />;
-  if (error) return <div className="text-accent-danger p-4">{t("toastLoadError")}</div>;
+  if (error) return <ErrorState onRetry={() => refetch()} />;
 
   const currentLevel = character?.characterSheet.generalInformation.level ?? 1;
 

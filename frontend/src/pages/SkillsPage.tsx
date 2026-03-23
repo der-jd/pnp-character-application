@@ -14,6 +14,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { FullPageSpinner } from "@/components/ui/Spinner";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { useToast } from "@/components/ui/Toast";
 import { Dialog } from "@/components/ui/Dialog";
 
@@ -24,7 +25,11 @@ export function SkillsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: character, isLoading } = useQuery({
+  const {
+    data: character,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["character", characterId],
     queryFn: () => fetchCharacter(characterId!),
     enabled: !!characterId,
@@ -102,7 +107,7 @@ export function SkillsPage() {
   }
 
   if (isLoading) return <FullPageSpinner />;
-  if (!character) return <div className="text-accent-danger p-4">{t("toastLoadError")}</div>;
+  if (!character) return <ErrorState onRetry={() => refetch()} />;
 
   const skills = character.characterSheet.skills;
 
