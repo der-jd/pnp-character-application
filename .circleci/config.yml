@@ -19,11 +19,11 @@ terraform_docker_image: &terraform_docker_image "hashicorp/terraform:1.14"
 executors:
   node-medium-executor:
     docker:
-      - image: cimg/node:22.13
+      - image: cimg/node:24.14
     resource_class: medium
   node-small-executor:
     docker:
-      - image: cimg/node:22.13
+      - image: cimg/node:24.14
     resource_class: small
 
 workflows:
@@ -172,9 +172,7 @@ jobs:
           command: npm run lint:terraform
 
   run-backend-component-tests:
-    docker:
-      - image: cimg/node:22.10
-    resource_class: medium
+    executor: node-medium-executor
     steps:
       - checkout
       - aws-cli/setup:
