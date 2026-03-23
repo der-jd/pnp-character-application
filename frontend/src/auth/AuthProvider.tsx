@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { signIn as cognitoSignIn, refreshSession, type AuthTokens } from "./cognito";
 
 // Only the refresh token is persisted to localStorage.
@@ -58,6 +58,7 @@ function clearRefreshToken(): void {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [tokens, setTokens] = useState<AuthTokens | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const refreshingRef = useRef(false);
 
   // Attempt to restore session on mount using stored refresh token
   useEffect(() => {
@@ -67,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    refreshingRef.current = true;
     refreshSession(refreshToken)
       .then((newTokens) => {
         setTokens(newTokens);
@@ -75,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         clearRefreshToken();
       })
       .finally(() => {
+        refreshingRef.current = false;
         setIsLoading(false);
       });
   }, []);
@@ -87,6 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (msUntilRefresh <= 0) return;
 
     const timer = setTimeout(() => {
+      if (refreshingRef.current) return;
+      refreshingRef.current = true;
       refreshSession(tokens.refreshToken)
         .then((newTokens) => {
           setTokens(newTokens);
@@ -94,6 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .catch(() => {
           clearRefreshToken();
           setTokens(null);
+        })
+        .finally(() => {
+          refreshingRef.current = false;
         });
     }, msUntilRefresh);
 
