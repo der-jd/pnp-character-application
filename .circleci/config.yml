@@ -221,6 +221,11 @@ jobs:
           command: |
             cd terraform
             terraform init -input=false
+      # Uncomment to enable backend monitoring (CloudWatch alarms, dashboards, SNS alerts).
+      # Uses the same email as backup alerts (TF_VAR_backup_alert_email).
+      # - run:
+      #     name: Enable monitoring
+      #     command: echo 'export TF_VAR_enable_monitoring=true' >> "$BASH_ENV"
       - run:
           name: Terraform plan
           command: |

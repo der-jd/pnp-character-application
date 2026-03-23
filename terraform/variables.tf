@@ -28,3 +28,10 @@ variable "backup_alert_email" {
   description = "Email address that receives CloudWatch/SNS backup failure notifications"
   type        = string
 }
+
+// Will be set via an environment variable in CircleCI
+variable "enable_monitoring" {
+  description = "Whether to create backend monitoring resources (CloudWatch alarms, dashboards, SNS topic)"
+  type        = bool
+  default     = false
+}

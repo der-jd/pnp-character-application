@@ -15,7 +15,8 @@ The following environment variables must be configured in CircleCI project setti
 - `TF_CLOUD_ORGANIZATION`: Terraform Cloud organization name
 - `TF_TOKEN_app_terraform_io`: Terraform Cloud API token
 - `TF_WORKSPACE`: Terraform Cloud workspace name (e.g., "prod")
-- `TF_VAR_backup_alert_email`: Email address for backup alerts (Terraform variable)
+- `TF_VAR_backup_alert_email`: Email address for backup and monitoring alerts (Terraform variable)
+- `TF_VAR_enable_monitoring`: Set to `true` to deploy backend monitoring resources (CloudWatch alarms, dashboards, SNS topic). Defaults to `false`. Currently commented out in the pipeline — uncomment the "Enable monitoring" step in config.yml to activate.
 
 ### Component Test Secrets
 
