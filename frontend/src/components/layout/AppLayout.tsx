@@ -13,7 +13,7 @@ export function AppLayout() {
         <div className="relative w-full h-52 overflow-hidden">
           <img src="/banner.png" alt="World Hoppers" className="w-full h-full object-cover object-center" />
           {/* Fade bottom into page background — only covers the lower third */}
-          <div className="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-b from-transparent to-bg-primary" />
+          <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-b from-transparent to-bg-primary" />
           {/* Subtle side fades */}
           {isDark && (
             <>
