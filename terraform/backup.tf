@@ -109,5 +109,5 @@ resource "aws_sns_topic" "backup_alerts" {
 resource "aws_sns_topic_subscription" "email" {
   topic_arn = aws_sns_topic.backup_alerts.arn
   protocol  = "email"
-  endpoint  = var.backup_alert_email
+  endpoint  = var.alert_email_address
 }
