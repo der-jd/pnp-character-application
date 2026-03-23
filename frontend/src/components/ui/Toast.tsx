@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback, useState, type ReactNode } from "react";
+import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from "react";
 import { clsx } from "clsx";
 import { X, CheckCircle, AlertCircle, Info } from "lucide-react";
 
@@ -24,9 +24,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const toast = useCallback((type: ToastType, message: string) => {
     const id = nextId++;
     setToasts((prev) => [...prev, { id, type, message }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
   }, []);
 
   const dismiss = useCallback((id: number) => {
@@ -69,6 +66,11 @@ const iconColors: Record<ToastType, string> = {
 };
 
 function ToastItem({ toast, onDismiss }: { toast: ToastMessage; onDismiss: (id: number) => void }) {
+  useEffect(() => {
+    const timer = setTimeout(() => onDismiss(toast.id), 4000);
+    return () => clearTimeout(timer);
+  }, [toast.id, onDismiss]);
+
   const Icon = icons[toast.type];
   return (
     <div
