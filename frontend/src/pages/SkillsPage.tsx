@@ -127,7 +127,7 @@ export function SkillsPage() {
                     <th className="text-center py-2 px-2 font-medium">{t("start")}</th>
                     <th className="text-center py-2 px-2 font-medium">{t("current")}</th>
                     <th className="text-center py-2 px-2 font-medium">{t("mod")}</th>
-                    <th className="text-center py-2 px-2 font-medium">{t("totalCost")}</th>
+                    <th className="text-center py-2 px-2 font-medium">{t("totalCostAdventurePoints")}</th>
                     <th className="text-center py-2 px-2 font-medium">{t("costCategory")}</th>
                     <th className="py-2 w-16"></th>
                   </tr>
