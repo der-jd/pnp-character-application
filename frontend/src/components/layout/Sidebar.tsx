@@ -165,7 +165,7 @@ export function Sidebar() {
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-muted hover:bg-sidebar-hover hover:text-text-primary transition-colors cursor-pointer"
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-          {!collapsed && <span>Einklappen</span>}
+          {!collapsed && <span>{t("navCollapse")}</span>}
         </button>
         <button
           onClick={signOut}

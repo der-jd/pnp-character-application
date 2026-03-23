@@ -21,6 +21,7 @@ const de = {
   navCombat: "Kampf",
   navHistory: "Chronik",
   navLevelUp: "Level Up",
+  navCollapse: "Einklappen",
 
   // Dashboard
   dashboardTitle: "Meine Charaktere",
