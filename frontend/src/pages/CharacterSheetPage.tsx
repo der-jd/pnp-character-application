@@ -533,9 +533,9 @@ function BaseValuesSection({
             <tr className="border-b border-border-primary text-text-muted text-xs">
               <th className="text-left py-2 pr-4 font-medium">{t("baseValues")}</th>
               <th className="text-center py-2 px-2 font-medium">{t("start")}</th>
-              <th className="text-center py-2 px-2 font-medium">{t("current")}</th>
               <th className="text-center py-2 px-2 font-medium">{t("byFormula")}</th>
               <th className="text-center py-2 px-2 font-medium">{t("byLvlUp")}</th>
+              <th className="text-center py-2 px-2 font-medium">{t("current")}</th>
               <th className="text-center py-2 px-2 font-medium">{t("mod")}</th>
               <th className="py-2 w-20"></th>
             </tr>
@@ -556,9 +556,9 @@ function BaseValuesSection({
                     <span className="font-mono">{bv.start}</span>
                   )}
                 </td>
-                <td className="text-center py-2 px-2 font-mono">{bv.current}</td>
                 <td className="text-center py-2 px-2 font-mono text-text-muted">{bv.byFormula ?? "—"}</td>
                 <td className="text-center py-2 px-2 font-mono text-text-muted">{bv.byLvlUp ?? "—"}</td>
+                <td className="text-center py-2 px-2 font-mono">{bv.current}</td>
                 <td className="text-center py-2 px-2">
                   {editing === name ? (
                     <input
