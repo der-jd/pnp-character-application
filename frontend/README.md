@@ -11,7 +11,7 @@ Static single-page application for managing characters of the "World Hoppers" pe
 - **Authentication**: [AWS Cognito](https://aws.amazon.com/cognito/) via `@aws-sdk/client-cognito-identity-provider`
 - **Validation**: [Zod](https://zod.dev/) schemas imported from the `api-spec` workspace package
 - **Language**: TypeScript (strict mode)
-- **Icons**: [Lucide React](https://lucide.dev/)
+- **Icons**: [Lucide React](https://lucide.dev/), [react-icons](https://react-icons.github.io/react-icons/)
 
 ## Getting Started
 
@@ -31,17 +31,6 @@ VITE_COGNITO_REGION=eu-central-1
 VITE_COGNITO_APP_CLIENT_ID=<your-cognito-app-client-id>
 ```
 
-## Scripts
-
-| Command   | Description                          |
-| --------- | ------------------------------------ |
-| `dev`     | Start Vite dev server                |
-| `build`   | Type-check with `tsc` and build      |
-| `preview` | Preview the production build locally |
-| `lint`    | Run ESLint                           |
-
-Run via `npm run <command> --workspace frontend`.
-
 ## Project Structure
 
 ```
@@ -52,17 +41,22 @@ src/
 │   └── ...
 ├── components/
 │   ├── ui/         # Base UI primitives (Button, Input, Card, Dialog, Badge, Select, Spinner, Toast)
-│   └── layout/     # AppLayout, Sidebar
+|   └── layout/     # AppLayout, Sidebar
+├── lib/            # Shared utilities
+│   └── ...
 ├── pages/          # Route-level page components
 │   └── ...
 ├── stores/         # Zustand stores
 │   └── ...
-├── i18n/           # Internationalization
+├── i18n/           # Internationalization and API-to-UI key mappings
 │   └── ...
-├── styles/         # Tailwind CSS configuration
+├── styles/         # Tailwind CSS theme tokens
 │   └── ...
 ├── App.tsx         # Root component with routing
 └── main.tsx        # Entry point
+test/
+├── unit-tests/     # Unit tests
+└── component-tests/# Component tests
 ```
 
 ## Architecture

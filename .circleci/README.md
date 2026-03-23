@@ -28,6 +28,14 @@ The following environment variables must be configured in CircleCI project setti
 - `COMPONENT_TESTS_COGNITO_REGION`: Region of the Cognito user pool
 - `COMPONENT_TESTS_COGNITO_APP_CLIENT_ID`: App client ID of the Cognito user pool
 
+### Frontend Build Variables (set automatically from Terraform outputs)
+
+- `VITE_COGNITO_REGION`: Cognito region for the frontend build
+- `VITE_COGNITO_APP_CLIENT_ID`: Cognito app client ID for the frontend build
+- `VITE_API_BASE_URL`: API base URL for the frontend build
+- `FRONTEND_BUCKET_NAME`: S3 bucket name for frontend deployment
+- `FRONTEND_BUCKET_REGION`: AWS region of the S3 bucket
+
 ### Pipeline Parameters (Optional)
 
 - `run-component-tests`: Set to `true` to run backend component tests on demand
