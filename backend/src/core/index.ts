@@ -12,6 +12,7 @@ export {
   updateCombatStats,
   updateBaseValue,
   setLevelUp,
+  updateGeneralInformation,
   updateRulesetVersion,
 } from "./dynamodb_characters.js";
 export {

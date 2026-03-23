@@ -34,6 +34,7 @@ export enum HistoryRecordType {
   SKILL_CHANGED = 6,
   COMBAT_STATS_CHANGED = 7,
   RULESET_VERSION_UPDATED = 8,
+  GENERAL_INFORMATION_CHANGED = 9,
 }
 
 export const historyRecordSchema = z

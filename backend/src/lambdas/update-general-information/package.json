@@ -1,0 +1,15 @@
+{
+  "name": "update-general-information",
+  "version": "0.0.0",
+  "description": "Version field not used. See backend/package.json for version management.",
+  "main": "index.mjs",
+  "type": "module",
+  "dependencies": {
+    "api-spec": "*",
+    "core": "*"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^22.9.0"
+  }
+}

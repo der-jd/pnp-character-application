@@ -236,6 +236,18 @@ export {
   PatchSkillHistoryRecord,
 } from "./endpoints/patch-skill.js";
 export {
+  patchGeneralInformationPathParamsSchema,
+  PatchGeneralInformationPathParams,
+  patchGeneralInformationRequestSchema,
+  PatchGeneralInformationRequest,
+  updateGeneralInformationResponseSchema,
+  UpdateGeneralInformationResponse,
+  patchGeneralInformationResponseSchema,
+  PatchGeneralInformationResponse,
+  patchGeneralInformationHistoryRecordSchema,
+  PatchGeneralInformationHistoryRecord,
+} from "./endpoints/patch-general-information.js";
+export {
   getHistoryPathParamsSchema,
   GetHistoryPathParams,
   getHistoryQueryParamsSchema,

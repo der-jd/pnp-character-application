@@ -7,6 +7,7 @@ import {
   CombatStats,
   BaseValue,
   Skill,
+  GeneralInformation,
   characterSchema,
   LevelUpProgress,
 } from "api-spec";
@@ -363,6 +364,34 @@ export async function updateRulesetVersion(userId: string, characterId: string, 
   await dynamoDBDocClient.send(command);
 
   console.log("Successfully updated ruleset version in DynamoDB");
+}
+
+export async function updateGeneralInformation(
+  userId: string,
+  characterId: string,
+  generalInformation: GeneralInformation,
+): Promise<void> {
+  console.log(`Update general information of character ${characterId} (user ${userId}) in DynamoDB`);
+
+  const command = new UpdateCommand({
+    TableName: process.env.TABLE_NAME_CHARACTERS,
+    Key: {
+      userId: userId,
+      characterId: characterId,
+    },
+    UpdateExpression: "SET #characterSheet.#generalInformation = :generalInformation",
+    ExpressionAttributeNames: {
+      "#characterSheet": "characterSheet",
+      "#generalInformation": "generalInformation",
+    },
+    ExpressionAttributeValues: {
+      ":generalInformation": generalInformation,
+    },
+  });
+
+  await dynamoDBDocClient.send(command);
+
+  console.log("Successfully updated DynamoDB item");
 }
 
 export async function updateCombatStats(
