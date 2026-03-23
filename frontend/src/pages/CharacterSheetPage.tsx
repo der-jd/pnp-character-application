@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { useEditableField } from "@/hooks/useEditableField";
 import type { Character, Attribute, BaseValue } from "api-spec";
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
@@ -340,9 +341,7 @@ function AttributesSection({
 }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-
-  const [editing, setEditing] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<{ start: number; current: number; mod: number }>({
+  const { editing, editValues, setEditValues, startEdit, cancelEdit } = useEditableField({
     start: 0,
     current: 0,
     mod: 0,
@@ -363,7 +362,7 @@ function AttributesSection({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["character", characterId] });
       toast("success", t("toastSaveSuccess"));
-      setEditing(null);
+      cancelEdit();
     },
     onError: (error) => {
       if (error instanceof ApiError) {
@@ -374,9 +373,8 @@ function AttributesSection({
     },
   });
 
-  function startEdit(name: string, attr: Attribute) {
-    setEditing(name);
-    setEditValues({ start: attr.start, current: attr.current, mod: attr.mod });
+  function handleStartEdit(name: string, attr: Attribute) {
+    startEdit(name, { start: attr.start, current: attr.current, mod: attr.mod });
   }
 
   function saveEdit(name: string, attr: Attribute) {
@@ -386,7 +384,7 @@ function AttributesSection({
       data.current = { initialValue: attr.current, increasedPoints: editValues.current - attr.current };
     if (editValues.mod !== attr.mod) data.mod = { initialValue: attr.mod, newValue: editValues.mod };
     if (Object.keys(data).length === 0) {
-      setEditing(null);
+      cancelEdit();
       return;
     }
     mutation.mutate({ name, data });
@@ -452,7 +450,7 @@ function AttributesSection({
                 <td className="py-2 text-right">
                   {editing === name ? (
                     <div className="flex gap-1 justify-end">
-                      <Button variant="ghost" size="sm" onClick={() => setEditing(null)}>
+                      <Button variant="ghost" size="sm" onClick={cancelEdit}>
                         {t("cancel")}
                       </Button>
                       <Button size="sm" onClick={() => saveEdit(name, attr)} loading={mutation.isPending}>
@@ -460,7 +458,7 @@ function AttributesSection({
                       </Button>
                     </div>
                   ) : (
-                    <Button variant="ghost" size="sm" onClick={() => startEdit(name, attr)}>
+                    <Button variant="ghost" size="sm" onClick={() => handleStartEdit(name, attr)}>
                       {t("edit")}
                     </Button>
                   )}
@@ -483,9 +481,7 @@ function BaseValuesSection({
 }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-
-  const [editing, setEditing] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<{ start: number; mod: number }>({ start: 0, mod: 0 });
+  const { editing, editValues, setEditValues, startEdit, cancelEdit } = useEditableField({ start: 0, mod: 0 });
 
   const mutation = useMutation({
     mutationFn: ({
@@ -498,7 +494,7 @@ function BaseValuesSection({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["character", characterId] });
       toast("success", t("toastSaveSuccess"));
-      setEditing(null);
+      cancelEdit();
     },
     onError: (error) => {
       if (error instanceof ApiError) {
@@ -509,9 +505,8 @@ function BaseValuesSection({
     },
   });
 
-  function startEdit(name: string, bv: BaseValue) {
-    setEditing(name);
-    setEditValues({ start: bv.start, mod: bv.mod });
+  function handleStartEdit(name: string, bv: BaseValue) {
+    startEdit(name, { start: bv.start, mod: bv.mod });
   }
 
   function saveEdit(name: string, bv: BaseValue) {
@@ -519,7 +514,7 @@ function BaseValuesSection({
     if (editValues.start !== bv.start) data.start = { initialValue: bv.start, newValue: editValues.start };
     if (editValues.mod !== bv.mod) data.mod = { initialValue: bv.mod, newValue: editValues.mod };
     if (Object.keys(data).length === 0) {
-      setEditing(null);
+      cancelEdit();
       return;
     }
     mutation.mutate({ name, data });
@@ -574,7 +569,7 @@ function BaseValuesSection({
                 <td className="py-2 text-right">
                   {editing === name ? (
                     <div className="flex gap-1 justify-end">
-                      <Button variant="ghost" size="sm" onClick={() => setEditing(null)}>
+                      <Button variant="ghost" size="sm" onClick={cancelEdit}>
                         {t("cancel")}
                       </Button>
                       <Button size="sm" onClick={() => saveEdit(name, bv)} loading={mutation.isPending}>
@@ -582,7 +577,7 @@ function BaseValuesSection({
                       </Button>
                     </div>
                   ) : (
-                    <Button variant="ghost" size="sm" onClick={() => startEdit(name, bv)}>
+                    <Button variant="ghost" size="sm" onClick={() => handleStartEdit(name, bv)}>
                       {t("edit")}
                     </Button>
                   )}
