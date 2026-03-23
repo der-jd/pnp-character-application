@@ -98,8 +98,12 @@ function CombatTable({
             <th className="text-center py-2 px-2 font-medium">{t("handling")}</th>
             <th className="text-center py-2 px-2 font-medium">{t("attackValue")}</th>
             <th className="text-center py-2 px-2 font-medium">{t("skilledAttackValue")}</th>
-            <th className="text-center py-2 px-2 font-medium">{t("paradeValue")}</th>
-            <th className="text-center py-2 px-2 font-medium">{t("skilledParadeValue")}</th>
+            {category === "melee" && (
+              <>
+                <th className="text-center py-2 px-2 font-medium">{t("paradeValue")}</th>
+                <th className="text-center py-2 px-2 font-medium">{t("skilledParadeValue")}</th>
+              </>
+            )}
             <th className="py-2 w-20"></th>
           </tr>
         </thead>
@@ -122,19 +126,23 @@ function CombatTable({
                   <span className="font-mono">{cs.skilledAttackValue}</span>
                 )}
               </td>
-              <td className="text-center py-2 px-2 font-mono">{cs.paradeValue}</td>
-              <td className="text-center py-2 px-2">
-                {editing === name ? (
-                  <input
-                    type="number"
-                    value={editValues.skilledParade}
-                    onChange={(e) => setEditValues((v) => ({ ...v, skilledParade: Number(e.target.value) }))}
-                    className="w-14 rounded border border-border-primary bg-bg-tertiary px-1 py-0.5 text-center text-sm font-mono"
-                  />
-                ) : (
-                  <span className="font-mono">{cs.skilledParadeValue}</span>
-                )}
-              </td>
+              {category === "melee" && (
+                <>
+                  <td className="text-center py-2 px-2 font-mono">{cs.paradeValue}</td>
+                  <td className="text-center py-2 px-2">
+                    {editing === name ? (
+                      <input
+                        type="number"
+                        value={editValues.skilledParade}
+                        onChange={(e) => setEditValues((v) => ({ ...v, skilledParade: Number(e.target.value) }))}
+                        className="w-14 rounded border border-border-primary bg-bg-tertiary px-1 py-0.5 text-center text-sm font-mono"
+                      />
+                    ) : (
+                      <span className="font-mono">{cs.skilledParadeValue}</span>
+                    )}
+                  </td>
+                </>
+              )}
               <td className="py-2 text-right">
                 {editing === name ? (
                   <div className="flex gap-1 justify-end">
