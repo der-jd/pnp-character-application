@@ -101,12 +101,12 @@ function CombatTable({
             <th className="text-left py-2 pr-4 font-medium">{t("combat")}</th>
             <th className="text-center py-2 px-2 font-medium">{t("availablePoints")}</th>
             <th className="text-center py-2 px-2 font-medium">{t("handling")}</th>
-            <th className="text-center py-2 px-2 font-medium">{t("attackValue")}</th>
             <th className="text-center py-2 px-2 font-medium">{t("skilledAttackValue")}</th>
+            <th className="text-center py-2 px-2 font-medium">{t("attackValue")}</th>
             {category === "melee" && (
               <>
-                <th className="text-center py-2 px-2 font-medium">{t("paradeValue")}</th>
                 <th className="text-center py-2 px-2 font-medium">{t("skilledParadeValue")}</th>
+                <th className="text-center py-2 px-2 font-medium">{t("paradeValue")}</th>
               </>
             )}
             <th className="py-2 w-20"></th>
@@ -118,7 +118,6 @@ function CombatTable({
               <td className="py-2 pr-4 font-medium">{t(skillNameKeys[name]!)}</td>
               <td className="text-center py-2 px-2 font-mono">{cs.availablePoints}</td>
               <td className="text-center py-2 px-2 font-mono">{cs.handling}</td>
-              <td className="text-center py-2 px-2 font-mono">{cs.attackValue}</td>
               <td className="text-center py-2 px-2">
                 {editing === name ? (
                   <input
@@ -131,9 +130,9 @@ function CombatTable({
                   <span className="font-mono">{cs.skilledAttackValue}</span>
                 )}
               </td>
+              <td className="text-center py-2 px-2 font-mono">{cs.attackValue}</td>
               {category === "melee" && (
                 <>
-                  <td className="text-center py-2 px-2 font-mono">{cs.paradeValue}</td>
                   <td className="text-center py-2 px-2">
                     {editing === name ? (
                       <input
@@ -146,6 +145,7 @@ function CombatTable({
                       <span className="font-mono">{cs.skilledParadeValue}</span>
                     )}
                   </td>
+                  <td className="text-center py-2 px-2 font-mono">{cs.paradeValue}</td>
                 </>
               )}
               <td className="py-2 text-right">
