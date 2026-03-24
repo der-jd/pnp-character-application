@@ -1,3 +1,37 @@
+locals {
+  lambda_functions = [
+    module.add_history_record_lambda.lambda_function,
+    module.add_special_ability_lambda.lambda_function,
+    module.apply_level_up_lambda.lambda_function,
+    module.clone_character_lambda.lambda_function,
+    module.create_character_lambda.lambda_function,
+    module.delete_character_lambda.lambda_function,
+    module.get_character_lambda.lambda_function,
+    module.get_characters_lambda.lambda_function,
+    module.get_history_lambda.lambda_function,
+    module.get_level_up_lambda.lambda_function,
+    module.get_skill_increase_cost_lambda.lambda_function,
+    module.revert_history_record_lambda.lambda_function,
+    module.set_history_comment_lambda.lambda_function,
+    module.update_attribute_lambda.lambda_function,
+    module.update_base_value_lambda.lambda_function,
+    module.update_calculation_points_lambda.lambda_function,
+    module.update_combat_stats_lambda.lambda_function,
+    module.update_skill_lambda.lambda_function,
+  ]
+
+  state_machine_arns = [
+    module.update_skill_state_machine.state_machine_arn,
+    module.update_attribute_state_machine.state_machine_arn,
+    module.update_base_value_state_machine.state_machine_arn,
+    module.add_special_ability_state_machine.state_machine_arn,
+    module.update_calculation_points_state_machine.state_machine_arn,
+    module.update_combat_stats_state_machine.state_machine_arn,
+    module.apply_level_up_state_machine.state_machine_arn,
+    module.create_character_state_machine.state_machine_arn,
+  ]
+}
+
 resource "aws_cloudwatch_dashboard" "backend" {
   dashboard_name = "pnp-app-backend"
 

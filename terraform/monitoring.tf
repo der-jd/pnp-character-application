@@ -1,39 +1,5 @@
 // --- CloudWatch Alarms ---
 
-locals {
-  lambda_functions = [
-    module.add_history_record_lambda.lambda_function,
-    module.add_special_ability_lambda.lambda_function,
-    module.apply_level_up_lambda.lambda_function,
-    module.clone_character_lambda.lambda_function,
-    module.create_character_lambda.lambda_function,
-    module.delete_character_lambda.lambda_function,
-    module.get_character_lambda.lambda_function,
-    module.get_characters_lambda.lambda_function,
-    module.get_history_lambda.lambda_function,
-    module.get_level_up_lambda.lambda_function,
-    module.get_skill_increase_cost_lambda.lambda_function,
-    module.revert_history_record_lambda.lambda_function,
-    module.set_history_comment_lambda.lambda_function,
-    module.update_attribute_lambda.lambda_function,
-    module.update_base_value_lambda.lambda_function,
-    module.update_calculation_points_lambda.lambda_function,
-    module.update_combat_stats_lambda.lambda_function,
-    module.update_skill_lambda.lambda_function,
-  ]
-
-  state_machine_arns = [
-    module.update_skill_state_machine.state_machine_arn,
-    module.update_attribute_state_machine.state_machine_arn,
-    module.update_base_value_state_machine.state_machine_arn,
-    module.add_special_ability_state_machine.state_machine_arn,
-    module.update_calculation_points_state_machine.state_machine_arn,
-    module.update_combat_stats_state_machine.state_machine_arn,
-    module.apply_level_up_state_machine.state_machine_arn,
-    module.create_character_state_machine.state_machine_arn,
-  ]
-}
-
 // Account-level Lambda metrics (no FunctionName dimension) aggregate across all
 // functions in the region, avoiding the 10-metric-query limit per alarm.
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
@@ -168,37 +134,20 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_history_errors" {
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
+// Account-level Step Functions metric (no StateMachineArn dimension) aggregates
+// across all state machines in the region in a single query.
 resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
   alarm_name          = "pnp-app-step-functions-failures"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
+  metric_name         = "ExecutionsFailed"
+  namespace           = "AWS/States"
+  period              = 300
+  statistic           = "Sum"
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
-  metric_query {
-    id          = "failures"
-    expression  = "SUM(METRICS())"
-    label       = "Total Step Function Failures"
-    return_data = true
-  }
-
-  dynamic "metric_query" {
-    for_each = local.state_machine_arns
-    content {
-      id = "f_${metric_query.key}"
-      metric {
-        metric_name = "ExecutionsFailed"
-        namespace   = "AWS/States"
-        period      = 300
-        stat        = "Sum"
-        dimensions = {
-          StateMachineArn = metric_query.value
-        }
-      }
-    }
-  }
-
-  alarm_description = "Alerts when any Step Functions state machine execution fails"
+  alarm_description = "Alerts when any Step Functions state machine execution in the account fails"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
