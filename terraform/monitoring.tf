@@ -34,37 +34,20 @@ locals {
   ]
 }
 
+// Account-level Lambda metrics (no FunctionName dimension) aggregate across all
+// functions in the region, avoiding the 10-metric-query limit per alarm.
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   alarm_name          = "pnp-app-lambda-errors"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = 300
+  statistic           = "Sum"
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
-  metric_query {
-    id          = "errors"
-    expression  = "SUM(METRICS())"
-    label       = "Total Lambda Errors"
-    return_data = true
-  }
-
-  dynamic "metric_query" {
-    for_each = local.lambda_functions
-    content {
-      id = "e_${replace(metric_query.value.function_name, "-", "_")}"
-      metric {
-        metric_name = "Errors"
-        namespace   = "AWS/Lambda"
-        period      = 300
-        stat        = "Sum"
-        dimensions = {
-          FunctionName = metric_query.value.function_name
-        }
-      }
-    }
-  }
-
-  alarm_description = "Alerts when any Lambda function produces errors"
+  alarm_description = "Alerts when any Lambda function in the account produces errors"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
@@ -73,33 +56,14 @@ resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
   alarm_name          = "pnp-app-lambda-throttles"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
+  metric_name         = "Throttles"
+  namespace           = "AWS/Lambda"
+  period              = 300
+  statistic           = "Sum"
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
-  metric_query {
-    id          = "throttles"
-    expression  = "SUM(METRICS())"
-    label       = "Total Lambda Throttles"
-    return_data = true
-  }
-
-  dynamic "metric_query" {
-    for_each = local.lambda_functions
-    content {
-      id = "t_${replace(metric_query.value.function_name, "-", "_")}"
-      metric {
-        metric_name = "Throttles"
-        namespace   = "AWS/Lambda"
-        period      = 300
-        stat        = "Sum"
-        dimensions = {
-          FunctionName = metric_query.value.function_name
-        }
-      }
-    }
-  }
-
-  alarm_description = "Alerts when any Lambda function is being throttled"
+  alarm_description = "Alerts when any Lambda function in the account is being throttled"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
