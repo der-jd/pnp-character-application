@@ -124,7 +124,7 @@ const de = {
   endurance: "Ausdauer",
   strength: "Kraft",
   pointsRemaining: "Verbleibende Punkte: {0}",
-  pointsTotal: "Gesamt: {0}/{1}",
+  pointsTotal: "Gesamt: {0}",
   attributeMin: "Min: {0}",
   attributeMax: "Max: {0}",
 

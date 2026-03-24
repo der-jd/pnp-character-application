@@ -133,7 +133,7 @@ export function CharacterSheetPage() {
       <SpecialAbilitiesSection characterId={characterId!} specialAbilities={sheet.specialAbilities} />
 
       {/* Attributes */}
-      <AttributesSection characterId={characterId!} attributes={sheet.attributes} />
+      <AttributesSection character={character} />
 
       {/* Base Values */}
       <BaseValuesSection characterId={characterId!} baseValues={sheet.baseValues} />
@@ -334,13 +334,7 @@ function SpecialAbilitiesSection({
   );
 }
 
-function AttributesSection({
-  characterId,
-  attributes,
-}: {
-  characterId: string;
-  attributes: Record<string, Attribute>;
-}) {
+function AttributesSection({ character }: { character: Character }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { editing, editValues, setEditValues, startEdit, cancelEdit } = useEditableField({
@@ -348,6 +342,9 @@ function AttributesSection({
     current: 0,
     mod: 0,
   });
+
+  const attributes = character.characterSheet.attributes;
+  const attributePoints = character.characterSheet.calculationPoints.attributePoints;
 
   const mutation = useMutation({
     mutationFn: ({
@@ -360,9 +357,9 @@ function AttributesSection({
         current?: { initialValue: number; increasedPoints: number };
         mod?: { initialValue: number; newValue: number };
       };
-    }) => updateAttribute(characterId, name, data),
+    }) => updateAttribute(character.characterId, name, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["character", characterId] });
+      queryClient.invalidateQueries({ queryKey: ["character", character.characterId] });
       toast("success", t("toastSaveSuccess"));
       cancelEdit();
     },
@@ -394,6 +391,22 @@ function AttributesSection({
 
   return (
     <Card title={t("attributes")}>
+      {/* Attribute points summary */}
+      <div className="mb-4 flex gap-4">
+        <Badge
+          variant={
+            attributePoints?.available === 0
+              ? "success"
+              : attributePoints?.available && attributePoints.available > 0
+                ? "info"
+                : "danger"
+          }
+        >
+          {t("pointsRemaining", attributePoints?.available ?? 0)}
+        </Badge>
+        <Badge variant="default">{t("pointsTotal", attributePoints?.total ?? 0)}</Badge>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
