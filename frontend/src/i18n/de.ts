@@ -266,9 +266,9 @@ const de = {
   availablePoints: "Verfügbare Punkte",
   handling: "Handhabung",
   attackValue: "Angriffswert",
-  skilledAttackValue: "Gesamter Angriffswert",
+  skilledAttackValue: "Verteilte Punkte auf Angriff",
   paradeValue: "Paradewert",
-  skilledParadeValue: "Gesamter Paradewert",
+  skilledParadeValue: "Verteilte Punkte auf Parade",
 
   // Level Up
   levelUp: "Level Up",
