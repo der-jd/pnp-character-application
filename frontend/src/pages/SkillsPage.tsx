@@ -115,6 +115,18 @@ export function SkillsPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{t("skills")}</h1>
 
+      {/* Adventure Points Summary */}
+      <Card className="sticky top-0 z-10 bg-bg-primary border-border-primary shadow-sm">
+        <div className="flex gap-4 flex-wrap">
+          <Badge variant="info">
+            {t("availableAp")}: {character.characterSheet.calculationPoints.adventurePoints.available}
+          </Badge>
+          <Badge variant="default">
+            {t("totalAp")}: {character.characterSheet.calculationPoints.adventurePoints.total}
+          </Badge>
+        </div>
+      </Card>
+
       {skillCategories.map((category) => {
         const categorySkills = skills[category as SkillCategory] as Record<string, Skill>;
         return (
