@@ -68,6 +68,9 @@ const de = {
   wizardStepAttributes: "Eigenschaften",
   wizardStepSkills: "Talente aktivieren",
   wizardStepCombat: "Kampfwerte",
+  wizardCombatDescription:
+    "Für jedes Kampftalent muss die initiale Begabung gewürfelt werden. Werte können manuell eingetragen oder zufällige Werte generiert werden.",
+  wizardCombatRandomFill: "Zufällige Werte generieren",
   wizardStepReview: "Zusammenfassung",
   wizardErrorNameRequired: "Bitte gib einen Charakternamen ein.",
   wizardErrorProfessionSkillRequired: "Bitte wähle ein Talent für den Beruf aus.",

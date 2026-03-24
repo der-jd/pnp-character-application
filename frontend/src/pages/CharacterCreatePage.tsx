@@ -717,21 +717,45 @@ function StepCombat({ state, update }: StepProps) {
     update({ combatSkillValues: { ...state.combatSkillValues, [name]: clamped } });
   }
 
+  function fillRandomValues() {
+    const randomValues: Record<string, number> = {};
+    for (const name of COMBAT_SKILL_NAMES) {
+      randomValues[name] =
+        Math.floor(Math.random() * (MAX_INITIAL_COMBAT_SKILL_VALUE - MIN_INITIAL_COMBAT_SKILL_VALUE + 1)) +
+        MIN_INITIAL_COMBAT_SKILL_VALUE;
+    }
+    update({ combatSkillValues: randomValues });
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-      {COMBAT_SKILL_NAMES.map((name) => (
-        <div key={name} className="flex items-center justify-between rounded-lg border border-border-primary px-4 py-3">
-          <span className="text-sm">{t(skillNameKeys[name]!)}</span>
-          <input
-            type="number"
-            min={MIN_INITIAL_COMBAT_SKILL_VALUE}
-            max={MAX_INITIAL_COMBAT_SKILL_VALUE}
-            value={state.combatSkillValues[name]}
-            onChange={(e) => setValue(name, parseInt(e.target.value, 10) || MIN_INITIAL_COMBAT_SKILL_VALUE)}
-            className="w-16 rounded border border-border-primary bg-bg-tertiary px-2 py-1 text-center text-sm font-mono focus:outline-none focus:ring-2 focus:ring-border-focus"
-          />
-        </div>
-      ))}
+    <div>
+      {/* Description */}
+      <div className="mb-6 p-4 bg-bg-tertiary rounded-lg border border-border-primary">
+        <p className="text-sm text-text-secondary mb-3">{t("wizardCombatDescription")}</p>
+        <Button variant="secondary" size="sm" onClick={fillRandomValues}>
+          {t("wizardCombatRandomFill")}
+        </Button>
+      </div>
+
+      {/* Combat skill inputs */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {COMBAT_SKILL_NAMES.map((name) => (
+          <div
+            key={name}
+            className="flex items-center justify-between rounded-lg border border-border-primary px-4 py-3"
+          >
+            <span className="text-sm">{t(skillNameKeys[name]!)}</span>
+            <input
+              type="number"
+              min={MIN_INITIAL_COMBAT_SKILL_VALUE}
+              max={MAX_INITIAL_COMBAT_SKILL_VALUE}
+              value={state.combatSkillValues[name]}
+              onChange={(e) => setValue(name, parseInt(e.target.value, 10) || MIN_INITIAL_COMBAT_SKILL_VALUE)}
+              className="w-16 rounded border border-border-primary bg-bg-tertiary px-2 py-1 text-center text-sm font-mono focus:outline-none focus:ring-2 focus:ring-border-focus"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
