@@ -25,7 +25,7 @@ describe("i18n translation system", () => {
     });
 
     it("interpolates numeric arguments", () => {
-      expect(t("pointsRemaining", 12)).toBe("Verbleibende Punkte: 12");
+      expect(t("pointsRemaining", 12)).toBe("Verfügbare EP: 12");
     });
 
     it("handles multiple positional arguments", () => {
