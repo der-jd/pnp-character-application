@@ -9,6 +9,7 @@ import { ApiError } from "@/api/client";
 import { skillNameKeys } from "@/i18n/mappings";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import { FullPageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { useToast } from "@/components/ui/Toast";
@@ -35,11 +36,38 @@ export function CombatPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{t("combat")}</h1>
 
-      <Card title={t("combatMelee")}>
+      <Card
+        title={
+          <div className="flex items-center gap-2">
+            {t("combatMelee")}
+            <Badge variant="default">
+              {t("attackBaseValue")}:{" "}
+              {character.characterSheet.baseValues.attackBaseValue.current +
+                character.characterSheet.baseValues.attackBaseValue.mod}
+            </Badge>
+            <Badge variant="default">
+              {t("paradeBaseValue")}:{" "}
+              {character.characterSheet.baseValues.paradeBaseValue.current +
+                character.characterSheet.baseValues.paradeBaseValue.mod}
+            </Badge>
+          </div>
+        }
+      >
         <CombatTable characterId={characterId!} category="melee" stats={combat.melee} />
       </Card>
 
-      <Card title={t("combatRanged")}>
+      <Card
+        title={
+          <div className="flex items-center gap-2">
+            {t("combatRanged")}
+            <Badge variant="default">
+              {t("rangedAttackBaseValue")}:{" "}
+              {character.characterSheet.baseValues.rangedAttackBaseValue.current +
+                character.characterSheet.baseValues.rangedAttackBaseValue.mod}
+            </Badge>
+          </div>
+        }
+      >
         <CombatTable characterId={characterId!} category="ranged" stats={combat.ranged} />
       </Card>
     </div>
