@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import type { CombatStats } from "api-spec";
+import type { CombatStats, Character } from "api-spec";
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
 import { updateCombatStats } from "@/api/character-edit";
@@ -53,7 +53,7 @@ export function CombatPage() {
           </div>
         }
       >
-        <CombatTable characterId={characterId!} category="melee" stats={combat.melee} />
+        <CombatTable characterId={characterId!} category="melee" stats={combat.melee} character={character} />
       </Card>
 
       <Card
@@ -68,7 +68,7 @@ export function CombatPage() {
           </div>
         }
       >
-        <CombatTable characterId={characterId!} category="ranged" stats={combat.ranged} />
+        <CombatTable characterId={characterId!} category="ranged" stats={combat.ranged} character={character} />
       </Card>
     </div>
   );
@@ -78,10 +78,12 @@ function CombatTable({
   characterId,
   category,
   stats,
+  character,
 }: {
   characterId: string;
   category: string;
   stats: Record<string, CombatStats>;
+  character: Character;
 }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -144,7 +146,13 @@ function CombatTable({
           {Object.entries(stats).map(([name, cs]) => (
             <tr key={name} className="border-b border-border-primary/50 hover:bg-bg-hover/30">
               <td className="py-2 pr-4 font-medium">{t(skillNameKeys[name]!)}</td>
-              <td className="text-center py-2 px-2 font-mono">{cs.availablePoints}</td>
+              <td className="text-center py-2 px-2 font-mono">
+                {cs.availablePoints}/{
+                  cs.handling +
+                  character.characterSheet.skills.combat[name as keyof typeof character.characterSheet.skills.combat].current +
+                  character.characterSheet.skills.combat[name as keyof typeof character.characterSheet.skills.combat].mod
+                }
+              </td>
               <td className="text-center py-2 px-2 font-mono">{cs.handling}</td>
               <td className="text-center py-2 px-2">
                 {editing === name ? (
