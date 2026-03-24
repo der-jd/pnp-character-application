@@ -35,7 +35,7 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 
 - DynamoDB tables for character data and history tracking
 - Backup configurations with CloudWatch alerting
-- SNS notifications for backup failures and monitoring alerts
+- SNS notifications for backup failures
 
 #### Frontend Infrastructure
 
@@ -63,7 +63,7 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 - `project_tag_key`/`project_tag_value` - Project tagging
 - `domain_name` - Main application domain
 - `api_domain_name` - API-specific domain
-- `alert_email_address` - Email for CloudWatch alarm notifications (both backup and monitoring alerts, configured via CircleCI as `TF_VAR_alert_email_address`)
+- `alert_email_address` - Email for CloudWatch alarm notifications (configured via CircleCI as `TF_VAR_alert_email_address`)
 
 ### Outputs
 
