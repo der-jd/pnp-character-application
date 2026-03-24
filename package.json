@@ -21,6 +21,9 @@
     "build": "cd api-spec && npm run build && cd .. && npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present"
   },
+  "overrides": {
+    "flatted": "3.4.2"
+  },
   "devDependencies": {
     "husky": "^9.1.7",
     "prettier": "^3.5.3",
