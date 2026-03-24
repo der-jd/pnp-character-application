@@ -75,7 +75,9 @@ const de = {
   wizardAdventurePointsDescription: "Gib die Start-Abenteuerpunkte für deinen Charakter an.",
   wizardStepReview: "Zusammenfassung",
   wizardErrorNameRequired: "Bitte gib einen Charakternamen ein.",
+  wizardErrorProfessionNameRequired: "Bitte gib einen Berufsnamen ein.",
   wizardErrorProfessionSkillRequired: "Bitte wähle ein Talent für den Beruf aus.",
+  wizardErrorHobbyNameRequired: "Bitte gib einen Hobby-Namen ein.",
   wizardErrorHobbySkillRequired: "Bitte wähle ein Talent für das Hobby aus.",
 
   // General Information

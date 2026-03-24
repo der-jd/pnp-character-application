@@ -240,8 +240,16 @@ export function CharacterCreatePage() {
       toast("error", t("wizardErrorNameRequired"));
       return;
     }
+    if (!state.professionName.trim()) {
+      toast("error", t("wizardErrorProfessionNameRequired"));
+      return;
+    }
     if (!state.professionSkill) {
       toast("error", t("wizardErrorProfessionSkillRequired"));
+      return;
+    }
+    if (!state.hobbyName.trim()) {
+      toast("error", t("wizardErrorHobbyNameRequired"));
       return;
     }
     if (!state.hobbySkill) {
@@ -287,7 +295,12 @@ export function CharacterCreatePage() {
       case 0:
         return state.name.trim().length > 0;
       case 1:
-        return state.professionSkill.length > 0 && state.hobbySkill.length > 0;
+        return (
+          state.professionName.trim().length > 0 &&
+          state.professionSkill.length > 0 &&
+          state.hobbyName.trim().length > 0 &&
+          state.hobbySkill.length > 0
+        );
       case 3: {
         const totalUsed = Object.values(state.attributes).reduce((s, v) => s + v, 0);
         return totalUsed === ATTRIBUTE_POINTS_FOR_CREATION;
@@ -434,6 +447,7 @@ function StepProfession({ state, update }: StepProps) {
             label={t("professionName")}
             value={state.professionName}
             onChange={(e) => update({ professionName: e.target.value })}
+            required
           />
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-secondary">{t("associatedSkill")}</label>
@@ -461,6 +475,7 @@ function StepProfession({ state, update }: StepProps) {
             label={t("hobbyName")}
             value={state.hobbyName}
             onChange={(e) => update({ hobbyName: e.target.value })}
+            required
           />
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-secondary">{t("associatedSkill")}</label>
