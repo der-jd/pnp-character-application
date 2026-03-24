@@ -775,8 +775,7 @@ function StepAdventurePoints({ state, update }: StepProps) {
   return (
     <div className="space-y-6">
       <div className="mb-6 p-4 bg-bg-tertiary rounded-lg border border-border-primary">
-        <p className="text-sm text-text-secondary mb-3">{t("wizardAdventurePointsDescription")}</p>
-        <p className="text-xs text-text-muted">{t("wizardAdventurePointsHint")}</p>
+        <p className="text-sm text-text-secondary">{t("wizardAdventurePointsDescription")}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

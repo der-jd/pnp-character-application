@@ -73,7 +73,6 @@ const de = {
     "Für jedes Kampftalent muss die initiale Begabung gewürfelt werden. Werte können manuell eingetragen oder zufällige Werte generiert werden.",
   wizardCombatRandomFill: "Zufällige Werte generieren",
   wizardAdventurePointsDescription: "Gib die Start-Abenteuerpunkte für deinen Charakter an.",
-  wizardAdventurePointsHint: "Der Standardwert für neue Charaktere beträgt 1000 Abenteuerpunkte.",
   wizardStepReview: "Zusammenfassung",
   wizardErrorNameRequired: "Bitte gib einen Charakternamen ein.",
   wizardErrorProfessionSkillRequired: "Bitte wähle ein Talent für den Beruf aus.",
