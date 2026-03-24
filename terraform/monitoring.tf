@@ -83,19 +83,22 @@ resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
 resource "aws_cloudwatch_metric_alarm" "api_latency" {
   alarm_name          = "pnp-app-api-high-latency"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
   metric_name         = "Latency"
   namespace           = "AWS/ApiGateway"
   period              = 300
   extended_statistic  = "p99"
-  threshold           = 3000
+  threshold           = 8000
   treat_missing_data  = "notBreaching"
 
   dimensions = {
     ApiName = aws_api_gateway_rest_api.pnp_rest_api.name
   }
 
-  alarm_description = "Alerts when API p99 latency exceeds 3 seconds"
+  # Threshold raised to 8s to tolerate Lambda cold starts (~5s p99 on low-traffic app).
+  # 2 of 3 consecutive windows must breach to avoid alerting on single cold-start spikes.
+  alarm_description = "Alerts when API p99 latency persistently exceeds 8 seconds (sustained cold start or performance regression)"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
