@@ -5,7 +5,8 @@
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   alarm_name          = "pnp-app-lambda-errors"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
   metric_name         = "Errors"
   namespace           = "AWS/Lambda"
   period              = 300
@@ -13,7 +14,9 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
-  alarm_description = "Alerts when any Lambda function in the account produces errors"
+  # 2 of 3 consecutive 5-min windows must breach to avoid alerting on
+  # one-off errors from invalid frontend requests (known issue).
+  alarm_description = "Alerts when Lambda errors persist across multiple evaluation periods"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
@@ -37,7 +40,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
 resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
   alarm_name          = "pnp-app-api-5xx-errors"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
   metric_name         = "5XXError"
   namespace           = "AWS/ApiGateway"
   period              = 300
@@ -49,7 +53,9 @@ resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
     ApiName = aws_api_gateway_rest_api.pnp_rest_api.name
   }
 
-  alarm_description = "Alerts when the API returns 5xx server errors"
+  # 2 of 3 consecutive 5-min windows must breach to avoid alerting on
+  # one-off 5xx errors caused by invalid frontend requests (known issue).
+  alarm_description = "Alerts when API 5xx errors persist across multiple evaluation periods"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
@@ -139,7 +145,8 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_history_errors" {
 resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
   alarm_name          = "pnp-app-step-functions-failures"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
+  evaluation_periods  = 3
+  datapoints_to_alarm = 2
   metric_name         = "ExecutionsFailed"
   namespace           = "AWS/States"
   period              = 300
@@ -147,7 +154,9 @@ resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
-  alarm_description = "Alerts when any Step Functions state machine execution in the account fails"
+  # 2 of 3 consecutive 5-min windows must breach to avoid alerting on
+  # one-off failures caused by invalid frontend requests (known issue).
+  alarm_description = "Alerts when Step Functions execution failures persist across multiple evaluation periods"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
