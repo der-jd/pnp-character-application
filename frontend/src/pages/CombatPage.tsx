@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { clsx } from "clsx";
 import type { CombatStats, Character } from "api-spec";
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
@@ -144,7 +145,13 @@ function CombatTable({
         </thead>
         <tbody>
           {Object.entries(stats).map(([name, cs]) => (
-            <tr key={name} className="border-b border-border-primary/50 hover:bg-bg-hover/30">
+            <tr
+              key={name}
+              className={clsx(
+                "border-b border-border-primary/50 hover:bg-bg-hover/30",
+                cs.availablePoints === 0 && "opacity-40",
+              )}
+            >
               <td className="py-2 pr-4 font-medium">{t(skillNameKeys[name]!)}</td>
               <td className="text-center py-2 px-2 font-mono">
                 {cs.availablePoints}/
@@ -196,7 +203,12 @@ function CombatTable({
                     </Button>
                   </div>
                 ) : (
-                  <Button variant="ghost" size="sm" onClick={() => startEdit(name, cs)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => startEdit(name, cs)}
+                    disabled={cs.availablePoints === 0}
+                  >
                     {t("edit")}
                   </Button>
                 )}
