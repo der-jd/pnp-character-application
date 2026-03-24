@@ -48,6 +48,13 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 - Route53 configuration for domain management
 - Custom domain setup for API and frontend
 
+#### Monitoring & Alerting
+
+- CloudWatch alarms for backend health monitoring (Lambda, API Gateway, DynamoDB, Step Functions)
+- CloudWatch dashboard for visualization of service metrics
+- SNS topic for email alerting on alarm state changes
+- Account-level metric aggregation to avoid CloudWatch API limits
+
 ## Configuration
 
 ### Variables
@@ -56,7 +63,7 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 - `project_tag_key`/`project_tag_value` - Project tagging
 - `domain_name` - Main application domain
 - `api_domain_name` - API-specific domain
-- `backup_alert_email` - Backup failure notification email (configured via CircleCI)
+- `alert_email_address` - Email for CloudWatch alarm notifications (configured via CircleCI as `TF_VAR_alert_email_address`)
 
 ### Outputs
 
@@ -68,6 +75,29 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 - `frontend_bucket_name` - S3 bucket name for frontend static assets
 - `route53_nameservers` - Route53 nameservers for DNS delegation
 - `route53_zone_id` - Route53 hosted zone ID
+
+## Monitoring & Alerting Configuration
+
+**Design Rationale:**
+
+- Account-level metrics avoid CloudWatch's 10-metric-query limit per alarm (which would be exceeded with per-function or per-state-machine metrics)
+- `treat_missing_data = "notBreaching"` ensures low-traffic periods show `OK` instead of `INSUFFICIENT_DATA`
+- All alarms include `ok_actions` to send "all clear" notifications
+
+### CloudWatch Dashboard
+
+The `pnp-app-backend` dashboard provides detailed visibility about:
+
+- API Gateway endpoints
+- Lambda functions
+- Step Functions state machines
+- DynamoDB tables
+
+### SNS Topic for Alerts
+
+The `pnp-app-alerts-topic` SNS topic in `alerts.tf` is shared by all alerting mechanisms.
+
+All notifications are sent to the email address specified in `TF_VAR_alert_email_address` (CircleCI environment variable).
 
 ### Deployment
 

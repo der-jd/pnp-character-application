@@ -15,7 +15,7 @@ The following environment variables must be configured in CircleCI project setti
 - `TF_CLOUD_ORGANIZATION`: Terraform Cloud organization name
 - `TF_TOKEN_app_terraform_io`: Terraform Cloud API token
 - `TF_WORKSPACE`: Terraform Cloud workspace name (e.g., "prod")
-- `TF_VAR_backup_alert_email`: Email address for backup alerts (Terraform variable)
+- `TF_VAR_alert_email_address`: Email address for CloudWatch/SNS alert notifications (Terraform variable)
 
 ### Component Test Secrets
 

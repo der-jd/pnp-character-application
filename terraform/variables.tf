@@ -24,7 +24,7 @@ variable "api_domain_name" {
 }
 
 // Will be set via an environment variable in CircleCI
-variable "backup_alert_email" {
-  description = "Email address that receives CloudWatch/SNS backup failure notifications"
+variable "alert_email_address" {
+  description = "Email address that receives CloudWatch/SNS alert notifications"
   type        = string
 }

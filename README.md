@@ -93,6 +93,10 @@ The application implements a backup strategy using **AWS Backup** to ensure data
 
 Backup configurations are managed through Terraform in the `terraform/backup.tf` module.
 
+## 📊 Monitoring, Dashboards & Alerting
+
+The application includes backend monitoring and alerting to track application health and performance, see [Monitoring & Alerting](./terraform/README.md#monitoring-and-alerting-configuration) for details.
+
 ## 🚀 Deployment
 
 **Continuous deployment** via CircleCI, see [CircleCI Configuration](./.circleci/README.md) for details.
