@@ -95,47 +95,7 @@ Backup configurations are managed through Terraform in the `terraform/backup.tf`
 
 ## 📊 Monitoring, Dashboards & Alerting
 
-The application includes comprehensive backend monitoring and alerting to track application health and performance:
-
-### CloudWatch Alarms (8 total)
-
-Account-level alarms that aggregate metrics across all services in the region:
-
-| Alarm                      | Service            | Trigger Condition                 |
-| -------------------------- | ------------------ | --------------------------------- |
-| Lambda Errors              | AWS Lambda         | Any function produces an error    |
-| Lambda Throttles           | AWS Lambda         | Any function is throttled         |
-| API 5xx Errors             | API Gateway        | Any 5xx server error              |
-| API 4xx Errors             | API Gateway        | >5 client errors in 5 minutes     |
-| API High Latency           | API Gateway        | p99 latency > 3 seconds           |
-| DynamoDB Characters Errors | DynamoDB           | System errors on characters table |
-| DynamoDB History Errors    | DynamoDB           | System errors on history table    |
-| Step Functions Failures    | AWS Step Functions | Any state machine execution fails |
-
-**Alert Configuration:**
-
-- Notifications sent to `TF_VAR_alert_email_address` via SNS (same email as backup alerts)
-- `treat_missing_data = "notBreaching"` ensures low-traffic periods show OK instead of INSUFFICIENT_DATA
-- All alarms include `ok_actions` to send "all clear" notifications when issues resolve
-
-### CloudWatch Dashboard
-
-A comprehensive backend monitoring dashboard (`pnp-app-backend`) displays:
-
-- **API Gateway**: Request count, 4xx/5xx errors, latency distribution (p50/p99/avg)
-- **Lambda**: Invocations, errors, duration, throttles, concurrent executions (per function)
-- **Step Functions**: Executions started/failed, execution time (per state machine)
-- **DynamoDB**: Consumed capacity units, operation latency, system/user errors, throttled requests
-
-The dashboard provides detailed per-function and per-state-machine visibility, complementing the account-level alarms.
-
-**Configuration:**
-
-- Managed through Terraform in `terraform/dashboard.tf`
-- Uses actual module references for function and state machine names (not hardcoded)
-- 1 of 3 free-tier CloudWatch dashboards used
-
-Monitoring configurations are managed through Terraform in the `terraform/alerts.tf` (SNS topic), `terraform/monitoring.tf` (alarms), and `terraform/dashboard.tf` (dashboard) modules.
+The application includes backend monitoring and alerting to track application health and performance, see [Monitoring & Alerting](./terraform/README.md#monitoring-and-alerting-configuration) for details.
 
 ## 🚀 Deployment
 

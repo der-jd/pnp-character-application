@@ -78,30 +78,6 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 
 ## Monitoring & Alerting Configuration
 
-### Files
-
-- **`alerts.tf`** - Shared SNS topic for backup and monitoring notifications
-- **`monitoring.tf`** - CloudWatch alarms for backend health
-- **`dashboard.tf`** - CloudWatch dashboard for service visibility
-- **`backup.tf`** - Backup infrastructure and related alarms (includes backup notifications via shared SNS topic)
-
-### CloudWatch Alarms
-
-8 alarms monitor the backend using account-level metrics (no FunctionName or StateMachineArn dimensions):
-
-| File          | Alarm                              | Namespace      | Metric                    | Threshold      |
-| ------------- | ---------------------------------- | -------------- | ------------------------- | -------------- |
-| monitoring.tf | pnp-app-lambda-errors              | AWS/Lambda     | Errors                    | > 0            |
-| monitoring.tf | pnp-app-lambda-throttles           | AWS/Lambda     | Throttles                 | > 0            |
-| monitoring.tf | pnp-app-api-5xx-errors             | AWS/ApiGateway | 5XXError                  | > 0            |
-| monitoring.tf | pnp-app-api-4xx-errors             | AWS/ApiGateway | 4XXError                  | > 5 (in 5 min) |
-| monitoring.tf | pnp-app-api-high-latency           | AWS/ApiGateway | Latency (p99)             | > 3000ms       |
-| monitoring.tf | pnp-app-dynamodb-characters-errors | AWS/DynamoDB   | SystemErrors              | > 0            |
-| monitoring.tf | pnp-app-dynamodb-history-errors    | AWS/DynamoDB   | SystemErrors              | > 0            |
-| monitoring.tf | pnp-app-step-functions-failures    | AWS/States     | ExecutionsFailed          | > 0            |
-| backup.tf     | pnp-app-backup-job-failed          | AWS/Backup     | NumberOfBackupJobsFailed  | > 0            |
-| backup.tf     | pnp-app-backup-job-expired         | AWS/Backup     | NumberOfBackupJobsExpired | > 0            |
-
 **Design Rationale:**
 
 - Account-level metrics avoid CloudWatch's 10-metric-query limit per alarm (which would be exceeded with per-function or per-state-machine metrics)
@@ -110,21 +86,16 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 
 ### CloudWatch Dashboard
 
-The `pnp-app-backend` dashboard provides detailed visibility:
+The `pnp-app-backend` dashboard provides detailed visibility about:
 
-- **API Gateway section**: Requests, 4xx/5xx errors, latency distribution (p50/p99/avg)
-- **Lambda section**: Per-function invocations, errors, duration, throttles, concurrent executions
-- **Step Functions section**: Per-state-machine executions started/failed, execution time
-- **DynamoDB section**: Capacity consumption, operation latency, errors, throttled requests
-
-The dashboard uses actual module references (e.g., `module.get_character_lambda.lambda_function.function_name`) for granular per-function and per-state-machine metrics, complementing the account-level alarms.
+- API Gateway endpoints
+- Lambda functions
+- Step Functions state machines
+- DynamoDB tables
 
 ### SNS Topic for Alerts
 
-The `pnp-app-alerts-topic` SNS topic in `alerts.tf` is shared by both:
-
-- Backup alarms (backup job failures/expirations)
-- Monitoring alarms (Lambda, API Gateway, DynamoDB, Step Functions issues)
+The `pnp-app-alerts-topic` SNS topic in `alerts.tf` is shared by all alerting mechanisms.
 
 All notifications are sent to the email address specified in `TF_VAR_alert_email_address` (CircleCI environment variable).
 
