@@ -147,11 +147,12 @@ function CombatTable({
             <tr key={name} className="border-b border-border-primary/50 hover:bg-bg-hover/30">
               <td className="py-2 pr-4 font-medium">{t(skillNameKeys[name]!)}</td>
               <td className="text-center py-2 px-2 font-mono">
-                {cs.availablePoints}/{
-                  cs.handling +
-                  character.characterSheet.skills.combat[name as keyof typeof character.characterSheet.skills.combat].current +
-                  character.characterSheet.skills.combat[name as keyof typeof character.characterSheet.skills.combat].mod
-                }
+                {cs.availablePoints}/
+                {cs.handling +
+                  character.characterSheet.skills.combat[name as keyof typeof character.characterSheet.skills.combat]
+                    .current +
+                  character.characterSheet.skills.combat[name as keyof typeof character.characterSheet.skills.combat]
+                    .mod}
               </td>
               <td className="text-center py-2 px-2 font-mono">{cs.handling}</td>
               <td className="text-center py-2 px-2">
