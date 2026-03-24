@@ -575,6 +575,14 @@ export class CharacterBuilder {
     return this;
   }
 
+  setStartAdventurePoints(startAdventurePoints: number): this {
+    console.log(`Set start adventure points: ${startAdventurePoints}`);
+    this.characterSheet.calculationPoints.adventurePoints.start = startAdventurePoints;
+    this.characterSheet.calculationPoints.adventurePoints.available = startAdventurePoints;
+    this.characterSheet.calculationPoints.adventurePoints.total = startAdventurePoints;
+    return this;
+  }
+
   build(): CharacterCreation {
     if (
       !this.attributesSet ||

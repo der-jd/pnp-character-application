@@ -45,6 +45,7 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
       .setAttributes(params.body.attributes)
       .activateSkills(params.body.activatedSkills)
       .setStartValuesOfCombatSkills(params.body.combatSkillsStartValues)
+      .setStartAdventurePoints(params.body.startAdventurePoints)
       .build();
 
     await createCharacterItem(characterCreation.character);

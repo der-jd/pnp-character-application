@@ -19,7 +19,10 @@ import {
   CombatSkillName,
   MAX_INITIAL_COMBAT_SKILL_VALUE,
   MIN_INITIAL_COMBAT_SKILL_VALUE,
+  DEFAULT_START_ADVENTURE_POINTS,
   CombatSection,
+  MIN_START_ADVENTURE_POINTS,
+  MAX_START_ADVENTURE_POINTS,
 } from "api-spec";
 import { _createCharacter } from "create-character";
 import { expectHttpError } from "./utils.js";
@@ -117,6 +120,7 @@ const characterCreationRequest: PostCharactersRequest = {
     firearmComplex: 1,
     heavyWeapons: 1,
   },
+  startAdventurePoints: DEFAULT_START_ADVENTURE_POINTS,
 };
 
 describe("Invalid requests", () => {
@@ -503,6 +507,32 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 400,
     },
+    {
+      name: "Start adventure points below minimum allowed",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          startAdventurePoints: MIN_START_ADVENTURE_POINTS - 1,
+        },
+      },
+      expectedStatusCode: 400,
+    },
+    {
+      name: "Start adventure points above maximum allowed",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          startAdventurePoints: MAX_START_ADVENTURE_POINTS + 1,
+        },
+      },
+      expectedStatusCode: 400,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {
@@ -521,6 +551,32 @@ describe("Valid requests", () => {
         pathParameters: null,
         queryStringParameters: null,
         body: characterCreationRequest,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Start adventure points at minimum boundary",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          startAdventurePoints: MIN_START_ADVENTURE_POINTS,
+        },
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Start adventure points at maximum boundary",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: null,
+        queryStringParameters: null,
+        body: {
+          ...characterCreationRequest,
+          startAdventurePoints: MAX_START_ADVENTURE_POINTS,
+        },
       },
       expectedStatusCode: 200,
     },
@@ -671,9 +727,9 @@ describe("Valid requests", () => {
       );
 
       // Check adventure points
-      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.start).toBe(0);
-      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.available).toBe(0);
-      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.total).toBe(0);
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.start).toBe(_case.request.body.startAdventurePoints);
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.available).toBe(_case.request.body.startAdventurePoints);
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.total).toBe(_case.request.body.startAdventurePoints);
 
       // Check special abilities
       expect(parsedBody.changes.new.character.characterSheet.specialAbilities).toStrictEqual([]);
