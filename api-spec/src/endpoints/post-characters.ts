@@ -67,7 +67,12 @@ export const postCharactersRequestSchema = z
     disadvantages: disadvantagesSchema,
     activatedSkills: activatedSkillsSchema,
     combatSkillsStartValues: combatSkillsStartValuesSchema,
-    startAdventurePoints: z.number().int().min(MIN_START_ADVENTURE_POINTS).max(MAX_START_ADVENTURE_POINTS).default(DEFAULT_START_ADVENTURE_POINTS),
+    startAdventurePoints: z
+      .number()
+      .int()
+      .min(MIN_START_ADVENTURE_POINTS)
+      .max(MAX_START_ADVENTURE_POINTS)
+      .default(DEFAULT_START_ADVENTURE_POINTS),
   })
   .strict();
 

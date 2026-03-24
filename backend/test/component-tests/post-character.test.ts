@@ -518,9 +518,15 @@ describe.sequential("post-character component tests", () => {
         ATTRIBUTE_POINTS_FOR_CREATION,
       );
 
-      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.start).toBe(DEFAULT_START_ADVENTURE_POINTS);
-      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.available).toBe(DEFAULT_START_ADVENTURE_POINTS);
-      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.total).toBe(DEFAULT_START_ADVENTURE_POINTS);
+      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.start).toBe(
+        DEFAULT_START_ADVENTURE_POINTS,
+      );
+      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.available).toBe(
+        DEFAULT_START_ADVENTURE_POINTS,
+      );
+      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.total).toBe(
+        DEFAULT_START_ADVENTURE_POINTS,
+      );
 
       // Check special abilities
       expect(createdCharacter.characterSheet.specialAbilities).toStrictEqual([]);

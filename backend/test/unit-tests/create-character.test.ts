@@ -727,9 +727,15 @@ describe("Valid requests", () => {
       );
 
       // Check adventure points
-      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.start).toBe(_case.request.body.startAdventurePoints);
-      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.available).toBe(_case.request.body.startAdventurePoints);
-      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.total).toBe(_case.request.body.startAdventurePoints);
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.start).toBe(
+        _case.request.body.startAdventurePoints,
+      );
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.available).toBe(
+        _case.request.body.startAdventurePoints,
+      );
+      expect(parsedBody.changes.new.character.characterSheet.calculationPoints.adventurePoints.total).toBe(
+        _case.request.body.startAdventurePoints,
+      );
 
       // Check special abilities
       expect(parsedBody.changes.new.character.characterSheet.specialAbilities).toStrictEqual([]);

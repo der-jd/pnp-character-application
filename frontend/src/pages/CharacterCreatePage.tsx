@@ -781,9 +781,7 @@ function StepAdventurePoints({ state, update }: StepProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium text-text-secondary block mb-1.5">
-            {t("startAdventurePoints")}
-          </label>
+          <label className="text-sm font-medium text-text-secondary block mb-1.5">{t("startAdventurePoints")}</label>
           <input
             type="number"
             min={MIN_START_ADVENTURE_POINTS}
