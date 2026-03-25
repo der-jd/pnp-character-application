@@ -42,7 +42,6 @@ export { parseRecordType } from "./history-utils.js";
 export { CharacterBuilder } from "./rules/character-builder.js";
 export { calculateBaseValues } from "./rules/base-value-formulas.js";
 export { getCombatSkillHandling } from "./rules/constants.js";
-export { COST_CATEGORY_DEFAULT, COST_CATEGORY_COMBAT_SKILLS } from "api-spec";
 export {
   calculateCombatStats,
   combatStatsChanged,

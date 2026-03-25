@@ -23,17 +23,12 @@ import {
   CombatSection,
   MIN_START_ADVENTURE_POINTS,
   MAX_START_ADVENTURE_POINTS,
+  COST_CATEGORY_COMBAT_SKILLS,
+  COST_CATEGORY_DEFAULT,
 } from "api-spec";
 import { _createCharacter } from "create-character";
 import { expectHttpError } from "./utils.js";
-import {
-  getSkill,
-  getSkillCategoryAndName,
-  COST_CATEGORY_COMBAT_SKILLS,
-  COST_CATEGORY_DEFAULT,
-  getCombatSkillHandling,
-  calculateBaseValues,
-} from "core";
+import { getSkill, getSkillCategoryAndName, getCombatSkillHandling, calculateBaseValues } from "core";
 
 const characterCreationRequest: PostCharactersRequest = {
   generalInformation: {
