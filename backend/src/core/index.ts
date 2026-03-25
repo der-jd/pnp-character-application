@@ -30,9 +30,6 @@ export { decodeUserId } from "./token.js";
 export {
   parseLearningMethod,
   parseCostCategory,
-  adjustCostCategory,
-  getSkillIncreaseCost,
-  getSkillActivationCost,
   getAttribute,
   getBaseValue,
   getSkill,
@@ -44,12 +41,7 @@ export {
 export { parseRecordType } from "./history-utils.js";
 export { CharacterBuilder } from "./rules/character-builder.js";
 export { calculateBaseValues } from "./rules/base-value-formulas.js";
-export {
-  COST_CATEGORY_COMBAT_SKILLS,
-  COST_CATEGORY_DEFAULT,
-  MAX_COST_CATEGORY,
-  getCombatSkillHandling,
-} from "./rules/constants.js";
+export { getCombatSkillHandling } from "./rules/constants.js";
 export {
   calculateCombatStats,
   combatStatsChanged,

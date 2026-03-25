@@ -14,6 +14,9 @@ import {
   InitialIncreased,
   SkillCategory,
   SkillName,
+  adjustCostCategory,
+  getSkillIncreaseCost,
+  getSkillActivationCost,
 } from "api-spec";
 import {
   Request,
@@ -27,12 +30,9 @@ import {
   isZodError,
   logZodError,
   parseLearningMethod,
-  adjustCostCategory,
-  getSkillIncreaseCost,
   getSkill,
   getCombatStats,
   getCombatCategory,
-  getSkillActivationCost,
   calculateCombatStats,
   combatStatsChanged,
   isCombatSkill,

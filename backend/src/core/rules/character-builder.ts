@@ -37,13 +37,11 @@ import {
   CombatSkillName,
   CombatSkillsStartValues,
   CombatSection,
-} from "api-spec";
-import {
   COST_CATEGORY_COMBAT_SKILLS,
   COST_CATEGORY_DEFAULT,
   MAX_COST_CATEGORY,
-  getCombatSkillHandling,
-} from "./constants.js";
+} from "api-spec";
+import { getCombatSkillHandling } from "./constants.js";
 import {
   advantagesEnumToString,
   disadvantagesEnumToString,
