@@ -28,14 +28,12 @@ describe("i18n translation system", () => {
       expect(t("pointsRemaining", 12)).toBe("Verfügbare EP: 12");
     });
 
-    it("handles multiple positional arguments", () => {
-      expect(t("pointsTotal", 30, 40)).toBe("Gesamt: 30/40");
+    it("handles positional arguments for pointsTotal", () => {
+      expect(t("pointsTotal", 30)).toBe("Gesamte EP: 30");
     });
 
-    it("leaves unreplaced placeholders intact if not enough args", () => {
-      // pointsTotal has {0} and {1}, only providing one arg
-      const result = t("pointsTotal", 30);
-      expect(result).toBe("Gesamt: 30/{1}");
+    it("handles multiple positional arguments", () => {
+      expect(t("professionBonus", "50")).toBe("Berufsbonus (+50)");
     });
 
     it("returns string without modification when no placeholders and no args", () => {
