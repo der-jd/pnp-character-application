@@ -346,6 +346,31 @@ function AttributesSection({ character }: { character: Character }) {
   const attributes = character.characterSheet.attributes;
   const attributePoints = character.characterSheet.calculationPoints.attributePoints;
 
+  // Calculate projected points during editing
+  const getProjectedPoints = () => {
+    if (!editing) return null;
+
+    const currentAttribute = attributes[editing as keyof typeof attributes];
+    const currentDifference = editValues.current - currentAttribute.current;
+
+    // Prevent reductions of current values (not allowed by backend)
+    if (currentDifference < 0) return null;
+
+    if (currentDifference === 0) return null;
+
+    const cost = Math.abs(currentDifference);
+    const projectedAvailable =
+      currentDifference > 0 ? attributePoints.available - cost : attributePoints.available + cost;
+
+    return {
+      available: projectedAvailable,
+      total: attributePoints.total,
+      cost: currentDifference > 0 ? cost : -cost,
+    };
+  };
+
+  const projectedPoints = getProjectedPoints();
+
   const mutation = useMutation({
     mutationFn: ({
       name,
@@ -358,17 +383,67 @@ function AttributesSection({ character }: { character: Character }) {
         mod?: { initialValue: number; newValue: number };
       };
     }) => updateAttribute(character.characterId, name, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["character", character.characterId] });
-      toast("success", t("toastSaveSuccess"));
-      cancelEdit();
+    onMutate: async ({ name, data }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["character", character.characterId] });
+
+      // Snapshot the previous value
+      const previousCharacter = queryClient.getQueryData(["character", character.characterId]) as Character;
+
+      // Optimistically update the character data
+      if (data.current && data.current.increasedPoints > 0) {
+        // Calculate cost (1 point per attribute point increase)
+        const cost = data.current.increasedPoints;
+
+        queryClient.setQueryData(["character", character.characterId], (old: Character) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            characterSheet: {
+              ...old.characterSheet,
+              attributes: {
+                ...old.characterSheet.attributes,
+                [name as keyof typeof old.characterSheet.attributes]: {
+                  ...old.characterSheet.attributes[name as keyof typeof old.characterSheet.attributes],
+                  current:
+                    old.characterSheet.attributes[name as keyof typeof old.characterSheet.attributes].current +
+                    data.current!.increasedPoints,
+                },
+              },
+              calculationPoints: {
+                ...old.characterSheet.calculationPoints,
+                attributePoints: {
+                  ...old.characterSheet.calculationPoints.attributePoints,
+                  available: old.characterSheet.calculationPoints.attributePoints.available - cost,
+                  total: old.characterSheet.calculationPoints.attributePoints.total,
+                },
+              },
+            },
+          };
+        });
+      }
+
+      return { previousCharacter };
     },
-    onError: (error) => {
+    onError: (error, _variables, context) => {
+      // Rollback on error
+      if (context?.previousCharacter) {
+        queryClient.setQueryData(["character", character.characterId], context.previousCharacter);
+      }
       if (error instanceof ApiError) {
         toast("error", error.message);
       } else {
         toast("error", t("toastSaveError"));
       }
+    },
+    onSuccess: () => {
+      toast("success", t("toastSaveSuccess"));
+      cancelEdit();
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure server state
+      queryClient.invalidateQueries({ queryKey: ["character", character.characterId] });
     },
   });
 
@@ -395,16 +470,32 @@ function AttributesSection({ character }: { character: Character }) {
       <div className="mb-4 flex gap-4">
         <Badge
           variant={
-            attributePoints?.available === 0
-              ? "success"
-              : attributePoints?.available && attributePoints.available > 0
-                ? "info"
-                : "danger"
+            projectedPoints
+              ? projectedPoints.available < 0
+                ? "danger"
+                : projectedPoints.available === 0
+                  ? "info"
+                  : "success"
+              : attributePoints?.available && attributePoints.available < 0
+                ? "danger"
+                : attributePoints?.available === 0
+                  ? "info"
+                  : "success"
           }
         >
-          {t("pointsRemaining", attributePoints?.available ?? 0)}
+          {projectedPoints
+            ? t("pointsRemaining", projectedPoints.available)
+            : t("pointsRemaining", attributePoints?.available ?? 0)}
+          {projectedPoints && (
+            <span className="ml-1 text-xs opacity-75">
+              ({projectedPoints.cost > 0 ? "-" : "+"}
+              {Math.abs(projectedPoints.cost)})
+            </span>
+          )}
         </Badge>
-        <Badge variant="default">{t("pointsTotal", attributePoints?.total ?? 0)}</Badge>
+        <Badge variant="default">
+          {projectedPoints ? t("pointsTotal", projectedPoints.total) : t("pointsTotal", attributePoints?.total ?? 0)}
+        </Badge>
       </div>
 
       <div className="overflow-x-auto">
@@ -442,7 +533,14 @@ function AttributesSection({ character }: { character: Character }) {
                     <input
                       type="number"
                       value={editValues.current}
-                      onChange={(e) => setEditValues((v) => ({ ...v, current: Number(e.target.value) }))}
+                      min={attr.current}
+                      onChange={(e) => {
+                        const newValue = Number(e.target.value);
+                        // Prevent reductions of current values (not allowed by backend)
+                        if (newValue >= attr.current) {
+                          setEditValues((v) => ({ ...v, current: newValue }));
+                        }
+                      }}
                       className="w-14 rounded border border-border-primary bg-bg-tertiary px-1 py-0.5 text-center text-sm font-mono"
                     />
                   ) : (

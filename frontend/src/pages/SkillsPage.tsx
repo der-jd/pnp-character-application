@@ -1,12 +1,20 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { clsx } from "clsx";
 import type { Skill, LearningMethodString, SkillCategory } from "api-spec";
-import { skillCategories } from "api-spec";
+import {
+  skillCategories,
+  CostCategory,
+  LearningMethod,
+  learningMethodSchema,
+  calculateTotalSkillIncreaseCost,
+  getSkillActivationCost,
+  adjustCostCategory,
+} from "api-spec";
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
-import { updateSkill, getSkillIncreaseCost } from "@/api/character-edit";
+import { updateSkill } from "@/api/character-edit";
 import { ApiError } from "@/api/client";
 import { skillNameKeys, skillCategoryKeys, learningMethodKeys } from "@/i18n/mappings";
 import { getSkillIcon, skillCategoryIcons } from "@/lib/skillIcons";
@@ -17,8 +25,6 @@ import { FullPageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { useToast } from "@/components/ui/Toast";
 import { Dialog } from "@/components/ui/Dialog";
-
-const LEARNING_METHODS: LearningMethodString[] = ["FREE", "LOW_PRICED", "NORMAL", "EXPENSIVE"];
 
 export function SkillsPage() {
   const { characterId } = useParams<{ characterId: string }>();
@@ -43,8 +49,41 @@ export function SkillsPage() {
 
   const [editValues, setEditValues] = useState({ start: 0, current: 0, mod: 0, activated: false });
   const [learningMethod, setLearningMethod] = useState<LearningMethodString>("NORMAL");
-  const [costPreview, setCostPreview] = useState<number | null>(null);
-  const [loadingCost, setLoadingCost] = useState(false);
+
+  // Calculate projected cost locally using shared cost rules
+  const projectedCost = useMemo(() => {
+    if (!editingSkill) return null;
+
+    const skill = editingSkill.skill;
+    const lm = LearningMethod[learningMethod as keyof typeof LearningMethod];
+    let totalCost = 0;
+
+    // Activation cost (only if activating a not-yet-activated skill)
+    if (editValues.activated && !skill.activated) {
+      const adjustedCategory = adjustCostCategory(skill.defaultCostCategory as CostCategory, lm);
+      totalCost += getSkillActivationCost(adjustedCategory);
+    }
+
+    // Increase cost (only if current is increasing)
+    const increasedPoints = editValues.current - skill.current;
+    if (increasedPoints > 0) {
+      totalCost += calculateTotalSkillIncreaseCost(
+        skill.current,
+        increasedPoints,
+        skill.defaultCostCategory as CostCategory,
+        lm,
+      );
+    }
+
+    return totalCost;
+  }, [editingSkill, editValues.current, editValues.activated, learningMethod]);
+
+  // Calculate projected available AP
+  const projectedAp = useMemo(() => {
+    if (!character || projectedCost === null || projectedCost === 0) return null;
+    const available = character.characterSheet.calculationPoints.adventurePoints.available;
+    return available - projectedCost;
+  }, [character, projectedCost]);
 
   const skillMutation = useMutation({
     mutationFn: ({ category, name }: { category: string; name: string }) =>
@@ -81,35 +120,17 @@ export function SkillsPage() {
     },
   });
 
-  async function fetchCost(category: string, name: string, method: LearningMethodString) {
-    setLoadingCost(true);
-    try {
-      const res = await getSkillIncreaseCost(characterId!, category, name, method);
-      setCostPreview(res.increaseCost);
-    } catch (error) {
-      setCostPreview(null);
-      if (error instanceof ApiError) {
-        toast("error", error.message);
-      } else {
-        toast("error", t("toastLoadError"));
-      }
-    } finally {
-      setLoadingCost(false);
-    }
-  }
-
   function openEdit(category: string, name: string, skill: Skill) {
     setEditingSkill({ category, name, skill });
     setEditValues({ start: skill.start, current: skill.current, mod: skill.mod, activated: skill.activated });
     setLearningMethod("NORMAL");
-    setCostPreview(null);
-    fetchCost(category, name, "NORMAL");
   }
 
   if (isLoading) return <FullPageSpinner />;
   if (!character) return <ErrorState onRetry={() => refetch()} />;
 
   const skills = character.characterSheet.skills;
+  const ap = character.characterSheet.calculationPoints.adventurePoints;
 
   return (
     <div className="space-y-6">
@@ -117,12 +138,29 @@ export function SkillsPage() {
 
       {/* Adventure Points Summary */}
       <Card className="sticky top-0 z-10 bg-bg-primary border-border-primary shadow-sm">
-        <div className="flex gap-4 flex-wrap">
-          <Badge variant="info">
-            {t("availableAp")}: {character.characterSheet.calculationPoints.adventurePoints.available}
+        <div className="flex gap-4 flex-wrap items-center">
+          <Badge
+            variant={
+              projectedAp !== null
+                ? projectedAp < 0
+                  ? "danger"
+                  : projectedAp === 0
+                    ? "info"
+                    : "success"
+                : ap.available < 0
+                  ? "danger"
+                  : ap.available === 0
+                    ? "info"
+                    : "success"
+            }
+          >
+            {t("availableAp")}: {projectedAp !== null ? projectedAp : ap.available}
+            {projectedAp !== null && projectedCost !== null && (
+              <span className="ml-1 text-xs opacity-75">(-{projectedCost})</span>
+            )}
           </Badge>
           <Badge variant="default">
-            {t("totalAp")}: {character.characterSheet.calculationPoints.adventurePoints.total}
+            {t("totalAp")}: {ap.total}
           </Badge>
         </div>
       </Card>
@@ -248,7 +286,14 @@ export function SkillsPage() {
                 <input
                   type="number"
                   value={editValues.current}
-                  onChange={(e) => setEditValues((v) => ({ ...v, current: Number(e.target.value) }))}
+                  min={editingSkill?.skill.current}
+                  onChange={(e) => {
+                    const newValue = Number(e.target.value);
+                    // Prevent reductions of current values (not allowed by backend)
+                    if (newValue >= (editingSkill?.skill.current || 0)) {
+                      setEditValues((v) => ({ ...v, current: newValue }));
+                    }
+                  }}
                   className="w-full rounded border border-border-primary bg-bg-tertiary px-2 py-1.5 text-center text-sm font-mono"
                 />
               </div>
@@ -266,13 +311,10 @@ export function SkillsPage() {
             <div>
               <label className="text-xs text-text-muted block mb-1">{t("learningMethod")}</label>
               <div className="flex gap-2">
-                {LEARNING_METHODS.map((method) => (
+                {learningMethodSchema.options.map((method) => (
                   <button
                     key={method}
-                    onClick={() => {
-                      setLearningMethod(method);
-                      fetchCost(editingSkill.category, editingSkill.name, method);
-                    }}
+                    onClick={() => setLearningMethod(method)}
                     className={clsx(
                       "px-3 py-1.5 rounded text-xs font-medium transition-colors cursor-pointer",
                       learningMethod === method
@@ -286,10 +328,17 @@ export function SkillsPage() {
               </div>
             </div>
 
-            {costPreview !== null && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-text-muted">{t("increaseCost")}:</span>
-                <Badge variant={loadingCost ? "default" : "info"}>{loadingCost ? "..." : costPreview}</Badge>
+            {/* Live cost preview */}
+            {projectedCost !== null && projectedCost > 0 && (
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-text-muted">{t("increaseCost")}:</span>
+                  <Badge variant="info">{projectedCost}</Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-text-muted">{t("availableAp")}:</span>
+                  <Badge variant={projectedAp !== null && projectedAp < 0 ? "danger" : "success"}>{projectedAp}</Badge>
+                </div>
               </div>
             )}
           </div>
