@@ -181,6 +181,8 @@ const de = {
   learningMethodNormal: "Normal",
   learningMethodExpensive: "Teuer",
   increaseCost: "Steigerungskosten",
+  nextPointCost: "AP/Pkt.",
+  activationCostColumn: "Aktivierungskosten",
   selectLearningMethod: "Lernmethode wählen",
 
   // Skill names
