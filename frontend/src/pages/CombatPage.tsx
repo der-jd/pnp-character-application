@@ -145,15 +145,9 @@ function CombatTable({
         </thead>
         <tbody>
           {Object.entries(stats).map(([name, cs]) => (
-            <tr
-              key={name}
-              className={clsx(
-                "border-b border-border-primary/50 hover:bg-bg-hover/30",
-                cs.availablePoints === 0 && "opacity-40",
-              )}
-            >
+            <tr key={name} className="border-b border-border-primary/50 hover:bg-bg-hover/30">
               <td className="py-2 pr-4 font-medium">{t(skillNameKeys[name]!)}</td>
-              <td className="text-center py-2 px-2 font-mono">
+              <td className={clsx("text-center py-2 px-2 font-mono", cs.availablePoints === 0 && "opacity-40")}>
                 {cs.availablePoints}/
                 {cs.handling +
                   character.characterSheet.skills.combat[name as keyof typeof character.characterSheet.skills.combat]
@@ -203,12 +197,7 @@ function CombatTable({
                     </Button>
                   </div>
                 ) : (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => startEdit(name, cs)}
-                    disabled={cs.availablePoints === 0}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => startEdit(name, cs)}>
                     {t("edit")}
                   </Button>
                 )}
