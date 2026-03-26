@@ -215,6 +215,7 @@ function GeneralInformationSection({
     mutationFn: (data: PatchGeneralInformationRequest) => updateGeneralInformation(characterId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["character", characterId] });
+      queryClient.invalidateQueries({ queryKey: ["characters"] });
       toast("success", t("toastSaveSuccess"));
       setEditing(false);
     },
