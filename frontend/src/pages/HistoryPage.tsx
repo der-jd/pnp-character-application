@@ -118,6 +118,7 @@ export function HistoryPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["history", characterId] });
       queryClient.invalidateQueries({ queryKey: ["character", characterId] });
+      queryClient.invalidateQueries({ queryKey: ["characters"] });
       toast("success", t("toastHistoryReverted"));
       setRevertTarget(null);
     },
