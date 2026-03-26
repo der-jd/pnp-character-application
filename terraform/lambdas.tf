@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_exec_role" {
-  name = "pnp-app-lambda-execution-role"
+  name = "${local.prefix}-lambda-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -33,6 +33,7 @@ resource "aws_iam_role_policy" "lambda_inline_policy" {
 
 module "add_history_record_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "add-history-record"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -44,6 +45,7 @@ module "add_history_record_lambda" {
 
 module "add_special_ability_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "add-special-ability"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -54,6 +56,7 @@ module "add_special_ability_lambda" {
 
 module "clone_character_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "clone-character"
   timeout       = 10
   environment_vars = {
@@ -66,6 +69,7 @@ module "clone_character_lambda" {
 
 module "create_character_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "create-character"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -76,6 +80,7 @@ module "create_character_lambda" {
 
 module "delete_character_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "delete-character"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -87,6 +92,7 @@ module "delete_character_lambda" {
 
 module "update_combat_stats_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "update-combat-stats"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -97,6 +103,7 @@ module "update_combat_stats_lambda" {
 
 module "get_character_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "get-character"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -107,6 +114,7 @@ module "get_character_lambda" {
 
 module "get_characters_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "get-characters"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -117,6 +125,7 @@ module "get_characters_lambda" {
 
 module "get_history_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "get-history"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -128,6 +137,7 @@ module "get_history_lambda" {
 
 module "get_level_up_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "get-level-up"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -138,6 +148,7 @@ module "get_level_up_lambda" {
 
 module "get_skill_increase_cost_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "get-skill-increase-cost"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -148,6 +159,7 @@ module "get_skill_increase_cost_lambda" {
 
 module "update_attribute_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "update-attribute"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -158,6 +170,7 @@ module "update_attribute_lambda" {
 
 module "update_general_information_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "update-general-information"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -168,6 +181,7 @@ module "update_general_information_lambda" {
 
 module "update_base_value_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "update-base-value"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -178,6 +192,7 @@ module "update_base_value_lambda" {
 
 module "update_calculation_points_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "update-calculation-points"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -188,6 +203,7 @@ module "update_calculation_points_lambda" {
 
 module "apply_level_up_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "apply-level-up"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -198,6 +214,7 @@ module "apply_level_up_lambda" {
 
 module "update_skill_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "update-skill"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -208,6 +225,7 @@ module "update_skill_lambda" {
 
 module "revert_history_record_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "revert-history-record"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name
@@ -219,6 +237,7 @@ module "revert_history_record_lambda" {
 
 module "set_history_comment_lambda" {
   source        = "./modules/lambda_function"
+  name_prefix   = local.prefix
   function_name = "set-history-comment"
   environment_vars = {
     TABLE_NAME_CHARACTERS = local.characters_table_name

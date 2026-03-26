@@ -1,6 +1,6 @@
 locals {
-  characters_table_name = "pnp-app-characters"
-  history_table_name    = "pnp-app-characters-history"
+  characters_table_name = "${local.prefix}-characters"
+  history_table_name    = "${local.prefix}-characters-history"
 }
 
 resource "aws_dynamodb_table" "characters" {

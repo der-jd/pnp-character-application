@@ -27,20 +27,172 @@ executors:
     resource_class: small
 
 workflows:
-  # TEMPORARY: Deployment disabled while multi-environment support is being implemented.
-  # Only CI checks run; deploy/build-frontend jobs are removed from this workflow.
-  build-deploy:
+  deploy-prod:
     when:
       and:
         - not: << pipeline.parameters.delete-services >>
         - not: << pipeline.parameters.run-component-tests >>
     jobs:
-      - check-format-files
-      - lint-typescript-code
-      - build-backend
-      - run-backend-unit-tests
-      - run-frontend-tests
-      - lint-terraform-code
+      - check-format-files:
+          filters:
+            branches:
+              only: main
+      - lint-typescript-code:
+          filters:
+            branches:
+              only: main
+      - build-backend:
+          filters:
+            branches:
+              only: main
+      - run-backend-unit-tests:
+          filters:
+            branches:
+              only: main
+      - run-frontend-tests:
+          filters:
+            branches:
+              only: main
+      - lint-terraform-code:
+          filters:
+            branches:
+              only: main
+      - deploy-backend-and-infrastructure:
+          env: prod
+          tf_var_file: envs/prod.tfvars
+          requires:
+            - check-format-files
+            - lint-typescript-code
+            - build-backend
+            - run-backend-unit-tests
+            - lint-terraform-code
+          filters:
+            branches:
+              only: main
+      - run-backend-component-tests:
+          requires:
+            - deploy-backend-and-infrastructure
+          filters:
+            branches:
+              only: main
+      - build-frontend:
+          requires:
+            - deploy-backend-and-infrastructure
+          filters:
+            branches:
+              only: main
+      - deploy-frontend:
+          requires:
+            - check-format-files
+            - lint-typescript-code
+            - build-frontend
+            - run-frontend-tests
+            - deploy-backend-and-infrastructure
+          filters:
+            branches:
+              only: main
+
+  deploy-dev:
+    when:
+      and:
+        - not: << pipeline.parameters.delete-services >>
+        - not: << pipeline.parameters.run-component-tests >>
+    jobs:
+      - check-format-files:
+          filters:
+            branches:
+              only: develop
+      - lint-typescript-code:
+          filters:
+            branches:
+              only: develop
+      - build-backend:
+          filters:
+            branches:
+              only: develop
+      - run-backend-unit-tests:
+          filters:
+            branches:
+              only: develop
+      - run-frontend-tests:
+          filters:
+            branches:
+              only: develop
+      - lint-terraform-code:
+          filters:
+            branches:
+              only: develop
+      - deploy-backend-and-infrastructure:
+          env: dev
+          tf_var_file: envs/dev.tfvars
+          requires:
+            - check-format-files
+            - lint-typescript-code
+            - build-backend
+            - run-backend-unit-tests
+            - lint-terraform-code
+          filters:
+            branches:
+              only: develop
+      - build-frontend:
+          requires:
+            - deploy-backend-and-infrastructure
+          filters:
+            branches:
+              only: develop
+      - deploy-frontend:
+          requires:
+            - check-format-files
+            - lint-typescript-code
+            - build-frontend
+            - run-frontend-tests
+            - deploy-backend-and-infrastructure
+          filters:
+            branches:
+              only: develop
+
+  ci-checks:
+    when:
+      and:
+        - not: << pipeline.parameters.delete-services >>
+        - not: << pipeline.parameters.run-component-tests >>
+    jobs:
+      - check-format-files:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
+      - lint-typescript-code:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
+      - build-backend:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
+      - run-backend-unit-tests:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
+      - run-frontend-tests:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
+      - lint-terraform-code:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
 
   component-tests:
     when:
@@ -184,6 +336,13 @@ jobs:
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
+    parameters:
+      env:
+        type: string
+        description: "Environment name (prod or dev)"
+      tf_var_file:
+        type: string
+        description: "Path to environment-specific tfvars file"
     docker:
       - image: *terraform_docker_image
     resource_class: medium
@@ -202,7 +361,7 @@ jobs:
           name: Terraform plan
           command: |
             cd terraform
-            terraform plan -out tfapply
+            terraform plan -var-file=<< parameters.tf_var_file >> -out tfapply
       - run:
           name: Terraform apply
           command: |
@@ -218,6 +377,7 @@ jobs:
             echo "export VITE_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output
             echo "export FRONTEND_BUCKET_NAME=$(terraform output frontend_bucket_name)" >> terraform_output
             echo "export FRONTEND_BUCKET_REGION=$(terraform output aws_region)" >> terraform_output
+            echo "export CLOUDFRONT_DISTRIBUTION_ID=$(terraform output cloudfront_distribution_id)" >> terraform_output
       - persist_to_workspace:
           root: ~/project
           paths:
@@ -260,6 +420,13 @@ jobs:
           command: |
             source ~/project/terraform/terraform_output
             aws s3 sync ~/project/frontend/dist s3://$FRONTEND_BUCKET_NAME --delete --region $FRONTEND_BUCKET_REGION
+      - run:
+          name: Invalidate CloudFront cache
+          command: |
+            source ~/project/terraform/terraform_output
+            aws cloudfront create-invalidation \
+              --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
+              --paths "/*"
 
   terraform-destroy:
     docker:
