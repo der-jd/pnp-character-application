@@ -6,8 +6,13 @@ import {
   MAX_STRING_LENGTH_VERY_LONG,
   userIdSchema,
 } from "../general-schemas.js";
-import { generalInformationSchema, characterNameSchema } from "../character-schemas.js";
-import { historyRecordSchema, rulesetVersionHistoryRecordSchema, versionUpdateSchema } from "../history-schemas.js";
+import { characterNameSchema } from "../character-schemas.js";
+import {
+  generalInformationChangeSchema,
+  historyRecordSchema,
+  rulesetVersionHistoryRecordSchema,
+  versionUpdateSchema,
+} from "../history-schemas.js";
 
 export const patchGeneralInformationPathParamsSchema = z
   .object({
@@ -34,12 +39,6 @@ export const patchGeneralInformationRequestSchema = z
   .strict();
 
 export type PatchGeneralInformationRequest = z.infer<typeof patchGeneralInformationRequestSchema>;
-
-export const generalInformationChangeSchema = z
-  .object({
-    generalInformation: generalInformationSchema,
-  })
-  .strict();
 
 export const updateGeneralInformationResponseSchema = z
   .object({

@@ -12,6 +12,7 @@ import {
   rulesetVersionSchema,
   skillSchema,
   specialAbilitySchema,
+  generalInformationSchema,
 } from "./character-schemas.js";
 import {
   MAX_STRING_LENGTH_DEFAULT,
@@ -165,6 +166,12 @@ export const skillChangeSchema = z
 export const rulesetVersionChangeSchema = z
   .object({
     value: rulesetVersionSchema,
+  })
+  .strict();
+
+export const generalInformationChangeSchema = z
+  .object({
+    generalInformation: generalInformationSchema,
   })
   .strict();
 

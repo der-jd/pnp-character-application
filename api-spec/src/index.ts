@@ -73,6 +73,7 @@ export {
   skillChangeSchema,
   characterCreationSchema,
   rulesetVersionChangeSchema,
+  generalInformationChangeSchema,
   rulesetVersionHistoryRecordSchema,
   RulesetVersionHistoryRecord,
   versionUpdateSchema,
@@ -246,7 +247,6 @@ export {
   PatchGeneralInformationResponse,
   patchGeneralInformationHistoryRecordSchema,
   PatchGeneralInformationHistoryRecord,
-  generalInformationChangeSchema,
 } from "./endpoints/patch-general-information.js";
 export {
   getHistoryPathParamsSchema,
