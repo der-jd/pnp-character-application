@@ -11,7 +11,7 @@ import { ApiError } from "@/api/client";
 import { attributeKeys, baseValueKeys, advantageNameKeys, disadvantageNameKeys } from "@/i18n/mappings";
 import { attributeIcons } from "@/lib/skillIcons";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { Badge, pointsBadgeVariant } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Dialog } from "@/components/ui/Dialog";
@@ -358,6 +358,7 @@ function AttributesSection({ character }: { character: Character }) {
 
     if (currentDifference === 0) return null;
 
+    // Attribute points use a 1:1 cost model (1 point increase = 1 AP cost), unlike skills which have threshold-based costs
     const cost = Math.abs(currentDifference);
     const projectedAvailable =
       currentDifference > 0 ? attributePoints.available - cost : attributePoints.available + cost;
@@ -390,7 +391,8 @@ function AttributesSection({ character }: { character: Character }) {
       // Snapshot the previous value
       const previousCharacter = queryClient.getQueryData(["character", character.characterId]) as Character;
 
-      // Optimistically update the character data
+      // Optimistically update only for current-value increases (which consume attribute points).
+      // Mod changes don't consume points and are handled by the server response + query invalidation.
       if (data.current && data.current.increasedPoints > 0) {
         // Calculate cost (1 point per attribute point increase)
         const cost = data.current.increasedPoints;
@@ -469,19 +471,7 @@ function AttributesSection({ character }: { character: Character }) {
       {/* Attribute points summary */}
       <div className="mb-4 flex gap-4">
         <Badge
-          variant={
-            projectedPoints
-              ? projectedPoints.available < 0
-                ? "danger"
-                : projectedPoints.available === 0
-                  ? "default"
-                  : "success"
-              : attributePoints?.available && attributePoints.available < 0
-                ? "danger"
-                : attributePoints?.available === 0
-                  ? "default"
-                  : "success"
-          }
+          variant={pointsBadgeVariant(projectedPoints ? projectedPoints.available : (attributePoints?.available ?? 0))}
         >
           {projectedPoints
             ? t("pointsRemaining", projectedPoints.available)

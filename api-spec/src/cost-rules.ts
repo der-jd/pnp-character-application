@@ -6,7 +6,7 @@ export const COST_CATEGORY_COMBAT_SKILLS = CostCategory.CAT_3;
 export const MAX_COST_CATEGORY = CostCategory.CAT_4;
 export const MIN_COST_CATEGORY = CostCategory.CAT_0;
 
-export const SKILL_THRESHOLDS = [50, 75, 99999];
+export const SKILL_THRESHOLDS = [50, 75, Infinity];
 
 /**
  * +------------+-------------+-------------+-------------+

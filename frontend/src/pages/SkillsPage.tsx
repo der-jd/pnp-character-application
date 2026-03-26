@@ -20,7 +20,7 @@ import { ApiError } from "@/api/client";
 import { skillNameKeys, skillCategoryKeys, learningMethodKeys } from "@/i18n/mappings";
 import { getSkillIcon, skillCategoryIcons } from "@/lib/skillIcons";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { Badge, pointsBadgeVariant } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { FullPageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -147,21 +147,7 @@ export function SkillsPage() {
       <Card className="sticky top-0 z-10 bg-bg-primary border-border-primary shadow-sm">
         <div className="flex gap-4 flex-wrap items-center justify-between">
           <div className="flex gap-4 flex-wrap items-center">
-            <Badge
-              variant={
-                projectedAp !== null
-                  ? projectedAp < 0
-                    ? "danger"
-                    : projectedAp === 0
-                      ? "default"
-                      : "success"
-                  : ap.available < 0
-                    ? "danger"
-                    : ap.available === 0
-                      ? "default"
-                      : "success"
-              }
-            >
+            <Badge variant={pointsBadgeVariant(projectedAp !== null ? projectedAp : ap.available)}>
               {t("availableAp")}: {projectedAp !== null ? projectedAp : ap.available}
               {projectedAp !== null && projectedCost !== null && (
                 <span className="ml-1 text-xs opacity-75">(-{projectedCost})</span>

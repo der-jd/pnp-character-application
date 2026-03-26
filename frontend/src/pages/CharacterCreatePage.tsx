@@ -292,22 +292,27 @@ export function CharacterCreatePage() {
 
   function canProceedFromStep(currentStep: number): boolean {
     switch (currentStep) {
-      case 0:
+      case 0: // General
         return state.name.trim().length > 0;
-      case 1:
+      case 1: // Profession
         return (
           state.professionName.trim().length > 0 &&
           state.professionSkill.length > 0 &&
           state.hobbyName.trim().length > 0 &&
           state.hobbySkill.length > 0
         );
+      case 2: // Advantages — always valid
+        return true;
       case 3: {
+        // Attributes
         const totalUsed = Object.values(state.attributes).reduce((s, v) => s + v, 0);
         return totalUsed === ATTRIBUTE_POINTS_FOR_CREATION;
       }
-      case 5:
+      case 4: // Skills
         return state.activatedSkills.length === NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION;
-      case 6:
+      case 5: // Combat — always valid
+        return true;
+      case 6: // Adventure Points
         return state.startAdventurePoints >= 0;
       default:
         return true;

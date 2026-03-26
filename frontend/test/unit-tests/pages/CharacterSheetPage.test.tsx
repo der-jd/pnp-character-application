@@ -134,7 +134,7 @@ describe("CharacterSheetPage", () => {
     expect(screen.getByText(t("pointsTotal", 105))).toBeInTheDocument();
   });
 
-  it("shows success color when no attribute points remain", () => {
+  it("shows attribute points when none remain", () => {
     // Create a character with 0 available attribute points
     const characterWithNoPoints = {
       ...mockCharacter,
