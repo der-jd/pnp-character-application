@@ -31,7 +31,8 @@ resource "aws_iam_role_policy" "api_gateway_policy" {
           module.update_calculation_points_state_machine.state_machine_arn,
           module.apply_level_up_state_machine.state_machine_arn,
           module.update_combat_stats_state_machine.state_machine_arn,
-          module.add_special_ability_state_machine.state_machine_arn
+          module.add_special_ability_state_machine.state_machine_arn,
+          module.update_general_information_state_machine.state_machine_arn
         ]
       }
     ]
@@ -164,6 +165,38 @@ module "character_id_clone_options" {
   source      = "./modules/apigw_options_method"
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   resource_id = aws_api_gateway_resource.character_id_clone.id
+}
+
+// ================== /characters/{character-id}/general-information ==================
+
+resource "aws_api_gateway_resource" "general_information" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "general-information" // .../characters/{character-id}/general-information
+}
+
+// ================== PATCH /characters/{character-id}/general-information ==================
+
+module "general_information_patch" {
+  source        = "./modules/apigw_stepfunction_integration"
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id   = aws_api_gateway_resource.general_information.id
+  http_method   = "PATCH"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  aws_region        = data.aws_region.current.region
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = module.update_general_information_state_machine.state_machine_arn
+}
+
+// ================== OPTIONS /characters/{character-id}/general-information ==================
+
+module "general_information_options" {
+  source      = "./modules/apigw_options_method"
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id = aws_api_gateway_resource.general_information.id
 }
 
 // ================== /characters/{character-id}/attributes ==================
@@ -587,6 +620,8 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     module.record_id_options,
     module.combat_skill_name_patch,
     module.combat_skill_name_options,
+    module.general_information_patch,
+    module.general_information_options,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id

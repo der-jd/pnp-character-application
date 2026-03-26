@@ -18,6 +18,7 @@ import {
   CombatSection,
   baseValueChangeSchema,
   levelUpChangeSchema,
+  generalInformationChangeSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -40,6 +41,7 @@ import {
   getSkillCategoryAndName,
   getCombatCategory,
   setLevelUp,
+  updateGeneralInformation,
   createLogger,
   sanitizeEvent,
 } from "core";
@@ -277,6 +279,12 @@ async function revertChange(userId: string, characterId: string, record: History
         await updateCombatStats(userId, characterId, combatCategory, combatSkillName, oldCombatStats);
         await updateAttributePointsIfExists(userId, characterId, record.calculationPoints.attributePoints?.old);
         await updateAdventurePointsIfExists(userId, characterId, record.calculationPoints.adventurePoints?.old);
+        break;
+      }
+
+      case HistoryRecordType.GENERAL_INFORMATION_CHANGED: {
+        const oldData = generalInformationChangeSchema.parse(record.data.old);
+        await updateGeneralInformation(userId, characterId, oldData.generalInformation);
         break;
       }
 

@@ -78,6 +78,27 @@ module "update_attribute_state_machine" {
   version_update_history_record_condition = "{% $exists($parse($mainOperationResult).versionUpdate) %}"
 }
 
+module "update_general_information_state_machine" {
+  source = "./modules/step_function_state_machine"
+
+  state_machine_name = "update-general-information"
+  role_arn           = aws_iam_role.step_function_role.arn
+  main_lambda_arn    = module.update_general_information_lambda.lambda_function.arn
+  history_lambda_arn = module.add_history_record_lambda.lambda_function.arn
+
+  main_state_name = "UpdateGeneralInformation"
+
+  main_operation_history_record_condition = "{% $parse($mainOperationResult).changes.old != $parse($mainOperationResult).changes.new %}"
+  main_operation_history_record_request = {
+    userId_expression = "{% $parse($mainOperationResult).userId %}"
+    type              = "9" // GENERAL_INFORMATION_CHANGED
+    name_expression   = "General Information"
+    data_expression   = "{% $parse($mainOperationResult).changes %}"
+  }
+
+  version_update_history_record_condition = "{% $exists($parse($mainOperationResult).versionUpdate) %}"
+}
+
 module "update_base_value_state_machine" {
   source = "./modules/step_function_state_machine"
 

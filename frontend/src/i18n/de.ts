@@ -331,6 +331,7 @@ const de = {
   historyTypeSkill: "Talent geändert",
   historyTypeCombatStats: "Kampfwerte geändert",
   historyTypeRulesetVersion: "Regelwerk-Version aktualisiert",
+  historyTypeGeneralInformation: "Allgemeine Informationen geändert",
   historyColumnNumber: "#",
   historyColumnType: "Typ",
   historyColumnName: "Name",

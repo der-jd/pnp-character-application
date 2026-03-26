@@ -190,6 +190,7 @@ export const historyRecordTypeKeys: Record<number, TranslationKey> = {
   [HistoryRecordType.SKILL_CHANGED]: "historyTypeSkill",
   [HistoryRecordType.COMBAT_STATS_CHANGED]: "historyTypeCombatStats",
   [HistoryRecordType.RULESET_VERSION_UPDATED]: "historyTypeRulesetVersion",
+  [HistoryRecordType.GENERAL_INFORMATION_CHANGED]: "historyTypeGeneralInformation",
 };
 
 export const levelUpEffectKeys: Record<string, TranslationKey> = {

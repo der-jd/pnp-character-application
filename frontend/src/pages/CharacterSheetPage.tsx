@@ -3,10 +3,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useEditableField } from "@/hooks/useEditableField";
-import type { Character, Attribute, BaseValue } from "api-spec";
+import type { Character, Attribute, BaseValue, GeneralInformation, PatchGeneralInformationRequest } from "api-spec";
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
-import { updateAttribute, updateBaseValue, updateCalculationPoints, addSpecialAbility } from "@/api/character-edit";
+import {
+  updateAttribute,
+  updateBaseValue,
+  updateCalculationPoints,
+  addSpecialAbility,
+  updateGeneralInformation,
+} from "@/api/character-edit";
 import { ApiError } from "@/api/client";
 import { attributeKeys, baseValueKeys, advantageNameKeys, disadvantageNameKeys } from "@/i18n/mappings";
 import { attributeIcons } from "@/lib/skillIcons";
@@ -64,29 +70,7 @@ export function CharacterSheetPage() {
       </div>
 
       {/* General Information */}
-      <Card title={t("generalInformation")}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-          <InfoField label={t("profession")} value={gi.profession.name} />
-          <InfoField label={t("hobby")} value={gi.hobby.name} />
-          <InfoField label={t("birthday")} value={gi.birthday} />
-          <InfoField label={t("birthplace")} value={gi.birthplace} />
-          <InfoField label={t("size")} value={gi.size} />
-          <InfoField label={t("weight")} value={gi.weight} />
-          <InfoField label={t("hairColor")} value={gi.hairColor} />
-          <InfoField label={t("eyeColor")} value={gi.eyeColor} />
-          <InfoField label={t("residence")} value={gi.residence} />
-          {gi.appearance && (
-            <div className="col-span-3">
-              <InfoField label={t("appearance")} value={gi.appearance} />
-            </div>
-          )}
-          {gi.specialCharacteristics && (
-            <div className="col-span-3">
-              <InfoField label={t("specialCharacteristics")} value={gi.specialCharacteristics} />
-            </div>
-          )}
-        </div>
-      </Card>
+      <GeneralInformationSection characterId={characterId!} generalInformation={gi} />
 
       {/* Calculation Points */}
       <CalculationPointsSection character={character} />
@@ -141,12 +125,230 @@ export function CharacterSheetPage() {
   );
 }
 
-function InfoField({ label, value }: { label: string; value: string }) {
+function InfoField({
+  label,
+  value,
+  editing,
+  onChange,
+  multiline,
+}: {
+  label: string;
+  value: string;
+  editing?: boolean;
+  onChange?: (value: string) => void;
+  multiline?: boolean;
+}) {
+  if (editing && onChange) {
+    return (
+      <div>
+        <p className="text-text-muted text-xs mb-1">{label}</p>
+        {multiline ? (
+          <textarea
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            rows={3}
+            className="w-full rounded border border-border-primary bg-bg-tertiary px-2 py-1 text-sm"
+          />
+        ) : (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="w-full rounded border border-border-primary bg-bg-tertiary px-2 py-1 text-sm"
+          />
+        )}
+      </div>
+    );
+  }
   return (
     <div>
       <p className="text-text-muted text-xs">{label}</p>
       <p className="text-text-primary">{value || "—"}</p>
     </div>
+  );
+}
+
+function GeneralInformationSection({
+  characterId,
+  generalInformation,
+}: {
+  characterId: string;
+  generalInformation: GeneralInformation;
+}) {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const gi = generalInformation;
+
+  const [editing, setEditing] = useState(false);
+  const [editValues, setEditValues] = useState({
+    name: gi.name,
+    sex: gi.sex,
+    birthday: gi.birthday,
+    birthplace: gi.birthplace,
+    size: gi.size,
+    weight: gi.weight,
+    hairColor: gi.hairColor,
+    eyeColor: gi.eyeColor,
+    residence: gi.residence,
+    appearance: gi.appearance,
+    specialCharacteristics: gi.specialCharacteristics,
+  });
+
+  function startEditing() {
+    setEditValues({
+      name: gi.name,
+      sex: gi.sex,
+      birthday: gi.birthday,
+      birthplace: gi.birthplace,
+      size: gi.size,
+      weight: gi.weight,
+      hairColor: gi.hairColor,
+      eyeColor: gi.eyeColor,
+      residence: gi.residence,
+      appearance: gi.appearance,
+      specialCharacteristics: gi.specialCharacteristics,
+    });
+    setEditing(true);
+  }
+
+  const mutation = useMutation({
+    mutationFn: (data: PatchGeneralInformationRequest) => updateGeneralInformation(characterId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["character", characterId] });
+      queryClient.invalidateQueries({ queryKey: ["characters"] });
+      toast("success", t("toastSaveSuccess"));
+      setEditing(false);
+    },
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        toast("error", error.message);
+      } else {
+        toast("error", t("toastSaveError"));
+      }
+    },
+  });
+
+  function saveEdit() {
+    const data: PatchGeneralInformationRequest = {};
+    if (editValues.name !== gi.name) data.name = editValues.name;
+    if (editValues.sex !== gi.sex) data.sex = editValues.sex;
+    if (editValues.birthday !== gi.birthday) data.birthday = editValues.birthday;
+    if (editValues.birthplace !== gi.birthplace) data.birthplace = editValues.birthplace;
+    if (editValues.size !== gi.size) data.size = editValues.size;
+    if (editValues.weight !== gi.weight) data.weight = editValues.weight;
+    if (editValues.hairColor !== gi.hairColor) data.hairColor = editValues.hairColor;
+    if (editValues.eyeColor !== gi.eyeColor) data.eyeColor = editValues.eyeColor;
+    if (editValues.residence !== gi.residence) data.residence = editValues.residence;
+    if (editValues.appearance !== gi.appearance) data.appearance = editValues.appearance;
+    if (editValues.specialCharacteristics !== gi.specialCharacteristics)
+      data.specialCharacteristics = editValues.specialCharacteristics;
+
+    if (Object.keys(data).length === 0) {
+      setEditing(false);
+      return;
+    }
+    mutation.mutate(data);
+  }
+
+  const set = (field: keyof typeof editValues, value: string) => setEditValues((v) => ({ ...v, [field]: value }));
+
+  return (
+    <Card
+      title={t("generalInformation")}
+      actions={
+        editing ? (
+          <>
+            <Button variant="secondary" size="sm" onClick={() => setEditing(false)}>
+              {t("cancel")}
+            </Button>
+            <Button size="sm" onClick={saveEdit} loading={mutation.isPending}>
+              {t("save")}
+            </Button>
+          </>
+        ) : (
+          <Button variant="ghost" size="sm" onClick={startEditing}>
+            {t("edit")}
+          </Button>
+        )
+      }
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+        <InfoField
+          label={t("characterName")}
+          value={editing ? editValues.name : gi.name}
+          editing={editing}
+          onChange={(v) => set("name", v)}
+        />
+        <InfoField
+          label={t("sex")}
+          value={editing ? editValues.sex : gi.sex}
+          editing={editing}
+          onChange={(v) => set("sex", v)}
+        />
+        <InfoField label={t("profession")} value={gi.profession.name} />
+        <InfoField label={t("hobby")} value={gi.hobby.name} />
+        <InfoField
+          label={t("birthday")}
+          value={editing ? editValues.birthday : gi.birthday}
+          editing={editing}
+          onChange={(v) => set("birthday", v)}
+        />
+        <InfoField
+          label={t("birthplace")}
+          value={editing ? editValues.birthplace : gi.birthplace}
+          editing={editing}
+          onChange={(v) => set("birthplace", v)}
+        />
+        <InfoField
+          label={t("size")}
+          value={editing ? editValues.size : gi.size}
+          editing={editing}
+          onChange={(v) => set("size", v)}
+        />
+        <InfoField
+          label={t("weight")}
+          value={editing ? editValues.weight : gi.weight}
+          editing={editing}
+          onChange={(v) => set("weight", v)}
+        />
+        <InfoField
+          label={t("hairColor")}
+          value={editing ? editValues.hairColor : gi.hairColor}
+          editing={editing}
+          onChange={(v) => set("hairColor", v)}
+        />
+        <InfoField
+          label={t("eyeColor")}
+          value={editing ? editValues.eyeColor : gi.eyeColor}
+          editing={editing}
+          onChange={(v) => set("eyeColor", v)}
+        />
+        <InfoField
+          label={t("residence")}
+          value={editing ? editValues.residence : gi.residence}
+          editing={editing}
+          onChange={(v) => set("residence", v)}
+        />
+        <div className="sm:col-span-2 lg:col-span-3">
+          <InfoField
+            label={t("appearance")}
+            value={editing ? editValues.appearance : gi.appearance}
+            editing={editing}
+            onChange={(v) => set("appearance", v)}
+            multiline
+          />
+        </div>
+        <div className="sm:col-span-2 lg:col-span-3">
+          <InfoField
+            label={t("specialCharacteristics")}
+            value={editing ? editValues.specialCharacteristics : gi.specialCharacteristics}
+            editing={editing}
+            onChange={(v) => set("specialCharacteristics", v)}
+            multiline
+          />
+        </div>
+      </div>
+    </Card>
   );
 }
 

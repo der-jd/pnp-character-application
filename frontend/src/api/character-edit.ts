@@ -5,6 +5,7 @@ import {
   patchCombatStatsResponseSchema,
   patchCalculationPointsResponseSchema,
   postSpecialAbilitiesResponseSchema,
+  patchGeneralInformationResponseSchema,
   getSkillResponseSchema,
   type PatchAttributeRequest,
   type PatchAttributeResponse,
@@ -17,6 +18,8 @@ import {
   type PatchCalculationPointsRequest,
   type PatchCalculationPointsResponse,
   type PostSpecialAbilitiesResponse,
+  type PatchGeneralInformationRequest,
+  type PatchGeneralInformationResponse,
   type GetSkillResponse,
   type LearningMethodString,
 } from "api-spec";
@@ -81,4 +84,11 @@ export function updateCalculationPoints(
 
 export function addSpecialAbility(characterId: string, specialAbility: string): Promise<PostSpecialAbilitiesResponse> {
   return post(`/characters/${characterId}/special-abilities`, postSpecialAbilitiesResponseSchema, { specialAbility });
+}
+
+export function updateGeneralInformation(
+  characterId: string,
+  data: PatchGeneralInformationRequest,
+): Promise<PatchGeneralInformationResponse> {
+  return patch(`/characters/${characterId}/general-information`, patchGeneralInformationResponseSchema, data);
 }

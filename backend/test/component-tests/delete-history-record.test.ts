@@ -9,6 +9,7 @@ import {
   patchSkillResponseSchema,
   patchCombatStatsResponseSchema,
   postSpecialAbilitiesResponseSchema,
+  patchGeneralInformationResponseSchema,
   LEVEL_UP_DICE_EXPRESSION,
   BaseValues,
   Attributes,
@@ -373,6 +374,31 @@ describe.sequential("delete-history-record component tests", () => {
       expect(updateResponse.historyRecord).toBeDefined();
 
       // Revert the special ability addition
+      deleteHistoryRecordResponseSchema.parse(
+        await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`),
+      );
+    });
+
+    test("Delete history record for changed general information", async () => {
+      const character = context.character;
+      const client = context.apiClient;
+
+      // Patch general information
+      const updateResponse = patchGeneralInformationResponseSchema.parse(
+        await client.patch(`characters/${character.characterId}/general-information`, {
+          name: "Reverted Name Test",
+          birthplace: "Reverted Birthplace",
+          eyeColor: "Brown",
+        }),
+      );
+
+      // Check if the character has been actually updated
+      expect(updateResponse.data.changes.new.generalInformation.name).not.toBe(
+        character.characterSheet.generalInformation.name,
+      );
+      expect(updateResponse.historyRecord).toBeDefined();
+
+      // Revert the general information update
       deleteHistoryRecordResponseSchema.parse(
         await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`),
       );
