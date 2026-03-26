@@ -183,8 +183,6 @@ function GeneralInformationSection({
   const [editValues, setEditValues] = useState({
     name: gi.name,
     sex: gi.sex,
-    profession: { ...gi.profession },
-    hobby: { ...gi.hobby },
     birthday: gi.birthday,
     birthplace: gi.birthplace,
     size: gi.size,
@@ -200,8 +198,6 @@ function GeneralInformationSection({
     setEditValues({
       name: gi.name,
       sex: gi.sex,
-      profession: { ...gi.profession },
-      hobby: { ...gi.hobby },
       birthday: gi.birthday,
       birthplace: gi.birthplace,
       size: gi.size,
@@ -235,10 +231,6 @@ function GeneralInformationSection({
     const data: PatchGeneralInformationRequest = {};
     if (editValues.name !== gi.name) data.name = editValues.name;
     if (editValues.sex !== gi.sex) data.sex = editValues.sex;
-    if (editValues.profession.name !== gi.profession.name || editValues.profession.skill !== gi.profession.skill)
-      data.profession = editValues.profession;
-    if (editValues.hobby.name !== gi.hobby.name || editValues.hobby.skill !== gi.hobby.skill)
-      data.hobby = editValues.hobby;
     if (editValues.birthday !== gi.birthday) data.birthday = editValues.birthday;
     if (editValues.birthplace !== gi.birthplace) data.birthplace = editValues.birthplace;
     if (editValues.size !== gi.size) data.size = editValues.size;
@@ -292,18 +284,8 @@ function GeneralInformationSection({
           editing={editing}
           onChange={(v) => set("sex", v)}
         />
-        <InfoField
-          label={t("profession")}
-          value={editing ? editValues.profession.name : gi.profession.name}
-          editing={editing}
-          onChange={(v) => setEditValues((prev) => ({ ...prev, profession: { ...prev.profession, name: v } }))}
-        />
-        <InfoField
-          label={t("hobby")}
-          value={editing ? editValues.hobby.name : gi.hobby.name}
-          editing={editing}
-          onChange={(v) => setEditValues((prev) => ({ ...prev, hobby: { ...prev.hobby, name: v } }))}
-        />
+        <InfoField label={t("profession")} value={gi.profession.name} />
+        <InfoField label={t("hobby")} value={gi.hobby.name} />
         <InfoField
           label={t("birthday")}
           value={editing ? editValues.birthday : gi.birthday}

@@ -206,35 +206,6 @@ describe("Valid requests", () => {
     );
   });
 
-  test("Update profession and hobby", async () => {
-    mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
-
-    const result = await _updateGeneralInformation({
-      headers: fakeHeaders,
-      pathParameters: {
-        "character-id": fakeCharacterId,
-      },
-      queryStringParameters: null,
-      body: {
-        profession: { name: "Mage", skill: "magic/fireball" },
-        hobby: { name: "Alchemy", skill: "crafting/alchemy" },
-      },
-    });
-
-    expect(result.statusCode).toBe(200);
-
-    const parsedBody = updateGeneralInformationResponseSchema.parse(JSON.parse(result.body));
-
-    expect(parsedBody.changes.new.generalInformation.profession).toStrictEqual({
-      name: "Mage",
-      skill: "magic/fireball",
-    });
-    expect(parsedBody.changes.new.generalInformation.hobby).toStrictEqual({
-      name: "Alchemy",
-      skill: "crafting/alchemy",
-    });
-  });
-
   test("Idempotent request - sending same values as current", async () => {
     mockDynamoDBGetCharacterResponse(fakeCharacterResponse);
 

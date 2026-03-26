@@ -245,28 +245,5 @@ describe.sequential("patch-general-information component tests", () => {
 
       expect(response.historyRecord).not.toBeNull();
     });
-
-    test("update profession and hobby", async () => {
-      const character = context.character;
-
-      const response = patchGeneralInformationResponseSchema.parse(
-        await context.apiClient.patch(`characters/${character.characterId}/general-information`, {
-          profession: { name: "Mage", skill: "magic/fireball" },
-          hobby: { name: "Alchemy", skill: "crafting/alchemy" },
-        }),
-      );
-      currentResponse = response;
-
-      expect(response.data.changes.new.generalInformation.profession).toStrictEqual({
-        name: "Mage",
-        skill: "magic/fireball",
-      });
-      expect(response.data.changes.new.generalInformation.hobby).toStrictEqual({
-        name: "Alchemy",
-        skill: "crafting/alchemy",
-      });
-
-      expect(response.historyRecord).not.toBeNull();
-    });
   });
 });

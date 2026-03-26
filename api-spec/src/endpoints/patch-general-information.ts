@@ -6,7 +6,7 @@ import {
   MAX_STRING_LENGTH_VERY_LONG,
   userIdSchema,
 } from "../general-schemas.js";
-import { professionHobbySchema, generalInformationSchema, characterNameSchema } from "../character-schemas.js";
+import { generalInformationSchema, characterNameSchema } from "../character-schemas.js";
 import { historyRecordSchema, rulesetVersionHistoryRecordSchema, versionUpdateSchema } from "../history-schemas.js";
 
 export const patchGeneralInformationPathParamsSchema = z
@@ -21,8 +21,6 @@ export const patchGeneralInformationRequestSchema = z
   .object({
     name: characterNameSchema.optional(),
     sex: z.string().max(MAX_STRING_LENGTH_SHORT).optional(),
-    profession: professionHobbySchema.optional(),
-    hobby: professionHobbySchema.optional(),
     birthday: z.string().max(MAX_STRING_LENGTH_DEFAULT).optional(),
     birthplace: z.string().max(MAX_STRING_LENGTH_DEFAULT).optional(),
     size: z.string().max(MAX_STRING_LENGTH_DEFAULT).optional(),
