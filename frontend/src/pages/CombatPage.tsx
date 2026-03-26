@@ -144,66 +144,94 @@ function CombatTable({
           </tr>
         </thead>
         <tbody>
-          {Object.entries(stats).map(([name, cs]) => (
-            <tr key={name} className="border-b border-border-primary/50 hover:bg-bg-hover/30">
-              <td className="py-2 pr-4 font-medium">{t(skillNameKeys[name]!)}</td>
-              <td className={clsx("text-center py-2 px-2 font-mono", cs.availablePoints === 0 && "opacity-40")}>
-                {cs.availablePoints}/
-                {cs.handling +
-                  character.characterSheet.skills.combat[name as keyof typeof character.characterSheet.skills.combat]
-                    .current +
-                  character.characterSheet.skills.combat[name as keyof typeof character.characterSheet.skills.combat]
-                    .mod}
-              </td>
-              <td className="text-center py-2 px-2 font-mono">{cs.handling}</td>
-              <td className="text-center py-2 px-2">
-                {editing === name ? (
-                  <input
-                    type="number"
-                    value={editValues.skilledAttack}
-                    onChange={(e) => setEditValues((v) => ({ ...v, skilledAttack: Number(e.target.value) }))}
-                    className="w-14 rounded border border-border-primary bg-bg-tertiary px-1 py-0.5 text-center text-sm font-mono"
-                  />
-                ) : (
-                  <span className="font-mono">{cs.skilledAttackValue}</span>
+          {Object.entries(stats).map(([name, cs]) => {
+            const totalPoints =
+              cs.handling +
+              character.characterSheet.skills.combat[name as keyof typeof character.characterSheet.skills.combat]
+                .current +
+              character.characterSheet.skills.combat[name as keyof typeof character.characterSheet.skills.combat].mod;
+            const projectedAvailable =
+              editing === name
+                ? cs.availablePoints -
+                  (editValues.skilledAttack - cs.skilledAttackValue) -
+                  (editValues.skilledParade - cs.skilledParadeValue)
+                : cs.availablePoints;
+
+            return (
+              <tr key={name} className="border-b border-border-primary/50 hover:bg-bg-hover/30">
+                <td className="py-2 pr-4 font-medium">{t(skillNameKeys[name]!)}</td>
+                <td
+                  className={clsx(
+                    "text-center py-2 px-2 font-mono",
+                    projectedAvailable > 0 && "text-accent-success",
+                    projectedAvailable === 0 && "opacity-40",
+                    projectedAvailable < 0 && "text-accent-danger",
+                  )}
+                >
+                  {projectedAvailable}/{totalPoints}
+                </td>
+                <td className="text-center py-2 px-2 font-mono">{cs.handling}</td>
+                <td className="text-center py-2 px-2">
+                  {editing === name ? (
+                    <input
+                      type="number"
+                      min={cs.skilledAttackValue}
+                      value={editValues.skilledAttack}
+                      onChange={(e) =>
+                        setEditValues((v) => ({
+                          ...v,
+                          skilledAttack: Math.max(cs.skilledAttackValue, Number(e.target.value)),
+                        }))
+                      }
+                      className="w-14 rounded border border-border-primary bg-bg-tertiary px-1 py-0.5 text-center text-sm font-mono"
+                    />
+                  ) : (
+                    <span className="font-mono">{cs.skilledAttackValue}</span>
+                  )}
+                </td>
+                <td className="text-center py-2 px-2 font-mono">{cs.attackValue}</td>
+                {category === "melee" && (
+                  <>
+                    <td className="text-center py-2 px-2">
+                      {editing === name ? (
+                        <input
+                          type="number"
+                          min={cs.skilledParadeValue}
+                          value={editValues.skilledParade}
+                          onChange={(e) =>
+                            setEditValues((v) => ({
+                              ...v,
+                              skilledParade: Math.max(cs.skilledParadeValue, Number(e.target.value)),
+                            }))
+                          }
+                          className="w-14 rounded border border-border-primary bg-bg-tertiary px-1 py-0.5 text-center text-sm font-mono"
+                        />
+                      ) : (
+                        <span className="font-mono">{cs.skilledParadeValue}</span>
+                      )}
+                    </td>
+                    <td className="text-center py-2 px-2 font-mono">{cs.paradeValue}</td>
+                  </>
                 )}
-              </td>
-              <td className="text-center py-2 px-2 font-mono">{cs.attackValue}</td>
-              {category === "melee" && (
-                <>
-                  <td className="text-center py-2 px-2">
-                    {editing === name ? (
-                      <input
-                        type="number"
-                        value={editValues.skilledParade}
-                        onChange={(e) => setEditValues((v) => ({ ...v, skilledParade: Number(e.target.value) }))}
-                        className="w-14 rounded border border-border-primary bg-bg-tertiary px-1 py-0.5 text-center text-sm font-mono"
-                      />
-                    ) : (
-                      <span className="font-mono">{cs.skilledParadeValue}</span>
-                    )}
-                  </td>
-                  <td className="text-center py-2 px-2 font-mono">{cs.paradeValue}</td>
-                </>
-              )}
-              <td className="py-2 text-right">
-                {editing === name ? (
-                  <div className="flex gap-1 justify-end">
-                    <Button variant="ghost" size="sm" onClick={() => setEditing(null)}>
-                      {t("cancel")}
+                <td className="py-2 text-right">
+                  {editing === name ? (
+                    <div className="flex gap-1 justify-end">
+                      <Button variant="ghost" size="sm" onClick={() => setEditing(null)}>
+                        {t("cancel")}
+                      </Button>
+                      <Button size="sm" onClick={() => mutation.mutate({ name })} loading={mutation.isPending}>
+                        {t("save")}
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button variant="ghost" size="sm" onClick={() => startEdit(name, cs)}>
+                      {t("edit")}
                     </Button>
-                    <Button size="sm" onClick={() => mutation.mutate({ name })} loading={mutation.isPending}>
-                      {t("save")}
-                    </Button>
-                  </div>
-                ) : (
-                  <Button variant="ghost" size="sm" onClick={() => startEdit(name, cs)}>
-                    {t("edit")}
-                  </Button>
-                )}
-              </td>
-            </tr>
-          ))}
+                  )}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
