@@ -1388,6 +1388,41 @@ describe("Valid requests", () => {
       },
       expectedStatusCode: 200,
     },
+    {
+      name: "Add history record for 'general information changed' to existing block",
+      request: {
+        headers: {},
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {
+          userId: fakeUserId,
+          type: HistoryRecordType.GENERAL_INFORMATION_CHANGED,
+          name: "General Information",
+          data: {
+            old: {
+              generalInformation: fakeCharacter.characterSheet.generalInformation,
+            },
+            new: {
+              generalInformation: {
+                ...fakeCharacter.characterSheet.generalInformation,
+                name: "Updated Name",
+                birthplace: "Updated Birthplace",
+                eyeColor: "Green",
+              },
+            },
+          },
+          learningMethod: null,
+          calculationPoints: {
+            adventurePoints: null,
+            attributePoints: null,
+          },
+          comment: null,
+        },
+      },
+      expectedStatusCode: 200,
+    },
   ];
 
   testCasesForExistingHistoryBlock.forEach((_case) => {
