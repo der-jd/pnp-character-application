@@ -8,10 +8,10 @@ import {
   headersSchema,
   SkillName,
   SkillCategory,
-} from "api-spec";
-import {
   adjustCostCategory,
   getSkillIncreaseCost,
+} from "api-spec";
+import {
   getSkill,
   parseLearningMethod,
   Request,

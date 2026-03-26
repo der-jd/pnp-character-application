@@ -56,7 +56,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "API Requests"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Sum"
           period = 300
           metrics = [
@@ -72,7 +72,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "API Errors"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Sum"
           period = 300
           metrics = [
@@ -89,7 +89,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "API Latency"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           period = 300
           metrics = [
             ["AWS/ApiGateway", "Latency", "ApiName", aws_api_gateway_rest_api.pnp_rest_api.name, { stat = "p99", label = "p99" }],
@@ -118,7 +118,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "Lambda Invocations"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Sum"
           period = 300
           metrics = [for fn in local.lambda_functions :
@@ -134,7 +134,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "Lambda Errors"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Sum"
           period = 300
           metrics = [for fn in local.lambda_functions :
@@ -150,7 +150,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "Lambda Duration (Average)"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Average"
           period = 300
           metrics = [for fn in local.lambda_functions :
@@ -166,7 +166,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "Lambda Throttles"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Sum"
           period = 300
           metrics = [for fn in local.lambda_functions :
@@ -182,7 +182,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "Lambda Concurrent Executions"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Maximum"
           period = 300
           metrics = [for fn in local.lambda_functions :
@@ -210,7 +210,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "Executions Started"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Sum"
           period = 300
           metrics = [for arn in local.state_machine_arns :
@@ -226,7 +226,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "Executions Failed"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Sum"
           period = 300
           metrics = [for arn in local.state_machine_arns :
@@ -242,7 +242,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "Execution Time (Average)"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Average"
           period = 300
           metrics = [for arn in local.state_machine_arns :
@@ -270,7 +270,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "Characters Table - Read/Write Capacity"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           period = 300
           metrics = [
             ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", aws_dynamodb_table.characters.name, { stat = "Sum", label = "Read Units" }],
@@ -286,7 +286,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "History Table - Read/Write Capacity"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           period = 300
           metrics = [
             ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", aws_dynamodb_table.characters_history.name, { stat = "Sum", label = "Read Units" }],
@@ -302,7 +302,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "Characters Table - Latency"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           period = 300
           metrics = [
             ["AWS/DynamoDB", "SuccessfulRequestLatency", "TableName", aws_dynamodb_table.characters.name, "Operation", "GetItem", { stat = "Average", label = "GetItem" }],
@@ -320,7 +320,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "History Table - Latency"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           period = 300
           metrics = [
             ["AWS/DynamoDB", "SuccessfulRequestLatency", "TableName", aws_dynamodb_table.characters_history.name, "Operation", "GetItem", { stat = "Average", label = "GetItem" }],
@@ -337,7 +337,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "DynamoDB Errors"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Sum"
           period = 300
           metrics = [
@@ -356,7 +356,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         height = 6
         properties = {
           title  = "DynamoDB Throttled Requests"
-          region = data.aws_region.current.name
+          region = data.aws_region.current.region
           stat   = "Sum"
           period = 300
           metrics = [

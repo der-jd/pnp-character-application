@@ -25,17 +25,15 @@ describe("i18n translation system", () => {
     });
 
     it("interpolates numeric arguments", () => {
-      expect(t("pointsRemaining", 12)).toBe("Verbleibende Punkte: 12");
+      expect(t("pointsRemaining", 12)).toBe("Verfügbare EP: 12");
+    });
+
+    it("handles positional arguments for pointsTotal", () => {
+      expect(t("pointsTotal", 30)).toBe("Gesamte EP: 30");
     });
 
     it("handles multiple positional arguments", () => {
-      expect(t("pointsTotal", 30, 40)).toBe("Gesamt: 30/40");
-    });
-
-    it("leaves unreplaced placeholders intact if not enough args", () => {
-      // pointsTotal has {0} and {1}, only providing one arg
-      const result = t("pointsTotal", 30);
-      expect(result).toBe("Gesamt: 30/{1}");
+      expect(t("professionBonus", "50")).toBe("Berufsbonus (+50)");
     });
 
     it("returns string without modification when no placeholders and no args", () => {

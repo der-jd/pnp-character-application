@@ -19,6 +19,7 @@ import {
   MAX_ATTRIBUTE_VALUE_FOR_CREATION,
   MAX_INITIAL_COMBAT_SKILL_VALUE,
   MIN_INITIAL_COMBAT_SKILL_VALUE,
+  DEFAULT_START_ADVENTURE_POINTS,
   CombatSection,
 } from "api-spec";
 import { commonInvalidTestCases, expectApiError } from "./shared.js";
@@ -94,6 +95,7 @@ const characterCreationRequest: PostCharactersRequest = {
     firearmComplex: 1,
     heavyWeapons: 1,
   },
+  startAdventurePoints: DEFAULT_START_ADVENTURE_POINTS,
 };
 
 describe.sequential("post-character component tests", () => {
@@ -516,9 +518,15 @@ describe.sequential("post-character component tests", () => {
         ATTRIBUTE_POINTS_FOR_CREATION,
       );
 
-      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.start).toBe(0);
-      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.available).toBe(0);
-      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.total).toBe(0);
+      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.start).toBe(
+        DEFAULT_START_ADVENTURE_POINTS,
+      );
+      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.available).toBe(
+        DEFAULT_START_ADVENTURE_POINTS,
+      );
+      expect(createdCharacter.characterSheet.calculationPoints.adventurePoints.total).toBe(
+        DEFAULT_START_ADVENTURE_POINTS,
+      );
 
       // Check special abilities
       expect(createdCharacter.characterSheet.specialAbilities).toStrictEqual([]);

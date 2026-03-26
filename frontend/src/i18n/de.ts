@@ -68,9 +68,16 @@ const de = {
   wizardStepAttributes: "Eigenschaften",
   wizardStepSkills: "Talente aktivieren",
   wizardStepCombat: "Kampfwerte",
+  wizardStepAdventurePoints: "Abenteuerpunkte",
+  wizardCombatDescription:
+    "Für jedes Kampftalent muss die initiale Begabung gewürfelt werden. Werte können manuell eingetragen oder zufällige Werte generiert werden.",
+  wizardCombatRandomFill: "Zufällige Werte generieren",
+  wizardAdventurePointsDescription: "Gib die Start-Abenteuerpunkte für deinen Charakter an.",
   wizardStepReview: "Zusammenfassung",
   wizardErrorNameRequired: "Bitte gib einen Charakternamen ein.",
+  wizardErrorProfessionNameRequired: "Bitte gib einen Berufsnamen ein.",
   wizardErrorProfessionSkillRequired: "Bitte wähle ein Talent für den Beruf aus.",
+  wizardErrorHobbyNameRequired: "Bitte gib einen Hobby-Namen ein.",
   wizardErrorHobbySkillRequired: "Bitte wähle ein Talent für das Hobby aus.",
 
   // General Information
@@ -116,8 +123,8 @@ const de = {
   dexterity: "Geschicklichkeit",
   endurance: "Ausdauer",
   strength: "Kraft",
-  pointsRemaining: "Verbleibende Punkte: {0}",
-  pointsTotal: "Gesamt: {0}/{1}",
+  pointsRemaining: "Verfügbare EP: {0}",
+  pointsTotal: "Gesamte EP: {0}",
   attributeMin: "Min: {0}",
   attributeMax: "Max: {0}",
 
@@ -127,10 +134,14 @@ const de = {
   adventurePoints: "Abenteuerpunkte (AP)",
   attributePoints: "Eigenschaftspunkte (EP)",
   start: "Start",
+  startAdventurePoints: "Start-Abenteuerpunkte",
+  defaultAdventurePoints: "Standard-Abenteuerpunkte",
   current: "Aktuell",
   mod: "Mod",
   total: "Gesamt",
   available: "Verfügbar",
+  availableAp: "Verfügbare AP",
+  totalAp: "Gesamte AP",
   totalCostAdventurePoints: "Gesamtkosten (AP)",
   totalCostAttributePoints: "Gesamtkosten (EP)",
   specialAbilities: "Sonderfertigkeiten",
@@ -170,6 +181,8 @@ const de = {
   learningMethodNormal: "Normal",
   learningMethodExpensive: "Teuer",
   increaseCost: "Steigerungskosten",
+  nextPointCost: "AP/Pkt.",
+  activationCostColumn: "Aktivierungskosten",
   selectLearningMethod: "Lernmethode wählen",
 
   // Skill names
@@ -259,9 +272,9 @@ const de = {
   availablePoints: "Verfügbare Punkte",
   handling: "Handhabung",
   attackValue: "Angriffswert",
-  skilledAttackValue: "Gesamter Angriffswert",
+  skilledAttackValue: "Verteilte Punkte auf Angriff",
   paradeValue: "Paradewert",
-  skilledParadeValue: "Gesamter Paradewert",
+  skilledParadeValue: "Verteilte Punkte auf Parade",
 
   // Level Up
   levelUp: "Level Up",

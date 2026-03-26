@@ -17,6 +17,13 @@ interface BadgeProps {
   className?: string;
 }
 
+/** Maps available points to a badge variant: green (>0), gray (0), red (<0). */
+export function pointsBadgeVariant(available: number): BadgeVariant {
+  if (available > 0) return "success";
+  if (available === 0) return "default";
+  return "danger";
+}
+
 export function Badge({ children, variant = "default", className }: BadgeProps) {
   return (
     <span

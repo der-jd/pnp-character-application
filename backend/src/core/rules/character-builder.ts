@@ -37,13 +37,11 @@ import {
   CombatSkillName,
   CombatSkillsStartValues,
   CombatSection,
-} from "api-spec";
-import {
   COST_CATEGORY_COMBAT_SKILLS,
   COST_CATEGORY_DEFAULT,
   MAX_COST_CATEGORY,
-  getCombatSkillHandling,
-} from "./constants.js";
+} from "api-spec";
+import { getCombatSkillHandling } from "./constants.js";
 import {
   advantagesEnumToString,
   disadvantagesEnumToString,
@@ -572,6 +570,13 @@ export class CharacterBuilder {
   setUserId(userId: string): this {
     console.log(`Set userId: ${userId}`);
     this.userId = userId;
+    return this;
+  }
+
+  setStartAdventurePoints(startAdventurePoints: number): this {
+    this.characterSheet.calculationPoints.adventurePoints.start = startAdventurePoints;
+    this.characterSheet.calculationPoints.adventurePoints.available = startAdventurePoints;
+    this.characterSheet.calculationPoints.adventurePoints.total = startAdventurePoints;
     return this;
   }
 

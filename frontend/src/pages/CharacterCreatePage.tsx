@@ -18,6 +18,9 @@ import {
   DISADVANTAGES,
   START_SKILLS,
   MIN_LEVEL,
+  MIN_START_ADVENTURE_POINTS,
+  MAX_START_ADVENTURE_POINTS,
+  DEFAULT_START_ADVENTURE_POINTS,
   combatSkills,
   AdvantagesNames,
   type PostCharactersRequest,
@@ -42,6 +45,7 @@ const STEPS = [
   "wizardStepAttributes",
   "wizardStepSkills",
   "wizardStepCombat",
+  "wizardStepAdventurePoints",
   "wizardStepReview",
 ] as const;
 
@@ -173,6 +177,8 @@ interface WizardState {
   activatedSkills: SkillNameWithCategory[];
   // Step 6 - Combat Skills
   combatSkillValues: Record<string, number>;
+  // Step 7 - Adventure Points
+  startAdventurePoints: number;
 }
 
 function createInitialState(): WizardState {
@@ -201,6 +207,7 @@ function createInitialState(): WizardState {
     attributes: attrs,
     activatedSkills: [],
     combatSkillValues: combatVals,
+    startAdventurePoints: DEFAULT_START_ADVENTURE_POINTS,
   };
 }
 
@@ -233,8 +240,16 @@ export function CharacterCreatePage() {
       toast("error", t("wizardErrorNameRequired"));
       return;
     }
+    if (!state.professionName.trim()) {
+      toast("error", t("wizardErrorProfessionNameRequired"));
+      return;
+    }
     if (!state.professionSkill) {
       toast("error", t("wizardErrorProfessionSkillRequired"));
+      return;
+    }
+    if (!state.hobbyName.trim()) {
+      toast("error", t("wizardErrorHobbyNameRequired"));
       return;
     }
     if (!state.hobbySkill) {
@@ -266,6 +281,7 @@ export function CharacterCreatePage() {
       disadvantages: state.selectedDisadvantages,
       activatedSkills: state.activatedSkills as PostCharactersRequest["activatedSkills"],
       combatSkillsStartValues: state.combatSkillValues as PostCharactersRequest["combatSkillsStartValues"],
+      startAdventurePoints: state.startAdventurePoints,
     };
     mutation.mutate(request);
   }
@@ -276,16 +292,28 @@ export function CharacterCreatePage() {
 
   function canProceedFromStep(currentStep: number): boolean {
     switch (currentStep) {
-      case 0:
+      case 0: // General
         return state.name.trim().length > 0;
-      case 1:
-        return state.professionSkill.length > 0 && state.hobbySkill.length > 0;
+      case 1: // Profession
+        return (
+          state.professionName.trim().length > 0 &&
+          state.professionSkill.length > 0 &&
+          state.hobbyName.trim().length > 0 &&
+          state.hobbySkill.length > 0
+        );
+      case 2: // Advantages — always valid
+        return true;
       case 3: {
+        // Attributes
         const totalUsed = Object.values(state.attributes).reduce((s, v) => s + v, 0);
         return totalUsed === ATTRIBUTE_POINTS_FOR_CREATION;
       }
-      case 4:
+      case 4: // Skills
         return state.activatedSkills.length === NUMBER_OF_ACTIVATABLE_SKILLS_FOR_CREATION;
+      case 5: // Combat — always valid
+        return true;
+      case 6: // Adventure Points
+        return state.startAdventurePoints >= 0;
       default:
         return true;
     }
@@ -324,7 +352,8 @@ export function CharacterCreatePage() {
         {step === 3 && <StepAttributes state={state} update={update} />}
         {step === 4 && <StepSkills state={state} update={update} />}
         {step === 5 && <StepCombat state={state} update={update} />}
-        {step === 6 && <StepReview state={state} />}
+        {step === 6 && <StepAdventurePoints state={state} update={update} />}
+        {step === 7 && <StepReview state={state} />}
       </Card>
 
       {/* Navigation */}
@@ -423,6 +452,7 @@ function StepProfession({ state, update }: StepProps) {
             label={t("professionName")}
             value={state.professionName}
             onChange={(e) => update({ professionName: e.target.value })}
+            required
           />
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-secondary">{t("associatedSkill")}</label>
@@ -450,6 +480,7 @@ function StepProfession({ state, update }: StepProps) {
             label={t("hobbyName")}
             value={state.hobbyName}
             onChange={(e) => update({ hobbyName: e.target.value })}
+            required
           />
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-secondary">{t("associatedSkill")}</label>
@@ -717,21 +748,74 @@ function StepCombat({ state, update }: StepProps) {
     update({ combatSkillValues: { ...state.combatSkillValues, [name]: clamped } });
   }
 
+  function fillRandomValues() {
+    const randomValues: Record<string, number> = {};
+    for (const name of COMBAT_SKILL_NAMES) {
+      randomValues[name] =
+        Math.floor(Math.random() * (MAX_INITIAL_COMBAT_SKILL_VALUE - MIN_INITIAL_COMBAT_SKILL_VALUE + 1)) +
+        MIN_INITIAL_COMBAT_SKILL_VALUE;
+    }
+    update({ combatSkillValues: randomValues });
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-      {COMBAT_SKILL_NAMES.map((name) => (
-        <div key={name} className="flex items-center justify-between rounded-lg border border-border-primary px-4 py-3">
-          <span className="text-sm">{t(skillNameKeys[name]!)}</span>
+    <div>
+      {/* Description */}
+      <div className="mb-6 p-4 bg-bg-tertiary rounded-lg border border-border-primary">
+        <p className="text-sm text-text-secondary mb-3">{t("wizardCombatDescription")}</p>
+        <Button variant="secondary" size="sm" onClick={fillRandomValues}>
+          {t("wizardCombatRandomFill")}
+        </Button>
+      </div>
+
+      {/* Combat skill inputs */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {COMBAT_SKILL_NAMES.map((name) => (
+          <div
+            key={name}
+            className="flex items-center justify-between rounded-lg border border-border-primary px-4 py-3"
+          >
+            <span className="text-sm">{t(skillNameKeys[name]!)}</span>
+            <input
+              type="number"
+              min={MIN_INITIAL_COMBAT_SKILL_VALUE}
+              max={MAX_INITIAL_COMBAT_SKILL_VALUE}
+              value={state.combatSkillValues[name]}
+              onChange={(e) => setValue(name, parseInt(e.target.value, 10) || MIN_INITIAL_COMBAT_SKILL_VALUE)}
+              className="w-16 rounded border border-border-primary bg-bg-tertiary px-2 py-1 text-center text-sm font-mono focus:outline-none focus:ring-2 focus:ring-border-focus"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StepAdventurePoints({ state, update }: StepProps) {
+  return (
+    <div className="space-y-6">
+      <div className="mb-6 p-4 bg-bg-tertiary rounded-lg border border-border-primary">
+        <p className="text-sm text-text-secondary">{t("wizardAdventurePointsDescription")}</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-medium text-text-secondary block mb-1.5">{t("startAdventurePoints")}</label>
           <input
             type="number"
-            min={MIN_INITIAL_COMBAT_SKILL_VALUE}
-            max={MAX_INITIAL_COMBAT_SKILL_VALUE}
-            value={state.combatSkillValues[name]}
-            onChange={(e) => setValue(name, parseInt(e.target.value, 10) || MIN_INITIAL_COMBAT_SKILL_VALUE)}
-            className="w-16 rounded border border-border-primary bg-bg-tertiary px-2 py-1 text-center text-sm font-mono focus:outline-none focus:ring-2 focus:ring-border-focus"
+            min={MIN_START_ADVENTURE_POINTS}
+            max={MAX_START_ADVENTURE_POINTS}
+            value={state.startAdventurePoints}
+            onChange={(e) => update({ startAdventurePoints: parseInt(e.target.value, 10) || 0 })}
+            className="w-full rounded-md border border-border-primary bg-bg-secondary px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-border-focus"
           />
         </div>
-      ))}
+        <div className="flex items-end">
+          <div className="text-sm text-text-muted">
+            {t("defaultAdventurePoints")}: {DEFAULT_START_ADVENTURE_POINTS}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -823,6 +907,16 @@ function StepReview({ state }: { state: WizardState }) {
             const name = skill.split("/")[1]!;
             return <Badge key={skill}>{t(skillNameKeys[name]!)}</Badge>;
           })}
+        </div>
+      </div>
+
+      {/* Adventure Points */}
+      <div>
+        <h3 className="text-sm font-semibold text-text-secondary mb-2">{t("wizardStepAdventurePoints")}</h3>
+        <div className="text-sm">
+          <div>
+            <span className="text-text-muted">{t("startAdventurePoints")}:</span> {state.startAdventurePoints}
+          </div>
         </div>
       </div>
     </div>

@@ -24,6 +24,10 @@ export const HOBBY_SKILL_BONUS = 25;
 export const MIN_INITIAL_COMBAT_SKILL_VALUE = 1;
 export const MAX_INITIAL_COMBAT_SKILL_VALUE = 30;
 
+export const MIN_START_ADVENTURE_POINTS = 0;
+export const MAX_START_ADVENTURE_POINTS = 99999;
+export const DEFAULT_START_ADVENTURE_POINTS = 1000;
+
 export const attributeForCreationSchema = attributeSchema.omit({ start: true, mod: true, totalCost: true }).extend({
   current: z.number().int().min(MIN_ATTRIBUTE_VALUE_FOR_CREATION).max(MAX_ATTRIBUTE_VALUE_FOR_CREATION),
 });
@@ -63,6 +67,12 @@ export const postCharactersRequestSchema = z
     disadvantages: disadvantagesSchema,
     activatedSkills: activatedSkillsSchema,
     combatSkillsStartValues: combatSkillsStartValuesSchema,
+    startAdventurePoints: z
+      .number()
+      .int()
+      .min(MIN_START_ADVENTURE_POINTS)
+      .max(MAX_START_ADVENTURE_POINTS)
+      .default(DEFAULT_START_ADVENTURE_POINTS),
   })
   .strict();
 

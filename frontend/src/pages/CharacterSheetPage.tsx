@@ -11,7 +11,7 @@ import { ApiError } from "@/api/client";
 import { attributeKeys, baseValueKeys, advantageNameKeys, disadvantageNameKeys } from "@/i18n/mappings";
 import { attributeIcons } from "@/lib/skillIcons";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { Badge, pointsBadgeVariant } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Dialog } from "@/components/ui/Dialog";
@@ -133,7 +133,7 @@ export function CharacterSheetPage() {
       <SpecialAbilitiesSection characterId={characterId!} specialAbilities={sheet.specialAbilities} />
 
       {/* Attributes */}
-      <AttributesSection characterId={characterId!} attributes={sheet.attributes} />
+      <AttributesSection character={character} />
 
       {/* Base Values */}
       <BaseValuesSection characterId={characterId!} baseValues={sheet.baseValues} />
@@ -334,13 +334,7 @@ function SpecialAbilitiesSection({
   );
 }
 
-function AttributesSection({
-  characterId,
-  attributes,
-}: {
-  characterId: string;
-  attributes: Record<string, Attribute>;
-}) {
+function AttributesSection({ character }: { character: Character }) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { editing, editValues, setEditValues, startEdit, cancelEdit } = useEditableField({
@@ -348,6 +342,35 @@ function AttributesSection({
     current: 0,
     mod: 0,
   });
+
+  const attributes = character.characterSheet.attributes;
+  const attributePoints = character.characterSheet.calculationPoints.attributePoints;
+
+  // Calculate projected points during editing
+  const getProjectedPoints = () => {
+    if (!editing) return null;
+
+    const currentAttribute = attributes[editing as keyof typeof attributes];
+    const currentDifference = editValues.current - currentAttribute.current;
+
+    // Prevent reductions of current values (not allowed by backend)
+    if (currentDifference < 0) return null;
+
+    if (currentDifference === 0) return null;
+
+    // Attribute points use a 1:1 cost model (1 point increase = 1 AP cost), unlike skills which have threshold-based costs
+    const cost = Math.abs(currentDifference);
+    const projectedAvailable =
+      currentDifference > 0 ? attributePoints.available - cost : attributePoints.available + cost;
+
+    return {
+      available: projectedAvailable,
+      total: attributePoints.total,
+      cost: currentDifference > 0 ? cost : -cost,
+    };
+  };
+
+  const projectedPoints = getProjectedPoints();
 
   const mutation = useMutation({
     mutationFn: ({
@@ -360,18 +383,69 @@ function AttributesSection({
         current?: { initialValue: number; increasedPoints: number };
         mod?: { initialValue: number; newValue: number };
       };
-    }) => updateAttribute(characterId, name, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["character", characterId] });
-      toast("success", t("toastSaveSuccess"));
-      cancelEdit();
+    }) => updateAttribute(character.characterId, name, data),
+    onMutate: async ({ name, data }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["character", character.characterId] });
+
+      // Snapshot the previous value
+      const previousCharacter = queryClient.getQueryData(["character", character.characterId]) as Character;
+
+      // Optimistically update only for current-value increases (which consume attribute points).
+      // Mod changes don't consume points and are handled by the server response + query invalidation.
+      if (data.current && data.current.increasedPoints > 0) {
+        // Calculate cost (1 point per attribute point increase)
+        const cost = data.current.increasedPoints;
+
+        queryClient.setQueryData(["character", character.characterId], (old: Character) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            characterSheet: {
+              ...old.characterSheet,
+              attributes: {
+                ...old.characterSheet.attributes,
+                [name as keyof typeof old.characterSheet.attributes]: {
+                  ...old.characterSheet.attributes[name as keyof typeof old.characterSheet.attributes],
+                  current:
+                    old.characterSheet.attributes[name as keyof typeof old.characterSheet.attributes].current +
+                    data.current!.increasedPoints,
+                },
+              },
+              calculationPoints: {
+                ...old.characterSheet.calculationPoints,
+                attributePoints: {
+                  ...old.characterSheet.calculationPoints.attributePoints,
+                  available: old.characterSheet.calculationPoints.attributePoints.available - cost,
+                  total: old.characterSheet.calculationPoints.attributePoints.total,
+                },
+              },
+            },
+          };
+        });
+      }
+
+      return { previousCharacter };
     },
-    onError: (error) => {
+    onError: (error, _variables, context) => {
+      // Rollback on error
+      if (context?.previousCharacter) {
+        queryClient.setQueryData(["character", character.characterId], context.previousCharacter);
+      }
       if (error instanceof ApiError) {
         toast("error", error.message);
       } else {
         toast("error", t("toastSaveError"));
       }
+    },
+    onSuccess: () => {
+      toast("success", t("toastSaveSuccess"));
+      cancelEdit();
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure server state
+      queryClient.invalidateQueries({ queryKey: ["character", character.characterId] });
     },
   });
 
@@ -394,6 +468,26 @@ function AttributesSection({
 
   return (
     <Card title={t("attributes")}>
+      {/* Attribute points summary */}
+      <div className="mb-4 flex gap-4">
+        <Badge
+          variant={pointsBadgeVariant(projectedPoints ? projectedPoints.available : (attributePoints?.available ?? 0))}
+        >
+          {projectedPoints
+            ? t("pointsRemaining", projectedPoints.available)
+            : t("pointsRemaining", attributePoints?.available ?? 0)}
+          {projectedPoints && (
+            <span className="ml-1 text-xs opacity-75">
+              ({projectedPoints.cost > 0 ? "-" : "+"}
+              {Math.abs(projectedPoints.cost)})
+            </span>
+          )}
+        </Badge>
+        <Badge variant="default">
+          {projectedPoints ? t("pointsTotal", projectedPoints.total) : t("pointsTotal", attributePoints?.total ?? 0)}
+        </Badge>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -429,7 +523,14 @@ function AttributesSection({
                     <input
                       type="number"
                       value={editValues.current}
-                      onChange={(e) => setEditValues((v) => ({ ...v, current: Number(e.target.value) }))}
+                      min={attr.current}
+                      onChange={(e) => {
+                        const newValue = Number(e.target.value);
+                        // Prevent reductions of current values (not allowed by backend)
+                        if (newValue >= attr.current) {
+                          setEditValues((v) => ({ ...v, current: newValue }));
+                        }
+                      }}
                       className="w-14 rounded border border-border-primary bg-bg-tertiary px-1 py-0.5 text-center text-sm font-mono"
                     />
                   ) : (
