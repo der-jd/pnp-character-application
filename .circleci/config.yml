@@ -27,6 +27,8 @@ executors:
     resource_class: small
 
 workflows:
+  # TEMPORARY: Deployment disabled while multi-environment support is being implemented.
+  # Only CI checks run; deploy/build-frontend jobs are removed from this workflow.
   build-deploy:
     when:
       and:
@@ -39,31 +41,6 @@ workflows:
       - run-backend-unit-tests
       - run-frontend-tests
       - lint-terraform-code
-      - deploy-backend-and-infrastructure:
-          requires:
-            - check-format-files
-            - lint-typescript-code
-            - build-backend
-            - run-backend-unit-tests
-            - lint-terraform-code
-      # Run component tests only on main branch
-      - run-backend-component-tests:
-          requires:
-            - deploy-backend-and-infrastructure
-          filters:
-            branches:
-              only:
-                - main
-      - build-frontend:
-          requires:
-            - deploy-backend-and-infrastructure
-      - deploy-frontend:
-          requires:
-            - check-format-files
-            - lint-typescript-code
-            - build-frontend
-            - run-frontend-tests
-            - deploy-backend-and-infrastructure
 
   component-tests:
     when:
