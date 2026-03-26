@@ -38,16 +38,21 @@ The following environment variables must be configured in CircleCI project setti
 
 ### Pipeline Parameters (Optional)
 
+- `enable-deployments`: Set to `true` to allow workflows that apply Terraform or upload the frontend to AWS
 - `run-component-tests`: Set to `true` to run backend component tests on demand
 - `delete-services`: Set to `true` to destroy all Terraform resources (use with caution)
 
 ## Pipeline Workflows
 
-### Build & Deploy (Default) - **Continuous Deployment**
+### Validate (Default)
 
 - Runs on all branches except when special parameters are set
-- Includes formatting checks, linting, building, testing, and deployment
-- Component tests run automatically on main branch
+- Includes formatting checks, linting, building, and tests without deploying to AWS
+
+### Deploy
+
+- Triggers only when `enable-deployments=true`
+- Applies Terraform, deploys the frontend, and runs main-branch component tests after deployment
 
 ### Component Tests
 

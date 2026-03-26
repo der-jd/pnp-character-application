@@ -4,6 +4,10 @@ orbs:
   aws-cli: circleci/aws-cli@5
 
 parameters:
+  enable-deployments:
+    description: If true, allows workflows that deploy infrastructure or frontend assets to AWS.
+    type: boolean
+    default: false
   run-component-tests:
     description: If true, runs backend component tests. Always runs on main branch.
     type: boolean
@@ -27,7 +31,7 @@ executors:
     resource_class: small
 
 workflows:
-  build-deploy:
+  validate:
     when:
       and:
         - not: << pipeline.parameters.delete-services >>
@@ -39,6 +43,13 @@ workflows:
       - run-backend-unit-tests
       - run-frontend-tests
       - lint-terraform-code
+  deploy:
+    when:
+      and:
+        - not: << pipeline.parameters.delete-services >>
+        - not: << pipeline.parameters.run-component-tests >>
+        - << pipeline.parameters.enable-deployments >>
+    jobs:
       - deploy-backend-and-infrastructure:
           requires:
             - check-format-files
