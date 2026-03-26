@@ -474,12 +474,12 @@ function AttributesSection({ character }: { character: Character }) {
               ? projectedPoints.available < 0
                 ? "danger"
                 : projectedPoints.available === 0
-                  ? "info"
+                  ? "default"
                   : "success"
               : attributePoints?.available && attributePoints.available < 0
                 ? "danger"
                 : attributePoints?.available === 0
-                  ? "info"
+                  ? "default"
                   : "success"
           }
         >

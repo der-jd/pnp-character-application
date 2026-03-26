@@ -153,12 +153,12 @@ export function SkillsPage() {
                   ? projectedAp < 0
                     ? "danger"
                     : projectedAp === 0
-                      ? "info"
+                      ? "default"
                       : "success"
                   : ap.available < 0
                     ? "danger"
                     : ap.available === 0
-                      ? "info"
+                      ? "default"
                       : "success"
               }
             >
