@@ -112,6 +112,18 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 400,
     },
+    {
+      name: "Request body is empty",
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+        },
+        queryStringParameters: null,
+        body: {},
+      },
+      expectedStatusCode: 400,
+    },
   ];
 
   invalidTestCases.forEach((_case) => {

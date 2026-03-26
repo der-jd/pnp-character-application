@@ -250,7 +250,7 @@ function GeneralInformationSection({
     mutation.mutate(data);
   }
 
-  const set = (field: string, value: string) => setEditValues((v) => ({ ...v, [field]: value }));
+  const set = (field: keyof typeof editValues, value: string) => setEditValues((v) => ({ ...v, [field]: value }));
 
   return (
     <Card

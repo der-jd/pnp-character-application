@@ -77,6 +77,16 @@ describe.sequential("patch-general-information component tests", () => {
         "Invalid input values",
       );
     });
+
+    test("request body is empty", async () => {
+      const character = context.character;
+
+      await expectApiError(
+        () => context.apiClient.patch(`characters/${character.characterId}/general-information`, {}),
+        400,
+        "Invalid input values",
+      );
+    });
   });
 
   /**

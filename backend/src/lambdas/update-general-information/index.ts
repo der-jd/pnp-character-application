@@ -63,7 +63,11 @@ export async function _updateGeneralInformation(request: Request): Promise<APIGa
       ...params.body,
     };
 
-    await updateGeneralInformation(params.userId, params.pathParams["character-id"], generalInformationNew);
+    if (JSON.stringify(generalInformationOld) !== JSON.stringify(generalInformationNew)) {
+      await updateGeneralInformation(params.userId, params.pathParams["character-id"], generalInformationNew);
+    } else {
+      console.log("No changes detected, skipping DynamoDB write");
+    }
 
     const responseBody: UpdateGeneralInformationResponse = {
       characterId: params.pathParams["character-id"],

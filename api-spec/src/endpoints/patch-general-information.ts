@@ -36,7 +36,10 @@ export const patchGeneralInformationRequestSchema = z
     appearance: z.string().max(MAX_STRING_LENGTH_VERY_LONG).optional(),
     specialCharacteristics: z.string().max(MAX_STRING_LENGTH_VERY_LONG).optional(),
   })
-  .strict();
+  .strict()
+  .refine((obj) => Object.keys(obj).length > 0, {
+    message: "At least one field must be provided",
+  });
 
 export type PatchGeneralInformationRequest = z.infer<typeof patchGeneralInformationRequestSchema>;
 
