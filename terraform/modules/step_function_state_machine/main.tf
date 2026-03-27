@@ -3,6 +3,11 @@ variable "state_machine_name" {
   description = "Name of the state machine (e.g., 'update-skill')"
 }
 
+variable "name_prefix" {
+  type        = string
+  description = "Prefix for the state machine name (e.g., 'pnp-app-prod')"
+}
+
 variable "role_arn" {
   type        = string
   description = "ARN of the IAM role for the state machine"
@@ -61,7 +66,7 @@ variable "include_version_history_record_in_response" {
 }
 
 resource "aws_cloudwatch_log_group" "state_machine_log_group" {
-  name              = "/aws/vendedlogs/states/${var.state_machine_name}"
+  name              = "/aws/vendedlogs/states/${var.name_prefix}-${var.state_machine_name}"
   retention_in_days = 0
 }
 
@@ -95,7 +100,7 @@ locals {
 }
 
 resource "aws_sfn_state_machine" "state_machine" {
-  name     = var.state_machine_name
+  name     = "${var.name_prefix}-${var.state_machine_name}"
   role_arn = var.role_arn
   type     = "EXPRESS"
 

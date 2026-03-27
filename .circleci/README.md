@@ -14,8 +14,12 @@ The following environment variables must be configured in CircleCI project setti
 
 - `TF_CLOUD_ORGANIZATION`: Terraform Cloud organization name
 - `TF_TOKEN_app_terraform_io`: Terraform Cloud API token
-- `TF_WORKSPACE`: Terraform Cloud workspace name (e.g., "prod")
 - `TF_VAR_alert_email_address`: Email address for CloudWatch/SNS alert notifications (Terraform variable)
+
+#### Workspace selection
+
+- Automated deployments set `TF_WORKSPACE` per job (`pnp-app-prod` on `main`, `pnp-app-dev` on `develop`)
+- `TF_WORKSPACE` only needs to be configured manually when running workflows like `delete-services` against a specific workspace
 
 ### Component Test Secrets
 
@@ -38,28 +42,34 @@ The following environment variables must be configured in CircleCI project setti
 
 ### Pipeline Parameters (Optional)
 
-- `enable-deployments`: Set to `true` to allow workflows that apply Terraform or upload the frontend to AWS
 - `run-component-tests`: Set to `true` to run backend component tests on demand
 - `delete-services`: Set to `true` to destroy all Terraform resources (use with caution)
 
 ## Pipeline Workflows
 
-### Validate (Default)
+### `deploy-prod`
 
-- Runs on all branches except when special parameters are set
-- Includes formatting checks, linting, building, and tests without deploying to AWS
+- Runs on `main`
+- Deploys Terraform with `envs/prod.tfvars` into Terraform Cloud workspace `pnp-app-prod`
+- Runs backend component tests after deployment and then deploys the frontend to S3/CloudFront
 
-### Deploy
+### `deploy-dev`
 
-- Triggers only when `enable-deployments=true`
-- Applies Terraform, deploys the frontend, and runs main-branch component tests after deployment
+- Runs on `develop`
+- Deploys Terraform with `envs/dev.tfvars` into Terraform Cloud workspace `pnp-app-dev`
+- Deploys the frontend to the dev S3 bucket and invalidates the dev CloudFront distribution
+
+### `ci-checks`
+
+- Runs on all other branches
+- Performs formatting, linting, build, and test checks without deploying to AWS
 
 ### Component Tests
 
 - Triggers when `run-component-tests=true`
-- Runs backend component tests against deployed infrastructure
+- Runs backend component tests against the configured Terraform workspace (defaults to prod in the pipeline config)
 
 ### Delete Services
 
 - Triggers when `delete-services=true`
-- Destroys all AWS resources via Terraform destroy
+- Destroys the prod Terraform workspace by default (`pnp-app-prod` with `envs/prod.tfvars`)

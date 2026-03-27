@@ -10,7 +10,7 @@ The application uses a serverless AWS architecture deployed via Terraform Cloud,
 
 - **Primary region**: `eu-central-1` for main infrastructure
 - **Secondary region**: `us-east-1` for CloudFront certificates
-- **Management**: [Terraform Cloud](https://cloud.hashicorp.com/) with workspace configuration via CircleCI environment variables
+- **Management**: [Terraform Cloud](https://cloud.hashicorp.com/) with separate workspaces per environment (`pnp-app-prod`, `pnp-app-dev`)
 
 ### Core Infrastructure Components
 
@@ -63,7 +63,12 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 - `project_tag_key`/`project_tag_value` - Project tagging
 - `domain_name` - Main application domain
 - `api_domain_name` - API-specific domain
+- `is_prod` - Controls shared Route 53 zone ownership, prod-only DNS records, and protection settings
+- `enable_backup` - Enables or disables AWS Backup resources for the environment
+- `enable_monitoring` - Enables or disables CloudWatch alarms, dashboard, and SNS alerts for the environment
 - `alert_email_address` - Email for CloudWatch alarm notifications (configured via CircleCI as `TF_VAR_alert_email_address`)
+
+Shared defaults live in `terraform/terraform.tfvars`. Environment-specific overrides live in `terraform/envs/prod.tfvars` and `terraform/envs/dev.tfvars`.
 
 ### Outputs
 
@@ -72,9 +77,16 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 - `api_version` - API version number
 - `cognito_user_pool_id` - Cognito user pool ID (sensitive)
 - `cognito_app_client_id` - Cognito app client ID (sensitive)
+- `cloudfront_distribution_id` - CloudFront distribution ID for cache invalidation in CI
 - `frontend_bucket_name` - S3 bucket name for frontend static assets
 - `route53_nameservers` - Route53 nameservers for DNS delegation
 - `route53_zone_id` - Route53 hosted zone ID
+
+## Multi-Environment Notes
+
+- Resource names are prefixed with `pnp-app-${var.env}` so prod and dev can coexist in the same AWS account
+- Prod owns the `worldhoppers.de` Route 53 hosted zone; non-prod environments read it via a data source and only create their own records
+- Dev defaults disable backup and monitoring to reduce cost and noise; prod keeps both enabled
 
 ## Monitoring & Alerting Configuration
 
@@ -86,7 +98,7 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 
 ### CloudWatch Dashboard
 
-The `pnp-app-backend` dashboard provides detailed visibility about:
+The `${local.prefix}-backend` dashboard provides detailed visibility about:
 
 - API Gateway endpoints
 - Lambda functions
@@ -95,7 +107,7 @@ The `pnp-app-backend` dashboard provides detailed visibility about:
 
 ### SNS Topic for Alerts
 
-The `pnp-app-alerts-topic` SNS topic in `alerts.tf` is shared by all alerting mechanisms.
+The `${local.prefix}-alerts-topic` SNS topic in `alerts.tf` is shared by all alerting mechanisms within an environment.
 
 All notifications are sent to the email address specified in `TF_VAR_alert_email_address` (CircleCI environment variable).
 

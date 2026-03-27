@@ -99,7 +99,7 @@ The application includes backend monitoring and alerting to track application he
 
 ## 🚀 Deployment
 
-**Continuous deployment** via CircleCI, see [CircleCI Configuration](./.circleci/README.md) for details.
+CircleCI runs CI checks on every branch, deploys prod from `main`, and deploys the dev environment from `develop`. See [CircleCI Configuration](./.circleci/README.md) for details.
 
 ## 📁 Repository Structure
 

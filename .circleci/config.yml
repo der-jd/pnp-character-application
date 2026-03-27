@@ -4,10 +4,6 @@ orbs:
   aws-cli: circleci/aws-cli@5
 
 parameters:
-  enable-deployments:
-    description: If true, allows workflows that deploy infrastructure or frontend assets to AWS.
-    type: boolean
-    default: false
   run-component-tests:
     description: If true, runs backend component tests. Always runs on main branch.
     type: boolean
@@ -31,43 +27,61 @@ executors:
     resource_class: small
 
 workflows:
-  validate:
+  deploy-prod:
     when:
       and:
         - not: << pipeline.parameters.delete-services >>
         - not: << pipeline.parameters.run-component-tests >>
     jobs:
-      - check-format-files
-      - lint-typescript-code
-      - build-backend
-      - run-backend-unit-tests
-      - run-frontend-tests
-      - lint-terraform-code
-  deploy:
-    when:
-      and:
-        - not: << pipeline.parameters.delete-services >>
-        - not: << pipeline.parameters.run-component-tests >>
-        - << pipeline.parameters.enable-deployments >>
-    jobs:
+      - check-format-files:
+          filters:
+            branches:
+              only: main
+      - lint-typescript-code:
+          filters:
+            branches:
+              only: main
+      - build-backend:
+          filters:
+            branches:
+              only: main
+      - run-backend-unit-tests:
+          filters:
+            branches:
+              only: main
+      - run-frontend-tests:
+          filters:
+            branches:
+              only: main
+      - lint-terraform-code:
+          filters:
+            branches:
+              only: main
       - deploy-backend-and-infrastructure:
+          tf_var_file: envs/prod.tfvars
+          tf_workspace: pnp-app-prod
           requires:
             - check-format-files
             - lint-typescript-code
             - build-backend
             - run-backend-unit-tests
             - lint-terraform-code
-      # Run component tests only on main branch
+          filters:
+            branches:
+              only: main
       - run-backend-component-tests:
+          tf_workspace: pnp-app-prod
           requires:
             - deploy-backend-and-infrastructure
           filters:
             branches:
-              only:
-                - main
+              only: main
       - build-frontend:
           requires:
             - deploy-backend-and-infrastructure
+          filters:
+            branches:
+              only: main
       - deploy-frontend:
           requires:
             - check-format-files
@@ -75,6 +89,111 @@ workflows:
             - build-frontend
             - run-frontend-tests
             - deploy-backend-and-infrastructure
+          filters:
+            branches:
+              only: main
+
+  deploy-dev:
+    when:
+      and:
+        - not: << pipeline.parameters.delete-services >>
+        - not: << pipeline.parameters.run-component-tests >>
+    jobs:
+      - check-format-files:
+          filters:
+            branches:
+              only: develop
+      - lint-typescript-code:
+          filters:
+            branches:
+              only: develop
+      - build-backend:
+          filters:
+            branches:
+              only: develop
+      - run-backend-unit-tests:
+          filters:
+            branches:
+              only: develop
+      - run-frontend-tests:
+          filters:
+            branches:
+              only: develop
+      - lint-terraform-code:
+          filters:
+            branches:
+              only: develop
+      - deploy-backend-and-infrastructure:
+          tf_var_file: envs/dev.tfvars
+          tf_workspace: pnp-app-dev
+          requires:
+            - check-format-files
+            - lint-typescript-code
+            - build-backend
+            - run-backend-unit-tests
+            - lint-terraform-code
+          filters:
+            branches:
+              only: develop
+      - build-frontend:
+          requires:
+            - deploy-backend-and-infrastructure
+          filters:
+            branches:
+              only: develop
+      - deploy-frontend:
+          requires:
+            - check-format-files
+            - lint-typescript-code
+            - build-frontend
+            - run-frontend-tests
+            - deploy-backend-and-infrastructure
+          filters:
+            branches:
+              only: develop
+
+  ci-checks:
+    when:
+      and:
+        - not: << pipeline.parameters.delete-services >>
+        - not: << pipeline.parameters.run-component-tests >>
+    jobs:
+      - check-format-files:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
+      - lint-typescript-code:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
+      - build-backend:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
+      - run-backend-unit-tests:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
+      - run-frontend-tests:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
+      - lint-terraform-code:
+          filters:
+            branches:
+              ignore:
+                - main
+                - develop
 
   component-tests:
     when:
@@ -82,12 +201,15 @@ workflows:
         - not: << pipeline.parameters.delete-services >>
         - << pipeline.parameters.run-component-tests >>
     jobs:
-      - run-backend-component-tests
+      - run-backend-component-tests:
+          tf_workspace: pnp-app-prod
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
     jobs:
-      - terraform-destroy
+      - terraform-destroy:
+          tf_var_file: envs/prod.tfvars
+          tf_workspace: pnp-app-prod
 
 jobs:
   check-format-files:
@@ -183,6 +305,10 @@ jobs:
           command: npm run lint:terraform
 
   run-backend-component-tests:
+    parameters:
+      tf_workspace:
+        type: string
+        default: pnp-app-prod
     executor: node-medium-executor
     steps:
       - checkout
@@ -192,6 +318,9 @@ jobs:
           name: Install dependencies
           command: npm ci
       - install-terraform
+      - run:
+          name: Select Terraform Cloud workspace
+          command: echo "export TF_WORKSPACE=<< parameters.tf_workspace >>" >> "$BASH_ENV"
       - run:
           name: Build api-spec package
           command: |
@@ -218,6 +347,13 @@ jobs:
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
+    parameters:
+      tf_var_file:
+        type: string
+        description: "Path to environment-specific tfvars file"
+      tf_workspace:
+        type: string
+        description: "Terraform Cloud workspace name for the target environment"
     docker:
       - image: *terraform_docker_image
     resource_class: medium
@@ -225,6 +361,9 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/project
+      - run:
+          name: Select Terraform Cloud workspace
+          command: echo "export TF_WORKSPACE=<< parameters.tf_workspace >>" >> "$BASH_ENV"
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
@@ -236,7 +375,7 @@ jobs:
           name: Terraform plan
           command: |
             cd terraform
-            terraform plan -out tfapply
+            terraform plan -var-file=<< parameters.tf_var_file >> -out tfapply
       - run:
           name: Terraform apply
           command: |
@@ -252,6 +391,7 @@ jobs:
             echo "export VITE_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output
             echo "export FRONTEND_BUCKET_NAME=$(terraform output frontend_bucket_name)" >> terraform_output
             echo "export FRONTEND_BUCKET_REGION=$(terraform output aws_region)" >> terraform_output
+            echo "export CLOUDFRONT_DISTRIBUTION_ID=$(terraform output cloudfront_distribution_id)" >> terraform_output
       - persist_to_workspace:
           root: ~/project
           paths:
@@ -294,13 +434,30 @@ jobs:
           command: |
             source ~/project/terraform/terraform_output
             aws s3 sync ~/project/frontend/dist s3://$FRONTEND_BUCKET_NAME --delete --region $FRONTEND_BUCKET_REGION
+      - run:
+          name: Invalidate CloudFront cache
+          command: |
+            source ~/project/terraform/terraform_output
+            aws cloudfront create-invalidation \
+              --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
+              --paths "/*"
 
   terraform-destroy:
+    parameters:
+      tf_var_file:
+        type: string
+        description: "Path to environment-specific tfvars file"
+      tf_workspace:
+        type: string
+        description: "Terraform Cloud workspace name for the target environment"
     docker:
       - image: *terraform_docker_image
     resource_class: small
     steps:
       - checkout
+      - run:
+          name: Select Terraform Cloud workspace
+          command: echo "export TF_WORKSPACE=<< parameters.tf_workspace >>" >> "$BASH_ENV"
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
@@ -312,7 +469,7 @@ jobs:
           name: Terraform plan destroy
           command: |
             cd terraform
-            terraform plan -destroy -out tfdestroy
+            terraform plan -var-file=<< parameters.tf_var_file >> -destroy -out tfdestroy
       - run:
           name: Terraform destroy
           command: |

@@ -1,9 +1,11 @@
 resource "aws_sns_topic" "alerts" {
-  name = "pnp-app-alerts-topic"
+  count = var.enable_monitoring ? 1 : 0
+  name  = "${local.prefix}-alerts-topic"
 }
 
 resource "aws_sns_topic_subscription" "alerts_email" {
-  topic_arn = aws_sns_topic.alerts.arn
+  count     = var.enable_monitoring ? 1 : 0
+  topic_arn = aws_sns_topic.alerts[0].arn
   protocol  = "email"
   endpoint  = var.alert_email_address
 }

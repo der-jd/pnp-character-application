@@ -1,6 +1,10 @@
 variable "function_name" { // Must match the directory name in ../backend/src/lambdas/
   type = string
 }
+variable "name_prefix" {
+  type        = string
+  description = "Prefix for the Lambda function name (e.g., 'pnp-app-prod')"
+}
 variable "handler" {
   type    = string
   default = "index.handler"
@@ -38,7 +42,7 @@ data "archive_file" "lambda_zip" {
 }
 
 resource "aws_lambda_function" "lambda_function" {
-  function_name    = "pnp-${var.function_name}"
+  function_name    = "${var.name_prefix}-${var.function_name}"
   handler          = var.handler
   runtime          = var.runtime
   role             = var.role_arn

@@ -1,9 +1,7 @@
 # =============================================================================
-# Terraform Variables Configuration
+# Shared Terraform Variables Configuration
+# Environment-specific overrides are in envs/prod.tfvars and envs/dev.tfvars
 # =============================================================================
 
-env               = "prod"
 project_tag_key   = "project"
 project_tag_value = "pnp-character-application"
-domain_name       = "worldhoppers.de"
-api_domain_name   = "api.worldhoppers.de"

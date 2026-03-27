@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "frontend_bucket" {
-  bucket        = "pnp-character-application-frontend"
+  bucket        = "pnp-character-application-frontend-${var.env}"
   force_destroy = true
 }
 

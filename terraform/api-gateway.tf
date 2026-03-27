@@ -1,5 +1,5 @@
 resource "aws_iam_role" "api_gateway_role" {
-  name = "pnp-app-api-gateway-role"
+  name = "${local.prefix}-api-gateway-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -41,7 +41,7 @@ resource "aws_iam_role_policy" "api_gateway_policy" {
 
 
 resource "aws_api_gateway_rest_api" "pnp_rest_api" {
-  name        = "pnp-app-api"
+  name        = "${local.prefix}-api"
   description = "REST API for the PnP character application"
   endpoint_configuration {
     // Using Regional API endpoint for direct access without CloudFront distribution.
