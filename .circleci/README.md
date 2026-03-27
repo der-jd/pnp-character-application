@@ -18,7 +18,7 @@ The following environment variables must be configured in CircleCI project setti
 
 #### Workspace selection
 
-- Automated deployments set `TF_WORKSPACE` per job (`pnp-app-prod` on `main`, `pnp-app-dev` on `develop`)
+- Automated deployments set `TF_WORKSPACE` per job (`pnp-app-dev` on every branch, `pnp-app-prod` on `main`)
 - `TF_WORKSPACE` only needs to be configured manually when running workflows like `delete-services` against a specific workspace
 
 ### Component Test Secrets
@@ -47,22 +47,12 @@ The following environment variables must be configured in CircleCI project setti
 
 ## Pipeline Workflows
 
-### `deploy-prod`
+### `build-deploy`
 
-- Runs on `main`
-- Deploys Terraform with `envs/prod.tfvars` into Terraform Cloud workspace `pnp-app-prod`
-- Runs backend component tests after deployment and then deploys the frontend to S3/CloudFront
-
-### `deploy-dev`
-
-- Runs on `develop`
-- Deploys Terraform with `envs/dev.tfvars` into Terraform Cloud workspace `pnp-app-dev`
-- Deploys the frontend to the dev S3 bucket and invalidates the dev CloudFront distribution
-
-### `ci-checks`
-
-- Runs on all other branches
-- Performs formatting, linting, build, and test checks without deploying to AWS
+- Runs on every commit except the special `component-tests` and `delete-services` pipelines
+- Deploys the dev environment from every branch using `envs/dev.tfvars` and Terraform Cloud workspace `pnp-app-dev`
+- Also deploys prod from `main` using `envs/prod.tfvars` and Terraform Cloud workspace `pnp-app-prod`
+- Uses separate workspace artifacts per environment so dev and prod frontend deploys can run in the same pipeline on `main`
 
 ### Component Tests
 
