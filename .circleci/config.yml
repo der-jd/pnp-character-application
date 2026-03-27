@@ -27,102 +27,21 @@ executors:
     resource_class: small
 
 workflows:
-  deploy-prod:
+  # Runs on every commit (all branches): CI checks + deploy to dev environment
+  build-deploy-dev:
     when:
       and:
         - not: << pipeline.parameters.delete-services >>
         - not: << pipeline.parameters.run-component-tests >>
     jobs:
-      - check-format-files:
-          filters:
-            branches:
-              only: main
-      - lint-typescript-code:
-          filters:
-            branches:
-              only: main
-      - build-backend:
-          filters:
-            branches:
-              only: main
-      - run-backend-unit-tests:
-          filters:
-            branches:
-              only: main
-      - run-frontend-tests:
-          filters:
-            branches:
-              only: main
-      - lint-terraform-code:
-          filters:
-            branches:
-              only: main
+      - check-format-files
+      - lint-typescript-code
+      - build-backend
+      - run-backend-unit-tests
+      - run-frontend-tests
+      - lint-terraform-code
       - deploy-backend-and-infrastructure:
-          env: prod
-          tf_var_file: envs/prod.tfvars
-          requires:
-            - check-format-files
-            - lint-typescript-code
-            - build-backend
-            - run-backend-unit-tests
-            - lint-terraform-code
-          filters:
-            branches:
-              only: main
-      - run-backend-component-tests:
-          requires:
-            - deploy-backend-and-infrastructure
-          filters:
-            branches:
-              only: main
-      - build-frontend:
-          requires:
-            - deploy-backend-and-infrastructure
-          filters:
-            branches:
-              only: main
-      - deploy-frontend:
-          requires:
-            - check-format-files
-            - lint-typescript-code
-            - build-frontend
-            - run-frontend-tests
-            - deploy-backend-and-infrastructure
-          filters:
-            branches:
-              only: main
-
-  deploy-dev:
-    when:
-      and:
-        - not: << pipeline.parameters.delete-services >>
-        - not: << pipeline.parameters.run-component-tests >>
-    jobs:
-      - check-format-files:
-          filters:
-            branches:
-              only: develop
-      - lint-typescript-code:
-          filters:
-            branches:
-              only: develop
-      - build-backend:
-          filters:
-            branches:
-              only: develop
-      - run-backend-unit-tests:
-          filters:
-            branches:
-              only: develop
-      - run-frontend-tests:
-          filters:
-            branches:
-              only: develop
-      - lint-terraform-code:
-          filters:
-            branches:
-              only: develop
-      - deploy-backend-and-infrastructure:
+          name: deploy-backend-and-infrastructure-dev
           env: dev
           tf_var_file: envs/dev.tfvars
           requires:
@@ -131,68 +50,68 @@ workflows:
             - build-backend
             - run-backend-unit-tests
             - lint-terraform-code
-          filters:
-            branches:
-              only: develop
       - build-frontend:
+          name: build-frontend-dev
           requires:
-            - deploy-backend-and-infrastructure
-          filters:
-            branches:
-              only: develop
+            - deploy-backend-and-infrastructure-dev
       - deploy-frontend:
+          name: deploy-frontend-dev
           requires:
             - check-format-files
             - lint-typescript-code
-            - build-frontend
+            - build-frontend-dev
             - run-frontend-tests
-            - deploy-backend-and-infrastructure
-          filters:
-            branches:
-              only: develop
+            - deploy-backend-and-infrastructure-dev
 
-  ci-checks:
+  # Runs only on main: deploy to prod environment
+  deploy-prod:
     when:
       and:
         - not: << pipeline.parameters.delete-services >>
         - not: << pipeline.parameters.run-component-tests >>
     jobs:
-      - check-format-files:
-          filters:
-            branches:
-              ignore:
-                - main
-                - develop
-      - lint-typescript-code:
-          filters:
-            branches:
-              ignore:
-                - main
-                - develop
       - build-backend:
+          name: build-backend-prod
           filters:
             branches:
-              ignore:
-                - main
-                - develop
-      - run-backend-unit-tests:
-          filters:
-            branches:
-              ignore:
-                - main
-                - develop
-      - run-frontend-tests:
-          filters:
-            branches:
-              ignore:
-                - main
-                - develop
+              only: main
       - lint-terraform-code:
+          name: lint-terraform-code-prod
           filters:
             branches:
-              ignore:
-                - main
-                - develop
+              only: main
+      - deploy-backend-and-infrastructure:
+          name: deploy-backend-and-infrastructure-prod
+          env: prod
+          tf_var_file: envs/prod.tfvars
+          requires:
+            - build-backend-prod
+            - lint-terraform-code-prod
+          filters:
+            branches:
+              only: main
+      # Run component tests against prod after deployment
+      - run-backend-component-tests:
+          requires:
+            - deploy-backend-and-infrastructure-prod
+          filters:
+            branches:
+              only: main
+      - build-frontend:
+          name: build-frontend-prod
+          requires:
+            - deploy-backend-and-infrastructure-prod
+          filters:
+            branches:
+              only: main
+      - deploy-frontend:
+          name: deploy-frontend-prod
+          requires:
+            - build-frontend-prod
+            - deploy-backend-and-infrastructure-prod
+          filters:
+            branches:
+              only: main
 
   component-tests:
     when:
