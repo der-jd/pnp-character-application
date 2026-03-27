@@ -1,13 +1,15 @@
 resource "aws_backup_vault" "vault" {
-  name = "pnp-app-backup-vault"
+  count = var.enable_backup ? 1 : 0
+  name  = "${local.prefix}-backup-vault"
 }
 
 resource "aws_backup_plan" "plan" {
-  name = "pnp-app-backup-plan"
+  count = var.enable_backup ? 1 : 0
+  name  = "${local.prefix}-backup-plan"
 
   rule {
     rule_name         = "daily"
-    target_vault_name = aws_backup_vault.vault.name
+    target_vault_name = aws_backup_vault.vault[0].name
 
     # Every day at 01:00 UTC => 03:00 CEST / 02:00 CET
     schedule          = "cron(0 1 * * ? *)"
@@ -21,7 +23,7 @@ resource "aws_backup_plan" "plan" {
 
   rule {
     rule_name         = "monthly"
-    target_vault_name = aws_backup_vault.vault.name
+    target_vault_name = aws_backup_vault.vault[0].name
 
     # First day of every month at 02:00 UTC => 04:00 CEST / 03:00 CET
     schedule          = "cron(0 2 1 * ? *)"
@@ -35,10 +37,11 @@ resource "aws_backup_plan" "plan" {
 }
 
 resource "aws_backup_selection" "selection" {
+  count   = var.enable_backup ? 1 : 0
   name    = "dynamodb-tag-selection"
-  plan_id = aws_backup_plan.plan.id
+  plan_id = aws_backup_plan.plan[0].id
 
-  iam_role_arn = aws_iam_role.backup_role.arn
+  iam_role_arn = aws_iam_role.backup_role[0].arn
 
   # Limit selection to DynamoDB tables AND require them to have the defined tag
   resources = [
@@ -53,7 +56,8 @@ resource "aws_backup_selection" "selection" {
 }
 
 resource "aws_iam_role" "backup_role" {
-  name = "pnp-app-backup-service-role"
+  count = var.enable_backup ? 1 : 0
+  name  = "${local.prefix}-backup-service-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -70,12 +74,14 @@ resource "aws_iam_role" "backup_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "backup_managed_policy" {
-  role       = aws_iam_role.backup_role.name
+  count      = var.enable_backup ? 1 : 0
+  role       = aws_iam_role.backup_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
 }
 
 resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
-  alarm_name          = "pnp-app-backup-job-failed"
+  count               = var.enable_backup && var.enable_monitoring ? 1 : 0
+  alarm_name          = "${local.prefix}-backup-job-failed"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "NumberOfBackupJobsFailed"
@@ -86,12 +92,13 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
   treat_missing_data  = "notBreaching"
 
   alarm_description = "Alerts when an AWS Backup job for the PnP Character Application fails"
-  alarm_actions     = [aws_sns_topic.alerts.arn]
-  ok_actions        = [aws_sns_topic.alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts[0].arn]
+  ok_actions        = [aws_sns_topic.alerts[0].arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
-  alarm_name          = "pnp-app-backup-job-expired"
+  count               = var.enable_backup && var.enable_monitoring ? 1 : 0
+  alarm_name          = "${local.prefix}-backup-job-expired"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "NumberOfBackupJobsExpired"
@@ -102,7 +109,6 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
   treat_missing_data  = "notBreaching"
 
   alarm_description = "Alerts when an AWS Backup job expires (misses completion window) for the PnP Character Application"
-  alarm_actions     = [aws_sns_topic.alerts.arn]
-  ok_actions        = [aws_sns_topic.alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts[0].arn]
+  ok_actions        = [aws_sns_topic.alerts[0].arn]
 }
-
