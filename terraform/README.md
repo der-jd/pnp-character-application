@@ -10,7 +10,7 @@ The application uses a serverless AWS architecture deployed via Terraform Cloud,
 
 - **Primary region**: `eu-central-1` for main infrastructure
 - **Secondary region**: `us-east-1` for CloudFront certificates
-- **Management**: [Terraform Cloud](https://cloud.hashicorp.com/) with separate workspaces per environment (`pnp-app-prod`, `pnp-app-dev`)
+- **Management**: [Terraform Cloud](https://cloud.hashicorp.com/) with separate workspaces per environment
 
 ### Core Infrastructure Components
 
