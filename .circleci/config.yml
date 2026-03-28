@@ -245,6 +245,8 @@ jobs:
       - run:
           name: Set environment variables for component tests
           command: |
+            source $BASH_ENV
+
             cd terraform
             terraform init -input=false
 
@@ -280,13 +282,15 @@ jobs:
       - run:
           name: Terraform init
           command: |
+            source $BASH_ENV
+
             cd terraform
             terraform init -input=false
       - run:
           name: Terraform plan
           command: |
             cd terraform
-            terraform plan               -var-file=variables/common.tfvars               -var-file=variables/<< parameters.env >>.tfvars               -out tfapply
+            terraform plan -var-file=variables/common.tfvars -var-file=variables/<< parameters.env >>.tfvars -out tfapply
       - run:
           name: Terraform apply
           command: |
@@ -375,6 +379,8 @@ jobs:
       - run:
           name: Terraform init
           command: |
+            source $BASH_ENV
+
             cd terraform
             terraform init -input=false
       - run:
