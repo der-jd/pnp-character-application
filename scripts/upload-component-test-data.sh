@@ -5,16 +5,17 @@
 
 set -euo pipefail
 
-# Configuration constants
-readonly DEFAULT_REGION="eu-central-1"
-readonly DEFAULT_CHARACTERS_DIR="../backend/test/component-tests/test-data/characters"
-readonly DEFAULT_HISTORY_DIR="../backend/test/component-tests/test-data/history"
-readonly CHARACTERS_TABLE="pnp-app-characters"
-readonly HISTORY_TABLE="pnp-app-characters-history"
-
 # Script metadata
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_NAME="$(basename "$0")"
+
+# Configuration constants
+readonly DEFAULT_REGION="eu-central-1"
+readonly DEFAULT_CHARACTERS_DIR="$SCRIPT_DIR/../backend/test/component-tests/test-data/characters"
+readonly DEFAULT_HISTORY_DIR="$SCRIPT_DIR/../backend/test/component-tests/test-data/history"
+readonly TABLE_PREFIX="pnp-app"
+readonly CHARACTERS_TABLE_BASE="$TABLE_PREFIX-characters"
+readonly HISTORY_TABLE_BASE="$TABLE_PREFIX-characters-history"
 
 # ANSI color codes
 readonly RED='\033[0;31m'
@@ -50,6 +51,7 @@ Test data must be in DynamoDB JSON format (with Type annotations).
 
 OPTIONS:
     -p, --profile PROFILE         AWS profile name (required)
+    -e, --env ENV                 Environment name for table suffix, e.g. dev or prod (required)
     -r, --region REGION           AWS region (default: $DEFAULT_REGION)
     -c, --characters-dir DIR      Directory containing character JSON files (default: $DEFAULT_CHARACTERS_DIR)
     -h, --history-dir DIR         Directory containing history JSON files (default: $DEFAULT_HISTORY_DIR)
@@ -58,11 +60,26 @@ OPTIONS:
     --help                        Show this help message
 
 EXAMPLES:
-    $SCRIPT_NAME -p my-aws-profile
-    $SCRIPT_NAME -p my-aws-profile -r us-west-2 -o
-    $SCRIPT_NAME -p my-aws-profile --characters-dir /path/to/characters --history-dir /path/to/history --dry-run
+    $SCRIPT_NAME -p my-aws-profile -e dev
+    $SCRIPT_NAME -p my-aws-profile -e prod -r us-west-2 -o
+    $SCRIPT_NAME -p my-aws-profile -e dev --characters-dir /path/to/characters --history-dir /path/to/history --dry-run
 
 EOF
+}
+
+get_characters_table_name() {
+    local environment="$1"
+    echo "$CHARACTERS_TABLE_BASE-$environment"
+}
+
+get_history_table_name() {
+    local environment="$1"
+    echo "$HISTORY_TABLE_BASE-$environment"
+}
+
+is_history_table() {
+    local table="$1"
+    [[ "$table" == "$HISTORY_TABLE_BASE-"* ]]
 }
 
 # Function to check if jq is installed
@@ -71,6 +88,19 @@ check_jq() {
         log_error "jq is not installed. Please install it first (apt-get install jq)."
         exit 1
     fi
+}
+
+validate_environment() {
+    local environment="$1"
+
+    case "$environment" in
+        dev|prod)
+            ;;
+        *)
+            log_error "Environment must be one of: dev, prod. Received '$environment'."
+            exit 1
+            ;;
+    esac
 }
 
 # Function to validate directory
@@ -121,14 +151,14 @@ upload_item() {
         item_json=$(cat "$item_file")
 
         local key_info=""
-        if [[ "$table" == "$CHARACTERS_TABLE" ]]; then
-            local user_id=$(echo "$item_json" | jq -r '.userId.S // "unknown"')
-            local character_id=$(echo "$item_json" | jq -r '.characterId.S // "unknown"')
-            key_info=" (userId: $user_id, characterId: $character_id)"
-        else
+        if is_history_table "$table"; then
             local character_id=$(echo "$item_json" | jq -r '.characterId.S // "unknown"')
             local block_number=$(echo "$item_json" | jq -r '.blockNumber.N // "unknown"')
             key_info=" (characterId: $character_id, blockNumber: $block_number)"
+        else
+            local user_id=$(echo "$item_json" | jq -r '.userId.S // "unknown"')
+            local character_id=$(echo "$item_json" | jq -r '.characterId.S // "unknown"')
+            key_info=" (userId: $user_id, characterId: $character_id)"
         fi
 
         log_info "[DRY RUN] Would upload: $(basename "$item_file") to $table$key_info"
@@ -140,14 +170,14 @@ upload_item() {
 
     # Extract and display key information
     local key_info=""
-    if [[ "$table" == "$CHARACTERS_TABLE" ]]; then
-        local user_id=$(echo "$item_json" | jq -r '.userId.S // "unknown"')
-        local character_id=$(echo "$item_json" | jq -r '.characterId.S // "unknown"')
-        key_info=" (userId: $user_id, characterId: $character_id)"
-    else
+    if is_history_table "$table"; then
         local character_id=$(echo "$item_json" | jq -r '.characterId.S // "unknown"')
         local block_number=$(echo "$item_json" | jq -r '.blockNumber.N // "unknown"')
         key_info=" (characterId: $character_id, blockNumber: $block_number)"
+    else
+        local user_id=$(echo "$item_json" | jq -r '.userId.S // "unknown"')
+        local character_id=$(echo "$item_json" | jq -r '.characterId.S // "unknown"')
+        key_info=" (userId: $user_id, characterId: $character_id)"
     fi
 
     if aws dynamodb put-item \
@@ -191,10 +221,10 @@ upload_items() {
 
         # Extract key for existence check
         local key
-        if [[ "$table" == "$CHARACTERS_TABLE" ]]; then
-            key=$(echo "$item_json" | jq '{userId: .userId, characterId: .characterId}')
-        else
+        if is_history_table "$table"; then
             key=$(echo "$item_json" | jq '{characterId: .characterId, blockNumber: .blockNumber}')
+        else
+            key=$(echo "$item_json" | jq '{userId: .userId, characterId: .characterId}')
         fi
 
         # Check if item exists
@@ -289,6 +319,7 @@ show_upload_overview() {
 # Main function
 main() {
     local aws_profile=""
+    local environment=""
     local aws_region="$DEFAULT_REGION"
     local characters_dir="$DEFAULT_CHARACTERS_DIR"
     local history_dir="$DEFAULT_HISTORY_DIR"
@@ -300,6 +331,10 @@ main() {
         case $1 in
             -p|--profile)
                 aws_profile="$2"
+                shift 2
+                ;;
+            -e|--env)
+                environment="$2"
                 shift 2
                 ;;
             -r|--region)
@@ -331,6 +366,7 @@ main() {
                 echo
                 log_info "Available options:"
                 log_info "  -p, --profile PROFILE         AWS profile name (required)"
+                log_info "  -e, --env ENV                 Environment name for table suffix (required)"
                 log_info "  -r, --region REGION           AWS region (default: eu-central-1)"
                 log_info "  -c, --characters-dir DIR      Directory containing character JSON files"
                 log_info "  -h, --history-dir DIR         Directory containing history JSON files"
@@ -351,6 +387,20 @@ main() {
         exit 1
     fi
 
+    if [[ -z "$environment" ]]; then
+        log_error "Environment is required. Use -e or --env to specify it."
+        usage
+        exit 1
+    fi
+
+    validate_environment "$environment"
+
+    local characters_table
+    characters_table=$(get_characters_table_name "$environment")
+
+    local history_table
+    history_table=$(get_history_table_name "$environment")
+
     check_jq
 
     # Validate inputs
@@ -361,11 +411,12 @@ main() {
     echo
     log_info "Configuration:"
     log_info "  AWS Profile: $aws_profile"
+    log_info "  Environment: $environment"
     log_info "  AWS Region: $aws_region"
     log_info "  Characters Directory: $characters_dir"
     log_info "  History Directory: $history_dir"
-    log_info "  Characters Table: $CHARACTERS_TABLE"
-    log_info "  History Table: $HISTORY_TABLE"
+    log_info "  Characters Table: $characters_table"
+    log_info "  History Table: $history_table"
     log_info "  Overwrite: $overwrite"
     log_info "  Dry Run: $dry_run"
     echo
@@ -376,7 +427,7 @@ main() {
     fi
 
     # Show upload overview and get confirmation
-    show_upload_overview "$characters_dir" "$history_dir" "$CHARACTERS_TABLE" "$HISTORY_TABLE" "$dry_run"
+    show_upload_overview "$characters_dir" "$history_dir" "$characters_table" "$history_table" "$dry_run"
 
     if [[ "$dry_run" != "true" ]]; then
         if [[ "$overwrite" == "true" ]]; then
@@ -399,13 +450,13 @@ main() {
 
     # Upload characters
     local total_failed=0
-    upload_items "$CHARACTERS_TABLE" "$characters_dir" "$aws_profile" "$aws_region" "$overwrite" "$dry_run"
+    upload_items "$characters_table" "$characters_dir" "$aws_profile" "$aws_region" "$overwrite" "$dry_run"
     total_failed=$((total_failed + $?))
 
     echo
 
     # Upload history
-    upload_items "$HISTORY_TABLE" "$history_dir" "$aws_profile" "$aws_region" "$overwrite" "$dry_run"
+    upload_items "$history_table" "$history_dir" "$aws_profile" "$aws_region" "$overwrite" "$dry_run"
     total_failed=$((total_failed + $?))
 
     echo
