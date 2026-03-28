@@ -18,8 +18,7 @@ The following environment variables must be configured in CircleCI project setti
 
 #### Workspace selection
 
-- Automated deployments derive `TF_WORKSPACE` from the environment (`pnp-app-dev` or `pnp-app-prod`)
-- Manual workflows like `component-tests` and `delete-services` currently target `prod` in the config
+- All workflows derive `TF_WORKSPACE` from the environment parameter
 
 ### Component Test Secrets
 
@@ -42,8 +41,9 @@ The following environment variables must be configured in CircleCI project setti
 
 ### Pipeline Parameters (Optional)
 
-- `run-component-tests`: Set to `true` to run backend component tests on demand
-- `delete-services`: Set to `true` to destroy all Terraform resources (use with caution)
+- `run-component-tests`: Set to `true` to run backend component tests for the specified environment (always runs on `main` for prod)
+- `delete-services`: Set to `true` to destroy all Terraform resources for the specified environment (use with caution)
+- `env`: Target environment (`dev` or `prod`, defaults to `dev`)
 
 ## Pipeline Workflows
 
@@ -63,9 +63,9 @@ The following environment variables must be configured in CircleCI project setti
 ### Component Tests
 
 - Triggers when `run-component-tests=true`
-- Runs backend component tests against the prod Terraform workspace by default
+- Runs backend component tests against the environment specified by the `env` parameter (defaults to `dev`)
 
 ### Delete Services
 
 - Triggers when `delete-services=true`
-- Destroys the prod Terraform workspace by default (`pnp-app-prod` with `terraform/variables/prod.tfvars`)
+- Destroys the Terraform resources for the environment specified by the `env` parameter (defaults to `dev`)
