@@ -1,7 +1,7 @@
-// --- CloudWatch Alarms ---
+# --- CloudWatch Alarms ---
 
-// Account-level Lambda metrics (no FunctionName dimension) aggregate across all
-// functions in the region, avoiding the 10-metric-query limit per alarm.
+# Account-level Lambda metrics (no FunctionName dimension) aggregate across all
+# functions in the region, avoiding the 10-metric-query limit per alarm.
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   alarm_name          = "${local.prefix}-lambda-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
@@ -143,8 +143,8 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_history_errors" {
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
-// Account-level Step Functions metric (no StateMachineArn dimension) aggregates
-// across all state machines in the region in a single query.
+# Account-level Step Functions metric (no StateMachineArn dimension) aggregates
+# across all state machines in the region in a single query.
 resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
   alarm_name          = "${local.prefix}-step-functions-failures-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"

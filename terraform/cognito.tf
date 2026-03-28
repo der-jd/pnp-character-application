@@ -30,19 +30,19 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     temporary_password_validity_days = 1
   }
 
-  // Require the attribute "email" during sign-up. Normally, it is only optional.
+  # Require the attribute "email" during sign-up. Normally, it is only optional.
   schema {
     name                = "email"
     attribute_data_type = "String"
     mutable             = true
     required            = true
     string_attribute_constraints {
-      max_length = 254 // https://stackoverflow.com/a/574698
-      min_length = 3   // https://stackoverflow.com/a/1423203
+      max_length = 254 # https://stackoverflow.com/a/574698
+      min_length = 3   # https://stackoverflow.com/a/1423203
     }
   }
 
-  // Keep the original attribute value active when an updated value is pending
+  # Keep the original attribute value active when an updated value is pending
   user_attribute_update_settings {
     attributes_require_verification_before_update = ["email"]
   }

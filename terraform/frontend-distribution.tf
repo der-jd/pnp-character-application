@@ -1,5 +1,5 @@
-// https://repost.aws/knowledge-center/cloudfront-serve-static-website
-// https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteEndpoints.html#WebsiteRestEndpointDiff
+# https://repost.aws/knowledge-center/cloudfront-serve-static-website
+# https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteEndpoints.html#WebsiteRestEndpointDiff
 
 resource "aws_cloudfront_distribution" "frontend_distribution" {
   comment = "PnP application frontend"
@@ -15,8 +15,8 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   default_root_object = "index.html"
 
   default_cache_behavior {
-    // Using the CachingDisabled managed policy ID.
-    // If caching should be enabled, a response headers policy for CORS is necessary.
+    # Using the CachingDisabled managed policy ID.
+    # If caching should be enabled, a response headers policy for CORS is necessary.
     cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]

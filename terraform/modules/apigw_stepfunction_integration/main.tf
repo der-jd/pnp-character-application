@@ -30,8 +30,8 @@ variable "state_machine_arn" {
 variable "integration_response_parameters" {
   type = map(string)
   default = {
-    "method.response.header.Access-Control-Allow-Origin" = "'*'" // TODO delete after testing and comment in following line
-    //"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
+    "method.response.header.Access-Control-Allow-Origin" = "'*'" # TODO delete after testing and comment in following line
+    #"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
     "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,POST'"
     "method.response.header.Access-Control-Max-Age"       = "'600'"

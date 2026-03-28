@@ -25,7 +25,7 @@ resource "aws_s3_bucket_ownership_controls" "frontend_bucket_ownership" {
 resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
   bucket = aws_s3_bucket.frontend_bucket.id
 
-  // https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
+  # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

@@ -53,7 +53,7 @@ variable "version_update_history_record_condition" {
   description = "If this JSONata condition is true, create a history record for version updates. Use '{% true %}' to always create, '{% false %}' to never create, or a conditional expression."
 }
 
-// This variable is only used for the create character endpoint which has a different response structure than the other update endpoints.
+# This variable is only used for the create character endpoint which has a different response structure than the other update endpoints.
 variable "include_version_history_record_in_response" {
   type        = bool
   description = "Whether to include versionUpdateHistoryRecord in the response. If true, the field is included (null when no record is created). If false, the field is completely omitted."
@@ -65,10 +65,10 @@ resource "aws_cloudwatch_log_group" "state_machine_log_group" {
   retention_in_days = 0
 }
 
-// Common retry policy for Lambda service exceptions
+# Common retry policy for Lambda service exceptions
 locals {
   lambda_service_retry = {
-    // Retry in case of Lambda service exceptions
+    # Retry in case of Lambda service exceptions
     ErrorEquals = [
       "Lambda.ClientExecutionTimeoutException",
       "Lambda.ServiceException",
@@ -77,8 +77,8 @@ locals {
     ]
     IntervalSeconds = 1
     MaxAttempts     = 4
-    BackoffRate     = 1.5 // Multiply the retry IntervalSeconds with this number after each retry -> exponential growth
-    MaxDelaySeconds = 3   // Cap exponential retry interval
+    BackoffRate     = 1.5 # Multiply the retry IntervalSeconds with this number after each retry -> exponential growth
+    MaxDelaySeconds = 3   # Cap exponential retry interval
   }
 
   general_retry = {
@@ -89,7 +89,7 @@ locals {
   }
 
   error_catch = [{
-    ErrorEquals = ["States.ALL"] // Fail on all errors if retries not defined or exceeded
+    ErrorEquals = ["States.ALL"] # Fail on all errors if retries not defined or exceeded
     Next        = "HandleError"
   }]
 }
@@ -105,9 +105,9 @@ resource "aws_sfn_state_machine" "state_machine" {
     level                  = "ALL"
   }
 
-  // Examples for error handling: https://docs.aws.amazon.com/step-functions/latest/dg/concepts-error-handling.html#error-handling-examples
-  // Best practices: https://docs.aws.amazon.com/step-functions/latest/dg/sfn-best-practices.html
-  // Transforming input and output with JSONata: https://docs.aws.amazon.com/step-functions/latest/dg/transforming-data.html
+  # Examples for error handling: https://docs.aws.amazon.com/step-functions/latest/dg/concepts-error-handling.html#error-handling-examples
+  # Best practices: https://docs.aws.amazon.com/step-functions/latest/dg/sfn-best-practices.html
+  # Transforming input and output with JSONata: https://docs.aws.amazon.com/step-functions/latest/dg/transforming-data.html
   definition = jsonencode({
     StartAt = var.main_state_name
     States = {
@@ -148,7 +148,7 @@ resource "aws_sfn_state_machine" "state_machine" {
           }
           "body" = {
             "userId"         = "{% $parse($mainOperationResult).userId %}"
-            "type"           = "8" // RULESET_VERSION_UPDATED
+            "type"           = "8" # RULESET_VERSION_UPDATED
             "name"           = "{% 'Update to ruleset version ' & $parse($mainOperationResult).versionUpdate.new.value %}"
             "data"           = "{% $parse($mainOperationResult).versionUpdate %}"
             "learningMethod" = null

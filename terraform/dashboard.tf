@@ -37,7 +37,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
 
   dashboard_body = jsonencode({
     widgets = [
-      // --- API Gateway ---
+      # --- API Gateway ---
       {
         type   = "text"
         x      = 0
@@ -99,7 +99,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         }
       },
 
-      // --- Lambda Functions ---
+      # --- Lambda Functions ---
       {
         type   = "text"
         x      = 0
@@ -191,7 +191,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         }
       },
 
-      // --- Step Functions ---
+      # --- Step Functions ---
       {
         type   = "text"
         x      = 0
@@ -251,7 +251,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
         }
       },
 
-      // --- DynamoDB ---
+      # --- DynamoDB ---
       {
         type   = "text"
         x      = 0

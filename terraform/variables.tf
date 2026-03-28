@@ -28,7 +28,7 @@ variable "api_domain_name" {
   type        = string
 }
 
-// Will be set via an environment variable in CircleCI
+# Will be set via an environment variable in CircleCI
 variable "alert_email_address" {
   description = "Email address that receives CloudWatch/SNS alert notifications"
   type        = string

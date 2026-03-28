@@ -47,7 +47,7 @@ module "update_skill_state_machine" {
   main_operation_history_record_condition = "{% $parse($mainOperationResult).changes.old != $parse($mainOperationResult).changes.new %}"
   main_operation_history_record_request = {
     userId_expression           = "{% $parse($mainOperationResult).userId %}"
-    type                        = "6" // SKILL_CHANGED
+    type                        = "6" # SKILL_CHANGED
     name_expression             = "{% $parse($mainOperationResult).skillCategory & '/' & $parse($mainOperationResult).skillName %}"
     data_expression             = "{% $parse($mainOperationResult).changes %}"
     learning_method_expression  = "{% $parse($mainOperationResult).learningMethod ? $parse($mainOperationResult).learningMethod : null %}"
@@ -69,7 +69,7 @@ module "update_attribute_state_machine" {
   main_operation_history_record_condition = "{% $parse($mainOperationResult).changes.old != $parse($mainOperationResult).changes.new %}"
   main_operation_history_record_request = {
     userId_expression           = "{% $parse($mainOperationResult).userId %}"
-    type                        = "5" // ATTRIBUTE_CHANGED
+    type                        = "5" # ATTRIBUTE_CHANGED
     name_expression             = "{% $parse($mainOperationResult).attributeName %}"
     data_expression             = "{% $parse($mainOperationResult).changes %}"
     attribute_points_expression = "{% $parse($mainOperationResult).attributePoints %}"
@@ -91,7 +91,7 @@ module "update_general_information_state_machine" {
   main_operation_history_record_condition = "{% $parse($mainOperationResult).changes.old != $parse($mainOperationResult).changes.new %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($mainOperationResult).userId %}"
-    type              = "9" // GENERAL_INFORMATION_CHANGED
+    type              = "9" # GENERAL_INFORMATION_CHANGED
     name_expression   = "General Information"
     data_expression   = "{% $parse($mainOperationResult).changes %}"
   }
@@ -112,7 +112,7 @@ module "update_base_value_state_machine" {
   main_operation_history_record_condition = "{% $parse($mainOperationResult).changes.old != $parse($mainOperationResult).changes.new %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($mainOperationResult).userId %}"
-    type              = "3" // BASE_VALUE_CHANGED
+    type              = "3" # BASE_VALUE_CHANGED
     name_expression   = "{% $parse($mainOperationResult).baseValueName %}"
     data_expression   = "{% $parse($mainOperationResult).changes %}"
   }
@@ -133,7 +133,7 @@ module "add_special_ability_state_machine" {
   main_operation_history_record_condition = "{% $parse($mainOperationResult).specialAbilities.old != $parse($mainOperationResult).specialAbilities.new %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($mainOperationResult).userId %}"
-    type              = "4" // SPECIAL_ABILITIES_CHANGED
+    type              = "4" # SPECIAL_ABILITIES_CHANGED
     name_expression   = "{% $parse($mainOperationResult).specialAbilityName %}"
     data_expression   = "{% $parse($mainOperationResult).specialAbilities %}"
   }
@@ -154,7 +154,7 @@ module "update_calculation_points_state_machine" {
   main_operation_history_record_condition = "{% $parse($mainOperationResult).calculationPoints.old != $parse($mainOperationResult).calculationPoints.new %}"
   main_operation_history_record_request = {
     userId_expression           = "{% $parse($mainOperationResult).userId %}"
-    type                        = "2" // CALCULATION_POINTS_CHANGED
+    type                        = "2" # CALCULATION_POINTS_CHANGED
     name_expression             = "Calculation Points"
     data_expression             = "{% $parse($mainOperationResult).calculationPoints %}"
     adventure_points_expression = "{% $parse($mainOperationResult).calculationPoints.old.adventurePoints ? {'old': $parse($mainOperationResult).calculationPoints.old.adventurePoints,'new': $parse($mainOperationResult).calculationPoints.new.adventurePoints} : null %}"
@@ -177,7 +177,7 @@ module "update_combat_stats_state_machine" {
   main_operation_history_record_condition = "{% $parse($mainOperationResult).combatStats.old != $parse($mainOperationResult).combatStats.new %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($mainOperationResult).userId %}"
-    type              = "7" // COMBAT_STATS_CHANGED
+    type              = "7" # COMBAT_STATS_CHANGED
     name_expression   = "{% $parse($mainOperationResult).combatCategory & '/' & $parse($mainOperationResult).combatSkillName %}"
     data_expression   = "{% $parse($mainOperationResult).combatStats %}"
   }
@@ -198,7 +198,7 @@ module "apply_level_up_state_machine" {
   main_operation_history_record_condition = "{% $parse($mainOperationResult).changes.old != $parse($mainOperationResult).changes.new %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($mainOperationResult).userId %}"
-    type              = "1" // LEVEL_UP_APPLIED
+    type              = "1" # LEVEL_UP_APPLIED
     name_expression   = "{% 'Level ' & $string($parse($mainOperationResult).changes.new.level) %}"
     data_expression   = "{% $parse($mainOperationResult).changes %}"
   }
@@ -219,7 +219,7 @@ module "create_character_state_machine" {
   main_operation_history_record_condition = "{% true %}"
   main_operation_history_record_request = {
     userId_expression = "{% $parse($mainOperationResult).userId %}"
-    type              = "0" // CHARACTER_CREATED
+    type              = "0" # CHARACTER_CREATED
     name_expression   = "{% $parse($mainOperationResult).characterName %}"
     data_expression   = "{% $parse($mainOperationResult).changes %}"
   }
