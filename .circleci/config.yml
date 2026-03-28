@@ -289,16 +289,22 @@ jobs:
       - run:
           name: Terraform plan
           command: |
+            source $BASH_ENV
+
             cd terraform
             terraform plan -var-file=variables/common.tfvars -var-file=variables/<< parameters.env >>.tfvars -out tfapply
       - run:
           name: Terraform apply
           command: |
+            source $BASH_ENV
+
             cd terraform
             terraform apply -auto-approve tfapply
       - run:
           name: Persist Terraform output for frontend
           command: |
+            source $BASH_ENV
+
             cd terraform
 
             rm -f ~/project/terraform/terraform_output_<< parameters.env >>
@@ -386,11 +392,15 @@ jobs:
       - run:
           name: Terraform plan destroy
           command: |
+            source $BASH_ENV
+
             cd terraform
             terraform plan -var-file=variables/common.tfvars -var-file=variables/<< parameters.env >>.tfvars -destroy -out tfdestroy
       - run:
           name: Terraform destroy
           command: |
+            source $BASH_ENV
+
             cd terraform
             terraform apply -auto-approve tfdestroy
 
