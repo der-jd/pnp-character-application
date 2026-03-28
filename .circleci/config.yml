@@ -231,7 +231,7 @@ jobs:
       - install-terraform
       - run:
           name: Select Terraform Cloud workspace
-          command: echo "export TF_WORKSPACE=pnp-app-<< parameters.env >>" >> "$BASH_ENV"
+          command: echo "export TF_WORKSPACE=${TF_WORKSPACE_<< parameters.env >>}" >> "$BASH_ENV"
       - run:
           name: Build api-spec package
           command: |
@@ -269,7 +269,7 @@ jobs:
           at: ~/project
       - run:
           name: Select Terraform Cloud workspace
-          command: echo "export TF_WORKSPACE=pnp-app-<< parameters.env >>" >> "$BASH_ENV"
+          command: echo "export TF_WORKSPACE=${TF_WORKSPACE_<< parameters.env >>}" >> "$BASH_ENV"
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
@@ -364,7 +364,7 @@ jobs:
       - checkout
       - run:
           name: Select Terraform Cloud workspace
-          command: echo "export TF_WORKSPACE=pnp-app-<< parameters.env >>" >> "$BASH_ENV"
+          command: echo "export TF_WORKSPACE=${TF_WORKSPACE_<< parameters.env >>}" >> "$BASH_ENV"
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
