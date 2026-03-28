@@ -14,8 +14,12 @@ The following environment variables must be configured in CircleCI project setti
 
 - `TF_CLOUD_ORGANIZATION`: Terraform Cloud organization name
 - `TF_TOKEN_app_terraform_io`: Terraform Cloud API token
-- `TF_WORKSPACE`: Terraform Cloud workspace name (e.g., "prod")
 - `TF_VAR_alert_email_address`: Email address for CloudWatch/SNS alert notifications (Terraform variable)
+
+#### Workspace selection
+
+- Automated deployments derive `TF_WORKSPACE` from the environment (`pnp-app-dev` or `pnp-app-prod`)
+- Manual workflows like `component-tests` and `delete-services` currently target `prod` in the config
 
 ### Component Test Secrets
 
@@ -43,18 +47,25 @@ The following environment variables must be configured in CircleCI project setti
 
 ## Pipeline Workflows
 
-### Build & Deploy (Default) - **Continuous Deployment**
+### `build-deploy-dev`
 
-- Runs on all branches except when special parameters are set
-- Includes formatting checks, linting, building, testing, and deployment
-- Component tests run automatically on main branch
+- Runs on every commit except the special `component-tests` and `delete-services` pipelines
+- Deploys the dev environment from `terraform/variables/common.tfvars` and `terraform/variables/dev.tfvars`
+- Uses the Terraform Cloud workspace `pnp-app-dev`
+
+### `build-deploy-prod`
+
+- Runs on every commit to `main`
+- Deploys prod from `terraform/variables/common.tfvars` and `terraform/variables/prod.tfvars`
+- Uses the Terraform Cloud workspace `pnp-app-prod`
+- Runs backend component tests after the backend and infrastructure deploy finishes
 
 ### Component Tests
 
 - Triggers when `run-component-tests=true`
-- Runs backend component tests against deployed infrastructure
+- Runs backend component tests against the prod Terraform workspace by default
 
 ### Delete Services
 
 - Triggers when `delete-services=true`
-- Destroys all AWS resources via Terraform destroy
+- Destroys the prod Terraform workspace by default (`pnp-app-prod` with `terraform/variables/prod.tfvars`)

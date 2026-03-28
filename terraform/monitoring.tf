@@ -3,7 +3,7 @@
 // Account-level Lambda metrics (no FunctionName dimension) aggregate across all
 // functions in the region, avoiding the 10-metric-query limit per alarm.
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
-  alarm_name          = "pnp-app-lambda-errors"
+  alarm_name          = "${local.prefix}-lambda-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 3
   datapoints_to_alarm = 2
@@ -22,7 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
-  alarm_name          = "pnp-app-lambda-throttles"
+  alarm_name          = "${local.prefix}-lambda-throttles-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "Throttles"
@@ -38,7 +38,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
-  alarm_name          = "pnp-app-api-5xx-errors"
+  alarm_name          = "${local.prefix}-api-5xx-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 3
   datapoints_to_alarm = 2
@@ -61,7 +61,7 @@ resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
-  alarm_name          = "pnp-app-api-4xx-errors"
+  alarm_name          = "${local.prefix}-api-4xx-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "4XXError"
@@ -81,7 +81,7 @@ resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "api_latency" {
-  alarm_name          = "pnp-app-api-high-latency"
+  alarm_name          = "${local.prefix}-api-high-latency-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 3
   datapoints_to_alarm = 2
@@ -104,7 +104,7 @@ resource "aws_cloudwatch_metric_alarm" "api_latency" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "dynamodb_characters_errors" {
-  alarm_name          = "pnp-app-dynamodb-characters-errors"
+  alarm_name          = "${local.prefix}-dynamodb-characters-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "SystemErrors"
@@ -124,7 +124,7 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_characters_errors" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "dynamodb_history_errors" {
-  alarm_name          = "pnp-app-dynamodb-history-errors"
+  alarm_name          = "${local.prefix}-dynamodb-history-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "SystemErrors"
@@ -146,7 +146,7 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_history_errors" {
 // Account-level Step Functions metric (no StateMachineArn dimension) aggregates
 // across all state machines in the region in a single query.
 resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
-  alarm_name          = "pnp-app-step-functions-failures"
+  alarm_name          = "${local.prefix}-step-functions-failures-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 3
   datapoints_to_alarm = 2

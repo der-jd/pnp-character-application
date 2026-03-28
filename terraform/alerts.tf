@@ -1,5 +1,5 @@
 resource "aws_sns_topic" "alerts" {
-  name = "pnp-app-alerts-topic"
+  name = "${local.prefix}-alerts-topic-${local.suffix}"
 }
 
 resource "aws_sns_topic_subscription" "alerts_email" {

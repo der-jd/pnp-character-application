@@ -28,3 +28,13 @@ variable "alert_email_address" {
   description = "Email address that receives CloudWatch/SNS alert notifications"
   type        = string
 }
+
+variable "daily_backup_retention_days" {
+  description = "Retention period in days for daily backups."
+  type        = number
+}
+
+variable "monthly_backup_retention_days" {
+  description = "Retention period in days for monthly backups."
+  type        = number
+}

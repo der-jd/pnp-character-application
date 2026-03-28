@@ -33,7 +33,7 @@ locals {
 }
 
 resource "aws_cloudwatch_dashboard" "backend" {
-  dashboard_name = "pnp-app-backend"
+  dashboard_name = "${local.prefix}-backend-${local.suffix}"
 
   dashboard_body = jsonencode({
     widgets = [

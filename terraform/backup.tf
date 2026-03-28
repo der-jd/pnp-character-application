@@ -1,9 +1,9 @@
 resource "aws_backup_vault" "vault" {
-  name = "pnp-app-backup-vault"
+  name = "${local.prefix}-backup-vault-${local.suffix}"
 }
 
 resource "aws_backup_plan" "plan" {
-  name = "pnp-app-backup-plan"
+  name = "${local.prefix}-backup-plan-${local.suffix}"
 
   rule {
     rule_name         = "daily"
@@ -15,7 +15,7 @@ resource "aws_backup_plan" "plan" {
     completion_window = 300 # minutes (5 hours)
 
     lifecycle {
-      delete_after = 90 # days
+      delete_after = var.daily_backup_retention_days
     }
   }
 
@@ -29,13 +29,13 @@ resource "aws_backup_plan" "plan" {
     completion_window = 300 # minutes (5 hours)
 
     lifecycle {
-      delete_after = 730 # days (24 months)
+      delete_after = var.monthly_backup_retention_days
     }
   }
 }
 
 resource "aws_backup_selection" "selection" {
-  name    = "dynamodb-tag-selection"
+  name    = "${local.prefix}-dynamodb-tag-selection-${local.suffix}"
   plan_id = aws_backup_plan.plan.id
 
   iam_role_arn = aws_iam_role.backup_role.arn
@@ -53,7 +53,7 @@ resource "aws_backup_selection" "selection" {
 }
 
 resource "aws_iam_role" "backup_role" {
-  name = "pnp-app-backup-service-role"
+  name = "${local.prefix}-backup-service-role-${local.suffix}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -75,7 +75,7 @@ resource "aws_iam_role_policy_attachment" "backup_managed_policy" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
-  alarm_name          = "pnp-app-backup-job-failed"
+  alarm_name          = "${local.prefix}-backup-job-failed-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "NumberOfBackupJobsFailed"
@@ -91,7 +91,7 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
-  alarm_name          = "pnp-app-backup-job-expired"
+  alarm_name          = "${local.prefix}-backup-job-expired-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "NumberOfBackupJobsExpired"
@@ -105,4 +105,3 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
-

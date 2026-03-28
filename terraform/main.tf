@@ -2,6 +2,12 @@ terraform {
   cloud {} // Organization and workspace name are defined via environment variables in CircleCI
 }
 
+locals {
+  prefix  = "pnp-app"
+  suffix  = var.env
+  is_prod = var.env == "prod"
+}
+
 data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}

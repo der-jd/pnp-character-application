@@ -1,8 +1,12 @@
 # ================== Route 53 DNS Management ==================
 
-# Main hosted zone for the domain
+# The hosted zone is owned by the prod environment. Non-prod environments
+# reference the existing zone via a data source to add their own DNS records.
+
+# Prod: create the hosted zone
 resource "aws_route53_zone" "main" {
-  name = var.domain_name
+  count = local.is_prod ? 1 : 0
+  name  = "worldhoppers.de"
 
   # Enable deletion protection to prevent the removal of the hosted zone and the corresponding nameservers.
   # This would break the DNS delegation from the external DNS provider where the domain is registered.
@@ -11,10 +15,20 @@ resource "aws_route53_zone" "main" {
   }
 }
 
-# Output the nameservers for delegation to another DNS provider
+# Non-prod: reference the existing hosted zone
+data "aws_route53_zone" "main" {
+  count = local.is_prod ? 0 : 1
+  name  = "worldhoppers.de"
+}
+
+locals {
+  route53_zone_id = local.is_prod ? aws_route53_zone.main[0].zone_id : data.aws_route53_zone.main[0].zone_id
+}
+
+# Output the nameservers for delegation to another DNS provider (prod only)
 output "route53_nameservers" {
   description = "Nameservers to configure at another DNS provider for DNS delegation"
-  value       = aws_route53_zone.main.name_servers
+  value       = local.is_prod ? aws_route53_zone.main[0].name_servers : []
 
   sensitive = false
 }
@@ -22,7 +36,7 @@ output "route53_nameservers" {
 # Output the hosted zone ID for reference
 output "route53_zone_id" {
   description = "Hosted zone ID for DNS record management"
-  value       = aws_route53_zone.main.zone_id
+  value       = local.route53_zone_id
 
   sensitive = false
 }
@@ -31,7 +45,7 @@ output "route53_zone_id" {
 
 # Frontend record (pointing to CloudFront distribution)
 resource "aws_route53_record" "frontend" {
-  zone_id = aws_route53_zone.main.zone_id
+  zone_id = local.route53_zone_id
   name    = var.domain_name
   type    = "A"
 
@@ -44,7 +58,7 @@ resource "aws_route53_record" "frontend" {
 
 # API subdomain record (pointing to API Gateway custom domain)
 resource "aws_route53_record" "api" {
-  zone_id = aws_route53_zone.main.zone_id
+  zone_id = local.route53_zone_id
   name    = var.api_domain_name
   type    = "A"
 
@@ -55,9 +69,10 @@ resource "aws_route53_record" "api" {
   }
 }
 
-# WWW record (optional - pointing to main domain)
+# WWW record (prod only - pointing to main domain)
 resource "aws_route53_record" "www" {
-  zone_id = aws_route53_zone.main.zone_id
+  count   = local.is_prod ? 1 : 0
+  zone_id = local.route53_zone_id
   name    = "www.${var.domain_name}"
   type    = "CNAME"
   ttl     = 300
@@ -79,7 +94,7 @@ resource "aws_route53_record" "main_cert_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = aws_route53_zone.main.zone_id
+  zone_id         = local.route53_zone_id
 }
 
 # DNS validation record for api domain ACM certificate
@@ -97,7 +112,7 @@ resource "aws_route53_record" "api_cert_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = aws_route53_zone.main.zone_id
+  zone_id         = local.route53_zone_id
 }
 
 # ================== Certificates ==================
@@ -106,7 +121,7 @@ resource "aws_route53_record" "api_cert_validation" {
 resource "aws_acm_certificate" "main_cert_us_east_1" {
   provider                  = aws.us_east_1
   domain_name               = var.domain_name
-  subject_alternative_names = ["www.${var.domain_name}"]
+  subject_alternative_names = local.is_prod ? ["www.${var.domain_name}"] : []
   validation_method         = "DNS"
 
   lifecycle {
