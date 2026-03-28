@@ -5,11 +5,11 @@ orbs:
 
 parameters:
   run-component-tests:
-    description: If true, runs backend component tests. Always runs on main branch.
+    description: If true, runs backend component tests for the specified environment. Always runs on main branch for prod.
     type: boolean
     default: false
   delete-services:
-    description: If true, deletes the Terraform resources in AWS.
+    description: If true, deletes the Terraform resources in AWS for the specified environment.
     type: boolean
     default: false
   env:
