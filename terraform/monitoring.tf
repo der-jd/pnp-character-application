@@ -3,8 +3,7 @@
 // Account-level Lambda metrics (no FunctionName dimension) aggregate across all
 // functions in the region, avoiding the 10-metric-query limit per alarm.
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
-  count               = var.enable_monitoring ? 1 : 0
-  alarm_name          = "${local.prefix}-lambda-errors"
+  alarm_name          = "${local.prefix}-lambda-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 3
   datapoints_to_alarm = 2
@@ -18,13 +17,12 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   # 2 of 3 consecutive 5-min windows must breach to avoid alerting on
   # one-off errors from invalid frontend requests (known issue).
   alarm_description = "Alerts when Lambda errors persist across multiple evaluation periods"
-  alarm_actions     = [aws_sns_topic.alerts[0].arn]
-  ok_actions        = [aws_sns_topic.alerts[0].arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
-  count               = var.enable_monitoring ? 1 : 0
-  alarm_name          = "${local.prefix}-lambda-throttles"
+  alarm_name          = "${local.prefix}-lambda-throttles-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "Throttles"
@@ -35,13 +33,12 @@ resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
   treat_missing_data  = "notBreaching"
 
   alarm_description = "Alerts when any Lambda function in the account is being throttled"
-  alarm_actions     = [aws_sns_topic.alerts[0].arn]
-  ok_actions        = [aws_sns_topic.alerts[0].arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
-  count               = var.enable_monitoring ? 1 : 0
-  alarm_name          = "${local.prefix}-api-5xx-errors"
+  alarm_name          = "${local.prefix}-api-5xx-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 3
   datapoints_to_alarm = 2
@@ -59,13 +56,12 @@ resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
   # 2 of 3 consecutive 5-min windows must breach to avoid alerting on
   # one-off 5xx errors caused by invalid frontend requests (known issue).
   alarm_description = "Alerts when API 5xx errors persist across multiple evaluation periods"
-  alarm_actions     = [aws_sns_topic.alerts[0].arn]
-  ok_actions        = [aws_sns_topic.alerts[0].arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
-  count               = var.enable_monitoring ? 1 : 0
-  alarm_name          = "${local.prefix}-api-4xx-errors"
+  alarm_name          = "${local.prefix}-api-4xx-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "4XXError"
@@ -80,13 +76,12 @@ resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
   }
 
   alarm_description = "Alerts when the API returns more than 5 client errors in 5 minutes, which may indicate auth issues or abuse"
-  alarm_actions     = [aws_sns_topic.alerts[0].arn]
-  ok_actions        = [aws_sns_topic.alerts[0].arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "api_latency" {
-  count               = var.enable_monitoring ? 1 : 0
-  alarm_name          = "${local.prefix}-api-high-latency"
+  alarm_name          = "${local.prefix}-api-high-latency-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 3
   datapoints_to_alarm = 2
@@ -104,13 +99,12 @@ resource "aws_cloudwatch_metric_alarm" "api_latency" {
   # Threshold raised to 8s to tolerate Lambda cold starts (~5s p99 on low-traffic app).
   # 2 of 3 consecutive windows must breach to avoid alerting on single cold-start spikes.
   alarm_description = "Alerts when API p99 latency persistently exceeds 8 seconds (sustained cold start or performance regression)"
-  alarm_actions     = [aws_sns_topic.alerts[0].arn]
-  ok_actions        = [aws_sns_topic.alerts[0].arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "dynamodb_characters_errors" {
-  count               = var.enable_monitoring ? 1 : 0
-  alarm_name          = "${local.prefix}-dynamodb-characters-errors"
+  alarm_name          = "${local.prefix}-dynamodb-characters-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "SystemErrors"
@@ -125,13 +119,12 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_characters_errors" {
   }
 
   alarm_description = "Alerts when DynamoDB system errors occur on the characters table"
-  alarm_actions     = [aws_sns_topic.alerts[0].arn]
-  ok_actions        = [aws_sns_topic.alerts[0].arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "dynamodb_history_errors" {
-  count               = var.enable_monitoring ? 1 : 0
-  alarm_name          = "${local.prefix}-dynamodb-history-errors"
+  alarm_name          = "${local.prefix}-dynamodb-history-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "SystemErrors"
@@ -146,15 +139,14 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_history_errors" {
   }
 
   alarm_description = "Alerts when DynamoDB system errors occur on the history table"
-  alarm_actions     = [aws_sns_topic.alerts[0].arn]
-  ok_actions        = [aws_sns_topic.alerts[0].arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 // Account-level Step Functions metric (no StateMachineArn dimension) aggregates
 // across all state machines in the region in a single query.
 resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
-  count               = var.enable_monitoring ? 1 : 0
-  alarm_name          = "${local.prefix}-step-functions-failures"
+  alarm_name          = "${local.prefix}-step-functions-failures-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 3
   datapoints_to_alarm = 2
@@ -168,6 +160,6 @@ resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
   # 2 of 3 consecutive 5-min windows must breach to avoid alerting on
   # one-off failures caused by invalid frontend requests (known issue).
   alarm_description = "Alerts when Step Functions execution failures persist across multiple evaluation periods"
-  alarm_actions     = [aws_sns_topic.alerts[0].arn]
-  ok_actions        = [aws_sns_topic.alerts[0].arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }

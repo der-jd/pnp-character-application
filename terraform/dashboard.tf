@@ -33,8 +33,7 @@ locals {
 }
 
 resource "aws_cloudwatch_dashboard" "backend" {
-  count          = var.enable_monitoring ? 1 : 0
-  dashboard_name = "${local.prefix}-backend"
+  dashboard_name = "${local.prefix}-backend-${local.suffix}"
 
   dashboard_body = jsonencode({
     widgets = [

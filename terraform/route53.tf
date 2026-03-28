@@ -5,7 +5,7 @@
 
 # Prod: create the hosted zone
 resource "aws_route53_zone" "main" {
-  count = var.is_prod ? 1 : 0
+  count = local.is_prod ? 1 : 0
   name  = "worldhoppers.de"
 
   # Enable deletion protection to prevent the removal of the hosted zone and the corresponding nameservers.
@@ -17,18 +17,18 @@ resource "aws_route53_zone" "main" {
 
 # Non-prod: reference the existing hosted zone
 data "aws_route53_zone" "main" {
-  count = var.is_prod ? 0 : 1
+  count = local.is_prod ? 0 : 1
   name  = "worldhoppers.de"
 }
 
 locals {
-  route53_zone_id = var.is_prod ? aws_route53_zone.main[0].zone_id : data.aws_route53_zone.main[0].zone_id
+  route53_zone_id = local.is_prod ? aws_route53_zone.main[0].zone_id : data.aws_route53_zone.main[0].zone_id
 }
 
 # Output the nameservers for delegation to another DNS provider (prod only)
 output "route53_nameservers" {
   description = "Nameservers to configure at another DNS provider for DNS delegation"
-  value       = var.is_prod ? aws_route53_zone.main[0].name_servers : []
+  value       = local.is_prod ? aws_route53_zone.main[0].name_servers : []
 
   sensitive = false
 }
@@ -71,7 +71,7 @@ resource "aws_route53_record" "api" {
 
 # WWW record (prod only - pointing to main domain)
 resource "aws_route53_record" "www" {
-  count   = var.is_prod ? 1 : 0
+  count   = local.is_prod ? 1 : 0
   zone_id = local.route53_zone_id
   name    = "www.${var.domain_name}"
   type    = "CNAME"
@@ -121,7 +121,7 @@ resource "aws_route53_record" "api_cert_validation" {
 resource "aws_acm_certificate" "main_cert_us_east_1" {
   provider                  = aws.us_east_1
   domain_name               = var.domain_name
-  subject_alternative_names = var.is_prod ? ["www.${var.domain_name}"] : []
+  subject_alternative_names = local.is_prod ? ["www.${var.domain_name}"] : []
   validation_method         = "DNS"
 
   lifecycle {

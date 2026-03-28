@@ -59,7 +59,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     }
   }
 
-  aliases = var.is_prod ? [var.domain_name, "www.${var.domain_name}"] : [var.domain_name]
+  aliases = local.is_prod ? [var.domain_name, "www.${var.domain_name}"] : [var.domain_name]
 
   viewer_certificate {
     acm_certificate_arn      = aws_acm_certificate_validation.main_cert_validation_us_east_1.certificate_arn
@@ -68,13 +68,9 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   }
 }
 
-output "cloudfront_distribution_id" {
-  value     = aws_cloudfront_distribution.frontend_distribution.id
-  sensitive = false
-}
 
 resource "aws_cloudfront_origin_access_control" "frontend_oac" {
-  name                              = "${local.prefix}-frontend-oac"
+  name                              = "${local.prefix}-frontend-oac-${local.suffix}"
   description                       = "Origin Access Control for accessing S3 bucket securely"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"

@@ -27,7 +27,7 @@ executors:
     resource_class: small
 
 workflows:
-  build-deploy:
+  build-deploy-dev:
     when:
       and:
         - not: << pipeline.parameters.delete-services >>
@@ -40,10 +40,8 @@ workflows:
       - run-frontend-tests
       - lint-terraform-code
       - deploy-backend-and-infrastructure:
-          name: deploy-dev-backend-and-infrastructure
-          output_file: terraform/terraform_output_dev
-          tf_var_file: envs/dev.tfvars
-          tf_workspace: pnp-app-dev
+          name: deploy-backend-and-infrastructure-dev
+          env: dev
           requires:
             - check-format-files
             - lint-typescript-code
@@ -51,64 +49,61 @@ workflows:
             - run-backend-unit-tests
             - lint-terraform-code
       - build-frontend:
-          name: build-dev-frontend
-          dist_dir: frontend/dist-dev
-          terraform_output_file: terraform/terraform_output_dev
+          name: build-frontend-dev
+          env: dev
           requires:
-            - deploy-dev-backend-and-infrastructure
+            - deploy-backend-and-infrastructure-dev
       - deploy-frontend:
-          name: deploy-dev-frontend
-          dist_dir: frontend/dist-dev
-          terraform_output_file: terraform/terraform_output_dev
+          name: deploy-frontend-dev
+          env: dev
           requires:
             - check-format-files
             - lint-typescript-code
-            - build-dev-frontend
+            - build-frontend-dev
             - run-frontend-tests
-            - deploy-dev-backend-and-infrastructure
+            - deploy-backend-and-infrastructure-dev
+
+  build-deploy-prod:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - not: << pipeline.parameters.delete-services >>
+        - not: << pipeline.parameters.run-component-tests >>
+    jobs:
+      - check-format-files
+      - lint-typescript-code
+      - build-backend
+      - run-backend-unit-tests
+      - run-frontend-tests
+      - lint-terraform-code
       - deploy-backend-and-infrastructure:
-          name: deploy-prod-backend-and-infrastructure
-          output_file: terraform/terraform_output_prod
-          tf_var_file: envs/prod.tfvars
-          tf_workspace: pnp-app-prod
+          name: deploy-backend-and-infrastructure-prod
+          env: prod
           requires:
             - check-format-files
             - lint-typescript-code
             - build-backend
             - run-backend-unit-tests
             - lint-terraform-code
-          filters:
-            branches:
-              only: main
       - run-backend-component-tests:
-          tf_workspace: pnp-app-prod
+          name: run-backend-component-tests-prod
+          env: prod
           requires:
-            - deploy-prod-backend-and-infrastructure
-          filters:
-            branches:
-              only: main
+            - deploy-backend-and-infrastructure-prod
       - build-frontend:
-          name: build-prod-frontend
-          dist_dir: frontend/dist-prod
-          terraform_output_file: terraform/terraform_output_prod
+          name: build-frontend-prod
+          env: prod
           requires:
-            - deploy-prod-backend-and-infrastructure
-          filters:
-            branches:
-              only: main
+            - deploy-backend-and-infrastructure-prod
       - deploy-frontend:
-          name: deploy-prod-frontend
-          dist_dir: frontend/dist-prod
-          terraform_output_file: terraform/terraform_output_prod
+          name: deploy-frontend-prod
+          env: prod
           requires:
             - check-format-files
             - lint-typescript-code
-            - build-prod-frontend
+            - build-frontend-prod
             - run-frontend-tests
-            - deploy-prod-backend-and-infrastructure
-          filters:
-            branches:
-              only: main
+            - deploy-backend-and-infrastructure-prod
 
   component-tests:
     when:
@@ -117,14 +112,15 @@ workflows:
         - << pipeline.parameters.run-component-tests >>
     jobs:
       - run-backend-component-tests:
-          tf_workspace: pnp-app-prod
+          name: run-backend-component-tests-prod
+          env: prod
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
     jobs:
       - terraform-destroy:
-          tf_var_file: envs/prod.tfvars
-          tf_workspace: pnp-app-prod
+          name: terraform-destroy-prod
+          env: prod
 
 jobs:
   check-format-files:
@@ -221,9 +217,9 @@ jobs:
 
   run-backend-component-tests:
     parameters:
-      tf_workspace:
-        type: string
-        default: pnp-app-prod
+      env:
+        type: enum
+        enum: [dev, prod]
     executor: node-medium-executor
     steps:
       - checkout
@@ -235,7 +231,7 @@ jobs:
       - install-terraform
       - run:
           name: Select Terraform Cloud workspace
-          command: echo "export TF_WORKSPACE=<< parameters.tf_workspace >>" >> "$BASH_ENV"
+          command: echo "export TF_WORKSPACE=pnp-app-<< parameters.env >>" >> "$BASH_ENV"
       - run:
           name: Build api-spec package
           command: |
@@ -247,15 +243,13 @@ jobs:
             cd terraform
             terraform init -input=false
 
-            # Create environment file for component tests
-            echo "export COMPONENT_TESTS_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
-            echo "export COMPONENT_TESTS_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
-            echo "export COMPONENT_TESTS_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output
+            echo "export COMPONENT_TESTS_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output_<< parameters.env >>
+            echo "export COMPONENT_TESTS_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output_<< parameters.env >>
+            echo "export COMPONENT_TESTS_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output_<< parameters.env >>
       - run:
           name: Run component tests
           command: |
-            # Set environment variables for tests
-            source ~/project/terraform/terraform_output
+            source ~/project/terraform/terraform_output_<< parameters.env >>
 
             cd backend
             npm run test:component
@@ -263,15 +257,9 @@ jobs:
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
   deploy-backend-and-infrastructure:
     parameters:
-      output_file:
-        type: string
-        description: "Workspace-relative file that stores Terraform outputs for downstream jobs"
-      tf_var_file:
-        type: string
-        description: "Path to environment-specific tfvars file"
-      tf_workspace:
-        type: string
-        description: "Terraform Cloud workspace name for the target environment"
+      env:
+        type: enum
+        enum: [dev, prod]
     docker:
       - image: *terraform_docker_image
     resource_class: medium
@@ -281,7 +269,7 @@ jobs:
           at: ~/project
       - run:
           name: Select Terraform Cloud workspace
-          command: echo "export TF_WORKSPACE=<< parameters.tf_workspace >>" >> "$BASH_ENV"
+          command: echo "export TF_WORKSPACE=pnp-app-<< parameters.env >>" >> "$BASH_ENV"
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
@@ -293,7 +281,7 @@ jobs:
           name: Terraform plan
           command: |
             cd terraform
-            terraform plan -var-file=<< parameters.tf_var_file >> -out tfapply
+            terraform plan               -var-file=variables/common.tfvars               -var-file=variables/<< parameters.env >>.tfvars               -out tfapply
       - run:
           name: Terraform apply
           command: |
@@ -304,27 +292,23 @@ jobs:
           command: |
             cd terraform
 
-            rm -f ~/project/<< parameters.output_file >>
+            rm -f ~/project/terraform/terraform_output_<< parameters.env >>
 
-            echo "export VITE_COGNITO_REGION=$(terraform output aws_region)" >> ~/project/<< parameters.output_file >>
-            echo "export VITE_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> ~/project/<< parameters.output_file >>
-            echo "export VITE_API_BASE_URL=$(terraform output api_versioned_url)" >> ~/project/<< parameters.output_file >>
-            echo "export FRONTEND_BUCKET_NAME=$(terraform output frontend_bucket_name)" >> ~/project/<< parameters.output_file >>
-            echo "export FRONTEND_BUCKET_REGION=$(terraform output aws_region)" >> ~/project/<< parameters.output_file >>
-            echo "export CLOUDFRONT_DISTRIBUTION_ID=$(terraform output cloudfront_distribution_id)" >> ~/project/<< parameters.output_file >>
+            echo "export VITE_COGNITO_REGION=$(terraform output aws_region)" >> ~/project/terraform/terraform_output_<< parameters.env >>
+            echo "export VITE_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> ~/project/terraform/terraform_output_<< parameters.env >>
+            echo "export VITE_API_BASE_URL=$(terraform output api_versioned_url)" >> ~/project/terraform/terraform_output_<< parameters.env >>
+            echo "export FRONTEND_BUCKET_NAME=$(terraform output frontend_bucket_name)" >> ~/project/terraform/terraform_output_<< parameters.env >>
+            echo "export FRONTEND_BUCKET_REGION=$(terraform output aws_region)" >> ~/project/terraform/terraform_output_<< parameters.env >>
       - persist_to_workspace:
           root: ~/project
           paths:
-            - << parameters.output_file >>
+            - terraform/terraform_output_<< parameters.env >>
 
   build-frontend:
     parameters:
-      dist_dir:
-        type: string
-        description: "Workspace-relative directory where the built frontend bundle is stored"
-      terraform_output_file:
-        type: string
-        description: "Workspace-relative file containing Terraform outputs for the target environment"
+      env:
+        type: enum
+        enum: [dev, prod]
     executor: node-medium-executor
     steps:
       - checkout
@@ -341,24 +325,21 @@ jobs:
       - run:
           name: Build frontend
           command: |
-            source ~/project/<< parameters.terraform_output_file >>
+            source ~/project/terraform/terraform_output_<< parameters.env >>
             cd frontend
             npm run build
-            rm -rf ~/project/<< parameters.dist_dir >>
-            mv dist ~/project/<< parameters.dist_dir >>
+            rm -rf ~/project/frontend/dist-<< parameters.env >>
+            mv dist ~/project/frontend/dist-<< parameters.env >>
       - persist_to_workspace:
           root: ~/project
           paths:
-            - << parameters.dist_dir >>
+            - frontend/dist-<< parameters.env >>
 
   deploy-frontend:
     parameters:
-      dist_dir:
-        type: string
-        description: "Workspace-relative directory that contains the frontend bundle to deploy"
-      terraform_output_file:
-        type: string
-        description: "Workspace-relative file containing Terraform outputs for the target environment"
+      env:
+        type: enum
+        enum: [dev, prod]
     executor: node-small-executor
     steps:
       - attach_workspace:
@@ -368,24 +349,14 @@ jobs:
       - run:
           name: Deploy frontend to S3
           command: |
-            source ~/project/<< parameters.terraform_output_file >>
-            aws s3 sync ~/project/<< parameters.dist_dir >> s3://$FRONTEND_BUCKET_NAME --delete --region $FRONTEND_BUCKET_REGION
-      - run:
-          name: Invalidate CloudFront cache
-          command: |
-            source ~/project/<< parameters.terraform_output_file >>
-            aws cloudfront create-invalidation \
-              --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
-              --paths "/*"
+            source ~/project/terraform/terraform_output_<< parameters.env >>
+            aws s3 sync ~/project/frontend/dist-<< parameters.env >> s3://$FRONTEND_BUCKET_NAME --delete --region $FRONTEND_BUCKET_REGION
 
   terraform-destroy:
     parameters:
-      tf_var_file:
-        type: string
-        description: "Path to environment-specific tfvars file"
-      tf_workspace:
-        type: string
-        description: "Terraform Cloud workspace name for the target environment"
+      env:
+        type: enum
+        enum: [dev, prod]
     docker:
       - image: *terraform_docker_image
     resource_class: small
@@ -393,7 +364,7 @@ jobs:
       - checkout
       - run:
           name: Select Terraform Cloud workspace
-          command: echo "export TF_WORKSPACE=<< parameters.tf_workspace >>" >> "$BASH_ENV"
+          command: echo "export TF_WORKSPACE=pnp-app-<< parameters.env >>" >> "$BASH_ENV"
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
@@ -405,7 +376,7 @@ jobs:
           name: Terraform plan destroy
           command: |
             cd terraform
-            terraform plan -var-file=<< parameters.tf_var_file >> -destroy -out tfdestroy
+            terraform plan               -var-file=variables/common.tfvars               -var-file=variables/<< parameters.env >>.tfvars               -destroy               -out tfdestroy
       - run:
           name: Terraform destroy
           command: |

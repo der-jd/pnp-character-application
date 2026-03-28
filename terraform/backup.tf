@@ -1,15 +1,13 @@
 resource "aws_backup_vault" "vault" {
-  count = var.enable_backup ? 1 : 0
-  name  = "${local.prefix}-backup-vault"
+  name = "${local.prefix}-backup-vault-${local.suffix}"
 }
 
 resource "aws_backup_plan" "plan" {
-  count = var.enable_backup ? 1 : 0
-  name  = "${local.prefix}-backup-plan"
+  name = "${local.prefix}-backup-plan-${local.suffix}"
 
   rule {
     rule_name         = "daily"
-    target_vault_name = aws_backup_vault.vault[0].name
+    target_vault_name = aws_backup_vault.vault.name
 
     # Every day at 01:00 UTC => 03:00 CEST / 02:00 CET
     schedule          = "cron(0 1 * * ? *)"
@@ -17,13 +15,13 @@ resource "aws_backup_plan" "plan" {
     completion_window = 300 # minutes (5 hours)
 
     lifecycle {
-      delete_after = 90 # days
+      delete_after = var.daily_backup_retention_days
     }
   }
 
   rule {
     rule_name         = "monthly"
-    target_vault_name = aws_backup_vault.vault[0].name
+    target_vault_name = aws_backup_vault.vault.name
 
     # First day of every month at 02:00 UTC => 04:00 CEST / 03:00 CET
     schedule          = "cron(0 2 1 * ? *)"
@@ -31,17 +29,16 @@ resource "aws_backup_plan" "plan" {
     completion_window = 300 # minutes (5 hours)
 
     lifecycle {
-      delete_after = 730 # days (24 months)
+      delete_after = var.monthly_backup_retention_days
     }
   }
 }
 
 resource "aws_backup_selection" "selection" {
-  count   = var.enable_backup ? 1 : 0
-  name    = "${local.prefix}-dynamodb-tag-selection"
-  plan_id = aws_backup_plan.plan[0].id
+  name    = "${local.prefix}-dynamodb-tag-selection-${local.suffix}"
+  plan_id = aws_backup_plan.plan.id
 
-  iam_role_arn = aws_iam_role.backup_role[0].arn
+  iam_role_arn = aws_iam_role.backup_role.arn
 
   # Limit selection to DynamoDB tables AND require them to have the defined tag
   resources = [
@@ -56,8 +53,7 @@ resource "aws_backup_selection" "selection" {
 }
 
 resource "aws_iam_role" "backup_role" {
-  count = var.enable_backup ? 1 : 0
-  name  = "${local.prefix}-backup-service-role"
+  name = "${local.prefix}-backup-service-role-${local.suffix}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -74,14 +70,12 @@ resource "aws_iam_role" "backup_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "backup_managed_policy" {
-  count      = var.enable_backup ? 1 : 0
-  role       = aws_iam_role.backup_role[0].name
+  role       = aws_iam_role.backup_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
 }
 
 resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
-  count               = var.enable_backup && var.enable_monitoring ? 1 : 0
-  alarm_name          = "${local.prefix}-backup-job-failed"
+  alarm_name          = "${local.prefix}-backup-job-failed-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "NumberOfBackupJobsFailed"
@@ -92,13 +86,12 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
   treat_missing_data  = "notBreaching"
 
   alarm_description = "Alerts when an AWS Backup job for the PnP Character Application fails"
-  alarm_actions     = [aws_sns_topic.alerts[0].arn]
-  ok_actions        = [aws_sns_topic.alerts[0].arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
-  count               = var.enable_backup && var.enable_monitoring ? 1 : 0
-  alarm_name          = "${local.prefix}-backup-job-expired"
+  alarm_name          = "${local.prefix}-backup-job-expired-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "NumberOfBackupJobsExpired"
@@ -109,6 +102,6 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
   treat_missing_data  = "notBreaching"
 
   alarm_description = "Alerts when an AWS Backup job expires (misses completion window) for the PnP Character Application"
-  alarm_actions     = [aws_sns_topic.alerts[0].arn]
-  ok_actions        = [aws_sns_topic.alerts[0].arn]
+  alarm_actions     = [aws_sns_topic.alerts.arn]
+  ok_actions        = [aws_sns_topic.alerts.arn]
 }

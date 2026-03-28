@@ -29,20 +29,12 @@ variable "alert_email_address" {
   type        = string
 }
 
-variable "enable_backup" {
-  description = "Whether to create AWS Backup resources (vault, plan, selection). Set to false for dev environments."
-  type        = bool
-  default     = true
+variable "daily_backup_retention_days" {
+  description = "Retention period in days for daily backups."
+  type        = number
 }
 
-variable "enable_monitoring" {
-  description = "Whether to create CloudWatch alarms, SNS topic, and dashboard. Set to false for dev environments."
-  type        = bool
-  default     = true
-}
-
-variable "is_prod" {
-  description = "Whether this is the production environment. Controls Route 53 zone creation vs. data source lookup, deletion protection, and prevent_destroy lifecycle rules."
-  type        = bool
-  default     = true
+variable "monthly_backup_retention_days" {
+  description = "Retention period in days for monthly backups."
+  type        = number
 }

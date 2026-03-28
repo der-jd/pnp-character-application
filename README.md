@@ -88,18 +88,18 @@ graph TB
 The application implements a backup strategy using **AWS Backup** to ensure data durability and recovery capabilities:
 
 - **Automated Backup Schedule**: Daily backups and monthly backups
-- **Retention Policy**: Daily backups retained for 90 days, monthly backups retained for 730 days (24 months)
+- **Retention Policy**: Prod keeps daily backups for 90 days and monthly backups for 730 days; dev keeps shorter retention to limit cost
 - **Backup Monitoring**: CloudWatch alarms alert on failed or expired backup jobs via SNS notifications
 
 Backup configurations are managed through Terraform in the `terraform/backup.tf` module.
 
 ## 📊 Monitoring, Dashboards & Alerting
 
-The application includes backend monitoring and alerting to track application health and performance, see [Monitoring & Alerting](./terraform/README.md#monitoring-and-alerting-configuration) for details.
+The application includes backend monitoring and alerting to track application health and performance, see [Monitoring & Alerting](./terraform/README.md#monitoring--alerting-configuration) for details.
 
 ## 🚀 Deployment
 
-CircleCI deploys the dev environment from every branch and additionally deploys prod from `main`. See [CircleCI Configuration](./.circleci/README.md) for details.
+CircleCI runs a dev deployment workflow on every branch and a separate prod deployment workflow on every commit to `main`. See [CircleCI Configuration](./.circleci/README.md) for details.
 
 ## 📁 Repository Structure
 
@@ -107,7 +107,7 @@ CircleCI deploys the dev environment from every branch and additionally deploys 
 pnp-character-application/
 ├── .circleci/          # CI/CD configuration
 ├── api-spec/           # Shared API types and schemas
-├── backend/            # Node.js Lambda functions and Step Functions
+├── backend/            # Node.js Lambda functions and business logic
 ├── frontend/           # React + Vite client application
 ├── scripts/            # Utility CLI tools
 ├── terraform/          # AWS infrastructure

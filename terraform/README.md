@@ -63,30 +63,28 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 - `project_tag_key`/`project_tag_value` - Project tagging
 - `domain_name` - Main application domain
 - `api_domain_name` - API-specific domain
-- `is_prod` - Controls shared Route 53 zone ownership, prod-only DNS records, and protection settings
-- `enable_backup` - Enables or disables AWS Backup resources for the environment
-- `enable_monitoring` - Enables or disables CloudWatch alarms, dashboard, and SNS alerts for the environment
+- `daily_backup_retention_days` - Retention period in days for daily backups
+- `monthly_backup_retention_days` - Retention period in days for monthly backups
 - `alert_email_address` - Email for CloudWatch alarm notifications (configured via CircleCI as `TF_VAR_alert_email_address`)
 
-Shared defaults live in `terraform/terraform.tfvars`. Environment-specific overrides live in `terraform/envs/prod.tfvars` and `terraform/envs/dev.tfvars`.
+Shared defaults live in `terraform/variables/common.tfvars`. Environment-specific overrides live in `terraform/variables/prod.tfvars` and `terraform/variables/dev.tfvars`.
 
 ### Outputs
 
-- `aws_region` - Primary AWS region ("eu-central-1")
+- `aws_region` - Primary AWS region (`eu-central-1`)
 - `api_versioned_url` - Complete API endpoint URL with version
 - `api_version` - API version number
 - `cognito_user_pool_id` - Cognito user pool ID (sensitive)
 - `cognito_app_client_id` - Cognito app client ID (sensitive)
-- `cloudfront_distribution_id` - CloudFront distribution ID for cache invalidation in CI
 - `frontend_bucket_name` - S3 bucket name for frontend static assets
 - `route53_nameservers` - Route53 nameservers for DNS delegation
 - `route53_zone_id` - Route53 hosted zone ID
 
 ## Multi-Environment Notes
 
-- Resource names are prefixed with `pnp-app-${var.env}` so prod and dev can coexist in the same AWS account
+- Resource names follow the pattern `prefix-name-suffix`, using `pnp-app` as the prefix and the environment as the suffix
 - Prod owns the `worldhoppers.de` Route 53 hosted zone; non-prod environments read it via a data source and only create their own records
-- Dev defaults disable backup and monitoring to reduce cost and noise; prod keeps both enabled
+- Backups and monitoring are enabled in every environment, with shorter backup retention in dev than in prod
 
 ## Monitoring & Alerting Configuration
 
@@ -98,7 +96,7 @@ Shared defaults live in `terraform/terraform.tfvars`. Environment-specific overr
 
 ### CloudWatch Dashboard
 
-The `${local.prefix}-backend` dashboard provides detailed visibility about:
+The `${local.prefix}-backend-${local.suffix}` dashboard provides detailed visibility about:
 
 - API Gateway endpoints
 - Lambda functions
@@ -107,7 +105,7 @@ The `${local.prefix}-backend` dashboard provides detailed visibility about:
 
 ### SNS Topic for Alerts
 
-The `${local.prefix}-alerts-topic` SNS topic in `alerts.tf` is shared by all alerting mechanisms within an environment.
+The `${local.prefix}-alerts-topic-${local.suffix}` SNS topic in `alerts.tf` is shared by all alerting mechanisms within an environment.
 
 All notifications are sent to the email address specified in `TF_VAR_alert_email_address` (CircleCI environment variable).
 

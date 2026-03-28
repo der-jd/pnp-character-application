@@ -1,5 +1,5 @@
 resource "aws_cognito_user_pool" "pnp_user_pool" {
-  name = "${local.prefix}-user-pool"
+  name = "${local.prefix}-user-pool-${local.suffix}"
 
   account_recovery_setting {
     recovery_mechanism {
@@ -68,7 +68,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
 
 # Cognito App Client (Frontend will use this to initiate login)
 resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
-  name                                 = "${local.prefix}-pool-client"
+  name                                 = "${local.prefix}-pool-client-${local.suffix}"
   user_pool_id                         = aws_cognito_user_pool.pnp_user_pool.id
   allowed_oauth_flows                  = ["implicit"]
   allowed_oauth_scopes                 = ["email", "openid"]

@@ -1,31 +1,40 @@
-variable "function_name" { // Must match the directory name in ../backend/src/lambdas/
-  type = string
-}
-variable "name_prefix" {
+variable "source_name" {
   type        = string
-  description = "Prefix for the Lambda function name (e.g., 'pnp-app-prod')"
+  description = "Directory name in ../backend/src/lambdas/ and base name for the generated zip file."
 }
+
+variable "function_name" {
+  type        = string
+  description = "Full Lambda function name in AWS."
+}
+
 variable "handler" {
   type    = string
   default = "index.handler"
 }
+
 variable "runtime" {
   type    = string
   default = "nodejs24.x"
 }
+
 variable "environment_vars" {
   type = map(string)
 }
+
 variable "layers" {
   type    = list(string)
   default = []
 }
+
 variable "role_arn" {
   type = string
 }
+
 variable "api_gateway_arn" {
   type = string
 }
+
 variable "timeout" {
   type    = number
   default = 5
@@ -37,12 +46,12 @@ locals {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "../backend/build/src/lambdas/${var.function_name}"
+  source_dir  = "../backend/build/src/lambdas/${var.source_name}"
   output_path = local.lambda_zip_path
 }
 
 resource "aws_lambda_function" "lambda_function" {
-  function_name    = "${var.name_prefix}-${var.function_name}"
+  function_name    = var.function_name
   handler          = var.handler
   runtime          = var.runtime
   role             = var.role_arn
@@ -50,9 +59,11 @@ resource "aws_lambda_function" "lambda_function" {
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   layers           = var.layers
   timeout          = var.timeout
+
   environment {
     variables = var.environment_vars
   }
+
   logging_config {
     log_format            = "JSON"
     application_log_level = "INFO"

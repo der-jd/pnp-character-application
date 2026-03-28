@@ -18,8 +18,8 @@ The following environment variables must be configured in CircleCI project setti
 
 #### Workspace selection
 
-- Automated deployments set `TF_WORKSPACE` per job (`pnp-app-dev` on every branch, `pnp-app-prod` on `main`)
-- `TF_WORKSPACE` only needs to be configured manually when running workflows like `delete-services` against a specific workspace
+- Automated deployments derive `TF_WORKSPACE` from the environment (`pnp-app-dev` or `pnp-app-prod`)
+- Manual workflows like `component-tests` and `delete-services` currently target `prod` in the config
 
 ### Component Test Secrets
 
@@ -47,19 +47,25 @@ The following environment variables must be configured in CircleCI project setti
 
 ## Pipeline Workflows
 
-### `build-deploy`
+### `build-deploy-dev`
 
 - Runs on every commit except the special `component-tests` and `delete-services` pipelines
-- Deploys the dev environment from every branch using `envs/dev.tfvars` and Terraform Cloud workspace `pnp-app-dev`
-- Also deploys prod from `main` using `envs/prod.tfvars` and Terraform Cloud workspace `pnp-app-prod`
-- Uses separate workspace artifacts per environment so dev and prod frontend deploys can run in the same pipeline on `main`
+- Deploys the dev environment from `terraform/variables/common.tfvars` and `terraform/variables/dev.tfvars`
+- Uses the Terraform Cloud workspace `pnp-app-dev`
+
+### `build-deploy-prod`
+
+- Runs on every commit to `main`
+- Deploys prod from `terraform/variables/common.tfvars` and `terraform/variables/prod.tfvars`
+- Uses the Terraform Cloud workspace `pnp-app-prod`
+- Runs backend component tests after the backend and infrastructure deploy finishes
 
 ### Component Tests
 
 - Triggers when `run-component-tests=true`
-- Runs backend component tests against the configured Terraform workspace (defaults to prod in the pipeline config)
+- Runs backend component tests against the prod Terraform workspace by default
 
 ### Delete Services
 
 - Triggers when `delete-services=true`
-- Destroys the prod Terraform workspace by default (`pnp-app-prod` with `envs/prod.tfvars`)
+- Destroys the prod Terraform workspace by default (`pnp-app-prod` with `terraform/variables/prod.tfvars`)

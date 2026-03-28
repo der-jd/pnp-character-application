@@ -1,5 +1,5 @@
 resource "aws_iam_role" "step_function_role" {
-  name = "${local.prefix}-step-function-role"
+  name = "${local.prefix}-step-function-role-${local.suffix}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -37,8 +37,7 @@ resource "aws_iam_role_policy_attachment" "step_function_cloudwatch_policy" {
 module "update_skill_state_machine" {
   source = "./modules/step_function_state_machine"
 
-  name_prefix        = local.prefix
-  state_machine_name = "update-skill"
+  state_machine_name = "${local.prefix}-update-skill-${local.suffix}"
   role_arn           = aws_iam_role.step_function_role.arn
   main_lambda_arn    = module.update_skill_lambda.lambda_function.arn
   history_lambda_arn = module.add_history_record_lambda.lambda_function.arn
@@ -60,8 +59,7 @@ module "update_skill_state_machine" {
 module "update_attribute_state_machine" {
   source = "./modules/step_function_state_machine"
 
-  name_prefix        = local.prefix
-  state_machine_name = "update-attribute"
+  state_machine_name = "${local.prefix}-update-attribute-${local.suffix}"
   role_arn           = aws_iam_role.step_function_role.arn
   main_lambda_arn    = module.update_attribute_lambda.lambda_function.arn
   history_lambda_arn = module.add_history_record_lambda.lambda_function.arn
@@ -83,8 +81,7 @@ module "update_attribute_state_machine" {
 module "update_general_information_state_machine" {
   source = "./modules/step_function_state_machine"
 
-  name_prefix        = local.prefix
-  state_machine_name = "update-general-information"
+  state_machine_name = "${local.prefix}-update-general-information-${local.suffix}"
   role_arn           = aws_iam_role.step_function_role.arn
   main_lambda_arn    = module.update_general_information_lambda.lambda_function.arn
   history_lambda_arn = module.add_history_record_lambda.lambda_function.arn
@@ -105,8 +102,7 @@ module "update_general_information_state_machine" {
 module "update_base_value_state_machine" {
   source = "./modules/step_function_state_machine"
 
-  name_prefix        = local.prefix
-  state_machine_name = "update-base-value"
+  state_machine_name = "${local.prefix}-update-base-value-${local.suffix}"
   role_arn           = aws_iam_role.step_function_role.arn
   main_lambda_arn    = module.update_base_value_lambda.lambda_function.arn
   history_lambda_arn = module.add_history_record_lambda.lambda_function.arn
@@ -127,8 +123,7 @@ module "update_base_value_state_machine" {
 module "add_special_ability_state_machine" {
   source = "./modules/step_function_state_machine"
 
-  name_prefix        = local.prefix
-  state_machine_name = "add-special-ability"
+  state_machine_name = "${local.prefix}-add-special-ability-${local.suffix}"
   role_arn           = aws_iam_role.step_function_role.arn
   main_lambda_arn    = module.add_special_ability_lambda.lambda_function.arn
   history_lambda_arn = module.add_history_record_lambda.lambda_function.arn
@@ -149,8 +144,7 @@ module "add_special_ability_state_machine" {
 module "update_calculation_points_state_machine" {
   source = "./modules/step_function_state_machine"
 
-  name_prefix        = local.prefix
-  state_machine_name = "update-calculation-points"
+  state_machine_name = "${local.prefix}-update-calculation-points-${local.suffix}"
   role_arn           = aws_iam_role.step_function_role.arn
   main_lambda_arn    = module.update_calculation_points_lambda.lambda_function.arn
   history_lambda_arn = module.add_history_record_lambda.lambda_function.arn
@@ -173,8 +167,7 @@ module "update_calculation_points_state_machine" {
 module "update_combat_stats_state_machine" {
   source = "./modules/step_function_state_machine"
 
-  name_prefix        = local.prefix
-  state_machine_name = "update-combat-stats"
+  state_machine_name = "${local.prefix}-update-combat-stats-${local.suffix}"
   role_arn           = aws_iam_role.step_function_role.arn
   main_lambda_arn    = module.update_combat_stats_lambda.lambda_function.arn
   history_lambda_arn = module.add_history_record_lambda.lambda_function.arn
@@ -195,8 +188,7 @@ module "update_combat_stats_state_machine" {
 module "apply_level_up_state_machine" {
   source = "./modules/step_function_state_machine"
 
-  name_prefix        = local.prefix
-  state_machine_name = "apply-level-up"
+  state_machine_name = "${local.prefix}-apply-level-up-${local.suffix}"
   role_arn           = aws_iam_role.step_function_role.arn
   main_lambda_arn    = module.apply_level_up_lambda.lambda_function.arn
   history_lambda_arn = module.add_history_record_lambda.lambda_function.arn
@@ -217,8 +209,7 @@ module "apply_level_up_state_machine" {
 module "create_character_state_machine" {
   source = "./modules/step_function_state_machine"
 
-  name_prefix        = local.prefix
-  state_machine_name = "create-character"
+  state_machine_name = "${local.prefix}-create-character-${local.suffix}"
   role_arn           = aws_iam_role.step_function_role.arn
   main_lambda_arn    = module.create_character_lambda.lambda_function.arn
   history_lambda_arn = module.add_history_record_lambda.lambda_function.arn

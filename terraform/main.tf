@@ -3,7 +3,9 @@ terraform {
 }
 
 locals {
-  prefix = "pnp-app-${var.env}" # e.g., "pnp-app-prod", "pnp-app-dev"
+  prefix  = "pnp-app"
+  suffix  = var.env
+  is_prod = var.env == "prod"
 }
 
 data "aws_caller_identity" "current" {}
