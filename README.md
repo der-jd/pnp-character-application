@@ -99,7 +99,7 @@ The application includes backend monitoring and alerting to track application he
 
 ## 🚀 Deployment
 
-CircleCI runs a dev deployment workflow on every branch and a separate prod deployment workflow on every commit to `main`. See [CircleCI Configuration](./.circleci/README.md) for details.
+CircleCI runs a dev deployment workflow on every branch and a separate prod deployment workflow on every commit to `main` (continuous deployment). See [CircleCI Configuration](./.circleci/README.md) for details.
 
 ## 📁 Repository Structure
 
