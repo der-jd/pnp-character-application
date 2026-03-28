@@ -1,5 +1,9 @@
 resource "aws_backup_vault" "vault" {
   name = "pnp-app-backup-vault"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_backup_plan" "plan" {

@@ -305,7 +305,9 @@ jobs:
             for resource in \
               aws_dynamodb_table.characters \
               aws_dynamodb_table.characters_history \
-              aws_route53_zone.main; do
+              aws_route53_zone.main \
+              aws_backup_vault.vault \
+              aws_cognito_user_pool.pnp_user_pool; do
               echo "  - $resource"
               terraform state rm "$resource" || true
             done
