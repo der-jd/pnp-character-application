@@ -226,14 +226,12 @@ resource "aws_sfn_state_machine" "state_machine" {
         QueryLanguage = "JSONata"
         Output = {
           "statusCode" = "{% $statusCode %}"
-          /**
-           * The content of "body" should be a stringified JSON to be consistent with output coming directly from a Lambda function.
-           * The body of a Lambda function is always a stringified JSON object.
-           * The mapping template for the API Gateway integration will parse the stringified JSON and return it as a JSON object.
-           *
-           * $parse() is used to parse the stringified JSON inside the variables temporarily back to a JSON object before the whole
-           * content is stringified with $string() again.
-           */
+          # The content of "body" should be a stringified JSON to be consistent with output coming directly from a Lambda function.
+          # The body of a Lambda function is always a stringified JSON object.
+          # The mapping template for the API Gateway integration will parse the stringified JSON and return it as a JSON object.
+          #
+          # $parse() is used to parse the stringified JSON inside the variables temporarily back to a JSON object before the whole
+          # content is stringified with $string() again.
           "body" = "{% $boolean(${var.include_version_history_record_in_response}) ? $string({'data': $parse($mainOperationResult), 'historyRecord': $addMainOperationHistoryRecordResult ? $parse($addMainOperationHistoryRecordResult) : null, 'versionUpdateHistoryRecord': $addVersionHistoryRecordResult ? $parse($addVersionHistoryRecordResult) : null}) : $string({'data': $parse($mainOperationResult), 'historyRecord': $addMainOperationHistoryRecordResult ? $parse($addMainOperationHistoryRecordResult) : null}) %}"
         }
       }

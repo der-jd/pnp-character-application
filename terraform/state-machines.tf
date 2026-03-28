@@ -23,12 +23,10 @@ resource "aws_iam_role_policy_attachment" "step_function_lambda_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaRole"
 }
 
-/**
- * Logging to CloudWatch Logs for Step Functions Express workflows requires special permissions and
- * a resource based policy for the log group. See:
- * https://docs.aws.amazon.com/step-functions/latest/dg/cw-logs.html#cloudwatch-iam-policy
- * https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AWS-vended-logs-permissions.html#AWS-vended-logs-permissions
- */
+# Logging to CloudWatch Logs for Step Functions Express workflows requires special permissions and
+# a resource based policy for the log group. See:
+# https://docs.aws.amazon.com/step-functions/latest/dg/cw-logs.html#cloudwatch-iam-policy
+# https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AWS-vended-logs-permissions.html#AWS-vended-logs-permissions
 resource "aws_iam_role_policy_attachment" "step_function_cloudwatch_policy" {
   role       = aws_iam_role.step_function_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"

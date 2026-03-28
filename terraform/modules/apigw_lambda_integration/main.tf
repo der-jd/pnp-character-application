@@ -112,12 +112,10 @@ resource "aws_api_gateway_integration_response" "lambda" {
   http_method         = aws_api_gateway_method.lambda.http_method
   status_code         = 200
   response_parameters = var.integration_response_parameters
-  /**
-   * This overwrites the response integrations status code with the status code from the Lambda response.
-   * This is necessary because the Lambda function returns a status code in the body of the response, which
-   * is not the status code of the HTTP response. The status code of the HTTP response is always 200 if left unchanged
-   * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-override-request-response-parameters.html
-   */
+  # This overwrites the response integrations status code with the status code from the Lambda response.
+  # This is necessary because the Lambda function returns a status code in the body of the response, which
+  # is not the status code of the HTTP response. The status code of the HTTP response is always 200 if left unchanged
+  # See: https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-override-request-response-parameters.html
   response_templates = {
     "application/json" = <<EOT
     ## --- Handle error case ---
@@ -133,11 +131,9 @@ resource "aws_api_gateway_integration_response" "lambda" {
     #end
     EOT
   }
-  /**
-   * API Gateway uses Java pattern-style regexes for selecting the correct response integration. Since
-   * we want to select the integration for all status codes, we use the regex ".*" which matches everything.
-   * See: https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-method-settings-execution-console.html Section 8
-   * See: https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/
-   */
+  # API Gateway uses Java pattern-style regexes for selecting the correct response integration. Since
+  # we want to select the integration for all status codes, we use the regex ".*" which matches everything.
+  # See: https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-method-settings-execution-console.html Section 8
+  # See: https://aws.amazon.com/blogs/compute/error-handling-patterns-in-amazon-api-gateway-and-aws-lambda/
   selection_pattern = ".*"
 }

@@ -47,18 +47,16 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     attributes_require_verification_before_update = ["email"]
   }
 
-  /**
-   * In our case "alias_attributes" can't be used as it allows to create users with the same email address.
-   * Only one user can have one specific email address as "verified". Setting the same email address for
-   * another user as "verified", will set the address to "Not verified" for the other user.
-   * Nevertheless, the email address is not unique across users and the described behavior is confusing.
-   *
-   * "username_attributes" forces the user to set an email address when signing up.
-   * The email address is unique across users, i.e. there can't be two users with the same email address.
-   * For sign-in the user must provide its email address.
-   * Notice: Even if the email is handled as username in the sign-up context, the actual username is set to
-   * an unique id (the same as the attribute 'sub') and the email is stored as "email" attribute.
-   */
+  # In our case "alias_attributes" can't be used as it allows to create users with the same email address.
+  # Only one user can have one specific email address as "verified". Setting the same email address for
+  # another user as "verified", will set the address to "Not verified" for the other user.
+  # Nevertheless, the email address is not unique across users and the described behavior is confusing.
+  #
+  # "username_attributes" forces the user to set an email address when signing up.
+  # The email address is unique across users, i.e. there can't be two users with the same email address.
+  # For sign-in the user must provide its email address.
+  # Notice: Even if the email is handled as username in the sign-up context, the actual username is set to
+  # an unique id (the same as the attribute 'sub') and the email is stored as "email" attribute.
   username_attributes = ["email"]
 
   username_configuration {

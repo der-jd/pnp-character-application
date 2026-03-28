@@ -24,23 +24,21 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     viewer_protocol_policy = "redirect-to-https"
   }
 
-  /**
-   * Custom error responses for Single Page Application (SPA) routing
-   *
-   * In a React SPA, client-side routing (React Router) handles URL navigation.
-   * When users refresh or directly access routes like /dashboard or /character/123,
-   * CloudFront would normally return 404 errors since these paths don't exist as files.
-   *
-   * These custom error responses intercept 403 and 404 errors and instead serve
-   * index.html with a 200 status code, allowing React Router to take over and
-   * render the correct component based on the URL path.
-   *
-   * 403: Handles cases where S3 denies access (e.g., missing public read permissions)
-   * 404: Handles cases where the requested path doesn't exist as a file in S3
-   *
-   * This pattern is standard for SPAs hosted on S3 + CloudFront and enables
-   * seamless client-side navigation while maintaining proper SEO-friendly URLs.
-   */
+  # Custom error responses for Single Page Application (SPA) routing
+  #
+  # In a React SPA, client-side routing (React Router) handles URL navigation.
+  # When users refresh or directly access routes like /dashboard or /character/123,
+  # CloudFront would normally return 404 errors since these paths don't exist as files.
+  #
+  # These custom error responses intercept 403 and 404 errors and instead serve
+  # index.html with a 200 status code, allowing React Router to take over and
+  # render the correct component based on the URL path.
+  #
+  # 403: Handles cases where S3 denies access (e.g., missing public read permissions)
+  # 404: Handles cases where the requested path doesn't exist as a file in S3
+  #
+  # This pattern is standard for SPAs hosted on S3 + CloudFront and enables
+  # seamless client-side navigation while maintaining proper SEO-friendly URLs.
   custom_error_response {
     error_code         = 403
     response_code      = 200
