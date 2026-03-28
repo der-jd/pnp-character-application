@@ -301,6 +301,8 @@ jobs:
           name: Remove protected resources from state
           command: |
             cd terraform
+            # TODO: The Route53 zone should be moved to a separate shared Terraform root module
+            # so it doesn't need to be removed from state during destroy. See PR #137.
             echo "The following resources will be removed from Terraform state and NOT destroyed:"
             for resource in \
               aws_dynamodb_table.characters \
