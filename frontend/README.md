@@ -40,8 +40,11 @@ src/
 ├── auth/           # AWS Cognito authentication
 │   └── ...
 ├── components/
-│   ├── ui/         # Base UI primitives (Button, Input, Card, Dialog, Badge, Select, Spinner, Toast)
-|   └── layout/     # AppLayout, Sidebar
+│   ├── ui/         # Base UI primitives (Badge, Button, etc.)
+│   ├── layout/     # AppLayout, Sidebar
+│   └── EventDialog.tsx
+├── hooks/          # Custom React hooks (useTheme, etc.)
+│   └── ...
 ├── lib/            # Shared utilities
 │   └── ...
 ├── pages/          # Route-level page components
