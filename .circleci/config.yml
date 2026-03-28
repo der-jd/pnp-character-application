@@ -117,8 +117,8 @@ workflows:
         - << pipeline.parameters.run-component-tests >>
     jobs:
       - run-backend-component-tests:
-          name: run-backend-component-tests-prod
-          env: prod
+          name: run-backend-component-tests-<< pipeline.parameters.env >>
+          env: << pipeline.parameters.env >>
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
