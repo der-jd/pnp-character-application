@@ -13,6 +13,11 @@ variable "project_tag_value" {
   type        = string
 }
 
+variable "hosted_zone_name" {
+  description = "The Route 53 hosted zone domain name"
+  type        = string
+}
+
 variable "domain_name" {
   description = "The main domain name for the application"
   type        = string

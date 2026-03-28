@@ -6,7 +6,7 @@
 # Prod: create the hosted zone
 resource "aws_route53_zone" "main" {
   count = local.is_prod ? 1 : 0
-  name  = "worldhoppers.de"
+  name  = var.hosted_zone_name
 
   # Enable deletion protection to prevent the removal of the hosted zone and the corresponding nameservers.
   # This would break the DNS delegation from the external DNS provider where the domain is registered.
@@ -18,7 +18,7 @@ resource "aws_route53_zone" "main" {
 # Non-prod: reference the existing hosted zone
 data "aws_route53_zone" "main" {
   count = local.is_prod ? 0 : 1
-  name  = "worldhoppers.de"
+  name  = var.hosted_zone_name
 }
 
 locals {
