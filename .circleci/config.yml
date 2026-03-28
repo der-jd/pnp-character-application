@@ -12,6 +12,11 @@ parameters:
     description: If true, deletes the Terraform resources in AWS.
     type: boolean
     default: false
+  env:
+    description: Target environment (dev or prod)
+    type: enum
+    enum: [dev, prod]
+    default: dev
 
 terraform_version: &terraform_version "1.14.5"
 terraform_docker_image: &terraform_docker_image "hashicorp/terraform:1.14"
@@ -119,8 +124,8 @@ workflows:
     when: << pipeline.parameters.delete-services >>
     jobs:
       - terraform-destroy:
-          name: terraform-destroy-prod
-          env: prod
+          name: terraform-destroy-<< pipeline.parameters.env >>
+          env: << pipeline.parameters.env >>
 
 jobs:
   check-format-files:
@@ -376,7 +381,7 @@ jobs:
           name: Terraform plan destroy
           command: |
             cd terraform
-            terraform plan               -var-file=variables/common.tfvars               -var-file=variables/<< parameters.env >>.tfvars               -destroy               -out tfdestroy
+            terraform plan -var-file=variables/common.tfvars -var-file=variables/<< parameters.env >>.tfvars -destroy -out tfdestroy
       - run:
           name: Terraform destroy
           command: |
