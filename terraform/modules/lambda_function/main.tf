@@ -34,7 +34,7 @@ locals {
 }
 
 # When the backend build output exists, zip it for deployment.
-# When it doesn't (e.g. during terraform destroy in CI where the backend isn't built),
+# When it doesn't (e.g. during terraform destroy in the CI/CD pipeline where the backend isn't built),
 # create a placeholder zip so the aws_lambda_function resource remains valid.
 # The placeholder content is irrelevant since the resource is being destroyed.
 data "archive_file" "lambda_zip" {

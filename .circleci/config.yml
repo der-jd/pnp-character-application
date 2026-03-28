@@ -298,6 +298,22 @@ jobs:
             cd terraform
             terraform init -input=false
       - run:
+          name: Remove protected resources from state
+          command: |
+            cd terraform
+            PROTECTED_RESOURCES=(
+              "aws_dynamodb_table.characters"
+              "aws_dynamodb_table.characters_history"
+              "aws_route53_zone.main"
+            )
+            echo "The following resources will be removed from Terraform state and NOT destroyed:"
+            for resource in "${PROTECTED_RESOURCES[@]}"; do
+              echo "  - $resource"
+              terraform state rm "$resource" || true
+            done
+            echo ""
+            echo "These resources still exist in AWS and must be removed manually if needed."
+      - run:
           name: Terraform plan destroy
           command: |
             cd terraform
