@@ -15,10 +15,10 @@ The following environment variables must be configured in CircleCI project setti
 - `TF_CLOUD_ORGANIZATION`: Terraform Cloud organization name
 - `TF_TOKEN_app_terraform_io`: Terraform Cloud API token
 - `TF_VAR_alert_email_address`: Email address for CloudWatch/SNS alert notifications (Terraform variable)
+- `TF_WORKSPACE_dev`: Terraform Cloud workspace name for the dev environment
+- `TF_WORKSPACE_prod`: Terraform Cloud workspace name for the prod environment
 
-#### Workspace selection
-
-- All workflows derive `TF_WORKSPACE` from the environment parameter
+All workflows derive `TF_WORKSPACE` from the environment parameter.
 
 ### Component Test Secrets
 
@@ -50,14 +50,12 @@ The following environment variables must be configured in CircleCI project setti
 ### `build-deploy-dev`
 
 - Runs on every commit except the special `component-tests` and `delete-services` pipelines
-- Deploys the dev environment from `terraform/variables/common.tfvars` and `terraform/variables/dev.tfvars`
-- Uses the Terraform Cloud workspace `pnp-app-dev`
+- Deploys the dev environment
 
 ### `build-deploy-prod`
 
 - Runs on every commit to `main`
-- Deploys prod from `terraform/variables/common.tfvars` and `terraform/variables/prod.tfvars`
-- Uses the Terraform Cloud workspace `pnp-app-prod`
+- Deploys the prod environment
 - Runs backend component tests after the backend and infrastructure deploy finishes
 
 ### Component Tests
