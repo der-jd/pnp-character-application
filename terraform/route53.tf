@@ -22,13 +22,13 @@ data "aws_route53_zone" "main" {
 }
 
 locals {
-  route53_zone_id = local.is_prod ? aws_route53_zone.main[0].zone_id : data.aws_route53_zone.main[0].zone_id
+  route53_zone = local.is_prod ? aws_route53_zone.main[0] : data.aws_route53_zone.main[0]
 }
 
-# Output the nameservers for delegation to another DNS provider (prod only)
+# Output the nameservers for delegation to another DNS provider
 output "route53_nameservers" {
   description = "Nameservers to configure at another DNS provider for DNS delegation"
-  value       = local.is_prod ? aws_route53_zone.main[0].name_servers : []
+  value       = local.route53_zone.name_servers
 
   sensitive = false
 }
@@ -36,7 +36,7 @@ output "route53_nameservers" {
 # Output the hosted zone ID for reference
 output "route53_zone_id" {
   description = "Hosted zone ID for DNS record management"
-  value       = local.route53_zone_id
+  value       = local.route53_zone.zone_id
 
   sensitive = false
 }
@@ -45,7 +45,7 @@ output "route53_zone_id" {
 
 # Frontend record (pointing to CloudFront distribution)
 resource "aws_route53_record" "frontend" {
-  zone_id = local.route53_zone_id
+  zone_id = local.route53_zone.zone_id
   name    = var.domain_name
   type    = "A"
 
@@ -58,7 +58,7 @@ resource "aws_route53_record" "frontend" {
 
 # API subdomain record (pointing to API Gateway custom domain)
 resource "aws_route53_record" "api" {
-  zone_id = local.route53_zone_id
+  zone_id = local.route53_zone.zone_id
   name    = var.api_domain_name
   type    = "A"
 
@@ -72,7 +72,7 @@ resource "aws_route53_record" "api" {
 # WWW record (prod only - pointing to main domain)
 resource "aws_route53_record" "www" {
   count   = local.is_prod ? 1 : 0
-  zone_id = local.route53_zone_id
+  zone_id = local.route53_zone.zone_id
   name    = "www.${var.domain_name}"
   type    = "CNAME"
   ttl     = 300
@@ -94,7 +94,7 @@ resource "aws_route53_record" "main_cert_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = local.route53_zone_id
+  zone_id         = local.route53_zone.zone_id
 }
 
 # DNS validation record for api domain ACM certificate
@@ -112,7 +112,7 @@ resource "aws_route53_record" "api_cert_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = local.route53_zone_id
+  zone_id         = local.route53_zone.zone_id
 }
 
 # ================== Certificates ==================
