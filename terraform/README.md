@@ -7,7 +7,7 @@ This directory contains the Terraform configuration for deploying the infrastruc
 
 ## Architecture Overview
 
-The application uses a serverless AWS architecture deployed via[Terraform Cloud](https://cloud.hashicorp.com/) with separate workspaces per environment and one for shared infrastructure.
+The application uses a serverless AWS architecture deployed via [Terraform Cloud](https://cloud.hashicorp.com/) with separate workspaces per environment and one for shared infrastructure.
 
 The infrastructure setup includes the following components:
 
