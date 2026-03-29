@@ -5,8 +5,7 @@
 resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   alarm_name          = "${local.prefix}-lambda-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 3
-  datapoints_to_alarm = 2
+  evaluation_periods  = 1
   metric_name         = "Errors"
   namespace           = "AWS/Lambda"
   period              = 300
@@ -14,9 +13,10 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
-  # 2 of 3 consecutive 5-min windows must breach to avoid alerting on
-  # one-off errors from invalid frontend requests (known issue).
-  alarm_description = "Alerts when Lambda errors persist across multiple evaluation periods"
+  # Lambda handlers return error responses instead of throwing, so the Errors
+  # metric now only fires on genuine infrastructure failures (OOM, timeout,
+  # unhandled exceptions). A single occurrence is actionable.
+  alarm_description = "Alerts on Lambda infrastructure failures (OOM, timeout, unhandled exceptions)"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
@@ -40,8 +40,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_throttles" {
 resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
   alarm_name          = "${local.prefix}-api-5xx-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 3
-  datapoints_to_alarm = 2
+  evaluation_periods  = 1
   metric_name         = "5XXError"
   namespace           = "AWS/ApiGateway"
   period              = 300
@@ -53,9 +52,10 @@ resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
     ApiName = aws_api_gateway_rest_api.pnp_rest_api.name
   }
 
-  # 2 of 3 consecutive 5-min windows must breach to avoid alerting on
-  # one-off 5xx errors caused by invalid frontend requests (known issue).
-  alarm_description = "Alerts when API 5xx errors persist across multiple evaluation periods"
+  # Application-level errors (4xx) are now returned as successful Lambda
+  # responses, so 5xx errors indicate genuine infrastructure issues.
+  # A single occurrence is actionable.
+  alarm_description = "Alerts on API 5xx errors indicating infrastructure failures"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
@@ -148,8 +148,7 @@ resource "aws_cloudwatch_metric_alarm" "dynamodb_history_errors" {
 resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
   alarm_name          = "${local.prefix}-step-functions-failures-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 3
-  datapoints_to_alarm = 2
+  evaluation_periods  = 1
   metric_name         = "ExecutionsFailed"
   namespace           = "AWS/States"
   period              = 300
@@ -157,9 +156,10 @@ resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
-  # 2 of 3 consecutive 5-min windows must breach to avoid alerting on
-  # one-off failures caused by invalid frontend requests (known issue).
-  alarm_description = "Alerts when Step Functions execution failures persist across multiple evaluation periods"
+  # Application-level errors are now routed through Choice states in the
+  # state machine, so ExecutionsFailed only fires on genuine infrastructure
+  # failures (Lambda crashes, timeouts). A single occurrence is actionable.
+  alarm_description = "Alerts on Step Functions infrastructure failures (Lambda crashes, timeouts)"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
 }
