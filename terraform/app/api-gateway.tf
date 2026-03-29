@@ -1,0 +1,721 @@
+resource "aws_iam_role" "api_gateway_role" {
+  name = "${local.prefix}-api-gateway-role-${local.suffix}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "apigateway.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "api_gateway_policy" {
+  name = "AllowStartSyncExecution"
+  role = aws_iam_role.api_gateway_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "states:StartSyncExecution",
+        Resource = [
+          module.create_character_state_machine.state_machine_arn,
+          module.update_skill_state_machine.state_machine_arn,
+          module.update_attribute_state_machine.state_machine_arn,
+          module.update_base_value_state_machine.state_machine_arn,
+          module.update_calculation_points_state_machine.state_machine_arn,
+          module.apply_level_up_state_machine.state_machine_arn,
+          module.update_combat_stats_state_machine.state_machine_arn,
+          module.add_special_ability_state_machine.state_machine_arn,
+          module.update_general_information_state_machine.state_machine_arn
+        ]
+      }
+    ]
+  })
+}
+
+
+resource "aws_api_gateway_rest_api" "pnp_rest_api" {
+  name        = "${local.prefix}-api-${local.suffix}"
+  description = "REST API for the PnP character application"
+  endpoint_configuration {
+    # Using Regional API endpoint for direct access without CloudFront distribution.
+    # See https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-endpoint-types.html#api-gateway-api-endpoint-types-regional
+    types = ["REGIONAL"]
+  }
+}
+
+# ================== /characters ==================
+
+resource "aws_api_gateway_resource" "characters" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_rest_api.pnp_rest_api.root_resource_id
+  path_part   = "characters" # .../characters
+}
+
+# ================== POST /characters ==================
+
+module "characters_post" {
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.characters.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "POST"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  aws_region           = data.aws_region.current.region
+  credentials          = aws_iam_role.api_gateway_role.arn
+  state_machine_arn    = module.create_character_state_machine.state_machine_arn
+}
+
+# ================== GET /characters ==================
+
+module "characters_get" {
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.characters.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "GET"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.querystring.character-short" = true
+  }
+  lambda_uri = module.get_characters_lambda.lambda_function.invoke_arn
+}
+
+# ================== OPTIONS /characters ==================
+
+module "characters_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.characters.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id} ==================
+
+resource "aws_api_gateway_resource" "character_id" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.characters.id
+  path_part   = "{character-id}" # .../characters/{character-id}
+}
+
+# ================== GET /characters/{character-id} ==================
+
+module "character_id_get" {
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.character_id.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "GET"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  lambda_uri = module.get_character_lambda.lambda_function.invoke_arn
+}
+
+# ================== DELETE /characters/{character-id} ==================
+
+module "character_id_delete" {
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.character_id.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "DELETE"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  lambda_uri = module.delete_character_lambda.lambda_function.invoke_arn
+}
+
+# ================== OPTIONS /characters/{character-id} ==================
+
+module "character_id_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.character_id.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id}/clone ==================
+
+resource "aws_api_gateway_resource" "character_id_clone" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "clone" # .../characters/{character-id}/clone
+}
+
+# ================== POST /characters/{character-id}/clone ==================
+
+module "character_id_clone_post" {
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.character_id_clone.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "POST"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  lambda_uri = module.clone_character_lambda.lambda_function.invoke_arn
+}
+
+# ================== OPTIONS /characters/{character-id}/clone ==================
+
+module "character_id_clone_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.character_id_clone.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id}/general-information ==================
+
+resource "aws_api_gateway_resource" "general_information" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "general-information" # .../characters/{character-id}/general-information
+}
+
+# ================== PATCH /characters/{character-id}/general-information ==================
+
+module "general_information_patch" {
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.general_information.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  aws_region        = data.aws_region.current.region
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = module.update_general_information_state_machine.state_machine_arn
+}
+
+# ================== OPTIONS /characters/{character-id}/general-information ==================
+
+module "general_information_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.general_information.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id}/attributes ==================
+
+resource "aws_api_gateway_resource" "attributes" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "attributes" # .../characters/{character-id}/attributes
+}
+
+# ================== /characters/{character-id}/attributes/{attribute-name} ==================
+
+resource "aws_api_gateway_resource" "attribute_name" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.attributes.id
+  path_part   = "{attribute-name}" # .../characters/{character-id}/attributes/{attribute-name}
+}
+
+# ================== PATCH /characters/{character-id}/attributes/{attribute-name} ==================
+
+module "attribute_name_patch" {
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.attribute_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"   = true
+    "method.request.path.attribute-name" = true
+  }
+  aws_region        = data.aws_region.current.region
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = module.update_attribute_state_machine.state_machine_arn
+}
+
+# ================== OPTIONS /characters/{character-id}/attributes/{attribute-name} ==================
+
+module "attribute_name_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.attribute_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id}/base-values ==================
+
+resource "aws_api_gateway_resource" "base_values" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "base-values" # .../characters/{character-id}/base-values
+}
+
+# ================== /characters/{character-id}/base-values/{base-value-name} ==================
+
+resource "aws_api_gateway_resource" "base_value_name" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.base_values.id
+  path_part   = "{base-value-name}" # .../characters/{character-id}/base-values/{base-value-name}
+}
+
+# ================== PATCH /characters/{character-id}/base-values/{base-value-name} ==================
+
+module "base_value_name_patch" {
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.base_value_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"    = true
+    "method.request.path.base-value-name" = true
+  }
+  aws_region        = data.aws_region.current.region
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = module.update_base_value_state_machine.state_machine_arn
+}
+
+# ================== OPTIONS /characters/{character-id}/base-values/{base-value-name} ==================
+
+module "base_value_name_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.base_value_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id}/calculation-points ==================
+
+resource "aws_api_gateway_resource" "calculation_points" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "calculation-points" # .../characters/{character-id}/calculation-points
+}
+
+# ================== PATCH /characters/{character-id}/calculation-points ==================
+
+module "calculation_points_patch" {
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.calculation_points.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  aws_region        = data.aws_region.current.region
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = module.update_calculation_points_state_machine.state_machine_arn
+}
+
+# ================== OPTIONS /characters/{character-id}/calculation-points ==================
+
+module "calculation_points_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.calculation_points.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id}/level-up ==================
+
+resource "aws_api_gateway_resource" "level_up" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "level-up" # .../characters/{character-id}/level-up
+}
+
+# ================== GET /characters/{character-id}/level-up ==================
+
+module "level_up_get" {
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.level_up.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "GET"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  lambda_uri = module.get_level_up_lambda.lambda_function.invoke_arn
+}
+
+# ================== POST /characters/{character-id}/level-up ==================
+
+module "level_up_post" {
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.level_up.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "POST"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  aws_region        = data.aws_region.current.region
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = module.apply_level_up_state_machine.state_machine_arn
+}
+
+# ================== OPTIONS /characters/{character-id}/level-up ==================
+
+module "level_up_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.level_up.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id}/skills ==================
+
+resource "aws_api_gateway_resource" "skills" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "skills" # .../characters/{character-id}/skills
+}
+
+# ================== /characters/{character-id}/skills/{skill-category} ==================
+
+resource "aws_api_gateway_resource" "skill_category" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.skills.id
+  path_part   = "{skill-category}" # .../characters/{character-id}/skills/{skill-category}
+}
+
+# ================== /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
+
+resource "aws_api_gateway_resource" "skill_name" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.skill_category.id
+  path_part   = "{skill-name}" # .../characters/{character-id}/skills/{skill-category}/{skill-name}
+}
+
+# ================== GET /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
+
+module "skill_name_get" {
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.skill_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "GET"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"           = true
+    "method.request.path.skill-category"         = true
+    "method.request.path.skill-name"             = true
+    "method.request.querystring.learning-method" = true
+  }
+  lambda_uri = module.get_skill_increase_cost_lambda.lambda_function.invoke_arn
+}
+
+# ================== PATCH /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
+
+module "skill_name_patch" {
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.skill_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"   = true
+    "method.request.path.skill-category" = true
+    "method.request.path.skill-name"     = true
+  }
+  aws_region        = data.aws_region.current.region
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = module.update_skill_state_machine.state_machine_arn
+}
+
+# ================== OPTIONS /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
+
+module "skill_name_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.skill_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id}/special-abilities ==================
+
+resource "aws_api_gateway_resource" "special_abilities" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "special-abilities" # .../characters/{character-id}/special-abilities
+}
+
+# ================== POST /characters/{character-id}/special-abilities ==================
+
+module "special_abilities_post" {
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.special_abilities.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "POST"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+  }
+  aws_region        = data.aws_region.current.region
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = module.add_special_ability_state_machine.state_machine_arn
+}
+
+# ================== OPTIONS /characters/{character-id}/special-abilities ==================
+
+module "special_abilities_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.special_abilities.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id}/combat ==================
+
+resource "aws_api_gateway_resource" "combat" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "combat" # .../characters/{character-id}/combat
+}
+
+# ================== /characters/{character-id}/combat/{combat-category} ==================
+
+resource "aws_api_gateway_resource" "combat_category" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.combat.id
+  path_part   = "{combat-category}" # .../characters/{character-id}/combat/{combat-category}
+}
+
+# ================== /characters/{character-id}/combat/{combat-category}/{combat-skill-name} ==================
+
+resource "aws_api_gateway_resource" "combat_skill_name" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.combat_category.id
+  path_part   = "{combat-skill-name}" # .../characters/{character-id}/combat/{combat-category}/{combat-skill-name}
+}
+
+# ================== PATCH /characters/{character-id}/combat/{combat-category}/{combat-skill-name} ==================
+
+module "combat_skill_name_patch" {
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.combat_skill_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"      = true
+    "method.request.path.combat-category"   = true
+    "method.request.path.combat-skill-name" = true
+  }
+  aws_region        = data.aws_region.current.region
+  credentials       = aws_iam_role.api_gateway_role.arn
+  state_machine_arn = module.update_combat_stats_state_machine.state_machine_arn
+}
+
+# ================== OPTIONS /characters/{character-id}/combat/{combat-category}/{combat-skill-name} ==================
+
+module "combat_skill_name_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.combat_skill_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id}/history ==================
+
+resource "aws_api_gateway_resource" "history" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.character_id.id
+  path_part   = "history" # .../history
+}
+
+# ================== GET /characters/{character-id}/history ==================
+
+module "history_get" {
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.history.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "GET"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"        = true
+    "method.request.querystring.block-number" = true
+  }
+  lambda_uri = module.get_history_lambda.lambda_function.invoke_arn
+}
+
+# ================== OPTIONS /characters/{character-id}/history ==================
+
+module "history_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.history.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================== /characters/{character-id}/history/{record-id} ==================
+
+resource "aws_api_gateway_resource" "record_id" {
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  parent_id   = aws_api_gateway_resource.history.id
+  path_part   = "{record-id}" # .../history/{record-id}
+}
+
+# ================== PATCH /characters/{character-id}/history/{record-id} ==================
+
+module "record_id_patch" {
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.record_id.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id"        = true
+    "method.request.path.record-id"           = true
+    "method.request.querystring.block-number" = true
+  }
+  lambda_uri = module.set_history_comment_lambda.lambda_function.invoke_arn
+}
+
+# ================== DELETE /characters/{character-id}/history/{record-id} ==================
+
+module "record_id_delete" {
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.record_id.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "DELETE"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  method_request_parameters = {
+    "method.request.path.character-id" = true
+    "method.request.path.record-id"    = true
+  }
+  lambda_uri = module.revert_history_record_lambda.lambda_function.invoke_arn
+}
+
+# ================== OPTIONS /characters/{character-id}/history/{record-id} ==================
+
+module "record_id_options" {
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.record_id.id
+  cors_allowed_origins = local.cors_allowed_origins
+}
+
+# ================================================================================
+
+resource "aws_api_gateway_deployment" "api_deployment" {
+  depends_on = [
+    module.characters_post,
+    module.attribute_name_patch,
+    module.attribute_name_options,
+    module.base_value_name_patch,
+    module.base_value_name_options,
+    module.calculation_points_patch,
+    module.calculation_points_options,
+    module.characters_get,
+    module.characters_options,
+    module.character_id_get,
+    module.character_id_delete,
+    module.character_id_options,
+    module.character_id_clone_post,
+    module.character_id_clone_options,
+    module.level_up_get,
+    module.level_up_post,
+    module.level_up_options,
+    module.special_abilities_post,
+    module.special_abilities_options,
+    module.skill_name_get,
+    module.skill_name_patch,
+    module.skill_name_options,
+    module.history_get,
+    module.history_options,
+    module.record_id_patch,
+    module.record_id_delete,
+    module.record_id_options,
+    module.combat_skill_name_patch,
+    module.combat_skill_name_options,
+    module.general_information_patch,
+    module.general_information_options,
+  ]
+
+  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
+  triggers = {
+    redeployment = md5(join("", [
+      file("${path.module}/api-gateway.tf"),
+      file("${path.module}/modules/apigw_options_method/main.tf"),
+      file("${path.module}/modules/apigw_lambda_integration/main.tf"),
+      file("${path.module}/modules/apigw_stepfunction_integration/main.tf"),
+    ]))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "api_stage" {
+  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
+  deployment_id = aws_api_gateway_deployment.api_deployment.id
+  stage_name    = var.env
+}
+
+# ================== Custom Domain Configuration ==================
+
+# Read API version from package.json
+data "local_file" "api_spec_package" {
+  filename = abspath("${path.root}/../../api-spec/package.json")
+}
+
+locals {
+  # Extract major version from package.json (e.g., "1.0.0" -> "v1")
+  api_version_parts = split(".", jsondecode(data.local_file.api_spec_package.content).version)
+  api_major_version = "v${local.api_version_parts[0]}"
+}
+
+# API Gateway custom domain name
+resource "aws_api_gateway_domain_name" "api_domain" {
+  domain_name              = var.api_domain_name
+  regional_certificate_arn = aws_acm_certificate_validation.api_cert_validation.certificate_arn
+  security_policy          = "TLS_1_2"
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+
+  depends_on = [aws_acm_certificate_validation.api_cert_validation]
+}
+
+# Base path mapping for API Gateway
+resource "aws_api_gateway_base_path_mapping" "api_mapping" {
+  api_id     = aws_api_gateway_rest_api.pnp_rest_api.id
+  stage_name = aws_api_gateway_stage.api_stage.stage_name
+
+  domain_name = aws_api_gateway_domain_name.api_domain.domain_name
+  base_path   = local.api_major_version
+}
+
+output "api_versioned_url" {
+  value     = "https://${aws_api_gateway_domain_name.api_domain.domain_name}/${aws_api_gateway_base_path_mapping.api_mapping.base_path}"
+  sensitive = false
+}
+
+output "api_version" {
+  value     = local.api_major_version
+  sensitive = false
+}

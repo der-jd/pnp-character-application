@@ -23,13 +23,7 @@ npm install
 npm run dev --workspace frontend
 ```
 
-The dev server connects to the live backend API. You need a `.env.local` file in the root folder with:
-
-```
-VITE_API_BASE_URL=https://api.worldhoppers.de/v1
-VITE_COGNITO_REGION=eu-central-1
-VITE_COGNITO_APP_CLIENT_ID=<your-cognito-app-client-id>
-```
+The dev server connects to the live backend API. For the required `.env.local` file and local startup prerequisites, see the [root README Quick Start](../README.md#-quick-start).
 
 ## Project Structure
 
@@ -40,8 +34,11 @@ src/
 ├── auth/           # AWS Cognito authentication
 │   └── ...
 ├── components/
-│   ├── ui/         # Base UI primitives (Button, Input, Card, Dialog, Badge, Select, Spinner, Toast)
-|   └── layout/     # AppLayout, Sidebar
+│   ├── ui/         # Base UI primitives (Badge, Button, etc.)
+│   ├── layout/     # AppLayout, Sidebar
+│   └── EventDialog.tsx
+├── hooks/          # Custom React hooks (useTheme, etc.)
+│   └── ...
 ├── lib/            # Shared utilities
 │   └── ...
 ├── pages/          # Route-level page components

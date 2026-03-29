@@ -9,15 +9,77 @@ Serverless web application for characters of a custom Pen & Paper game called "W
 ```bash
 # Install dependencies
 npm install
+```
 
-# Install linter for terraform
-npm install-lint-terraform
+### Required local environment variables
 
-# Initialize Terraform
-cd terraform && terraform init
+Create a `.env.local` file in the repository root for local frontend development, backend component tests, and Terraform-based workflows:
 
-# Start frontend development
+```bash
+# Create a .env.local file in the repository root
+cat <<'EOF' > .env.local
+# All environment variables for local development against the dev environment
+
+# Backend component tests
+export COMPONENT_TESTS_API_BASE_URL="https://api.dev.worldhoppers.de/v1"
+export COMPONENT_TESTS_COGNITO_REGION="eu-central-1"
+export COMPONENT_TESTS_COGNITO_APP_CLIENT_ID="<dev-cognito-app-client-id>"
+export COMPONENT_TESTS_COGNITO_USERNAME="<dev-component-test-username>"
+export COMPONENT_TESTS_COGNITO_PASSWORD="<dev-component-test-password>"
+
+# Terraform environment variables for local deployment
+export TF_CLOUD_ORGANIZATION="<your-terraform-cloud-organization>"
+export TF_TOKEN_app_terraform_io="<your-terraform-cloud-api-token>"
+# Development workspace
+export TF_WORKSPACE="<your-terraform-dev-workspace>"
+# Shared workspace (optional)
+#export TF_WORKSPACE="<your-terraform-shared-workspace>"
+export TF_VAR_alert_email_address="<your-alert-email-address>"
+
+# Frontend environment variables
+export VITE_API_BASE_URL="https://api.dev.worldhoppers.de/v1"
+export VITE_COGNITO_REGION="eu-central-1"
+export VITE_COGNITO_APP_CLIENT_ID="<dev-cognito-app-client-id>"
+
+# General test user for manual testing
+export GENERAL_TEST_USER_EMAIL="<test-user-email>"
+export GENERAL_TEST_USER_PASSWORD="<test-user-password>"
+EOF
+```
+
+Do **not** commit real tokens, passwords, or test-user secrets!
+
+### Backend local development
+
+There is no long-running local backend server in this repository. The backend is developed as Lambda and Step Function code, then built and tested locally:
+
+```bash
+# Type-check and bundle the backend Lambdas
+npm run build --workspace backend
+
+# Run backend unit tests
+npm run test:unit --workspace backend
+```
+
+### Start the frontend
+
+Start the frontend against the deployed dev backend:
+
+```bash
+# Start the frontend against the deployed dev backend
 npm run dev --workspace frontend
+```
+
+The frontend runs locally, but it connects to the deployed development API and Cognito user pool. Backend changes must therefore be deployed to the dev environment before you can verify them through the frontend.
+
+### Optional infrastructure setup
+
+If you are working on Terraform, initialize the infrastructure tooling as well:
+
+```bash
+npm run install-lint-terraform
+(cd terraform/app && terraform init)
+(cd terraform/shared && terraform init)
 ```
 
 ## 🏗️ Architecture
@@ -88,18 +150,18 @@ graph TB
 The application implements a backup strategy using **AWS Backup** to ensure data durability and recovery capabilities:
 
 - **Automated Backup Schedule**: Daily backups and monthly backups
-- **Retention Policy**: Daily backups retained for 90 days, monthly backups retained for 730 days (24 months)
+- **Retention Policy**: Prod keeps daily backups for 90 days and monthly backups for 730 days; dev keeps shorter retention to limit cost
 - **Backup Monitoring**: CloudWatch alarms alert on failed or expired backup jobs via SNS notifications
 
 Backup configurations are managed through Terraform in the `terraform/backup.tf` module.
 
 ## 📊 Monitoring, Dashboards & Alerting
 
-The application includes backend monitoring and alerting to track application health and performance, see [Monitoring & Alerting](./terraform/README.md#monitoring-and-alerting-configuration) for details.
+The application includes backend monitoring and alerting to track application health and performance, see [Monitoring & Alerting](./terraform/README.md#monitoring--alerting-configuration) for details.
 
 ## 🚀 Deployment
 
-**Continuous deployment** via CircleCI, see [CircleCI Configuration](./.circleci/README.md) for details.
+CircleCI runs a dev deployment workflow on every branch and a separate prod deployment workflow on every commit to `main` (continuous deployment). See [CircleCI Configuration](./.circleci/README.md) for details.
 
 ## 📁 Repository Structure
 
@@ -107,7 +169,7 @@ The application includes backend monitoring and alerting to track application he
 pnp-character-application/
 ├── .circleci/          # CI/CD configuration
 ├── api-spec/           # Shared API types and schemas
-├── backend/            # Node.js Lambda functions and Step Functions
+├── backend/            # Node.js Lambda functions and business logic
 ├── frontend/           # React + Vite client application
 ├── scripts/            # Utility CLI tools
 ├── terraform/          # AWS infrastructure

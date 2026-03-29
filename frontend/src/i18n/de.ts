@@ -335,7 +335,7 @@ const de = {
   historyColumnNumber: "#",
   historyColumnType: "Typ",
   historyColumnName: "Name",
-  historyColumnTimestamp: "Zeitpunkt (UTC)",
+  historyColumnTimestamp: "Zeitpunkt",
   historyColumnComment: "Kommentar",
   historyColumnActions: "Aktionen",
   historyDetails: "Details",

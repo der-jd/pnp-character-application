@@ -41,16 +41,6 @@ describe("Invalid requests", () => {
       },
       expectedStatusCode: 401,
     },
-    {
-      name: "No character found for a non existing user id",
-      request: {
-        headers: dummyHeaders,
-        pathParameters: null,
-        queryStringParameters: null,
-        body: null,
-      },
-      expectedStatusCode: 404,
-    },
   ];
 
   invalidTestCases.forEach((_case) => {
@@ -63,6 +53,22 @@ describe("Invalid requests", () => {
 });
 
 describe("Valid requests", () => {
+  test("Returns empty array when no characters exist for user", async () => {
+    mockDynamoDBQueryCharactersResponse({ Items: [] });
+
+    const result = await getCharacters({
+      headers: dummyHeaders,
+      pathParameters: null,
+      queryStringParameters: null,
+      body: null,
+    });
+
+    expect(result.statusCode).toBe(200);
+
+    const parsedBody = getCharactersResponseSchema.parse(JSON.parse(result.body));
+    expect(parsedBody.characters).toEqual([]);
+  });
+
   test("Successfully get characters - full response", async () => {
     mockDynamoDBQueryCharactersResponse(fakeCharacterListResponse);
 

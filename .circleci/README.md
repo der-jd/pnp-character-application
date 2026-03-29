@@ -14,13 +14,21 @@ The following environment variables must be configured in CircleCI project setti
 
 - `TF_CLOUD_ORGANIZATION`: Terraform Cloud organization name
 - `TF_TOKEN_app_terraform_io`: Terraform Cloud API token
-- `TF_WORKSPACE`: Terraform Cloud workspace name (e.g., "prod")
 - `TF_VAR_alert_email_address`: Email address for CloudWatch/SNS alert notifications (Terraform variable)
+- `TF_WORKSPACE_shared`: Terraform Cloud workspace name for the shared infrastructure
+- `TF_WORKSPACE_dev`: Terraform Cloud workspace name for the dev environment
+- `TF_WORKSPACE_prod`: Terraform Cloud workspace name for the prod environment
+
+All workflows derive `TF_WORKSPACE` from the environment parameter and set it automatically.
 
 ### Component Test Secrets
 
-- `COMPONENT_TESTS_COGNITO_USERNAME`: Test user username for Cognito authentication
-- `COMPONENT_TESTS_COGNITO_PASSWORD`: Test user password for Cognito authentication
+- `COMPONENT_TESTS_COGNITO_USERNAME_dev`: Test user username for Cognito authentication in dev environment
+- `COMPONENT_TESTS_COGNITO_PASSWORD_dev`: Test user password for Cognito authentication in dev environment
+- `COMPONENT_TESTS_COGNITO_USERNAME_prod`: Test user username for Cognito authentication in prod environment
+- `COMPONENT_TESTS_COGNITO_PASSWORD_prod`: Test user password for Cognito authentication in prod environment
+
+`COMPONENT_TESTS_COGNITO_USERNAME` and `COMPONENT_TESTS_COGNITO_PASSWORD` are derived from the environment parameter and set automatically.
 
 #### Automatically set via Terraform outputs
 
@@ -28,7 +36,7 @@ The following environment variables must be configured in CircleCI project setti
 - `COMPONENT_TESTS_COGNITO_REGION`: Region of the Cognito user pool
 - `COMPONENT_TESTS_COGNITO_APP_CLIENT_ID`: App client ID of the Cognito user pool
 
-### Frontend Build Variables (set automatically from Terraform outputs)
+### Frontend Build Variables (automatically set via Terraform outputs)
 
 - `VITE_COGNITO_REGION`: Cognito region for the frontend build
 - `VITE_COGNITO_APP_CLIENT_ID`: Cognito app client ID for the frontend build
@@ -36,25 +44,31 @@ The following environment variables must be configured in CircleCI project setti
 - `FRONTEND_BUCKET_NAME`: S3 bucket name for frontend deployment
 - `FRONTEND_BUCKET_REGION`: AWS region of the S3 bucket
 
-### Pipeline Parameters (Optional)
+## Pipeline Parameters (Optional)
 
-- `run-component-tests`: Set to `true` to run backend component tests on demand
-- `delete-services`: Set to `true` to destroy all Terraform resources (use with caution)
+- `run-component-tests`: Set to `true` to run backend component tests for the specified environment (always runs on `main` for prod)
+- `delete-services`: Set to `true` to destroy all Terraform resources for the specified environment (use with caution)
+- `env`: Target environment (`dev` or `prod`, defaults to `dev`)
 
 ## Pipeline Workflows
 
-### Build & Deploy (Default) - **Continuous Deployment**
+### `build-deploy-dev`
 
-- Runs on all branches except when special parameters are set
-- Includes formatting checks, linting, building, testing, and deployment
-- Component tests run automatically on main branch
+- Runs on every commit except the special `component-tests` and `delete-services` pipelines
+- Deploys the dev environment
+
+### `build-deploy-prod`
+
+- Runs on every commit to `main`
+- Deploys the prod environment
+- Runs backend component tests after the backend and infrastructure deploy finishes
 
 ### Component Tests
 
 - Triggers when `run-component-tests=true`
-- Runs backend component tests against deployed infrastructure
+- Runs backend component tests against the environment specified by the `env` parameter (defaults to `dev`)
 
 ### Delete Services
 
 - Triggers when `delete-services=true`
-- Destroys all AWS resources via Terraform destroy
+- Destroys the Terraform resources for the environment specified by the `env` parameter (defaults to `dev`)

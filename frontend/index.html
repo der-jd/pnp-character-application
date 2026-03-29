@@ -4,16 +4,10 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'sha256-aB/1rsCzfUIDEEpMA5XLZBOA/g5rbud2FTGsqWNkOJw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.worldhoppers.de https://cognito-idp.eu-central-1.amazonaws.com; font-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self';"
-    />
     <title>World Hoppers</title>
+    <script src="/theme-init.js"></script>
   </head>
   <body>
-    <script>
-      document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || "dark");
-    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

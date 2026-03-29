@@ -124,7 +124,8 @@ export async function getCharacterItems(userId: string): Promise<Character[]> {
   const response = await dynamoDBDocClient.send(command);
 
   if (!response.Items || response.Items.length === 0) {
-    throw new HttpError(404, "No characters found for the given user id");
+    console.log("No characters found for user, returning empty array");
+    return [];
   }
 
   console.log("Successfully got DynamoDB items");

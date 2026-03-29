@@ -5,13 +5,18 @@ orbs:
 
 parameters:
   run-component-tests:
-    description: If true, runs backend component tests. Always runs on main branch.
+    description: If true, runs backend component tests for the specified environment. Always runs on main branch for prod.
     type: boolean
     default: false
   delete-services:
-    description: If true, deletes the Terraform resources in AWS.
+    description: If true, deletes the Terraform resources in AWS for the specified environment.
     type: boolean
     default: false
+  env:
+    description: Target environment (dev or prod)
+    type: enum
+    enum: [dev, prod]
+    default: dev
 
 terraform_version: &terraform_version "1.14.5"
 terraform_docker_image: &terraform_docker_image "hashicorp/terraform:1.14"
@@ -27,7 +32,7 @@ executors:
     resource_class: small
 
 workflows:
-  build-deploy:
+  build-deploy-dev:
     when:
       and:
         - not: << pipeline.parameters.delete-services >>
@@ -39,31 +44,81 @@ workflows:
       - run-backend-unit-tests
       - run-frontend-tests
       - lint-terraform-code
-      - deploy-backend-and-infrastructure:
+      - deploy-shared-infrastructure:
+          requires:
+            - check-format-files
+            - lint-terraform-code
+      - deploy-backend-and-app-infrastructure:
+          name: deploy-backend-and-app-infrastructure-dev
+          env: dev
           requires:
             - check-format-files
             - lint-typescript-code
             - build-backend
             - run-backend-unit-tests
             - lint-terraform-code
-      # Run component tests only on main branch
-      - run-backend-component-tests:
-          requires:
-            - deploy-backend-and-infrastructure
-          filters:
-            branches:
-              only:
-                - main
+            - deploy-shared-infrastructure
       - build-frontend:
+          name: build-frontend-dev
+          env: dev
           requires:
-            - deploy-backend-and-infrastructure
+            - deploy-backend-and-app-infrastructure-dev
       - deploy-frontend:
+          name: deploy-frontend-dev
+          env: dev
           requires:
             - check-format-files
             - lint-typescript-code
-            - build-frontend
+            - build-frontend-dev
             - run-frontend-tests
-            - deploy-backend-and-infrastructure
+            - deploy-backend-and-app-infrastructure-dev
+
+  build-deploy-prod:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+        - not: << pipeline.parameters.delete-services >>
+        - not: << pipeline.parameters.run-component-tests >>
+    jobs:
+      - check-format-files
+      - lint-typescript-code
+      - build-backend
+      - run-backend-unit-tests
+      - run-frontend-tests
+      - lint-terraform-code
+      - deploy-shared-infrastructure:
+          requires:
+            - check-format-files
+            - lint-terraform-code
+      - deploy-backend-and-app-infrastructure:
+          name: deploy-backend-and-app-infrastructure-prod
+          env: prod
+          requires:
+            - check-format-files
+            - lint-typescript-code
+            - build-backend
+            - run-backend-unit-tests
+            - lint-terraform-code
+            - deploy-shared-infrastructure
+      - run-backend-component-tests:
+          name: run-backend-component-tests-prod
+          env: prod
+          requires:
+            - deploy-backend-and-app-infrastructure-prod
+      - build-frontend:
+          name: build-frontend-prod
+          env: prod
+          requires:
+            - deploy-backend-and-app-infrastructure-prod
+      - deploy-frontend:
+          name: deploy-frontend-prod
+          env: prod
+          requires:
+            - check-format-files
+            - lint-typescript-code
+            - build-frontend-prod
+            - run-frontend-tests
+            - deploy-backend-and-app-infrastructure-prod
 
   component-tests:
     when:
@@ -71,12 +126,16 @@ workflows:
         - not: << pipeline.parameters.delete-services >>
         - << pipeline.parameters.run-component-tests >>
     jobs:
-      - run-backend-component-tests
+      - run-backend-component-tests:
+          name: run-backend-component-tests-<< pipeline.parameters.env >>
+          env: << pipeline.parameters.env >>
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
     jobs:
-      - terraform-destroy
+      - terraform-destroy:
+          name: terraform-destroy-<< pipeline.parameters.env >>
+          env: << pipeline.parameters.env >>
 
 jobs:
   check-format-files:
@@ -172,6 +231,10 @@ jobs:
           command: npm run lint:terraform
 
   run-backend-component-tests:
+    parameters:
+      env:
+        type: enum
+        enum: [dev, prod]
     executor: node-medium-executor
     steps:
       - checkout
@@ -182,6 +245,9 @@ jobs:
           command: npm ci
       - install-terraform
       - run:
+          name: Select Terraform Cloud workspace
+          command: echo "export TF_WORKSPACE=${TF_WORKSPACE_<< parameters.env >>}" >> "$BASH_ENV"
+      - run:
           name: Build api-spec package
           command: |
             cd api-spec
@@ -189,24 +255,64 @@ jobs:
       - run:
           name: Set environment variables for component tests
           command: |
-            cd terraform
+            source $BASH_ENV
+
+            cd terraform/app
             terraform init -input=false
 
-            # Create environment file for component tests
-            echo "export COMPONENT_TESTS_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
-            echo "export COMPONENT_TESTS_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
-            echo "export COMPONENT_TESTS_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output
+            echo "export COMPONENT_TESTS_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output_<< parameters.env >>
+            echo "export COMPONENT_TESTS_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output_<< parameters.env >>
+            echo "export COMPONENT_TESTS_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output_<< parameters.env >>
+            echo "export COMPONENT_TESTS_COGNITO_USERNAME=${COMPONENT_TESTS_COGNITO_USERNAME_<< parameters.env >>}" >> "$BASH_ENV"
+            echo "export COMPONENT_TESTS_COGNITO_PASSWORD=${COMPONENT_TESTS_COGNITO_PASSWORD_<< parameters.env >>}" >> "$BASH_ENV"
       - run:
           name: Run component tests
           command: |
-            # Set environment variables for tests
-            source ~/project/terraform/terraform_output
+            source ~/project/terraform/app/terraform_output_<< parameters.env >>
+            source $BASH_ENV
 
             cd backend
             npm run test:component
 
   # https://developer.hashicorp.com/terraform/tutorials/automation/circle-ci
-  deploy-backend-and-infrastructure:
+  deploy-shared-infrastructure:
+    docker:
+      - image: *terraform_docker_image
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Select Terraform Cloud workspace
+          command: echo "export TF_WORKSPACE=$TF_WORKSPACE_shared" >> "$BASH_ENV"
+      - aws-cli/setup:
+          role_arn: "$AWS_ROLE_ARN"
+      - run:
+          name: Terraform init
+          command: |
+            source $BASH_ENV
+
+            cd terraform/shared
+            terraform init -input=false
+      - run:
+          name: Terraform plan
+          command: |
+            source $BASH_ENV
+
+            cd terraform/shared
+            terraform plan -var-file=variables/common.tfvars -out tfapply
+      - run:
+          name: Terraform apply
+          command: |
+            source $BASH_ENV
+
+            cd terraform/shared
+            terraform apply -auto-approve tfapply
+
+  deploy-backend-and-app-infrastructure:
+    parameters:
+      env:
+        type: enum
+        enum: [dev, prod]
     docker:
       - image: *terraform_docker_image
     resource_class: medium
@@ -214,39 +320,56 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/project
+      - run:
+          name: Select Terraform Cloud workspace
+          command: echo "export TF_WORKSPACE=${TF_WORKSPACE_<< parameters.env >>}" >> "$BASH_ENV"
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
           name: Terraform init
           command: |
-            cd terraform
+            source $BASH_ENV
+
+            cd terraform/app
             terraform init -input=false
       - run:
           name: Terraform plan
           command: |
-            cd terraform
-            terraform plan -out tfapply
+            source $BASH_ENV
+
+            cd terraform/app
+            terraform plan -var-file=variables/common.tfvars -var-file=variables/<< parameters.env >>.tfvars -out tfapply
       - run:
           name: Terraform apply
           command: |
-            cd terraform
+            source $BASH_ENV
+
+            cd terraform/app
             terraform apply -auto-approve tfapply
       - run:
           name: Persist Terraform output for frontend
           command: |
-            cd terraform
+            source $BASH_ENV
 
-            echo "export VITE_COGNITO_REGION=$(terraform output aws_region)" >> terraform_output
-            echo "export VITE_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> terraform_output
-            echo "export VITE_API_BASE_URL=$(terraform output api_versioned_url)" >> terraform_output
-            echo "export FRONTEND_BUCKET_NAME=$(terraform output frontend_bucket_name)" >> terraform_output
-            echo "export FRONTEND_BUCKET_REGION=$(terraform output aws_region)" >> terraform_output
+            cd terraform/app
+
+            rm -f ~/project/terraform/app/terraform_output_<< parameters.env >>
+
+            echo "export VITE_COGNITO_REGION=$(terraform output aws_region)" >> ~/project/terraform/app/terraform_output_<< parameters.env >>
+            echo "export VITE_COGNITO_APP_CLIENT_ID=$(terraform output cognito_app_client_id)" >> ~/project/terraform/app/terraform_output_<< parameters.env >>
+            echo "export VITE_API_BASE_URL=$(terraform output api_versioned_url)" >> ~/project/terraform/app/terraform_output_<< parameters.env >>
+            echo "export FRONTEND_BUCKET_NAME=$(terraform output frontend_bucket_name)" >> ~/project/terraform/app/terraform_output_<< parameters.env >>
+            echo "export FRONTEND_BUCKET_REGION=$(terraform output aws_region)" >> ~/project/terraform/app/terraform_output_<< parameters.env >>
       - persist_to_workspace:
           root: ~/project
           paths:
-            - terraform/terraform_output
+            - terraform/app/terraform_output_<< parameters.env >>
 
   build-frontend:
+    parameters:
+      env:
+        type: enum
+        enum: [dev, prod]
     executor: node-medium-executor
     steps:
       - checkout
@@ -263,15 +386,21 @@ jobs:
       - run:
           name: Build frontend
           command: |
-            source ~/project/terraform/terraform_output
+            source ~/project/terraform/app/terraform_output_<< parameters.env >>
             cd frontend
             npm run build
+            rm -rf ~/project/frontend/dist-<< parameters.env >>
+            mv dist ~/project/frontend/dist-<< parameters.env >>
       - persist_to_workspace:
           root: ~/project
           paths:
-            - frontend/dist
+            - frontend/dist-<< parameters.env >>
 
   deploy-frontend:
+    parameters:
+      env:
+        type: enum
+        enum: [dev, prod]
     executor: node-small-executor
     steps:
       - attach_workspace:
@@ -281,34 +410,42 @@ jobs:
       - run:
           name: Deploy frontend to S3
           command: |
-            source ~/project/terraform/terraform_output
-            aws s3 sync ~/project/frontend/dist s3://$FRONTEND_BUCKET_NAME --delete --region $FRONTEND_BUCKET_REGION
+            source ~/project/terraform/app/terraform_output_<< parameters.env >>
+            aws s3 sync ~/project/frontend/dist-<< parameters.env >> s3://$FRONTEND_BUCKET_NAME --delete --region $FRONTEND_BUCKET_REGION
 
   terraform-destroy:
+    parameters:
+      env:
+        type: enum
+        enum: [dev, prod]
     docker:
       - image: *terraform_docker_image
     resource_class: small
     steps:
       - checkout
+      - run:
+          name: Select Terraform Cloud workspace
+          command: echo "export TF_WORKSPACE=${TF_WORKSPACE_<< parameters.env >>}" >> "$BASH_ENV"
       - aws-cli/setup:
           role_arn: "$AWS_ROLE_ARN"
       - run:
           name: Terraform init
           command: |
-            cd terraform
+            source $BASH_ENV
+
+            cd terraform/app
             terraform init -input=false
       - run:
           name: Remove protected resources from state
           command: |
-            cd terraform
-            # TODO: The Route53 zone should be moved to a separate shared Terraform root module
-            # so it doesn't need to be removed from state during destroy. See PR #137.
+            source $BASH_ENV
+
+            cd terraform/app
             echo "The following resources will be removed from Terraform state and NOT destroyed:"
             failed_resources=""
             for resource in \
               aws_dynamodb_table.characters \
               aws_dynamodb_table.characters_history \
-              aws_route53_zone.main \
               aws_backup_vault.vault \
               aws_cognito_user_pool.pnp_user_pool; do
               echo "  - $resource"
@@ -330,12 +467,16 @@ jobs:
       - run:
           name: Terraform plan destroy
           command: |
-            cd terraform
-            terraform plan -destroy -out tfdestroy
+            source $BASH_ENV
+
+            cd terraform/app
+            terraform plan -var-file=variables/common.tfvars -var-file=variables/<< parameters.env >>.tfvars -destroy -out tfdestroy
       - run:
           name: Terraform destroy
           command: |
-            cd terraform
+            source $BASH_ENV
+
+            cd terraform/app
             terraform apply -auto-approve tfdestroy
 
 commands:
