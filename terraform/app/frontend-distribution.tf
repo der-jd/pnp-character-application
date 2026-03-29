@@ -17,11 +17,12 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   default_cache_behavior {
     # Using the CachingDisabled managed policy ID.
     # If caching should be enabled, a response headers policy for CORS is necessary.
-    cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
-    allowed_methods        = ["GET", "HEAD"]
-    cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = "S3-${aws_s3_bucket.frontend_bucket.id}"
-    viewer_protocol_policy = "redirect-to-https"
+    cache_policy_id            = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+    allowed_methods            = ["GET", "HEAD"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3-${aws_s3_bucket.frontend_bucket.id}"
+    viewer_protocol_policy     = "redirect-to-https"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.frontend_security_headers.id
   }
 
   # Custom error responses for Single Page Application (SPA) routing
@@ -65,6 +66,41 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     acm_certificate_arn      = aws_acm_certificate_validation.main_cert_validation_us_east_1.certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
+  }
+}
+
+resource "aws_cloudfront_response_headers_policy" "frontend_security_headers" {
+  name = "${local.prefix}-frontend-security-${local.suffix}"
+
+  security_headers_config {
+    content_type_options {
+      override = true
+    }
+
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+
+    referrer_policy {
+      referrer_policy = "same-origin"
+      override        = true
+    }
+
+    strict_transport_security {
+      access_control_max_age_sec = 31536000
+      include_subdomains         = true
+      preload                    = true
+      override                   = true
+    }
+  }
+
+  custom_headers_config {
+    items {
+      header   = "Content-Security-Policy"
+      override = true
+      value    = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://${var.api_domain_name} https://cognito-idp.eu-central-1.amazonaws.com; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';"
+    }
   }
 }
 
