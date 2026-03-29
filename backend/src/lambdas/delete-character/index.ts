@@ -4,7 +4,7 @@ import {
   parseBody,
   decodeUserId,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   getHistoryItems,
   deleteCharacterItem,
   deleteBatchHistoryItems,
@@ -69,7 +69,7 @@ export async function deleteCharacter(request: Request): Promise<APIGatewayProxy
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

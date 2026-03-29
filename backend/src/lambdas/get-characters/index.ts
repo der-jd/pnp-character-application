@@ -3,7 +3,7 @@ import {
   Request,
   parseBody,
   getCharacterItems,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   HttpError,
   decodeUserId,
   isZodError,
@@ -68,7 +68,7 @@ export async function getCharacters(request: Request): Promise<APIGatewayProxyRe
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

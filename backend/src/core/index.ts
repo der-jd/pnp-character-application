@@ -26,7 +26,8 @@ export {
   deleteLatestHistoryRecord,
   setRecordComment,
 } from "./dynamodb_history.js";
-export { logAndEnsureHttpError, HttpError, isZodError, logZodError } from "./errors.js";
+export { logAndEnsureHttpError, buildErrorResponse, HttpError, isZodError, logZodError } from "./errors.js";
+export type { ErrorResponse } from "./errors.js";
 export { decodeUserId } from "./token.js";
 export {
   parseLearningMethod,

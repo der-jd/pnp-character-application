@@ -27,7 +27,7 @@ import {
   Request,
   parseBody,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   updateAdventurePoints,
   decodeUserId,
   updateAttributePoints,
@@ -109,7 +109,7 @@ export async function revertRecordFromHistory(request: Request): Promise<APIGate
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

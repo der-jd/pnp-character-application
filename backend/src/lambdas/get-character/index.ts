@@ -4,7 +4,7 @@ import {
   parseBody,
   getCharacterItem,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   decodeUserId,
   isZodError,
   logZodError,
@@ -45,7 +45,7 @@ export async function getCharacter(request: Request): Promise<APIGatewayProxyRes
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

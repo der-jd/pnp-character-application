@@ -14,7 +14,7 @@ import {
   getHistoryItem,
   getHistoryItems,
   getCharacterItem,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   HttpError,
   decodeUserId,
   isZodError,
@@ -78,7 +78,7 @@ export async function getHistory(request: Request): Promise<APIGatewayProxyResul
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

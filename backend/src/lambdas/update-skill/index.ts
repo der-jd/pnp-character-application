@@ -25,7 +25,7 @@ import {
   updateSkill,
   decodeUserId,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   updateCombatStats,
   isZodError,
   logZodError,
@@ -184,7 +184,7 @@ export async function _updateSkill(request: Request): Promise<APIGatewayProxyRes
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

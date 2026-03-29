@@ -27,7 +27,7 @@ import {
   Request,
   parseBody,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   isZodError,
   logZodError,
   createLogger,
@@ -173,7 +173,7 @@ export async function addRecordToHistory(request: Request): Promise<APIGatewayPr
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 
