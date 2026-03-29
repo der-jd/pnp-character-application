@@ -18,7 +18,8 @@ resource "aws_iam_role_policy_attachment" "lambda_managed_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# TODO this general access needs to be replaced with a tenant specific access
+# TODO this general access should be replaced with a tenant specific access
+# -> a called lambda function can only access the table entries of the tenant
 resource "aws_iam_role_policy" "lambda_inline_policy" {
   role = aws_iam_role.lambda_exec_role.name
   policy = jsonencode({
