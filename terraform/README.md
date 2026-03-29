@@ -170,3 +170,40 @@ When setting up a new environment that requires the same users, use the migratio
 This migrates user email addresses. **Passwords cannot be migrated** between Cognito pools — users will need to reset their password on first login. **User subs (IDs) change** — Cognito always generates a new sub per pool. The script outputs old-to-new sub mappings. If your application stores data keyed by user sub (e.g. `userId` in DynamoDB), you will need to update those references after migration.
 
 After migration (or after creating new test users), update the component test credentials in CircleCI. See the [CircleCI README](../.circleci/README.md#component-test-secrets) for the relevant environment variables.
+
+## Shared Infrastructure Removal
+
+The `terraform-destroy` pipeline only removes per-environment resources from `terraform/app/`. **Shared infrastructure in `terraform/shared/` is not affected** and must be destroyed separately.
+
+### When to Destroy Shared Infrastructure
+
+Shared infrastructure should only be destroyed when:
+- Decommissioning the entire project across all environments
+- Migrating to a different domain/hosting setup
+- Complete infrastructure rebuild is required
+
+### Manual Shared Infrastructure Cleanup
+
+To destroy shared infrastructure (Route53 hosted zone):
+
+```bash
+# Navigate to shared infrastructure
+cd terraform/shared
+
+# Initialize Terraform (uses shared workspace)
+terraform init
+
+# Plan destruction
+terraform plan -var-file=variables/common.tfvars -destroy -out tfdestroy
+
+# Apply destruction
+terraform apply -auto-approve tfdestroy
+```
+
+**⚠️ Critical Warning**: Destroying shared infrastructure will:
+- Remove the Route53 hosted zone and all DNS records
+- Break DNS resolution for all environments
+- Require updating NS records at the domain registrar
+- Affect all environments simultaneously
+
+Ensure all per-environment resources are already destroyed before proceeding with shared infrastructure cleanup.
