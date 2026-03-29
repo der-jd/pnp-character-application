@@ -89,7 +89,7 @@ The shared root module (`terraform/shared/`) provides:
 
 ## Shared Infrastructure
 
-The `terraform/shared/` directory is a separate Terraform root module that manages resources shared across all environments. It uses its own Terraform Cloud workspace (`TF_WORKSPACE_shared`) and is deployed before any per-environment infrastructure.
+The `terraform/shared/` directory is a separate Terraform root module that manages resources shared across all environments. It uses its own Terraform Cloud workspace and is deployed before any per-environment infrastructure.
 
 Currently managed in the shared module:
 
