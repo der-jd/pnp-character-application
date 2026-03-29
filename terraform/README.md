@@ -140,3 +140,5 @@ When setting up a new environment that requires the same users, use the migratio
 ```
 
 This migrates user email addresses. **Passwords cannot be migrated** between Cognito pools — users will need to reset their password on first login. **User subs (IDs) change** — Cognito always generates a new sub per pool. The script outputs old-to-new sub mappings. If your application stores data keyed by user sub (e.g. `userId` in DynamoDB), you will need to update those references after migration.
+
+After migration (or after creating new test users), update the component test credentials in CircleCI. See the [CircleCI README](../.circleci/README.md#component-test-secrets) for the relevant environment variables.
