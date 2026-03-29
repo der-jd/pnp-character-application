@@ -19,7 +19,7 @@ The following environment variables must be configured in CircleCI project setti
 - `TF_WORKSPACE_dev`: Terraform Cloud workspace name for the dev environment
 - `TF_WORKSPACE_prod`: Terraform Cloud workspace name for the prod environment
 
-All workflows derive and set `TF_WORKSPACE` from the environment parameter.
+All workflows derive `TF_WORKSPACE` from the environment parameter and set it automatically.
 
 ### Component Test Secrets
 
@@ -27,6 +27,8 @@ All workflows derive and set `TF_WORKSPACE` from the environment parameter.
 - `COMPONENT_TESTS_COGNITO_PASSWORD_dev`: Test user password for Cognito authentication in dev environment
 - `COMPONENT_TESTS_COGNITO_USERNAME_prod`: Test user username for Cognito authentication in prod environment
 - `COMPONENT_TESTS_COGNITO_PASSWORD_prod`: Test user password for Cognito authentication in prod environment
+
+`COMPONENT_TESTS_COGNITO_USERNAME` and `COMPONENT_TESTS_COGNITO_PASSWORD` are derived from the environment parameter and set automatically.
 
 #### Automatically set via Terraform outputs
 
