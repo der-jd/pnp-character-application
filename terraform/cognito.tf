@@ -62,6 +62,10 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   username_configuration {
     case_sensitive = true
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Cognito App Client (Frontend will use this to initiate login)

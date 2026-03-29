@@ -41,13 +41,34 @@ variable "timeout" {
 }
 
 locals {
-  lambda_zip_path = "../backend/dist/${var.function_name}.zip"
+  lambda_source_dir    = "../backend/build/src/lambdas/${var.source_name}"
+  lambda_zip_path      = "../backend/dist/${var.function_name}.zip"
+  placeholder_zip_path = "../backend/dist/${var.function_name}-placeholder.zip"
+  # Assumes the build output entry point is always index.js (matching the default handler "index.handler")
+  source_dir_exists = fileexists("${path.root}/${local.lambda_source_dir}/index.js")
+  source_code_hash = (local.source_dir_exists
+    ? data.archive_file.lambda_zip[0].output_base64sha256
+    : data.archive_file.placeholder_zip[0].output_base64sha256
+  )
 }
 
+# When the backend build output exists, zip it for deployment.
+# When it doesn't (e.g. during terraform destroy in the CI/CD pipeline where the backend isn't built),
+# create a placeholder zip so the aws_lambda_function resource remains valid.
+# The placeholder content is irrelevant since the resource is being destroyed.
 data "archive_file" "lambda_zip" {
+  count       = local.source_dir_exists ? 1 : 0
   type        = "zip"
   source_dir  = "../backend/build/src/lambdas/${var.source_name}"
   output_path = local.lambda_zip_path
+}
+
+data "archive_file" "placeholder_zip" {
+  count                   = local.source_dir_exists ? 0 : 1
+  type                    = "zip"
+  source_content          = "placeholder"
+  source_content_filename = "index.js"
+  output_path             = local.placeholder_zip_path
 }
 
 resource "aws_lambda_function" "lambda_function" {
@@ -55,8 +76,8 @@ resource "aws_lambda_function" "lambda_function" {
   handler          = var.handler
   runtime          = var.runtime
   role             = var.role_arn
-  filename         = local.lambda_zip_path
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  filename         = local.source_dir_exists ? local.lambda_zip_path : local.placeholder_zip_path
+  source_code_hash = local.source_code_hash
   layers           = var.layers
   timeout          = var.timeout
 

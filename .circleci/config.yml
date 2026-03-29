@@ -390,6 +390,36 @@ jobs:
             cd terraform
             terraform init -input=false
       - run:
+          name: Remove protected resources from state
+          command: |
+            cd terraform
+            # TODO: The Route53 zone should be moved to a separate shared Terraform root module
+            # so it doesn't need to be removed from state during destroy. See PR #137.
+            echo "The following resources will be removed from Terraform state and NOT destroyed:"
+            failed_resources=""
+            for resource in \
+              aws_dynamodb_table.characters \
+              aws_dynamodb_table.characters_history \
+              aws_route53_zone.main \
+              aws_backup_vault.vault \
+              aws_cognito_user_pool.pnp_user_pool; do
+              echo "  - $resource"
+              if ! output=$(terraform state rm "$resource" 2>&1); then
+                if echo "$output" | grep -q "No matching objects found"; then
+                  echo "    [skipped] Not in state"
+                else
+                  echo "    [ERROR] $output"
+                  failed_resources="$failed_resources $resource"
+                fi
+              fi
+            done
+            echo ""
+            if [ -n "$failed_resources" ]; then
+              echo "ERROR: Failed to remove resources from state:$failed_resources"
+              exit 1
+            fi
+            echo "These resources still exist in AWS and must be removed manually if needed."
+      - run:
           name: Terraform plan destroy
           command: |
             source $BASH_ENV

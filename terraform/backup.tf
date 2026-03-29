@@ -1,5 +1,9 @@
 resource "aws_backup_vault" "vault" {
   name = "${local.prefix}-backup-vault-${local.suffix}"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_backup_plan" "plan" {
