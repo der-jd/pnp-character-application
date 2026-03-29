@@ -13,9 +13,6 @@ resource "aws_cloudwatch_metric_alarm" "lambda_errors" {
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
-  # Lambda handlers return error responses instead of throwing, so the Errors
-  # metric now only fires on genuine infrastructure failures (OOM, timeout,
-  # unhandled exceptions). A single occurrence is actionable.
   alarm_description = "Alerts on Lambda infrastructure failures (OOM, timeout, unhandled exceptions)"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
@@ -52,9 +49,6 @@ resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
     ApiName = aws_api_gateway_rest_api.pnp_rest_api.name
   }
 
-  # Application-level errors (4xx) are now returned as successful Lambda
-  # responses, so 5xx errors indicate genuine infrastructure issues.
-  # A single occurrence is actionable.
   alarm_description = "Alerts on API 5xx errors indicating infrastructure failures"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
@@ -156,9 +150,6 @@ resource "aws_cloudwatch_metric_alarm" "step_functions_failures" {
   threshold           = 0
   treat_missing_data  = "notBreaching"
 
-  # Application-level errors are now routed through Choice states in the
-  # state machine, so ExecutionsFailed only fires on genuine infrastructure
-  # failures (Lambda crashes, timeouts). A single occurrence is actionable.
   alarm_description = "Alerts on Step Functions infrastructure failures (Lambda crashes, timeouts)"
   alarm_actions     = [aws_sns_topic.alerts.arn]
   ok_actions        = [aws_sns_topic.alerts.arn]
