@@ -40,6 +40,10 @@ export TF_VAR_alert_email_address="<your-alert-email-address>"
 export VITE_API_BASE_URL="https://api.dev.worldhoppers.de/v1"
 export VITE_COGNITO_REGION="eu-central-1"
 export VITE_COGNITO_APP_CLIENT_ID="<dev-cognito-app-client-id>"
+
+# General test user for manual testing
+export GENERAL_TEST_USER_EMAIL="<test-user-email>"
+export GENERAL_TEST_USER_PASSWORD="<test-user-password>"
 EOF
 ```
 
