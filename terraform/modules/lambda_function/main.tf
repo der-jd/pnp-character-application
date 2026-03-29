@@ -28,9 +28,15 @@ variable "timeout" {
 }
 
 locals {
-  lambda_source_dir = "../backend/build/src/lambdas/${var.function_name}"
-  lambda_zip_path   = "../backend/dist/${var.function_name}.zip"
+  lambda_source_dir    = "../backend/build/src/lambdas/${var.function_name}"
+  lambda_zip_path      = "../backend/dist/${var.function_name}.zip"
+  placeholder_zip_path = "../backend/dist/${var.function_name}-placeholder.zip"
+  # Assumes the build output entry point is always index.js (matching the default handler "index.handler")
   source_dir_exists = fileexists("${path.root}/${local.lambda_source_dir}/index.js")
+  source_code_hash = (local.source_dir_exists
+    ? data.archive_file.lambda_zip[0].output_base64sha256
+    : data.archive_file.placeholder_zip[0].output_base64sha256
+  )
 }
 
 # When the backend build output exists, zip it for deployment.
@@ -49,7 +55,7 @@ data "archive_file" "placeholder_zip" {
   type                    = "zip"
   source_content          = "placeholder"
   source_content_filename = "index.js"
-  output_path             = local.lambda_zip_path
+  output_path             = local.placeholder_zip_path
 }
 
 resource "aws_lambda_function" "lambda_function" {
@@ -57,8 +63,8 @@ resource "aws_lambda_function" "lambda_function" {
   handler          = var.handler
   runtime          = var.runtime
   role             = var.role_arn
-  filename         = local.lambda_zip_path
-  source_code_hash = local.source_dir_exists ? data.archive_file.lambda_zip[0].output_base64sha256 : data.archive_file.placeholder_zip[0].output_base64sha256
+  filename         = local.source_dir_exists ? local.lambda_zip_path : local.placeholder_zip_path
+  source_code_hash = local.source_code_hash
   layers           = var.layers
   timeout          = var.timeout
   environment {

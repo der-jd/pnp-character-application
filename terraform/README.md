@@ -139,4 +139,4 @@ When setting up a new environment that requires the same users, use the migratio
   --dry-run  # optional: preview without making changes
 ```
 
-This preserves the user ID (sub) and email. **Passwords cannot be migrated** between Cognito pools — users will need to reset their password on first login.
+This migrates user email addresses. **Passwords cannot be migrated** between Cognito pools — users will need to reset their password on first login. **User subs (IDs) change** — Cognito always generates a new sub per pool. The script outputs old-to-new sub mappings. If your application stores data keyed by user sub (e.g. `userId` in DynamoDB), you will need to update those references after migration.
