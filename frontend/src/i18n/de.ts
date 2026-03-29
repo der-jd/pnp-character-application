@@ -12,6 +12,15 @@ const de = {
   signInError: "Anmeldung fehlgeschlagen. Bitte überprüfe deine Zugangsdaten.",
   signInErrorNetwork: "Netzwerkfehler. Bitte versuche es erneut.",
   sessionExpired: "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
+  newPassword: "Neues Passwort",
+  confirmNewPassword: "Neues Passwort bestätigen",
+  setNewPassword: "Neues Passwort setzen",
+  settingNewPassword: "Passwort wird gesetzt...",
+  newPasswordDescription: "Bitte setze ein neues Passwort für deinen Account.",
+  newPasswordMismatch: "Die Passwörter stimmen nicht überein.",
+  newPasswordInvalid:
+    "Das Passwort erfüllt nicht die Anforderungen (min. 16 Zeichen, Groß-/Kleinbuchstaben, Zahlen und Sonderzeichen).",
+  newPasswordError: "Fehler beim Setzen des neuen Passworts. Bitte versuche es erneut.",
 
   // Navigation
   navDashboard: "Dashboard",

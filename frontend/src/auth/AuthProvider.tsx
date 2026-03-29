@@ -1,5 +1,12 @@
 import { createContext, useContext, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { signIn as cognitoSignIn, refreshSession, type AuthTokens } from "./cognito";
+import {
+  signIn as cognitoSignIn,
+  completeNewPassword as cognitoCompleteNewPassword,
+  refreshSession,
+  isNewPasswordChallenge,
+  type AuthTokens,
+  type NewPasswordChallenge,
+} from "./cognito";
 
 // Only the refresh token is persisted to localStorage.
 // Short-lived id/access tokens are kept in memory only to limit XSS exposure.
@@ -11,7 +18,9 @@ interface AuthContextValue {
   idToken: string | null;
   username: string | null;
   email: string | null;
-  signIn: (username: string, password: string) => Promise<void>;
+  newPasswordRequired: boolean;
+  signIn: (username: string, password: string) => Promise<{ newPasswordRequired: boolean }>;
+  completeNewPassword: (newPassword: string) => Promise<void>;
   signOut: () => void;
 }
 
@@ -58,6 +67,7 @@ function clearRefreshToken(): void {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [tokens, setTokens] = useState<AuthTokens | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [pendingChallenge, setPendingChallenge] = useState<NewPasswordChallenge | null>(null);
   const refreshingRef = useRef(false);
 
   // Attempt to restore session on mount using stored refresh token
@@ -109,14 +119,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [tokens]);
 
   const handleSignIn = useCallback(async (username: string, password: string) => {
-    const newTokens = await cognitoSignIn(username, password);
-    storeRefreshToken(newTokens.refreshToken); // only refresh token persisted
-    setTokens(newTokens); // id/access tokens in memory only
+    const result = await cognitoSignIn(username, password);
+    if (isNewPasswordChallenge(result)) {
+      setPendingChallenge(result);
+      return { newPasswordRequired: true };
+    }
+    storeRefreshToken(result.refreshToken);
+    setTokens(result);
+    return { newPasswordRequired: false };
   }, []);
+
+  const handleCompleteNewPassword = useCallback(
+    async (newPassword: string) => {
+      if (!pendingChallenge) throw new Error("No pending password challenge");
+      const newTokens = await cognitoCompleteNewPassword(
+        pendingChallenge.session,
+        pendingChallenge.username,
+        newPassword,
+      );
+      setPendingChallenge(null);
+      storeRefreshToken(newTokens.refreshToken);
+      setTokens(newTokens);
+    },
+    [pendingChallenge],
+  );
 
   const handleSignOut = useCallback(() => {
     clearRefreshToken();
     setTokens(null);
+    setPendingChallenge(null);
   }, []);
 
   return (
@@ -127,7 +158,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         idToken: tokens?.idToken ?? null,
         username: extractUsername(decodeTokenPayload(tokens?.idToken ?? null)),
         email: extractEmail(decodeTokenPayload(tokens?.idToken ?? null)),
+        newPasswordRequired: pendingChallenge !== null,
         signIn: handleSignIn,
+        completeNewPassword: handleCompleteNewPassword,
         signOut: handleSignOut,
       }}
     >

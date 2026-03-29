@@ -103,13 +103,16 @@ for i in $(seq 0 $((user_count - 1))); do
     continue
   fi
 
+  # Do not suppress the invitation message so Cognito sends the temporary
+  # password to the user via email. The user's status will be
+  # FORCE_CHANGE_PASSWORD and the frontend prompts them to set a new password
+  # on first login.
   create_output=$(aws cognito-idp admin-create-user \
     --user-pool-id "$TARGET_POOL_ID" \
     --username "$user_email" \
     --user-attributes \
       Name="email",Value="$user_email" \
       Name="email_verified",Value="${email_verified:-true}" \
-    --message-action SUPPRESS \
     --profile "$AWS_PROFILE" \
     --region "$AWS_REGION" \
     --output json)
@@ -123,6 +126,7 @@ echo ""
 echo "Migration complete. $user_count user(s) processed."
 echo ""
 echo "IMPORTANT:"
-echo "  - Users must reset their password in the new pool."
+echo "  - Users will receive an email with a temporary password."
+echo "    On first login, the application will prompt them to set a new password."
 echo "  - User subs have changed. If your application stores data keyed by user sub"
 echo "    (e.g. userId in DynamoDB), you will need to update those references."
