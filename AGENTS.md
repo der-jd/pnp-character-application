@@ -25,7 +25,7 @@ Always run from root after changes:
 ## Infrastructure
 
 - Never commit Terraform state or secrets
-- Update `terraform/.terraform.lock.hcl` only via `terraform init`
+- Update `terraform/app/.terraform.lock.hcl` and `terraform/shared/.terraform.lock.hcl` only via `terraform init`
 
 ## Version Management
 

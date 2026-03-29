@@ -23,13 +23,7 @@ npm install
 npm run dev --workspace frontend
 ```
 
-The dev server connects to the live backend API. You need a `.env.local` file in the root folder with:
-
-```
-VITE_API_BASE_URL=https://api.dev.worldhoppers.de/v1
-VITE_COGNITO_REGION=eu-central-1
-VITE_COGNITO_APP_CLIENT_ID=<your-cognito-app-client-id>
-```
+The dev server connects to the live backend API. For the required `.env.local` file and local startup prerequisites, see the [root README Quick Start](../README.md#-quick-start).
 
 ## Project Structure
 

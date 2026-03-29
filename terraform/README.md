@@ -1,16 +1,20 @@
 # Terraform Infrastructure as Code
 
-This directory contains the Terraform configuration for deploying the infrastructure on AWS.
+This directory contains the Terraform configuration for deploying the infrastructure on AWS, organized into two root modules:
+
+- **[`app/`](app/)** — Per-environment application infrastructure (API Gateway, Lambda, DynamoDB, CloudFront, etc.), deployed with separate Terraform Cloud workspaces per environment
+- **[`shared/`](shared/)** — Shared infrastructure that persists independently of environments (Route53 hosted zone), deployed with its own Terraform Cloud workspace
 
 ## Architecture Overview
 
-The application uses a serverless AWS architecture deployed via Terraform Cloud, with the following key components:
+The application uses a serverless AWS architecture deployed via[Terraform Cloud](https://cloud.hashicorp.com/) with separate workspaces per environment and one for shared infrastructure.
+
+The infrastructure setup includes the following components:
 
 ### Multi-Region Setup
 
 - **Primary region**: `eu-central-1` for main infrastructure
 - **Secondary region**: `us-east-1` for CloudFront certificates
-- **Management**: [Terraform Cloud](https://cloud.hashicorp.com/) with separate workspaces per environment
 
 ### Core Infrastructure Components
 
@@ -45,8 +49,8 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 
 #### DNS Management
 
-- Route53 configuration for domain management
-- Custom domain setup for API and frontend
+- Route53 hosted zone managed in a [shared root module](shared/) that persists independently of per-environment infrastructure
+- Per-environment DNS records and certificates for API and frontend custom domains
 
 #### Monitoring & Alerting
 
@@ -67,7 +71,7 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 - `monthly_backup_retention_days` - Retention period in days for monthly backups
 - `alert_email_address` - Email for CloudWatch alarm notifications (configured via CircleCI as `TF_VAR_alert_email_address`)
 
-Shared defaults live in `terraform/variables/common.tfvars`. Environment-specific overrides live in `terraform/variables/prod.tfvars` and `terraform/variables/dev.tfvars`.
+Shared defaults live in `terraform/app/variables/common.tfvars`. Environment-specific overrides live in `terraform/app/variables/prod.tfvars` and `terraform/app/variables/dev.tfvars`.
 
 ### Outputs
 
@@ -77,13 +81,26 @@ Shared defaults live in `terraform/variables/common.tfvars`. Environment-specifi
 - `cognito_user_pool_id` - Cognito user pool ID (sensitive)
 - `cognito_app_client_id` - Cognito app client ID (sensitive)
 - `frontend_bucket_name` - S3 bucket name for frontend static assets
+
+The shared root module (`terraform/shared/`) provides:
+
 - `route53_nameservers` - Route53 nameservers for DNS delegation
 - `route53_zone_id` - Route53 hosted zone ID
+
+## Shared Infrastructure
+
+The `terraform/shared/` directory is a separate Terraform root module that manages resources shared across all environments. It uses its own Terraform Cloud workspace (`TF_WORKSPACE_shared`) and is deployed before any per-environment infrastructure.
+
+Currently managed in the shared module:
+
+- **Route53 hosted zone** — NS records are configured at the domain registrar, so the zone must persist even when individual environments are torn down
+
+Per-environment root modules reference the hosted zone via a data source and only manage their own DNS records and certificates.
 
 ## Multi-Environment Notes
 
 - Resource names follow the pattern `prefix-name-suffix`, using `pnp-app` as the prefix and the environment as the suffix
-- Prod owns the `worldhoppers.de` Route 53 hosted zone; non-prod environments read it via a data source and only create their own records
+- The Route 53 hosted zone is managed in the [shared root module](shared/) and referenced by all environments via a data source
 - Backups and monitoring are enabled in every environment, with shorter backup retention in dev than in prod
 
 ## Monitoring & Alerting Configuration
@@ -115,18 +132,19 @@ See [CircleCI configuration](../.circleci/README.md)
 
 ## Environment Removal
 
-Environments can be torn down via the `delete-services` pipeline parameter in CircleCI. This triggers a `terraform destroy` that removes all application resources except protected ones.
+Environments can be torn down via the `delete-services` pipeline parameter in CircleCI. This triggers a `terraform destroy` that removes all per-environment application resources except protected ones.
+
+The Route53 hosted zone is **not affected** by environment teardowns — it lives in the [shared root module](shared/) with its own Terraform state.
 
 ### Protected Resources
 
-The following resources are **not destroyed** and must be cleaned up manually if needed:
+The following per-environment resources are **not destroyed** and must be cleaned up manually if needed:
 
 | Resource                                                                 | Reason                                                                         | Manual Cleanup                                          |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------- |
 | **DynamoDB tables** (`pnp-app-characters`, `pnp-app-characters-history`) | Contain user data, `deletion_protection_enabled` + `lifecycle.prevent_destroy` | Disable deletion protection in AWS Console, then delete |
 | **Cognito user pool** (`pnp-app-user-pool`)                              | Contains user accounts, `deletion_protection` + `lifecycle.prevent_destroy`    | Disable deletion protection in AWS Console, then delete |
 | **Backup vault** (`pnp-app-backup-vault`)                                | Contains recovery points, `lifecycle.prevent_destroy`                          | Delete all recovery points first, then delete the vault |
-| **Route53 hosted zone**                                                  | NS records are configured at the domain registrar, `lifecycle.prevent_destroy` | Only delete if you no longer need the domain            |
 
 After the destroy pipeline completes, these resources are removed from Terraform state but still exist in AWS. They are logged in the pipeline output.
 

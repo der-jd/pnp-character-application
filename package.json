@@ -16,7 +16,7 @@
     "install-lint-terraform": "curl --silent https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | TFLINT_VERSION=\"v0.57.0\" bash && tflint --init",
     "format": "prettier . --write",
     "check-format": "prettier . --check",
-    "lint:terraform": "tflint --chdir=terraform && echo \"SUCCESS: No lint errors found!\"",
+    "lint:terraform": "tflint --chdir=terraform/app && tflint --chdir=terraform/shared && echo \"SUCCESS: No lint errors found!\"",
     "lint": "npm run lint --workspaces --if-present",
     "build": "cd api-spec && npm run build && cd .. && npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present"
