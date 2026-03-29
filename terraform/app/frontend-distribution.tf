@@ -73,6 +73,11 @@ resource "aws_cloudfront_response_headers_policy" "frontend_security_headers" {
   name = "${local.prefix}-frontend-security-${local.suffix}"
 
   security_headers_config {
+    content_security_policy {
+      content_security_policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://${var.api_domain_name} https://cognito-idp.eu-central-1.amazonaws.com; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';"
+      override                = true
+    }
+
     content_type_options {
       override = true
     }
@@ -92,14 +97,6 @@ resource "aws_cloudfront_response_headers_policy" "frontend_security_headers" {
       include_subdomains         = true
       preload                    = true
       override                   = true
-    }
-  }
-
-  custom_headers_config {
-    items {
-      header   = "Content-Security-Policy"
-      override = true
-      value    = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://${var.api_domain_name} https://cognito-idp.eu-central-1.amazonaws.com; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';"
     }
   }
 }
