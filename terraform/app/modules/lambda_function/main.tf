@@ -44,9 +44,9 @@ locals {
   lambda_build_dir     = abspath("${path.root}/../../backend/build/src/lambdas/${var.source_name}")
   lambda_zip_path      = abspath("${path.root}/../../backend/dist/${var.function_name}.zip")
   placeholder_zip_path = abspath("${path.root}/../../backend/dist/${var.function_name}-placeholder.zip")
-  # Assumes the build output entry point is always index.js (matching the default handler "index.handler")
-  source_dir_exists = fileexists("${local.lambda_build_dir}/index.js")
-  source_code_hash = (local.source_dir_exists
+  source_dir_files     = try(fileset(local.lambda_build_dir, "**"), [])
+  build_dir_has_files  = length(local.source_dir_files) > 0
+  source_code_hash = (local.build_dir_has_files
     ? data.archive_file.lambda_zip[0].output_base64sha256
     : data.archive_file.placeholder_zip[0].output_base64sha256
   )
@@ -57,14 +57,14 @@ locals {
 # create a placeholder zip so the aws_lambda_function resource remains valid.
 # The placeholder content is irrelevant since the resource is being destroyed.
 data "archive_file" "lambda_zip" {
-  count       = local.source_dir_exists ? 1 : 0
+  count       = local.build_dir_has_files ? 1 : 0
   type        = "zip"
   source_dir  = local.lambda_build_dir
   output_path = local.lambda_zip_path
 }
 
 data "archive_file" "placeholder_zip" {
-  count                   = local.source_dir_exists ? 0 : 1
+  count                   = local.build_dir_has_files ? 0 : 1
   type                    = "zip"
   source_content          = "placeholder"
   source_content_filename = "index.js"
@@ -76,7 +76,7 @@ resource "aws_lambda_function" "lambda_function" {
   handler          = var.handler
   runtime          = var.runtime
   role             = var.role_arn
-  filename         = local.source_dir_exists ? local.lambda_zip_path : local.placeholder_zip_path
+  filename         = local.build_dir_has_files ? local.lambda_zip_path : local.placeholder_zip_path
   source_code_hash = local.source_code_hash
   layers           = var.layers
   timeout          = var.timeout
