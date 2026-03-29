@@ -102,3 +102,43 @@ All notifications are sent to the email address specified in `TF_VAR_alert_email
 ### Deployment
 
 See [CircleCI configuration](../.circleci/README.md)
+
+## Environment Removal
+
+Environments can be torn down via the `delete-services` pipeline parameter in CircleCI. This triggers a `terraform destroy` that removes all application resources except protected ones.
+
+### Protected Resources
+
+The following resources are **not destroyed** and must be cleaned up manually if needed:
+
+| Resource                                                                 | Reason                                                                         | Manual Cleanup                                          |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------- |
+| **DynamoDB tables** (`pnp-app-characters`, `pnp-app-characters-history`) | Contain user data, `deletion_protection_enabled` + `lifecycle.prevent_destroy` | Disable deletion protection in AWS Console, then delete |
+| **Cognito user pool** (`pnp-app-user-pool`)                              | Contains user accounts, `deletion_protection` + `lifecycle.prevent_destroy`    | Disable deletion protection in AWS Console, then delete |
+| **Backup vault** (`pnp-app-backup-vault`)                                | Contains recovery points, `lifecycle.prevent_destroy`                          | Delete all recovery points first, then delete the vault |
+| **Route53 hosted zone**                                                  | NS records are configured at the domain registrar, `lifecycle.prevent_destroy` | Only delete if you no longer need the domain            |
+
+After the destroy pipeline completes, these resources are removed from Terraform state but still exist in AWS. They are logged in the pipeline output.
+
+### Redeploying After a Teardown
+
+If you deploy a new environment to the same account without cleaning up the protected resources, Terraform will attempt to create new resources with the same names, which will fail. Either:
+
+1. **Clean up first**: Manually delete the leftover protected resources before deploying, or
+2. **Import existing resources**: Use `terraform import` to bring existing resources back into the new Terraform state
+
+### Migrating Cognito Users
+
+When setting up a new environment that requires the same users, use the migration script:
+
+```bash
+./scripts/migrate_cognito_users.sh \
+  --source-pool-id <old_pool_id> \
+  --target-pool-id <new_pool_id> \
+  --profile <aws_profile> \
+  --dry-run  # optional: preview without making changes
+```
+
+This migrates user email addresses. **Passwords cannot be migrated** between Cognito pools — users will need to reset their password on first login. **User subs (IDs) change** — Cognito always generates a new sub per pool. The script outputs old-to-new sub mappings. If your application stores data keyed by user sub (e.g. `userId` in DynamoDB), you will need to update those references after migration.
+
+After migration (or after creating new test users), update the component test credentials in CircleCI. See the [CircleCI README](../.circleci/README.md#component-test-secrets) for the relevant environment variables.
