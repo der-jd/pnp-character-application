@@ -74,7 +74,7 @@ resource "aws_cloudfront_response_headers_policy" "frontend_security_headers" {
 
   security_headers_config {
     content_security_policy {
-      content_security_policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://${var.api_domain_name} https://cognito-idp.eu-central-1.amazonaws.com; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';"
+      content_security_policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://${var.api_domain_name} https://cognito-idp.${data.aws_region.current.region}.amazonaws.com; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';"
       override                = true
     }
 
