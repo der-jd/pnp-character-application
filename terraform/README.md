@@ -178,6 +178,7 @@ The `terraform-destroy` pipeline only removes per-environment resources from `te
 ### When to Destroy Shared Infrastructure
 
 Shared infrastructure should only be destroyed when:
+
 - Decommissioning the entire project across all environments
 - Migrating to a different domain/hosting setup
 - Complete infrastructure rebuild is required
@@ -201,6 +202,7 @@ terraform apply -auto-approve tfdestroy
 ```
 
 **⚠️ Critical Warning**: Destroying shared infrastructure will:
+
 - Remove the Route53 hosted zone and all DNS records
 - Break DNS resolution for all environments
 - Require updating NS records at the domain registrar
