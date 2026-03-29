@@ -28,6 +28,12 @@ variable "api_domain_name" {
   type        = string
 }
 
+variable "local_development_allowed_origins" {
+  description = "Browser origins that may call the API during local development."
+  type        = list(string)
+  default     = []
+}
+
 # Will be set via an environment variable in CircleCI
 variable "alert_email_address" {
   description = "Email address that receives CloudWatch/SNS alert notifications"

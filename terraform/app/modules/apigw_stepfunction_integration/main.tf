@@ -27,14 +27,16 @@ variable "credentials" {
 variable "state_machine_arn" {
   type = string
 }
+variable "cors_allowed_origins" {
+  type = list(string)
+}
 variable "integration_response_parameters" {
   type = map(string)
   default = {
-    "method.response.header.Access-Control-Allow-Origin" = "'*'" # TODO delete after testing and comment in following line
-    #"method.response.header.Access-Control-Allow-Origin"  = "'https://${aws_cloudfront_distribution.frontend_distribution.domain_name}'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
     "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,GET,PATCH,POST'"
     "method.response.header.Access-Control-Max-Age"       = "'600'"
+    "method.response.header.Vary"                         = "'Origin'"
   }
 }
 
@@ -60,6 +62,7 @@ resource "aws_api_gateway_method_response" "step_function" {
     "method.response.header.Access-Control-Allow-Methods" = true
     "method.response.header.Access-Control-Allow-Headers" = true
     "method.response.header.Access-Control-Max-Age"       = true
+    "method.response.header.Vary"                         = true
   }
 }
 
@@ -148,6 +151,14 @@ resource "aws_api_gateway_integration_response" "step_function" {
   response_parameters = var.integration_response_parameters
   response_templates = {
     "application/json" = <<EOT
+    #set($origin = $input.params("Origin"))
+    #if(!$origin)
+        #set($origin = $input.params("origin"))
+    #end
+    #set($allowedOrigins = $util.parseJson('${jsonencode(var.cors_allowed_origins)}'))
+    #if($origin && $allowedOrigins.contains($origin))
+        #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin)
+    #end
     ## --- Handle error case for step function ---
     #set($output = $util.parseJson($input.path('$.output')))
     #if($output.errorMessage != "")

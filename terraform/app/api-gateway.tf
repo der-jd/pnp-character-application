@@ -61,24 +61,26 @@ resource "aws_api_gateway_resource" "characters" {
 # ================== POST /characters ==================
 
 module "characters_post" {
-  source            = "./modules/apigw_stepfunction_integration"
-  rest_api_id       = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id       = aws_api_gateway_resource.characters.id
-  http_method       = "POST"
-  authorizer_id     = aws_api_gateway_authorizer.cognito_authorizer.id
-  aws_region        = data.aws_region.current.region
-  credentials       = aws_iam_role.api_gateway_role.arn
-  state_machine_arn = module.create_character_state_machine.state_machine_arn
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.characters.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "POST"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
+  aws_region           = data.aws_region.current.region
+  credentials          = aws_iam_role.api_gateway_role.arn
+  state_machine_arn    = module.create_character_state_machine.state_machine_arn
 }
 
 # ================== GET /characters ==================
 
 module "characters_get" {
-  source        = "./modules/apigw_lambda_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.characters.id
-  http_method   = "GET"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.characters.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "GET"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.querystring.character-short" = true
   }
@@ -88,9 +90,10 @@ module "characters_get" {
 # ================== OPTIONS /characters ==================
 
 module "characters_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.characters.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.characters.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id} ==================
@@ -104,11 +107,12 @@ resource "aws_api_gateway_resource" "character_id" {
 # ================== GET /characters/{character-id} ==================
 
 module "character_id_get" {
-  source        = "./modules/apigw_lambda_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.character_id.id
-  http_method   = "GET"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.character_id.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "GET"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
@@ -118,11 +122,12 @@ module "character_id_get" {
 # ================== DELETE /characters/{character-id} ==================
 
 module "character_id_delete" {
-  source        = "./modules/apigw_lambda_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.character_id.id
-  http_method   = "DELETE"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.character_id.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "DELETE"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
@@ -132,9 +137,10 @@ module "character_id_delete" {
 # ================== OPTIONS /characters/{character-id} ==================
 
 module "character_id_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.character_id.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.character_id.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id}/clone ==================
@@ -148,11 +154,12 @@ resource "aws_api_gateway_resource" "character_id_clone" {
 # ================== POST /characters/{character-id}/clone ==================
 
 module "character_id_clone_post" {
-  source        = "./modules/apigw_lambda_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.character_id_clone.id
-  http_method   = "POST"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.character_id_clone.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "POST"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
@@ -162,9 +169,10 @@ module "character_id_clone_post" {
 # ================== OPTIONS /characters/{character-id}/clone ==================
 
 module "character_id_clone_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.character_id_clone.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.character_id_clone.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id}/general-information ==================
@@ -178,11 +186,12 @@ resource "aws_api_gateway_resource" "general_information" {
 # ================== PATCH /characters/{character-id}/general-information ==================
 
 module "general_information_patch" {
-  source        = "./modules/apigw_stepfunction_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.general_information.id
-  http_method   = "PATCH"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.general_information.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
@@ -194,9 +203,10 @@ module "general_information_patch" {
 # ================== OPTIONS /characters/{character-id}/general-information ==================
 
 module "general_information_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.general_information.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.general_information.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id}/attributes ==================
@@ -218,11 +228,12 @@ resource "aws_api_gateway_resource" "attribute_name" {
 # ================== PATCH /characters/{character-id}/attributes/{attribute-name} ==================
 
 module "attribute_name_patch" {
-  source        = "./modules/apigw_stepfunction_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.attribute_name.id
-  http_method   = "PATCH"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.attribute_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"   = true
     "method.request.path.attribute-name" = true
@@ -235,9 +246,10 @@ module "attribute_name_patch" {
 # ================== OPTIONS /characters/{character-id}/attributes/{attribute-name} ==================
 
 module "attribute_name_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.attribute_name.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.attribute_name.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id}/base-values ==================
@@ -259,11 +271,12 @@ resource "aws_api_gateway_resource" "base_value_name" {
 # ================== PATCH /characters/{character-id}/base-values/{base-value-name} ==================
 
 module "base_value_name_patch" {
-  source        = "./modules/apigw_stepfunction_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.base_value_name.id
-  http_method   = "PATCH"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.base_value_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"    = true
     "method.request.path.base-value-name" = true
@@ -276,9 +289,10 @@ module "base_value_name_patch" {
 # ================== OPTIONS /characters/{character-id}/base-values/{base-value-name} ==================
 
 module "base_value_name_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.base_value_name.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.base_value_name.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id}/calculation-points ==================
@@ -292,11 +306,12 @@ resource "aws_api_gateway_resource" "calculation_points" {
 # ================== PATCH /characters/{character-id}/calculation-points ==================
 
 module "calculation_points_patch" {
-  source        = "./modules/apigw_stepfunction_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.calculation_points.id
-  http_method   = "PATCH"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.calculation_points.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
@@ -308,9 +323,10 @@ module "calculation_points_patch" {
 # ================== OPTIONS /characters/{character-id}/calculation-points ==================
 
 module "calculation_points_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.calculation_points.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.calculation_points.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id}/level-up ==================
@@ -324,11 +340,12 @@ resource "aws_api_gateway_resource" "level_up" {
 # ================== GET /characters/{character-id}/level-up ==================
 
 module "level_up_get" {
-  source        = "./modules/apigw_lambda_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.level_up.id
-  http_method   = "GET"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.level_up.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "GET"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
@@ -338,11 +355,12 @@ module "level_up_get" {
 # ================== POST /characters/{character-id}/level-up ==================
 
 module "level_up_post" {
-  source        = "./modules/apigw_stepfunction_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.level_up.id
-  http_method   = "POST"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.level_up.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "POST"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
@@ -354,9 +372,10 @@ module "level_up_post" {
 # ================== OPTIONS /characters/{character-id}/level-up ==================
 
 module "level_up_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.level_up.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.level_up.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id}/skills ==================
@@ -386,11 +405,12 @@ resource "aws_api_gateway_resource" "skill_name" {
 # ================== GET /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
 
 module "skill_name_get" {
-  source        = "./modules/apigw_lambda_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.skill_name.id
-  http_method   = "GET"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.skill_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "GET"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"           = true
     "method.request.path.skill-category"         = true
@@ -403,11 +423,12 @@ module "skill_name_get" {
 # ================== PATCH /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
 
 module "skill_name_patch" {
-  source        = "./modules/apigw_stepfunction_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.skill_name.id
-  http_method   = "PATCH"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.skill_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"   = true
     "method.request.path.skill-category" = true
@@ -421,9 +442,10 @@ module "skill_name_patch" {
 # ================== OPTIONS /characters/{character-id}/skills/{skill-category}/{skill-name} ==================
 
 module "skill_name_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.skill_name.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.skill_name.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id}/special-abilities ==================
@@ -437,11 +459,12 @@ resource "aws_api_gateway_resource" "special_abilities" {
 # ================== POST /characters/{character-id}/special-abilities ==================
 
 module "special_abilities_post" {
-  source        = "./modules/apigw_stepfunction_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.special_abilities.id
-  http_method   = "POST"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.special_abilities.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "POST"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id" = true
   }
@@ -453,9 +476,10 @@ module "special_abilities_post" {
 # ================== OPTIONS /characters/{character-id}/special-abilities ==================
 
 module "special_abilities_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.special_abilities.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.special_abilities.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id}/combat ==================
@@ -485,11 +509,12 @@ resource "aws_api_gateway_resource" "combat_skill_name" {
 # ================== PATCH /characters/{character-id}/combat/{combat-category}/{combat-skill-name} ==================
 
 module "combat_skill_name_patch" {
-  source        = "./modules/apigw_stepfunction_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.combat_skill_name.id
-  http_method   = "PATCH"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_stepfunction_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.combat_skill_name.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"      = true
     "method.request.path.combat-category"   = true
@@ -500,13 +525,13 @@ module "combat_skill_name_patch" {
   state_machine_arn = module.update_combat_stats_state_machine.state_machine_arn
 }
 
-
 # ================== OPTIONS /characters/{character-id}/combat/{combat-category}/{combat-skill-name} ==================
 
 module "combat_skill_name_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.combat_skill_name.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.combat_skill_name.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id}/history ==================
@@ -520,11 +545,12 @@ resource "aws_api_gateway_resource" "history" {
 # ================== GET /characters/{character-id}/history ==================
 
 module "history_get" {
-  source        = "./modules/apigw_lambda_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.history.id
-  http_method   = "GET"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.history.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "GET"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"        = true
     "method.request.querystring.block-number" = true
@@ -535,9 +561,10 @@ module "history_get" {
 # ================== OPTIONS /characters/{character-id}/history ==================
 
 module "history_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.history.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.history.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================== /characters/{character-id}/history/{record-id} ==================
@@ -551,11 +578,12 @@ resource "aws_api_gateway_resource" "record_id" {
 # ================== PATCH /characters/{character-id}/history/{record-id} ==================
 
 module "record_id_patch" {
-  source        = "./modules/apigw_lambda_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.record_id.id
-  http_method   = "PATCH"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.record_id.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "PATCH"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id"        = true
     "method.request.path.record-id"           = true
@@ -567,11 +595,12 @@ module "record_id_patch" {
 # ================== DELETE /characters/{character-id}/history/{record-id} ==================
 
 module "record_id_delete" {
-  source        = "./modules/apigw_lambda_integration"
-  rest_api_id   = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id   = aws_api_gateway_resource.record_id.id
-  http_method   = "DELETE"
-  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+  source               = "./modules/apigw_lambda_integration"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.record_id.id
+  cors_allowed_origins = local.cors_allowed_origins
+  http_method          = "DELETE"
+  authorizer_id        = aws_api_gateway_authorizer.cognito_authorizer.id
   method_request_parameters = {
     "method.request.path.character-id" = true
     "method.request.path.record-id"    = true
@@ -582,9 +611,10 @@ module "record_id_delete" {
 # ================== OPTIONS /characters/{character-id}/history/{record-id} ==================
 
 module "record_id_options" {
-  source      = "./modules/apigw_options_method"
-  rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
-  resource_id = aws_api_gateway_resource.record_id.id
+  source               = "./modules/apigw_options_method"
+  rest_api_id          = aws_api_gateway_rest_api.pnp_rest_api.id
+  resource_id          = aws_api_gateway_resource.record_id.id
+  cors_allowed_origins = local.cors_allowed_origins
 }
 
 # ================================================================================
@@ -626,7 +656,12 @@ resource "aws_api_gateway_deployment" "api_deployment" {
 
   rest_api_id = aws_api_gateway_rest_api.pnp_rest_api.id
   triggers = {
-    redeployment = md5(file("api-gateway.tf")) # TODO changes in the tf modules are not detected and the required redeployment is not triggered
+    redeployment = md5(join("", [
+      file("${path.module}/api-gateway.tf"),
+      file("${path.module}/modules/apigw_options_method/main.tf"),
+      file("${path.module}/modules/apigw_lambda_integration/main.tf"),
+      file("${path.module}/modules/apigw_stepfunction_integration/main.tf"),
+    ]))
   }
 
   lifecycle {

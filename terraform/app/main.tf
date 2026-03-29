@@ -3,9 +3,11 @@ terraform {
 }
 
 locals {
-  prefix  = "pnp-app"
-  suffix  = var.env
-  is_prod = var.env == "prod"
+  prefix                   = "pnp-app"
+  suffix                   = var.env
+  is_prod                  = var.env == "prod"
+  frontend_allowed_origins = local.is_prod ? ["https://${var.domain_name}", "https://www.${var.domain_name}"] : ["https://${var.domain_name}"]
+  cors_allowed_origins     = concat(local.frontend_allowed_origins, var.local_development_allowed_origins)
 }
 
 data "aws_caller_identity" "current" {}
