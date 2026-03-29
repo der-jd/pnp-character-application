@@ -644,7 +644,7 @@ resource "aws_api_gateway_stage" "api_stage" {
 
 # Read API version from package.json
 data "local_file" "api_spec_package" {
-  filename = "${path.root}/../api-spec/package.json"
+  filename = abspath("${path.root}/../../api-spec/package.json")
 }
 
 locals {

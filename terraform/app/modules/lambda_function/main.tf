@@ -1,6 +1,6 @@
 variable "source_name" {
   type        = string
-  description = "Directory name in ../backend/src/lambdas/ and base name for the generated zip file."
+  description = "Lambda folder name under backend/src/lambdas/ and backend/build/src/lambdas/."
 }
 
 variable "function_name" {
@@ -41,11 +41,11 @@ variable "timeout" {
 }
 
 locals {
-  lambda_source_dir    = "../backend/build/src/lambdas/${var.source_name}"
-  lambda_zip_path      = "../backend/dist/${var.function_name}.zip"
-  placeholder_zip_path = "../backend/dist/${var.function_name}-placeholder.zip"
+  lambda_build_dir     = abspath("${path.root}/../../backend/build/src/lambdas/${var.source_name}")
+  lambda_zip_path      = abspath("${path.root}/../../backend/dist/${var.function_name}.zip")
+  placeholder_zip_path = abspath("${path.root}/../../backend/dist/${var.function_name}-placeholder.zip")
   # Assumes the build output entry point is always index.js (matching the default handler "index.handler")
-  source_dir_exists = fileexists("${path.root}/${local.lambda_source_dir}/index.js")
+  source_dir_exists = fileexists("${local.lambda_build_dir}/index.js")
   source_code_hash = (local.source_dir_exists
     ? data.archive_file.lambda_zip[0].output_base64sha256
     : data.archive_file.placeholder_zip[0].output_base64sha256
@@ -59,7 +59,7 @@ locals {
 data "archive_file" "lambda_zip" {
   count       = local.source_dir_exists ? 1 : 0
   type        = "zip"
-  source_dir  = "../backend/build/src/lambdas/${var.source_name}"
+  source_dir  = local.lambda_build_dir
   output_path = local.lambda_zip_path
 }
 
