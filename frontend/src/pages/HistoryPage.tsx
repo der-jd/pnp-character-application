@@ -32,6 +32,9 @@ export function HistoryPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Get current timezone for header
+  const currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const [additionalBlocks, setAdditionalBlocks] = useState<HistoryBlock[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -172,7 +175,9 @@ export function HistoryPage() {
             <span>{t("historyColumnNumber")}</span>
             <span>{t("historyColumnType")}</span>
             <span>{t("historyColumnName")}</span>
-            <span>{t("historyColumnTimestamp")}</span>
+            <span>
+              {t("historyColumnTimestamp")} ({currentTimeZone})
+            </span>
             <span>{t("historyColumnComment")}</span>
             <span>{t("historyColumnActions")}</span>
           </div>
