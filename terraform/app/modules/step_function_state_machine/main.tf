@@ -268,8 +268,10 @@ resource "aws_sfn_state_machine" "state_machine" {
         Type          = "Succeed"
         QueryLanguage = "JSONata"
         Output = {
-          "statusCode" = 500
-          "body"       = "{% $string({'statusCode': 500, 'message': 'History record operation failed'}) %}"
+          # Forward the original status code and body from whichever history
+          # record Lambda failed (version update or main operation).
+          "statusCode" = "{% $addMainOperationHistoryRecordStatusCode ? $addMainOperationHistoryRecordStatusCode : $addVersionHistoryRecordStatusCode %}"
+          "body"       = "{% $addMainOperationHistoryRecordResult ? $addMainOperationHistoryRecordResult : $addVersionHistoryRecordResult %}"
         }
       },
       SuccessState = {
