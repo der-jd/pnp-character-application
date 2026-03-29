@@ -438,6 +438,8 @@ jobs:
       - run:
           name: Remove protected resources from state
           command: |
+            source $BASH_ENV
+
             cd terraform/app
             echo "The following resources will be removed from Terraform state and NOT destroyed:"
             failed_resources=""
