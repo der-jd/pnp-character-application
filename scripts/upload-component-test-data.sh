@@ -16,6 +16,7 @@ readonly DEFAULT_HISTORY_DIR="$SCRIPT_DIR/../backend/test/component-tests/test-d
 readonly TABLE_PREFIX="pnp-app"
 readonly CHARACTERS_TABLE_BASE="$TABLE_PREFIX-characters"
 readonly HISTORY_TABLE_BASE="$TABLE_PREFIX-characters-history"
+readonly USER_ID_PLACEHOLDER="__COMPONENT_TEST_USER_ID__"
 
 # ANSI color codes
 readonly RED='\033[0;31m'

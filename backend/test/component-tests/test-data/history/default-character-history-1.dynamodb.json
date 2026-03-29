@@ -2612,7 +2612,7 @@
                         }
                       },
                       "userId": {
-                        "S": "b3149882-e041-709e-1392-d6d720f316b8"
+                        "S": "__COMPONENT_TEST_USER_ID__"
                       }
                     }
                   },

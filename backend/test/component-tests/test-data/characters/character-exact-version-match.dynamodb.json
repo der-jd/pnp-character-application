@@ -1,6 +1,6 @@
 {
   "userId": {
-    "S": "c314f862-a001-707e-7254-5572e9500c88"
+    "S": "__COMPONENT_TEST_USER_ID__"
   },
   "characterId": {
     "S": "707b4c44-2dee-49e9-8399-574292bcadd6"
