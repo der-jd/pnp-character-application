@@ -53,6 +53,7 @@ Test data must be in DynamoDB JSON format (with Type annotations).
 OPTIONS:
     -p, --profile PROFILE         AWS profile name (required)
     -e, --env ENV                 Environment name for table suffix, e.g. dev or prod (required)
+    -u, --user-id USER_ID         User ID used to replace placeholder values before upload (required)
     -r, --region REGION           AWS region (default: $DEFAULT_REGION)
     -c, --characters-dir DIR      Directory containing character JSON files (default: $DEFAULT_CHARACTERS_DIR)
     -h, --history-dir DIR         Directory containing history JSON files (default: $DEFAULT_HISTORY_DIR)
@@ -61,9 +62,9 @@ OPTIONS:
     --help                        Show this help message
 
 EXAMPLES:
-    $SCRIPT_NAME -p my-aws-profile -e dev
-    $SCRIPT_NAME -p my-aws-profile -e prod -r us-west-2 -o
-    $SCRIPT_NAME -p my-aws-profile -e dev --characters-dir /path/to/characters --history-dir /path/to/history --dry-run
+    $SCRIPT_NAME -p my-aws-profile -e dev -u my-test-user-id
+    $SCRIPT_NAME -p my-aws-profile -e prod -u my-test-user-id -r us-west-2 -o
+    $SCRIPT_NAME -p my-aws-profile -e dev -u my-test-user-id --characters-dir /path/to/characters --history-dir /path/to/history --dry-run
 
 EOF
 }
@@ -104,6 +105,29 @@ validate_environment() {
     esac
 }
 
+validate_user_id() {
+    local user_id="$1"
+
+    if [[ -z "$user_id" ]]; then
+        log_error "User ID is required. Use -u or --user-id to specify it."
+        exit 1
+    fi
+
+    if [[ "$user_id" == "$USER_ID_PLACEHOLDER" ]]; then
+        log_error "User ID must not be the placeholder value '$USER_ID_PLACEHOLDER'."
+        exit 1
+    fi
+}
+
+get_item_json() {
+    local item_file="$1"
+    local user_id="$2"
+    local item_json
+
+    item_json=$(<"$item_file")
+    printf '%s' "${item_json//$USER_ID_PLACEHOLDER/$user_id}"
+}
+
 # Function to validate directory
 validate_directory() {
     local dir="$1"
@@ -142,43 +166,28 @@ item_exists() {
 upload_item() {
     local table="$1"
     local item_file="$2"
-    local profile="$3"
-    local region="$4"
-    local dry_run="$5"
-
-    if [[ "$dry_run" == "true" ]]; then
-        # Extract and display key information for dry run too
-        local item_json
-        item_json=$(cat "$item_file")
-
-        local key_info=""
-        if is_history_table "$table"; then
-            local character_id=$(echo "$item_json" | jq -r '.characterId.S // "unknown"')
-            local block_number=$(echo "$item_json" | jq -r '.blockNumber.N // "unknown"')
-            key_info=" (characterId: $character_id, blockNumber: $block_number)"
-        else
-            local user_id=$(echo "$item_json" | jq -r '.userId.S // "unknown"')
-            local character_id=$(echo "$item_json" | jq -r '.characterId.S // "unknown"')
-            key_info=" (userId: $user_id, characterId: $character_id)"
-        fi
-
-        log_info "[DRY RUN] Would upload: $(basename "$item_file") to $table$key_info"
-        return 0
-    fi
+    local user_id="$3"
+    local profile="$4"
+    local region="$5"
+    local dry_run="$6"
 
     local item_json
-    item_json=$(cat "$item_file")
+    item_json=$(get_item_json "$item_file" "$user_id")
 
-    # Extract and display key information
     local key_info=""
     if is_history_table "$table"; then
-        local character_id=$(echo "$item_json" | jq -r '.characterId.S // "unknown"')
-        local block_number=$(echo "$item_json" | jq -r '.blockNumber.N // "unknown"')
+        local character_id=$(printf '%s\n' "$item_json" | jq -r '.characterId.S // "unknown"')
+        local block_number=$(printf '%s\n' "$item_json" | jq -r '.blockNumber.N // "unknown"')
         key_info=" (characterId: $character_id, blockNumber: $block_number)"
     else
-        local user_id=$(echo "$item_json" | jq -r '.userId.S // "unknown"')
-        local character_id=$(echo "$item_json" | jq -r '.characterId.S // "unknown"')
-        key_info=" (userId: $user_id, characterId: $character_id)"
+        local resolved_user_id=$(printf '%s\n' "$item_json" | jq -r '.userId.S // "unknown"')
+        local character_id=$(printf '%s\n' "$item_json" | jq -r '.characterId.S // "unknown"')
+        key_info=" (userId: $resolved_user_id, characterId: $character_id)"
+    fi
+
+    if [[ "$dry_run" == "true" ]]; then
+        log_info "[DRY RUN] Would upload: $(basename "$item_file") to $table$key_info"
+        return 0
     fi
 
     if aws dynamodb put-item \
@@ -199,10 +208,11 @@ upload_item() {
 upload_items() {
     local table="$1"
     local source_dir="$2"
-    local profile="$3"
-    local region="$4"
-    local overwrite="$5"
-    local dry_run="$6"
+    local user_id="$3"
+    local profile="$4"
+    local region="$5"
+    local overwrite="$6"
+    local dry_run="$7"
 
     local uploaded=0
     local skipped=0
@@ -218,21 +228,21 @@ upload_items() {
 
     for file in "${files[@]}"; do
         local item_json
-        item_json=$(cat "$file")
+        item_json=$(get_item_json "$file" "$user_id")
 
         # Extract key for existence check
         local key
         if is_history_table "$table"; then
-            key=$(echo "$item_json" | jq '{characterId: .characterId, blockNumber: .blockNumber}')
+            key=$(printf '%s\n' "$item_json" | jq '{characterId: .characterId, blockNumber: .blockNumber}')
         else
-            key=$(echo "$item_json" | jq '{userId: .userId, characterId: .characterId}')
+            key=$(printf '%s\n' "$item_json" | jq '{userId: .userId, characterId: .characterId}')
         fi
 
         # Check if item exists
         if item_exists "$table" "$key" "$profile" "$region"; then
             if [[ "$overwrite" == "true" ]]; then
                 log_warning "Overwriting existing item: $(basename "$file")"
-                if upload_item "$table" "$file" "$profile" "$region" "$dry_run"; then
+                if upload_item "$table" "$file" "$user_id" "$profile" "$region" "$dry_run"; then
                     ((uploaded++))
                 else
                     ((failed++))
@@ -242,7 +252,7 @@ upload_items() {
                 ((skipped++))
             fi
         else
-            if upload_item "$table" "$file" "$profile" "$region" "$dry_run"; then
+            if upload_item "$table" "$file" "$user_id" "$profile" "$region" "$dry_run"; then
                 ((uploaded++))
             else
                 ((failed++))
@@ -321,6 +331,7 @@ show_upload_overview() {
 main() {
     local aws_profile=""
     local environment=""
+    local user_id=""
     local aws_region="$DEFAULT_REGION"
     local characters_dir="$DEFAULT_CHARACTERS_DIR"
     local history_dir="$DEFAULT_HISTORY_DIR"
@@ -336,6 +347,10 @@ main() {
                 ;;
             -e|--env)
                 environment="$2"
+                shift 2
+                ;;
+            -u|--user-id)
+                user_id="$2"
                 shift 2
                 ;;
             -r|--region)
@@ -368,6 +383,7 @@ main() {
                 log_info "Available options:"
                 log_info "  -p, --profile PROFILE         AWS profile name (required)"
                 log_info "  -e, --env ENV                 Environment name for table suffix (required)"
+                log_info "  -u, --user-id USER_ID         User ID used to replace placeholder values (required)"
                 log_info "  -r, --region REGION           AWS region (default: eu-central-1)"
                 log_info "  -c, --characters-dir DIR      Directory containing character JSON files"
                 log_info "  -h, --history-dir DIR         Directory containing history JSON files"
@@ -394,6 +410,7 @@ main() {
         exit 1
     fi
 
+    validate_user_id "$user_id"
     validate_environment "$environment"
 
     local characters_table
@@ -413,6 +430,7 @@ main() {
     log_info "Configuration:"
     log_info "  AWS Profile: $aws_profile"
     log_info "  Environment: $environment"
+    log_info "  User ID: $user_id"
     log_info "  AWS Region: $aws_region"
     log_info "  Characters Directory: $characters_dir"
     log_info "  History Directory: $history_dir"
@@ -451,13 +469,13 @@ main() {
 
     # Upload characters
     local total_failed=0
-    upload_items "$characters_table" "$characters_dir" "$aws_profile" "$aws_region" "$overwrite" "$dry_run"
+    upload_items "$characters_table" "$characters_dir" "$user_id" "$aws_profile" "$aws_region" "$overwrite" "$dry_run"
     total_failed=$((total_failed + $?))
 
     echo
 
     # Upload history
-    upload_items "$history_table" "$history_dir" "$aws_profile" "$aws_region" "$overwrite" "$dry_run"
+    upload_items "$history_table" "$history_dir" "$user_id" "$aws_profile" "$aws_region" "$overwrite" "$dry_run"
     total_failed=$((total_failed + $?))
 
     echo
