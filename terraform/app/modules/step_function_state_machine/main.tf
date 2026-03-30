@@ -270,6 +270,12 @@ resource "aws_sfn_state_machine" "state_machine" {
         Output = {
           # Forward the original status code and body from whichever history
           # record Lambda failed (version update or main operation).
+          # Ordering matters: $addMainOperationHistoryRecordStatusCode is checked first because, if the
+          # version history record step fails, execution jumps here before the main operation history
+          # record Lambda ever runs (so $addMainOperationHistoryRecordStatusCode is undefined and the
+          # fallback to $addVersionHistoryRecordStatusCode applies). If the main operation history record
+          # step fails instead, $addVersionHistoryRecordStatusCode may already be set from the earlier
+          # successful step, but $addMainOperationHistoryRecordStatusCode is defined and takes precedence.
           "statusCode" = "{% $addMainOperationHistoryRecordStatusCode ? $addMainOperationHistoryRecordStatusCode : $addVersionHistoryRecordStatusCode %}"
           "body"       = "{% $addMainOperationHistoryRecordResult ? $addMainOperationHistoryRecordResult : $addVersionHistoryRecordResult %}"
         }
