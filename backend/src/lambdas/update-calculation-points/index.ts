@@ -16,7 +16,7 @@ import {
   getCharacterItem,
   decodeUserId,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   updateAdventurePoints,
   updateAttributePoints,
   isZodError,
@@ -119,7 +119,7 @@ export async function _updateCalculationPoints(request: Request): Promise<APIGat
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

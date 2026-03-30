@@ -13,7 +13,7 @@ import {
   getCharacterItem,
   decodeUserId,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   setSpecialAbilities,
   logZodError,
   isZodError,
@@ -85,7 +85,7 @@ export async function _addSpecialAbility(request: Request): Promise<APIGatewayPr
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

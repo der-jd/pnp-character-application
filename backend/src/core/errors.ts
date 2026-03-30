@@ -1,3 +1,24 @@
+export interface ErrorResponse {
+  statusCode: number;
+  body: string;
+}
+
+/**
+ * Builds a structured error response object instead of throwing.
+ * Use this in Lambda handler catch blocks to return error responses,
+ * keeping Lambda invocations successful and reserving failures for
+ * truly unexpected infrastructure errors.
+ */
+export function buildErrorResponse(value: unknown): ErrorResponse {
+  const httpError = logAndEnsureHttpError(value);
+  // HttpError.message is already a JSON string containing {message, statusCode, context}
+  // (set via super() in the constructor). Reuse it directly as the response body.
+  return {
+    statusCode: httpError.statusCode,
+    body: httpError.message,
+  };
+}
+
 export function logAndEnsureHttpError(value: unknown): HttpError {
   if (value instanceof HttpError) {
     console.error(value);

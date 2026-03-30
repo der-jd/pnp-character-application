@@ -125,7 +125,26 @@ resource "aws_sfn_state_machine" "state_machine" {
           local.general_retry
         ]
         Catch = local.error_catch
-        Next  = "IsVersionHistoryRecordNecessary"
+        Next  = "CheckMainOperationError"
+      },
+      CheckMainOperationError = {
+        Type          = "Choice"
+        QueryLanguage = "JSONata"
+        Choices = [
+          {
+            Condition = "{% $statusCode >= 400 %}"
+            Next      = "MainOperationErrorResponse"
+          }
+        ]
+        Default = "IsVersionHistoryRecordNecessary"
+      },
+      MainOperationErrorResponse = {
+        Type          = "Succeed"
+        QueryLanguage = "JSONata"
+        Output = {
+          "statusCode" = "{% $statusCode %}"
+          "body"       = "{% $mainOperationResult %}"
+        }
       },
       IsVersionHistoryRecordNecessary = {
         Type          = "Choice"
@@ -160,7 +179,8 @@ resource "aws_sfn_state_machine" "state_machine" {
           }
         }
         Assign = {
-          addVersionHistoryRecordResult = "{% $states.result.body %}"
+          addVersionHistoryRecordResult     = "{% $states.result.body %}"
+          addVersionHistoryRecordStatusCode = "{% $states.result.statusCode %}"
         }
         TimeoutSeconds = 5
         Retry = [
@@ -168,7 +188,18 @@ resource "aws_sfn_state_machine" "state_machine" {
           local.general_retry
         ]
         Catch = local.error_catch
-        Next  = "IsMainOperationHistoryRecordNecessary"
+        Next  = "CheckVersionHistoryRecordError"
+      },
+      CheckVersionHistoryRecordError = {
+        Type          = "Choice"
+        QueryLanguage = "JSONata"
+        Choices = [
+          {
+            Condition = "{% $addVersionHistoryRecordStatusCode >= 400 %}"
+            Next      = "HistoryRecordErrorResponse"
+          }
+        ]
+        Default = "IsMainOperationHistoryRecordNecessary"
       },
       IsMainOperationHistoryRecordNecessary = {
         Type          = "Choice"
@@ -203,7 +234,8 @@ resource "aws_sfn_state_machine" "state_machine" {
           }
         }
         Assign = {
-          addMainOperationHistoryRecordResult = "{% $states.result.body %}"
+          addMainOperationHistoryRecordResult     = "{% $states.result.body %}"
+          addMainOperationHistoryRecordStatusCode = "{% $states.result.statusCode %}"
         }
         TimeoutSeconds = 5
         Retry = [
@@ -211,7 +243,18 @@ resource "aws_sfn_state_machine" "state_machine" {
           local.general_retry
         ]
         Catch = local.error_catch
-        Next  = "SuccessState"
+        Next  = "CheckMainOperationHistoryRecordError"
+      },
+      CheckMainOperationHistoryRecordError = {
+        Type          = "Choice"
+        QueryLanguage = "JSONata"
+        Choices = [
+          {
+            Condition = "{% $addMainOperationHistoryRecordStatusCode >= 400 %}"
+            Next      = "HistoryRecordErrorResponse"
+          }
+        ]
+        Default = "SuccessState"
       },
       HandleError = {
         Type          = "Pass"
@@ -220,6 +263,22 @@ resource "aws_sfn_state_machine" "state_machine" {
           "errorMessage" = "{% $parse($states.input.Cause).errorMessage %}"
         }
         End = true
+      },
+      HistoryRecordErrorResponse = {
+        Type          = "Succeed"
+        QueryLanguage = "JSONata"
+        Output = {
+          # Forward the original status code and body from whichever history
+          # record Lambda failed (version update or main operation).
+          # Ordering matters: $addMainOperationHistoryRecordStatusCode is checked first because, if the
+          # version history record step fails, execution jumps here before the main operation history
+          # record Lambda ever runs (so $addMainOperationHistoryRecordStatusCode is undefined and the
+          # fallback to $addVersionHistoryRecordStatusCode applies). If the main operation history record
+          # step fails instead, $addVersionHistoryRecordStatusCode may already be set from the earlier
+          # successful step, but $addMainOperationHistoryRecordStatusCode is defined and takes precedence.
+          "statusCode" = "{% $addMainOperationHistoryRecordStatusCode ? $addMainOperationHistoryRecordStatusCode : $addVersionHistoryRecordStatusCode %}"
+          "body"       = "{% $addMainOperationHistoryRecordResult ? $addMainOperationHistoryRecordResult : $addVersionHistoryRecordResult %}"
+        }
       },
       SuccessState = {
         Type          = "Succeed"

@@ -17,7 +17,7 @@ import {
   getCharacterItem,
   updateBaseValue,
   setLevelUp,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   HttpError,
   isZodError,
   logZodError,
@@ -160,7 +160,7 @@ export async function _applyLevelUp(request: Request): Promise<APIGatewayProxyRe
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

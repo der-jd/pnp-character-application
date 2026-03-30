@@ -14,7 +14,7 @@ import {
   getCharacterItem,
   decodeUserId,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   updateGeneralInformation,
   isZodError,
   logZodError,
@@ -85,7 +85,7 @@ export async function _updateGeneralInformation(request: Request): Promise<APIGa
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

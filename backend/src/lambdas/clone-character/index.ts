@@ -6,7 +6,7 @@ import {
   getCharacterItem,
   decodeUserId,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   getHistoryItems,
   createBatchHistoryItems,
   createCharacterItem,
@@ -88,7 +88,7 @@ export async function cloneCharacter(request: Request): Promise<APIGatewayProxyR
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

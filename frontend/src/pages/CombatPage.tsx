@@ -156,6 +156,10 @@ function CombatTable({
                   (editValues.skilledAttack - cs.skilledAttackValue) -
                   (editValues.skilledParade - cs.skilledParadeValue)
                 : cs.availablePoints;
+            const projectedAttackValue =
+              editing === name ? cs.attackValue + (editValues.skilledAttack - cs.skilledAttackValue) : cs.attackValue;
+            const projectedParadeValue =
+              editing === name ? cs.paradeValue + (editValues.skilledParade - cs.skilledParadeValue) : cs.paradeValue;
 
             return (
               <tr key={name} className="border-b border-border-primary/50 hover:bg-bg-hover/30">
@@ -189,7 +193,7 @@ function CombatTable({
                     <span className="font-mono">{cs.skilledAttackValue}</span>
                   )}
                 </td>
-                <td className="text-center py-2 px-2 font-mono">{cs.attackValue}</td>
+                <td className="text-center py-2 px-2 font-mono">{projectedAttackValue}</td>
                 {category === "melee" && (
                   <>
                     <td className="text-center py-2 px-2">
@@ -210,7 +214,7 @@ function CombatTable({
                         <span className="font-mono">{cs.skilledParadeValue}</span>
                       )}
                     </td>
-                    <td className="text-center py-2 px-2 font-mono">{cs.paradeValue}</td>
+                    <td className="text-center py-2 px-2 font-mono">{projectedParadeValue}</td>
                   </>
                 )}
                 <td className="py-2 text-right">

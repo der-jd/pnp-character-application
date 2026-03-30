@@ -16,7 +16,7 @@ import {
   getCharacterItem,
   decodeUserId,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   updateBaseValue,
   isZodError,
   logZodError,
@@ -127,7 +127,7 @@ export async function _updateBaseValue(request: Request): Promise<APIGatewayProx
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

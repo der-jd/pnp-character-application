@@ -15,7 +15,7 @@ import {
   Request,
   parseBody,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   getHistoryItem,
   setRecordComment,
   decodeUserId,
@@ -101,7 +101,7 @@ export async function setHistoryComment(request: Request): Promise<APIGatewayPro
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 

@@ -4,7 +4,7 @@ import {
   parseBody,
   decodeUserId,
   HttpError,
-  logAndEnsureHttpError,
+  buildErrorResponse,
   createCharacterItem,
   isZodError,
   logZodError,
@@ -69,7 +69,7 @@ export async function _createCharacter(request: Request): Promise<APIGatewayProx
     console.log(response);
     return response;
   } catch (error) {
-    throw logAndEnsureHttpError(error);
+    return buildErrorResponse(error);
   }
 }
 
