@@ -6,7 +6,17 @@ import { AuthProvider, useAuth } from "@/auth/AuthProvider";
 // Mock the Cognito module
 vi.mock("@/auth/cognito", () => ({
   signIn: vi.fn(),
+  completeNewPassword: vi.fn(),
+  changePassword: vi.fn(),
   refreshSession: vi.fn(),
+  isNewPasswordChallenge: vi.fn((result: unknown) => {
+    return (
+      typeof result === "object" &&
+      result !== null &&
+      "type" in result &&
+      (result as { type: string }).type === "NEW_PASSWORD_REQUIRED"
+    );
+  }),
 }));
 
 import * as cognito from "@/auth/cognito";
@@ -30,6 +40,8 @@ describe("AuthProvider", () => {
   beforeEach(() => {
     localStorage.clear();
     vi.mocked(cognito.signIn).mockReset();
+    vi.mocked(cognito.completeNewPassword).mockReset();
+    vi.mocked(cognito.changePassword).mockReset();
     vi.mocked(cognito.refreshSession).mockReset();
   });
 

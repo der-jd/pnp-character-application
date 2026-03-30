@@ -21,6 +21,15 @@ const de = {
   newPasswordInvalid:
     "Das Passwort erfüllt nicht die Anforderungen (min. 16 Zeichen, Groß-/Kleinbuchstaben, Zahlen und Sonderzeichen).",
   newPasswordError: "Fehler beim Setzen des neuen Passworts. Bitte versuche es erneut.",
+  changePassword: "Passwort ändern",
+  changingPassword: "Passwort wird geändert...",
+  currentPassword: "Aktuelles Passwort",
+  changePasswordSuccess: "Passwort wurde erfolgreich geändert.",
+  changePasswordError: "Fehler beim Ändern des Passworts. Bitte versuche es erneut.",
+  changePasswordWrongCurrent: "Das aktuelle Passwort ist falsch.",
+  changePasswordLimitExceeded: "Zu viele Versuche. Bitte versuche es später erneut.",
+  passwordRequirements: "Min. 16 Zeichen, Groß-/Kleinbuchstaben, Zahlen und Sonderzeichen erforderlich.",
+  fieldRequired: "Dieses Feld ist erforderlich.",
 
   // Navigation
   navDashboard: "Dashboard",

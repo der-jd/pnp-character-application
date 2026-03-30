@@ -2,6 +2,7 @@ import { createContext, useContext, useCallback, useEffect, useRef, useState, ty
 import {
   signIn as cognitoSignIn,
   completeNewPassword as cognitoCompleteNewPassword,
+  changePassword as cognitoChangePassword,
   refreshSession,
   isNewPasswordChallenge,
   type AuthTokens,
@@ -21,6 +22,7 @@ interface AuthContextValue {
   newPasswordRequired: boolean;
   signIn: (username: string, password: string) => Promise<{ newPasswordRequired: boolean }>;
   completeNewPassword: (newPassword: string) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   signOut: () => void;
 }
 
@@ -144,6 +146,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [pendingChallenge],
   );
 
+  const handleChangePassword = useCallback(
+    async (currentPassword: string, newPassword: string) => {
+      if (!tokens?.accessToken) throw new Error("Not authenticated");
+      await cognitoChangePassword(tokens.accessToken, currentPassword, newPassword);
+    },
+    [tokens],
+  );
+
   const handleSignOut = useCallback(() => {
     clearRefreshToken();
     setTokens(null);
@@ -161,6 +171,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         newPasswordRequired: pendingChallenge !== null,
         signIn: handleSignIn,
         completeNewPassword: handleCompleteNewPassword,
+        changePassword: handleChangePassword,
         signOut: handleSignOut,
       }}
     >

@@ -1,5 +1,6 @@
 import {
   CognitoIdentityProviderClient,
+  ChangePasswordCommand,
   InitiateAuthCommand,
   RespondToAuthChallengeCommand,
   type InitiateAuthCommandOutput,
@@ -99,4 +100,13 @@ export async function refreshSession(refreshToken: string): Promise<AuthTokens> 
     refreshToken,
     expiresAt: Date.now() + (auth.ExpiresIn ?? 3600) * 1000,
   };
+}
+
+export async function changePassword(accessToken: string, currentPassword: string, newPassword: string): Promise<void> {
+  const command = new ChangePasswordCommand({
+    AccessToken: accessToken,
+    PreviousPassword: currentPassword,
+    ProposedPassword: newPassword,
+  });
+  await client.send(command);
 }
