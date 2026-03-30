@@ -3,7 +3,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
 
   account_recovery_setting {
     recovery_mechanism {
-      name     = "verified_email"
+      name     = "admin_only"
       priority = 1
     }
   }
