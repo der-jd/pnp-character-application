@@ -12,6 +12,10 @@ parameters:
     description: If true, deletes the Terraform resources in AWS for the specified environment.
     type: boolean
     default: false
+  deploy-shared:
+    description: If true, deploys the shared infrastructure (Route53 hosted zone). Use when terraform/shared/ files change.
+    type: boolean
+    default: false
   env:
     description: Target environment (dev or prod)
     type: enum
@@ -37,6 +41,7 @@ workflows:
       and:
         - not: << pipeline.parameters.delete-services >>
         - not: << pipeline.parameters.run-component-tests >>
+        - not: << pipeline.parameters.deploy-shared >>
     jobs:
       - check-format-files
       - lint-typescript-code
@@ -44,10 +49,6 @@ workflows:
       - run-backend-unit-tests
       - run-frontend-tests
       - lint-terraform-code
-      - deploy-shared-infrastructure:
-          requires:
-            - check-format-files
-            - lint-terraform-code
       - deploy-backend-and-app-infrastructure:
           name: deploy-backend-and-app-infrastructure-dev
           env: dev
@@ -57,7 +58,6 @@ workflows:
             - build-backend
             - run-backend-unit-tests
             - lint-terraform-code
-            - deploy-shared-infrastructure
       - build-frontend:
           name: build-frontend-dev
           env: dev
@@ -79,6 +79,7 @@ workflows:
         - equal: [main, << pipeline.git.branch >>]
         - not: << pipeline.parameters.delete-services >>
         - not: << pipeline.parameters.run-component-tests >>
+        - not: << pipeline.parameters.deploy-shared >>
     jobs:
       - check-format-files
       - lint-typescript-code
@@ -86,10 +87,6 @@ workflows:
       - run-backend-unit-tests
       - run-frontend-tests
       - lint-terraform-code
-      - deploy-shared-infrastructure:
-          requires:
-            - check-format-files
-            - lint-terraform-code
       - deploy-backend-and-app-infrastructure:
           name: deploy-backend-and-app-infrastructure-prod
           env: prod
@@ -99,7 +96,6 @@ workflows:
             - build-backend
             - run-backend-unit-tests
             - lint-terraform-code
-            - deploy-shared-infrastructure
       - run-backend-component-tests:
           name: run-backend-component-tests-prod
           env: prod
@@ -119,6 +115,16 @@ workflows:
             - build-frontend-prod
             - run-frontend-tests
             - deploy-backend-and-app-infrastructure-prod
+
+  deploy-shared:
+    when: << pipeline.parameters.deploy-shared >>
+    jobs:
+      - check-format-files
+      - lint-terraform-code
+      - deploy-shared-infrastructure:
+          requires:
+            - check-format-files
+            - lint-terraform-code
 
   component-tests:
     when:

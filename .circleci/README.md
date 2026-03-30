@@ -48,20 +48,28 @@ All workflows derive `TF_WORKSPACE` from the environment parameter and set it au
 
 - `run-component-tests`: Set to `true` to run backend component tests for the specified environment (always runs on `main` for prod)
 - `delete-services`: Set to `true` to destroy all Terraform resources for the specified environment (use with caution)
+- `deploy-shared`: Set to `true` to deploy the shared infrastructure (Route53 hosted zone). Use when files in `terraform/shared/` change.
 - `env`: Target environment (`dev` or `prod`, defaults to `dev`)
 
 ## Pipeline Workflows
 
 ### `build-deploy-dev`
 
-- Runs on every commit except the special `component-tests` and `delete-services` pipelines
+- Runs on every commit except the special `deploy-shared`, `component-tests` and `delete-services` pipelines
 - Deploys the dev environment
 
 ### `build-deploy-prod`
 
-- Runs on every commit to `main`
+- Runs on every commit to `main` except the special `deploy-shared`, `component-tests` and `delete-services` pipelines
 - Deploys the prod environment
 - Runs backend component tests after the backend and infrastructure deploy finishes
+
+### Deploy Shared Infrastructure
+
+- Triggers when `deploy-shared=true`
+- Deploys the shared infrastructure (`terraform/shared/`) which manages the Route53 hosted zone
+- Must be triggered manually when files in `terraform/shared/` change
+- Runs independently of the dev/prod deployment workflows to avoid Terraform state lock conflicts
 
 ### Component Tests
 

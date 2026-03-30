@@ -89,13 +89,13 @@ The shared root module (`terraform/shared/`) provides:
 
 ## Shared Infrastructure
 
-The `terraform/shared/` directory is a separate Terraform root module that manages resources shared across all environments. It uses its own Terraform Cloud workspace and is deployed before any per-environment infrastructure.
+The `terraform/shared/` directory is a separate Terraform root module that manages resources shared across all environments. It uses its own Terraform Cloud workspace and is deployed independently via the `deploy-shared` pipeline parameter (see [CircleCI configuration](../.circleci/README.md)).
 
 Currently managed in the shared module:
 
 - **Route53 hosted zone** — NS records are configured at the domain registrar, so the zone must persist even when individual environments are torn down
 
-Per-environment root modules reference the hosted zone via a data source and only manage their own DNS records and certificates.
+Per-environment root modules reference the hosted zone via a data source (not a remote state dependency) and only manage their own DNS records and certificates. This means the shared module does not need to be deployed as part of every dev/prod pipeline run.
 
 ## Multi-Environment Notes
 
