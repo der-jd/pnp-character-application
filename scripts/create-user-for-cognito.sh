@@ -10,7 +10,7 @@ usage() {
   cat << EOF
 Usage: $SCRIPT_NAME [OPTIONS]
 
-Create a Cognito test user in the environment-specific user pool.
+Create a Cognito user in the environment-specific user pool.
 
 OPTIONS:
   -u, --user-email EMAIL         User email address (required)
@@ -104,10 +104,6 @@ user_pool_name=$(get_user_pool_name "$environment")
 # Suppress AWS CLI pager output --> write output of AWS CLI commands directly to the console
 export AWS_PAGER=""
 
-generate_password() {
-  openssl rand -base64 32
-}
-
 echo "Getting AWS Cognito user pool id for '$user_pool_name'..."
 user_pool_id=$(aws cognito-idp list-user-pools \
     --query "UserPools[?Name=='$user_pool_name'].Id" \
@@ -122,24 +118,15 @@ if [[ -z "$user_pool_id" || "$user_pool_id" == "None" ]]; then
 fi
 
 echo "Creating new Cognito user..."
-# Suppress invitation email as the temporary password will be overwritten below
+# Cognito sends an invitation email with a temporary password. The user's
+# status will be FORCE_CHANGE_PASSWORD and the frontend prompts them to set
+# a new password on first login.
 aws cognito-idp admin-create-user \
     --user-pool-id "$user_pool_id" \
     --username "$user_mail" \
     --user-attributes Name="email",Value="$user_mail" Name="email_verified",Value="true" \
-    --message-action SUPPRESS \
     --profile "$aws_profile" \
     --region "$aws_region"
 
-echo "Updating temporary password..."
-user_password=$(generate_password)
-aws cognito-idp admin-set-user-password \
-    --user-pool-id "$user_pool_id" \
-    --username "$user_mail" \
-    --password "$user_password" \
-    --permanent \
-    --profile "$aws_profile" \
-    --region "$aws_region"
-
-echo "New test user created. Use the following password to log in."
-echo "$user_password"
+echo "New user created. The user will receive an invitation email with a temporary password."
+echo "On first login, the application will prompt them to set a new password."

@@ -6,9 +6,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "update-history-types": "npx ts-node update-history-types.ts",
-    "convert-character-xml": "npm run build && node build/convert-character-xml.js",
-    "upload-component-test-data": "./upload-component-test-data.sh",
-    "create-user": "./create_user_for_cognito.sh"
+    "convert-character-xml": "npm run build && node build/convert-character-xml.js"
   },
   "devDependencies": {
     "@aws-sdk/util-dynamodb": "^3.758.0",
