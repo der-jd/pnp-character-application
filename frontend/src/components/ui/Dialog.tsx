@@ -13,6 +13,7 @@ interface DialogProps {
 
 export function Dialog({ open, onClose, title, children, actions }: DialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const backdropMouseDown = useRef(false);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -39,8 +40,11 @@ export function Dialog({ open, onClose, title, children, actions }: DialogProps)
       ref={dialogRef}
       aria-labelledby="dialog-title"
       className="backdrop:bg-black/60 bg-bg-secondary rounded-xl border border-border-primary shadow-2xl p-0 w-full max-w-md text-text-primary fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+      onMouseDown={(e) => {
+        backdropMouseDown.current = e.target === dialogRef.current;
+      }}
       onClick={(e) => {
-        if (e.target === dialogRef.current) onClose();
+        if (backdropMouseDown.current && e.target === dialogRef.current) onClose();
       }}
     >
       <div className="flex items-center justify-between border-b border-border-primary px-5 py-4">
