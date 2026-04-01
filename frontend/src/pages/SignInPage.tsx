@@ -4,6 +4,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { t } from "@/i18n";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { PasswordStrengthBar } from "@/components/ui/PasswordStrengthBar";
 
 export function SignInPage() {
   const { signIn, completeNewPassword, newPasswordRequired } = useAuth();
@@ -60,7 +61,7 @@ export function SignInPage() {
   }
 
   return (
-    <div className="fixed inset-0 bg-bg-primary p-4 flex items-center justify-center">
+    <div className="fixed inset-0 bg-bg-primary p-4 flex items-center justify-center overflow-y-auto">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 text-center">
@@ -78,15 +79,20 @@ export function SignInPage() {
             className="rounded-xl border border-border-primary bg-bg-secondary p-6 space-y-4"
           >
             <p className="text-sm text-text-secondary">{t("newPasswordDescription")}</p>
-            <Input
-              label={t("newPassword")}
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              autoComplete="new-password"
-              required
-              autoFocus
-            />
+            <div>
+              <Input
+                label={t("newPassword")}
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+                required
+                autoFocus
+              />
+              <div className="mt-1.5">
+                <PasswordStrengthBar password={newPassword} />
+              </div>
+            </div>
             <Input
               label={t("confirmNewPassword")}
               type="password"

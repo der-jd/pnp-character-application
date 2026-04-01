@@ -4,6 +4,7 @@ import { t } from "@/i18n";
 import { Dialog } from "./Dialog";
 import { Input } from "./Input";
 import { Button } from "./Button";
+import { PasswordStrengthBar } from "./PasswordStrengthBar";
 import { useToast } from "./Toast";
 
 interface ChangePasswordDialogProps {
@@ -87,12 +88,12 @@ export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProp
       toast("success", t("changePasswordSuccess"));
       onClose();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "";
-      if (message.includes("NotAuthorizedException")) {
+      const errorString = err instanceof Error ? `${err.name}: ${err.message}` : "";
+      if (errorString.includes("NotAuthorizedException")) {
         setCurrentPasswordError(t("changePasswordWrongCurrent"));
-      } else if (message.includes("InvalidPasswordException")) {
+      } else if (errorString.includes("InvalidPasswordException")) {
         setNewPasswordError(t("newPasswordInvalid"));
-      } else if (message.includes("LimitExceededException")) {
+      } else if (errorString.includes("LimitExceededException")) {
         setCurrentPasswordError(t("changePasswordLimitExceeded"));
       } else {
         setCurrentPasswordError(t("changePasswordError"));
@@ -129,15 +130,20 @@ export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProp
           required
           autoFocus
         />
-        <Input
-          label={t("newPassword")}
-          type="password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          autoComplete="new-password"
-          error={newPasswordError}
-          required
-        />
+        <div>
+          <Input
+            label={t("newPassword")}
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            autoComplete="new-password"
+            error={newPasswordError}
+            required
+          />
+          <div className="mt-1.5">
+            <PasswordStrengthBar password={newPassword} />
+          </div>
+        </div>
         <Input
           label={t("confirmNewPassword")}
           type="password"

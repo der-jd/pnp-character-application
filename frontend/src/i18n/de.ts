@@ -29,6 +29,12 @@ const de = {
   changePasswordWrongCurrent: "Das aktuelle Passwort ist falsch.",
   changePasswordLimitExceeded: "Zu viele Versuche. Bitte versuche es später erneut.",
   passwordRequirements: "Min. 16 Zeichen, Groß-/Kleinbuchstaben, Zahlen und Sonderzeichen erforderlich.",
+  showPassword: "Passwort anzeigen",
+  hidePassword: "Passwort verbergen",
+  passwordStrengthWeak: "Schwach",
+  passwordStrengthFair: "Ausreichend",
+  passwordStrengthGood: "Gut",
+  passwordStrengthStrong: "Stark",
   fieldRequired: "Dieses Feld ist erforderlich.",
 
   // Navigation
