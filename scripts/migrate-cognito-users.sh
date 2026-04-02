@@ -1,67 +1,118 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-AWS_REGION="eu-central-1"
+readonly SCRIPT_NAME="$(basename "$0")"
+readonly AWS_REGION="eu-central-1"
 
 usage() {
-  echo "Migrate users from one Cognito user pool to another."
-  echo "Migrates email addresses. Users will receive a new sub (user ID) in the target pool"
-  echo "and will need to reset their password on first login."
-  echo ""
-  echo "Usage: $0 --source-pool-id <id> --target-pool-id <id> --profile <aws_profile> [--dry-run]"
-  echo ""
-  echo "Options:"
-  echo "  --source-pool-id  Source Cognito user pool ID"
-  echo "  --target-pool-id  Target Cognito user pool ID"
-  echo "  --profile         AWS CLI profile"
-  echo "  --dry-run         Print users that would be migrated without making changes"
-  echo ""
-  echo "Note: The user sub (ID) cannot be preserved across pools. Cognito always generates"
-  echo "a new sub for each user. If your application stores data keyed by sub (e.g. in"
-  echo "DynamoDB), you will need to update those references after migration. The script"
-  echo "outputs old and new sub mappings to help with this."
-  exit 1
+  cat << EOF
+Usage: $SCRIPT_NAME [OPTIONS]
+
+Migrate users from one Cognito user pool to another.
+Migrates email addresses. Users will receive a new sub (user ID) in the target pool
+and will receive an invitation email with a temporary password for first login.
+
+OPTIONS:
+  -s, --source-pool-id ID         Source Cognito user pool ID (required)
+  -t, --target-pool-id ID         Target Cognito user pool ID (required)
+  -p, --profile PROFILE           AWS profile name (required)
+  -r, --region REGION             AWS region (default: $AWS_REGION)
+  --dry-run                       Print users that would be migrated without making changes
+  --help                          Show this help message
+
+Note: The user sub (ID) cannot be preserved across pools. Cognito always generates
+a new sub for each user. If your application stores data keyed by sub (e.g. in
+DynamoDB), you will need to update those references after migration. The script
+outputs old and new sub mappings to help with this.
+
+EXAMPLES:
+  $SCRIPT_NAME -s eu-central-1_ABC123 -t eu-central-1_DEF456 -p my-aws-profile
+  $SCRIPT_NAME -s eu-central-1_ABC123 -t eu-central-1_DEF456 -p my-aws-profile --dry-run
+
+EOF
 }
 
-DRY_RUN=false
+source_pool_id=""
+target_pool_id=""
+aws_profile=""
+aws_region="$AWS_REGION"
+dry_run=false
 
-while [ $# -gt 0 ]; do
-  case "$1" in
-    --source-pool-id) SOURCE_POOL_ID="$2"; shift 2 ;;
-    --target-pool-id) TARGET_POOL_ID="$2"; shift 2 ;;
-    --profile) AWS_PROFILE="$2"; shift 2 ;;
-    --dry-run) DRY_RUN=true; shift ;;
-    *) usage ;;
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -s|--source-pool-id)
+      source_pool_id="$2"
+      shift 2
+      ;;
+    -t|--target-pool-id)
+      target_pool_id="$2"
+      shift 2
+      ;;
+    -p|--profile)
+      aws_profile="$2"
+      shift 2
+      ;;
+    -r|--region)
+      aws_region="$2"
+      shift 2
+      ;;
+    --dry-run)
+      dry_run=true
+      shift
+      ;;
+    --help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Error: Unknown option: $1"
+      usage
+      exit 1
+      ;;
   esac
 done
 
-if [ -z "$SOURCE_POOL_ID" ] || [ -z "$TARGET_POOL_ID" ] || [ -z "$AWS_PROFILE" ]; then
+if [[ -z "$source_pool_id" ]]; then
+  echo "Error: Missing source pool ID. Use -s or --source-pool-id to specify it."
   usage
+  exit 1
 fi
 
-# Suppress AWS CLI pager output
+if [[ -z "$target_pool_id" ]]; then
+  echo "Error: Missing target pool ID. Use -t or --target-pool-id to specify it."
+  usage
+  exit 1
+fi
+
+if [[ -z "$aws_profile" ]]; then
+  echo "Error: Missing AWS profile. Use -p or --profile to specify it."
+  usage
+  exit 1
+fi
+
+# Suppress AWS CLI pager output --> write output of AWS CLI commands directly to the console
 export AWS_PAGER=""
 
-echo "Fetching users from source pool $SOURCE_POOL_ID..."
+echo "Fetching users from source pool '$source_pool_id'..."
 
 # Collect all users across paginated responses (list-users returns max 60 per call)
 all_users="[]"
 pagination_token=""
 
 while true; do
-  if [ -n "$pagination_token" ]; then
+  if [[ -n "$pagination_token" ]]; then
     response=$(aws cognito-idp list-users \
-      --user-pool-id "$SOURCE_POOL_ID" \
+      --user-pool-id "$source_pool_id" \
       --pagination-token "$pagination_token" \
-      --profile "$AWS_PROFILE" \
-      --region "$AWS_REGION" \
+      --profile "$aws_profile" \
+      --region "$aws_region" \
       --output json)
   else
     response=$(aws cognito-idp list-users \
-      --user-pool-id "$SOURCE_POOL_ID" \
-      --profile "$AWS_PROFILE" \
-      --region "$AWS_REGION" \
+      --user-pool-id "$source_pool_id" \
+      --profile "$aws_profile" \
+      --region "$aws_region" \
       --output json)
   fi
 
@@ -69,7 +120,7 @@ while true; do
   all_users=$(echo "$all_users $page_users" | jq -s '.[0] + .[1]')
 
   pagination_token=$(echo "$response" | jq -r '.PaginationToken // empty')
-  if [ -z "$pagination_token" ]; then
+  if [[ -z "$pagination_token" ]]; then
     break
   fi
   echo "  Fetched $(echo "$page_users" | jq 'length') users, fetching next page..."
@@ -78,7 +129,7 @@ done
 user_count=$(echo "$all_users" | jq 'length')
 echo "Found $user_count user(s) in source pool."
 
-if [ "$user_count" -eq 0 ]; then
+if [[ "$user_count" -eq 0 ]]; then
   echo "No users to migrate."
   exit 0
 fi
@@ -98,7 +149,7 @@ for i in $(seq 0 $((user_count - 1))); do
   echo "  Email:   $user_email"
   echo "  Old sub: $old_sub"
 
-  if [ "$DRY_RUN" = true ]; then
+  if [[ "$dry_run" == true ]]; then
     echo "  [dry-run] Would create user in target pool"
     continue
   fi
@@ -108,13 +159,13 @@ for i in $(seq 0 $((user_count - 1))); do
   # FORCE_CHANGE_PASSWORD and the frontend prompts them to set a new password
   # on first login.
   create_output=$(aws cognito-idp admin-create-user \
-    --user-pool-id "$TARGET_POOL_ID" \
+    --user-pool-id "$target_pool_id" \
     --username "$user_email" \
     --user-attributes \
       Name="email",Value="$user_email" \
       Name="email_verified",Value="${email_verified:-true}" \
-    --profile "$AWS_PROFILE" \
-    --region "$AWS_REGION" \
+    --profile "$aws_profile" \
+    --region "$aws_region" \
     --output json)
 
   new_sub=$(echo "$create_output" | jq -r '.User.Attributes[] | select(.Name == "sub") | .Value')

@@ -10,18 +10,26 @@ usage() {
   cat << EOF
 Usage: $SCRIPT_NAME [OPTIONS]
 
-Create a Cognito user in the environment-specific user pool.
+Reset a Cognito user's password. Sets a temporary password that the user
+must change on next login (FORCE_CHANGE_PASSWORD).
+
+The temporary password is generated automatically and printed to the console.
+You must deliver it to the user out-of-band (e.g. in person, via chat).
+
+Note: The user pool uses "admin_only" account recovery, so password resets
+cannot be done via the AWS Console or self-service — only via this script.
 
 OPTIONS:
   -u, --user-email EMAIL         User email address (required)
   -p, --profile PROFILE          AWS profile name (required)
-  -e, --env ENV                  Environment name for resource suffix, e.g. dev or prod (required)
+  -e, --env ENV                  Environment name, e.g. dev or prod (required)
   -r, --region REGION            AWS region (default: $AWS_REGION)
+  --permanent                    Set as permanent password (user won't be forced to change it)
   --help                         Show this help message
 
 EXAMPLES:
-  $SCRIPT_NAME -u test@example.com -p my-aws-profile -e dev
-  $SCRIPT_NAME -u test@example.com -p my-aws-profile -e prod -r eu-central-1
+  $SCRIPT_NAME -u user@example.com -p my-aws-profile -e dev
+  $SCRIPT_NAME -u user@example.com -p my-aws-profile -e prod --permanent
 
 EOF
 }
@@ -44,10 +52,15 @@ get_user_pool_name() {
   echo "$USER_POOL_NAME_BASE-$environment"
 }
 
+generate_password() {
+  openssl rand -base64 32
+}
+
 user_mail=""
 aws_profile=""
 environment=""
 aws_region="$AWS_REGION"
+permanent=false
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -66,6 +79,10 @@ while [[ $# -gt 0 ]]; do
     -r|--region)
       aws_region="$2"
       shift 2
+      ;;
+    --permanent)
+      permanent=true
+      shift
       ;;
     --help)
       usage
@@ -117,16 +134,28 @@ if [[ -z "$user_pool_id" || "$user_pool_id" == "None" ]]; then
   exit 1
 fi
 
-echo "Creating new Cognito user..."
-# Cognito sends an invitation email. The user receives a temporary password,
-# enters FORCE_CHANGE_PASSWORD status, and must set a new password on first login.
-aws cognito-idp admin-create-user \
+echo "Resetting password for user '$user_mail' in pool '$user_pool_name'..."
+new_password=$(generate_password)
+
+permanent_flag=""
+if [[ "$permanent" == true ]]; then
+  permanent_flag="--permanent"
+fi
+
+aws cognito-idp admin-set-user-password \
     --user-pool-id "$user_pool_id" \
     --username "$user_mail" \
-    --user-attributes Name="email",Value="$user_mail" Name="email_verified",Value="true" \
-    --desired-delivery-mediums EMAIL \
+    --password "$new_password" \
+    $permanent_flag \
     --profile "$aws_profile" \
     --region "$aws_region"
 
-echo "New user created. The user will receive an invitation email with a temporary password."
-echo "On first login, the application will prompt them to set a new password."
+echo ""
+echo "Password reset successful."
+if [[ "$permanent" == true ]]; then
+  echo "The password has been set as permanent."
+else
+  echo "The user will be forced to set a new password on next login."
+fi
+echo ""
+echo "New password: $new_password"

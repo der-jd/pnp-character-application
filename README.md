@@ -82,6 +82,42 @@ npm run install-lint-terraform
 (cd terraform/shared && terraform init)
 ```
 
+### User management scripts
+
+The user pool uses `admin_only` account recovery and `AllowAdminCreateUserOnly`, so all user management is done via CLI scripts.
+
+**Create a new user:**
+
+```bash
+./scripts/create-user-for-cognito.sh -u user@example.com -p {your-aws-profile} -e {dev or prod}
+```
+
+The script requests email delivery for the Cognito invitation. Cognito sends an invitation email with a temporary password, and the user must set a new password on first login.
+
+**Reset a user's password:**
+
+```bash
+# Temporary password (user must change it on next login)
+./scripts/reset-cognito-user-password.sh -u user@example.com -p {your-aws-profile} -e {dev or prod}
+
+# Permanent password (no forced change)
+./scripts/reset-cognito-user-password.sh -u user@example.com -p {your-aws-profile} -e {dev or prod} --permanent
+```
+
+The script generates a random password and prints it to the console. Deliver it to the user out-of-band. The AWS Console "Reset password" button is not available with `admin_only` recovery.
+
+**Migrate users between pools:**
+
+```bash
+# Dry run first
+./scripts/migrate-cognito-users.sh -s eu-central-1_OLD -t eu-central-1_NEW -p {your-aws-profile} --dry-run
+
+# Execute migration
+./scripts/migrate-cognito-users.sh -s eu-central-1_OLD -t eu-central-1_NEW -p {your-aws-profile}
+```
+
+Migrates email addresses to a new pool. Users receive a new sub and an invitation email with a temporary password. See the script's `--help` for details on sub mapping.
+
 ## 🏗️ Architecture
 
 ```mermaid
