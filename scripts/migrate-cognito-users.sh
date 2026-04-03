@@ -99,7 +99,24 @@ generate_password() {
 # Suppress AWS CLI pager output --> write output of AWS CLI commands directly to the console
 export AWS_PAGER=""
 
-echo "Fetching users from source pool '$source_pool_id'..."
+source_pool_name=$(aws cognito-idp describe-user-pool \
+    --user-pool-id "$source_pool_id" \
+    --query 'UserPool.Name' \
+    --output text \
+    --profile "$aws_profile" \
+    --region "$aws_region")
+
+target_pool_name=$(aws cognito-idp describe-user-pool \
+    --user-pool-id "$target_pool_id" \
+    --query 'UserPool.Name' \
+    --output text \
+    --profile "$aws_profile" \
+    --region "$aws_region")
+
+echo "Source pool: $source_pool_name ($source_pool_id)"
+echo "Target pool: $target_pool_name ($target_pool_id)"
+echo ""
+echo "Fetching users from source pool..."
 
 # Collect all users across paginated responses (list-users returns max 60 per call)
 all_users="[]"
