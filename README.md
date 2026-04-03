@@ -90,7 +90,7 @@ The user pool uses `admin_only` account recovery and `AllowAdminCreateUserOnly`,
 **Create a new user:**
 
 ```bash
-./scripts/create-user-for-cognito.sh -u user@example.com -p {your-aws-profile} -e {dev or prod}
+./scripts/create-cognito-user.sh -u user@example.com -p {your-aws-profile} -e {dev or prod}
 ```
 
 The script requests email delivery for the Cognito invitation. Cognito sends an invitation email with a temporary password, and the user must set a new password on first login.
