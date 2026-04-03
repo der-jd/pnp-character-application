@@ -117,7 +117,7 @@ The script generates a random password and prints it to the console. Deliver it 
 ./scripts/migrate-cognito-users.sh -s eu-central-1_OLD -t eu-central-1_NEW -p {your-aws-profile}
 ```
 
-Migrates email addresses to a new pool. Users receive a new sub and an invitation email with a temporary password. See the script's `--help` for details on sub mapping.
+Migrates email addresses to a new pool. Users receive a new sub. Temporary passwords are generated and printed to the console. Deliver them to the users out-of-band. See the script's `--help` for details on sub mapping.
 
 ## 🏗️ Architecture
 

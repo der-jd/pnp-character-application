@@ -10,8 +10,9 @@ usage() {
 Usage: $SCRIPT_NAME [OPTIONS]
 
 Migrate users from one Cognito user pool to another.
-Migrates email addresses. Users will receive a new sub (user ID) in the target pool
-and will receive an invitation email with a temporary password for first login.
+Migrates email addresses. Users will receive a new sub (user ID) in the target pool.
+Temporary passwords are generated and printed to the console. Deliver them to the
+users out-of-band. Users must change the password on first login.
 
 OPTIONS:
   -s, --source-pool-id ID         Source Cognito user pool ID (required)
@@ -91,6 +92,10 @@ if [[ -z "$aws_profile" ]]; then
   exit 1
 fi
 
+generate_password() {
+  openssl rand -base64 32
+}
+
 # Suppress AWS CLI pager output --> write output of AWS CLI commands directly to the console
 export AWS_PAGER=""
 
@@ -154,22 +159,24 @@ for i in $(seq 0 $((user_count - 1))); do
     continue
   fi
 
-  # Do not suppress the invitation message so Cognito sends the temporary
-  # password to the user via email. The user's status will be
-  # FORCE_CHANGE_PASSWORD and the frontend prompts them to set a new password
-  # on first login.
+  # Suppress invitation email — temporary password is printed to the console
+  # and must be delivered to the user out-of-band.
+  temporary_password=$(generate_password)
   create_output=$(aws cognito-idp admin-create-user \
     --user-pool-id "$target_pool_id" \
     --username "$user_email" \
     --user-attributes \
       Name="email",Value="$user_email" \
       Name="email_verified",Value="${email_verified:-true}" \
+    --temporary-password "$temporary_password" \
+    --message-action SUPPRESS \
     --profile "$aws_profile" \
     --region "$aws_region" \
     --output json)
 
   new_sub=$(echo "$create_output" | jq -r '.User.Attributes[] | select(.Name == "sub") | .Value')
-  echo "  New sub: $new_sub"
+  echo "  New sub:            $new_sub"
+  echo "  Temporary password: $temporary_password"
   echo "  $old_sub -> $new_sub"
 done
 
@@ -177,7 +184,7 @@ echo ""
 echo "Migration complete. $user_count user(s) processed."
 echo ""
 echo "IMPORTANT:"
-echo "  - Users will receive an email with a temporary password."
+echo "  - Deliver the temporary passwords to the users out-of-band."
 echo "    On first login, the application will prompt them to set a new password."
 echo "  - User subs have changed. If your application stores data keyed by user sub"
 echo "    (e.g. userId in DynamoDB), you will need to update those references."
