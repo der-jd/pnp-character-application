@@ -150,8 +150,15 @@ aws cognito-idp admin-set-user-password \
     --profile "$aws_profile" \
     --region "$aws_region"
 
+echo "Signing out all existing sessions..."
+aws cognito-idp admin-user-global-sign-out \
+    --user-pool-id "$user_pool_id" \
+    --username "$user_mail" \
+    --profile "$aws_profile" \
+    --region "$aws_region"
+
 echo ""
-echo "Password reset successful."
+echo "Password reset successful. All existing sessions have been invalidated."
 if [[ "$permanent" == true ]]; then
   echo "The password has been set as permanent."
 else
