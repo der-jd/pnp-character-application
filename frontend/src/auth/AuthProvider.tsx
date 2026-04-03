@@ -12,10 +12,6 @@ import {
 // Only the refresh token is persisted to localStorage.
 // Short-lived id/access tokens are kept in memory only to limit XSS exposure.
 const REFRESH_TOKEN_KEY = "wh_auth_refresh";
-// The pending password challenge is persisted to sessionStorage so a page
-// refresh doesn't strand the user mid-flow. sessionStorage is tab-scoped
-// and cleared when the tab closes.
-const PENDING_CHALLENGE_KEY = "wh_auth_challenge";
 
 interface AuthContextValue {
   isAuthenticated: boolean;
@@ -70,28 +66,13 @@ function clearRefreshToken(): void {
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
-function loadPendingChallenge(): NewPasswordChallenge | null {
-  try {
-    const stored = sessionStorage.getItem(PENDING_CHALLENGE_KEY);
-    if (!stored) return null;
-    return JSON.parse(stored) as NewPasswordChallenge;
-  } catch {
-    return null;
-  }
-}
-
-function storePendingChallenge(challenge: NewPasswordChallenge): void {
-  sessionStorage.setItem(PENDING_CHALLENGE_KEY, JSON.stringify(challenge));
-}
-
-function clearPendingChallenge(): void {
-  sessionStorage.removeItem(PENDING_CHALLENGE_KEY);
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [tokens, setTokens] = useState<AuthTokens | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [pendingChallenge, setPendingChallenge] = useState<NewPasswordChallenge | null>(loadPendingChallenge);
+  // Kept in memory only — not persisted to storage to avoid exposing the
+  // Cognito session token to XSS. If the user refreshes during the password
+  // challenge, they simply re-enter their temporary password.
+  const [pendingChallenge, setPendingChallenge] = useState<NewPasswordChallenge | null>(null);
   const refreshingRef = useRef(false);
 
   // Attempt to restore session on mount using stored refresh token
@@ -145,7 +126,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const handleSignIn = useCallback(async (username: string, password: string) => {
     const result = await cognitoSignIn(username, password);
     if (isNewPasswordChallenge(result)) {
-      storePendingChallenge(result);
       setPendingChallenge(result);
       return { newPasswordRequired: true };
     }
@@ -162,7 +142,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         pendingChallenge.username,
         newPassword,
       );
-      clearPendingChallenge();
       setPendingChallenge(null);
       storeRefreshToken(newTokens.refreshToken);
       setTokens(newTokens);
@@ -180,7 +159,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleSignOut = useCallback(() => {
     clearRefreshToken();
-    clearPendingChallenge();
     setTokens(null);
     setPendingChallenge(null);
   }, []);
