@@ -1,4 +1,5 @@
 import { createContext, useContext, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   signIn as cognitoSignIn,
   completeNewPassword as cognitoCompleteNewPassword,
@@ -67,6 +68,7 @@ function clearRefreshToken(): void {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [tokens, setTokens] = useState<AuthTokens | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   // Kept in memory only — not persisted to storage to avoid exposing the
@@ -159,9 +161,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleSignOut = useCallback(() => {
     clearRefreshToken();
+    queryClient.clear();
     setTokens(null);
     setPendingChallenge(null);
-  }, []);
+  }, [queryClient]);
 
   return (
     <AuthContext.Provider
