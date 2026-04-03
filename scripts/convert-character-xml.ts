@@ -373,6 +373,9 @@ async function main(): Promise<void> {
   characterSchema.parse(character);
   const historyEntries = aggregateCombatSkillModEntries(rawHistoryEntries, warnings);
 
+  const startAP = getStartAdventurePoints(rawHistoryEntries);
+  characterSheet.calculationPoints.adventurePoints.start = startAP;
+
   const lastAPFromHistory = getLastAdventurePointsAvailable(rawHistoryEntries);
   const computedAP = characterSheet.calculationPoints.adventurePoints.available;
   if (lastAPFromHistory !== null && lastAPFromHistory !== computedAP) {
@@ -1346,6 +1349,15 @@ function buildHistoryRecords(
   const records: HistoryRecord[] = [];
   let number = startingNumber;
 
+  const apTracker = {
+    start: characterSheet.calculationPoints.adventurePoints.start,
+    runningTotal: characterSheet.calculationPoints.adventurePoints.start,
+  };
+  const attrTracker = {
+    start: characterSheet.calculationPoints.attributePoints.start,
+    runningTotal: characterSheet.calculationPoints.attributePoints.start,
+  };
+
   for (const entry of entries) {
     const typeLabel = normalizeLabel(asText(entry.type));
     if (IGNORED_HISTORY_TYPES.has(typeLabel)) {
@@ -1384,7 +1396,7 @@ function buildHistoryRecords(
 
     switch (recordType) {
       case HistoryRecordType.CALCULATION_POINTS_CHANGED:
-        fillCalculationPointsRecord(record, entry, name, warnings);
+        fillCalculationPointsRecord(record, entry, name, apTracker, attrTracker, warnings);
         break;
       case HistoryRecordType.BASE_VALUE_CHANGED:
         fillBaseValueRecord(record, name, oldValueText, newValueText, characterSheet, warnings);
@@ -1624,17 +1636,25 @@ function fillCalculationPointsRecord(
   record: HistoryRecord,
   entry: HistoryEntry,
   name: string,
+  apTracker: { start: number; runningTotal: number },
+  attrTracker: { start: number; runningTotal: number },
   warnings: string[],
 ): void {
   const oldAvailable = toInt(entry.old_calculation_points_available);
   const newAvailable = toInt(entry.new_calculation_points_available);
-
-  const oldPoints = toCalculationPoints(oldAvailable);
-  const newPoints = toCalculationPoints(newAvailable);
+  const change = newAvailable - oldAvailable;
 
   const normalizedName = normalizeLabel(name).toLowerCase();
   const isAttributePoints = normalizedName.includes("attribut") || normalizedName.includes("eigenschaft");
   const key = isAttributePoints ? "attributePoints" : "adventurePoints";
+
+  const tracker = isAttributePoints ? attrTracker : apTracker;
+  const oldTotal = tracker.runningTotal;
+  tracker.runningTotal += change;
+  const newTotal = tracker.runningTotal;
+
+  const oldPoints: CalculationPoints = { start: tracker.start, available: oldAvailable, total: oldTotal };
+  const newPoints: CalculationPoints = { start: tracker.start, available: newAvailable, total: newTotal };
 
   record.data.old = { [key]: oldPoints };
   record.data.new = { [key]: newPoints };
@@ -1844,14 +1864,6 @@ function fillSpecialAbilityRecord(
   }
 }
 
-function toCalculationPoints(available: number): CalculationPoints {
-  return {
-    start: 0,
-    available,
-    total: available,
-  };
-}
-
 function getCombatCategory(skill: CombatSkillName): CombatCategory {
   const meleeSkills = Object.keys(characterSheetSchema.shape.combat.shape.melee.shape);
   return meleeSkills.includes(skill) ? "melee" : "ranged";
@@ -1878,6 +1890,17 @@ function getCreationDate(entries: HistoryEntry[]): string | null {
     return null;
   }
   return asText(entries[0].date) || null;
+}
+
+function getStartAdventurePoints(entries: HistoryEntry[]): number {
+  for (const entry of entries) {
+    const typeLabel = normalizeLabel(asText(entry.type));
+    const comment = normalizeLabel(asText(entry.comment));
+    if (typeLabel === normalizeLabel("Ereignis (Berechnungspunkte)") && comment === normalizeLabel("Erstellung")) {
+      return toInt(entry.new_calculation_points_available);
+    }
+  }
+  return 0;
 }
 
 function isCreationEntry(entry: HistoryEntry, creationDate: string | null, warnings: string[]): boolean {
