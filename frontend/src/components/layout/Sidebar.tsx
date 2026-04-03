@@ -14,6 +14,7 @@ import {
   CalendarPlus,
   Sun,
   Moon,
+  KeyRound,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@/i18n";
@@ -24,6 +25,7 @@ import { useState } from "react";
 import type { CharacterShort } from "api-spec";
 import { EventDialog } from "@/components/EventDialog";
 import { Toggle } from "@/components/ui/Toggle";
+import { ChangePasswordDialog } from "@/components/ui/ChangePasswordDialog";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   clsx(
@@ -41,6 +43,7 @@ export function Sidebar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   const { data } = useQuery({ queryKey: ["characters"], queryFn: fetchCharacters });
   const characters = (data?.characters ?? []) as CharacterShort[];
@@ -197,6 +200,14 @@ export function Sidebar() {
           {!collapsed && <span>{t("navCollapse")}</span>}
         </button>
         <button
+          onClick={() => setChangePasswordOpen(true)}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-muted hover:bg-sidebar-hover hover:text-text-primary transition-colors cursor-pointer"
+          title={t("changePassword")}
+        >
+          <KeyRound size={18} className="shrink-0" />
+          {!collapsed && <span>{t("changePassword")}</span>}
+        </button>
+        <button
           onClick={signOut}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-text-muted hover:bg-sidebar-hover hover:text-accent-danger transition-colors cursor-pointer"
         >
@@ -207,6 +218,7 @@ export function Sidebar() {
       {characterId && (
         <EventDialog open={eventDialogOpen} onClose={() => setEventDialogOpen(false)} characterId={characterId} />
       )}
+      <ChangePasswordDialog open={changePasswordOpen} onClose={() => setChangePasswordOpen(false)} />
     </aside>
   );
 }

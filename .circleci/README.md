@@ -36,7 +36,11 @@ All workflows derive `TF_WORKSPACE` from the environment parameter and set it au
 - `COMPONENT_TESTS_COGNITO_REGION`: Region of the Cognito user pool
 - `COMPONENT_TESTS_COGNITO_APP_CLIENT_ID`: App client ID of the Cognito user pool
 
-### Frontend Build Variables (automatically set via Terraform outputs)
+### Frontend Build Variables
+
+- `VITE_APP_ENV`: Environment name for the frontend build
+
+#### Automatically set via Terraform outputs
 
 - `VITE_COGNITO_REGION`: Cognito region for the frontend build
 - `VITE_COGNITO_APP_CLIENT_ID`: Cognito app client ID for the frontend build

@@ -10,7 +10,9 @@ usage() {
   cat << EOF
 Usage: $SCRIPT_NAME [OPTIONS]
 
-Create a Cognito test user in the environment-specific user pool.
+Create a Cognito user in the environment-specific user pool.
+A random temporary password is generated and printed to the console.
+The user must change it on first login. Deliver it to the user out-of-band.
 
 OPTIONS:
   -u, --user-email EMAIL         User email address (required)
@@ -104,10 +106,6 @@ user_pool_name=$(get_user_pool_name "$environment")
 # Suppress AWS CLI pager output --> write output of AWS CLI commands directly to the console
 export AWS_PAGER=""
 
-generate_password() {
-  openssl rand -base64 32
-}
-
 echo "Getting AWS Cognito user pool id for '$user_pool_name'..."
 user_pool_id=$(aws cognito-idp list-user-pools \
     --query "UserPools[?Name=='$user_pool_name'].Id" \
@@ -121,25 +119,24 @@ if [[ -z "$user_pool_id" || "$user_pool_id" == "None" ]]; then
   exit 1
 fi
 
+generate_password() {
+  openssl rand -base64 32
+}
+
 echo "Creating new Cognito user..."
-# Suppress invitation email as the temporary password will be overwritten below
+# Suppress the invitation email — the temporary password is printed to the
+# console and must be delivered to the user out-of-band.
+temporary_password=$(generate_password)
 aws cognito-idp admin-create-user \
     --user-pool-id "$user_pool_id" \
     --username "$user_mail" \
     --user-attributes Name="email",Value="$user_mail" Name="email_verified",Value="true" \
+    --temporary-password "$temporary_password" \
     --message-action SUPPRESS \
     --profile "$aws_profile" \
     --region "$aws_region"
 
-echo "Updating temporary password..."
-user_password=$(generate_password)
-aws cognito-idp admin-set-user-password \
-    --user-pool-id "$user_pool_id" \
-    --username "$user_mail" \
-    --password "$user_password" \
-    --permanent \
-    --profile "$aws_profile" \
-    --region "$aws_region"
-
-echo "New test user created. Use the following password to log in."
-echo "$user_password"
+echo ""
+echo "New user created. The user must change the password on first login."
+echo ""
+echo "Temporary password: $temporary_password"

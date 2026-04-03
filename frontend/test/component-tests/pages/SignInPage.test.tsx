@@ -16,6 +16,8 @@ vi.mock("@/auth/AuthProvider", () => ({
     isLoading: false,
     idToken: null,
     signOut: vi.fn(),
+    newPasswordRequired: false,
+    completeNewPassword: vi.fn(),
   }),
 }));
 
@@ -66,7 +68,7 @@ describe("SignInPage", () => {
   });
 
   it("calls signIn and navigates on successful submission", async () => {
-    mockSignIn.mockResolvedValue(undefined);
+    mockSignIn.mockResolvedValue({ newPasswordRequired: false });
     const user = userEvent.setup();
     renderSignIn();
 

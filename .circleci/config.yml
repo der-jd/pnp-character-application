@@ -393,6 +393,7 @@ jobs:
           name: Build frontend
           command: |
             source ~/project/terraform/app/terraform_output_<< parameters.env >>
+            export VITE_APP_ENV=<< parameters.env >>
             cd frontend
             npm run build
             rm -rf ~/project/frontend/dist-<< parameters.env >>

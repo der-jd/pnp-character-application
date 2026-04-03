@@ -37,6 +37,7 @@ export TF_WORKSPACE="<your-terraform-dev-workspace>"
 export TF_VAR_alert_email_address="<your-alert-email-address>"
 
 # Frontend environment variables
+export VITE_APP_ENV="dev"
 export VITE_API_BASE_URL="https://api.dev.worldhoppers.de/v1"
 export VITE_COGNITO_REGION="eu-central-1"
 export VITE_COGNITO_APP_CLIENT_ID="<dev-cognito-app-client-id>"
@@ -81,6 +82,42 @@ npm run install-lint-terraform
 (cd terraform/app && terraform init)
 (cd terraform/shared && terraform init)
 ```
+
+### User management scripts
+
+The user pool uses `admin_only` account recovery and `AllowAdminCreateUserOnly`, so all user management is done via CLI scripts.
+
+**Create a new user:**
+
+```bash
+./scripts/create-cognito-user.sh -u user@example.com -p {your-aws-profile} -e {dev or prod}
+```
+
+Generates a random temporary password and prints it to the console. The user must change it on first login. Deliver it to the user out-of-band.
+
+**Reset a user's password:**
+
+```bash
+# Temporary password (user must change it on next login)
+./scripts/reset-cognito-user-password.sh -u user@example.com -p {your-aws-profile} -e {dev or prod}
+
+# Permanent password (no forced change)
+./scripts/reset-cognito-user-password.sh -u user@example.com -p {your-aws-profile} -e {dev or prod} --permanent
+```
+
+The script generates a random password and prints it to the console. Deliver it to the user out-of-band. The AWS Console "Reset password" button is not available with `admin_only` recovery.
+
+**Migrate users between pools:**
+
+```bash
+# Dry run first
+./scripts/migrate-cognito-users.sh -s eu-central-1_OLD -t eu-central-1_NEW -p {your-aws-profile} --dry-run
+
+# Execute migration
+./scripts/migrate-cognito-users.sh -s eu-central-1_OLD -t eu-central-1_NEW -p {your-aws-profile}
+```
+
+Migrates email addresses to a new pool. Users receive a new sub. Temporary passwords are generated and printed to the console. Deliver them to the users out-of-band. See the script's `--help` for details on sub mapping.
 
 ## 🏗️ Architecture
 

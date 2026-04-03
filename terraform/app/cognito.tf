@@ -3,18 +3,13 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
 
   account_recovery_setting {
     recovery_mechanism {
-      name     = "verified_email"
+      name     = "admin_only"
       priority = 1
     }
   }
 
   admin_create_user_config {
     allow_admin_create_user_only = true
-    invite_message_template {
-      email_message = "Your username is '{username}' and temporary password is: {####}"
-      email_subject = "Your temporary password for PnP-Application"
-      sms_message   = "Your username is '{username}' and temporary password is: {####}"
-    }
   }
 
   auto_verified_attributes = ["email"]
@@ -27,7 +22,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     require_uppercase                = true
     require_numbers                  = true
     require_symbols                  = true
-    temporary_password_validity_days = 1
+    temporary_password_validity_days = 3
   }
 
   # Require the attribute "email" during sign-up. Normally, it is only optional.
@@ -60,7 +55,8 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   username_attributes = ["email"]
 
   username_configuration {
-    case_sensitive = true
+    # Case-insensitive usernames for convenience (e.g., "user@example.com" and "User@Example.Com" are treated as the same)
+    case_sensitive = false
   }
 
   lifecycle {
@@ -70,17 +66,12 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
 
 # Cognito App Client (Frontend will use this to initiate login)
 resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
-  name                                 = "${local.prefix}-pool-client-${local.suffix}"
-  user_pool_id                         = aws_cognito_user_pool.pnp_user_pool.id
-  allowed_oauth_flows                  = ["implicit"]
-  allowed_oauth_scopes                 = ["email", "openid"]
-  callback_urls                        = ["https://${aws_cloudfront_distribution.frontend_distribution.domain_name}"]
-  logout_urls                          = ["https://${aws_cloudfront_distribution.frontend_distribution.domain_name}/logout"]
-  allowed_oauth_flows_user_pool_client = true
-  explicit_auth_flows                  = ["ALLOW_CUSTOM_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH", "ALLOW_USER_SRP_AUTH"]
-  access_token_validity                = 12
-  id_token_validity                    = 12
-  refresh_token_validity               = 1
+  name                   = "${local.prefix}-pool-client-${local.suffix}"
+  user_pool_id           = aws_cognito_user_pool.pnp_user_pool.id
+  explicit_auth_flows    = ["ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH"]
+  access_token_validity  = 4
+  id_token_validity      = 4
+  refresh_token_validity = 1
 
   token_validity_units {
     access_token  = "hours"

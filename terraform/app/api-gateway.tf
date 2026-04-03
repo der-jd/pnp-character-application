@@ -658,6 +658,7 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   triggers = {
     redeployment = md5(join("", [
       file("${path.module}/api-gateway.tf"),
+      file("${path.module}/cognito.tf"),
       file("${path.module}/modules/apigw_options_method/main.tf"),
       file("${path.module}/modules/apigw_lambda_integration/main.tf"),
       file("${path.module}/modules/apigw_stepfunction_integration/main.tf"),

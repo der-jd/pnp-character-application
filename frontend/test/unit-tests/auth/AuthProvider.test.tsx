@@ -1,17 +1,40 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "@/auth/AuthProvider";
 
 // Mock the Cognito module
 vi.mock("@/auth/cognito", () => ({
   signIn: vi.fn(),
+  completeNewPassword: vi.fn(),
+  changePassword: vi.fn(),
   refreshSession: vi.fn(),
+  isNewPasswordChallenge: vi.fn((result: unknown) => {
+    return (
+      typeof result === "object" &&
+      result !== null &&
+      "type" in result &&
+      (result as { type: string }).type === "NEW_PASSWORD_REQUIRED"
+    );
+  }),
 }));
 
 import * as cognito from "@/auth/cognito";
 
 const REFRESH_TOKEN_KEY = "wh_auth_refresh";
+
+function createTestQueryClient() {
+  return new QueryClient({ defaultOptions: { queries: { retry: false } } });
+}
+
+function Wrapper({ children }: { children: React.ReactNode }) {
+  return <QueryClientProvider client={createTestQueryClient()}>{children}</QueryClientProvider>;
+}
+
+function renderWithProviders(ui: React.ReactElement) {
+  return render(ui, { wrapper: Wrapper });
+}
 
 function AuthDisplay() {
   const { isAuthenticated, isLoading, idToken, signIn, signOut } = useAuth();
@@ -30,11 +53,13 @@ describe("AuthProvider", () => {
   beforeEach(() => {
     localStorage.clear();
     vi.mocked(cognito.signIn).mockReset();
+    vi.mocked(cognito.completeNewPassword).mockReset();
+    vi.mocked(cognito.changePassword).mockReset();
     vi.mocked(cognito.refreshSession).mockReset();
   });
 
   it("starts unauthenticated with no stored tokens", async () => {
-    render(
+    renderWithProviders(
       <AuthProvider>
         <AuthDisplay />
       </AuthProvider>,
@@ -58,7 +83,7 @@ describe("AuthProvider", () => {
     };
     vi.mocked(cognito.refreshSession).mockResolvedValue(refreshedTokens);
 
-    render(
+    renderWithProviders(
       <AuthProvider>
         <AuthDisplay />
       </AuthProvider>,
@@ -78,7 +103,7 @@ describe("AuthProvider", () => {
 
     vi.mocked(cognito.refreshSession).mockRejectedValue(new Error("Refresh failed"));
 
-    render(
+    renderWithProviders(
       <AuthProvider>
         <AuthDisplay />
       </AuthProvider>,
@@ -102,7 +127,7 @@ describe("AuthProvider", () => {
     vi.mocked(cognito.signIn).mockResolvedValue(newTokens);
 
     const user = userEvent.setup();
-    render(
+    renderWithProviders(
       <AuthProvider>
         <AuthDisplay />
       </AuthProvider>,
@@ -125,7 +150,7 @@ describe("AuthProvider", () => {
     expect(localStorage.getItem(REFRESH_TOKEN_KEY)).not.toContain("new-access");
   });
 
-  it("signs out and clears stored refresh token", async () => {
+  it("signs out and clears stored refresh token and query cache", async () => {
     localStorage.setItem(REFRESH_TOKEN_KEY, "refresh-token");
 
     vi.mocked(cognito.refreshSession).mockResolvedValue({
@@ -135,16 +160,23 @@ describe("AuthProvider", () => {
       expiresAt: Date.now() + 3600_000,
     });
 
+    const testQueryClient = createTestQueryClient();
     const user = userEvent.setup();
     render(
-      <AuthProvider>
-        <AuthDisplay />
-      </AuthProvider>,
+      <QueryClientProvider client={testQueryClient}>
+        <AuthProvider>
+          <AuthDisplay />
+        </AuthProvider>
+      </QueryClientProvider>,
     );
 
     await waitFor(() => {
       expect(screen.getByTestId("authed")).toHaveTextContent("yes");
     });
+
+    // Seed the query cache with data that would have been fetched while signed in
+    testQueryClient.setQueryData(["characters"], { characters: [{ id: "char-1" }] });
+    expect(testQueryClient.getQueryData(["characters"])).toBeDefined();
 
     await user.click(screen.getByText("Sign Out"));
 
@@ -154,6 +186,7 @@ describe("AuthProvider", () => {
     });
 
     expect(localStorage.getItem(REFRESH_TOKEN_KEY)).toBeNull();
+    expect(testQueryClient.getQueryData(["characters"])).toBeUndefined();
   });
 
   it("throws when useAuth is used outside AuthProvider", () => {

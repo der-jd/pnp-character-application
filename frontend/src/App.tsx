@@ -13,6 +13,7 @@ import { CombatPage } from "@/pages/CombatPage";
 import { LevelUpPage } from "@/pages/LevelUpPage";
 import { HistoryPage } from "@/pages/HistoryPage";
 import { CharacterCreatePage } from "@/pages/CharacterCreatePage";
+import { DevBanner } from "@/components/ui/DevBanner";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -37,6 +38,7 @@ export function App() {
 
   return (
     <ToastProvider>
+      <DevBanner />
       <Routes>
         {/* Public */}
         <Route
