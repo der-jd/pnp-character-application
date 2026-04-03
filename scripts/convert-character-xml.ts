@@ -3,6 +3,9 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { fromIni } from "@aws-sdk/credential-provider-ini";
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { parseStringPromise } from "xml2js";
 import yargs from "yargs";
@@ -47,6 +50,9 @@ import {
   LEVEL_UP_DICE_MIN_TOTAL,
   LEVEL_UP_DICE_MAX_TOTAL,
 } from "api-spec";
+
+const TABLE_NAME_PREFIX = "pnp-app";
+const REGION = "eu-central-1";
 
 const MAX_ITEM_SIZE = 200 * 1024; // 200 KB, matches backend/src/lambdas/add-history-record/index.ts
 
@@ -186,11 +192,7 @@ const COMBAT_SKILL_MAP: Record<string, CombatSkillName> = {
 
 const GEWUERFELTE_BEGABUNG_COMMENT = normalizeLabel("Gewürfelte Begabung");
 const COMBAT_SKILL_HISTORY_TYPE_LABELS = new Set([normalizeLabel("Kampftalent gesteigert")]);
-const IGNORED_HISTORY_TYPES = new Set([
-  normalizeLabel("Vorteil geändert"),
-  normalizeLabel("Nachteil geändert"),
-  normalizeLabel("Sprache/Schrift geändert"),
-]);
+const IGNORED_HISTORY_TYPES = new Set([normalizeLabel("Sprache/Schrift geändert")]);
 const IGNORED_HISTORY_TYPES_WITH_WARNING = new Set([normalizeLabel("Sprache/Schrift geändert")]);
 const ADVANTAGE_CHANGED_TYPE = normalizeLabel("Vorteil geändert");
 const STUDIUM_NAME = normalizeLabel("Studium");
@@ -289,6 +291,37 @@ async function main(): Promise<void> {
       type: "string",
       describe: "Output directory for generated JSON files",
     })
+    .option("upload", {
+      type: "boolean",
+      default: false,
+      describe: "Upload converted character and history to DynamoDB",
+    })
+    .option("aws-profile", {
+      type: "string",
+      describe: "AWS profile to use for DynamoDB upload (required with --upload)",
+    })
+    .option("aws-region", {
+      type: "string",
+      default: REGION,
+      describe: `AWS region for DynamoDB upload (default: ${REGION})`,
+    })
+    .option("env", {
+      type: "string",
+      choices: ["dev", "prod"] as const,
+      describe: "Environment name for DynamoDB table names (required with --upload)",
+    })
+    .check((args) => {
+      if (args.upload && !args["aws-profile"]) {
+        throw new Error("--aws-profile is required when --upload is set");
+      }
+      if (args.upload && !args.env) {
+        throw new Error("--env is required when --upload is set");
+      }
+      if (args.upload && !args["user-id"]) {
+        throw new Error("--user-id is required when --upload is set");
+      }
+      return true;
+    })
     .help()
     .strict()
     .parse();
@@ -336,9 +369,16 @@ async function main(): Promise<void> {
     );
   }
   characterSheet.generalInformation.levelUpProgress = buildLevelUpProgressFromHistory(historyEntries);
+  const creationDate = getCreationDate(rawHistoryEntries);
+  const postCreationEntries = filterCreationEntries(historyEntries, creationDate, warnings);
   const creationTimestamp = getEarliestHistoryTimestamp(rawHistoryEntries);
   const creationRecord = buildCharacterCreatedRecord(characterSheet, activatedSkills, creationTimestamp);
-  const subsequentRecords = buildHistoryRecords(historyEntries, characterSheet, warnings, creationRecord.number + 1);
+  const subsequentRecords = buildHistoryRecords(
+    postCreationEntries,
+    characterSheet,
+    warnings,
+    creationRecord.number + 1,
+  );
   const records = [creationRecord, ...subsequentRecords];
 
   const historyBlocks = buildHistoryBlocks(records, characterId);
@@ -364,6 +404,13 @@ async function main(): Promise<void> {
 
   console.log(`Character JSON written to ${characterOutPath}`);
   console.log(`History blocks written to ${outDir}`);
+
+  if (argv.upload) {
+    const envName = argv.env as string;
+    const awsProfile = argv["aws-profile"] as string;
+    const awsRegion = argv["aws-region"] as string;
+    await uploadToDynamoDB(character, historyBlocks, envName, awsProfile, awsRegion);
+  }
 
   if (warnings.length > 0) {
     console.warn("\n" + "=".repeat(60));
@@ -1520,7 +1567,9 @@ function mapRecordType(typeLabel: string, warnings: string[]): HistoryRecordType
     case normalizeLabel("Nachteil ge\u00e4ndert"):
     case normalizeLabel("Beruf ge\u00e4ndert"):
     case normalizeLabel("Hobby ge\u00e4ndert"):
-      // TODO this is actually CHARACTER_CREATED
+      // Creation-date entries of these types are filtered out before reaching
+      // buildHistoryRecords(). Any post-creation entries are kept as
+      // SPECIAL_ABILITIES_CHANGED records.
       return HistoryRecordType.SPECIAL_ABILITIES_CHANGED;
     default:
       warnings.push(`Unknown history entry type '${typeLabel}', defaulting to SPECIAL_ABILITIES_CHANGED`);
@@ -1785,6 +1834,103 @@ function getCombatCategory(skill: CombatSkillName): CombatCategory {
   return meleeSkills.includes(skill) ? "melee" : "ranged";
 }
 
+// The first history entry's date is assumed to be the character creation date.
+// Creation entries are identified by type and comment, NOT purely by date,
+// because gameplay entries can also occur on the creation date.
+//
+// Assumptions:
+// - "Talent gesteigert" / "Kampftalent gesteigert" on the creation date are
+//   normal history records UNLESS the comment indicates otherwise (e.g.
+//   "Gewürfelte Begabung" / "Begabung").
+// - "Eigenschaft gesteigert" on the creation date is always initial attribute
+//   allocation (no gameplay attribute increases on day one).
+// - "Talent aktiviert" on the creation date is an initial activation unless the
+//   comment starts with "SE:" (Sonderereignis / special event).
+// - "AT/FK verteilt" / "PA verteilt" are always normal history records, even
+//   on the creation date (combat stat distribution is a post-creation action).
+// - "Vorteil geändert" / "Nachteil geändert" are always creation entries; if
+//   they appear after the creation date, an error is emitted.
+function getCreationDate(entries: HistoryEntry[]): string | null {
+  if (entries.length === 0) {
+    return null;
+  }
+  return asText(entries[0].date) || null;
+}
+
+function isCreationEntry(entry: HistoryEntry, creationDate: string | null, warnings: string[]): boolean {
+  const typeLabel = normalizeLabel(asText(entry.type));
+  const comment = normalizeLabel(asText(entry.comment));
+  const date = asText(entry.date);
+  const isOnCreationDate = creationDate !== null && date === creationDate;
+
+  // Vorteil/Nachteil geändert are always creation; error if post-creation
+  if (typeLabel === normalizeLabel("Vorteil geändert") || typeLabel === normalizeLabel("Nachteil geändert")) {
+    if (!isOnCreationDate) {
+      warnings.push(
+        `ERROR: '${asText(entry.type)}' entry found after creation date (${date}): '${asText(entry.new_value)}'. ` +
+          `These entries must only appear during character creation.`,
+      );
+    }
+    return true;
+  }
+
+  // Beruf/Hobby geändert are always creation
+  if (typeLabel === normalizeLabel("Beruf geändert") || typeLabel === normalizeLabel("Hobby geändert")) {
+    return true;
+  }
+
+  // Everything below requires being on the creation date
+  if (!isOnCreationDate) {
+    return false;
+  }
+
+  // Initial AP grant (comment "Erstellung")
+  if (typeLabel === normalizeLabel("Ereignis (Berechnungspunkte)") && comment === normalizeLabel("Erstellung")) {
+    return true;
+  }
+
+  // Initial attribute allocation
+  if (typeLabel === normalizeLabel("Eigenschaft gesteigert")) {
+    return true;
+  }
+
+  // Talent activations that are NOT special events (SE:)
+  if (typeLabel === normalizeLabel("Talent aktiviert")) {
+    return !comment.toLowerCase().startsWith("se:");
+  }
+
+  // Initial combat skill values: comment contains "Begabung" (matches
+  // "Gewürfelte Begabung", "Begabung", and variants)
+  if (comment.toLowerCase().includes("begabung")) {
+    return true;
+  }
+
+  return false;
+}
+
+function filterCreationEntries(
+  entries: HistoryEntry[],
+  creationDate: string | null,
+  warnings: string[],
+): HistoryEntry[] {
+  const filtered: HistoryEntry[] = [];
+  let skipped = 0;
+
+  for (const entry of entries) {
+    if (isCreationEntry(entry, creationDate, warnings)) {
+      skipped += 1;
+    } else {
+      filtered.push(entry);
+    }
+  }
+
+  if (skipped > 0) {
+    queueInfoBlock("Info", [`${skipped} history entries absorbed into CHARACTER_CREATED record`]);
+  }
+
+  return filtered;
+}
+
 function toIsoTimestamp(value: string): string {
   const normalized = normalizeLabel(value);
   const match = normalized.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
@@ -1858,6 +2004,55 @@ function createHistoryBlock(characterId: string, blockNumber: number, previousBl
     previousBlockId,
     changes: [] as HistoryRecord[],
   };
+}
+
+async function uploadToDynamoDB(
+  character: Character,
+  historyBlocks: Array<{
+    blockNumber: number;
+    blockId: string;
+    previousBlockId: string | null;
+    characterId: string;
+    changes: HistoryRecord[];
+  }>,
+  envName: string,
+  awsProfile: string,
+  awsRegion: string,
+): Promise<void> {
+  const charactersTable = `${TABLE_NAME_PREFIX}-characters-${envName}`;
+  const historyTable = `${TABLE_NAME_PREFIX}-characters-history-${envName}`;
+
+  const client = new DynamoDBClient({
+    region: awsRegion,
+    credentials: fromIni({ profile: awsProfile }),
+  });
+  const docClient = DynamoDBDocumentClient.from(client, {
+    marshallOptions: { removeUndefinedValues: true },
+  });
+
+  console.log(`\nUploading to DynamoDB (profile: ${awsProfile}, env: ${envName})...`);
+
+  await docClient.send(
+    new PutCommand({
+      TableName: charactersTable,
+      Item: character,
+      ConditionExpression: "attribute_not_exists(userId) AND attribute_not_exists(characterId)",
+    }),
+  );
+  console.log(`  Character uploaded to ${charactersTable}`);
+
+  for (const block of historyBlocks) {
+    await docClient.send(
+      new PutCommand({
+        TableName: historyTable,
+        Item: block,
+        ConditionExpression: "attribute_not_exists(characterId) AND attribute_not_exists(blockNumber)",
+      }),
+    );
+    console.log(`  History block ${block.blockNumber} uploaded to ${historyTable}`);
+  }
+
+  console.log("Upload complete.");
 }
 
 main().catch((error) => {
