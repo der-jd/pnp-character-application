@@ -157,7 +157,7 @@ if [[ "$user_count" -eq 0 ]]; then
 fi
 
 echo ""
-echo "Sub mapping (old -> new):"
+echo "Sub mapping:"
 echo "========================="
 
 for i in $(seq 0 $((user_count - 1))); do
