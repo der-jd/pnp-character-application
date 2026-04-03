@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/auth/AuthProvider";
+import { isValidPassword } from "@/auth/passwordPolicy";
 import { t } from "@/i18n";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -40,6 +41,11 @@ export function SignInPage() {
     e.preventDefault();
     setError("");
 
+    if (!isValidPassword(newPassword)) {
+      setError(t("newPasswordInvalid"));
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       setError(t("newPasswordMismatch"));
       return;
@@ -50,8 +56,11 @@ export function SignInPage() {
       await completeNewPassword(newPassword);
       navigate("/dashboard", { replace: true });
     } catch (err) {
-      if (err instanceof Error && err.message.includes("InvalidPasswordException")) {
+      const errorString = err instanceof Error ? `${err.name}: ${err.message}` : "";
+      if (errorString.includes("InvalidPasswordException")) {
         setError(t("newPasswordInvalid"));
+      } else if (errorString.includes("LimitExceededException")) {
+        setError(t("changePasswordLimitExceeded"));
       } else {
         setError(t("newPasswordError"));
       }
@@ -77,6 +86,7 @@ export function SignInPage() {
           <form
             onSubmit={handleNewPassword}
             className="rounded-xl border border-border-primary bg-bg-secondary p-6 space-y-4"
+            noValidate
           >
             <p className="text-sm text-text-secondary">{t("newPasswordDescription")}</p>
             <div>
@@ -117,6 +127,7 @@ export function SignInPage() {
           <form
             onSubmit={handleSignIn}
             className="rounded-xl border border-border-primary bg-bg-secondary p-6 space-y-4"
+            noValidate
           >
             <Input
               label={t("username")}

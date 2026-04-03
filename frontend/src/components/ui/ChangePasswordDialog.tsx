@@ -1,5 +1,6 @@
 import { useState, type FormEvent, useEffect } from "react";
 import { useAuth } from "@/auth/AuthProvider";
+import { isValidPassword } from "@/auth/passwordPolicy";
 import { t } from "@/i18n";
 import { Dialog } from "./Dialog";
 import { Input } from "./Input";
@@ -10,20 +11,6 @@ import { useToast } from "./Toast";
 interface ChangePasswordDialogProps {
   open: boolean;
   onClose: () => void;
-}
-
-/**
- * Validates the proposed password against the Cognito pool policy:
- * min 16 chars, uppercase, lowercase, digit, special character.
- */
-function isValidPassword(password: string): boolean {
-  return (
-    password.length >= 16 &&
-    /[A-Z]/.test(password) &&
-    /[a-z]/.test(password) &&
-    /[0-9]/.test(password) &&
-    /[^A-Za-z0-9]/.test(password)
-  );
 }
 
 export function ChangePasswordDialog({ open, onClose }: ChangePasswordDialogProps) {
