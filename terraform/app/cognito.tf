@@ -69,8 +69,8 @@ resource "aws_cognito_user_pool_client" "pnp_user_pool_client" {
   name                   = "${local.prefix}-pool-client-${local.suffix}"
   user_pool_id           = aws_cognito_user_pool.pnp_user_pool.id
   explicit_auth_flows    = ["ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH"]
-  access_token_validity  = 12
-  id_token_validity      = 12
+  access_token_validity  = 4
+  id_token_validity      = 4
   refresh_token_validity = 1
 
   token_validity_units {
