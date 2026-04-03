@@ -7,7 +7,7 @@ export function AppLayout() {
   const isDark = theme === "dark";
 
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex flex-1 min-h-0 w-full">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <div className="relative w-full h-52 overflow-hidden">
