@@ -151,8 +151,8 @@ for i in $(seq 0 $((user_count - 1))); do
 
   echo ""
   echo "User $((i + 1))/$user_count:"
-  echo "  Email:   $user_email"
-  echo "  Old sub: $old_sub"
+  echo "  Email:              $user_email"
+  echo "  Old sub:            $old_sub"
 
   if [[ "$dry_run" == true ]]; then
     echo "  [dry-run] Would create user in target pool"
@@ -177,7 +177,6 @@ for i in $(seq 0 $((user_count - 1))); do
   new_sub=$(echo "$create_output" | jq -r '.User.Attributes[] | select(.Name == "sub") | .Value')
   echo "  New sub:            $new_sub"
   echo "  Temporary password: $temporary_password"
-  echo "  $old_sub -> $new_sub"
 done
 
 echo ""
