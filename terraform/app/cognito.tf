@@ -55,6 +55,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   username_attributes = ["email"]
 
   username_configuration {
+    # Case-insensitive usernames for convenience (e.g., "user@example.com" and "User@Example.Com" are treated as the same)
     case_sensitive = false
   }
 
