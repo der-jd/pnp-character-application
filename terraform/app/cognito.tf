@@ -27,7 +27,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
     require_uppercase                = true
     require_numbers                  = true
     require_symbols                  = true
-    temporary_password_validity_days = 1
+    temporary_password_validity_days = 3
   }
 
   # Require the attribute "email" during sign-up. Normally, it is only optional.
