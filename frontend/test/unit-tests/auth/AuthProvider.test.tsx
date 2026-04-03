@@ -150,7 +150,7 @@ describe("AuthProvider", () => {
     expect(localStorage.getItem(REFRESH_TOKEN_KEY)).not.toContain("new-access");
   });
 
-  it("signs out and clears stored refresh token", async () => {
+  it("signs out and clears stored refresh token and query cache", async () => {
     localStorage.setItem(REFRESH_TOKEN_KEY, "refresh-token");
 
     vi.mocked(cognito.refreshSession).mockResolvedValue({
@@ -160,16 +160,23 @@ describe("AuthProvider", () => {
       expiresAt: Date.now() + 3600_000,
     });
 
+    const testQueryClient = createTestQueryClient();
     const user = userEvent.setup();
-    renderWithProviders(
-      <AuthProvider>
-        <AuthDisplay />
-      </AuthProvider>,
+    render(
+      <QueryClientProvider client={testQueryClient}>
+        <AuthProvider>
+          <AuthDisplay />
+        </AuthProvider>
+      </QueryClientProvider>,
     );
 
     await waitFor(() => {
       expect(screen.getByTestId("authed")).toHaveTextContent("yes");
     });
+
+    // Seed the query cache with data that would have been fetched while signed in
+    testQueryClient.setQueryData(["characters"], { characters: [{ id: "char-1" }] });
+    expect(testQueryClient.getQueryData(["characters"])).toBeDefined();
 
     await user.click(screen.getByText("Sign Out"));
 
@@ -179,6 +186,7 @@ describe("AuthProvider", () => {
     });
 
     expect(localStorage.getItem(REFRESH_TOKEN_KEY)).toBeNull();
+    expect(testQueryClient.getQueryData(["characters"])).toBeUndefined();
   });
 
   it("throws when useAuth is used outside AuthProvider", () => {
