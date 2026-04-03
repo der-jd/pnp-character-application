@@ -93,7 +93,7 @@ The user pool uses `admin_only` account recovery and `AllowAdminCreateUserOnly`,
 ./scripts/create-cognito-user.sh -u user@example.com -p {your-aws-profile} -e {dev or prod}
 ```
 
-The script requests email delivery for the Cognito invitation. Cognito sends an invitation email with a temporary password, and the user must set a new password on first login.
+Generates a random temporary password and prints it to the console. The user must change it on first login. Deliver it to the user out-of-band.
 
 **Reset a user's password:**
 

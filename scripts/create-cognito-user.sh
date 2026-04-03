@@ -11,6 +11,8 @@ usage() {
 Usage: $SCRIPT_NAME [OPTIONS]
 
 Create a Cognito user in the environment-specific user pool.
+A random temporary password is generated and printed to the console.
+The user must change it on first login. Deliver it to the user out-of-band.
 
 OPTIONS:
   -u, --user-email EMAIL         User email address (required)
@@ -117,16 +119,24 @@ if [[ -z "$user_pool_id" || "$user_pool_id" == "None" ]]; then
   exit 1
 fi
 
+generate_password() {
+  openssl rand -base64 32
+}
+
 echo "Creating new Cognito user..."
-# Cognito sends an invitation email. The user receives a temporary password,
-# enters FORCE_CHANGE_PASSWORD status, and must set a new password on first login.
+# Suppress the invitation email — the temporary password is printed to the
+# console and must be delivered to the user out-of-band.
+temporary_password=$(generate_password)
 aws cognito-idp admin-create-user \
     --user-pool-id "$user_pool_id" \
     --username "$user_mail" \
     --user-attributes Name="email",Value="$user_mail" Name="email_verified",Value="true" \
-    --desired-delivery-mediums EMAIL \
+    --temporary-password "$temporary_password" \
+    --message-action SUPPRESS \
     --profile "$aws_profile" \
     --region "$aws_region"
 
-echo "New user created. The user will receive an invitation email with a temporary password."
-echo "On first login, the application will prompt them to set a new password."
+echo ""
+echo "New user created. The user must change the password on first login."
+echo ""
+echo "Temporary password: $temporary_password"
