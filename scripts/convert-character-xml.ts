@@ -2059,7 +2059,6 @@ async function uploadToDynamoDB(
     new PutCommand({
       TableName: charactersTable,
       Item: character,
-      ConditionExpression: "attribute_not_exists(userId) AND attribute_not_exists(characterId)",
     }),
   );
   console.log(`  Character uploaded to ${charactersTable}`);
@@ -2069,7 +2068,6 @@ async function uploadToDynamoDB(
       new PutCommand({
         TableName: historyTable,
         Item: block,
-        ConditionExpression: "attribute_not_exists(characterId) AND attribute_not_exists(blockNumber)",
       }),
     );
     console.log(`  History block ${block.blockNumber} uploaded to ${historyTable}`);
