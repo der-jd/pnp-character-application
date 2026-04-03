@@ -266,6 +266,18 @@ const FEAR_OF_COST_BY_LABEL: Record<string, number> = {
   [normalizeLabel("Angst vor … (selten)")]: 2,
 };
 
+// Keys are SHA-256 hashes of normalized character names to avoid exposing
+// character details in this repository.
+const FEAR_OF_DETAIL_BY_CHARACTER_HASH: Record<string, Record<string, string>> = {
+  d802629f373db91d25031dd5c7e5712ff85fc036009d0bb017540ca685951f42: {
+    [normalizeLabel("Angst vor … (häufig)")]: "Insekten",
+  },
+};
+
+function hashCharacterName(name: string): string {
+  return crypto.createHash("sha256").update(normalizeLabel(name)).digest("hex");
+}
+
 type XmlCharacterSheet = Record<string, unknown>;
 
 type HistoryEntry = Record<string, unknown>;
@@ -718,7 +730,7 @@ function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: Charac
   const disadvantages = ensureArray(disadvantagesNode.disadvantage)
     .map((name) => asText(name))
     .filter(Boolean);
-  characterSheet.disadvantages = mapDisadvantages(disadvantages, warnings);
+  characterSheet.disadvantages = mapDisadvantages(disadvantages, characterSheet.generalInformation.name, warnings);
 
   const attributes = asRecord(sheet.attributes);
   for (const [rawName, rawValue] of Object.entries(attributes)) {
@@ -1224,8 +1236,13 @@ function mapAdvantages(advantages: string[], warnings: string[]): CharacterSheet
   return result;
 }
 
-function mapDisadvantages(disadvantages: string[], warnings: string[]): CharacterSheet["disadvantages"] {
+function mapDisadvantages(
+  disadvantages: string[],
+  characterName: string,
+  warnings: string[],
+): CharacterSheet["disadvantages"] {
   const result: CharacterSheet["disadvantages"] = [];
+  const fearOfDetails = FEAR_OF_DETAIL_BY_CHARACTER_HASH[hashCharacterName(characterName)] ?? {};
   for (const rawName of disadvantages) {
     const normalized = normalizeLabel(rawName);
     const enumValue = DISADVANTAGE_MAP[normalized];
@@ -1246,11 +1263,17 @@ function mapDisadvantages(disadvantages: string[], warnings: string[]): Characte
       continue;
     }
     const [, info, value] = defaultEntry;
-    const infoOverride = enumValue === DisadvantagesNames.FEAR_OF ? rawName : info;
+    let infoOverride = info;
     if (enumValue === DisadvantagesNames.FEAR_OF) {
-      warnings.push(
-        `FEAR_OF disadvantage detected ('${rawName}'). Please manually enter the specific matter of fear in the resulting character JSON.`,
-      );
+      const detail = fearOfDetails[normalized];
+      if (detail) {
+        infoOverride = detail;
+      } else {
+        infoOverride = rawName;
+        warnings.push(
+          `FEAR_OF disadvantage detected ('${rawName}'). Please manually enter the specific matter of fear in the resulting character JSON.`,
+        );
+      }
     }
     result.push([enumValue, infoOverride, value]);
   }
