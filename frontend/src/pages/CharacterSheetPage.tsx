@@ -14,7 +14,7 @@ import {
   updateGeneralInformation,
 } from "@/api/character-edit";
 import { ApiError } from "@/api/client";
-import { attributeKeys, baseValueKeys, advantageNameKeys, disadvantageNameKeys } from "@/i18n/mappings";
+import { attributeKeys, baseValueKeys, advantageNameKeys, disadvantageNameKeys, skillNameKeys } from "@/i18n/mappings";
 import { attributeIcons } from "@/lib/skillIcons";
 import { Card } from "@/components/ui/Card";
 import { Badge, pointsBadgeVariant } from "@/components/ui/Badge";
@@ -123,6 +123,12 @@ export function CharacterSheetPage() {
       <BaseValuesSection characterId={characterId!} baseValues={sheet.baseValues} />
     </div>
   );
+}
+
+function translateSkill(skill: string): string {
+  const skillName = skill.split("/")[1];
+  const key = skillName ? skillNameKeys[skillName] : undefined;
+  return key ? t(key) : skill;
 }
 
 function InfoField({
@@ -285,8 +291,8 @@ function GeneralInformationSection({
           editing={editing}
           onChange={(v) => set("sex", v)}
         />
-        <InfoField label={t("profession")} value={gi.profession.name} />
-        <InfoField label={t("hobby")} value={gi.hobby.name} />
+        <InfoField label={t("profession")} value={`${gi.profession.name} (${translateSkill(gi.profession.skill)})`} />
+        <InfoField label={t("hobby")} value={`${gi.hobby.name} (${translateSkill(gi.hobby.skill)})`} />
         <InfoField
           label={t("birthday")}
           value={editing ? editValues.birthday : gi.birthday}
