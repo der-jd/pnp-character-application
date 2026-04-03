@@ -17,6 +17,9 @@ export default defineConfig(({ command, mode }) => {
           "Use the dev backend for local development.",
       );
     }
+
+    // Default VITE_APP_ENV to "dev" for local development so the dev banner is always visible
+    process.env.VITE_APP_ENV ??= loaded.VITE_APP_ENV ?? "dev";
   }
 
   return {
