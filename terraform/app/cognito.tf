@@ -55,7 +55,7 @@ resource "aws_cognito_user_pool" "pnp_user_pool" {
   username_attributes = ["email"]
 
   username_configuration {
-    case_sensitive = true
+    case_sensitive = false
   }
 
   lifecycle {
