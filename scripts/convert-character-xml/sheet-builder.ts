@@ -802,6 +802,7 @@ function mapDisadvantages(
     if (enumValue === DisadvantagesNames.FEAR_OF) {
       const detail = fearOfDetails[normalized];
       if (detail) {
+        warnings.push(`Applying custom FEAR_OF detail override for '${characterName}': '${rawName}' -> '${detail}'`);
         infoOverride = detail;
       } else {
         infoOverride = rawName;
