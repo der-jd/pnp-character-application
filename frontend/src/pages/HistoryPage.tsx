@@ -380,11 +380,27 @@ export function HistoryPage() {
   );
 }
 
-function TreeNode({ label, children }: { label: string; children: React.ReactNode }) {
+function TreeNode({
+  label,
+  children,
+  defaultExpanded = true,
+}: {
+  label: string;
+  children: React.ReactNode;
+  defaultExpanded?: boolean;
+}) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
   return (
     <div>
-      <div className="font-medium text-text-secondary">{label}</div>
-      <div className="ml-4 border-l border-border-primary pl-3 mt-0.5 space-y-0.5">{children}</div>
+      <button
+        type="button"
+        onClick={() => setExpanded((prev) => !prev)}
+        className="flex items-center gap-1 font-medium text-text-secondary hover:text-text-primary cursor-pointer select-none"
+      >
+        {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        {label}
+      </button>
+      {expanded && <div className="ml-4 border-l border-border-primary pl-3 mt-0.5 space-y-0.5">{children}</div>}
     </div>
   );
 }
