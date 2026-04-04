@@ -146,6 +146,9 @@ export const COMBAT_SKILL_MAP: Record<string, CombatSkillName> = {
 };
 
 export const GEWUERFELTE_BEGABUNG_COMMENT = normalizeLabel("Gewürfelte Begabung");
+export const HISTORY_TYPE_CALCULATION_POINTS_EVENT = normalizeLabel("Ereignis (Berechnungspunkte)");
+export const HISTORY_NAME_ADVENTURE_POINTS = normalizeLabel("Abenteuerpunkte (AP)");
+export const HISTORY_NAME_ADVENTURE_POINTS_KEYWORD = normalizeLabel("Abenteuer");
 export const COMBAT_SKILL_HISTORY_TYPE_LABELS = new Set([normalizeLabel("Kampftalent gesteigert")]);
 export const IGNORED_HISTORY_TYPES = new Set([normalizeLabel("Sprache/Schrift geändert")]);
 export const IGNORED_HISTORY_TYPES_WITH_WARNING = new Set([normalizeLabel("Sprache/Schrift geändert")]);

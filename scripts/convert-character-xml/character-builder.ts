@@ -1,12 +1,17 @@
 import { AdvantagesNames, type Character, type CharacterSheet, characterSchema } from "api-spec";
 import type { XmlCharacterSheet, HistoryEntry } from "./types.js";
 import { normalizeLabel, asText, toInt, queueInfoBlock } from "./xml-utils.js";
-import { ADVANTAGE_CHANGED_TYPE, STUDIUM_NAME } from "./constants.js";
+import {
+  ADVANTAGE_CHANGED_TYPE,
+  HISTORY_NAME_ADVENTURE_POINTS,
+  HISTORY_NAME_ADVENTURE_POINTS_KEYWORD,
+  HISTORY_TYPE_CALCULATION_POINTS_EVENT,
+  STUDIUM_NAME,
+} from "./constants.js";
 import {
   buildCharacterSheet,
   extractLevelUpEffects,
   buildLevelUpProgressFromEffects,
-  aggregateCombatSkillModEntries,
   mapNonCombatSkill,
 } from "./sheet-builder.js";
 import backendPackage from "../../backend/package.json";
@@ -29,7 +34,8 @@ export function convertCharacter(
   const collegeSkillName = extractCollegeSkillName(rawHistoryEntries);
   patchCollegeEducationSkillName(characterSheet, collegeSkillName, warnings);
 
-  const historyEntries = aggregateCombatSkillModEntries(rawHistoryEntries, []);
+  // TODO remove?
+  //const historyEntries = aggregateCombatSkillModEntries(rawHistoryEntries, []);
 
   const startAP = getStartAdventurePoints(rawHistoryEntries);
   characterSheet.calculationPoints.adventurePoints.start = startAP;
@@ -42,7 +48,7 @@ export function convertCharacter(
     );
   }
 
-  const levelUpEffects = extractLevelUpEffects(historyEntries);
+  const levelUpEffects = extractLevelUpEffects(rawHistoryEntries);
   characterSheet.generalInformation.levelUpProgress = buildLevelUpProgressFromEffects(levelUpEffects);
 
   const character: Character = {
@@ -121,8 +127,8 @@ function patchCollegeEducationSkillName(
 function getStartAdventurePoints(entries: HistoryEntry[]): number {
   for (const entry of entries) {
     const typeLabel = normalizeLabel(asText(entry.type));
-    const comment = normalizeLabel(asText(entry.comment));
-    if (typeLabel === normalizeLabel("Ereignis (Berechnungspunkte)") && comment === normalizeLabel("Erstellung")) {
+    const name = normalizeLabel(asText(entry.name));
+    if (typeLabel === HISTORY_TYPE_CALCULATION_POINTS_EVENT && name === HISTORY_NAME_ADVENTURE_POINTS) {
       return toInt(entry.new_calculation_points_available);
     }
   }
@@ -133,8 +139,10 @@ function getLastAdventurePointsAvailable(entries: HistoryEntry[]): number | null
   let lastAvailable: number | null = null;
   for (const entry of entries) {
     const typeLabel = normalizeLabel(asText(entry.type));
-    const name = normalizeLabel(asText(entry.name)).toLowerCase();
-    const isAPEvent = typeLabel === normalizeLabel("Ereignis (Berechnungspunkte)") && name.includes("abenteuer");
+    const name = normalizeLabel(asText(entry.name));
+    const isAPEvent =
+      typeLabel === HISTORY_TYPE_CALCULATION_POINTS_EVENT &&
+      name.toLowerCase().includes(HISTORY_NAME_ADVENTURE_POINTS_KEYWORD.toLowerCase());
     const isSkillIncrease =
       typeLabel === normalizeLabel("Talent gesteigert") || typeLabel === normalizeLabel("Kampftalent gesteigert");
     if (!isAPEvent && !isSkillIncrease) continue;

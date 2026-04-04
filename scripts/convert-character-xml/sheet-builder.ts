@@ -61,6 +61,12 @@ import {
 // Shared character-sheet building logic used by both Phase 1 and Phase 2.
 // ---------------------------------------------------------------------------
 
+/**
+ * Builds a character sheet from an XML character sheet.
+ * It does not take the history into account.
+ * @param sheet The XML character sheet
+ * @returns The built character sheet and any warnings
+ */
 export function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet: CharacterSheet; warnings: string[] } {
   const warnings: string[] = [];
   const characterSheet = createEmptyCharacterSheet();
@@ -451,7 +457,7 @@ function applyCalculationPoints(
   const adventurePoints = asRecord(calculationPoints.adventure_points);
   const adventurePointsTotal = toInt(adventurePoints.total);
   characterSheet.calculationPoints.adventurePoints = {
-    start: 0, // Start points will be calculated from history TODO check
+    start: 0, // Start points will be taken from history in a later step
     available: adventurePointsTotal - spentOnSkills - spentOnCombatSkills,
     total: adventurePointsTotal,
   };
