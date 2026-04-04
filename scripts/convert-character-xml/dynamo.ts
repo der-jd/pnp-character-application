@@ -6,7 +6,7 @@ import type { HistoryBlock } from "./types.js";
 import { TABLE_NAME_PREFIX } from "./constants.js";
 
 export async function uploadToDynamoDB(
-  character: Character,
+  character: Character | null,
   historyBlocks: HistoryBlock[],
   envName: string,
   awsProfile: string,
@@ -25,13 +25,15 @@ export async function uploadToDynamoDB(
 
   console.log(`\nUploading to DynamoDB (profile: ${awsProfile}, env: ${envName})...`);
 
-  await docClient.send(
-    new PutCommand({
-      TableName: charactersTable,
-      Item: character,
-    }),
-  );
-  console.log(`  Character uploaded to ${charactersTable}`);
+  if (character) {
+    await docClient.send(
+      new PutCommand({
+        TableName: charactersTable,
+        Item: character,
+      }),
+    );
+    console.log(`  Character uploaded to ${charactersTable}`);
+  }
 
   for (const block of historyBlocks) {
     await docClient.send(

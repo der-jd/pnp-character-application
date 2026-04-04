@@ -3,7 +3,6 @@ import { marshall } from "@aws-sdk/util-dynamodb";
 import {
   type BaseValues,
   type CalculationPoints,
-  type Character,
   type CharacterSheet,
   type CombatSkillName,
   type CombatStats,
@@ -19,21 +18,12 @@ import {
   historyBlockSchema,
   levelUpProgressSchema,
 } from "api-spec";
-import type { XmlCharacterSheet, HistoryEntry, CombatCategory, HistoryBlock, AggregatedSkillModState } from "./types.js";
-import {
-  normalizeLabel,
-  asText,
-  asRecord,
-  toInt,
-  toOptionalInt,
-  toIsoTimestamp,
-  queueInfoBlock,
-} from "./xml-utils.js";
+import type { HistoryEntry, XmlCharacterSheet, CombatCategory, HistoryBlock } from "./types.js";
+import { normalizeLabel, asText, toInt, toOptionalInt, toIsoTimestamp, queueInfoBlock } from "./xml-utils.js";
 import {
   MAX_ITEM_SIZE,
   ATTRIBUTE_MAP,
   BASE_VALUE_MAP,
-  NON_COMBAT_SKILL_MAP,
   COMBAT_SKILL_MAP,
   GEWUERFELTE_BEGABUNG_COMMENT,
   COMBAT_SKILL_HISTORY_TYPE_LABELS,
@@ -43,6 +33,7 @@ import {
   BASE_VALUE_TO_LEVEL_UP_EFFECT,
 } from "./constants.js";
 import {
+  buildCharacterSheet,
   recalculateCombatStats,
   mapNonCombatSkill,
   splitSkill,
@@ -51,18 +42,25 @@ import {
   extractLevelUpEffects,
   buildLevelUpProgressFromEffects,
   calculateGenerationPoints,
-} from "./character-builder.js";
+  aggregateCombatSkillModEntries,
+} from "./sheet-builder.js";
 
 // ---------------------------------------------------------------------------
-// Phase 2 — Build the history blocks from the XML history and Phase 1 output.
+// Phase 2 — Build the history blocks from the XML sheet and history entries.
+//
+// This phase is fully independent from Phase 1 (character conversion). It
+// builds its own CharacterSheet from the XML to use as reference data.
 // ---------------------------------------------------------------------------
 
 export function convertHistory(
   rawHistoryEntries: HistoryEntry[],
-  character: Character,
+  sheet: XmlCharacterSheet,
+  characterId: string,
   warnings: string[],
 ): HistoryBlock[] {
-  const { characterSheet } = character;
+  const { characterSheet, warnings: sheetWarnings } = buildCharacterSheet(sheet);
+  warnings.push(...sheetWarnings);
+
   const historyEntries = aggregateCombatSkillModEntries(rawHistoryEntries, warnings);
   const levelUpEffects = extractLevelUpEffects(historyEntries);
 
@@ -72,16 +70,29 @@ export function convertHistory(
   const activatedSkills = extractActivatedSkills(rawHistoryEntries, warnings);
   const creationTimestamp = getEarliestHistoryTimestamp(rawHistoryEntries);
   const creationRecord = buildCharacterCreatedRecord(characterSheet, activatedSkills, creationTimestamp);
+
+  const startAP = getStartAdventurePoints(rawHistoryEntries);
+  const characterSheetForHistory = {
+    ...characterSheet,
+    calculationPoints: {
+      ...characterSheet.calculationPoints,
+      adventurePoints: {
+        ...characterSheet.calculationPoints.adventurePoints,
+        start: startAP,
+      },
+    },
+  };
+
   const subsequentRecords = buildHistoryRecords(
     postCreationEntries,
-    characterSheet,
+    characterSheetForHistory,
     warnings,
     levelUpEffects,
     creationRecord.number + 1,
   );
   const records = [creationRecord, ...subsequentRecords];
 
-  const historyBlocks = buildHistoryBlocks(records, character.characterId);
+  const historyBlocks = buildHistoryBlocks(records, characterId);
 
   // The migration record goes into its own dedicated history block so that
   // all blocks before it contain only legacy history. This makes it easy to
@@ -94,7 +105,7 @@ export function convertHistory(
   );
   const lastBlock = historyBlocks[historyBlocks.length - 1];
   const migrationBlock: HistoryBlock = {
-    characterId: character.characterId,
+    characterId,
     blockNumber: lastBlock ? lastBlock.blockNumber + 1 : 1,
     blockId: crypto.randomUUID(),
     previousBlockId: lastBlock ? lastBlock.blockId : null,
@@ -108,6 +119,10 @@ export function convertHistory(
 
   return historyBlocks;
 }
+
+// ---------------------------------------------------------------------------
+// Private helpers
+// ---------------------------------------------------------------------------
 
 function extractActivatedSkills(rawHistoryEntries: HistoryEntry[], warnings: string[]): SkillNameWithCategory[] {
   const creationDate = getCreationDate(rawHistoryEntries);
@@ -295,6 +310,48 @@ function buildCharacterCreatedRecord(
   const startAP = characterSheet.calculationPoints.adventurePoints.start;
   const startAttr = characterSheet.calculationPoints.attributePoints.start;
 
+  // Reset attributes to their start values
+  const initialAttributes = { ...characterSheet.attributes };
+  for (const key of Object.keys(initialAttributes) as (keyof typeof initialAttributes)[]) {
+    initialAttributes[key] = { ...initialAttributes[key], current: initialAttributes[key].start, totalCost: 0 };
+  }
+
+  // Reset skills to their start values with zero cost
+  const initialSkills = structuredClone(characterSheet.skills);
+  for (const category of Object.keys(initialSkills) as (keyof typeof initialSkills)[]) {
+    const section = initialSkills[category] as Record<string, Skill>;
+    for (const skillName of Object.keys(section)) {
+      const skill = section[skillName];
+      section[skillName] = { ...skill, current: skill.start, totalCost: 0 };
+    }
+  }
+
+  // Reset base values: keep start and mod, clear byLvlUp, recalculate is not
+  // worth it here — this is a non-revertable legacy record for display only.
+  const initialBaseValues = structuredClone(characterSheet.baseValues);
+  for (const key of Object.keys(initialBaseValues) as (keyof typeof initialBaseValues)[]) {
+    const bv = initialBaseValues[key];
+    bv.current = bv.start + (bv.mod ?? 0) + (bv.byFormula ?? 0);
+    delete bv.byLvlUp;
+  }
+
+  // Reset combat stats to initial handling values
+  const initialCombat = structuredClone(characterSheet.combat);
+  for (const cat of ["melee", "ranged"] as const) {
+    const section = initialCombat[cat] as Record<string, CombatStats>;
+    for (const skillName of Object.keys(section)) {
+      const stats = section[skillName];
+      section[skillName] = {
+        ...stats,
+        availablePoints: stats.handling,
+        attackValue: 0,
+        skilledAttackValue: 0,
+        paradeValue: 0,
+        skilledParadeValue: 0,
+      };
+    }
+  }
+
   const creationCharacterSheet: CharacterSheet = {
     ...characterSheet,
     generalInformation: {
@@ -306,6 +363,10 @@ function buildCharacterCreatedRecord(
       adventurePoints: { start: startAP, available: startAP, total: startAP },
       attributePoints: { start: startAttr, available: 0, total: startAttr },
     },
+    attributes: initialAttributes,
+    skills: initialSkills,
+    baseValues: initialBaseValues,
+    combat: initialCombat,
   };
 
   return {
@@ -676,102 +737,6 @@ function isLevelUpBaseValueEntry(entry: HistoryEntry): boolean {
   return !!effectKind;
 }
 
-function aggregateCombatSkillModEntries(entries: HistoryEntry[], warnings: string[]): HistoryEntry[] {
-  const replacementByIndex = new Map<number, HistoryEntry>();
-  const skipIndices = new Set<number>();
-  const states = new Map<CombatSkillName, AggregatedSkillModState>();
-
-  entries.forEach((entry, index) => {
-    if (!isGewuerfelteBegabungCombatSkillEntry(entry)) {
-      return;
-    }
-
-    const combatSkillName = getCombatSkillNameFromHistoryEntry(entry);
-    if (!combatSkillName) {
-      return;
-    }
-
-    skipIndices.add(index);
-    const parsedOld = toOptionalInt(entry.old_value);
-    const parsedNew = toOptionalInt(entry.new_value);
-    const displayName = asText(entry.name);
-    const existing = states.get(combatSkillName);
-
-    if (!existing) {
-      states.set(combatSkillName, {
-        combatSkillName,
-        firstIndex: index,
-        firstEntry: entry,
-        lastEntry: entry,
-        oldValue: parsedOld,
-        newValue: parsedNew,
-        displayName,
-      });
-      return;
-    }
-
-    existing.lastEntry = entry;
-    if (existing.oldValue === null && parsedOld !== null) {
-      existing.oldValue = parsedOld;
-    }
-    if (parsedNew !== null) {
-      existing.newValue = parsedNew;
-    }
-  });
-
-  if (states.size === 0) {
-    return entries;
-  }
-
-  for (const state of states.values()) {
-    const fallbackOldValue = asText(state.firstEntry.old_value);
-    const fallbackNewValue = asText(state.lastEntry.new_value);
-    if (state.oldValue === null || state.newValue === null) {
-      warnings.push(
-        `Incomplete Gewürfelte Begabung history data for combat skill '${state.displayName}', using available values`,
-      );
-    }
-    const replacement: HistoryEntry = {
-      ...state.firstEntry,
-      old_value: state.oldValue !== null ? state.oldValue.toString() : fallbackOldValue,
-      new_value: state.newValue !== null ? state.newValue.toString() : fallbackNewValue,
-      date: state.lastEntry.date ?? state.firstEntry.date,
-      name: state.firstEntry.name ?? state.displayName,
-    };
-    replacementByIndex.set(state.firstIndex, replacement);
-  }
-
-  return entries.reduce<HistoryEntry[]>((result, entry, index) => {
-    const replacement = replacementByIndex.get(index);
-    if (replacement) {
-      result.push(replacement);
-      return result;
-    }
-    if (skipIndices.has(index)) {
-      return result;
-    }
-    result.push(entry);
-    return result;
-  }, []);
-}
-
-function isGewuerfelteBegabungCombatSkillEntry(entry: HistoryEntry): boolean {
-  const comment = normalizeLabel(asText(entry.comment));
-  if (!comment || comment !== GEWUERFELTE_BEGABUNG_COMMENT) {
-    return false;
-  }
-  const typeLabel = normalizeLabel(asText(entry.type));
-  if (!COMBAT_SKILL_HISTORY_TYPE_LABELS.has(typeLabel)) {
-    return false;
-  }
-  return getCombatSkillNameFromHistoryEntry(entry) !== null;
-}
-
-function getCombatSkillNameFromHistoryEntry(entry: HistoryEntry): CombatSkillName | null {
-  const normalizedSkillName = normalizeLabel(asText(entry.name));
-  return COMBAT_SKILL_MAP[normalizedSkillName] ?? null;
-}
-
 // The first history entry's date is assumed to be the character creation date.
 // Creation entries are identified by type and comment, NOT purely by date,
 // because gameplay entries can also occur on the creation date.
@@ -808,6 +773,17 @@ function getEarliestHistoryTimestamp(entries: HistoryEntry[]): string {
     }
   }
   return earliest ?? new Date().toISOString();
+}
+
+function getStartAdventurePoints(entries: HistoryEntry[]): number {
+  for (const entry of entries) {
+    const typeLabel = normalizeLabel(asText(entry.type));
+    const comment = normalizeLabel(asText(entry.comment));
+    if (typeLabel === normalizeLabel("Ereignis (Berechnungspunkte)") && comment === normalizeLabel("Erstellung")) {
+      return toInt(entry.new_calculation_points_available);
+    }
+  }
+  return 0;
 }
 
 function isCreationEntry(entry: HistoryEntry, creationDate: string | null, warnings: string[]): boolean {

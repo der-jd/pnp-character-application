@@ -5,13 +5,7 @@ import { parseStringPromise } from "xml2js";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import type { HistoryEntry, XmlCharacterSheet } from "./types.js";
-import {
-  normalizeTagName,
-  ensureArray,
-  asRecord,
-  findRepoRoot,
-  flushInfoBlocks,
-} from "./xml-utils.js";
+import { normalizeTagName, ensureArray, asRecord, findRepoRoot, flushInfoBlocks } from "./xml-utils.js";
 import { REGION } from "./constants.js";
 import { convertCharacter } from "./character-builder.js";
 import { convertHistory } from "./history-builder.js";
@@ -35,6 +29,12 @@ export async function main(): Promise<void> {
     .option("out-dir", {
       type: "string",
       describe: "Output directory for generated JSON files",
+    })
+    .option("phase", {
+      type: "string",
+      choices: ["character", "history", "both"] as const,
+      default: "both",
+      describe: "Which conversion phase to run: character, history, or both",
     })
     .option("upload", {
       type: "boolean",
@@ -78,6 +78,7 @@ export async function main(): Promise<void> {
   const outDir = argv["out-dir"] ? path.resolve(argv["out-dir"]) : defaultOutDir;
   const userId = argv["user-id"] ?? crypto.randomUUID().replace(/-/g, "");
   const characterId = argv["character-id"] ?? crypto.randomUUID();
+  const phase = argv.phase as "character" | "history" | "both";
 
   const xml = await fs.readFile(inputPath, "utf-8");
   const parsed = await parseStringPromise(xml, {
@@ -90,31 +91,32 @@ export async function main(): Promise<void> {
   const historyNode = asRecord(sheet.history);
   const rawHistoryEntries = ensureArray(historyNode.entry) as HistoryEntry[];
 
-  // --- Phase 1: Build character ---
-  const { character, warnings } = convertCharacter(sheet, rawHistoryEntries, userId, characterId);
-
-  // --- Phase 2: Build history ---
-  const historyBlocks = convertHistory(rawHistoryEntries, character, warnings);
-
-  // --- Write output files ---
   await fs.mkdir(outDir, { recursive: true });
+  const warnings: string[] = [];
 
-  const characterOutPath = path.join(outDir, "character.json");
-  await fs.writeFile(characterOutPath, JSON.stringify(character, null, 2), "utf-8");
+  // --- Phase 1: Build character (independent) ---
+  let character = null;
+  if (phase === "character" || phase === "both") {
+    const result = convertCharacter(sheet, rawHistoryEntries, userId, characterId);
+    character = result.character;
+    warnings.push(...result.warnings);
 
-  for (const block of historyBlocks) {
-    const historyOutPath = path.join(outDir, `history-block-${block.blockNumber}.json`);
-    await fs.writeFile(historyOutPath, JSON.stringify(block, null, 2), "utf-8");
+    const characterOutPath = path.join(outDir, "character.json");
+    await fs.writeFile(characterOutPath, JSON.stringify(character, null, 2), "utf-8");
+    console.log(`Character JSON written to ${characterOutPath}`);
   }
 
-  flushInfoBlocks();
+  // --- Phase 2: Build history (independent) ---
+  let historyBlocks: import("./types.js").HistoryBlock[] = [];
+  if (phase === "history" || phase === "both") {
+    historyBlocks = convertHistory(rawHistoryEntries, sheet, characterId, warnings);
 
-  warnings.push(
-    "Please compare the converted character sheet and history against the original source data; conversion may contain errors and requires manual verification.",
-  );
-
-  console.log(`Character JSON written to ${characterOutPath}`);
-  console.log(`History blocks written to ${outDir}`);
+    for (const block of historyBlocks) {
+      const historyOutPath = path.join(outDir, `history-block-${block.blockNumber}.json`);
+      await fs.writeFile(historyOutPath, JSON.stringify(block, null, 2), "utf-8");
+    }
+    console.log(`History blocks written to ${outDir}`);
+  }
 
   // --- Optional DynamoDB upload ---
   if (argv.upload) {
@@ -123,6 +125,12 @@ export async function main(): Promise<void> {
     const awsRegion = argv["aws-region"] as string;
     await uploadToDynamoDB(character, historyBlocks, envName, awsProfile, awsRegion);
   }
+
+  flushInfoBlocks();
+
+  warnings.push(
+    "Please compare the converted character sheet and history against the original source data; conversion may contain errors and requires manual verification.",
+  );
 
   if (warnings.length > 0) {
     console.warn("\n" + "=".repeat(60));
