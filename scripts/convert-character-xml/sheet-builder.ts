@@ -69,25 +69,7 @@ export function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet:
 
   applyAdvantagesAndDisadvantages(sheet, characterSheet, warnings);
 
-  const attributes = asRecord(sheet.attributes);
-  for (const [rawName, rawValue] of Object.entries(attributes)) {
-    const normalizedName = normalizeLabel(rawName);
-    const attributeKey = ATTRIBUTE_MAP[normalizedName] as keyof CharacterSheet["attributes"] | undefined;
-    if (!attributeKey) {
-      warnings.push(`Unknown attribute '${rawName}', skipping`);
-      continue;
-    }
-    const value = rawValue as Record<string, unknown>;
-    const start = toInt(value.start);
-    const current = toInt(value.current);
-    const mod = toInt(value.mod);
-    characterSheet.attributes[attributeKey] = {
-      start,
-      current,
-      mod,
-      totalCost: current,
-    };
-  }
+  applyAttributes(sheet, characterSheet, warnings);
 
   applyBaseValues(sheet, characterSheet, warnings);
   applyBaseValueFormulas(characterSheet);
@@ -566,6 +548,28 @@ function applyAdvantagesAndDisadvantages(
     .map((name) => asText(name))
     .filter(Boolean);
   characterSheet.disadvantages = mapDisadvantages(disadvantages, characterSheet.generalInformation.name, warnings);
+}
+
+function applyAttributes(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): void {
+  const attributes = asRecord(sheet.attributes);
+  for (const [rawName, rawValue] of Object.entries(attributes)) {
+    const normalizedName = normalizeLabel(rawName);
+    const attributeKey = ATTRIBUTE_MAP[normalizedName] as keyof CharacterSheet["attributes"] | undefined;
+    if (!attributeKey) {
+      warnings.push(`Unknown attribute '${rawName}', skipping`);
+      continue;
+    }
+    const value = rawValue as Record<string, unknown>;
+    const start = toInt(value.start);
+    const current = toInt(value.current);
+    const mod = toInt(value.mod);
+    characterSheet.attributes[attributeKey] = {
+      start,
+      current,
+      mod,
+      totalCost: current,
+    };
+  }
 }
 
 function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): void {
