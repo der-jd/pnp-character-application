@@ -7,7 +7,8 @@ import {
 } from "api-spec";
 import { normalizeLabel } from "./xml-utils.js";
 
-export const TABLE_NAME_PREFIX = "pnp-app";
+export const CHARACTERS_TABLE_PREFIX = "pnp-app-characters";
+export const HISTORY_TABLE_PREFIX = "pnp-app-characters-history";
 export const REGION = "eu-central-1";
 
 export const MAX_ITEM_SIZE = 200 * 1024; // 200 KB, matches backend/src/lambdas/add-history-record/index.ts

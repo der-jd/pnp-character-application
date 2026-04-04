@@ -3,7 +3,7 @@ import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { fromIni } from "@aws-sdk/credential-provider-ini";
 import type { Character } from "api-spec";
 import type { HistoryBlock } from "./types.js";
-import { TABLE_NAME_PREFIX } from "./constants.js";
+import { CHARACTERS_TABLE_PREFIX, HISTORY_TABLE_PREFIX } from "./constants.js";
 
 export async function uploadToDynamoDB(
   character: Character | null,
@@ -12,8 +12,8 @@ export async function uploadToDynamoDB(
   awsProfile: string,
   awsRegion: string,
 ): Promise<void> {
-  const charactersTable = `${TABLE_NAME_PREFIX}-characters-${envName}`;
-  const historyTable = `${TABLE_NAME_PREFIX}-characters-history-${envName}`;
+  const charactersTable = `${CHARACTERS_TABLE_PREFIX}-${envName}`;
+  const historyTable = `${HISTORY_TABLE_PREFIX}-${envName}`;
 
   const client = new DynamoDBClient({
     region: awsRegion,
