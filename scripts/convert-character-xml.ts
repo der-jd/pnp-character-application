@@ -372,7 +372,13 @@ function convertHistory(
     levelUpEffects,
     creationRecord.number + 1,
   );
-  const records = [creationRecord, ...subsequentRecords];
+  const migrationRecord = buildMigrationRecord(
+    characterSheet,
+    subsequentRecords.length > 0
+      ? subsequentRecords[subsequentRecords.length - 1].number + 1
+      : creationRecord.number + 1,
+  );
+  const records = [creationRecord, ...subsequentRecords, migrationRecord];
 
   const historyBlocks = buildHistoryBlocks(records, character.characterId);
   for (const block of historyBlocks) {
@@ -1587,6 +1593,29 @@ function buildCharacterCreatedRecord(
     },
     comment: null,
     timestamp,
+  };
+}
+
+function buildMigrationRecord(characterSheet: CharacterSheet, number: number): HistoryRecord {
+  return {
+    type: HistoryRecordType.RULESET_VERSION_UPDATED,
+    name: "Migration from legacy character tool",
+    number,
+    id: crypto.randomUUID(),
+    data: {
+      new: {
+        character: characterSheet,
+        rulesetVersion: "1.1.1",
+      },
+    },
+    learningMethod: null,
+    calculationPoints: {
+      adventurePoints: null,
+      attributePoints: null,
+    },
+    comment:
+      "Character migrated from legacy XML format. History records before this point may reference old skill names or rules.",
+    timestamp: new Date().toISOString(),
   };
 }
 
