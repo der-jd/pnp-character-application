@@ -111,9 +111,15 @@ export function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet:
   const hobbyName = asText(hobby.name);
   const hobbySkillName = asText(hobby.skill);
   const normalizedHobbyName = normalizeLabel(hobbyName);
+  // Some XML exports provide the hobby name without a corresponding hobby skill, so map Jiu-Jitsu from the name.
   const jiujitsuHobbyName = normalizeLabel("Jiu-Jitsu");
   const forcedHobbySkill: SkillNameWithCategory | null =
     normalizedHobbyName === jiujitsuHobbyName ? "combat/martialArts" : null;
+  if (forcedHobbySkill) {
+    warnings.push(
+      `Hobby '${hobbyName}' was mapped to '${forcedHobbySkill}' from the hobby name because the XML can omit the corresponding hobby skill`,
+    );
+  }
   const hobbySkillFromXml = mapGeneralInformationSkill(hobbySkillName);
   if (!forcedHobbySkill && !hobbySkillFromXml && hobbySkillName) {
     warnings.push(`Unknown hobby skill '${hobbySkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`);
