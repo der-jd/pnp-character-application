@@ -311,15 +311,6 @@ function convertCharacter(
   const collegeSkillName = extractCollegeSkillName(rawHistoryEntries);
   patchCollegeEducationSkillName(characterSheet, collegeSkillName, warnings);
 
-  const character: Character = {
-    userId,
-    characterId,
-    characterSheet,
-    rulesetVersion: "1.0.0",
-  };
-
-  characterSchema.parse(character);
-
   const historyEntries = aggregateCombatSkillModEntries(rawHistoryEntries, warnings);
 
   const startAP = getStartAdventurePoints(rawHistoryEntries);
@@ -335,6 +326,15 @@ function convertCharacter(
 
   const levelUpEffects = extractLevelUpEffects(historyEntries);
   characterSheet.generalInformation.levelUpProgress = buildLevelUpProgressFromEffects(levelUpEffects);
+
+  const character: Character = {
+    userId,
+    characterId,
+    characterSheet,
+    rulesetVersion: "1.0.0",
+  };
+
+  characterSchema.parse(character);
 
   return { character, warnings, activatedSkills, levelUpEffects, rawHistoryEntries, historyEntries };
 }
