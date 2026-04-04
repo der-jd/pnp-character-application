@@ -72,7 +72,6 @@ export function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet:
   applyAttributes(sheet, characterSheet, warnings);
 
   applyBaseValues(sheet, characterSheet, warnings);
-  applyBaseValueFormulas(characterSheet);
 
   const spentOnSkills = applyNonCombatSkills(sheet, characterSheet, warnings);
   const spentOnCombatSkills = applyCombatSkills(sheet, characterSheet, warnings);
@@ -603,6 +602,16 @@ function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterShee
 
     characterSheet.baseValues[baseKey] = baseValue;
   }
+
+  for (const baseValueName of Object.keys(characterSheet.baseValues) as (keyof BaseValues)[]) {
+    const formulaValue = calculateBaseValueByFormula(baseValueName, characterSheet.attributes);
+    if (formulaValue === undefined) {
+      continue;
+    }
+    const rounded = Math.round(formulaValue);
+    characterSheet.baseValues[baseValueName].byFormula = rounded;
+    characterSheet.baseValues[baseValueName].current += rounded;
+  }
 }
 
 // Keep in sync with backend/src/core/rules/base-value-formulas.ts
@@ -626,18 +635,6 @@ function calculateBaseValueByFormula(baseValueName: keyof BaseValues, attributes
       return 1;
     default:
       return undefined;
-  }
-}
-
-function applyBaseValueFormulas(characterSheet: CharacterSheet): void {
-  for (const baseValueName of Object.keys(characterSheet.baseValues) as (keyof BaseValues)[]) {
-    const formulaValue = calculateBaseValueByFormula(baseValueName, characterSheet.attributes);
-    if (formulaValue === undefined) {
-      continue;
-    }
-    const rounded = Math.round(formulaValue);
-    characterSheet.baseValues[baseValueName].byFormula = rounded;
-    characterSheet.baseValues[baseValueName].current += rounded;
   }
 }
 
