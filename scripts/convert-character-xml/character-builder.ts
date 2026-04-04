@@ -9,6 +9,9 @@ import {
   aggregateCombatSkillModEntries,
   mapNonCombatSkill,
 } from "./sheet-builder.js";
+import backendPackage from "../../backend/package.json";
+
+const RULESET_VERSION = backendPackage.version;
 
 // ---------------------------------------------------------------------------
 // Phase 1 — Build the character JSON from the XML sheet and history metadata.
@@ -45,7 +48,7 @@ export function convertCharacter(
     userId,
     characterId,
     characterSheet,
-    rulesetVersion: "1.0.0",
+    rulesetVersion: RULESET_VERSION,
   };
 
   characterSchema.parse(character);
