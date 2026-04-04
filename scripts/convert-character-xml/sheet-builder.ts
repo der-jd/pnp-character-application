@@ -137,25 +137,6 @@ export function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet:
     "Profession/Hobby bonus for combat skills is expected to already be stored in the mod value in the XML; please adjust manually if that's not the case.",
   ]);
 
-  const calculationPoints = asRecord(sheet.calculation_points);
-  const attributePoints = asRecord(calculationPoints.attribute_points);
-  const attributeAdditional = toInt(attributePoints.additional);
-  const attributeSpent = toInt(attributePoints.spent);
-
-  characterSheet.calculationPoints.attributePoints = {
-    start: ATTRIBUTE_POINTS_FOR_CREATION,
-    available: ATTRIBUTE_POINTS_FOR_CREATION + attributeAdditional - attributeSpent,
-    total: ATTRIBUTE_POINTS_FOR_CREATION + attributeAdditional,
-  };
-
-  const adventurePoints = asRecord(calculationPoints.adventure_points);
-  const adventurePointsTotal = toInt(adventurePoints.total);
-  characterSheet.calculationPoints.adventurePoints = {
-    start: 0,
-    available: 0,
-    total: adventurePointsTotal,
-  };
-
   const advantagesNode = asRecord(sheet.advantages);
   const advantages = ensureArray(advantagesNode.advantage)
     .map((name) => asText(name))
@@ -194,8 +175,7 @@ export function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet:
   const spentOnSkills = applyNonCombatSkills(sheet, characterSheet, warnings);
   const spentOnCombatSkills = applyCombatSkills(sheet, characterSheet, warnings);
 
-  characterSheet.calculationPoints.adventurePoints.available =
-    adventurePointsTotal - spentOnSkills - spentOnCombatSkills;
+  applyCalculationPoints(sheet, characterSheet, spentOnSkills, spentOnCombatSkills);
 
   return { characterSheet, warnings };
 }
@@ -548,6 +528,31 @@ function zeroCombatStats(name: CombatSkillName): CombatStats {
     skilledAttackValue: 0,
     paradeValue: 0,
     skilledParadeValue: 0,
+  };
+}
+
+function applyCalculationPoints(
+  sheet: XmlCharacterSheet,
+  characterSheet: CharacterSheet,
+  spentOnSkills: number,
+  spentOnCombatSkills: number,
+): void {
+  const calculationPoints = asRecord(sheet.calculation_points);
+  const attributePoints = asRecord(calculationPoints.attribute_points);
+  const attributeAdditional = toInt(attributePoints.additional);
+  const attributeSpent = toInt(attributePoints.spent);
+  characterSheet.calculationPoints.attributePoints = {
+    start: ATTRIBUTE_POINTS_FOR_CREATION,
+    available: ATTRIBUTE_POINTS_FOR_CREATION + attributeAdditional - attributeSpent,
+    total: ATTRIBUTE_POINTS_FOR_CREATION + attributeAdditional,
+  };
+
+  const adventurePoints = asRecord(calculationPoints.adventure_points);
+  const adventurePointsTotal = toInt(adventurePoints.total);
+  characterSheet.calculationPoints.adventurePoints = {
+    start: 0, // Start points will be calculated from history TODO check
+    available: adventurePointsTotal - spentOnSkills - spentOnCombatSkills,
+    total: adventurePointsTotal,
   };
 }
 
