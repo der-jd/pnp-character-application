@@ -251,13 +251,15 @@ function CollapsibleNode({
 }
 
 function formatEffectDetail(effect: EffectByLevelUp): string {
-  if (effect.kind === "hpRoll" || effect.kind === "armorLevelRoll") {
-    return t("levelUpProgressDiceResult", effect.roll.value);
+  switch (effect.kind) {
+    case "hpRoll":
+    case "armorLevelRoll":
+      return t("levelUpProgressDiceResult", effect.roll.value);
+    case "rerollUnlock":
+      return "";
+    default:
+      return `+${effect.delta}`;
   }
-  if (effect.kind === "rerollUnlock") {
-    return "";
-  }
-  return `+${effect.delta}`;
 }
 
 function LevelUpProgressTree({ progress }: { progress: LevelUpProgress }) {
