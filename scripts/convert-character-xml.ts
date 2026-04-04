@@ -1564,7 +1564,7 @@ function buildCharacterCreatedRecord(
     },
     calculationPoints: {
       adventurePoints: { start: startAP, available: startAP, total: startAP },
-      attributePoints: { start: startAttr, available: startAttr, total: startAttr },
+      attributePoints: { start: startAttr, available: 0, total: startAttr },
     },
   };
 
