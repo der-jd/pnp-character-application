@@ -25,6 +25,7 @@ export function convertCharacter(
 ): { character: Character; warnings: string[] } {
   const { characterSheet, warnings } = buildCharacterSheet(sheet);
 
+  // Update character sheet with college skill name from history (if corresponding advantage is selected)
   const collegeSkillName = extractCollegeSkillName(rawHistoryEntries);
   patchCollegeEducationSkillName(characterSheet, collegeSkillName, warnings);
 
