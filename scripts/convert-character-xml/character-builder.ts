@@ -3,10 +3,12 @@ import type { XmlCharacterSheet, HistoryEntry } from "./types.js";
 import { normalizeLabel, asText, toInt, queueInfoBlock } from "./xml-utils.js";
 import {
   ADVANTAGE_CHANGED_TYPE,
+  HISTORY_SKILL_INCREASE_TYPE_LABELS,
   HISTORY_NAME_ADVENTURE_POINTS,
   HISTORY_NAME_ADVENTURE_POINTS_KEYWORD,
   HISTORY_TYPE_CALCULATION_POINTS_EVENT,
   STUDIUM_NAME,
+  XML_CHARACTER_SHEET_KEYS,
 } from "./constants.js";
 import {
   buildCharacterSheet,
@@ -69,15 +71,15 @@ export function convertCharacter(
 
 function extractCollegeSkillName(entries: HistoryEntry[]): string | null {
   for (const entry of entries) {
-    const typeLabel = normalizeLabel(asText(entry.type));
+    const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
     if (typeLabel !== ADVANTAGE_CHANGED_TYPE) {
       continue;
     }
-    const newValue = normalizeLabel(asText(entry.new_value));
+    const newValue = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.newValue]));
     if (newValue !== STUDIUM_NAME) {
       continue;
     }
-    const comment = asText(entry.comment).trim();
+    const comment = asText(entry[XML_CHARACTER_SHEET_KEYS.comment]).trim();
     if (comment) {
       return comment;
     }
@@ -126,10 +128,10 @@ function patchCollegeEducationSkillName(
 
 function getStartAdventurePoints(entries: HistoryEntry[]): number {
   for (const entry of entries) {
-    const typeLabel = normalizeLabel(asText(entry.type));
-    const name = normalizeLabel(asText(entry.name));
+    const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
+    const name = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.name]));
     if (typeLabel === HISTORY_TYPE_CALCULATION_POINTS_EVENT && name === HISTORY_NAME_ADVENTURE_POINTS) {
-      return toInt(entry.new_calculation_points_available);
+      return toInt(entry[XML_CHARACTER_SHEET_KEYS.newCalculationPointsAvailable]);
     }
   }
   return 0;
@@ -138,17 +140,16 @@ function getStartAdventurePoints(entries: HistoryEntry[]): number {
 function getLastAdventurePointsAvailable(entries: HistoryEntry[]): number | null {
   let lastAvailable: number | null = null;
   for (const entry of entries) {
-    const typeLabel = normalizeLabel(asText(entry.type));
-    const name = normalizeLabel(asText(entry.name));
+    const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
+    const name = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.name]));
     const isAPEvent =
       typeLabel === HISTORY_TYPE_CALCULATION_POINTS_EVENT &&
       name.toLowerCase().includes(HISTORY_NAME_ADVENTURE_POINTS_KEYWORD.toLowerCase());
-    const isSkillIncrease =
-      typeLabel === normalizeLabel("Talent gesteigert") || typeLabel === normalizeLabel("Kampftalent gesteigert");
+    const isSkillIncrease = HISTORY_SKILL_INCREASE_TYPE_LABELS.has(typeLabel);
     if (!isAPEvent && !isSkillIncrease) continue;
-    const change = toInt(entry.calculation_points_change);
+    const change = toInt(entry[XML_CHARACTER_SHEET_KEYS.calculationPointsChange]);
     if (change === 0) continue;
-    lastAvailable = toInt(entry.new_calculation_points_available);
+    lastAvailable = toInt(entry[XML_CHARACTER_SHEET_KEYS.newCalculationPointsAvailable]);
   }
   return lastAvailable;
 }

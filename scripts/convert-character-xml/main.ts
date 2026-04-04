@@ -6,7 +6,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import type { HistoryEntry, XmlCharacterSheet } from "./types.js";
 import { normalizeTagName, ensureArray, asRecord, findRepoRoot, flushInfoBlocks } from "./xml-utils.js";
-import { REGION } from "./constants.js";
+import { REGION, XML_CHARACTER_SHEET_KEYS, XML_ROOT_NODE_NAMES } from "./constants.js";
 import { convertCharacter } from "./character-builder.js";
 import { convertHistory } from "./history-builder.js";
 import { uploadToDynamoDB } from "./dynamo.js";
@@ -87,9 +87,11 @@ export async function main(): Promise<void> {
     tagNameProcessors: [normalizeTagName],
   });
 
-  const sheet = asRecord(parsed.character_sheet ?? parsed.characterSheet ?? parsed) as XmlCharacterSheet;
-  const historyNode = asRecord(sheet.history);
-  const rawHistoryEntries = ensureArray(historyNode.entry) as HistoryEntry[];
+  const sheet = asRecord(
+    parsed[XML_ROOT_NODE_NAMES[0]] ?? parsed[XML_ROOT_NODE_NAMES[1]] ?? parsed,
+  ) as XmlCharacterSheet;
+  const historyNode = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.history]);
+  const rawHistoryEntries = ensureArray(historyNode[XML_CHARACTER_SHEET_KEYS.entry]) as HistoryEntry[];
 
   await fs.mkdir(outDir, { recursive: true });
   const warnings: string[] = [];

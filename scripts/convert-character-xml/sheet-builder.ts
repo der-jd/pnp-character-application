@@ -53,8 +53,11 @@ import {
   FEAR_OF_COST_BY_LABEL,
   FEAR_OF_DETAIL_BY_CHARACTER_HASH,
   DEFAULT_GENERAL_INFORMATION_SKILL,
+  HISTORY_TYPE_BASE_VALUE_EVENT,
   LEVEL_UP_COMMENT_PATTERN,
   BASE_VALUE_TO_LEVEL_UP_EFFECT,
+  XML_CHARACTER_SHEET_KEYS,
+  XML_HOBBY_NAME_TO_SKILL,
 } from "./constants.js";
 
 // ---------------------------------------------------------------------------
@@ -162,12 +165,12 @@ export function extractLevelUpEffects(entries: HistoryEntry[]): Record<string, E
   const effectsByLevel: Record<string, EffectByLevelUp> = {};
 
   for (const entry of entries) {
-    const typeLabel = normalizeLabel(asText(entry.type));
-    if (typeLabel !== normalizeLabel("Ereignis (Basiswerte)")) {
+    const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
+    if (typeLabel !== HISTORY_TYPE_BASE_VALUE_EVENT) {
       continue;
     }
 
-    const comment = asText(entry.comment);
+    const comment = asText(entry[XML_CHARACTER_SHEET_KEYS.comment]);
     const levelMatch = comment.match(LEVEL_UP_COMMENT_PATTERN);
     if (!levelMatch) {
       continue;
@@ -177,13 +180,13 @@ export function extractLevelUpEffects(entries: HistoryEntry[]): Record<string, E
       continue;
     }
 
-    const effectKind = BASE_VALUE_TO_LEVEL_UP_EFFECT[normalizeLabel(asText(entry.name))];
+    const effectKind = BASE_VALUE_TO_LEVEL_UP_EFFECT[normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.name]))];
     if (!effectKind) {
       continue;
     }
 
-    const newValue = toInt(entry.new_value, 0);
-    const oldValue = toInt(entry.old_value, 0);
+    const newValue = toInt(entry[XML_CHARACTER_SHEET_KEYS.newValue], 0);
+    const oldValue = toInt(entry[XML_CHARACTER_SHEET_KEYS.oldValue], 0);
     const delta = newValue - oldValue;
     if (delta <= 0 && effectKind !== "rerollUnlock") {
       continue;
@@ -259,9 +262,9 @@ export function aggregateCombatSkillModEntries(entries: HistoryEntry[], warnings
     }
 
     skipIndices.add(index);
-    const parsedOld = toOptionalInt(entry.old_value);
-    const parsedNew = toOptionalInt(entry.new_value);
-    const displayName = asText(entry.name);
+    const parsedOld = toOptionalInt(entry[XML_CHARACTER_SHEET_KEYS.oldValue]);
+    const parsedNew = toOptionalInt(entry[XML_CHARACTER_SHEET_KEYS.newValue]);
+    const displayName = asText(entry[XML_CHARACTER_SHEET_KEYS.name]);
     const existing = states.get(combatSkillName);
 
     if (!existing) {
@@ -291,8 +294,8 @@ export function aggregateCombatSkillModEntries(entries: HistoryEntry[], warnings
   }
 
   for (const state of states.values()) {
-    const fallbackOldValue = asText(state.firstEntry.old_value);
-    const fallbackNewValue = asText(state.lastEntry.new_value);
+    const fallbackOldValue = asText(state.firstEntry[XML_CHARACTER_SHEET_KEYS.oldValue]);
+    const fallbackNewValue = asText(state.lastEntry[XML_CHARACTER_SHEET_KEYS.newValue]);
     if (state.oldValue === null || state.newValue === null) {
       warnings.push(
         `Incomplete Gewürfelte Begabung history data for combat skill '${state.displayName}', using available values`,
@@ -300,10 +303,11 @@ export function aggregateCombatSkillModEntries(entries: HistoryEntry[], warnings
     }
     const replacement: HistoryEntry = {
       ...state.firstEntry,
-      old_value: state.oldValue !== null ? state.oldValue.toString() : fallbackOldValue,
-      new_value: state.newValue !== null ? state.newValue.toString() : fallbackNewValue,
-      date: state.lastEntry.date ?? state.firstEntry.date,
-      name: state.firstEntry.name ?? state.displayName,
+      [XML_CHARACTER_SHEET_KEYS.oldValue]: state.oldValue !== null ? state.oldValue.toString() : fallbackOldValue,
+      [XML_CHARACTER_SHEET_KEYS.newValue]: state.newValue !== null ? state.newValue.toString() : fallbackNewValue,
+      [XML_CHARACTER_SHEET_KEYS.date]:
+        state.lastEntry[XML_CHARACTER_SHEET_KEYS.date] ?? state.firstEntry[XML_CHARACTER_SHEET_KEYS.date],
+      [XML_CHARACTER_SHEET_KEYS.name]: state.firstEntry[XML_CHARACTER_SHEET_KEYS.name] ?? state.displayName,
     };
     replacementByIndex.set(state.firstIndex, replacement);
   }
@@ -444,18 +448,18 @@ function applyCalculationPoints(
   spentOnSkills: number,
   spentOnCombatSkills: number,
 ): void {
-  const calculationPoints = asRecord(sheet.calculation_points);
-  const attributePoints = asRecord(calculationPoints.attribute_points);
-  const attributeAdditional = toInt(attributePoints.additional);
-  const attributeSpent = toInt(attributePoints.spent);
+  const calculationPoints = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.calculationPoints]);
+  const attributePoints = asRecord(calculationPoints[XML_CHARACTER_SHEET_KEYS.attributePoints]);
+  const attributeAdditional = toInt(attributePoints[XML_CHARACTER_SHEET_KEYS.additional]);
+  const attributeSpent = toInt(attributePoints[XML_CHARACTER_SHEET_KEYS.spent]);
   characterSheet.calculationPoints.attributePoints = {
     start: ATTRIBUTE_POINTS_FOR_CREATION,
     available: ATTRIBUTE_POINTS_FOR_CREATION + attributeAdditional - attributeSpent,
     total: ATTRIBUTE_POINTS_FOR_CREATION + attributeAdditional,
   };
 
-  const adventurePoints = asRecord(calculationPoints.adventure_points);
-  const adventurePointsTotal = toInt(adventurePoints.total);
+  const adventurePoints = asRecord(calculationPoints[XML_CHARACTER_SHEET_KEYS.adventurePoints]);
+  const adventurePointsTotal = toInt(adventurePoints[XML_CHARACTER_SHEET_KEYS.total]);
   characterSheet.calculationPoints.adventurePoints = {
     start: 0, // Start points will be taken from history in a later step
     available: adventurePointsTotal - spentOnSkills - spentOnCombatSkills,
@@ -464,25 +468,25 @@ function applyCalculationPoints(
 }
 
 function applyGeneralInformation(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): void {
-  const general = asRecord(sheet.general_information);
-  characterSheet.generalInformation.name = asText(general.name);
-  characterSheet.generalInformation.sex = asText(general.sex);
-  characterSheet.generalInformation.level = toInt(sheet.level, 1);
+  const general = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.generalInformation]);
+  characterSheet.generalInformation.name = asText(general[XML_CHARACTER_SHEET_KEYS.name]);
+  characterSheet.generalInformation.sex = asText(general[XML_CHARACTER_SHEET_KEYS.sex]);
+  characterSheet.generalInformation.level = toInt(sheet[XML_CHARACTER_SHEET_KEYS.level], 1);
   characterSheet.generalInformation.levelUpProgress = levelUpProgressSchema.parse({});
-  characterSheet.generalInformation.birthday = asText(general.birthday);
-  characterSheet.generalInformation.birthplace = asText(general.birthplace);
-  characterSheet.generalInformation.size = asText(general.size);
-  characterSheet.generalInformation.weight = asText(general.weight);
-  characterSheet.generalInformation.hairColor = asText(general.hair_color);
-  characterSheet.generalInformation.eyeColor = asText(general.eye_color);
-  characterSheet.generalInformation.residence = asText(general.residence);
-  characterSheet.generalInformation.appearance = asText(general.appearance);
+  characterSheet.generalInformation.birthday = asText(general[XML_CHARACTER_SHEET_KEYS.birthday]);
+  characterSheet.generalInformation.birthplace = asText(general[XML_CHARACTER_SHEET_KEYS.birthplace]);
+  characterSheet.generalInformation.size = asText(general[XML_CHARACTER_SHEET_KEYS.size]);
+  characterSheet.generalInformation.weight = asText(general[XML_CHARACTER_SHEET_KEYS.weight]);
+  characterSheet.generalInformation.hairColor = asText(general[XML_CHARACTER_SHEET_KEYS.hairColor]);
+  characterSheet.generalInformation.eyeColor = asText(general[XML_CHARACTER_SHEET_KEYS.eyeColor]);
+  characterSheet.generalInformation.residence = asText(general[XML_CHARACTER_SHEET_KEYS.residence]);
+  characterSheet.generalInformation.appearance = asText(general[XML_CHARACTER_SHEET_KEYS.appearance]);
 
-  const languagesNode = asRecord(sheet.languages_scripts);
-  const languages = ensureArray(languagesNode.language_script)
+  const languagesNode = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.languagesScripts]);
+  const languages = ensureArray(languagesNode[XML_CHARACTER_SHEET_KEYS.languageScript])
     .map((entry) => asText(entry))
     .filter(Boolean);
-  const specialCharacteristics = asText(general.special_characteristics);
+  const specialCharacteristics = asText(general[XML_CHARACTER_SHEET_KEYS.specialCharacteristics]);
   if (languages.length > 0) {
     queueInfoBlock("Info", [
       `Languages/Scripts entries dropped during conversion (not part of new schema): ${languages.join(", ")}`,
@@ -490,9 +494,9 @@ function applyGeneralInformation(sheet: XmlCharacterSheet, characterSheet: Chara
   }
   characterSheet.generalInformation.specialCharacteristics = specialCharacteristics;
 
-  const profession = asRecord(general.profession);
-  const professionName = asText(profession.name);
-  const professionSkillName = asText(profession.skill);
+  const profession = asRecord(general[XML_CHARACTER_SHEET_KEYS.profession]);
+  const professionName = asText(profession[XML_CHARACTER_SHEET_KEYS.name]);
+  const professionSkillName = asText(profession[XML_CHARACTER_SHEET_KEYS.skill]);
   const professionSkill = mapGeneralInformationSkill(professionSkillName);
   if (!professionSkill) {
     warnings.push(
@@ -506,14 +510,11 @@ function applyGeneralInformation(sheet: XmlCharacterSheet, characterSheet: Chara
   };
   applyProfessionOrHobbyBonus(characterSheet, resolvedProfessionSkill, PROFESSION_SKILL_BONUS, warnings);
 
-  const hobby = asRecord(general.hobby);
-  const hobbyName = asText(hobby.name);
-  const hobbySkillName = asText(hobby.skill);
+  const hobby = asRecord(general[XML_CHARACTER_SHEET_KEYS.hobby]);
+  const hobbyName = asText(hobby[XML_CHARACTER_SHEET_KEYS.name]);
+  const hobbySkillName = asText(hobby[XML_CHARACTER_SHEET_KEYS.skill]);
   const normalizedHobbyName = normalizeLabel(hobbyName);
-  // Some XML exports provide the hobby name without a corresponding hobby skill, so map Jiu-Jitsu from the name.
-  const jiujitsuHobbyName = normalizeLabel("Jiu-Jitsu");
-  const forcedHobbySkill: SkillNameWithCategory | null =
-    normalizedHobbyName === jiujitsuHobbyName ? "combat/martialArts" : null;
+  const forcedHobbySkill = XML_HOBBY_NAME_TO_SKILL.get(normalizedHobbyName) ?? null;
   if (forcedHobbySkill) {
     warnings.push(
       `Hobby '${hobbyName}' was mapped to '${forcedHobbySkill}' from the hobby name because the XML can omit the corresponding hobby skill`,
@@ -542,21 +543,21 @@ function applyAdvantagesAndDisadvantages(
   characterSheet: CharacterSheet,
   warnings: string[],
 ): void {
-  const advantagesNode = asRecord(sheet.advantages);
-  const advantages = ensureArray(advantagesNode.advantage)
+  const advantagesNode = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.advantages]);
+  const advantages = ensureArray(advantagesNode[XML_CHARACTER_SHEET_KEYS.advantage])
     .map((name) => asText(name))
     .filter(Boolean);
   characterSheet.advantages = mapAdvantages(advantages, warnings);
 
-  const disadvantagesNode = asRecord(sheet.disadvantages);
-  const disadvantages = ensureArray(disadvantagesNode.disadvantage)
+  const disadvantagesNode = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.disadvantages]);
+  const disadvantages = ensureArray(disadvantagesNode[XML_CHARACTER_SHEET_KEYS.disadvantage])
     .map((name) => asText(name))
     .filter(Boolean);
   characterSheet.disadvantages = mapDisadvantages(disadvantages, characterSheet.generalInformation.name, warnings);
 }
 
 function applyAttributes(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): void {
-  const attributes = asRecord(sheet.attributes);
+  const attributes = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.attributes]);
   for (const [rawName, rawValue] of Object.entries(attributes)) {
     const normalizedName = normalizeLabel(rawName);
     const attributeKey = ATTRIBUTE_MAP[normalizedName] as keyof CharacterSheet["attributes"] | undefined;
@@ -565,9 +566,9 @@ function applyAttributes(sheet: XmlCharacterSheet, characterSheet: CharacterShee
       continue;
     }
     const value = rawValue as Record<string, unknown>;
-    const start = toInt(value.start);
-    const current = toInt(value.current);
-    const mod = toInt(value.mod);
+    const start = toInt(value[XML_CHARACTER_SHEET_KEYS.start]);
+    const current = toInt(value[XML_CHARACTER_SHEET_KEYS.current]);
+    const mod = toInt(value[XML_CHARACTER_SHEET_KEYS.mod]);
     characterSheet.attributes[attributeKey] = {
       start,
       current,
@@ -578,8 +579,8 @@ function applyAttributes(sheet: XmlCharacterSheet, characterSheet: CharacterShee
 }
 
 function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): void {
-  const baseValues = asRecord(sheet.base_values);
-  const basePoints = asRecord(sheet.base_points);
+  const baseValues = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.baseValues]);
+  const basePoints = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.basePoints]);
 
   for (const [rawName, rawValue] of Object.entries(baseValues)) {
     const normalizedName = normalizeLabel(rawName);
@@ -589,11 +590,11 @@ function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterShee
       continue;
     }
     const value = rawValue as Record<string, unknown>;
-    const mod = toInt(value.mod);
+    const mod = toInt(value[XML_CHARACTER_SHEET_KEYS.mod]);
 
     const points = asRecord(basePoints[rawName]);
-    const start = toInt(points.start);
-    const bought = toInt(points.bought);
+    const start = toInt(points[XML_CHARACTER_SHEET_KEYS.start]);
+    const bought = toInt(points[XML_CHARACTER_SHEET_KEYS.bought]);
 
     const baseValue: BaseValue = {
       start,
@@ -645,8 +646,8 @@ function calculateBaseValueByFormula(baseValueName: keyof BaseValues, attributes
 }
 
 function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): number {
-  const skillsNode = asRecord(sheet.skills);
-  delete (skillsNode as Record<string, unknown>).activated_skills;
+  const skillsNode = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.skills]);
+  delete (skillsNode as Record<string, unknown>)[XML_CHARACTER_SHEET_KEYS.activatedSkills];
   let spentTotal = 0;
   for (const [rawName, rawValue] of Object.entries(skillsNode)) {
     const normalizedName = normalizeLabel(rawName);
@@ -657,8 +658,11 @@ function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: Characte
     }
     const { category, name } = splitSkill(mappedSkill);
     const value = rawValue as Record<string, unknown>;
-    const activated = value.activated !== undefined ? toInt(value.activated) > 0 : START_SKILLS.includes(mappedSkill);
-    const totalCost = toInt(value.total_costs);
+    const activated =
+      value[XML_CHARACTER_SHEET_KEYS.activated] !== undefined
+        ? toInt(value[XML_CHARACTER_SHEET_KEYS.activated]) > 0
+        : START_SKILLS.includes(mappedSkill);
+    const totalCost = toInt(value[XML_CHARACTER_SHEET_KEYS.totalCosts]);
     spentTotal += totalCost;
 
     const skillCategory = getSkillCategorySection(characterSheet.skills, category);
@@ -666,9 +670,9 @@ function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: Characte
     skillCategory[name] = {
       ...existing,
       activated: activated || existing.activated,
-      start: existing.start + toInt(value.start),
-      current: existing.current + toInt(value.taw),
-      mod: existing.mod + toInt(value.mod),
+      start: existing.start + toInt(value[XML_CHARACTER_SHEET_KEYS.start]),
+      current: existing.current + toInt(value[XML_CHARACTER_SHEET_KEYS.taw]),
+      mod: existing.mod + toInt(value[XML_CHARACTER_SHEET_KEYS.mod]),
       totalCost: existing.totalCost + totalCost,
     };
   }
@@ -676,13 +680,13 @@ function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: Characte
 }
 
 function applyCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): number {
-  const combatSkillsNode = asRecord(sheet.combat_skills);
+  const combatSkillsNode = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.combatSkills]);
   const baseValues = characterSheet.baseValues;
 
-  const meleeNode = asRecord(combatSkillsNode.melee);
-  const rangedNode = asRecord(combatSkillsNode.ranged);
-  const meleeSkills = ensureArray(meleeNode.skill) as Record<string, unknown>[];
-  const rangedSkills = ensureArray(rangedNode.skill) as Record<string, unknown>[];
+  const meleeNode = asRecord(combatSkillsNode[XML_CHARACTER_SHEET_KEYS.melee]);
+  const rangedNode = asRecord(combatSkillsNode[XML_CHARACTER_SHEET_KEYS.ranged]);
+  const meleeSkills = ensureArray(meleeNode[XML_CHARACTER_SHEET_KEYS.skill]) as Record<string, unknown>[];
+  const rangedSkills = ensureArray(rangedNode[XML_CHARACTER_SHEET_KEYS.skill]) as Record<string, unknown>[];
 
   let spentTotal = 0;
   for (const skillEntry of meleeSkills) {
@@ -715,7 +719,7 @@ function applyCombatSkillEntry(
   baseValues: BaseValues,
   warnings: string[],
 ): number {
-  const name = normalizeLabel(asText(entry.name));
+  const name = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.name]));
   const combatSkillName = COMBAT_SKILL_MAP[name];
   if (!combatSkillName) {
     warnings.push(
@@ -725,9 +729,9 @@ function applyCombatSkillEntry(
   }
 
   const skill = characterSheet.skills.combat[combatSkillName];
-  const current = toInt(entry.ability);
-  const mod = toInt(entry.mod);
-  const totalCost = toInt(entry.total_costs);
+  const current = toInt(entry[XML_CHARACTER_SHEET_KEYS.ability]);
+  const mod = toInt(entry[XML_CHARACTER_SHEET_KEYS.mod]);
+  const totalCost = toInt(entry[XML_CHARACTER_SHEET_KEYS.totalCosts]);
   characterSheet.skills.combat[combatSkillName] = {
     ...skill,
     activated: true,
@@ -736,9 +740,12 @@ function applyCombatSkillEntry(
     totalCost,
   };
 
-  const handling = toInt(entry.handling, COMBAT_SKILL_HANDLING[combatSkillName]);
-  const skilledAttackValue = category === "melee" ? toInt(entry.at_distributed) : toInt(entry.fk_distributed);
-  const skilledParadeValue = category === "melee" ? toInt(entry.pa_distributed) : 0;
+  const handling = toInt(entry[XML_CHARACTER_SHEET_KEYS.handling], COMBAT_SKILL_HANDLING[combatSkillName]);
+  const skilledAttackValue =
+    category === "melee"
+      ? toInt(entry[XML_CHARACTER_SHEET_KEYS.atDistributed])
+      : toInt(entry[XML_CHARACTER_SHEET_KEYS.fkDistributed]);
+  const skilledParadeValue = category === "melee" ? toInt(entry[XML_CHARACTER_SHEET_KEYS.paDistributed]) : 0;
 
   const combatCategory = getCombatCategorySection(characterSheet.combat, category);
   const updatedCombatStats = recalculateCombatStats(
@@ -864,11 +871,11 @@ function mapGeneralInformationSkill(name: string): SkillNameWithCategory | null 
 }
 
 function isGewuerfelteBegabungCombatSkillEntry(entry: HistoryEntry): boolean {
-  const comment = normalizeLabel(asText(entry.comment));
+  const comment = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.comment]));
   if (!comment || comment !== GEWUERFELTE_BEGABUNG_COMMENT) {
     return false;
   }
-  const typeLabel = normalizeLabel(asText(entry.type));
+  const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
   if (!COMBAT_SKILL_HISTORY_TYPE_LABELS.has(typeLabel)) {
     return false;
   }
@@ -876,6 +883,6 @@ function isGewuerfelteBegabungCombatSkillEntry(entry: HistoryEntry): boolean {
 }
 
 function getCombatSkillNameFromHistoryEntry(entry: HistoryEntry): CombatSkillName | null {
-  const normalizedSkillName = normalizeLabel(asText(entry.name));
+  const normalizedSkillName = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.name]));
   return COMBAT_SKILL_MAP[normalizedSkillName] ?? null;
 }

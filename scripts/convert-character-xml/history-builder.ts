@@ -21,6 +21,23 @@ import {
 import type { HistoryEntry, XmlCharacterSheet, CombatCategory, HistoryBlock } from "./types.js";
 import { normalizeLabel, asText, toInt, toOptionalInt, toIsoTimestamp, queueInfoBlock } from "./xml-utils.js";
 import {
+  ADVANTAGE_CHANGED_TYPE,
+  CALCULATION_POINTS_ATTRIBUTE_KEYWORDS,
+  CREATION_COMMENT,
+  HISTORY_NAME_ADVENTURE_POINTS_KEYWORD,
+  HISTORY_SPECIAL_ABILITY_TYPE_LABELS,
+  HISTORY_TYPE_ATTACK_DISTRIBUTED,
+  HISTORY_TYPE_ATTRIBUTE_CHANGED,
+  HISTORY_TYPE_BASE_VALUE_EVENT,
+  HISTORY_TYPE_CALCULATION_POINTS_EVENT,
+  HISTORY_TYPE_DISADVANTAGE_CHANGED,
+  HISTORY_TYPE_HOBBY_CHANGED,
+  HISTORY_TYPE_LEVEL_UP_EVENT,
+  HISTORY_TYPE_PARADE_DISTRIBUTED,
+  HISTORY_TYPE_PROFESSION_CHANGED,
+  HISTORY_TYPE_SKILL_ACTIVATED,
+  HISTORY_TYPE_SKILL_CHANGED,
+  HISTORY_TYPE_COMBAT_SKILL_CHANGED,
   MAX_ITEM_SIZE,
   ATTRIBUTE_MAP,
   BASE_VALUE_MAP,
@@ -30,6 +47,10 @@ import {
   IGNORED_HISTORY_TYPES_WITH_WARNING,
   LEVEL_UP_COMMENT_PATTERN,
   BASE_VALUE_TO_LEVEL_UP_EFFECT,
+  SPECIAL_EVENT_COMMENT_KEYWORDS,
+  SPECIAL_EVENT_COMMENT_PREFIX,
+  XML_CHARACTER_SHEET_KEYS,
+  XML_LEARNING_METHOD_MAP,
 } from "./constants.js";
 import {
   buildCharacterSheet,
@@ -125,33 +146,36 @@ export function convertHistory(
 
 function extractActivatedSkills(rawHistoryEntries: HistoryEntry[], warnings: string[]): SkillNameWithCategory[] {
   const creationDate = getCreationDate(rawHistoryEntries);
-  const talentActivatedType = normalizeLabel("Talent aktiviert");
+  const talentActivatedType = HISTORY_TYPE_SKILL_ACTIVATED;
 
   const seen = new Set<SkillNameWithCategory>();
   const activatedSkills: SkillNameWithCategory[] = [];
 
   for (const entry of rawHistoryEntries) {
-    const typeLabel = normalizeLabel(asText(entry.type));
+    const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
     if (typeLabel !== talentActivatedType) {
       continue;
     }
 
-    const date = asText(entry.date);
+    const date = asText(entry[XML_CHARACTER_SHEET_KEYS.date]);
     if (creationDate !== null && date !== creationDate) {
       continue;
     }
 
-    const comment = normalizeLabel(asText(entry.comment));
-    if (comment.toLowerCase().startsWith("se:")) {
+    const comment = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.comment]));
+    if (comment.toLowerCase().startsWith(SPECIAL_EVENT_COMMENT_PREFIX)) {
       continue;
     }
 
     // Skills activated automatically by advantages (e.g. Abitur from Studium) are not player choices
-    if (comment.toLowerCase().includes("studium") || comment.toLowerCase().includes("abitur")) {
+    if (
+      comment.toLowerCase().includes(SPECIAL_EVENT_COMMENT_KEYWORDS.studium) ||
+      comment.toLowerCase().includes(SPECIAL_EVENT_COMMENT_KEYWORDS.abitur)
+    ) {
       continue;
     }
 
-    const label = normalizeLabel(asText(entry.name));
+    const label = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.name]));
     if (!label) {
       continue;
     }
@@ -226,7 +250,7 @@ function buildHistoryRecords(
   const runningLevelUpEffects: Record<string, EffectByLevelUp> = {};
 
   for (const entry of entries) {
-    const typeLabel = normalizeLabel(asText(entry.type));
+    const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
     if (IGNORED_HISTORY_TYPES.has(typeLabel)) {
       if (IGNORED_HISTORY_TYPES_WITH_WARNING.has(typeLabel)) {
         queueInfoBlock("Info", [
@@ -241,11 +265,11 @@ function buildHistoryRecords(
       continue;
     }
 
-    const name = asText(entry.name);
-    const oldValueText = asText(entry.old_value);
-    const newValueText = asText(entry.new_value);
-    const increaseMode = normalizeLabel(asText(entry.increase_mode));
-    const comment = asText(entry.comment) || null;
+    const name = asText(entry[XML_CHARACTER_SHEET_KEYS.name]);
+    const oldValueText = asText(entry[XML_CHARACTER_SHEET_KEYS.oldValue]);
+    const newValueText = asText(entry[XML_CHARACTER_SHEET_KEYS.newValue]);
+    const increaseMode = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.increaseMode]));
+    const comment = asText(entry[XML_CHARACTER_SHEET_KEYS.comment]) || null;
 
     const recordType = mapRecordType(typeLabel, warnings);
     const learningMethod = mapLearningMethod(increaseMode, warnings);
@@ -264,7 +288,7 @@ function buildHistoryRecords(
         attributePoints: null,
       },
       comment,
-      timestamp: toIsoTimestamp(asText(entry.date)),
+      timestamp: toIsoTimestamp(asText(entry[XML_CHARACTER_SHEET_KEYS.date])),
     };
 
     switch (recordType) {
@@ -424,12 +448,12 @@ function fillCalculationPointsRecord(
   attrTracker: { start: number; runningTotal: number },
   warnings: string[],
 ): void {
-  const oldAvailable = toInt(entry.old_calculation_points_available);
-  const newAvailable = toInt(entry.new_calculation_points_available);
+  const oldAvailable = toInt(entry[XML_CHARACTER_SHEET_KEYS.oldCalculationPointsAvailable]);
+  const newAvailable = toInt(entry[XML_CHARACTER_SHEET_KEYS.newCalculationPointsAvailable]);
   const change = newAvailable - oldAvailable;
 
   const normalizedName = normalizeLabel(name).toLowerCase();
-  const isAttributePoints = normalizedName.includes("attribut") || normalizedName.includes("eigenschaft");
+  const isAttributePoints = CALCULATION_POINTS_ATTRIBUTE_KEYWORDS.some((keyword) => normalizedName.includes(keyword));
   const key = isAttributePoints ? "attributePoints" : "adventurePoints";
 
   const tracker = isAttributePoints ? attrTracker : apTracker;
@@ -447,7 +471,10 @@ function fillCalculationPointsRecord(
     attributePoints: key === "attributePoints" ? { old: oldPoints, new: newPoints } : null,
   };
 
-  if (!isAttributePoints && !normalizeLabel(name).toLowerCase().includes("abenteuer")) {
+  if (
+    !isAttributePoints &&
+    !normalizeLabel(name).toLowerCase().includes(HISTORY_NAME_ADVENTURE_POINTS_KEYWORD.toLowerCase())
+  ) {
     warnings.push(`Calculation points entry '${name}' assumed to be adventure points`);
   }
 }
@@ -605,8 +632,8 @@ function fillCombatStatsRecord(
   const baseStats = combatCategory[combatSkillName];
   const skill = characterSheet.skills.combat[combatSkillName];
 
-  const isAttackDistribution = normalizeLabel(typeLabel) === normalizeLabel("AT/FK verteilt");
-  const isParadeDistribution = normalizeLabel(typeLabel) === normalizeLabel("PA verteilt");
+  const isAttackDistribution = normalizeLabel(typeLabel) === HISTORY_TYPE_ATTACK_DISTRIBUTED;
+  const isParadeDistribution = normalizeLabel(typeLabel) === HISTORY_TYPE_PARADE_DISTRIBUTED;
 
   if (!isAttackDistribution && !isParadeDistribution) {
     warnings.push(`Unknown combat stats distribution type '${typeLabel}' for '${name}'`);
@@ -652,11 +679,11 @@ function fillSpecialAbilityRecord(
 ): void {
   const normalizedType = normalizeLabel(typeLabel);
   let value = newValueText || name;
-  if (normalizedType === normalizeLabel("Vorteil ge\u00e4ndert")) {
+  if (normalizedType === ADVANTAGE_CHANGED_TYPE) {
     value = `Advantage: ${value}`;
-  } else if (normalizedType === normalizeLabel("Nachteil ge\u00e4ndert")) {
+  } else if (normalizedType === HISTORY_TYPE_DISADVANTAGE_CHANGED) {
     value = `Disadvantage: ${value}`;
-  } else if (normalizedType === normalizeLabel("Beruf ge\u00e4ndert")) {
+  } else if (normalizedType === HISTORY_TYPE_PROFESSION_CHANGED) {
     value = `Profession: ${name} / ${newValueText}`;
   }
 
@@ -668,33 +695,25 @@ function fillSpecialAbilityRecord(
 
 function mapRecordType(typeLabel: string, warnings: string[]): HistoryRecordType {
   const normalized = normalizeLabel(typeLabel);
+  if (HISTORY_SPECIAL_ABILITY_TYPE_LABELS.has(normalized)) {
+    return HistoryRecordType.SPECIAL_ABILITIES_CHANGED;
+  }
   switch (normalized) {
-    case normalizeLabel("Ereignis (Berechnungspunkte)"):
+    case HISTORY_TYPE_CALCULATION_POINTS_EVENT:
       return HistoryRecordType.CALCULATION_POINTS_CHANGED;
-    case normalizeLabel("Ereignis (Basiswerte)"):
+    case HISTORY_TYPE_BASE_VALUE_EVENT:
       return HistoryRecordType.BASE_VALUE_CHANGED;
-    case normalizeLabel("Ereignis (Level Up)"):
+    case HISTORY_TYPE_LEVEL_UP_EVENT:
       return HistoryRecordType.LEVEL_UP_APPLIED;
-    case normalizeLabel("Eigenschaft gesteigert"):
+    case HISTORY_TYPE_ATTRIBUTE_CHANGED:
       return HistoryRecordType.ATTRIBUTE_CHANGED;
-    case normalizeLabel("Talent gesteigert"):
+    case HISTORY_TYPE_SKILL_CHANGED:
+    case HISTORY_TYPE_COMBAT_SKILL_CHANGED:
+    case HISTORY_TYPE_SKILL_ACTIVATED:
       return HistoryRecordType.SKILL_CHANGED;
-    case normalizeLabel("Kampftalent gesteigert"):
-      return HistoryRecordType.SKILL_CHANGED;
-    case normalizeLabel("Talent aktiviert"):
-      return HistoryRecordType.SKILL_CHANGED;
-    case normalizeLabel("AT/FK verteilt"):
+    case HISTORY_TYPE_ATTACK_DISTRIBUTED:
+    case HISTORY_TYPE_PARADE_DISTRIBUTED:
       return HistoryRecordType.COMBAT_STATS_CHANGED;
-    case normalizeLabel("PA verteilt"):
-      return HistoryRecordType.COMBAT_STATS_CHANGED;
-    case normalizeLabel("Vorteil ge\u00e4ndert"):
-    case normalizeLabel("Nachteil ge\u00e4ndert"):
-    case normalizeLabel("Beruf ge\u00e4ndert"):
-    case normalizeLabel("Hobby ge\u00e4ndert"):
-      // Creation-date entries of these types are filtered out before reaching
-      // buildHistoryRecords(). Any post-creation entries are kept as
-      // SPECIAL_ABILITIES_CHANGED records.
-      return HistoryRecordType.SPECIAL_ABILITIES_CHANGED;
     default:
       warnings.push(`Unknown history entry type '${typeLabel}', defaulting to SPECIAL_ABILITIES_CHANGED`);
       return HistoryRecordType.SPECIAL_ABILITIES_CHANGED;
@@ -706,19 +725,11 @@ function mapLearningMethod(value: string, warnings: string[]): LearningMethodStr
   if (!normalized) {
     return null;
   }
-  switch (normalized) {
-    case normalizeLabel("G\u00fcnstig").toLowerCase():
-      return "LOW_PRICED";
-    case normalizeLabel("Normal").toLowerCase():
-      return "NORMAL";
-    case normalizeLabel("Teuer").toLowerCase():
-      return "EXPENSIVE";
-    case normalizeLabel("Frei").toLowerCase():
-      return "FREE";
-    default:
-      warnings.push(`Unknown learning method '${value}', setting to null`);
-      return null;
+  const mapped = XML_LEARNING_METHOD_MAP[normalized] ?? null;
+  if (!mapped) {
+    warnings.push(`Unknown learning method '${value}', setting to null`);
   }
+  return mapped;
 }
 
 /**
@@ -726,16 +737,16 @@ function mapLearningMethod(value: string, warnings: string[]): LearningMethodStr
  * (has "Level X" in the comment and maps to a known level-up effect).
  */
 function isLevelUpBaseValueEntry(entry: HistoryEntry): boolean {
-  const typeLabel = normalizeLabel(asText(entry.type));
-  if (typeLabel !== normalizeLabel("Ereignis (Basiswerte)")) {
+  const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
+  if (typeLabel !== HISTORY_TYPE_BASE_VALUE_EVENT) {
     return false;
   }
-  const comment = asText(entry.comment);
+  const comment = asText(entry[XML_CHARACTER_SHEET_KEYS.comment]);
   const levelMatch = comment.match(LEVEL_UP_COMMENT_PATTERN);
   if (!levelMatch) {
     return false;
   }
-  const effectKind = BASE_VALUE_TO_LEVEL_UP_EFFECT[normalizeLabel(asText(entry.name))];
+  const effectKind = BASE_VALUE_TO_LEVEL_UP_EFFECT[normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.name]))];
   return !!effectKind;
 }
 
@@ -746,7 +757,7 @@ function isLevelUpBaseValueEntry(entry: HistoryEntry): boolean {
 // Assumptions:
 // - "Talent gesteigert" / "Kampftalent gesteigert" on the creation date are
 //   normal history records UNLESS the comment indicates otherwise (e.g.
-//   "Gewürfelte Begabung" / "Begabung").
+//   "Gewürfelte Begabung" / "Begabung"). TODO not correct
 // - "Eigenschaft gesteigert" on the creation date is always initial attribute
 //   allocation (no gameplay attribute increases on day one).
 // - "Talent aktiviert" on the creation date is an initial activation unless the
@@ -759,13 +770,13 @@ function getCreationDate(entries: HistoryEntry[]): string | null {
   if (entries.length === 0) {
     return null;
   }
-  return asText(entries[0].date) || null;
+  return asText(entries[0][XML_CHARACTER_SHEET_KEYS.date]) || null;
 }
 
 function getEarliestHistoryTimestamp(entries: HistoryEntry[]): string {
   let earliest: string | null = null;
   for (const entry of entries) {
-    const rawDate = asText(entry.date);
+    const rawDate = asText(entry[XML_CHARACTER_SHEET_KEYS.date]);
     if (!rawDate) {
       continue;
     }
@@ -777,28 +788,30 @@ function getEarliestHistoryTimestamp(entries: HistoryEntry[]): string {
   return earliest ?? new Date().toISOString();
 }
 
+// TODO redundant?
 function getStartAdventurePoints(entries: HistoryEntry[]): number {
   for (const entry of entries) {
-    const typeLabel = normalizeLabel(asText(entry.type));
-    const comment = normalizeLabel(asText(entry.comment));
-    if (typeLabel === normalizeLabel("Ereignis (Berechnungspunkte)") && comment === normalizeLabel("Erstellung")) {
-      return toInt(entry.new_calculation_points_available);
+    const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
+    const comment = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.comment]));
+    if (typeLabel === HISTORY_TYPE_CALCULATION_POINTS_EVENT && comment === CREATION_COMMENT) {
+      // TODO dont check for comment?!
+      return toInt(entry[XML_CHARACTER_SHEET_KEYS.newCalculationPointsAvailable]);
     }
   }
   return 0;
 }
 
 function isCreationEntry(entry: HistoryEntry, creationDate: string | null, warnings: string[]): boolean {
-  const typeLabel = normalizeLabel(asText(entry.type));
-  const comment = normalizeLabel(asText(entry.comment));
-  const date = asText(entry.date);
+  const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
+  const comment = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.comment]));
+  const date = asText(entry[XML_CHARACTER_SHEET_KEYS.date]);
   const isOnCreationDate = creationDate !== null && date === creationDate;
 
   // Vorteil/Nachteil geändert are always creation; error if post-creation
-  if (typeLabel === normalizeLabel("Vorteil geändert") || typeLabel === normalizeLabel("Nachteil geändert")) {
+  if (typeLabel === ADVANTAGE_CHANGED_TYPE || typeLabel === HISTORY_TYPE_DISADVANTAGE_CHANGED) {
     if (!isOnCreationDate) {
       warnings.push(
-        `ERROR: '${asText(entry.type)}' entry found after creation date (${date}): '${asText(entry.new_value)}'. ` +
+        `ERROR: '${asText(entry[XML_CHARACTER_SHEET_KEYS.type])}' entry found after creation date (${date}): '${asText(entry[XML_CHARACTER_SHEET_KEYS.newValue])}'. ` +
           `These entries must only appear during character creation.`,
       );
     }
@@ -806,7 +819,7 @@ function isCreationEntry(entry: HistoryEntry, creationDate: string | null, warni
   }
 
   // Beruf/Hobby geändert are always creation
-  if (typeLabel === normalizeLabel("Beruf geändert") || typeLabel === normalizeLabel("Hobby geändert")) {
+  if (typeLabel === HISTORY_TYPE_PROFESSION_CHANGED || typeLabel === HISTORY_TYPE_HOBBY_CHANGED) {
     return true;
   }
 
@@ -816,23 +829,23 @@ function isCreationEntry(entry: HistoryEntry, creationDate: string | null, warni
   }
 
   // Initial AP grant (comment "Erstellung")
-  if (typeLabel === normalizeLabel("Ereignis (Berechnungspunkte)") && comment === normalizeLabel("Erstellung")) {
+  if (typeLabel === HISTORY_TYPE_CALCULATION_POINTS_EVENT && comment === CREATION_COMMENT) {
     return true;
   }
 
   // Initial attribute allocation
-  if (typeLabel === normalizeLabel("Eigenschaft gesteigert")) {
+  if (typeLabel === HISTORY_TYPE_ATTRIBUTE_CHANGED) {
     return true;
   }
 
   // Talent activations that are NOT special events (SE:)
-  if (typeLabel === normalizeLabel("Talent aktiviert")) {
-    return !comment.toLowerCase().startsWith("se:");
+  if (typeLabel === HISTORY_TYPE_SKILL_ACTIVATED) {
+    return !comment.toLowerCase().startsWith(SPECIAL_EVENT_COMMENT_PREFIX);
   }
 
   // Initial combat skill values: comment contains "Begabung" (matches
   // "Gewürfelte Begabung", "Begabung", and variants)
-  if (comment.toLowerCase().includes("begabung")) {
+  if (comment.toLowerCase().includes(SPECIAL_EVENT_COMMENT_KEYWORDS.begabung)) {
     return true;
   }
 

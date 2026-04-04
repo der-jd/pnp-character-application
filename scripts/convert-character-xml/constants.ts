@@ -2,6 +2,7 @@ import {
   AdvantagesNames,
   type CombatSkillName,
   DisadvantagesNames,
+  type LearningMethodString,
   type LevelUpEffectKind,
   type SkillNameWithCategory,
 } from "api-spec";
@@ -10,6 +11,70 @@ import { normalizeLabel } from "./xml-utils.js";
 export const CHARACTERS_TABLE_PREFIX = "pnp-app-characters";
 export const HISTORY_TABLE_PREFIX = "pnp-app-characters-history";
 export const REGION = "eu-central-1";
+
+export const XML_ROOT_NODE_NAMES = ["character_sheet", "characterSheet"] as const;
+
+export const XML_CHARACTER_SHEET_KEYS = {
+  history: "history",
+  entry: "entry",
+  calculationPoints: "calculation_points",
+  attributePoints: "attribute_points",
+  additional: "additional",
+  spent: "spent",
+  adventurePoints: "adventure_points",
+  total: "total",
+  generalInformation: "general_information",
+  name: "name",
+  sex: "sex",
+  level: "level",
+  birthday: "birthday",
+  birthplace: "birthplace",
+  size: "size",
+  weight: "weight",
+  hairColor: "hair_color",
+  eyeColor: "eye_color",
+  residence: "residence",
+  appearance: "appearance",
+  languagesScripts: "languages_scripts",
+  languageScript: "language_script",
+  specialCharacteristics: "special_characteristics",
+  profession: "profession",
+  skill: "skill",
+  hobby: "hobby",
+  advantages: "advantages",
+  advantage: "advantage",
+  disadvantages: "disadvantages",
+  disadvantage: "disadvantage",
+  attributes: "attributes",
+  baseValues: "base_values",
+  basePoints: "base_points",
+  start: "start",
+  current: "current",
+  mod: "mod",
+  bought: "bought",
+  skills: "skills",
+  activatedSkills: "activated_skills",
+  activated: "activated",
+  totalCosts: "total_costs",
+  taw: "taw",
+  combatSkills: "combat_skills",
+  melee: "melee",
+  ranged: "ranged",
+  ability: "ability",
+  handling: "handling",
+  atDistributed: "at_distributed",
+  fkDistributed: "fk_distributed",
+  paDistributed: "pa_distributed",
+  type: "type",
+  comment: "comment",
+  oldValue: "old_value",
+  newValue: "new_value",
+  date: "date",
+  increaseMode: "increase_mode",
+  calculationPointsChange: "calculation_points_change",
+  oldCalculationPointsAvailable: "old_calculation_points_available",
+  newCalculationPointsAvailable: "new_calculation_points_available",
+} as const;
 
 export const MAX_ITEM_SIZE = 200 * 1024; // 200 KB, matches backend/src/lambdas/add-history-record/index.ts
 
@@ -147,15 +212,55 @@ export const COMBAT_SKILL_MAP: Record<string, CombatSkillName> = {
 
 export const GEWUERFELTE_BEGABUNG_COMMENT = normalizeLabel("Gewürfelte Begabung");
 export const HISTORY_TYPE_CALCULATION_POINTS_EVENT = normalizeLabel("Ereignis (Berechnungspunkte)");
+export const HISTORY_TYPE_BASE_VALUE_EVENT = normalizeLabel("Ereignis (Basiswerte)");
+export const HISTORY_TYPE_LEVEL_UP_EVENT = normalizeLabel("Ereignis (Level Up)");
+export const HISTORY_TYPE_ATTRIBUTE_CHANGED = normalizeLabel("Eigenschaft gesteigert");
+export const HISTORY_TYPE_SKILL_CHANGED = normalizeLabel("Talent gesteigert");
+export const HISTORY_TYPE_SKILL_ACTIVATED = normalizeLabel("Talent aktiviert");
+export const HISTORY_TYPE_COMBAT_SKILL_CHANGED = normalizeLabel("Kampftalent gesteigert");
+export const HISTORY_TYPE_ATTACK_DISTRIBUTED = normalizeLabel("AT/FK verteilt");
+export const HISTORY_TYPE_PARADE_DISTRIBUTED = normalizeLabel("PA verteilt");
+export const ADVANTAGE_CHANGED_TYPE = normalizeLabel("Vorteil geändert");
+export const HISTORY_TYPE_DISADVANTAGE_CHANGED = normalizeLabel("Nachteil geändert");
+export const HISTORY_TYPE_PROFESSION_CHANGED = normalizeLabel("Beruf geändert");
+export const HISTORY_TYPE_HOBBY_CHANGED = normalizeLabel("Hobby geändert");
+export const HISTORY_TYPE_LANGUAGE_SCRIPT_CHANGED = normalizeLabel("Sprache/Schrift geändert");
 export const HISTORY_NAME_ADVENTURE_POINTS = normalizeLabel("Abenteuerpunkte (AP)");
 export const HISTORY_NAME_ADVENTURE_POINTS_KEYWORD = normalizeLabel("Abenteuer");
-export const COMBAT_SKILL_HISTORY_TYPE_LABELS = new Set([normalizeLabel("Kampftalent gesteigert")]);
-export const IGNORED_HISTORY_TYPES = new Set([normalizeLabel("Sprache/Schrift geändert")]);
-export const IGNORED_HISTORY_TYPES_WITH_WARNING = new Set([normalizeLabel("Sprache/Schrift geändert")]);
-export const ADVANTAGE_CHANGED_TYPE = normalizeLabel("Vorteil geändert");
+export const COMBAT_SKILL_HISTORY_TYPE_LABELS = new Set([HISTORY_TYPE_COMBAT_SKILL_CHANGED]);
+export const HISTORY_SKILL_INCREASE_TYPE_LABELS = new Set([
+  HISTORY_TYPE_SKILL_CHANGED,
+  HISTORY_TYPE_COMBAT_SKILL_CHANGED,
+]);
+// TODO check if needed
+export const HISTORY_SPECIAL_ABILITY_TYPE_LABELS = new Set([
+  ADVANTAGE_CHANGED_TYPE,
+  HISTORY_TYPE_DISADVANTAGE_CHANGED,
+  HISTORY_TYPE_PROFESSION_CHANGED,
+  HISTORY_TYPE_HOBBY_CHANGED,
+]);
+export const IGNORED_HISTORY_TYPES = new Set([HISTORY_TYPE_LANGUAGE_SCRIPT_CHANGED]);
+export const IGNORED_HISTORY_TYPES_WITH_WARNING = new Set([HISTORY_TYPE_LANGUAGE_SCRIPT_CHANGED]);
 export const STUDIUM_NAME = normalizeLabel("Studium");
 export const DEFAULT_GENERAL_INFORMATION_SKILL = "body/athletics" as SkillNameWithCategory;
 export const LEVEL_UP_COMMENT_PATTERN = /level\s*(\d+)/i;
+export const CREATION_COMMENT = normalizeLabel("Erstellung"); // TODO check if needed
+export const SPECIAL_EVENT_COMMENT_PREFIX = "se:";
+export const SPECIAL_EVENT_COMMENT_KEYWORDS = {
+  studium: STUDIUM_NAME.toLowerCase(),
+  abitur: normalizeLabel("Abitur").toLowerCase(),
+  begabung: normalizeLabel("Begabung").toLowerCase(),
+} as const;
+export const CALCULATION_POINTS_ATTRIBUTE_KEYWORDS = ["attribut", "eigenschaft"] as const;
+export const XML_HOBBY_NAME_TO_SKILL = new Map<string, SkillNameWithCategory>([
+  [normalizeLabel("Jiu-Jitsu"), "combat/martialArts"],
+]);
+export const XML_LEARNING_METHOD_MAP: Record<string, LearningMethodString> = {
+  [normalizeLabel("Günstig").toLowerCase()]: "LOW_PRICED",
+  [normalizeLabel("Normal").toLowerCase()]: "NORMAL",
+  [normalizeLabel("Teuer").toLowerCase()]: "EXPENSIVE",
+  [normalizeLabel("Frei").toLowerCase()]: "FREE",
+};
 export const BASE_VALUE_TO_LEVEL_UP_EFFECT: Record<string, LevelUpEffectKind> = {
   [normalizeLabel("Lebenspunkte (LeP)")]: "hpRoll",
   [normalizeLabel("Rüstungslevel")]: "armorLevelRoll",
