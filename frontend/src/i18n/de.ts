@@ -322,6 +322,15 @@ const de = {
   levelUpApply: "Level Up anwenden",
   levelUpSuccess: "Level Up erfolgreich durchgeführt!",
   levelUpNoOptions: "Keine Level Up verfügbar.",
+  levelUpProgressTitle: "Level Up Verlauf",
+  levelUpProgressEmpty: "Noch keine Level Ups durchgeführt.",
+  levelUpProgressByLevel: "Effekte nach Level",
+  levelUpProgressSummary: "Zusammenfassung",
+  levelUpProgressLevel: "Level {0}",
+  levelUpProgressDiceResult: "Wurf: {0}",
+  levelUpProgressFirstChosen: "Erstmals gewählt: Level {0}",
+  levelUpProgressLastChosen: "Zuletzt gewählt: Level {0}",
+  levelUpProgressCount: "{0}x gewählt",
 
   // Event
   navEvent: "Ereignis hinzufügen",

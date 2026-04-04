@@ -1,13 +1,15 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { clsx } from "clsx";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import {
   LEVEL_UP_DICE_EXPRESSION,
   LEVEL_UP_DICE_MIN_TOTAL,
   LEVEL_UP_DICE_MAX_TOTAL,
   type LevelUpOption,
   type EffectByLevelUp,
+  type LevelUpProgress,
 } from "api-spec";
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
@@ -216,6 +218,102 @@ export function LevelUpPage() {
           {t("levelUpApply")}
         </Button>
       </div>
+
+      {/* Level Up Progress Tree */}
+      {character && <LevelUpProgressTree progress={character.characterSheet.generalInformation.levelUpProgress} />}
     </div>
+  );
+}
+
+function CollapsibleNode({
+  label,
+  defaultExpanded = false,
+  children,
+}: {
+  label: ReactNode;
+  defaultExpanded?: boolean;
+  children: ReactNode;
+}) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setExpanded((prev) => !prev)}
+        className="flex items-center gap-1.5 font-medium text-text-secondary hover:text-text-primary cursor-pointer select-none"
+      >
+        {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        {label}
+      </button>
+      {expanded && <div className="ml-4 border-l border-border-primary pl-3 mt-1 space-y-1">{children}</div>}
+    </div>
+  );
+}
+
+function formatEffectDetail(effect: EffectByLevelUp): string {
+  if (effect.kind === "hpRoll" || effect.kind === "armorLevelRoll") {
+    return t("levelUpProgressDiceResult", effect.roll.value);
+  }
+  if (effect.kind === "rerollUnlock") {
+    return "";
+  }
+  return `+${effect.delta}`;
+}
+
+function LevelUpProgressTree({ progress }: { progress: LevelUpProgress }) {
+  const levelEntries = Object.entries(progress.effectsByLevel).sort(([a], [b]) => Number(a) - Number(b));
+  const effectEntries = Object.entries(progress.effects) as [
+    string,
+    { selectionCount: number; firstChosenLevel: number; lastChosenLevel: number },
+  ][];
+
+  const isEmpty = levelEntries.length === 0 && effectEntries.length === 0;
+
+  return (
+    <Card>
+      <h2 className="text-lg font-semibold mb-3">{t("levelUpProgressTitle")}</h2>
+      {isEmpty ? (
+        <p className="text-text-muted text-sm">{t("levelUpProgressEmpty")}</p>
+      ) : (
+        <div className="space-y-2">
+          {levelEntries.length > 0 && (
+            <CollapsibleNode label={t("levelUpProgressByLevel")} defaultExpanded>
+              {levelEntries.map(([level, effect]) => {
+                const effectName = t(levelUpEffectKeys[effect.kind]!);
+                const detail = formatEffectDetail(effect);
+                return (
+                  <div key={level} className="flex items-center gap-2 text-sm py-0.5">
+                    <Badge variant="info">{t("levelUpProgressLevel", level)}</Badge>
+                    <span className="text-text-primary">{effectName}</span>
+                    {detail && <span className="text-text-muted">{detail}</span>}
+                  </div>
+                );
+              })}
+            </CollapsibleNode>
+          )}
+
+          {effectEntries.length > 0 && (
+            <CollapsibleNode label={t("levelUpProgressSummary")} defaultExpanded>
+              {effectEntries.map(([kind, prog]) => (
+                <CollapsibleNode
+                  key={kind}
+                  label={
+                    <span className="flex items-center gap-2">
+                      {t(levelUpEffectKeys[kind]!)}
+                      <Badge variant="default">{t("levelUpProgressCount", prog.selectionCount)}</Badge>
+                    </span>
+                  }
+                >
+                  <div className="text-sm text-text-muted space-y-0.5">
+                    <div>{t("levelUpProgressFirstChosen", prog.firstChosenLevel)}</div>
+                    <div>{t("levelUpProgressLastChosen", prog.lastChosenLevel)}</div>
+                  </div>
+                </CollapsibleNode>
+              ))}
+            </CollapsibleNode>
+          )}
+        </div>
+      )}
+    </Card>
   );
 }
