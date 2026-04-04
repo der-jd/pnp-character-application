@@ -67,17 +67,7 @@ export function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet:
 
   applyGeneralInformation(sheet, characterSheet, warnings);
 
-  const advantagesNode = asRecord(sheet.advantages);
-  const advantages = ensureArray(advantagesNode.advantage)
-    .map((name) => asText(name))
-    .filter(Boolean);
-  characterSheet.advantages = mapAdvantages(advantages, warnings);
-
-  const disadvantagesNode = asRecord(sheet.disadvantages);
-  const disadvantages = ensureArray(disadvantagesNode.disadvantage)
-    .map((name) => asText(name))
-    .filter(Boolean);
-  characterSheet.disadvantages = mapDisadvantages(disadvantages, characterSheet.generalInformation.name, warnings);
+  applyAdvantagesAndDisadvantages(sheet, characterSheet, warnings);
 
   const attributes = asRecord(sheet.attributes);
   for (const [rawName, rawValue] of Object.entries(attributes)) {
@@ -558,6 +548,24 @@ function applyGeneralInformation(sheet: XmlCharacterSheet, characterSheet: Chara
     "Profession/Hobby bonus for non-combat skills is now stored as the skill's mod value instead of being baked into the current value.",
     "Profession/Hobby bonus for combat skills is expected to already be stored in the mod value in the XML; please adjust manually if that's not the case.",
   ]);
+}
+
+function applyAdvantagesAndDisadvantages(
+  sheet: XmlCharacterSheet,
+  characterSheet: CharacterSheet,
+  warnings: string[],
+): void {
+  const advantagesNode = asRecord(sheet.advantages);
+  const advantages = ensureArray(advantagesNode.advantage)
+    .map((name) => asText(name))
+    .filter(Boolean);
+  characterSheet.advantages = mapAdvantages(advantages, warnings);
+
+  const disadvantagesNode = asRecord(sheet.disadvantages);
+  const disadvantages = ensureArray(disadvantagesNode.disadvantage)
+    .map((name) => asText(name))
+    .filter(Boolean);
+  characterSheet.disadvantages = mapDisadvantages(disadvantages, characterSheet.generalInformation.name, warnings);
 }
 
 function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): void {
