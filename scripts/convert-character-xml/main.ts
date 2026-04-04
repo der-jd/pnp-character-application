@@ -4,7 +4,7 @@ import path from "node:path";
 import { parseStringPromise } from "xml2js";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import type { HistoryEntry, XmlCharacterSheet } from "./types.js";
+import type { HistoryEntry, HistoryBlock, XmlCharacterSheet } from "./types.js";
 import { normalizeTagName, ensureArray, asRecord, findRepoRoot, flushInfoBlocks } from "./xml-utils.js";
 import { REGION, XML_CHARACTER_SHEET_KEYS, XML_ROOT_NODE_NAMES } from "./constants.js";
 import { convertCharacter } from "./character-builder.js";
@@ -109,7 +109,7 @@ export async function main(): Promise<void> {
   }
 
   // --- Phase 2: Build history (independent) ---
-  let historyBlocks: import("./types.js").HistoryBlock[] = [];
+  let historyBlocks: HistoryBlock[] = [];
   if (phase === "history" || phase === "both") {
     historyBlocks = convertHistory(rawHistoryEntries, sheet, characterId, warnings);
 
