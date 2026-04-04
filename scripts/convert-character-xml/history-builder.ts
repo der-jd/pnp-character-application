@@ -26,7 +26,6 @@ import {
   BASE_VALUE_MAP,
   COMBAT_SKILL_MAP,
   GEWUERFELTE_BEGABUNG_COMMENT,
-  COMBAT_SKILL_HISTORY_TYPE_LABELS,
   IGNORED_HISTORY_TYPES,
   IGNORED_HISTORY_TYPES_WITH_WARNING,
   LEVEL_UP_COMMENT_PATTERN,
@@ -157,7 +156,7 @@ function extractActivatedSkills(rawHistoryEntries: HistoryEntry[], warnings: str
       continue;
     }
 
-    let mapped: SkillNameWithCategory | null = null;
+    let mapped: SkillNameWithCategory | null;
     if (label.includes("/")) {
       mapped = label as SkillNameWithCategory;
     } else {

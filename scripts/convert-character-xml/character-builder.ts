@@ -1,10 +1,4 @@
-import {
-  AdvantagesNames,
-  type Character,
-  type CharacterSheet,
-  type SkillNameWithCategory,
-  characterSchema,
-} from "api-spec";
+import { AdvantagesNames, type Character, type CharacterSheet, characterSchema } from "api-spec";
 import type { XmlCharacterSheet, HistoryEntry } from "./types.js";
 import { normalizeLabel, asText, toInt, queueInfoBlock } from "./xml-utils.js";
 import { ADVANTAGE_CHANGED_TYPE, STUDIUM_NAME } from "./constants.js";
