@@ -326,13 +326,16 @@ function buildCharacterCreatedRecord(
     }
   }
 
-  // Reset base values: keep start and mod, clear byLvlUp, recalculate is not
-  // worth it here — this is a non-revertable legacy record for display only.
+  // Reset base values to creation state: keep start and mod (mod may be
+  // non-zero from advantages, disadvantages, profession, hobby, etc.),
+  // but zero out formula and level-up contributions.
+  // This is a non-revertable legacy record for display only.
   const initialBaseValues = structuredClone(characterSheet.baseValues);
   for (const key of Object.keys(initialBaseValues) as (keyof typeof initialBaseValues)[]) {
     const bv = initialBaseValues[key];
-    bv.current = bv.start + (bv.mod ?? 0) + (bv.byFormula ?? 0);
     delete bv.byLvlUp;
+    delete bv.byFormula;
+    bv.current = bv.start + (bv.mod ?? 0);
   }
 
   // Reset combat stats to initial handling values
