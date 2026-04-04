@@ -284,6 +284,108 @@ type HistoryEntry = Record<string, unknown>;
 
 type CombatCategory = keyof CombatSection;
 
+// ---------------------------------------------------------------------------
+// Phase 1 — Build the character JSON from the XML sheet and history metadata.
+// ---------------------------------------------------------------------------
+
+interface ConvertCharacterResult {
+  character: Character;
+  warnings: string[];
+  activatedSkills: SkillNameWithCategory[];
+  levelUpEffects: Record<string, EffectByLevelUp>;
+  /** Raw history entries from the XML (unmodified). */
+  rawHistoryEntries: HistoryEntry[];
+  /** History entries after aggregating combat skill mod entries. */
+  historyEntries: HistoryEntry[];
+}
+
+function convertCharacter(
+  sheet: XmlCharacterSheet,
+  rawHistoryEntries: HistoryEntry[],
+  userId: string,
+  characterId: string,
+): ConvertCharacterResult {
+  const { characterSheet, warnings } = buildCharacterSheet(sheet);
+  const activatedSkills = extractActivatedSkills(sheet, warnings);
+
+  const collegeSkillName = extractCollegeSkillName(rawHistoryEntries);
+  patchCollegeEducationSkillName(characterSheet, collegeSkillName, warnings);
+
+  const character: Character = {
+    userId,
+    characterId,
+    characterSheet,
+    rulesetVersion: "1.0.0",
+  };
+
+  characterSchema.parse(character);
+
+  const historyEntries = aggregateCombatSkillModEntries(rawHistoryEntries, warnings);
+
+  const startAP = getStartAdventurePoints(rawHistoryEntries);
+  characterSheet.calculationPoints.adventurePoints.start = startAP;
+
+  const lastAPFromHistory = getLastAdventurePointsAvailable(rawHistoryEntries);
+  const computedAP = characterSheet.calculationPoints.adventurePoints.available;
+  if (lastAPFromHistory !== null && lastAPFromHistory !== computedAP) {
+    warnings.push(
+      `Adventure points mismatch: computed from totalCost = ${computedAP}, last history entry = ${lastAPFromHistory}`,
+    );
+  }
+
+  const levelUpEffects = extractLevelUpEffects(historyEntries);
+  characterSheet.generalInformation.levelUpProgress = buildLevelUpProgressFromEffects(levelUpEffects);
+
+  return { character, warnings, activatedSkills, levelUpEffects, rawHistoryEntries, historyEntries };
+}
+
+// ---------------------------------------------------------------------------
+// Phase 2 — Build the history blocks from the XML history and Phase 1 output.
+// ---------------------------------------------------------------------------
+
+type HistoryBlock = {
+  blockNumber: number;
+  blockId: string;
+  previousBlockId: string | null;
+  characterId: string;
+  changes: HistoryRecord[];
+};
+
+function convertHistory(
+  rawHistoryEntries: HistoryEntry[],
+  historyEntries: HistoryEntry[],
+  character: Character,
+  activatedSkills: SkillNameWithCategory[],
+  levelUpEffects: Record<string, EffectByLevelUp>,
+  warnings: string[],
+): HistoryBlock[] {
+  const { characterSheet } = character;
+  const creationDate = getCreationDate(rawHistoryEntries);
+  const postCreationEntries = filterCreationEntries(historyEntries, creationDate, warnings);
+
+  const creationTimestamp = getEarliestHistoryTimestamp(rawHistoryEntries);
+  const creationRecord = buildCharacterCreatedRecord(characterSheet, activatedSkills, creationTimestamp);
+  const subsequentRecords = buildHistoryRecords(
+    postCreationEntries,
+    characterSheet,
+    warnings,
+    levelUpEffects,
+    creationRecord.number + 1,
+  );
+  const records = [creationRecord, ...subsequentRecords];
+
+  const historyBlocks = buildHistoryBlocks(records, character.characterId);
+  for (const block of historyBlocks) {
+    historyBlockSchema.parse(block);
+  }
+
+  return historyBlocks;
+}
+
+// ---------------------------------------------------------------------------
+// CLI entry point — orchestrates Phase 1, Phase 2, file I/O, and upload.
+// ---------------------------------------------------------------------------
+
 async function main(): Promise<void> {
   const argv = await yargs(hideBin(process.argv))
     .option("input", {
@@ -338,6 +440,7 @@ async function main(): Promise<void> {
     .strict()
     .parse();
 
+  // --- Parse XML ---
   const inputPath = path.resolve(argv.input);
   const repoRoot = await findRepoRoot(process.cwd());
   const defaultOutDir = path.join(repoRoot, "tmp", "xml-conversion");
@@ -353,54 +456,28 @@ async function main(): Promise<void> {
   });
 
   const sheet = asRecord(parsed.character_sheet ?? parsed.characterSheet ?? parsed);
-
-  const { characterSheet, warnings } = buildCharacterSheet(sheet);
-  const activatedSkills = extractActivatedSkills(sheet, warnings);
-
   const historyNode = asRecord(sheet.history);
   const rawHistoryEntries = ensureArray(historyNode.entry) as HistoryEntry[];
 
-  const collegeSkillName = extractCollegeSkillName(rawHistoryEntries);
-  patchCollegeEducationSkillName(characterSheet, collegeSkillName, warnings);
-
-  const character: Character = {
+  // --- Phase 1: Build character ---
+  const { character, warnings, activatedSkills, levelUpEffects, historyEntries } = convertCharacter(
+    sheet,
+    rawHistoryEntries,
     userId,
     characterId,
-    characterSheet,
-    rulesetVersion: "1.0.0",
-  };
-
-  characterSchema.parse(character);
-  const historyEntries = aggregateCombatSkillModEntries(rawHistoryEntries, warnings);
-
-  const startAP = getStartAdventurePoints(rawHistoryEntries);
-  characterSheet.calculationPoints.adventurePoints.start = startAP;
-
-  const lastAPFromHistory = getLastAdventurePointsAvailable(rawHistoryEntries);
-  const computedAP = characterSheet.calculationPoints.adventurePoints.available;
-  if (lastAPFromHistory !== null && lastAPFromHistory !== computedAP) {
-    warnings.push(
-      `Adventure points mismatch: computed from totalCost = ${computedAP}, last history entry = ${lastAPFromHistory}`,
-    );
-  }
-  characterSheet.generalInformation.levelUpProgress = buildLevelUpProgressFromHistory(historyEntries);
-  const creationDate = getCreationDate(rawHistoryEntries);
-  const postCreationEntries = filterCreationEntries(historyEntries, creationDate, warnings);
-  const creationTimestamp = getEarliestHistoryTimestamp(rawHistoryEntries);
-  const creationRecord = buildCharacterCreatedRecord(characterSheet, activatedSkills, creationTimestamp);
-  const subsequentRecords = buildHistoryRecords(
-    postCreationEntries,
-    characterSheet,
-    warnings,
-    creationRecord.number + 1,
   );
-  const records = [creationRecord, ...subsequentRecords];
 
-  const historyBlocks = buildHistoryBlocks(records, characterId);
-  for (const block of historyBlocks) {
-    historyBlockSchema.parse(block);
-  }
+  // --- Phase 2: Build history ---
+  const historyBlocks = convertHistory(
+    rawHistoryEntries,
+    historyEntries,
+    character,
+    activatedSkills,
+    levelUpEffects,
+    warnings,
+  );
 
+  // --- Write output files ---
   await fs.mkdir(outDir, { recursive: true });
 
   const characterOutPath = path.join(outDir, "character.json");
@@ -420,6 +497,7 @@ async function main(): Promise<void> {
   console.log(`Character JSON written to ${characterOutPath}`);
   console.log(`History blocks written to ${outDir}`);
 
+  // --- Optional DynamoDB upload ---
   if (argv.upload) {
     const envName = argv.env as string;
     const awsProfile = argv["aws-profile"] as string;
@@ -1344,6 +1422,7 @@ function buildHistoryRecords(
   entries: HistoryEntry[],
   characterSheet: CharacterSheet,
   warnings: string[],
+  levelUpEffects: Record<string, EffectByLevelUp>,
   startingNumber = 1,
 ): HistoryRecord[] {
   const records: HistoryRecord[] = [];
@@ -1358,6 +1437,9 @@ function buildHistoryRecords(
     runningTotal: characterSheet.calculationPoints.attributePoints.start,
   };
 
+  // Running level-up progress state, built incrementally as level-up records are processed
+  const runningLevelUpEffects: Record<string, EffectByLevelUp> = {};
+
   for (const entry of entries) {
     const typeLabel = normalizeLabel(asText(entry.type));
     if (IGNORED_HISTORY_TYPES.has(typeLabel)) {
@@ -1368,6 +1450,12 @@ function buildHistoryRecords(
       }
       continue;
     }
+
+    // Skip base value entries that belong to level-ups (they are absorbed into the LEVEL_UP_APPLIED record)
+    if (isLevelUpBaseValueEntry(entry)) {
+      continue;
+    }
+
     const name = asText(entry.name);
     const oldValueText = asText(entry.old_value);
     const newValueText = asText(entry.new_value);
@@ -1402,7 +1490,7 @@ function buildHistoryRecords(
         fillBaseValueRecord(record, name, oldValueText, newValueText, characterSheet, warnings);
         break;
       case HistoryRecordType.LEVEL_UP_APPLIED:
-        fillLevelUpRecord(record, oldValueText, newValueText);
+        fillLevelUpRecord(record, oldValueText, newValueText, levelUpEffects, runningLevelUpEffects);
         break;
       case HistoryRecordType.ATTRIBUTE_CHANGED:
         fillAttributeRecord(record, name, oldValueText, newValueText, characterSheet, warnings);
@@ -1464,6 +1552,22 @@ function buildCharacterCreatedRecord(
   activatedSkills: SkillNameWithCategory[],
   timestamp: string,
 ): HistoryRecord {
+  const startAP = characterSheet.calculationPoints.adventurePoints.start;
+  const startAttr = characterSheet.calculationPoints.attributePoints.start;
+
+  const creationCharacterSheet: CharacterSheet = {
+    ...characterSheet,
+    generalInformation: {
+      ...characterSheet.generalInformation,
+      level: 1,
+      levelUpProgress: levelUpProgressSchema.parse({}),
+    },
+    calculationPoints: {
+      adventurePoints: { start: startAP, available: startAP, total: startAP },
+      attributePoints: { start: startAttr, available: startAttr, total: startAttr },
+    },
+  };
+
   return {
     type: HistoryRecordType.CHARACTER_CREATED,
     name: characterSheet.generalInformation.name || "Character Created",
@@ -1471,7 +1575,7 @@ function buildCharacterCreatedRecord(
     id: crypto.randomUUID(),
     data: {
       new: {
-        character: characterSheet,
+        character: creationCharacterSheet,
         generationPoints: calculateGenerationPoints(characterSheet),
         activatedSkills,
       },
@@ -1500,12 +1604,12 @@ function calculateGenerationPoints(characterSheet: CharacterSheet): {
   };
 }
 
-function buildLevelUpProgressFromHistory(entries: HistoryEntry[]): LevelUpProgress {
-  const progress = levelUpProgressSchema.parse({});
+/**
+ * Extracts a map of level → EffectByLevelUp from the old history's "Ereignis (Basiswerte)" entries
+ * that have a "Level X" comment pattern.
+ */
+function extractLevelUpEffects(entries: HistoryEntry[]): Record<string, EffectByLevelUp> {
   const effectsByLevel: Record<string, EffectByLevelUp> = {};
-  const summaries: Partial<
-    Record<LevelUpEffectKind, { selectionCount: number; firstChosenLevel: number; lastChosenLevel: number }>
-  > = {};
 
   for (const entry of entries) {
     const typeLabel = normalizeLabel(asText(entry.type));
@@ -1557,14 +1661,26 @@ function buildLevelUpProgressFromHistory(entries: HistoryEntry[]): LevelUpProgre
     if (!(levelKey in effectsByLevel)) {
       effectsByLevel[levelKey] = effect;
     }
+  }
 
-    const summary = summaries[effectKind];
+  return effectsByLevel;
+}
+
+function buildLevelUpProgressFromEffects(effectsByLevel: Record<string, EffectByLevelUp>): LevelUpProgress {
+  const progress = levelUpProgressSchema.parse({});
+  const summaries: Partial<
+    Record<LevelUpEffectKind, { selectionCount: number; firstChosenLevel: number; lastChosenLevel: number }>
+  > = {};
+
+  for (const [levelKey, effect] of Object.entries(effectsByLevel)) {
+    const level = Number.parseInt(levelKey, 10);
+    const summary = summaries[effect.kind];
     if (summary) {
       summary.selectionCount += 1;
       summary.lastChosenLevel = Math.max(summary.lastChosenLevel, level);
       summary.firstChosenLevel = Math.min(summary.firstChosenLevel, level);
     } else {
-      summaries[effectKind] = {
+      summaries[effect.kind] = {
         selectionCount: 1,
         firstChosenLevel: level,
         lastChosenLevel: level,
@@ -1575,6 +1691,24 @@ function buildLevelUpProgressFromHistory(entries: HistoryEntry[]): LevelUpProgre
   progress.effectsByLevel = effectsByLevel;
   progress.effects = summaries as LevelUpProgress["effects"];
   return progress;
+}
+
+/**
+ * Returns true if this "Ereignis (Basiswerte)" entry belongs to a level-up
+ * (has "Level X" in the comment and maps to a known level-up effect).
+ */
+function isLevelUpBaseValueEntry(entry: HistoryEntry): boolean {
+  const typeLabel = normalizeLabel(asText(entry.type));
+  if (typeLabel !== normalizeLabel("Ereignis (Basiswerte)")) {
+    return false;
+  }
+  const comment = asText(entry.comment);
+  const levelMatch = comment.match(LEVEL_UP_COMMENT_PATTERN);
+  if (!levelMatch) {
+    return false;
+  }
+  const effectKind = BASE_VALUE_TO_LEVEL_UP_EFFECT[normalizeLabel(asText(entry.name))];
+  return !!effectKind;
 }
 
 function mapRecordType(typeLabel: string, warnings: string[]): HistoryRecordType {
@@ -1694,12 +1828,30 @@ function fillBaseValueRecord(
   record.data.new = { baseValue: newValue };
 }
 
-function fillLevelUpRecord(record: HistoryRecord, oldValueText: string, newValueText: string): void {
+function fillLevelUpRecord(
+  record: HistoryRecord,
+  oldValueText: string,
+  newValueText: string,
+  levelUpEffects: Record<string, EffectByLevelUp>,
+  runningLevelUpEffects: Record<string, EffectByLevelUp>,
+): void {
   const oldLevel = toInt(oldValueText);
   const newLevel = toInt(newValueText);
-  const progress = levelUpProgressSchema.parse({});
-  record.data.old = { level: oldLevel, levelUpProgress: progress };
-  record.data.new = { level: newLevel, levelUpProgress: progress };
+
+  // Build the old progress from the current running state (before this level-up)
+  const oldProgress = buildLevelUpProgressFromEffects({ ...runningLevelUpEffects });
+
+  // Add the effect for the new level to the running state
+  const newLevelKey = String(newLevel);
+  if (newLevelKey in levelUpEffects) {
+    runningLevelUpEffects[newLevelKey] = levelUpEffects[newLevelKey];
+  }
+
+  // Build the new progress from the updated running state (after this level-up)
+  const newProgress = buildLevelUpProgressFromEffects({ ...runningLevelUpEffects });
+
+  record.data.old = { level: oldLevel, levelUpProgress: oldProgress };
+  record.data.new = { level: newLevel, levelUpProgress: newProgress };
 }
 
 function fillAttributeRecord(
@@ -1993,23 +2145,8 @@ function estimateItemSize(item: unknown): number {
   return Buffer.byteLength(json, "utf8");
 }
 
-function buildHistoryBlocks(
-  records: HistoryRecord[],
-  characterId: string,
-): Array<{
-  blockNumber: number;
-  blockId: string;
-  previousBlockId: string | null;
-  characterId: string;
-  changes: HistoryRecord[];
-}> {
-  const blocks: Array<{
-    blockNumber: number;
-    blockId: string;
-    previousBlockId: string | null;
-    characterId: string;
-    changes: HistoryRecord[];
-  }> = [];
+function buildHistoryBlocks(records: HistoryRecord[], characterId: string): HistoryBlock[] {
+  const blocks: HistoryBlock[] = [];
 
   let blockNumber = 1;
   let previousBlockId: string | null = null;
@@ -2054,13 +2191,7 @@ function createHistoryBlock(characterId: string, blockNumber: number, previousBl
 
 async function uploadToDynamoDB(
   character: Character,
-  historyBlocks: Array<{
-    blockNumber: number;
-    blockId: string;
-    previousBlockId: string | null;
-    characterId: string;
-    changes: HistoryRecord[];
-  }>,
+  historyBlocks: HistoryBlock[],
   envName: string,
   awsProfile: string,
   awsRegion: string,
