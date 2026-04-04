@@ -6,11 +6,13 @@ import {
   type LevelUpEffectKind,
   type SkillNameWithCategory,
 } from "api-spec";
+import backendPackage from "../../backend/package.json";
 import { normalizeLabel } from "./xml-utils.js";
 
 export const CHARACTERS_TABLE_PREFIX = "pnp-app-characters";
 export const HISTORY_TABLE_PREFIX = "pnp-app-characters-history";
 export const REGION = "eu-central-1";
+export const RULESET_VERSION = backendPackage.version;
 
 export const XML_ROOT_NODE_NAMES = ["character_sheet", "characterSheet"] as const;
 
@@ -232,20 +234,13 @@ export const HISTORY_SKILL_INCREASE_TYPE_LABELS = new Set([
   HISTORY_TYPE_SKILL_CHANGED,
   HISTORY_TYPE_COMBAT_SKILL_CHANGED,
 ]);
-// TODO check if needed
-export const HISTORY_SPECIAL_ABILITY_TYPE_LABELS = new Set([
-  ADVANTAGE_CHANGED_TYPE,
-  HISTORY_TYPE_DISADVANTAGE_CHANGED,
-  HISTORY_TYPE_PROFESSION_CHANGED,
-  HISTORY_TYPE_HOBBY_CHANGED,
-]);
 export const IGNORED_HISTORY_TYPES = new Set([HISTORY_TYPE_LANGUAGE_SCRIPT_CHANGED]);
 export const IGNORED_HISTORY_TYPES_WITH_WARNING = new Set([HISTORY_TYPE_LANGUAGE_SCRIPT_CHANGED]);
 export const STUDIUM_NAME = normalizeLabel("Studium");
 export const DEFAULT_GENERAL_INFORMATION_SKILL = "body/athletics" as SkillNameWithCategory;
 export const LEVEL_UP_COMMENT_PATTERN = /level\s*(\d+)/i;
-export const CREATION_COMMENT = normalizeLabel("Erstellung"); // TODO check if needed
-export const SPECIAL_EVENT_COMMENT_PREFIX = "se:";
+export const CREATION_COMMENT = normalizeLabel("Erstellung");
+export const SPECIAL_EXPERIENCE_COMMENT_PREFIX = "se:";
 export const SPECIAL_EVENT_COMMENT_KEYWORDS = {
   studium: STUDIUM_NAME.toLowerCase(),
   abitur: normalizeLabel("Abitur").toLowerCase(),

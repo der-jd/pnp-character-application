@@ -8,6 +8,7 @@ import {
   type CombatSkillName,
   type CombatStats,
   CostCategory,
+  DEFAULT_START_ADVENTURE_POINTS,
   DisadvantagesNames,
   type EffectByLevelUp,
   GENERATION_POINTS,
@@ -53,7 +54,9 @@ import {
   FEAR_OF_COST_BY_LABEL,
   FEAR_OF_DETAIL_BY_CHARACTER_HASH,
   DEFAULT_GENERAL_INFORMATION_SKILL,
+  HISTORY_NAME_ADVENTURE_POINTS,
   HISTORY_TYPE_BASE_VALUE_EVENT,
+  HISTORY_TYPE_CALCULATION_POINTS_EVENT,
   LEVEL_UP_COMMENT_PATTERN,
   BASE_VALUE_TO_LEVEL_UP_EFFECT,
   XML_CHARACTER_SHEET_KEYS,
@@ -326,11 +329,7 @@ export function aggregateCombatSkillModEntries(entries: HistoryEntry[], warnings
   }, []);
 }
 
-// ---------------------------------------------------------------------------
-// Private helpers
-// ---------------------------------------------------------------------------
-
-function createEmptyCharacterSheet(): CharacterSheet {
+export function createEmptyCharacterSheet(): CharacterSheet {
   const zeroAttribute = () => ({ start: 0, current: 0, mod: 0, totalCost: 0 });
   const zeroBaseValue = (): BaseValue => ({ start: 0, current: 0, mod: 0 });
   const zeroSkill = (skill: SkillNameWithCategory): Skill => ({
@@ -429,6 +428,136 @@ function createEmptyCharacterSheet(): CharacterSheet {
     },
   };
 }
+
+/**
+ * Returns the start adventure points from the first adventure points entry in the history.
+ * Assumes the first matching entry represents the initial AP allocation at character creation.
+ */
+export function getStartAdventurePoints(entries: HistoryEntry[]): number {
+  for (const entry of entries) {
+    const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
+    const name = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.name]));
+    if (typeLabel === HISTORY_TYPE_CALCULATION_POINTS_EVENT && name === HISTORY_NAME_ADVENTURE_POINTS) {
+      return toInt(entry[XML_CHARACTER_SHEET_KEYS.newCalculationPointsAvailable]);
+    }
+  }
+  return DEFAULT_START_ADVENTURE_POINTS;
+}
+
+// Keep in sync with backend/src/core/rules/base-value-formulas.ts
+export function calculateBaseValueByFormula(
+  baseValueName: keyof BaseValues,
+  attributes: Attributes,
+): number | undefined {
+  const attr = (name: keyof Attributes) => attributes[name].current + attributes[name].mod;
+
+  switch (baseValueName) {
+    case "healthPoints":
+      return 2 * attr("endurance") + attr("strength") + 20;
+    case "mentalHealth":
+      return attr("courage") + 2 * attr("mentalResilience") + 8;
+    case "initiativeBaseValue":
+      return (2 * attr("courage") + attr("dexterity") + attr("endurance")) / 5;
+    case "attackBaseValue":
+      return (10 * (attr("courage") + attr("dexterity") + attr("strength"))) / 5;
+    case "paradeBaseValue":
+      return (10 * (attr("endurance") + attr("dexterity") + attr("strength"))) / 5;
+    case "rangedAttackBaseValue":
+      return (10 * (attr("concentration") + attr("dexterity") + attr("strength"))) / 5;
+    case "legendaryActions":
+      return 1;
+    default:
+      return undefined;
+  }
+}
+
+export function mapAdvantages(advantages: string[], warnings: string[]): CharacterSheet["advantages"] {
+  const result: CharacterSheet["advantages"] = [];
+  for (const rawName of advantages) {
+    const normalized = normalizeLabel(rawName);
+    const enumValue = ADVANTAGE_MAP[normalized];
+    if (enumValue === undefined) {
+      warnings.push(`Unknown advantage '${rawName}', skipping`);
+      continue;
+    }
+    const defaultEntry = ADVANTAGES.find(([name]) => name === enumValue);
+    if (!defaultEntry) {
+      warnings.push(`No default advantage cost found for '${rawName}', skipping`);
+      continue;
+    }
+    const [, info, value] = defaultEntry;
+    result.push([enumValue, info, value]);
+  }
+  return result;
+}
+
+export function mapDisadvantages(
+  disadvantages: string[],
+  characterName: string,
+  warnings: string[],
+): CharacterSheet["disadvantages"] {
+  const result: CharacterSheet["disadvantages"] = [];
+  const fearOfDetails = FEAR_OF_DETAIL_BY_CHARACTER_HASH[hashCharacterName(characterName)] ?? {};
+  for (const rawName of disadvantages) {
+    const normalized = normalizeLabel(rawName);
+    const enumValue = DISADVANTAGE_MAP[normalized];
+    if (enumValue === undefined) {
+      warnings.push(`Unknown disadvantage '${rawName}', skipping`);
+      continue;
+    }
+
+    let defaultEntry = DISADVANTAGES.find(([name]) => name === enumValue);
+    if (enumValue === DisadvantagesNames.FEAR_OF) {
+      const fearCost = FEAR_OF_COST_BY_LABEL[normalized];
+      defaultEntry =
+        DISADVANTAGES.find(([name, , value]) => name === enumValue && value === (fearCost ?? 5)) ?? defaultEntry;
+    }
+
+    if (!defaultEntry) {
+      warnings.push(`No default disadvantage cost found for '${rawName}', skipping`);
+      continue;
+    }
+    const [, info, value] = defaultEntry;
+    let infoOverride = info;
+    if (enumValue === DisadvantagesNames.FEAR_OF) {
+      const detail = fearOfDetails[normalized];
+      if (detail) {
+        warnings.push(`Applying custom FEAR_OF detail override for '${characterName}': '${rawName}' -> '${detail}'`);
+        infoOverride = detail;
+      } else {
+        infoOverride = rawName;
+        warnings.push(
+          `FEAR_OF disadvantage detected ('${rawName}'). Please manually enter the specific matter of fear in the resulting character JSON.`,
+        );
+      }
+    }
+    result.push([enumValue, infoOverride, value]);
+  }
+  return result;
+}
+
+export function mapGeneralInformationSkill(name: string): SkillNameWithCategory | null {
+  if (!name) {
+    return null;
+  }
+  if (name.includes("/")) {
+    return name as SkillNameWithCategory;
+  }
+  const normalized = normalizeLabel(name);
+  const nonCombat = NON_COMBAT_SKILL_MAP.get(normalized);
+  if (nonCombat) {
+    return nonCombat;
+  }
+  const combatSkill = COMBAT_SKILL_MAP[normalized];
+  if (combatSkill) {
+    return `combat/${combatSkill}` as SkillNameWithCategory;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Private helpers
+// ---------------------------------------------------------------------------
 
 function zeroCombatStats(name: CombatSkillName): CombatStats {
   const handling = COMBAT_SKILL_HANDLING[name];
@@ -621,30 +750,6 @@ function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterShee
   }
 }
 
-// Keep in sync with backend/src/core/rules/base-value-formulas.ts
-function calculateBaseValueByFormula(baseValueName: keyof BaseValues, attributes: Attributes): number | undefined {
-  const attr = (name: keyof Attributes) => attributes[name].current + attributes[name].mod;
-
-  switch (baseValueName) {
-    case "healthPoints":
-      return 2 * attr("endurance") + attr("strength") + 20;
-    case "mentalHealth":
-      return attr("courage") + 2 * attr("mentalResilience") + 8;
-    case "initiativeBaseValue":
-      return (2 * attr("courage") + attr("dexterity") + attr("endurance")) / 5;
-    case "attackBaseValue":
-      return (10 * (attr("courage") + attr("dexterity") + attr("strength"))) / 5;
-    case "paradeBaseValue":
-      return (10 * (attr("endurance") + attr("dexterity") + attr("strength"))) / 5;
-    case "rangedAttackBaseValue":
-      return (10 * (attr("concentration") + attr("dexterity") + attr("strength"))) / 5;
-    case "legendaryActions":
-      return 1;
-    default:
-      return undefined;
-  }
-}
-
 function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): number {
   const skillsNode = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.skills]);
   delete (skillsNode as Record<string, unknown>)[XML_CHARACTER_SHEET_KEYS.activatedSkills];
@@ -764,71 +869,6 @@ function applyCombatSkillEntry(
   return totalCost;
 }
 
-function mapAdvantages(advantages: string[], warnings: string[]): CharacterSheet["advantages"] {
-  const result: CharacterSheet["advantages"] = [];
-  for (const rawName of advantages) {
-    const normalized = normalizeLabel(rawName);
-    const enumValue = ADVANTAGE_MAP[normalized];
-    if (enumValue === undefined) {
-      warnings.push(`Unknown advantage '${rawName}', skipping`);
-      continue;
-    }
-    const defaultEntry = ADVANTAGES.find(([name]) => name === enumValue);
-    if (!defaultEntry) {
-      warnings.push(`No default advantage cost found for '${rawName}', skipping`);
-      continue;
-    }
-    const [, info, value] = defaultEntry;
-    result.push([enumValue, info, value]);
-  }
-  return result;
-}
-
-function mapDisadvantages(
-  disadvantages: string[],
-  characterName: string,
-  warnings: string[],
-): CharacterSheet["disadvantages"] {
-  const result: CharacterSheet["disadvantages"] = [];
-  const fearOfDetails = FEAR_OF_DETAIL_BY_CHARACTER_HASH[hashCharacterName(characterName)] ?? {};
-  for (const rawName of disadvantages) {
-    const normalized = normalizeLabel(rawName);
-    const enumValue = DISADVANTAGE_MAP[normalized];
-    if (enumValue === undefined) {
-      warnings.push(`Unknown disadvantage '${rawName}', skipping`);
-      continue;
-    }
-
-    let defaultEntry = DISADVANTAGES.find(([name]) => name === enumValue);
-    if (enumValue === DisadvantagesNames.FEAR_OF) {
-      const fearCost = FEAR_OF_COST_BY_LABEL[normalized];
-      defaultEntry =
-        DISADVANTAGES.find(([name, , value]) => name === enumValue && value === (fearCost ?? 5)) ?? defaultEntry;
-    }
-
-    if (!defaultEntry) {
-      warnings.push(`No default disadvantage cost found for '${rawName}', skipping`);
-      continue;
-    }
-    const [, info, value] = defaultEntry;
-    let infoOverride = info;
-    if (enumValue === DisadvantagesNames.FEAR_OF) {
-      const detail = fearOfDetails[normalized];
-      if (detail) {
-        warnings.push(`Applying custom FEAR_OF detail override for '${characterName}': '${rawName}' -> '${detail}'`);
-        infoOverride = detail;
-      } else {
-        infoOverride = rawName;
-        warnings.push(
-          `FEAR_OF disadvantage detected ('${rawName}'). Please manually enter the specific matter of fear in the resulting character JSON.`,
-        );
-      }
-    }
-    result.push([enumValue, infoOverride, value]);
-  }
-  return result;
-}
-
 function applyProfessionOrHobbyBonus(
   characterSheet: CharacterSheet,
   skillName: SkillNameWithCategory,
@@ -849,25 +889,6 @@ function applyProfessionOrHobbyBonus(
   // In the XML the bonus has been added to the current value, but in the new schema it is added to the mod value
   skill.mod += bonus;
   skill.current -= bonus;
-}
-
-function mapGeneralInformationSkill(name: string): SkillNameWithCategory | null {
-  if (!name) {
-    return null;
-  }
-  if (name.includes("/")) {
-    return name as SkillNameWithCategory;
-  }
-  const normalized = normalizeLabel(name);
-  const nonCombat = NON_COMBAT_SKILL_MAP.get(normalized);
-  if (nonCombat) {
-    return nonCombat;
-  }
-  const combatSkill = COMBAT_SKILL_MAP[normalized];
-  if (combatSkill) {
-    return `combat/${combatSkill}` as SkillNameWithCategory;
-  }
-  return null;
 }
 
 function isGewuerfelteBegabungCombatSkillEntry(entry: HistoryEntry): boolean {

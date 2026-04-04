@@ -4,9 +4,9 @@ import { normalizeLabel, asText, toInt, queueInfoBlock } from "./xml-utils.js";
 import {
   ADVANTAGE_CHANGED_TYPE,
   HISTORY_SKILL_INCREASE_TYPE_LABELS,
-  HISTORY_NAME_ADVENTURE_POINTS,
   HISTORY_NAME_ADVENTURE_POINTS_KEYWORD,
   HISTORY_TYPE_CALCULATION_POINTS_EVENT,
+  RULESET_VERSION,
   STUDIUM_NAME,
   XML_CHARACTER_SHEET_KEYS,
 } from "./constants.js";
@@ -14,16 +14,22 @@ import {
   buildCharacterSheet,
   extractLevelUpEffects,
   buildLevelUpProgressFromEffects,
+  getStartAdventurePoints,
   mapNonCombatSkill,
 } from "./sheet-builder.js";
-import backendPackage from "../../backend/package.json";
 
-const RULESET_VERSION = backendPackage.version;
-
-// ---------------------------------------------------------------------------
-// Phase 1 — Build the character JSON from the XML sheet and history metadata.
-// ---------------------------------------------------------------------------
-
+/**
+ * Phase 1 — Build the authoritative character JSON from the XML sheet.
+ *
+ * This is the source of truth for the converted character. The character sheet
+ * is built from the full XML state (not from history replay), so it reflects
+ * the final, current state of the character. History entries are only used for
+ * metadata that isn't part of the XML sheet itself (e.g. start adventure
+ * points, college education skill name, level-up effects).
+ *
+ * Phase 1 is independent from Phase 2 (history conversion). The character
+ * produced here must be 100% aligned with the new schema.
+ */
 export function convertCharacter(
   sheet: XmlCharacterSheet,
   rawHistoryEntries: HistoryEntry[],
@@ -35,9 +41,6 @@ export function convertCharacter(
   // Update character sheet with college skill name from history (if corresponding advantage is selected)
   const collegeSkillName = extractCollegeSkillName(rawHistoryEntries);
   patchCollegeEducationSkillName(characterSheet, collegeSkillName, warnings);
-
-  // TODO remove?
-  //const historyEntries = aggregateCombatSkillModEntries(rawHistoryEntries, []);
 
   const startAP = getStartAdventurePoints(rawHistoryEntries);
   characterSheet.calculationPoints.adventurePoints.start = startAP;
@@ -124,17 +127,6 @@ function patchCollegeEducationSkillName(
   queueInfoBlock("!! Notice !!", [
     `COLLEGE_EDUCATION for ${mappedSkillName}: added ${additionalBonus} to skill mod value and subtracted ${additionalBonus} from skill current value. In the new schema, the bonus is stored as mod value instead of being baked into the current value.`,
   ]);
-}
-
-function getStartAdventurePoints(entries: HistoryEntry[]): number {
-  for (const entry of entries) {
-    const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
-    const name = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.name]));
-    if (typeLabel === HISTORY_TYPE_CALCULATION_POINTS_EVENT && name === HISTORY_NAME_ADVENTURE_POINTS) {
-      return toInt(entry[XML_CHARACTER_SHEET_KEYS.newCalculationPointsAvailable]);
-    }
-  }
-  return 0;
 }
 
 function getLastAdventurePointsAvailable(entries: HistoryEntry[]): number | null {

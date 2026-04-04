@@ -111,7 +111,7 @@ export async function main(): Promise<void> {
   // --- Phase 2: Build history (independent) ---
   let historyBlocks: HistoryBlock[] = [];
   if (phase === "history" || phase === "both") {
-    historyBlocks = convertHistory(rawHistoryEntries, sheet, characterId, warnings);
+    historyBlocks = convertHistory(rawHistoryEntries, userId, characterId, warnings);
 
     for (const block of historyBlocks) {
       const historyOutPath = path.join(outDir, `history-block-${block.blockNumber}.json`);
