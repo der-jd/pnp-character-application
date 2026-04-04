@@ -65,77 +65,7 @@ export function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet:
   const warnings: string[] = [];
   const characterSheet = createEmptyCharacterSheet();
 
-  const general = asRecord(sheet.general_information);
-  characterSheet.generalInformation.name = asText(general.name);
-  characterSheet.generalInformation.sex = asText(general.sex);
-  characterSheet.generalInformation.level = toInt(sheet.level, 1);
-  characterSheet.generalInformation.levelUpProgress = levelUpProgressSchema.parse({});
-  characterSheet.generalInformation.birthday = asText(general.birthday);
-  characterSheet.generalInformation.birthplace = asText(general.birthplace);
-  characterSheet.generalInformation.size = asText(general.size);
-  characterSheet.generalInformation.weight = asText(general.weight);
-  characterSheet.generalInformation.hairColor = asText(general.hair_color);
-  characterSheet.generalInformation.eyeColor = asText(general.eye_color);
-  characterSheet.generalInformation.residence = asText(general.residence);
-  characterSheet.generalInformation.appearance = asText(general.appearance);
-
-  const languagesNode = asRecord(sheet.languages_scripts);
-  const languages = ensureArray(languagesNode.language_script)
-    .map((entry) => asText(entry))
-    .filter(Boolean);
-  const specialCharacteristics = asText(general.special_characteristics);
-  if (languages.length > 0) {
-    queueInfoBlock("Info", [
-      `Languages/Scripts entries dropped during conversion (not part of new schema): ${languages.join(", ")}`,
-    ]);
-  }
-  characterSheet.generalInformation.specialCharacteristics = specialCharacteristics;
-
-  const profession = asRecord(general.profession);
-  const professionName = asText(profession.name);
-  const professionSkillName = asText(profession.skill);
-  const professionSkill = mapGeneralInformationSkill(professionSkillName);
-  if (!professionSkill) {
-    warnings.push(
-      `Unknown profession skill '${professionSkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`,
-    );
-  }
-  const resolvedProfessionSkill: SkillNameWithCategory = professionSkill ?? DEFAULT_GENERAL_INFORMATION_SKILL;
-  characterSheet.generalInformation.profession = {
-    name: professionName,
-    skill: resolvedProfessionSkill,
-  };
-  applyProfessionOrHobbyBonus(characterSheet, resolvedProfessionSkill, PROFESSION_SKILL_BONUS, warnings);
-
-  const hobby = asRecord(general.hobby);
-  const hobbyName = asText(hobby.name);
-  const hobbySkillName = asText(hobby.skill);
-  const normalizedHobbyName = normalizeLabel(hobbyName);
-  // Some XML exports provide the hobby name without a corresponding hobby skill, so map Jiu-Jitsu from the name.
-  const jiujitsuHobbyName = normalizeLabel("Jiu-Jitsu");
-  const forcedHobbySkill: SkillNameWithCategory | null =
-    normalizedHobbyName === jiujitsuHobbyName ? "combat/martialArts" : null;
-  if (forcedHobbySkill) {
-    warnings.push(
-      `Hobby '${hobbyName}' was mapped to '${forcedHobbySkill}' from the hobby name because the XML can omit the corresponding hobby skill`,
-    );
-  }
-  const hobbySkillFromXml = mapGeneralInformationSkill(hobbySkillName);
-  if (!forcedHobbySkill && !hobbySkillFromXml && hobbySkillName) {
-    warnings.push(`Unknown hobby skill '${hobbySkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`);
-  }
-  const resolvedHobbySkill: SkillNameWithCategory =
-    forcedHobbySkill ?? hobbySkillFromXml ?? DEFAULT_GENERAL_INFORMATION_SKILL;
-  characterSheet.generalInformation.hobby = {
-    name: hobbyName,
-    skill: resolvedHobbySkill,
-  };
-
-  applyProfessionOrHobbyBonus(characterSheet, resolvedHobbySkill, HOBBY_SKILL_BONUS, warnings);
-  queueInfoBlock("!! Notice !!", [
-    "Profession/Hobby bonus for non-combat skills is now stored as the skill's mod value instead of being baked into the current value.",
-    "Profession/Hobby bonus for combat skills is expected to already be stored in the mod value in the XML; please adjust manually if that's not the case.",
-  ]);
+  applyGeneralInformation(sheet, characterSheet, warnings);
 
   const advantagesNode = asRecord(sheet.advantages);
   const advantages = ensureArray(advantagesNode.advantage)
@@ -554,6 +484,80 @@ function applyCalculationPoints(
     available: adventurePointsTotal - spentOnSkills - spentOnCombatSkills,
     total: adventurePointsTotal,
   };
+}
+
+function applyGeneralInformation(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): void {
+  const general = asRecord(sheet.general_information);
+  characterSheet.generalInformation.name = asText(general.name);
+  characterSheet.generalInformation.sex = asText(general.sex);
+  characterSheet.generalInformation.level = toInt(sheet.level, 1);
+  characterSheet.generalInformation.levelUpProgress = levelUpProgressSchema.parse({});
+  characterSheet.generalInformation.birthday = asText(general.birthday);
+  characterSheet.generalInformation.birthplace = asText(general.birthplace);
+  characterSheet.generalInformation.size = asText(general.size);
+  characterSheet.generalInformation.weight = asText(general.weight);
+  characterSheet.generalInformation.hairColor = asText(general.hair_color);
+  characterSheet.generalInformation.eyeColor = asText(general.eye_color);
+  characterSheet.generalInformation.residence = asText(general.residence);
+  characterSheet.generalInformation.appearance = asText(general.appearance);
+
+  const languagesNode = asRecord(sheet.languages_scripts);
+  const languages = ensureArray(languagesNode.language_script)
+    .map((entry) => asText(entry))
+    .filter(Boolean);
+  const specialCharacteristics = asText(general.special_characteristics);
+  if (languages.length > 0) {
+    queueInfoBlock("Info", [
+      `Languages/Scripts entries dropped during conversion (not part of new schema): ${languages.join(", ")}`,
+    ]);
+  }
+  characterSheet.generalInformation.specialCharacteristics = specialCharacteristics;
+
+  const profession = asRecord(general.profession);
+  const professionName = asText(profession.name);
+  const professionSkillName = asText(profession.skill);
+  const professionSkill = mapGeneralInformationSkill(professionSkillName);
+  if (!professionSkill) {
+    warnings.push(
+      `Unknown profession skill '${professionSkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`,
+    );
+  }
+  const resolvedProfessionSkill: SkillNameWithCategory = professionSkill ?? DEFAULT_GENERAL_INFORMATION_SKILL;
+  characterSheet.generalInformation.profession = {
+    name: professionName,
+    skill: resolvedProfessionSkill,
+  };
+  applyProfessionOrHobbyBonus(characterSheet, resolvedProfessionSkill, PROFESSION_SKILL_BONUS, warnings);
+
+  const hobby = asRecord(general.hobby);
+  const hobbyName = asText(hobby.name);
+  const hobbySkillName = asText(hobby.skill);
+  const normalizedHobbyName = normalizeLabel(hobbyName);
+  // Some XML exports provide the hobby name without a corresponding hobby skill, so map Jiu-Jitsu from the name.
+  const jiujitsuHobbyName = normalizeLabel("Jiu-Jitsu");
+  const forcedHobbySkill: SkillNameWithCategory | null =
+    normalizedHobbyName === jiujitsuHobbyName ? "combat/martialArts" : null;
+  if (forcedHobbySkill) {
+    warnings.push(
+      `Hobby '${hobbyName}' was mapped to '${forcedHobbySkill}' from the hobby name because the XML can omit the corresponding hobby skill`,
+    );
+  }
+  const hobbySkillFromXml = mapGeneralInformationSkill(hobbySkillName);
+  if (!forcedHobbySkill && !hobbySkillFromXml && hobbySkillName) {
+    warnings.push(`Unknown hobby skill '${hobbySkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`);
+  }
+  const resolvedHobbySkill: SkillNameWithCategory =
+    forcedHobbySkill ?? hobbySkillFromXml ?? DEFAULT_GENERAL_INFORMATION_SKILL;
+  characterSheet.generalInformation.hobby = {
+    name: hobbyName,
+    skill: resolvedHobbySkill,
+  };
+
+  applyProfessionOrHobbyBonus(characterSheet, resolvedHobbySkill, HOBBY_SKILL_BONUS, warnings);
+  queueInfoBlock("!! Notice !!", [
+    "Profession/Hobby bonus for non-combat skills is now stored as the skill's mod value instead of being baked into the current value.",
+    "Profession/Hobby bonus for combat skills is expected to already be stored in the mod value in the XML; please adjust manually if that's not the case.",
+  ]);
 }
 
 function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): void {
