@@ -13,6 +13,8 @@ import {
   LEVEL_UP_DICE_EXPRESSION,
   BaseValues,
   Attributes,
+  HistoryRecordType,
+  getCharacterResponseSchema,
 } from "api-spec";
 import {
   expectApiError,
@@ -402,6 +404,67 @@ describe.sequential("delete-history-record component tests", () => {
       deleteHistoryRecordResponseSchema.parse(
         await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`),
       );
+    });
+
+    test.each([
+      {
+        name: "minor version change",
+        seedFile: "character-minor-version-older.dynamodb.json",
+      },
+      {
+        name: "patch version change",
+        seedFile: "character-patch-version-older.dynamodb.json",
+      },
+    ])("Delete history record for a ruleset version update: $name", async ({ seedFile }) => {
+      // Clean up the default context and create one with an older version character
+      await TestContextFactory.cleanupContext(context);
+      const versionContext = await TestContextFactory.createContext(
+        TestContextFactory.loadCharacterIdFromTestData(seedFile),
+      );
+
+      const oldVersion = versionContext.character.rulesetVersion;
+      const client = versionContext.apiClient;
+
+      // Trigger a version update by patching an attribute
+      const updateResponse = patchAttributeResponseSchema.parse(
+        await client.patch(`characters/${versionContext.character.characterId}/attributes/endurance`, {
+          mod: {
+            initialValue: versionContext.character.characterSheet.attributes.endurance.mod,
+            newValue: versionContext.character.characterSheet.attributes.endurance.mod + 1,
+          },
+        }),
+      );
+
+      // Verify the version update was triggered
+      expect(updateResponse.data.versionUpdate).toBeDefined();
+      expect(updateResponse.versionUpdateHistoryRecord).not.toBeNull();
+      expect(updateResponse.versionUpdateHistoryRecord!.type).toBe(HistoryRecordType.RULESET_VERSION_UPDATED);
+
+      // First revert the attribute change (latest record)
+      deleteHistoryRecordResponseSchema.parse(
+        await client.delete(
+          `characters/${versionContext.character.characterId}/history/${updateResponse.historyRecord?.id}`,
+        ),
+      );
+
+      // Then revert the version update record (now the latest)
+      const revertedVersionRecord = deleteHistoryRecordResponseSchema.parse(
+        await client.delete(
+          `characters/${versionContext.character.characterId}/history/${updateResponse.versionUpdateHistoryRecord?.id}`,
+        ),
+      );
+
+      // Verify the reverted record is the version update record
+      expect(revertedVersionRecord.type).toBe(HistoryRecordType.RULESET_VERSION_UPDATED);
+
+      // Verify the character's version is back to the old value
+      const character = getCharacterResponseSchema.parse(
+        await client.get(`characters/${versionContext.character.characterId}`),
+      );
+      expect(character.rulesetVersion).toBe(oldVersion);
+
+      // Re-assign context for cleanup in afterAll
+      context = versionContext;
     });
   });
 });

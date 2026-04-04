@@ -14,6 +14,7 @@ import {
   PatchCombatStatsHistoryRecord,
   PostSpecialAbilitiesHistoryRecord,
   PatchGeneralInformationHistoryRecord,
+  RulesetVersionHistoryRecord,
 } from "api-spec";
 import { fakeCharacter, fakeCharacterId } from "./character.js";
 
@@ -1171,6 +1172,60 @@ export const generalInformationChangedRecord: PatchGeneralInformationHistoryReco
         eyeColor: "Green",
       },
     },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const rulesetVersionMinorChangedRecord: RulesetVersionHistoryRecord = {
+  type: HistoryRecordType.RULESET_VERSION_UPDATED,
+  name: "Ruleset Version",
+  number: 2,
+  id: "a1b2c3d4-e5f6-4890-abcd-ef1234567890",
+  data: {
+    old: { value: "1.0.0" },
+    new: { value: "1.1.0" },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const rulesetVersionPatchChangedRecord: RulesetVersionHistoryRecord = {
+  type: HistoryRecordType.RULESET_VERSION_UPDATED,
+  name: "Ruleset Version",
+  number: 2,
+  id: "b2c3d4e5-f6a7-4901-bcde-a12345678901",
+  data: {
+    old: { value: "1.1.0" },
+    new: { value: "1.1.1" },
+  },
+  learningMethod: null,
+  calculationPoints: {
+    adventurePoints: null,
+    attributePoints: null,
+  },
+  comment: null,
+  timestamp: new Date().toISOString(),
+};
+
+export const rulesetVersionMajorChangedRecord: RulesetVersionHistoryRecord = {
+  type: HistoryRecordType.RULESET_VERSION_UPDATED,
+  name: "Ruleset Version",
+  number: 2,
+  id: "c3d4e5f6-a7b8-4012-adef-123456789012",
+  data: {
+    old: { value: "1.1.1" },
+    new: { value: "2.0.0" },
   },
   learningMethod: null,
   calculationPoints: {
