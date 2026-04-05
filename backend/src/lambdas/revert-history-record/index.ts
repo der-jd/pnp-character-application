@@ -19,6 +19,7 @@ import {
   baseValueChangeSchema,
   levelUpChangeSchema,
   generalInformationChangeSchema,
+  versionUpdateSchema,
 } from "api-spec";
 import {
   getHistoryItems,
@@ -42,6 +43,7 @@ import {
   getCombatCategory,
   setLevelUp,
   updateGeneralInformation,
+  updateRulesetVersion,
   createLogger,
   sanitizeEvent,
 } from "core";
@@ -285,6 +287,19 @@ async function revertChange(userId: string, characterId: string, record: History
       case HistoryRecordType.GENERAL_INFORMATION_CHANGED: {
         const oldData = generalInformationChangeSchema.parse(record.data.old);
         await updateGeneralInformation(userId, characterId, oldData.generalInformation);
+        break;
+      }
+
+      case HistoryRecordType.RULESET_VERSION_UPDATED: {
+        const versionData = versionUpdateSchema.parse(record.data);
+        const [oldMajor] = versionData.old.value.split(".").map(Number);
+        const [newMajor] = versionData.new.value.split(".").map(Number);
+
+        if (oldMajor !== newMajor) {
+          throw new HttpError(400, "Reverting a major version change is not allowed!");
+        }
+
+        await updateRulesetVersion(userId, characterId, versionData.old.value);
         break;
       }
 

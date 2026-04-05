@@ -2818,6 +2818,59 @@
             "N": "7"
           }
         }
+      },
+      {
+        "M": {
+          "calculationPoints": {
+            "M": {
+              "adventurePoints": {
+                "NULL": true
+              },
+              "attributePoints": {
+                "NULL": true
+              }
+            }
+          },
+          "comment": {
+            "NULL": true
+          },
+          "data": {
+            "M": {
+              "old": {
+                "M": {
+                  "value": {
+                    "S": "1.1.1"
+                  }
+                }
+              },
+              "new": {
+                "M": {
+                  "value": {
+                    "S": "2.1.1"
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "S": "e4a7b2c1-3d5f-4e8a-9b1c-2d3e4f5a6b7c"
+          },
+          "learningMethod": {
+            "NULL": true
+          },
+          "name": {
+            "S": "Update to ruleset version 2.1.1"
+          },
+          "number": {
+            "N": "4"
+          },
+          "timestamp": {
+            "S": "2025-09-23T05:00:00.000Z"
+          },
+          "type": {
+            "N": "8"
+          }
+        }
       }
     ]
   },

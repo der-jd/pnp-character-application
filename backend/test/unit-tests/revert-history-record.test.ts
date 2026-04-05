@@ -20,6 +20,9 @@ import {
   specialAbilitiesChangedRecord,
   attackBaseValueAndCombatStatsChangedRecord,
   rangedAttackBaseValueAndCombatStatsChangedRecord,
+  rulesetVersionMinorChangedRecord,
+  rulesetVersionPatchChangedRecord,
+  rulesetVersionMajorChangedRecord,
 } from "./test-data/history.js";
 import { expectHttpError } from "./utils.js";
 import { revertRecordFromHistory } from "revert-history-record";
@@ -151,6 +154,23 @@ describe("Invalid requests", () => {
 
       await expectHttpError(() => revertRecordFromHistory(_case.request), _case.expectedStatusCode);
     });
+  });
+
+  test("Reverting a major ruleset version change is not supported", async () => {
+    addFakeHistoryRecord(lastBlock, rulesetVersionMajorChangedRecord);
+    mockDynamoDBQueryHistoryResponse(fakeHistoryBlockListResponse);
+
+    const request = {
+      headers: fakeHeaders,
+      pathParameters: {
+        "character-id": fakeCharacterId,
+        "record-id": rulesetVersionMajorChangedRecord.id,
+      },
+      queryStringParameters: null,
+      body: null,
+    };
+
+    await expectHttpError(() => revertRecordFromHistory(request), 400);
   });
 });
 
@@ -327,6 +347,34 @@ describe("Valid requests", () => {
     {
       name: "Revert history record for changed general information",
       fakeRecord: generalInformationChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for a minor ruleset version change",
+      fakeRecord: rulesetVersionMinorChangedRecord,
+      request: {
+        headers: fakeHeaders,
+        pathParameters: {
+          "character-id": fakeCharacterId,
+          "record-id": "to-be-replaced", // This will be replaced with the actual record id in the test
+        },
+        queryStringParameters: null,
+        body: null,
+      },
+      expectedStatusCode: 200,
+    },
+    {
+      name: "Revert history record for a patch ruleset version change",
+      fakeRecord: rulesetVersionPatchChangedRecord,
       request: {
         headers: fakeHeaders,
         pathParameters: {
