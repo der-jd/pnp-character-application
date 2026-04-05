@@ -25,8 +25,15 @@ export function queueInfoBlock(title: string, lines: string[]): void {
 }
 
 export function flushInfoBlocks(): void {
-  for (const [title, lines] of infoMessages) {
-    console.info(["", `${title}:`, ...lines.map((line) => `  • ${line}`), ""].join("\n"));
+  const allLines = Array.from(infoMessages.values()).flat();
+  if (allLines.length > 0) {
+    console.info("\n" + "=".repeat(60));
+    console.info(`  ${allLines.length} INFO(S) DURING CONVERSION`);
+    console.info("=".repeat(60));
+    for (const line of allLines) {
+      console.info(`  - ${line}`);
+    }
+    console.info("=".repeat(60) + "\n");
   }
   infoMessages.clear();
 }

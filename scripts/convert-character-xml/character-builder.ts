@@ -124,7 +124,7 @@ function patchCollegeEducationSkillName(
     chosenSkill.mod += additionalBonus;
     chosenSkill.current -= additionalBonus;
   }
-  queueInfoBlock("!! Notice !!", [
+  queueInfoBlock("Info", [
     `COLLEGE_EDUCATION for ${mappedSkillName}: added ${additionalBonus} to skill mod value and subtracted ${additionalBonus} from skill current value. In the new schema, the bonus is stored as mod value instead of being baked into the current value.`,
   ]);
 }

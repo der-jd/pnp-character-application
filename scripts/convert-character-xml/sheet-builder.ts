@@ -661,7 +661,7 @@ function applyGeneralInformation(sheet: XmlCharacterSheet, characterSheet: Chara
   };
 
   applyProfessionOrHobbyBonus(characterSheet, resolvedHobbySkill, HOBBY_SKILL_BONUS, warnings);
-  queueInfoBlock("!! Notice !!", [
+  queueInfoBlock("Info", [
     "Profession/Hobby bonus for non-combat skills is now stored as the skill's mod value instead of being baked into the current value.",
     "Profession/Hobby bonus for combat skills is expected to already be stored in the mod value in the XML; please adjust manually if that's not the case.",
   ]);
