@@ -21,6 +21,7 @@ dist/
 
 # Folder for temporary (AI generated) files that should not be committed
 .temp/
+tmp/
 
 .claude/
 

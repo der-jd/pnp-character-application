@@ -7,7 +7,9 @@ import {
   LEVEL_UP_DICE_MIN_TOTAL,
   LEVEL_UP_DICE_MAX_TOTAL,
   type LevelUpOption,
+  type LevelUpEffectKind,
   type EffectByLevelUp,
+  type LevelUpProgress,
 } from "api-spec";
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
@@ -22,6 +24,7 @@ import { Input } from "@/components/ui/Input";
 import { FullPageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { useToast } from "@/components/ui/Toast";
+import { CollapsibleNode } from "@/components/ui/CollapsibleNode";
 
 export function LevelUpPage() {
   const { characterId } = useParams<{ characterId: string }>();
@@ -216,6 +219,79 @@ export function LevelUpPage() {
           {t("levelUpApply")}
         </Button>
       </div>
+
+      {/* Level Up Progress Tree */}
+      {character && <LevelUpProgressTree progress={character.characterSheet.generalInformation.levelUpProgress} />}
     </div>
+  );
+}
+
+function formatEffectDetail(effect: EffectByLevelUp): string {
+  switch (effect.kind) {
+    case "hpRoll":
+    case "armorLevelRoll":
+      return t("levelUpProgressDiceResult", effect.roll.value);
+    case "rerollUnlock":
+      return "";
+    default:
+      return `+${effect.delta}`;
+  }
+}
+
+function LevelUpProgressTree({ progress }: { progress: LevelUpProgress }) {
+  const levelEntries = Object.entries(progress.effectsByLevel).sort(([a], [b]) => Number(a) - Number(b));
+  const effectEntries = Object.entries(progress.effects) as [
+    LevelUpEffectKind,
+    { selectionCount: number; firstChosenLevel: number; lastChosenLevel: number },
+  ][];
+
+  const isEmpty = levelEntries.length === 0 && effectEntries.length === 0;
+
+  return (
+    <Card>
+      <h2 className="text-lg font-semibold mb-3">{t("levelUpProgressTitle")}</h2>
+      {isEmpty ? (
+        <p className="text-text-muted text-sm">{t("levelUpProgressEmpty")}</p>
+      ) : (
+        <div className="space-y-2">
+          {levelEntries.length > 0 && (
+            <CollapsibleNode label={t("levelUpProgressByLevel")} defaultExpanded>
+              {levelEntries.map(([level, effect]) => {
+                const effectName = t(levelUpEffectKeys[effect.kind]);
+                const detail = formatEffectDetail(effect);
+                return (
+                  <div key={level} className="flex items-center gap-2 text-sm py-0.5">
+                    <Badge variant="info">{t("levelUpProgressLevel", level)}</Badge>
+                    <span className="text-text-primary">{effectName}</span>
+                    {detail && <span className="text-text-muted">{detail}</span>}
+                  </div>
+                );
+              })}
+            </CollapsibleNode>
+          )}
+
+          {effectEntries.length > 0 && (
+            <CollapsibleNode label={t("levelUpProgressSummary")} defaultExpanded>
+              {effectEntries.map(([kind, prog]) => (
+                <CollapsibleNode
+                  key={kind}
+                  label={
+                    <span className="flex items-center gap-2">
+                      {t(levelUpEffectKeys[kind])}
+                      <Badge variant="default">{t("levelUpProgressCount", prog.selectionCount)}</Badge>
+                    </span>
+                  }
+                >
+                  <div className="text-sm text-text-muted space-y-0.5">
+                    <div>{t("levelUpProgressFirstChosen", prog.firstChosenLevel)}</div>
+                    <div>{t("levelUpProgressLastChosen", prog.lastChosenLevel)}</div>
+                  </div>
+                </CollapsibleNode>
+              ))}
+            </CollapsibleNode>
+          )}
+        </div>
+      )}
+    </Card>
   );
 }

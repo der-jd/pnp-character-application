@@ -1,4 +1,4 @@
-import { AdvantagesNames, DisadvantagesNames, HistoryRecordType } from "api-spec";
+import { AdvantagesNames, DisadvantagesNames, HistoryRecordType, type LevelUpEffectKind } from "api-spec";
 import type { TranslationKey } from "./de";
 
 /**
@@ -193,7 +193,7 @@ export const historyRecordTypeKeys: Record<number, TranslationKey> = {
   [HistoryRecordType.GENERAL_INFORMATION_CHANGED]: "historyTypeGeneralInformation",
 };
 
-export const levelUpEffectKeys: Record<string, TranslationKey> = {
+export const levelUpEffectKeys: Record<LevelUpEffectKind, TranslationKey> = {
   hpRoll: "levelUpEffectHpRoll",
   armorLevelRoll: "levelUpEffectArmorLevelRoll",
   initiativePlusOne: "levelUpEffectInitiativePlusOne",
