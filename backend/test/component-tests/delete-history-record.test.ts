@@ -435,8 +435,9 @@ describe.sequential("delete-history-record component tests", () => {
         }),
       );
 
-      // Verify the version update was triggered
+      // Verify the version update was triggered and version has actually changed
       expect(updateResponse.data.versionUpdate).toBeDefined();
+      expect(updateResponse.data.versionUpdate!.new.value).not.toBe(oldVersion);
       expect(updateResponse.versionUpdateHistoryRecord).not.toBeNull();
       expect(updateResponse.versionUpdateHistoryRecord!.type).toBe(HistoryRecordType.RULESET_VERSION_UPDATED);
 
