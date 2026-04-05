@@ -12,6 +12,7 @@ import { normalizeLabel } from "./xml-utils.js";
 export const CHARACTERS_TABLE_PREFIX = "pnp-app-characters";
 export const HISTORY_TABLE_PREFIX = "pnp-app-characters-history";
 export const REGION = "eu-central-1";
+export const LEGACY_RULESET_VERSION = "0.0.0";
 export const RULESET_VERSION = backendPackage.version;
 
 export const XML_ROOT_NODE_NAMES = ["character_sheet", "characterSheet"] as const;

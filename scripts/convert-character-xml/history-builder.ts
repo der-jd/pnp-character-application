@@ -50,6 +50,7 @@ import {
   XML_CHARACTER_SHEET_KEYS,
   XML_HOBBY_NAME_TO_SKILL,
   XML_LEARNING_METHOD_MAP,
+  LEGACY_RULESET_VERSION,
 } from "./constants.js";
 import {
   recalculateCombatStats,
@@ -361,7 +362,7 @@ function buildMigrationRecord(number: number): HistoryRecord {
     number,
     id: crypto.randomUUID(),
     data: {
-      old: { value: "0.0.0" },
+      old: { value: LEGACY_RULESET_VERSION },
       new: { value: RULESET_VERSION },
     },
     learningMethod: null,
@@ -385,7 +386,7 @@ function buildCreationCharacter(
     userId,
     characterId,
     characterSheet: buildCreationCharacterSheet(creationEntries, warnings),
-    rulesetVersion: RULESET_VERSION,
+    rulesetVersion: LEGACY_RULESET_VERSION,
   };
 }
 
