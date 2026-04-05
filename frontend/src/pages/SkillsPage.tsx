@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { clsx } from "clsx";
-import type { Skill, LearningMethodString, SkillCategory } from "api-spec";
+import type { Skill, LearningMethodString, SkillCategory, SkillNameWithCategory } from "api-spec";
 import {
   skillCategories,
   CostCategory,
@@ -12,6 +12,7 @@ import {
   getSkillActivationCost,
   getSkillIncreaseCost,
   adjustCostCategory,
+  START_SKILLS,
 } from "api-spec";
 import { t } from "@/i18n";
 import { fetchCharacter } from "@/api/characters";
@@ -138,6 +139,7 @@ export function SkillsPage() {
 
   const skills = character.characterSheet.skills;
   const ap = character.characterSheet.calculationPoints.adventurePoints;
+  const startSkillSet = useMemo(() => new Set<string>(START_SKILLS), []);
 
   return (
     <div className="space-y-6">
@@ -177,6 +179,22 @@ export function SkillsPage() {
         </div>
       </Card>
 
+      {/* Activation legend */}
+      <div className="flex gap-4 flex-wrap items-center text-xs text-text-muted">
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-2 w-2 rounded-full bg-accent-success" />
+          {t("skillLegendStartSkill")}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-2 w-2 rounded-full border-2 border-accent-success" />
+          {t("skillLegendActivatedSkill")}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-2 w-2 rounded-full bg-bg-tertiary" />
+          {t("skillLegendNotActivated")}
+        </span>
+      </div>
+
       {skillCategories.map((category) => {
         const categorySkills = skills[category as SkillCategory] as Record<string, Skill>;
         return (
@@ -208,8 +226,9 @@ export function SkillsPage() {
                 </thead>
                 <tbody>
                   {Object.entries(categorySkills).map(([name, skill]) => {
-                    const key = `${category}/${name}`;
+                    const key = `${category}/${name}` as SkillNameWithCategory;
                     const isEditing = editingKey === key;
+                    const isStartSkill = startSkillSet.has(key);
                     const adjustedCategory = adjustCostCategory(skill.defaultCostCategory as CostCategory, lm);
                     const nextPointCost = getSkillIncreaseCost(skill.current, adjustedCategory);
                     const activationCost = !skill.activated ? getSkillActivationCost(adjustedCategory) : null;
@@ -231,9 +250,20 @@ export function SkillsPage() {
                             />
                           ) : (
                             <span
+                              title={
+                                skill.activated
+                                  ? isStartSkill
+                                    ? t("skillLegendStartSkill")
+                                    : t("skillLegendActivatedSkill")
+                                  : t("skillLegendNotActivated")
+                              }
                               className={clsx(
                                 "inline-block h-2 w-2 rounded-full",
-                                skill.activated ? "bg-accent-success" : "bg-bg-tertiary",
+                                skill.activated
+                                  ? isStartSkill
+                                    ? "bg-accent-success"
+                                    : "border-2 border-accent-success"
+                                  : "bg-bg-tertiary",
                               )}
                             />
                           )}
