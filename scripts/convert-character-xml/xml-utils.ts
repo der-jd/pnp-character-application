@@ -67,15 +67,6 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-export function toOptionalInt(value: unknown): number | null {
-  const text = asText(value);
-  if (!text) {
-    return null;
-  }
-  const parsed = Number.parseInt(text, 10);
-  return Number.isNaN(parsed) ? null : parsed;
-}
-
 export function toIsoTimestamp(value: string): string {
   const normalized = normalizeLabel(value);
   const match = normalized.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);

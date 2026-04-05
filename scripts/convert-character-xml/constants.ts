@@ -213,7 +213,6 @@ export const COMBAT_SKILL_MAP: Record<string, CombatSkillName> = {
   [normalizeLabel("Schusswaffe schwierig")]: "firearmComplex",
 };
 
-export const GEWUERFELTE_BEGABUNG_COMMENT = normalizeLabel("Gewürfelte Begabung");
 export const HISTORY_TYPE_CALCULATION_POINTS_EVENT = normalizeLabel("Ereignis (Berechnungspunkte)");
 export const HISTORY_TYPE_BASE_VALUE_EVENT = normalizeLabel("Ereignis (Basiswerte)");
 export const HISTORY_TYPE_LEVEL_UP_EVENT = normalizeLabel("Ereignis (Level Up)");

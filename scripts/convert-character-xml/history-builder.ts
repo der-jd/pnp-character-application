@@ -18,7 +18,7 @@ import {
   historyBlockSchema,
 } from "api-spec";
 import type { HistoryEntry, CombatCategory, HistoryBlock } from "./types.js";
-import { normalizeLabel, asText, toInt, toOptionalInt, toIsoTimestamp, queueInfoBlock } from "./xml-utils.js";
+import { normalizeLabel, asText, toInt, toIsoTimestamp, queueInfoBlock } from "./xml-utils.js";
 import {
   ADVANTAGE_CHANGED_TYPE,
   CALCULATION_POINTS_ATTRIBUTE_KEYWORDS,
@@ -41,7 +41,6 @@ import {
   ATTRIBUTE_MAP,
   BASE_VALUE_MAP,
   COMBAT_SKILL_MAP,
-  GEWUERFELTE_BEGABUNG_COMMENT,
   IGNORED_HISTORY_TYPES,
   IGNORED_HISTORY_TYPES_WITH_WARNING,
   SPECIAL_EVENT_COMMENT_KEYWORDS,
@@ -654,22 +653,6 @@ function fillSkillRecord(
   const normalizedName = normalizeLabel(name);
   const mappedNonCombat = mapNonCombatSkill(normalizedName);
   const mappedCombat = COMBAT_SKILL_MAP[normalizedName];
-  const normalizedComment = comment ? normalizeLabel(comment) : "";
-
-  if (mappedCombat && normalizedComment === GEWUERFELTE_BEGABUNG_COMMENT) {
-    const skill = characterSheet.skills.combat[mappedCombat];
-    const oldMod = toOptionalInt(oldValueText);
-    const newMod = toOptionalInt(newValueText);
-
-    if (oldMod === null || newMod === null) {
-      warnings.push(`Missing mod values for Gewürfelte Begabung history entry '${name}', storing raw values`);
-    } else {
-      record.data.old = { skill: { ...skill, mod: oldMod } };
-      record.data.new = { skill: { ...skill, mod: newMod } };
-      return;
-    }
-  }
-
   if (mappedCombat) {
     const skill = characterSheet.skills.combat[mappedCombat];
     record.data.old = { skill: { ...skill, current: toInt(oldValueText) } };
