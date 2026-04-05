@@ -503,6 +503,8 @@ function applyCreationEntry(characterSheet: CharacterSheet, entry: HistoryEntry,
       return;
     }
     case HISTORY_TYPE_DISADVANTAGE_CHANGED: {
+      // Character name is not needed for disadvantage mapping as the history record is only for audit.
+      // Also, the character name is not available for the history record at this point.
       const mapped = mapDisadvantages([newValueText], "", warnings);
       characterSheet.disadvantages.push(...mapped);
       return;
