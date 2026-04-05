@@ -230,7 +230,6 @@ export const HISTORY_TYPE_HOBBY_CHANGED = normalizeLabel("Hobby geändert");
 export const HISTORY_TYPE_LANGUAGE_SCRIPT_CHANGED = normalizeLabel("Sprache/Schrift geändert");
 export const HISTORY_NAME_ADVENTURE_POINTS = normalizeLabel("Abenteuerpunkte (AP)");
 export const HISTORY_NAME_ADVENTURE_POINTS_KEYWORD = normalizeLabel("Abenteuer");
-export const COMBAT_SKILL_HISTORY_TYPE_LABELS = new Set([HISTORY_TYPE_COMBAT_SKILL_CHANGED]);
 export const HISTORY_SKILL_INCREASE_TYPE_LABELS = new Set([
   HISTORY_TYPE_SKILL_CHANGED,
   HISTORY_TYPE_COMBAT_SKILL_CHANGED,

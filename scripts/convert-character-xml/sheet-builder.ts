@@ -29,7 +29,7 @@ import {
   combatSkills,
   levelUpProgressSchema,
 } from "api-spec";
-import type { XmlCharacterSheet, HistoryEntry, CombatCategory, AggregatedSkillModState } from "./types.js";
+import type { XmlCharacterSheet, HistoryEntry, CombatCategory } from "./types.js";
 import {
   normalizeLabel,
   ensureArray,
@@ -37,7 +37,6 @@ import {
   asRecord,
   toInt,
   clamp,
-  toOptionalInt,
   queueInfoBlock,
   hashCharacterName,
 } from "./xml-utils.js";
@@ -47,8 +46,6 @@ import {
   BASE_VALUE_MAP,
   NON_COMBAT_SKILL_MAP,
   COMBAT_SKILL_MAP,
-  GEWUERFELTE_BEGABUNG_COMMENT,
-  COMBAT_SKILL_HISTORY_TYPE_LABELS,
   ADVANTAGE_MAP,
   DISADVANTAGE_MAP,
   FEAR_OF_COST_BY_LABEL,
@@ -247,86 +244,6 @@ export function buildLevelUpProgressFromEffects(effectsByLevel: Record<string, E
   progress.effectsByLevel = effectsByLevel;
   progress.effects = summaries as LevelUpProgress["effects"];
   return progress;
-}
-
-export function aggregateCombatSkillModEntries(entries: HistoryEntry[], warnings: string[]): HistoryEntry[] {
-  const replacementByIndex = new Map<number, HistoryEntry>();
-  const skipIndices = new Set<number>();
-  const states = new Map<CombatSkillName, AggregatedSkillModState>();
-
-  entries.forEach((entry, index) => {
-    if (!isGewuerfelteBegabungCombatSkillEntry(entry)) {
-      return;
-    }
-
-    const combatSkillName = getCombatSkillNameFromHistoryEntry(entry);
-    if (!combatSkillName) {
-      return;
-    }
-
-    skipIndices.add(index);
-    const parsedOld = toOptionalInt(entry[XML_CHARACTER_SHEET_KEYS.oldValue]);
-    const parsedNew = toOptionalInt(entry[XML_CHARACTER_SHEET_KEYS.newValue]);
-    const displayName = asText(entry[XML_CHARACTER_SHEET_KEYS.name]);
-    const existing = states.get(combatSkillName);
-
-    if (!existing) {
-      states.set(combatSkillName, {
-        combatSkillName,
-        firstIndex: index,
-        firstEntry: entry,
-        lastEntry: entry,
-        oldValue: parsedOld,
-        newValue: parsedNew,
-        displayName,
-      });
-      return;
-    }
-
-    existing.lastEntry = entry;
-    if (existing.oldValue === null && parsedOld !== null) {
-      existing.oldValue = parsedOld;
-    }
-    if (parsedNew !== null) {
-      existing.newValue = parsedNew;
-    }
-  });
-
-  if (states.size === 0) {
-    return entries;
-  }
-
-  for (const state of states.values()) {
-    const fallbackOldValue = asText(state.firstEntry[XML_CHARACTER_SHEET_KEYS.oldValue]);
-    const fallbackNewValue = asText(state.lastEntry[XML_CHARACTER_SHEET_KEYS.newValue]);
-    if (state.oldValue === null || state.newValue === null) {
-      warnings.push(
-        `Incomplete Gewürfelte Begabung history data for combat skill '${state.displayName}', using available values`,
-      );
-    }
-    const replacement: HistoryEntry = {
-      ...state.firstEntry,
-      [XML_CHARACTER_SHEET_KEYS.oldValue]: state.oldValue !== null ? state.oldValue.toString() : fallbackOldValue,
-      [XML_CHARACTER_SHEET_KEYS.newValue]: state.newValue !== null ? state.newValue.toString() : fallbackNewValue,
-      [XML_CHARACTER_SHEET_KEYS.date]:
-        state.lastEntry[XML_CHARACTER_SHEET_KEYS.date] ?? state.firstEntry[XML_CHARACTER_SHEET_KEYS.date],
-      [XML_CHARACTER_SHEET_KEYS.name]: state.firstEntry[XML_CHARACTER_SHEET_KEYS.name] ?? state.displayName,
-    };
-    replacementByIndex.set(state.firstIndex, replacement);
-  }
-
-  return entries.reduce<HistoryEntry[]>((result, entry, index) => {
-    const replacement = replacementByIndex.get(index);
-    if (replacement) {
-      result.push(replacement);
-      return result;
-    }
-    if (skipIndices.has(index)) {
-      return result;
-    }
-    result.push(entry);
-    return result;
-  }, []);
 }
 
 export function createEmptyCharacterSheet(): CharacterSheet {
@@ -886,21 +803,4 @@ function applyProfessionOrHobbyBonus(
   // In the XML the bonus has been added to the current value, but in the new schema it is added to the mod value
   skill.mod += bonus;
   skill.current -= bonus;
-}
-
-function isGewuerfelteBegabungCombatSkillEntry(entry: HistoryEntry): boolean {
-  const comment = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.comment]));
-  if (!comment || comment !== GEWUERFELTE_BEGABUNG_COMMENT) {
-    return false;
-  }
-  const typeLabel = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.type]));
-  if (!COMBAT_SKILL_HISTORY_TYPE_LABELS.has(typeLabel)) {
-    return false;
-  }
-  return getCombatSkillNameFromHistoryEntry(entry) !== null;
-}
-
-function getCombatSkillNameFromHistoryEntry(entry: HistoryEntry): CombatSkillName | null {
-  const normalizedSkillName = normalizeLabel(asText(entry[XML_CHARACTER_SHEET_KEYS.name]));
-  return COMBAT_SKILL_MAP[normalizedSkillName] ?? null;
 }
