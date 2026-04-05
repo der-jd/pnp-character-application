@@ -670,7 +670,12 @@ function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterShee
 
 function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): number {
   const skillsNode = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.skills]);
+
+  // Parse the activated_skills node before removing it. When the node contains
+  // actual skill names it is the authoritative source for activation state.
+  const activatedFromXml = parseActivatedSkillsNode(skillsNode, warnings);
   delete (skillsNode as Record<string, unknown>)[XML_CHARACTER_SHEET_KEYS.activatedSkills];
+
   let spentTotal = 0;
   for (const [rawName, rawValue] of Object.entries(skillsNode)) {
     const normalizedName = normalizeLabel(rawName);
@@ -681,10 +686,19 @@ function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: Characte
     }
     const { category, name } = splitSkill(mappedSkill);
     const value = rawValue as Record<string, unknown>;
+
+    // Determine activated status. Priority order:
+    // 1. If the XML contains an <activated_skills> element with skill names, use it.
+    // 2. If the per-skill <activated> field exists, use it (>0 = activated).
+    // 3. Otherwise the skill has no explicit deactivation marker, so treat it as
+    //    activated. The XML export always marks deactivated skills with a negative
+    //    <activated> value (-4146); absence of the field means activated.
     const activated =
-      value[XML_CHARACTER_SHEET_KEYS.activated] !== undefined
-        ? toInt(value[XML_CHARACTER_SHEET_KEYS.activated]) > 0
-        : START_SKILLS.includes(mappedSkill);
+      activatedFromXml !== null
+        ? activatedFromXml.has(mappedSkill)
+        : value[XML_CHARACTER_SHEET_KEYS.activated] !== undefined
+          ? toInt(value[XML_CHARACTER_SHEET_KEYS.activated]) > 0
+          : true;
     const totalCost = toInt(value[XML_CHARACTER_SHEET_KEYS.totalCosts]);
     spentTotal += totalCost;
 
@@ -807,4 +821,55 @@ function applyProfessionOrHobbyBonus(
   // In the XML the bonus has been added to the current value, but in the new schema it is added to the mod value
   skill.mod += bonus;
   skill.current -= bonus;
+}
+
+/**
+ * Parses the `<activated_skills>` XML node into a Set of mapped skill names.
+ *
+ * The node can appear in two forms depending on the XML version:
+ * - As an XML attribute on `<skills>` (e.g. `activated_skills="15"`): a plain
+ *   count of activated skills — not usable as a list, so we return null.
+ * - As an XML child element containing `<skill>` children with skill names:
+ *   the authoritative list of activated skills.
+ *
+ * Returns null if the node is missing, is a plain count, or contains no
+ * recognisable skill names, so callers can fall back to per-skill logic.
+ */
+function parseActivatedSkillsNode(
+  skillsNode: Record<string, unknown>,
+  warnings: string[],
+): Set<SkillNameWithCategory> | null {
+  const activatedRaw = skillsNode[XML_CHARACTER_SHEET_KEYS.activatedSkills];
+  if (activatedRaw === undefined || activatedRaw === null) {
+    return null;
+  }
+
+  // When activated_skills is an XML attribute (mergeAttrs: true), xml2js stores
+  // it as a plain string. If the string is numeric it is just a count — skip it.
+  if (typeof activatedRaw === "string" && /^\d+$/.test(activatedRaw.trim())) {
+    return null;
+  }
+
+  const resolvedEntries =
+    typeof activatedRaw === "object" &&
+    activatedRaw !== null &&
+    XML_CHARACTER_SHEET_KEYS.skill in (activatedRaw as Record<string, unknown>)
+      ? ensureArray((activatedRaw as Record<string, unknown>)[XML_CHARACTER_SHEET_KEYS.skill])
+      : ensureArray(activatedRaw);
+
+  const result = new Set<SkillNameWithCategory>();
+  for (const entry of resolvedEntries) {
+    const label = normalizeLabel(asText(entry));
+    if (!label) {
+      continue;
+    }
+    const mapped = label.includes("/") ? (label as SkillNameWithCategory) : mapNonCombatSkill(label);
+    if (!mapped) {
+      warnings.push(`Unknown activated skill '${label}', skipping`);
+      continue;
+    }
+    result.add(mapped);
+  }
+
+  return result.size > 0 ? result : null;
 }
