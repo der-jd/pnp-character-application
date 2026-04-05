@@ -61,7 +61,7 @@ import {
 } from "./constants.js";
 
 // ---------------------------------------------------------------------------
-// Phase 1 – character-sheet building (used by character-builder.ts)
+// Phase 1 only (used by character-builder.ts)
 // ---------------------------------------------------------------------------
 
 /**
@@ -459,7 +459,7 @@ export function mapGeneralInformationSkill(name: string): SkillNameWithCategory 
 }
 
 // ---------------------------------------------------------------------------
-// Phase 2 only – history-based rebuilding (used by history-builder.ts)
+// Phase 2 only (used by history-builder.ts)
 // ---------------------------------------------------------------------------
 
 export function calculateGenerationPoints(characterSheet: CharacterSheet): {

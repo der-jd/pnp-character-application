@@ -55,24 +55,20 @@
 // HISTORY TRANSFORMATIONS
 // -----------------------------------------------------------------------------
 //
-//   1. Creation entry absorption — all creation-day entries (attribute
-//      allocation, skill activations, initial AP grant, advantage/disadvantage/
-//      profession/hobby changes, "Begabung" entries) are filtered out and
-//      replaced by a single CHARACTER_CREATED record with a full character
-//      snapshot.
+//   1. Creation entry absorption — creation entries (attribute allocation,
+//      skill activations, initial AP grant, advantage/disadvantage/profession/
+//      hobby changes) are filtered out and replaced by a single
+//      CHARACTER_CREATED record with a full character snapshot. Classification
+//      is by entry type and comment, not purely by date.
 //
-//   2. Level-up combining — "Ereignis (Level Up)" + following
-//      "Ereignis (Basiswerte) / Level X" entries are combined into single
-//      LEVEL_UP_APPLIED records with cumulative levelUpProgress.
+//   2. Level-up entries kept separate — "Ereignis (Level Up)" and associated
+//      "Ereignis (Basiswerte) / Level X" entries remain as two separate
+//      history records (not aggregated).
 //
-//   3. Gewürfelte Begabung aggregation — multiple combat skill mod entries
-//      with "Gewürfelte Begabung" comment for the same skill are merged into
-//      one entry (earliest old value → latest new value).
+//   3. Migration boundary — a RULESET_VERSION_UPDATED record is appended in
+//      its own dedicated block with old/new ruleset versions.
 //
-//   4. Migration boundary — a RULESET_VERSION_UPDATED record is appended at
-//      the end with a full character snapshot.
-//
-//   5. Ignored types — "Sprache/Schrift geändert" entries are dropped
+//   4. Ignored types — "Sprache/Schrift geändert" entries are dropped
 //      (not in new schema).
 //
 // -----------------------------------------------------------------------------

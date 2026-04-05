@@ -76,7 +76,7 @@ import {
  *   structure. No value normalization is applied (e.g. no subtraction of base
  *   values or profession/hobby bonuses). The raw XML values are stored directly.
  * - The CHARACTER_CREATED record is built from scratch using
- *   createEmptyCharacterSheet() and replaying creation-date entries. Effects of
+ *   createEmptyCharacterSheet() and replaying creation entries. Effects of
  *   advantages, disadvantages, profession, and hobby (skill mods, bonuses) are
  *   NOT applied — they appear in follow-up legacy records. This means the
  *   creation sheet is intentionally incomplete compared to the new schema.
@@ -302,7 +302,7 @@ function buildHistoryRecords(
         fillAttributeRecord(record, name, oldValueText, newValueText, characterSheet, warnings);
         break;
       case HistoryRecordType.SKILL_CHANGED:
-        fillSkillRecord(record, name, oldValueText, newValueText, comment, characterSheet, warnings);
+        fillSkillRecord(record, name, oldValueText, newValueText, characterSheet, warnings);
         break;
       case HistoryRecordType.COMBAT_STATS_CHANGED:
         fillCombatStatsRecord(record, typeLabel, name, oldValueText, newValueText, characterSheet, warnings);
@@ -646,7 +646,6 @@ function fillSkillRecord(
   name: string,
   oldValueText: string,
   newValueText: string,
-  comment: string | null,
   characterSheet: CharacterSheet,
   warnings: string[],
 ): void {
