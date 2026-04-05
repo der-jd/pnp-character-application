@@ -668,9 +668,64 @@ function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterShee
   }
 }
 
+/**
+ * Applies non-combat skills from the XML sheet to the character sheet.
+ *
+ * ## Skill mapping
+ *
+ * Multiple old XML skills can map to the same new skill (see NON_COMBAT_SKILL_MAP).
+ * When this happens, points and costs are summed across all source skills, and the
+ * activation status is OR-ed: if at least one source skill is activated, the target
+ * skill is activated as well (unless it is already a start skill in the new format).
+ *
+ * ## Activation cost
+ *
+ * Activation costs from the old format are NOT reconciled. If a player paid AP to
+ * activate a skill in the old format but the skill is now a start skill, those AP
+ * are simply absorbed. Conversely, if a former start skill maps to a non-start skill
+ * in the new format but already has points, it gets activated for free.
+ *
+ * ## Activation decision paths
+ *
+ * The old XML encodes activation state in three ways:
+ *   - No <activated> field   → old start skill (activated by default)
+ *   - <activated>1            → explicitly activated (non-start)
+ *   - <activated>-4146        → deactivated
+ *
+ * The new format has a separate set of start skills (START_SKILLS). An old skill
+ * may or may not map to a new start skill. The following table lists all valid
+ * combinations and the resulting action:
+ *
+ * ```
+ *  XML state              │ Points?¹ │ New start skill? │ Action (final state)
+ *  ───────────────────────┼──────────┼──────────────────┼─────────────────────
+ *  Start (no field)       │ no       │ yes              │ ignore (activated)
+ *  Start (no field)       │ no       │ no               │ ignore (deactivated)
+ *  Start (no field)       │ yes      │ yes              │ transfer points (activated)
+ *  Start (no field)       │ yes      │ no               │ activate + transfer (activated)
+ *  Activated (1)          │ no       │ yes              │ ignore (activated)
+ *  Activated (1)          │ no       │ no               │ activate (activated)
+ *  Activated (1)          │ yes      │ yes              │ transfer points (activated)
+ *  Activated (1)          │ yes      │ no               │ activate + transfer (activated)
+ *  Deactivated (-xxx)     │ no       │ yes              │ ignore (activated)
+ *  Deactivated (-xxx)     │ no       │ no               │ ignore (deactivated)
+ *  Deactivated (-xxx)     │ yes      │ —                │ bug (impossible)
+ *
+ *  ¹ "Points" means taw > 0 OR mod > 0. A skill with points only in the mod
+ *    field (taw=0, mod>0) is still considered as having points and gets activated.
+ * ```
+ *
+ * Implementation: `activated` is computed per XML entry, then merged with
+ * `existing.activated` (which carries the new-format start skill default)
+ * via `activated || existing.activated`.
+ */
 function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): number {
   const skillsNode = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.skills]);
+
+  // The <skills> tag carries an activated_skills="N" count attribute which
+  // xml2js merges into the object. Remove it before iterating over skills.
   delete (skillsNode as Record<string, unknown>)[XML_CHARACTER_SHEET_KEYS.activatedSkills];
+
   let spentTotal = 0;
   for (const [rawName, rawValue] of Object.entries(skillsNode)) {
     const normalizedName = normalizeLabel(rawName);
@@ -681,10 +736,19 @@ function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: Characte
     }
     const { category, name } = splitSkill(mappedSkill);
     const value = rawValue as Record<string, unknown>;
+
+    // Determine activated status:
+    // - If the per-skill <activated> field exists, use it (>0 = activated).
+    // - Absence of the <activated> field means the skill is an old start skill.
+    //   Activate it only when it carries points (taw > 0 or mod > 0), so that
+    //   pointless old start skills that map to new non-start skills stay deactivated.
+    //   Combined with `activated || existing.activated` below, old start skills
+    //   that still ARE start skills in the new format keep their default `true`.
+    const hasPoints = toInt(value[XML_CHARACTER_SHEET_KEYS.taw]) > 0 || toInt(value[XML_CHARACTER_SHEET_KEYS.mod]) > 0;
     const activated =
       value[XML_CHARACTER_SHEET_KEYS.activated] !== undefined
         ? toInt(value[XML_CHARACTER_SHEET_KEYS.activated]) > 0
-        : START_SKILLS.includes(mappedSkill);
+        : hasPoints;
     const totalCost = toInt(value[XML_CHARACTER_SHEET_KEYS.totalCosts]);
     spentTotal += totalCost;
 
