@@ -238,7 +238,6 @@ export const HISTORY_SKILL_INCREASE_TYPE_LABELS = new Set([
 export const IGNORED_HISTORY_TYPES = new Set([HISTORY_TYPE_LANGUAGE_SCRIPT_CHANGED]);
 export const IGNORED_HISTORY_TYPES_WITH_WARNING = new Set([HISTORY_TYPE_LANGUAGE_SCRIPT_CHANGED]);
 export const STUDIUM_NAME = normalizeLabel("Studium");
-export const DEFAULT_GENERAL_INFORMATION_SKILL = "body/athletics" as SkillNameWithCategory;
 export const MISSING_SKILL_PLACEHOLDER = "general/missing" as SkillNameWithCategory;
 export const LEVEL_UP_COMMENT_PATTERN = /level\s*(\d+)/i;
 export const CREATION_COMMENT = normalizeLabel("Erstellung");

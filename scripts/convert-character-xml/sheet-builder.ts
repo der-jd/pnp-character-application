@@ -53,7 +53,7 @@ import {
   DISADVANTAGE_MAP,
   FEAR_OF_COST_BY_LABEL,
   FEAR_OF_DETAIL_BY_CHARACTER_HASH,
-  DEFAULT_GENERAL_INFORMATION_SKILL,
+  MISSING_SKILL_PLACEHOLDER,
   HISTORY_NAME_ADVENTURE_POINTS,
   HISTORY_TYPE_BASE_VALUE_EVENT,
   HISTORY_TYPE_CALCULATION_POINTS_EVENT,
@@ -61,7 +61,6 @@ import {
   BASE_VALUE_TO_LEVEL_UP_EFFECT,
   XML_CHARACTER_SHEET_KEYS,
   XML_HOBBY_NAME_TO_SKILL,
-  MISSING_SKILL_PLACEHOLDER,
 } from "./constants.js";
 
 // ---------------------------------------------------------------------------
@@ -629,11 +628,9 @@ function applyGeneralInformation(sheet: XmlCharacterSheet, characterSheet: Chara
   const professionSkillName = asText(profession[XML_CHARACTER_SHEET_KEYS.skill]);
   const professionSkill = mapGeneralInformationSkill(professionSkillName);
   if (!professionSkill) {
-    warnings.push(
-      `Unknown profession skill '${professionSkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`,
-    );
+    warnings.push(`Unknown profession skill '${professionSkillName}', defaulting to ${MISSING_SKILL_PLACEHOLDER}`);
   }
-  const resolvedProfessionSkill: SkillNameWithCategory = professionSkill ?? DEFAULT_GENERAL_INFORMATION_SKILL;
+  const resolvedProfessionSkill: SkillNameWithCategory = professionSkill ?? MISSING_SKILL_PLACEHOLDER;
   characterSheet.generalInformation.profession = {
     name: professionName,
     skill: resolvedProfessionSkill,
@@ -652,10 +649,9 @@ function applyGeneralInformation(sheet: XmlCharacterSheet, characterSheet: Chara
   }
   const hobbySkillFromXml = mapGeneralInformationSkill(hobbySkillName);
   if (!forcedHobbySkill && !hobbySkillFromXml && hobbySkillName) {
-    warnings.push(`Unknown hobby skill '${hobbySkillName}', defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`);
+    warnings.push(`Unknown hobby skill '${hobbySkillName}', defaulting to ${MISSING_SKILL_PLACEHOLDER}`);
   }
-  const resolvedHobbySkill: SkillNameWithCategory =
-    forcedHobbySkill ?? hobbySkillFromXml ?? DEFAULT_GENERAL_INFORMATION_SKILL;
+  const resolvedHobbySkill: SkillNameWithCategory = forcedHobbySkill ?? hobbySkillFromXml ?? MISSING_SKILL_PLACEHOLDER;
   characterSheet.generalInformation.hobby = {
     name: hobbyName,
     skill: resolvedHobbySkill,
