@@ -23,7 +23,6 @@ import {
   ADVANTAGE_CHANGED_TYPE,
   CALCULATION_POINTS_ATTRIBUTE_KEYWORDS,
   CREATION_COMMENT,
-  DEFAULT_GENERAL_INFORMATION_SKILL,
   HISTORY_NAME_ADVENTURE_POINTS_KEYWORD,
   HISTORY_TYPE_ATTACK_DISTRIBUTED,
   HISTORY_TYPE_ATTRIBUTE_CHANGED,
@@ -51,6 +50,7 @@ import {
   XML_HOBBY_NAME_TO_SKILL,
   XML_LEARNING_METHOD_MAP,
   LEGACY_RULESET_VERSION,
+  MISSING_SKILL_PLACEHOLDER,
 } from "./constants.js";
 import {
   recalculateCombatStats,
@@ -473,13 +473,11 @@ function applyCreationEntry(characterSheet: CharacterSheet, entry: HistoryEntry,
     case HISTORY_TYPE_PROFESSION_CHANGED: {
       const professionSkill = mapGeneralInformationSkill(newValueText);
       if (!professionSkill) {
-        warnings.push(
-          `Unknown profession skill '${newValueText}' in creation, defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`,
-        );
+        warnings.push(`Unknown profession skill '${newValueText}' in creation, using placeholder skill`);
       }
       characterSheet.generalInformation.profession = {
         name: rawName,
-        skill: professionSkill ?? DEFAULT_GENERAL_INFORMATION_SKILL,
+        skill: professionSkill ?? MISSING_SKILL_PLACEHOLDER,
       };
       return;
     }
@@ -487,14 +485,15 @@ function applyCreationEntry(characterSheet: CharacterSheet, entry: HistoryEntry,
       const normalizedHobbyName = normalizeLabel(rawName);
       const forcedHobbySkill = XML_HOBBY_NAME_TO_SKILL.get(normalizedHobbyName) ?? null;
       const hobbySkillFromEntry = mapGeneralInformationSkill(newValueText);
-      if (!forcedHobbySkill && !hobbySkillFromEntry && newValueText) {
-        warnings.push(
-          `Unknown hobby skill '${newValueText}' in creation, defaulting to ${DEFAULT_GENERAL_INFORMATION_SKILL}`,
-        );
+      if (!forcedHobbySkill && !hobbySkillFromEntry) {
+        const message = newValueText
+          ? `Unknown hobby skill '${newValueText}' in creation, using placeholder skill`
+          : `Missing hobby skill value for hobby '${rawName}' in creation, using placeholder skill`;
+        warnings.push(message);
       }
       characterSheet.generalInformation.hobby = {
         name: rawName,
-        skill: forcedHobbySkill ?? hobbySkillFromEntry ?? DEFAULT_GENERAL_INFORMATION_SKILL,
+        skill: forcedHobbySkill ?? hobbySkillFromEntry ?? MISSING_SKILL_PLACEHOLDER,
       };
       return;
     }
