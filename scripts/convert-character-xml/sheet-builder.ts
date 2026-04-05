@@ -697,19 +697,22 @@ function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterShee
  * combinations and the resulting action:
  *
  * ```
- *  XML state              │ Points? │ New start skill? │ Action
- *  ───────────────────────┼─────────┼──────────────────┼─────────────────────
- *  Start (no field)       │ no      │ yes              │ ignore (default)
- *  Start (no field)       │ no      │ no               │ ignore (not invested)
- *  Start (no field)       │ yes     │ yes              │ transfer points
- *  Start (no field)       │ yes     │ no               │ activate + transfer
- *  Activated (1)          │ no      │ yes              │ ignore (default)
- *  Activated (1)          │ no      │ no               │ activate
- *  Activated (1)          │ yes     │ yes              │ transfer points
- *  Activated (1)          │ yes     │ no               │ activate + transfer
- *  Deactivated (-xxx)     │ no      │ yes              │ ignore (default)
- *  Deactivated (-xxx)     │ no      │ no               │ ignore
- *  Deactivated (-xxx)     │ yes     │ —                │ bug (impossible)
+ *  XML state              │ Points?¹ │ New start skill? │ Action
+ *  ───────────────────────┼──────────┼──────────────────┼─────────────────────
+ *  Start (no field)       │ no       │ yes              │ ignore (default)
+ *  Start (no field)       │ no       │ no               │ ignore (not invested)
+ *  Start (no field)       │ yes      │ yes              │ transfer points
+ *  Start (no field)       │ yes      │ no               │ activate + transfer
+ *  Activated (1)          │ no       │ yes              │ ignore (default)
+ *  Activated (1)          │ no       │ no               │ activate
+ *  Activated (1)          │ yes      │ yes              │ transfer points
+ *  Activated (1)          │ yes      │ no               │ activate + transfer
+ *  Deactivated (-xxx)     │ no       │ yes              │ ignore (default)
+ *  Deactivated (-xxx)     │ no       │ no               │ ignore
+ *  Deactivated (-xxx)     │ yes      │ —                │ bug (impossible)
+ *
+ *  ¹ "Points" means taw > 0 OR mod > 0. A skill with points only in the mod
+ *    field (taw=0, mod>0) is still considered as having points and gets activated.
  * ```
  *
  * Implementation: `activated` is computed per XML entry, then merged with
@@ -737,14 +740,15 @@ function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: Characte
     // Determine activated status:
     // - If the per-skill <activated> field exists, use it (>0 = activated).
     // - Absence of the <activated> field means the skill is an old start skill.
-    //   Activate it only when it carries points (taw > 0), so that pointless old
-    //   start skills that map to new non-start skills stay deactivated.
+    //   Activate it only when it carries points (taw > 0 or mod > 0), so that
+    //   pointless old start skills that map to new non-start skills stay deactivated.
     //   Combined with `activated || existing.activated` below, old start skills
     //   that still ARE start skills in the new format keep their default `true`.
+    const hasPoints = toInt(value[XML_CHARACTER_SHEET_KEYS.taw]) > 0 || toInt(value[XML_CHARACTER_SHEET_KEYS.mod]) > 0;
     const activated =
       value[XML_CHARACTER_SHEET_KEYS.activated] !== undefined
         ? toInt(value[XML_CHARACTER_SHEET_KEYS.activated]) > 0
-        : toInt(value[XML_CHARACTER_SHEET_KEYS.taw]) > 0;
+        : hasPoints;
     const totalCost = toInt(value[XML_CHARACTER_SHEET_KEYS.totalCosts]);
     spentTotal += totalCost;
 
