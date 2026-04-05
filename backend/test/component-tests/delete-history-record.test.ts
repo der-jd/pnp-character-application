@@ -105,6 +105,30 @@ describe.sequential("delete-history-record component tests", () => {
         "The latest record does not match the given id",
       );
     });
+
+    test("reverting a major ruleset version change is not allowed", async () => {
+      // Use a seed character with major version 2.x whose history contains a major version update record
+      const majorVersionContext = await TestContextFactory.createContext(
+        TestContextFactory.loadCharacterIdFromTestData("character-major-version-newer.dynamodb.json"),
+      );
+      const client = majorVersionContext.apiClient;
+
+      // The latest history record should be the RULESET_VERSION_UPDATED record with a major version change
+      expect(majorVersionContext.lastHistoryRecord.type).toBe(HistoryRecordType.RULESET_VERSION_UPDATED);
+
+      // Attempt to revert the major version change — should be blocked
+      await expectApiError(
+        () =>
+          client.delete(
+            `characters/${majorVersionContext.character.characterId}/history/${majorVersionContext.lastHistoryRecord.id}`,
+          ),
+        400,
+        "Reverting a major version change is not allowed",
+      );
+
+      // Clean up the major version context immediately since it can't be used for afterEach verification
+      await TestContextFactory.cleanupContext(majorVersionContext);
+    });
   });
 
   /**
@@ -404,31 +428,6 @@ describe.sequential("delete-history-record component tests", () => {
       deleteHistoryRecordResponseSchema.parse(
         await client.delete(`characters/${character.characterId}/history/${updateResponse.historyRecord?.id}`),
       );
-    });
-
-    test("Reverting a major ruleset version change is not allowed", async () => {
-      // Use a seed character with major version 2.x whose history contains a major version update record
-      await TestContextFactory.cleanupContext(context);
-      const majorVersionContext = await TestContextFactory.createContext(
-        TestContextFactory.loadCharacterIdFromTestData("character-major-version-newer.dynamodb.json"),
-      );
-      const client = majorVersionContext.apiClient;
-
-      // The latest history record should be the RULESET_VERSION_UPDATED record with a major version change
-      expect(majorVersionContext.lastHistoryRecord.type).toBe(HistoryRecordType.RULESET_VERSION_UPDATED);
-
-      // Attempt to revert the major version change — should be blocked
-      await expectApiError(
-        () =>
-          client.delete(
-            `characters/${majorVersionContext.character.characterId}/history/${majorVersionContext.lastHistoryRecord.id}`,
-          ),
-        400,
-        "Reverting a major version change is not allowed",
-      );
-
-      // Re-assign context for cleanup in afterAll
-      context = majorVersionContext;
     });
 
     test.each([
