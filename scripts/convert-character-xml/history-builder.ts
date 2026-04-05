@@ -66,30 +66,29 @@ import {
   getStartAdventurePoints,
 } from "./sheet-builder.js";
 
-// ---------------------------------------------------------------------------
-// Phase 2 — Convert legacy XML history entries into new-schema history blocks.
-//
-// This phase is fully independent from Phase 1 (character conversion).
-//
-// Design decisions:
-// - Legacy history entries are kept as-is and only mapped to the new schema
-//   structure. No value normalization is applied (e.g. no subtraction of base
-//   values or profession/hobby bonuses). The raw XML values are stored directly.
-// - The CHARACTER_CREATED record is built from scratch using
-//   createEmptyCharacterSheet() and replaying creation-date entries. Effects of
-//   advantages, disadvantages, profession, and hobby (skill mods, bonuses) are
-//   NOT applied — they appear in follow-up legacy records. This means the
-//   creation sheet is intentionally incomplete compared to the new schema.
-// - Level-up entries are not aggregated: the legacy "Level Up" event and its
-//   associated "Basiswerte" change remain as two separate history records.
-// - All legacy records are non-revertable. A RULESET_VERSION_UPDATED migration
-//   record is appended in its own block to mark the boundary between legacy
-//   and new history.
-// - The authoritative character state is the one produced by Phase 1
-//   (convertCharacter). The legacy history exists for visualization and audit
-//   only — it does not need to be consistent with the final character sheet.
-// ---------------------------------------------------------------------------
-
+/**
+ * Phase 2 — Convert legacy XML history entries into new-schema history blocks.
+ *
+ * This phase is fully independent from Phase 1 (character conversion).
+ *
+ * Design decisions:
+ * - Legacy history entries are kept as-is and only mapped to the new schema
+ *   structure. No value normalization is applied (e.g. no subtraction of base
+ *   values or profession/hobby bonuses). The raw XML values are stored directly.
+ * - The CHARACTER_CREATED record is built from scratch using
+ *   createEmptyCharacterSheet() and replaying creation-date entries. Effects of
+ *   advantages, disadvantages, profession, and hobby (skill mods, bonuses) are
+ *   NOT applied — they appear in follow-up legacy records. This means the
+ *   creation sheet is intentionally incomplete compared to the new schema.
+ * - Level-up entries are not aggregated: the legacy "Level Up" event and its
+ *   associated "Basiswerte" change remain as two separate history records.
+ * - All legacy records are non-revertable. A RULESET_VERSION_UPDATED migration
+ *   record is appended in its own block to mark the boundary between legacy
+ *   and new history.
+ * - The authoritative character state is the one produced by Phase 1
+ *   (convertCharacter). The legacy history exists for visualization and audit
+ *   only — it does not need to be consistent with the final character sheet.
+ */
 export function convertHistory(
   rawHistoryEntries: HistoryEntry[],
   userId: string,
