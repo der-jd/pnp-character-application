@@ -697,18 +697,18 @@ function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterShee
  * combinations and the resulting action:
  *
  * ```
- *  XML state              │ Points?¹ │ New start skill? │ Action
+ *  XML state              │ Points?¹ │ New start skill? │ Action (final state)
  *  ───────────────────────┼──────────┼──────────────────┼─────────────────────
- *  Start (no field)       │ no       │ yes              │ ignore (default)
- *  Start (no field)       │ no       │ no               │ ignore (not invested)
- *  Start (no field)       │ yes      │ yes              │ transfer points
- *  Start (no field)       │ yes      │ no               │ activate + transfer
- *  Activated (1)          │ no       │ yes              │ ignore (default)
- *  Activated (1)          │ no       │ no               │ activate
- *  Activated (1)          │ yes      │ yes              │ transfer points
- *  Activated (1)          │ yes      │ no               │ activate + transfer
- *  Deactivated (-xxx)     │ no       │ yes              │ ignore (default)
- *  Deactivated (-xxx)     │ no       │ no               │ ignore
+ *  Start (no field)       │ no       │ yes              │ ignore (activated)
+ *  Start (no field)       │ no       │ no               │ ignore (deactivated)
+ *  Start (no field)       │ yes      │ yes              │ transfer points (activated)
+ *  Start (no field)       │ yes      │ no               │ activate + transfer (activated)
+ *  Activated (1)          │ no       │ yes              │ ignore (activated)
+ *  Activated (1)          │ no       │ no               │ activate (activated)
+ *  Activated (1)          │ yes      │ yes              │ transfer points (activated)
+ *  Activated (1)          │ yes      │ no               │ activate + transfer (activated)
+ *  Deactivated (-xxx)     │ no       │ yes              │ ignore (activated)
+ *  Deactivated (-xxx)     │ no       │ no               │ ignore (deactivated)
  *  Deactivated (-xxx)     │ yes      │ —                │ bug (impossible)
  *
  *  ¹ "Points" means taw > 0 OR mod > 0. A skill with points only in the mod
