@@ -61,6 +61,7 @@ import {
   BASE_VALUE_TO_LEVEL_UP_EFFECT,
   XML_CHARACTER_SHEET_KEYS,
   XML_HOBBY_NAME_TO_SKILL,
+  MISSING_SKILL_PLACEHOLDER,
 } from "./constants.js";
 
 // ---------------------------------------------------------------------------
@@ -362,8 +363,8 @@ export function createEmptyCharacterSheet(): CharacterSheet {
       level: 1,
       levelUpProgress: levelUpProgressSchema.parse({}),
       sex: "",
-      profession: { name: "", skill: "body/athletics" },
-      hobby: { name: "", skill: "body/athletics" },
+      profession: { name: "", skill: MISSING_SKILL_PLACEHOLDER },
+      hobby: { name: "", skill: MISSING_SKILL_PLACEHOLDER },
       birthday: "",
       birthplace: "",
       size: "",
