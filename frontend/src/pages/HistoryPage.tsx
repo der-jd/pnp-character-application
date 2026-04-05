@@ -5,10 +5,10 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { MessageSquare, Undo2, ChevronRight, ChevronDown, Loader2 } from "lucide-react";
 import { HistoryRecordType, type HistoryRecord, type HistoryBlock } from "api-spec";
-import { t } from "@/i18n";
+import { t, type TranslationKey } from "@/i18n";
 import { fetchHistory, updateHistoryComment, revertHistoryRecord } from "@/api/history";
 import { ApiError } from "@/api/client";
-import { historyRecordTypeKeys } from "@/i18n/mappings";
+import { historyRecordTypeKeys, advantageNameKeys, disadvantageNameKeys } from "@/i18n/mappings";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { FullPageSpinner } from "@/components/ui/Spinner";
@@ -390,6 +390,16 @@ function TreeRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+function formatAdvantageOrDisadvantage(tuple: unknown[], nameKeys: Record<number, TranslationKey>): string {
+  const [enumValue, info, cost] = tuple as [number, string, number];
+  const nameKey = nameKeys[enumValue];
+  const name = nameKey ? t(nameKey) : String(enumValue);
+  const parts = [name];
+  if (info) parts.push(info);
+  if (cost !== undefined) parts.push(String(cost));
+  return parts.join(", ");
+}
+
 function JsonTree({ data }: { data: Record<string, unknown> }) {
   return (
     <div className="space-y-0.5">
@@ -402,6 +412,22 @@ function JsonTree({ data }: { data: Record<string, unknown> }) {
           );
         }
         if (Array.isArray(value)) {
+          const isAdvantages = key === "advantages";
+          const isDisadvantages = key === "disadvantages";
+          if ((isAdvantages || isDisadvantages) && value.length > 0 && Array.isArray(value[0])) {
+            const nameKeys = isAdvantages ? advantageNameKeys : disadvantageNameKeys;
+            return (
+              <CollapsibleNode compact defaultExpanded key={key} label={`${key} (${value.length})`}>
+                {value.map((tuple, i) => (
+                  <TreeRow
+                    key={i}
+                    label={`[${i}]`}
+                    value={formatAdvantageOrDisadvantage(tuple as unknown[], nameKeys)}
+                  />
+                ))}
+              </CollapsibleNode>
+            );
+          }
           return (
             <CollapsibleNode compact defaultExpanded key={key} label={`${key} (${value.length})`}>
               {value.map((item, i) =>
