@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { FullPageSpinner } from "@/components/ui/Spinner";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog, Dialog } from "@/components/ui/Dialog";
+import { CollapsibleNode } from "@/components/ui/CollapsibleNode";
 
 const TYPE_BADGE_VARIANTS: Record<number, "default" | "success" | "info" | "warning" | "danger"> = {
   [HistoryRecordType.CHARACTER_CREATED]: "success",
@@ -285,7 +286,7 @@ export function HistoryPage() {
                       <div className="text-xs space-y-1.5">
                         {record.learningMethod && <TreeRow label={t("learningMethod")} value={record.learningMethod} />}
                         {record.calculationPoints.adventurePoints && (
-                          <TreeNode label={t("adventurePoints")}>
+                          <CollapsibleNode compact defaultExpanded label={t("adventurePoints")}>
                             <TreeRow
                               label={t("oldValue")}
                               value={JSON.stringify(record.calculationPoints.adventurePoints.old)}
@@ -294,10 +295,10 @@ export function HistoryPage() {
                               label={t("newValue")}
                               value={JSON.stringify(record.calculationPoints.adventurePoints.new)}
                             />
-                          </TreeNode>
+                          </CollapsibleNode>
                         )}
                         {record.calculationPoints.attributePoints && (
-                          <TreeNode label={t("attributePoints")}>
+                          <CollapsibleNode compact defaultExpanded label={t("attributePoints")}>
                             <TreeRow
                               label={t("oldValue")}
                               value={JSON.stringify(record.calculationPoints.attributePoints.old)}
@@ -306,16 +307,16 @@ export function HistoryPage() {
                               label={t("newValue")}
                               value={JSON.stringify(record.calculationPoints.attributePoints.new)}
                             />
-                          </TreeNode>
+                          </CollapsibleNode>
                         )}
                         {record.data.old && (
-                          <TreeNode label={t("oldValue")}>
+                          <CollapsibleNode compact defaultExpanded label={t("oldValue")}>
                             <JsonTree data={record.data.old} />
-                          </TreeNode>
+                          </CollapsibleNode>
                         )}
-                        <TreeNode label={t("newValue")}>
+                        <CollapsibleNode compact defaultExpanded label={t("newValue")}>
                           <JsonTree data={record.data.new} />
-                        </TreeNode>
+                        </CollapsibleNode>
                       </div>
                     </div>
                   )}
@@ -380,31 +381,6 @@ export function HistoryPage() {
   );
 }
 
-function TreeNode({
-  label,
-  children,
-  defaultExpanded = true,
-}: {
-  label: string;
-  children: React.ReactNode;
-  defaultExpanded?: boolean;
-}) {
-  const [expanded, setExpanded] = useState(defaultExpanded);
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={() => setExpanded((prev) => !prev)}
-        className="flex items-center gap-1 font-medium text-text-secondary hover:text-text-primary cursor-pointer select-none"
-      >
-        {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-        {label}
-      </button>
-      {expanded && <div className="ml-4 border-l border-border-primary pl-3 mt-0.5 space-y-0.5">{children}</div>}
-    </div>
-  );
-}
-
 function TreeRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-2">
@@ -420,24 +396,24 @@ function JsonTree({ data }: { data: Record<string, unknown> }) {
       {Object.entries(data).map(([key, value]) => {
         if (value !== null && typeof value === "object" && !Array.isArray(value)) {
           return (
-            <TreeNode key={key} label={key}>
+            <CollapsibleNode compact defaultExpanded key={key} label={key}>
               <JsonTree data={value as Record<string, unknown>} />
-            </TreeNode>
+            </CollapsibleNode>
           );
         }
         if (Array.isArray(value)) {
           return (
-            <TreeNode key={key} label={`${key} (${value.length})`}>
+            <CollapsibleNode compact defaultExpanded key={key} label={`${key} (${value.length})`}>
               {value.map((item, i) =>
                 typeof item === "object" && item !== null ? (
-                  <TreeNode key={i} label={`[${i}]`}>
+                  <CollapsibleNode compact defaultExpanded key={i} label={`[${i}]`}>
                     <JsonTree data={item as Record<string, unknown>} />
-                  </TreeNode>
+                  </CollapsibleNode>
                 ) : (
                   <TreeRow key={i} label={`[${i}]`} value={String(item)} />
                 ),
               )}
-            </TreeNode>
+            </CollapsibleNode>
           );
         }
         return <TreeRow key={key} label={key} value={String(value ?? "—")} />;

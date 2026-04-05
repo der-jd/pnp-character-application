@@ -1,8 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { clsx } from "clsx";
-import { ChevronDown, ChevronRight } from "lucide-react";
 import {
   LEVEL_UP_DICE_EXPRESSION,
   LEVEL_UP_DICE_MIN_TOTAL,
@@ -24,6 +23,7 @@ import { Input } from "@/components/ui/Input";
 import { FullPageSpinner } from "@/components/ui/Spinner";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { useToast } from "@/components/ui/Toast";
+import { CollapsibleNode } from "@/components/ui/CollapsibleNode";
 
 export function LevelUpPage() {
   const { characterId } = useParams<{ characterId: string }>();
@@ -221,31 +221,6 @@ export function LevelUpPage() {
 
       {/* Level Up Progress Tree */}
       {character && <LevelUpProgressTree progress={character.characterSheet.generalInformation.levelUpProgress} />}
-    </div>
-  );
-}
-
-function CollapsibleNode({
-  label,
-  defaultExpanded = false,
-  children,
-}: {
-  label: ReactNode;
-  defaultExpanded?: boolean;
-  children: ReactNode;
-}) {
-  const [expanded, setExpanded] = useState(defaultExpanded);
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={() => setExpanded((prev) => !prev)}
-        className="flex items-center gap-1.5 font-medium text-text-secondary hover:text-text-primary cursor-pointer select-none"
-      >
-        {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-        {label}
-      </button>
-      {expanded && <div className="ml-4 border-l border-border-primary pl-3 mt-1 space-y-1">{children}</div>}
     </div>
   );
 }
