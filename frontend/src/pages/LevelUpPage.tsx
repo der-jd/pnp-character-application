@@ -7,6 +7,7 @@ import {
   LEVEL_UP_DICE_MIN_TOTAL,
   LEVEL_UP_DICE_MAX_TOTAL,
   type LevelUpOption,
+  type LevelUpEffectKind,
   type EffectByLevelUp,
   type LevelUpProgress,
 } from "api-spec";
@@ -240,7 +241,7 @@ function formatEffectDetail(effect: EffectByLevelUp): string {
 function LevelUpProgressTree({ progress }: { progress: LevelUpProgress }) {
   const levelEntries = Object.entries(progress.effectsByLevel).sort(([a], [b]) => Number(a) - Number(b));
   const effectEntries = Object.entries(progress.effects) as [
-    string,
+    LevelUpEffectKind,
     { selectionCount: number; firstChosenLevel: number; lastChosenLevel: number },
   ][];
 
@@ -256,7 +257,7 @@ function LevelUpProgressTree({ progress }: { progress: LevelUpProgress }) {
           {levelEntries.length > 0 && (
             <CollapsibleNode label={t("levelUpProgressByLevel")} defaultExpanded>
               {levelEntries.map(([level, effect]) => {
-                const effectName = t(levelUpEffectKeys[effect.kind]!);
+                const effectName = t(levelUpEffectKeys[effect.kind]);
                 const detail = formatEffectDetail(effect);
                 return (
                   <div key={level} className="flex items-center gap-2 text-sm py-0.5">
@@ -276,7 +277,7 @@ function LevelUpProgressTree({ progress }: { progress: LevelUpProgress }) {
                   key={kind}
                   label={
                     <span className="flex items-center gap-2">
-                      {t(levelUpEffectKeys[kind]!)}
+                      {t(levelUpEffectKeys[kind])}
                       <Badge variant="default">{t("levelUpProgressCount", prog.selectionCount)}</Badge>
                     </span>
                   }
