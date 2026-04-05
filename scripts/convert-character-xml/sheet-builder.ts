@@ -668,6 +668,54 @@ function applyBaseValues(sheet: XmlCharacterSheet, characterSheet: CharacterShee
   }
 }
 
+/**
+ * Applies non-combat skills from the XML sheet to the character sheet.
+ *
+ * ## Skill mapping
+ *
+ * Multiple old XML skills can map to the same new skill (see NON_COMBAT_SKILL_MAP).
+ * When this happens, points and costs are summed across all source skills, and the
+ * activation status is OR-ed: if at least one source skill is activated, the target
+ * skill is activated as well (unless it is already a start skill in the new format).
+ *
+ * ## Activation cost
+ *
+ * Activation costs from the old format are NOT reconciled. If a player paid AP to
+ * activate a skill in the old format but the skill is now a start skill, those AP
+ * are simply absorbed. Conversely, if a former start skill maps to a non-start skill
+ * in the new format but already has points, it gets activated for free.
+ *
+ * ## Activation decision paths
+ *
+ * The old XML encodes activation state in three ways:
+ *   - No <activated> field   → old start skill (activated by default)
+ *   - <activated>1            → explicitly activated (non-start)
+ *   - <activated>-4146        → deactivated
+ *
+ * The new format has a separate set of start skills (START_SKILLS). An old skill
+ * may or may not map to a new start skill. The following table lists all valid
+ * combinations and the resulting action:
+ *
+ * ```
+ *  XML state              │ Points? │ New start skill? │ Action
+ *  ───────────────────────┼─────────┼──────────────────┼─────────────────────
+ *  Start (no field)       │ no      │ yes              │ ignore (default)
+ *  Start (no field)       │ no      │ no               │ ignore (not invested)
+ *  Start (no field)       │ yes     │ yes              │ transfer points
+ *  Start (no field)       │ yes     │ no               │ activate + transfer
+ *  Activated (1)          │ no      │ yes              │ ignore (default)
+ *  Activated (1)          │ no      │ no               │ activate
+ *  Activated (1)          │ yes     │ yes              │ transfer points
+ *  Activated (1)          │ yes     │ no               │ activate + transfer
+ *  Deactivated (-xxx)     │ no      │ yes              │ ignore (default)
+ *  Deactivated (-xxx)     │ no      │ no               │ ignore
+ *  Deactivated (-xxx)     │ yes     │ —                │ bug (impossible)
+ * ```
+ *
+ * Implementation: `activated` is computed per XML entry, then merged with
+ * `existing.activated` (which carries the new-format start skill default)
+ * via `activated || existing.activated`.
+ */
 function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: CharacterSheet, warnings: string[]): number {
   const skillsNode = asRecord(sheet[XML_CHARACTER_SHEET_KEYS.skills]);
 
@@ -690,15 +738,17 @@ function applyNonCombatSkills(sheet: XmlCharacterSheet, characterSheet: Characte
     // Determine activated status. Priority order:
     // 1. If the XML contains an <activated_skills> element with skill names, use it.
     // 2. If the per-skill <activated> field exists, use it (>0 = activated).
-    // 3. Otherwise the skill has no explicit deactivation marker, so treat it as
-    //    activated. The XML export always marks deactivated skills with a negative
-    //    <activated> value (-4146); absence of the field means activated.
+    // 3. Absence of the <activated> field means the skill is an old start skill.
+    //    Activate it only when it carries points (taw > 0), so that pointless old
+    //    start skills that map to new non-start skills stay deactivated.
+    //    Combined with `activated || existing.activated` below, old start skills
+    //    that still ARE start skills in the new format keep their default `true`.
     const activated =
       activatedFromXml !== null
         ? activatedFromXml.has(mappedSkill)
         : value[XML_CHARACTER_SHEET_KEYS.activated] !== undefined
           ? toInt(value[XML_CHARACTER_SHEET_KEYS.activated]) > 0
-          : true;
+          : toInt(value[XML_CHARACTER_SHEET_KEYS.taw]) > 0;
     const totalCost = toInt(value[XML_CHARACTER_SHEET_KEYS.totalCosts]);
     spentTotal += totalCost;
 
