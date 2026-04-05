@@ -94,6 +94,7 @@ export async function main(): Promise<void> {
   const rawHistoryEntries = ensureArray(historyNode[XML_CHARACTER_SHEET_KEYS.entry]) as HistoryEntry[];
 
   await fs.mkdir(outDir, { recursive: true });
+  console.log(`Character ID: ${characterId}`);
   const warnings: string[] = [];
 
   // --- Phase 1: Build character (independent) ---
