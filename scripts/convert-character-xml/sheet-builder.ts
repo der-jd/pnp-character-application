@@ -61,7 +61,7 @@ import {
 } from "./constants.js";
 
 // ---------------------------------------------------------------------------
-// Shared character-sheet building logic used by both Phase 1 and Phase 2.
+// Phase 1 – character-sheet building (used by character-builder.ts)
 // ---------------------------------------------------------------------------
 
 /**
@@ -88,77 +88,6 @@ export function buildCharacterSheet(sheet: XmlCharacterSheet): { characterSheet:
   applyCalculationPoints(sheet, characterSheet, spentOnSkills, spentOnCombatSkills);
 
   return { characterSheet, warnings };
-}
-
-// ---------------------------------------------------------------------------
-// Shared utility functions (exported for use by both phases)
-// ---------------------------------------------------------------------------
-
-export function recalculateCombatStats(
-  stats: CombatStats,
-  category: CombatCategory,
-  skill: Skill,
-  baseValues: BaseValues,
-): CombatStats {
-  const availablePoints =
-    stats.handling + (skill.current + skill.mod) - (stats.skilledAttackValue + stats.skilledParadeValue);
-  const updated: CombatStats = {
-    ...stats,
-    availablePoints,
-  };
-
-  if (category === "melee") {
-    updated.attackValue =
-      stats.skilledAttackValue + baseValues.attackBaseValue.current + baseValues.attackBaseValue.mod;
-    updated.paradeValue =
-      stats.skilledParadeValue + baseValues.paradeBaseValue.current + baseValues.paradeBaseValue.mod;
-  } else {
-    updated.attackValue =
-      stats.skilledAttackValue + baseValues.rangedAttackBaseValue.current + baseValues.rangedAttackBaseValue.mod;
-    updated.paradeValue = 0;
-  }
-
-  return updated;
-}
-
-export function mapNonCombatSkill(name: string): SkillNameWithCategory | null {
-  if (!name) {
-    return null;
-  }
-  return NON_COMBAT_SKILL_MAP.get(normalizeLabel(name)) ?? null;
-}
-
-export function splitSkill(skill: SkillNameWithCategory): { category: SkillCategory; name: SkillName } {
-  const [category, name] = skill.split("/") as [SkillCategory, SkillName];
-  return { category, name };
-}
-
-export function getSkillCategorySection(
-  skills: CharacterSheet["skills"],
-  category: SkillCategory,
-): Record<string, Skill> {
-  return skills[category] as Record<string, Skill>;
-}
-
-export function getCombatCategorySection(
-  combat: CharacterSheet["combat"],
-  category: CombatCategory,
-): Record<string, CombatStats> {
-  return combat[category] as Record<string, CombatStats>;
-}
-
-export function calculateGenerationPoints(characterSheet: CharacterSheet): {
-  throughDisadvantages: number;
-  spent: number;
-  total: number;
-} {
-  const throughDisadvantages = characterSheet.disadvantages.reduce((sum, [, , value]) => sum + (value ?? 0), 0);
-  const spent = characterSheet.advantages.reduce((sum, [, , value]) => sum + (value ?? 0), 0);
-  return {
-    throughDisadvantages,
-    spent,
-    total: GENERATION_POINTS + throughDisadvantages,
-  };
 }
 
 export function extractLevelUpEffects(entries: HistoryEntry[]): Record<string, EffectByLevelUp> {
@@ -244,6 +173,63 @@ export function buildLevelUpProgressFromEffects(effectsByLevel: Record<string, E
   progress.effectsByLevel = effectsByLevel;
   progress.effects = summaries as LevelUpProgress["effects"];
   return progress;
+}
+
+// ---------------------------------------------------------------------------
+// Shared utility functions (used by both phases)
+// ---------------------------------------------------------------------------
+
+export function mapNonCombatSkill(name: string): SkillNameWithCategory | null {
+  if (!name) {
+    return null;
+  }
+  return NON_COMBAT_SKILL_MAP.get(normalizeLabel(name)) ?? null;
+}
+
+export function recalculateCombatStats(
+  stats: CombatStats,
+  category: CombatCategory,
+  skill: Skill,
+  baseValues: BaseValues,
+): CombatStats {
+  const availablePoints =
+    stats.handling + (skill.current + skill.mod) - (stats.skilledAttackValue + stats.skilledParadeValue);
+  const updated: CombatStats = {
+    ...stats,
+    availablePoints,
+  };
+
+  if (category === "melee") {
+    updated.attackValue =
+      stats.skilledAttackValue + baseValues.attackBaseValue.current + baseValues.attackBaseValue.mod;
+    updated.paradeValue =
+      stats.skilledParadeValue + baseValues.paradeBaseValue.current + baseValues.paradeBaseValue.mod;
+  } else {
+    updated.attackValue =
+      stats.skilledAttackValue + baseValues.rangedAttackBaseValue.current + baseValues.rangedAttackBaseValue.mod;
+    updated.paradeValue = 0;
+  }
+
+  return updated;
+}
+
+export function splitSkill(skill: SkillNameWithCategory): { category: SkillCategory; name: SkillName } {
+  const [category, name] = skill.split("/") as [SkillCategory, SkillName];
+  return { category, name };
+}
+
+export function getSkillCategorySection(
+  skills: CharacterSheet["skills"],
+  category: SkillCategory,
+): Record<string, Skill> {
+  return skills[category] as Record<string, Skill>;
+}
+
+export function getCombatCategorySection(
+  combat: CharacterSheet["combat"],
+  category: CombatCategory,
+): Record<string, CombatStats> {
+  return combat[category] as Record<string, CombatStats>;
 }
 
 export function createEmptyCharacterSheet(): CharacterSheet {
@@ -470,6 +456,24 @@ export function mapGeneralInformationSkill(name: string): SkillNameWithCategory 
     return `combat/${combatSkill}` as SkillNameWithCategory;
   }
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// Phase 2 only – history-based rebuilding (used by history-builder.ts)
+// ---------------------------------------------------------------------------
+
+export function calculateGenerationPoints(characterSheet: CharacterSheet): {
+  throughDisadvantages: number;
+  spent: number;
+  total: number;
+} {
+  const throughDisadvantages = characterSheet.disadvantages.reduce((sum, [, , value]) => sum + (value ?? 0), 0);
+  const spent = characterSheet.advantages.reduce((sum, [, , value]) => sum + (value ?? 0), 0);
+  return {
+    throughDisadvantages,
+    spent,
+    total: GENERATION_POINTS + throughDisadvantages,
+  };
 }
 
 // ---------------------------------------------------------------------------
