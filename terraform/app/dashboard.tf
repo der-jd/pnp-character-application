@@ -1,6 +1,4 @@
 resource "aws_cloudwatch_dashboard" "backend" {
-  count = local.is_prod ? 1 : 0
-
   dashboard_name = "${local.prefix}-backend-${local.suffix}"
 
   # Lambda and Step Functions metrics are omitted here because CloudWatch
