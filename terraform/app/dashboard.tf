@@ -1,39 +1,13 @@
-locals {
-  lambda_functions = [
-    module.add_history_record_lambda.lambda_function,
-    module.add_special_ability_lambda.lambda_function,
-    module.apply_level_up_lambda.lambda_function,
-    module.clone_character_lambda.lambda_function,
-    module.create_character_lambda.lambda_function,
-    module.delete_character_lambda.lambda_function,
-    module.get_character_lambda.lambda_function,
-    module.get_characters_lambda.lambda_function,
-    module.get_history_lambda.lambda_function,
-    module.get_level_up_lambda.lambda_function,
-    module.get_skill_increase_cost_lambda.lambda_function,
-    module.revert_history_record_lambda.lambda_function,
-    module.set_history_comment_lambda.lambda_function,
-    module.update_attribute_lambda.lambda_function,
-    module.update_base_value_lambda.lambda_function,
-    module.update_calculation_points_lambda.lambda_function,
-    module.update_combat_stats_lambda.lambda_function,
-    module.update_skill_lambda.lambda_function,
-  ]
-
-  state_machine_arns = [
-    module.update_skill_state_machine.state_machine_arn,
-    module.update_attribute_state_machine.state_machine_arn,
-    module.update_base_value_state_machine.state_machine_arn,
-    module.add_special_ability_state_machine.state_machine_arn,
-    module.update_calculation_points_state_machine.state_machine_arn,
-    module.update_combat_stats_state_machine.state_machine_arn,
-    module.apply_level_up_state_machine.state_machine_arn,
-    module.create_character_state_machine.state_machine_arn,
-  ]
-}
-
 resource "aws_cloudwatch_dashboard" "backend" {
   dashboard_name = "${local.prefix}-backend-${local.suffix}"
+
+  # Lambda and Step Functions metrics are omitted here because CloudWatch
+  # provides free automatic per-service dashboards that already cover
+  # per-function invocations, errors, duration, throttles, concurrent
+  # executions, and per-state-machine execution metrics.
+  #
+  # Keeping only API Gateway and DynamoDB widgets gives a focused cross-service
+  # overview while staying within the free-tier limit of 50 metrics per dashboard.
 
   dashboard_body = jsonencode({
     widgets = [
@@ -99,163 +73,11 @@ resource "aws_cloudwatch_dashboard" "backend" {
         }
       },
 
-      # --- Lambda Functions ---
-      {
-        type   = "text"
-        x      = 0
-        y      = 7
-        width  = 24
-        height = 1
-        properties = {
-          markdown = "# Lambda Functions"
-        }
-      },
-      {
-        type   = "metric"
-        x      = 0
-        y      = 8
-        width  = 8
-        height = 6
-        properties = {
-          title  = "Lambda Invocations"
-          region = data.aws_region.current.region
-          stat   = "Sum"
-          period = 300
-          metrics = [for fn in local.lambda_functions :
-            ["AWS/Lambda", "Invocations", "FunctionName", fn.function_name]
-          ]
-        }
-      },
-      {
-        type   = "metric"
-        x      = 8
-        y      = 8
-        width  = 8
-        height = 6
-        properties = {
-          title  = "Lambda Errors"
-          region = data.aws_region.current.region
-          stat   = "Sum"
-          period = 300
-          metrics = [for fn in local.lambda_functions :
-            ["AWS/Lambda", "Errors", "FunctionName", fn.function_name]
-          ]
-        }
-      },
-      {
-        type   = "metric"
-        x      = 16
-        y      = 8
-        width  = 8
-        height = 6
-        properties = {
-          title  = "Lambda Duration (Average)"
-          region = data.aws_region.current.region
-          stat   = "Average"
-          period = 300
-          metrics = [for fn in local.lambda_functions :
-            ["AWS/Lambda", "Duration", "FunctionName", fn.function_name]
-          ]
-        }
-      },
-      {
-        type   = "metric"
-        x      = 0
-        y      = 14
-        width  = 8
-        height = 6
-        properties = {
-          title  = "Lambda Throttles"
-          region = data.aws_region.current.region
-          stat   = "Sum"
-          period = 300
-          metrics = [for fn in local.lambda_functions :
-            ["AWS/Lambda", "Throttles", "FunctionName", fn.function_name]
-          ]
-        }
-      },
-      {
-        type   = "metric"
-        x      = 8
-        y      = 14
-        width  = 8
-        height = 6
-        properties = {
-          title  = "Lambda Concurrent Executions"
-          region = data.aws_region.current.region
-          stat   = "Maximum"
-          period = 300
-          metrics = [for fn in local.lambda_functions :
-            ["AWS/Lambda", "ConcurrentExecutions", "FunctionName", fn.function_name]
-          ]
-        }
-      },
-
-      # --- Step Functions ---
-      {
-        type   = "text"
-        x      = 0
-        y      = 20
-        width  = 24
-        height = 1
-        properties = {
-          markdown = "# Step Functions"
-        }
-      },
-      {
-        type   = "metric"
-        x      = 0
-        y      = 21
-        width  = 8
-        height = 6
-        properties = {
-          title  = "Executions Started"
-          region = data.aws_region.current.region
-          stat   = "Sum"
-          period = 300
-          metrics = [for arn in local.state_machine_arns :
-            ["AWS/States", "ExecutionsStarted", "StateMachineArn", arn]
-          ]
-        }
-      },
-      {
-        type   = "metric"
-        x      = 8
-        y      = 21
-        width  = 8
-        height = 6
-        properties = {
-          title  = "Executions Failed"
-          region = data.aws_region.current.region
-          stat   = "Sum"
-          period = 300
-          metrics = [for arn in local.state_machine_arns :
-            ["AWS/States", "ExecutionsFailed", "StateMachineArn", arn]
-          ]
-        }
-      },
-      {
-        type   = "metric"
-        x      = 16
-        y      = 21
-        width  = 8
-        height = 6
-        properties = {
-          title  = "Execution Time (Average)"
-          region = data.aws_region.current.region
-          stat   = "Average"
-          period = 300
-          metrics = [for arn in local.state_machine_arns :
-            ["AWS/States", "ExecutionTime", "StateMachineArn", arn]
-          ]
-        }
-      },
-
       # --- DynamoDB ---
       {
         type   = "text"
         x      = 0
-        y      = 27
+        y      = 7
         width  = 24
         height = 1
         properties = {
@@ -265,7 +87,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
       {
         type   = "metric"
         x      = 0
-        y      = 28
+        y      = 8
         width  = 12
         height = 6
         properties = {
@@ -281,7 +103,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
       {
         type   = "metric"
         x      = 12
-        y      = 28
+        y      = 8
         width  = 12
         height = 6
         properties = {
@@ -297,7 +119,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
       {
         type   = "metric"
         x      = 0
-        y      = 34
+        y      = 14
         width  = 12
         height = 6
         properties = {
@@ -315,7 +137,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
       {
         type   = "metric"
         x      = 12
-        y      = 34
+        y      = 14
         width  = 12
         height = 6
         properties = {
@@ -332,7 +154,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
       {
         type   = "metric"
         x      = 0
-        y      = 40
+        y      = 20
         width  = 12
         height = 6
         properties = {
@@ -351,7 +173,7 @@ resource "aws_cloudwatch_dashboard" "backend" {
       {
         type   = "metric"
         x      = 12
-        y      = 40
+        y      = 20
         width  = 12
         height = 6
         properties = {
