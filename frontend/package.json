@@ -15,7 +15,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.797.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.1038.0",
     "@tanstack/react-query": "^5.95.0",
     "api-spec": "*",
     "clsx": "^2.1.1",
