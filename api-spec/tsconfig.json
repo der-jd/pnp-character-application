@@ -5,6 +5,7 @@
     "moduleResolution": "nodenext",
     "declaration": true,
     "emitDeclarationOnly": false,
+    "rootDir": "src",
     "outDir": "dist",
     "declarationDir": "dist",
     "esModuleInterop": true,
