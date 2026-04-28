@@ -57,16 +57,25 @@ All workflows derive `TF_WORKSPACE` from the environment parameter and set it au
 
 ## Pipeline Workflows
 
+### Serialized AWS Environment Operations
+
+The dev and prod AWS environment operations are serialized with CircleCI job groups and per-environment serial group keys:
+
+- `<< pipeline.project.slug >>/aws-dev`: dev deployment, manual dev component tests, and manual dev destroy
+- `<< pipeline.project.slug >>/aws-prod`: prod deployment, automatic/manual prod component tests, and manual prod destroy
+
+Only the environment-touching job groups acquire these locks. Formatting, linting, builds, and unit tests can still run concurrently before a deployment waits for the matching environment lock.
+
 ### `build-deploy-dev`
 
 - Runs on every commit except the special `deploy-shared`, `component-tests` and `delete-services` pipelines
-- Deploys the dev environment
+- Deploys the dev environment under the dev AWS environment serial group
 
 ### `build-deploy-prod`
 
 - Runs on every commit to `main` except the special `deploy-shared`, `component-tests` and `delete-services` pipelines
-- Deploys the prod environment
-- Runs backend component tests after the backend and infrastructure deploy finishes
+- Deploys the prod environment under the prod AWS environment serial group
+- Runs backend component tests under the same prod AWS environment serial group after the backend and infrastructure deploy finishes
 
 ### Deploy Shared Infrastructure
 
@@ -78,9 +87,9 @@ All workflows derive `TF_WORKSPACE` from the environment parameter and set it au
 ### Component Tests
 
 - Triggers when `run-component-tests=true`
-- Runs backend component tests against the environment specified by the `env` parameter (defaults to `dev`)
+- Runs backend component tests against the environment specified by the `env` parameter (defaults to `dev`) under the matching AWS environment serial group
 
 ### Delete Services
 
 - Triggers when `delete-services=true`
-- Destroys the Terraform resources for the environment specified by the `env` parameter (defaults to `dev`)
+- Destroys the Terraform resources for the environment specified by the `env` parameter (defaults to `dev`) under the matching AWS environment serial group

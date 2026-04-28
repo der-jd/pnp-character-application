@@ -35,6 +35,58 @@ executors:
       - image: cimg/node:24.14
     resource_class: small
 
+job-groups:
+  deploy-application-dev:
+    jobs:
+      - deploy-backend-and-app-infrastructure:
+          name: deploy-backend-and-app-infrastructure-dev
+          env: dev
+      - build-frontend:
+          name: build-frontend-dev
+          env: dev
+          requires:
+            - deploy-backend-and-app-infrastructure-dev
+      - deploy-frontend:
+          name: deploy-frontend-dev
+          env: dev
+          requires:
+            - build-frontend-dev
+            - deploy-backend-and-app-infrastructure-dev
+
+  deploy-application-prod:
+    jobs:
+      - deploy-backend-and-app-infrastructure:
+          name: deploy-backend-and-app-infrastructure-prod
+          env: prod
+      - run-backend-component-tests:
+          name: run-backend-component-tests-prod
+          env: prod
+          requires:
+            - deploy-backend-and-app-infrastructure-prod
+      - build-frontend:
+          name: build-frontend-prod
+          env: prod
+          requires:
+            - deploy-backend-and-app-infrastructure-prod
+      - deploy-frontend:
+          name: deploy-frontend-prod
+          env: prod
+          requires:
+            - build-frontend-prod
+            - deploy-backend-and-app-infrastructure-prod
+
+  run-environment-component-tests:
+    jobs:
+      - run-backend-component-tests:
+          name: run-backend-component-tests-<< pipeline.parameters.env >>
+          env: << pipeline.parameters.env >>
+
+  destroy-environment:
+    jobs:
+      - terraform-destroy:
+          name: terraform-destroy-<< pipeline.parameters.env >>
+          env: << pipeline.parameters.env >>
+
 workflows:
   build-deploy-dev:
     when:
@@ -49,29 +101,15 @@ workflows:
       - run-backend-unit-tests
       - run-frontend-tests
       - lint-terraform-code
-      - deploy-backend-and-app-infrastructure:
-          name: deploy-backend-and-app-infrastructure-dev
-          env: dev
+      - deploy-application-dev:
+          serial-group: << pipeline.project.slug >>/aws-dev
           requires:
             - check-format-files
             - lint-typescript-code
             - build-backend
             - run-backend-unit-tests
-            - lint-terraform-code
-      - build-frontend:
-          name: build-frontend-dev
-          env: dev
-          requires:
-            - deploy-backend-and-app-infrastructure-dev
-      - deploy-frontend:
-          name: deploy-frontend-dev
-          env: dev
-          requires:
-            - check-format-files
-            - lint-typescript-code
-            - build-frontend-dev
             - run-frontend-tests
-            - deploy-backend-and-app-infrastructure-dev
+            - lint-terraform-code
 
   build-deploy-prod:
     when:
@@ -87,34 +125,15 @@ workflows:
       - run-backend-unit-tests
       - run-frontend-tests
       - lint-terraform-code
-      - deploy-backend-and-app-infrastructure:
-          name: deploy-backend-and-app-infrastructure-prod
-          env: prod
+      - deploy-application-prod:
+          serial-group: << pipeline.project.slug >>/aws-prod
           requires:
             - check-format-files
             - lint-typescript-code
             - build-backend
             - run-backend-unit-tests
-            - lint-terraform-code
-      - run-backend-component-tests:
-          name: run-backend-component-tests-prod
-          env: prod
-          requires:
-            - deploy-backend-and-app-infrastructure-prod
-      - build-frontend:
-          name: build-frontend-prod
-          env: prod
-          requires:
-            - deploy-backend-and-app-infrastructure-prod
-      - deploy-frontend:
-          name: deploy-frontend-prod
-          env: prod
-          requires:
-            - check-format-files
-            - lint-typescript-code
-            - build-frontend-prod
             - run-frontend-tests
-            - deploy-backend-and-app-infrastructure-prod
+            - lint-terraform-code
 
   deploy-shared:
     when: << pipeline.parameters.deploy-shared >>
@@ -132,16 +151,14 @@ workflows:
         - not: << pipeline.parameters.delete-services >>
         - << pipeline.parameters.run-component-tests >>
     jobs:
-      - run-backend-component-tests:
-          name: run-backend-component-tests-<< pipeline.parameters.env >>
-          env: << pipeline.parameters.env >>
+      - run-environment-component-tests:
+          serial-group: << pipeline.project.slug >>/aws-<< pipeline.parameters.env >>
 
   delete-services:
     when: << pipeline.parameters.delete-services >>
     jobs:
-      - terraform-destroy:
-          name: terraform-destroy-<< pipeline.parameters.env >>
-          env: << pipeline.parameters.env >>
+      - destroy-environment:
+          serial-group: << pipeline.project.slug >>/aws-<< pipeline.parameters.env >>
 
 jobs:
   check-format-files:
