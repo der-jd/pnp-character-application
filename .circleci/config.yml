@@ -75,17 +75,29 @@ job-groups:
             - build-frontend-prod
             - deploy-backend-and-app-infrastructure-prod
 
-  run-environment-component-tests:
+  run-environment-component-tests-dev:
     jobs:
       - run-backend-component-tests:
-          name: run-backend-component-tests-<< pipeline.parameters.env >>
-          env: << pipeline.parameters.env >>
+          name: run-backend-component-tests-dev
+          env: dev
 
-  destroy-environment:
+  run-environment-component-tests-prod:
+    jobs:
+      - run-backend-component-tests:
+          name: run-backend-component-tests-prod
+          env: prod
+
+  destroy-environment-dev:
     jobs:
       - terraform-destroy:
-          name: terraform-destroy-<< pipeline.parameters.env >>
-          env: << pipeline.parameters.env >>
+          name: terraform-destroy-dev
+          env: dev
+
+  destroy-environment-prod:
+    jobs:
+      - terraform-destroy:
+          name: terraform-destroy-prod
+          env: prod
 
 workflows:
   build-deploy-dev:
@@ -145,20 +157,43 @@ workflows:
             - check-format-files
             - lint-terraform-code
 
-  component-tests:
+  component-tests-dev:
     when:
       and:
         - not: << pipeline.parameters.delete-services >>
         - << pipeline.parameters.run-component-tests >>
+        - equal: [dev, << pipeline.parameters.env >>]
     jobs:
-      - run-environment-component-tests:
-          serial-group: << pipeline.project.slug >>/aws-<< pipeline.parameters.env >>
+      - run-environment-component-tests-dev:
+          serial-group: << pipeline.project.slug >>/aws-dev
 
-  delete-services:
-    when: << pipeline.parameters.delete-services >>
+  component-tests-prod:
+    when:
+      and:
+        - not: << pipeline.parameters.delete-services >>
+        - << pipeline.parameters.run-component-tests >>
+        - equal: [prod, << pipeline.parameters.env >>]
     jobs:
-      - destroy-environment:
-          serial-group: << pipeline.project.slug >>/aws-<< pipeline.parameters.env >>
+      - run-environment-component-tests-prod:
+          serial-group: << pipeline.project.slug >>/aws-prod
+
+  delete-services-dev:
+    when:
+      and:
+        - << pipeline.parameters.delete-services >>
+        - equal: [dev, << pipeline.parameters.env >>]
+    jobs:
+      - destroy-environment-dev:
+          serial-group: << pipeline.project.slug >>/aws-dev
+
+  delete-services-prod:
+    when:
+      and:
+        - << pipeline.parameters.delete-services >>
+        - equal: [prod, << pipeline.parameters.env >>]
+    jobs:
+      - destroy-environment-prod:
+          serial-group: << pipeline.project.slug >>/aws-prod
 
 jobs:
   check-format-files:
