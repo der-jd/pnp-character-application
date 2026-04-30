@@ -44,7 +44,7 @@ resource "aws_backup_selection" "selection" {
 
   iam_role_arn = aws_iam_role.backup_role.arn
 
-  # Limit selection to DynamoDB tables AND require them to have the defined tag
+  # Limit selection to DynamoDB tables for this project and environment.
   resources = [
     "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/*"
   ]
@@ -52,6 +52,10 @@ resource "aws_backup_selection" "selection" {
     string_equals {
       key   = "aws:ResourceTag/${var.project_tag_key}"
       value = var.project_tag_value
+    }
+    string_equals {
+      key   = "aws:ResourceTag/environment"
+      value = var.env
     }
   }
 }
@@ -88,6 +92,9 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
   statistic           = "Sum"
   threshold           = 0
   treat_missing_data  = "notBreaching"
+  dimensions = {
+    BackupVaultName = aws_backup_vault.vault.name
+  }
 
   alarm_description = "Alerts when an AWS Backup job for the PnP Character Application fails"
   alarm_actions     = [aws_sns_topic.alerts.arn]
@@ -104,6 +111,9 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
   statistic           = "Sum"
   threshold           = 0
   treat_missing_data  = "notBreaching"
+  dimensions = {
+    BackupVaultName = aws_backup_vault.vault.name
+  }
 
   alarm_description = "Alerts when an AWS Backup job expires (misses completion window) for the PnP Character Application"
   alarm_actions     = [aws_sns_topic.alerts.arn]
