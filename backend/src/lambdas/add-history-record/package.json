@@ -8,7 +8,7 @@
     "@aws-sdk/util-dynamodb": "^3.787.0",
     "api-spec": "*",
     "core": "*",
-    "zod": "^4.1.5"
+    "zod": "^4.4.2"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.0"
