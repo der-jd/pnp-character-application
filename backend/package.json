@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
-    "@vitest/coverage-v8": "^4.1.7",
+    "@vitest/coverage-v8": "^4.1.8",
     "@vitest/ui": "^4.0.18",
     "aws-sdk-client-mock": "^4.1.0",
     "aws-sdk-client-mock-jest": "^4.1.0",
@@ -27,13 +27,13 @@
     "eslint": "^10.4.1",
     "globals": "^17.6.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.0",
+    "typescript-eslint": "^8.60.1",
     "vitest": "^4.1.7"
   },
   "optionalDependencies": {
-    "@rollup/rollup-darwin-arm64": "^4.60.4",
-    "@rollup/rollup-darwin-x64": "^4.60.4",
-    "@rollup/rollup-linux-x64-gnu": "^4.60.4",
-    "@rollup/rollup-win32-x64-msvc": "^4.60.4"
+    "@rollup/rollup-darwin-arm64": "^4.61.1",
+    "@rollup/rollup-darwin-x64": "^4.61.1",
+    "@rollup/rollup-linux-x64-gnu": "^4.61.1",
+    "@rollup/rollup-win32-x64-msvc": "^4.61.1"
   }
 }
