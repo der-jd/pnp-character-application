@@ -9,6 +9,6 @@
     "api-spec": "*"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.0"
+    "@types/aws-lambda": "^8.10.162"
   }
 }
