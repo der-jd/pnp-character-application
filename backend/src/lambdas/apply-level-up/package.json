@@ -8,7 +8,7 @@
     "api-spec": "*",
     "core": "*",
     "uuid": "^14.0.0",
-    "@aws-sdk/util-dynamodb": "^3.996.3"
+    "@aws-sdk/util-dynamodb": "^3.996.4"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.162"

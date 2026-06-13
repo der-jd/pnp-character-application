@@ -10,19 +10,19 @@
     "convert-character-xml": "tsx convert-character-xml.ts"
   },
   "devDependencies": {
-    "@aws-sdk/util-dynamodb": "^3.996.3",
+    "@aws-sdk/util-dynamodb": "^3.996.4",
     "@eslint/js": "^10.0.0",
-    "@types/node": "^25.9.2",
+    "@types/node": "^25.9.3",
     "@types/unidecode": "^1.1.0",
     "@types/uuid": "^11.0.0",
     "@types/xml2js": "^0.4.14",
     "@types/yargs": "^17.0.33",
-    "eslint": "^10.4.1",
+    "eslint": "^10.5.0",
     "globals": "^17.6.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.1",
+    "typescript-eslint": "^8.61.0",
     "unidecode": "^1.1.0",
     "xml2js": "^0.6.2",
     "yargs": "^18.0.0"
