@@ -15,16 +15,16 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.1068.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.1073.0",
     "@tanstack/react-query": "^5.101.0",
     "api-spec": "*",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
-    "lucide-react": "^1.18.0",
+    "lucide-react": "^1.21.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-icons": "^5.6.0",
-    "react-router-dom": "^7.17.0",
+    "react-router-dom": "^7.18.0",
     "zod": "^4.4.3",
     "zustand": "^5.0.14"
   },
@@ -43,8 +43,8 @@
     "jsdom": "^29.1.1",
     "tailwindcss": "^4.1.11",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.0",
+    "typescript-eslint": "^8.61.1",
     "vite": "^8.0.16",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.9"
   }
 }
