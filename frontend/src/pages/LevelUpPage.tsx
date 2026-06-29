@@ -65,10 +65,7 @@ export function LevelUpPage() {
           ? { kind: "rerollUnlock" }
           : {
               kind: selectedOption.kind as
-                | "initiativePlusOne"
-                | "luckPlusOne"
-                | "bonusActionPlusOne"
-                | "legendaryActionPlusOne",
+                "initiativePlusOne" | "luckPlusOne" | "bonusActionPlusOne" | "legendaryActionPlusOne",
               delta: 1,
             };
 
