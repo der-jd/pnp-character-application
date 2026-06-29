@@ -343,12 +343,7 @@ export type KnowledgeSkillName = keyof CharacterSheet["skills"]["knowledge"];
 export type HandcraftSkillName = keyof CharacterSheet["skills"]["handcraft"];
 
 export type SkillName =
-  | CombatSkillName
-  | BodySkillName
-  | SocialSkillName
-  | NatureSkillName
-  | KnowledgeSkillName
-  | HandcraftSkillName;
+  CombatSkillName | BodySkillName | SocialSkillName | NatureSkillName | KnowledgeSkillName | HandcraftSkillName;
 
 export type SkillCategory = keyof CharacterSheet["skills"];
 
