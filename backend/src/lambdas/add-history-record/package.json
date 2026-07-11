@@ -5,7 +5,7 @@
   "main": "index.mjs",
   "type": "module",
   "dependencies": {
-    "@aws-sdk/util-dynamodb": "^3.996.5",
+    "@aws-sdk/util-dynamodb": "^3.996.6",
     "api-spec": "*",
     "core": "*",
     "zod": "^4.4.3"

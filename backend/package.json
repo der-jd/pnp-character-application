@@ -19,15 +19,15 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@vitest/coverage-v8": "^4.1.10",
     "@vitest/ui": "^4.0.18",
     "aws-sdk-client-mock": "^4.1.0",
     "aws-sdk-client-mock-jest": "^4.1.0",
     "esbuild": "^0.28.1",
-    "eslint": "^10.6.0",
+    "eslint": "^10.7.0",
     "globals": "^17.7.0",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.62.1",
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.63.0",
     "vitest": "^4.1.9"
   },
   "optionalDependencies": {
