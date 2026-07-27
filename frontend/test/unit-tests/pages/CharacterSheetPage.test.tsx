@@ -35,8 +35,7 @@ vi.mock("@/api/character-edit", () => ({
   addSpecialAbility: vi.fn(),
 }));
 
-// Mock react-router-dom
-vi.mock("react-router-dom", () => ({
+vi.mock("react-router", () => ({
   useParams: () => ({ characterId: "test-character-id" }),
   useNavigate: () => vi.fn(),
 }));
