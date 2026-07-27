@@ -1,4 +1,4 @@
-import { NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useParams, useNavigate, useLocation } from "react-router";
 import { clsx } from "clsx";
 import {
   LayoutDashboard,

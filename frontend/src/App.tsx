@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { setTokenGetter } from "@/api/client";

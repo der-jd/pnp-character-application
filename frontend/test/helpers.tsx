@@ -1,5 +1,5 @@
 import { render, type RenderOptions } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/auth/AuthProvider";
