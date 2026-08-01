@@ -25,15 +25,15 @@
     "aws-sdk-client-mock-jest": "^4.1.0",
     "esbuild": "^0.28.1",
     "eslint": "^10.8.0",
-    "globals": "^17.7.0",
+    "globals": "^17.8.0",
     "typescript": "^7.0.2",
     "typescript-eslint": "^8.65.0",
     "vitest": "^4.1.9"
   },
   "optionalDependencies": {
-    "@rollup/rollup-darwin-arm64": "^4.62.2",
-    "@rollup/rollup-darwin-x64": "^4.62.2",
-    "@rollup/rollup-linux-x64-gnu": "^4.62.2",
-    "@rollup/rollup-win32-x64-msvc": "^4.62.2"
+    "@rollup/rollup-darwin-arm64": "^4.62.3",
+    "@rollup/rollup-darwin-x64": "^4.62.3",
+    "@rollup/rollup-linux-x64-gnu": "^4.62.3",
+    "@rollup/rollup-win32-x64-msvc": "^4.62.3"
   }
 }
