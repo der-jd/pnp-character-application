@@ -10,7 +10,7 @@
     "convert-character-xml": "tsx convert-character-xml.ts"
   },
   "devDependencies": {
-    "@aws-sdk/util-dynamodb": "^3.996.8",
+    "@aws-sdk/util-dynamodb": "^3.996.9",
     "@eslint/js": "^10.0.0",
     "@types/node": "^26.2.0",
     "@types/unidecode": "^1.1.0",
