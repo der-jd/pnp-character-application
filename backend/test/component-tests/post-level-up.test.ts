@@ -20,7 +20,7 @@ async function fetchOptionsHash(client: ApiClient, characterId: string): Promise
   return response.optionsHash;
 }
 
-describe.sequential("post-level-up component tests", () => {
+describe("post-level-up component tests", { concurrent: false }, () => {
   let context: TestContext;
   let currentResponse: PostLevelUpResponse | undefined;
 

@@ -10,7 +10,7 @@ import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfter
 import { ApiClient } from "./api-client.js";
 import { TestContext, TestContextFactory } from "./test-context-factory.js";
 
-describe.sequential("post-character-clone component tests", () => {
+describe("post-character-clone component tests", { concurrent: false }, () => {
   let context: TestContext;
   let currentResponse: PostCharacterCloneResponse | undefined;
 

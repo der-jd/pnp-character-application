@@ -15,7 +15,7 @@ import {
 import { expectApiError, updateAndVerifyTestContextAfterEachTest } from "./shared.js";
 import { TestContext, TestContextFactory } from "./test-context-factory.js";
 
-describe.sequential("version-update component tests", () => {
+describe("version-update component tests", { concurrent: false }, () => {
   let context: TestContext;
   let currentResponse: PatchAttributeResponse | undefined;
 

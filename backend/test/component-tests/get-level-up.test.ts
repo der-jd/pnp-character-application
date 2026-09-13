@@ -4,7 +4,7 @@ import { expectApiError, commonInvalidTestCases } from "./shared.js";
 import { ApiClient } from "./api-client.js";
 import { TestContext, TestContextFactory } from "./test-context-factory.js";
 
-describe.sequential("get-level-up component tests", () => {
+describe("get-level-up component tests", { concurrent: false }, () => {
   describe("character with available level-up options", () => {
     let context: TestContext;
 
