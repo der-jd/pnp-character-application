@@ -26,7 +26,7 @@ import {
 import { ApiClient } from "./api-client.js";
 import { TestContext, TestContextFactory } from "./test-context-factory.js";
 
-describe.sequential("delete-history-record component tests", () => {
+describe("delete-history-record component tests", { concurrent: false }, () => {
   let context: TestContext;
 
   beforeAll(async () => {

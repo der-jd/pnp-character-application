@@ -4,7 +4,7 @@ import { expectApiError, commonInvalidTestCases } from "./shared.js";
 import { ApiClient } from "./api-client.js";
 import { TestContextFactory, TestContext } from "./test-context-factory.js";
 
-describe.sequential("get-characters component tests", () => {
+describe("get-characters component tests", { concurrent: false }, () => {
   let context: TestContext;
 
   beforeAll(async () => {

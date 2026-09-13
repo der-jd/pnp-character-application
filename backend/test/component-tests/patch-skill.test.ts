@@ -14,7 +14,7 @@ import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfter
 import { TestContextFactory, TestContext } from "./test-context-factory.js";
 import { ApiClient } from "./api-client.js";
 
-describe.sequential("patch-skill component tests", () => {
+describe("patch-skill component tests", { concurrent: false }, () => {
   let context: TestContext;
   let currentResponse: PatchSkillResponse | undefined;
 

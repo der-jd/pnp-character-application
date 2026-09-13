@@ -98,7 +98,7 @@ const characterCreationRequest: PostCharactersRequest = {
   startAdventurePoints: DEFAULT_START_ADVENTURE_POINTS,
 };
 
-describe.sequential("post-character component tests", () => {
+describe("post-character component tests", { concurrent: false }, () => {
   let baseSetup: BaseSetup;
   const createdCharacterIds: string[] = [];
 

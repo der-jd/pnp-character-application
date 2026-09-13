@@ -13,7 +13,7 @@ import { expectApiError, commonInvalidTestCases, updateAndVerifyTestContextAfter
 import { ApiClient } from "./api-client.js";
 import { TestContextFactory, TestContext } from "./test-context-factory.js";
 
-describe.sequential("post-special-abilities component tests", () => {
+describe("post-special-abilities component tests", { concurrent: false }, () => {
   let context: TestContext;
   let currentResponse: PostSpecialAbilitiesResponse | undefined;
 
