@@ -9,7 +9,7 @@
     "core": "*"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.163",
-    "@types/node": "^26.6.2"
+    "@types/aws-lambda": "^8.10.164",
+    "@types/node": "^26.6.3"
   }
 }
