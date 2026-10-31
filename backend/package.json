@@ -27,13 +27,13 @@
     "eslint": "^10.13.0",
     "globals": "^17.13.0",
     "typescript": "^7.0.2",
-    "typescript-eslint": "^8.72.0",
+    "typescript-eslint": "^8.72.1",
     "vitest": "^5.0.4"
   },
   "optionalDependencies": {
-    "@rollup/rollup-darwin-arm64": "^4.64.12",
-    "@rollup/rollup-darwin-x64": "^4.64.12",
-    "@rollup/rollup-linux-x64-gnu": "^4.64.12",
-    "@rollup/rollup-win32-x64-msvc": "^4.64.12"
+    "@rollup/rollup-darwin-arm64": "^4.66.0",
+    "@rollup/rollup-darwin-x64": "^4.66.0",
+    "@rollup/rollup-linux-x64-gnu": "^4.66.0",
+    "@rollup/rollup-win32-x64-msvc": "^4.66.0"
   }
 }
