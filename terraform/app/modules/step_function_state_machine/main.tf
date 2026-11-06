@@ -257,12 +257,10 @@ resource "aws_sfn_state_machine" "state_machine" {
         Default = "SuccessState"
       },
       HandleError = {
-        Type          = "Pass"
+        Type          = "Fail"
         QueryLanguage = "JSONata"
-        Output = {
-          "errorMessage" = "{% $parse($states.input.Cause).errorMessage %}"
-        }
-        End = true
+        Error         = "{% $states.input.Error %}"
+        Cause         = "{% $states.input.Cause %}"
       },
       HistoryRecordErrorResponse = {
         Type          = "Succeed"
