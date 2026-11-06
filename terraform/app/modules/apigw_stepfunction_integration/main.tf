@@ -159,16 +159,18 @@ resource "aws_api_gateway_integration_response" "step_function" {
     #if($origin && $allowedOrigins.contains($origin))
         #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin)
     #end
-    ## --- Handle error case for step function ---
-    #set($output = $util.parseJson($input.path('$.output')))
-    #if($output.errorMessage != "")
-        #set($errorJsonObject = $util.parseJson($output.errorMessage))
-        #set($context.responseOverride.status = $errorJsonObject.statusCode)
-        $output.errorMessage
-    ## --- Handle success case for step function ---
-    #else
+    ## StartSyncExecution answers HTTP 200 for failed executions as well, with "status" set and no "output".
+    ## A request it rejects, such as one with a malformed JSON body, has neither "status" nor "output".
+    #if($input.path('$.status') == "SUCCEEDED")
+        #set($output = $util.parseJson($input.path('$.output')))
         #set($context.responseOverride.status = $output.statusCode)
         $output.body
+    #elseif($input.path('$.__type').contains("InvalidExecutionInput"))
+        #set($context.responseOverride.status = 400)
+        {"message":"The request body is not valid JSON!","statusCode":400}
+    #else
+        #set($context.responseOverride.status = 500)
+        {"message":"An internal error occurred!","statusCode":500}
     #end
     EOT
   }
