@@ -69,7 +69,7 @@ resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
 
   alarm_name          = "${local.prefix}-api-4xx-errors-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
+  evaluation_periods  = 3
   metric_name         = "4XXError"
   namespace           = "AWS/ApiGateway"
   period              = 300
@@ -81,7 +81,9 @@ resource "aws_cloudwatch_metric_alarm" "api_4xx_errors" {
     ApiName = aws_api_gateway_rest_api.pnp_rest_api.name
   }
 
-  alarm_description = "Alerts when the API returns more than 5 client errors in 5 minutes, which may indicate auth issues or abuse"
+  # 3 consecutive windows must breach to avoid alerting on the about one-minute burst of
+  # expected 4xx responses from post-deploy component tests, which spans at most 2 windows.
+  alarm_description = "Alerts when the API returns more than 5 client errors in each of 3 consecutive 5-minute windows, which may indicate auth issues or abuse"
   alarm_actions     = [aws_sns_topic.alerts[0].arn]
   ok_actions        = [aws_sns_topic.alerts[0].arn]
 }
