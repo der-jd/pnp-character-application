@@ -38,7 +38,7 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 #### Data Storage
 
 - DynamoDB tables for character data and history tracking
-- Backup configurations with CloudWatch alerting
+- Backup configurations with CloudWatch alerting in prod
 - SNS notifications for backup failures
 
 #### Frontend Infrastructure
@@ -124,7 +124,7 @@ The `${local.prefix}-backend-${local.suffix}` dashboard provides detailed visibi
 
 ### SNS Topic for Alerts
 
-The `${local.prefix}-alerts-topic-${local.suffix}` SNS topic in `alerts.tf` is shared by all alerting mechanisms within an environment.
+The `${local.prefix}-alerts-topic-${local.suffix}` SNS topic in `alerts.tf` exists only in prod and is shared by all alerting mechanisms there.
 
 All notifications are sent to the email address specified in `TF_VAR_alert_email_address` (CircleCI environment variable).
 
