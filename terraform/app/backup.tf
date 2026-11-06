@@ -83,6 +83,8 @@ resource "aws_iam_role_policy_attachment" "backup_managed_policy" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
+  count = local.is_prod ? 1 : 0
+
   alarm_name          = "${local.prefix}-backup-job-failed-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -97,11 +99,13 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_failed" {
   }
 
   alarm_description = "Alerts when an AWS Backup job for the PnP Character Application fails"
-  alarm_actions     = [aws_sns_topic.alerts.arn]
-  ok_actions        = [aws_sns_topic.alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts[0].arn]
+  ok_actions        = [aws_sns_topic.alerts[0].arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
+  count = local.is_prod ? 1 : 0
+
   alarm_name          = "${local.prefix}-backup-job-expired-${local.suffix}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -116,6 +120,6 @@ resource "aws_cloudwatch_metric_alarm" "backup_job_expired" {
   }
 
   alarm_description = "Alerts when an AWS Backup job expires (misses completion window) for the PnP Character Application"
-  alarm_actions     = [aws_sns_topic.alerts.arn]
-  ok_actions        = [aws_sns_topic.alerts.arn]
+  alarm_actions     = [aws_sns_topic.alerts[0].arn]
+  ok_actions        = [aws_sns_topic.alerts[0].arn]
 }

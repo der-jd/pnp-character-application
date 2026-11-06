@@ -54,9 +54,9 @@ Endpoints that mutate data use Step Functions to combine the update of the chara
 
 #### Monitoring & Alerting
 
-- CloudWatch alarms for backend health monitoring (Lambda, API Gateway, DynamoDB, Step Functions)
+- CloudWatch alarms for backend health monitoring (Lambda, API Gateway, DynamoDB, Step Functions), deployed only in prod
 - CloudWatch dashboard for visualization of service metrics
-- SNS topic for email alerting on alarm state changes
+- SNS topic for email alerting on alarm state changes, deployed only in prod
 - Account-level metric aggregation to avoid CloudWatch API limits
 
 ## Configuration
@@ -101,13 +101,15 @@ Per-environment root modules reference the hosted zone via a data source (not a 
 
 - Resource names follow the pattern `prefix-name-suffix`, using `pnp-app` as the prefix and the environment as the suffix
 - The Route 53 hosted zone is managed in the [shared root module](shared/) and referenced by all environments via a data source
-- Backups and monitoring are enabled in every environment, with shorter backup retention in dev than in prod
+- Backups and the CloudWatch dashboard are enabled in every environment, with shorter backup retention in dev than in prod
+- Alarms and their SNS topic exist only in prod, which keeps the account within the 10 free alarm metrics
 
 ## Monitoring & Alerting Configuration
 
 **Design Rationale:**
 
-- Account-level metrics avoid CloudWatch's 10-metric-query limit per alarm (which would be exceeded with per-function or per-state-machine metrics)
+- Account-level metrics avoid CloudWatch's 10-metric-query limit per alarm (which would be exceeded with per-function or per-state-machine metrics) and the cost of billing each resource as a separate alarm metric
+- The Lambda and Step Functions alarms cover the whole account, so a failure in dev also fires them. Check the affected function or state machine before treating such an alert as a prod incident
 - `treat_missing_data = "notBreaching"` ensures low-traffic periods show `OK` instead of `INSUFFICIENT_DATA`
 - All alarms include `ok_actions` to send "all clear" notifications
 
