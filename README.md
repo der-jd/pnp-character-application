@@ -188,7 +188,7 @@ The application implements a backup strategy using **AWS Backup** to ensure data
 
 - **Automated Backup Schedule**: Daily backups and monthly backups
 - **Retention Policy**: Prod keeps daily backups for 90 days and monthly backups for 730 days; dev keeps shorter retention to limit cost
-- **Backup Monitoring**: CloudWatch alarms alert on failed or expired backup jobs via SNS notifications
+- **Backup Monitoring**: In prod, CloudWatch alarms alert on failed or expired backup jobs via SNS notifications
 
 Backup configurations are managed through Terraform in the `terraform/backup.tf` module.
 
